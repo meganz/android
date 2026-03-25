@@ -3,20 +3,26 @@ package mega.privacy.android.data.repository.photos
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -44,6 +50,7 @@ import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
+import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
@@ -65,6 +72,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -119,6 +127,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val mediaTimelinePreferencesGateway: MediaTimelinePreferencesGateway,
     private val photoMapper: PhotoMapper,
+    private val typedNodeMapper: TypedNodeMapper,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
@@ -237,6 +246,73 @@ internal class DefaultPhotosRepository @Inject constructor(
             .onStart { Timber.d("DefaultPhotosRepository::monitorPaginatedPhotos") }
             .flowOn(ioDispatcher)
 
+    override suspend fun getMediaTypedNodes(): List<TypedNode> = withContext(ioDispatcher) {
+        val nodes = getMegaNodeByCategory(searchCategory = SearchCategory.ALL_MEDIA)
+        nodes.mapNotNull { node ->
+            if (!node.isFile) return@mapNotNull null
+            if (megaApiFacade.isInRubbish(node)) return@mapNotNull null
+
+            typedNodeMapper(
+                megaNode = node,
+                folderTypeData = null,
+                offline = offlineNodesCache[node.handle.toString()]
+            )
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    override val monitorMediaTypedNodes: Flow<List<TypedNode>> = flow {
+        val initialNodes = getMediaTypedNodes()
+        val currentNodes = LinkedHashMap<NodeId, TypedNode>(initialNodes.size)
+        initialNodes.forEach { currentNodes[it.id] = it }
+        emit(currentNodes.values.toList())
+
+        nodeRepository.monitorNodeUpdates()
+            .debounce(300L)
+            .conflate()
+            .collect { nodeUpdate ->
+                var changed = false
+                nodeUpdate.changes.forEach { (node, _) ->
+                    if (node !is FileNode ||
+                        nodeRepository.isNodeInRubbishBin(node.id) ||
+                        !constraints.all { it(node) }
+                    ) {
+                        if (currentNodes.remove(node.id) != null) {
+                            changed = true
+                        }
+                        return@forEach
+                    }
+
+                    val megaNode = getMegaNode(node.id) ?: run {
+                        if (currentNodes.remove(node.id) != null) changed = true
+                        return@forEach
+                    }
+
+                    val mapped = typedNodeMapper(
+                        megaNode = megaNode,
+                        folderTypeData = null,
+                        offline = offlineNodesCache[megaNode.handle.toString()]
+                    )
+                    val existing = currentNodes[node.id]
+                    if (existing != mapped) {
+                        currentNodes[node.id] = mapped
+                        changed = true
+                    }
+                }
+
+                if (changed) {
+                    emit(currentNodes.values.toList())
+                }
+            }
+    }
+        .flowOn(ioDispatcher)
+        .shareIn(
+            scope = appScope,
+            started = SharingStarted.WhileSubscribed(),
+            replay = 1
+        )
+
+    @Deprecated("Please consider using monitorMediaTypedNodes")
     override fun monitorPhotos(): Flow<List<Photo>> {
         Timber.d("DefaultPhotosRepository::monitorPhotos")
         initialize()

@@ -46,12 +46,16 @@ import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.components.ImagePhotosNode
 import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
 import mega.privacy.android.feature.photos.components.VideoPhotosNode
+import mega.privacy.android.feature.photos.model.MediaType
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem.HeaderItem
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem.PhotoNodeItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateTextCache
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.shared.resources.R as sharedR
@@ -62,6 +66,7 @@ import java.util.Date
 import java.util.Locale
 import kotlin.time.Duration
 
+@Deprecated("Please use PhotosNodeGridViewV2")
 @Composable
 fun PhotosNodeGridView(
     items: List<PhotosNodeContentItem>,
@@ -361,6 +366,273 @@ private fun dateText(
     )
 }
 
+
+@Composable
+fun PhotosNodeGridViewV2(
+    items: List<PhotosNodeContentItemV2>,
+    isHiddenNodesEnabled: Boolean,
+    selectedPhotoIds: Set<Long>,
+    gridSize: TimelineGridSize,
+    onGridSizeChange: (value: TimelineGridSize) -> Unit,
+    onClick: (id: Long) -> Unit,
+    onLongClick: (id: Long) -> Unit,
+    modifier: Modifier = Modifier,
+    lazyGridState: LazyGridState = rememberLazyGridState(),
+    contentPadding: PaddingValues = PaddingValues(),
+    header: (@Composable () -> Unit)? = null,
+) {
+    val configuration = LocalConfiguration.current
+    val spanCount = remember(key1 = configuration.orientation, key2 = gridSize) {
+        if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            gridSize.portrait
+        } else {
+            gridSize.landscape
+        }
+    }
+    val isPreview by remember(configuration, gridSize) {
+        derivedStateOf { isPreview(configuration, gridSize) }
+    }
+
+    FastScrollLazyVerticalGrid(
+        totalItems = items.size,
+        columns = GridCells.Fixed(spanCount),
+        modifier = modifier.fillMaxSize(),
+        contentPadding = contentPadding,
+        state = lazyGridState,
+        tooltipText = { index ->
+            val item = items.getOrNull(index)
+            item?.let {
+                dateTextV2(
+                    modificationTime = it.fullModificationTime,
+                    gridSize = gridSize,
+                    locale = configuration.locales[0],
+                )
+            }.orEmpty()
+        },
+        horizontalArrangement = Arrangement.spacedBy(1.dp),
+        verticalArrangement = Arrangement.spacedBy(1.dp)
+    ) {
+        header?.let {
+            item(
+                span = { GridItemSpan(maxLineSpan) },
+                key = "PhotosNodeGridView:Header"
+            ) {
+                it()
+            }
+        }
+
+        itemsIndexed(
+            items = items,
+            key = { _, item -> item.key },
+            contentType = { _, item -> item.contentType },
+            span = { _, item ->
+                when (item.contentType) {
+                    PhotosNodeContentType.Header -> GridItemSpan(maxLineSpan)
+                    PhotosNodeContentType.PhotoNode -> GridItemSpan(1)
+                }
+            }
+        ) { index, item ->
+            when (item.contentType) {
+                PhotosNodeContentType.Header -> {
+                    HeaderBodyV2(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                top = if (index == 0) 16.dp else 8.dp,
+                                bottom = 8.dp
+                            )
+                            .padding(horizontal = 16.dp)
+                            .testTag(PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG),
+                        time = item.fullModificationTime,
+                        shouldShowGridSizeSettings = index == 0 && selectedPhotoIds.isEmpty(),
+                        gridSize = gridSize,
+                        onGridSizeChange = onGridSizeChange
+                    )
+                }
+
+                PhotosNodeContentType.PhotoNode -> {
+                    PhotoNodeBodyV2(
+                        modifier = Modifier.animateItem(),
+                        spanCount = spanCount,
+                        node = item,
+                        isPreview = isPreview,
+                        isSelected = item.id in selectedPhotoIds,
+                        isHiddenNodesEnabled = isHiddenNodesEnabled,
+                        shouldShowFavourite = item.isFavourite,
+                        onClick = { onClick(item.id) },
+                        onLongClick = { onLongClick(item.id) },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeaderBodyV2(
+    time: Long,
+    shouldShowGridSizeSettings: Boolean,
+    gridSize: TimelineGridSize,
+    onGridSizeChange: (value: TimelineGridSize) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val locales = LocalConfiguration.current.locales
+    var isGridSizeMenuExpanded by remember { mutableStateOf(false) }
+
+    Row(modifier = modifier) {
+        MegaText(
+            modifier = Modifier.weight(weight = 1F),
+            text = dateTextV2(
+                modificationTime = time,
+                gridSize = gridSize,
+                locale = locales[0],
+            ),
+            style = AppTheme.typography.titleSmall,
+            textColor = TextColor.Secondary
+        )
+
+        if (shouldShowGridSizeSettings) {
+            Box {
+                val gridSizeIcon = when (gridSize) {
+                    TimelineGridSize.Large -> IconPack.Small.Thin.Outline.Square
+                    TimelineGridSize.Default -> IconPack.Small.Thin.Outline.Grid4
+                    TimelineGridSize.Compact -> IconPack.Small.Thin.Outline.Grid9
+                }
+                MegaIcon(
+                    modifier = Modifier
+                        .clickable {
+                            isGridSizeMenuExpanded = !isGridSizeMenuExpanded
+                        }
+                        .testTag(PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_ICON_TAG),
+                    imageVector = gridSizeIcon,
+                    tint = IconColor.Secondary,
+                    contentDescription = "Change grid size, current size is : ${gridSize.name}"
+                )
+
+                TimelineGridSizeSettingsMenu(
+                    modifier = Modifier
+                        .widthIn(min = 220.dp)
+                        .padding(vertical = 8.dp, horizontal = 4.dp)
+                        .testTag(PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_MENU_TAG),
+                    expanded = isGridSizeMenuExpanded,
+                    onDismissRequest = { isGridSizeMenuExpanded = false }
+                ) {
+                    MegaText(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp)
+                            .padding(top = 6.dp),
+                        text = stringResource(sharedR.string.timeline_tab_grid_size_menu_title),
+                        style = AppTheme.typography.labelLarge,
+                        textColor = TextColor.Secondary
+                    )
+
+                    TimelineGridSize.entries.reversed().forEach {
+                        DropdownMenuItem(
+                            text = {
+                                MegaText(
+                                    text = stringResource(it.nameResId),
+                                    style = AppTheme.typography.bodyLarge,
+                                    textColor = TextColor.Primary
+                                )
+                            },
+                            leadingIcon = {
+                                if (gridSize == it) {
+                                    MegaIcon(
+                                        imageVector = IconPack.Medium.Thin.Outline.Check,
+                                        tint = IconColor.Primary,
+                                        contentDescription = null
+                                    )
+                                } else {
+                                    Box(modifier = Modifier.size(24.dp))
+                                }
+                            },
+                            onClick = {
+                                onGridSizeChange(it)
+                                isGridSizeMenuExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PhotoNodeBodyV2(
+    spanCount: Int,
+    node: PhotosNodeContentItemV2,
+    isPreview: Boolean,
+    isSelected: Boolean,
+    isHiddenNodesEnabled: Boolean,
+    shouldShowFavourite: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    val windowInfo = LocalWindowInfo.current
+    val density = LocalDensity.current
+    val photosNodeSize = remember(spanCount) {
+        with(density) {
+            (windowInfo.containerSize.width / spanCount).toDp()
+        }
+    }
+    val thumbnailRequest = remember(node.id) {
+        MediaThumbnailRequest(
+            id = node.id,
+            isPreview = isPreview,
+            thumbnailFilePath = node.thumbnailFilePath,
+            previewFilePath = node.previewFilePath,
+            isPublicNode = false,
+            fileExtension = node.extension
+        )
+    }
+    when (node.mediaType) {
+        MediaType.Image -> {
+            ImagePhotosNode(
+                modifier = modifier
+                    .size(photosNodeSize)
+                    .testTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG),
+                thumbnailRequest = thumbnailRequest,
+                isSensitive = isHiddenNodesEnabled && node.isSensitive,
+                isSelected = isSelected,
+                shouldShowFavourite = shouldShowFavourite,
+                enabled = enabled,
+                onClick = onClick,
+                onLongClick = onLongClick,
+            )
+        }
+
+        MediaType.Video -> {
+            VideoPhotosNode(
+                modifier = modifier
+                    .size(photosNodeSize)
+                    .testTag(VIDEO_NODE_BODY_IMAGE_NODE_TAG),
+                duration = node.duration,
+                thumbnailRequest = thumbnailRequest,
+                isSensitive = isHiddenNodesEnabled && node.isSensitive,
+                isSelected = isSelected,
+                shouldShowFavourite = shouldShowFavourite,
+                enabled = enabled,
+                onClick = onClick,
+                onLongClick = onLongClick,
+            )
+        }
+    }
+}
+
+private fun dateTextV2(
+    gridSize: TimelineGridSize,
+    modificationTime: Long,
+    locale: Locale,
+): String = TimelineDateTextCache.get(
+    epochSeconds = modificationTime,
+    gridSize = gridSize,
+    locale = locale
+)
+
 @CombinedThemePreviews
 @Composable
 private fun PhotosNodeGridViewPreview() {
@@ -420,6 +692,68 @@ private fun PhotosNodeGridViewPreview() {
                     )
                 )
             ),
+            selectedPhotoIds = setOf(),
+            gridSize = TimelineGridSize.Default,
+            onGridSizeChange = {},
+            onClick = {},
+            onLongClick = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun PhotosNodeGridViewV2Preview() {
+    AndroidThemeForPreviews {
+        PhotosNodeGridViewV2(
+            items = listOf(
+                PhotosNodeContentItemV2(
+                    key = -1L,
+                    contentType = PhotosNodeContentType.Header,
+                    id = 1L,
+                    mediaType = MediaType.Image,
+                    day = 1,
+                    month = 1,
+                    year = 1,
+                    fullModificationTime = 123123L,
+                    thumbnailFilePath = null,
+                    previewFilePath = null,
+                    extension = "",
+                    isFavourite = false,
+                    isSensitive = false
+                ),
+                PhotosNodeContentItemV2(
+                    key = 2L,
+                    contentType = PhotosNodeContentType.PhotoNode,
+                    id = 2L,
+                    mediaType = MediaType.Image,
+                    day = 1,
+                    month = 1,
+                    year = 1,
+                    fullModificationTime = 123123L,
+                    thumbnailFilePath = null,
+                    previewFilePath = null,
+                    extension = "",
+                    isFavourite = false,
+                    isSensitive = false
+                ),
+                PhotosNodeContentItemV2(
+                    key = 3L,
+                    contentType = PhotosNodeContentType.PhotoNode,
+                    id = 3L,
+                    mediaType = MediaType.Video,
+                    day = 1,
+                    month = 1,
+                    year = 1,
+                    fullModificationTime = 123123L,
+                    thumbnailFilePath = null,
+                    previewFilePath = null,
+                    extension = "",
+                    isFavourite = false,
+                    isSensitive = false
+                )
+            ),
+            isHiddenNodesEnabled = false,
             selectedPhotoIds = setOf(),
             gridSize = TimelineGridSize.Default,
             onGridSizeChange = {},

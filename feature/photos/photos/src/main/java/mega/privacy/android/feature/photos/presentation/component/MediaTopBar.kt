@@ -21,8 +21,8 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.theme.values.IconColor
-import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
@@ -50,7 +50,7 @@ internal fun MediaTopBar(
     timelineTabActionUiState: TimelineTabActionUiState,
     timelineFilterUiState: TimelineFilterUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
-    videosTabUiState: VideosTabUiState,
+    videosSelectionUiState: VideosTabUiState.Selection,
     playlistsTabUiState: VideoPlaylistsTabUiState,
     timelineItemCount: Int,
     timelineSelectedCount: Int,
@@ -88,13 +88,6 @@ internal fun MediaTopBar(
     ) {
         derivedStateOf {
             timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
-        }
-    }
-    val areAllVideosSelected by remember(videosTabUiState) {
-        derivedStateOf {
-            if (videosTabUiState is VideosTabUiState.Data) {
-                videosTabUiState.selectedTypedNodes.size == videosTabUiState.allVideoEntities.size
-            } else false
         }
     }
     val areAllPlaylistsSelected by remember(playlistsTabUiState) {
@@ -142,8 +135,8 @@ internal fun MediaTopBar(
 
         isVideosTabSearchBarVisible || selectionModeType == MediaSelectionModeType.Videos ->
             VideosTabToolbar(
-                count = if (videosTabUiState is VideosTabUiState.Data) videosTabUiState.selectedTypedNodes.size else 0,
-                isAllSelected = areAllVideosSelected,
+                count = videosSelectionUiState.count,
+                isAllSelected = videosSelectionUiState.areAllSelected,
                 isSelectionMode = selectionModeType == MediaSelectionModeType.Videos,
                 onSelectAllClicked = onAllVideosSelected,
                 onCancelSelectionClicked = onClearVideosSelection,

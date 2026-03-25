@@ -35,7 +35,7 @@ import mega.privacy.android.domain.usecase.photos.SetEnableCameraUploadBannerDis
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -295,7 +295,7 @@ class MediaCameraUploadViewModel @Inject constructor(
         _uiState.update { it.copy(enableCameraUploadPageShowing = isShown) }
     }
 
-    internal suspend fun updateCUPageEnablementBasedOnDisplayedPhotos(photos: List<PhotosNodeContentItem>) {
+    internal suspend fun updateCUPageEnablementBasedOnDisplayedPhotos(photos: List<PhotosNodeContentItemV2>) {
         runCatching { isCameraUploadsEnabledUseCase() }
             .onSuccess { isCameraUploadsEnabled ->
                 _uiState.update { it.copy(enableCameraUploadPageShowing = photos.isEmpty() && !isCameraUploadsEnabled) }

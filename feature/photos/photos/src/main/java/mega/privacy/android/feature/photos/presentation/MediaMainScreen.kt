@@ -54,7 +54,6 @@ import mega.privacy.android.feature.photos.extensions.toTrackingEvent
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLegacyPhotosSource
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaScreen
-import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
@@ -120,7 +119,7 @@ fun MediaMainRoute(
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
-    val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
+    val videosSelectionUiState by videosTabViewModel.selectionUiState.collectAsStateWithLifecycle()
     val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val timelineSelectedPhotoIds = rememberSaveable { mutableStateSetOf<Long>() }
@@ -132,14 +131,14 @@ fun MediaMainRoute(
     val selectionModeType by remember(
         timelineSelectedPhotoIds,
         albumsTabUiState.selectedUserAlbums,
-        videosTabUiState,
+        videosSelectionUiState,
         playlistsTabUiState
     ) {
         derivedStateOf {
             getSelectionModeType(
                 timelineSelectedPhotoCount = timelineSelectedPhotoIds.size,
                 albumsSelectedUserAlbumsCount = albumsTabUiState.selectedUserAlbums.size,
-                videosTabUiState = videosTabUiState,
+                videosSelectionUiState = videosSelectionUiState,
                 playlistsTabUiState = playlistsTabUiState
             )
         }
@@ -268,7 +267,7 @@ fun MediaMainRoute(
         timelineTabActionUiState = timelineTabActionUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         timelineFilterUiState = timelineFilterUiState,
-        videosTabUiState = videosTabUiState,
+        videosSelectionUiState = videosSelectionUiState,
         playlistsTabUiState = playlistsTabUiState,
         nodeActionUiState = nodeActionUiState,
         selectedPhotoIds = timelineSelectedPhotoIds,
@@ -297,10 +296,10 @@ fun MediaMainRoute(
         onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
         onTimelinePhotoSelected = {
-            if (it.photo.id in timelineSelectedPhotoIds) {
-                timelineSelectedPhotoIds.remove(it.photo.id)
+            if (it in timelineSelectedPhotoIds) {
+                timelineSelectedPhotoIds.remove(it)
             } else {
-                timelineSelectedPhotoIds.add(it.photo.id)
+                timelineSelectedPhotoIds.add(it)
             }
         },
         onClearTimelinePhotosSelection = { timelineSelectedPhotoIds.clear() },
@@ -335,7 +334,7 @@ fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
     timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
-    videosTabUiState: VideosTabUiState,
+    videosSelectionUiState: VideosTabUiState.Selection,
     playlistsTabUiState: VideoPlaylistsTabUiState,
     nodeActionUiState: NodeActionState,
     selectedPhotoIds: Set<Long>,
@@ -351,7 +350,7 @@ fun MediaMainScreen(
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
     navigateToMediaSearch: (NavKey) -> Unit,
-    onTimelinePhotoSelected: (nodes: PhotoNodeUiState) -> Unit,
+    onTimelinePhotoSelected: (id: Long) -> Unit,
     onClearTimelinePhotosSelection: () -> Unit,
     onNavigateToTimelinePhotoPreview: (key: MediaTimelinePhotoPreviewNavKey) -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
@@ -380,8 +379,6 @@ fun MediaMainScreen(
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
 
     var videosTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
-
-    var selectedVideoCount by rememberSaveable { mutableIntStateOf(0) }
     var selectedVideoNodes by remember { mutableStateOf(emptyList<TypedNode>()) }
 
     var selectedPlaylistCount by rememberSaveable { mutableIntStateOf(0) }
@@ -398,22 +395,8 @@ fun MediaMainScreen(
         }
     }
 
-    LaunchedEffect(videosTabUiState) {
-        if (videosTabUiState is VideosTabUiState.Data) {
-            onCurrentVideosSearchQueryRequest().let {
-                if (it != videosTabQuery) {
-                    videosTabQuery = it
-                }
-            }
-            if (selectedVideoCount != videosTabUiState.selectedTypedNodes.size) {
-                selectedVideoNodes = videosTabUiState.selectedTypedNodes
-                selectedVideoCount = videosTabUiState.selectedTypedNodes.size
-                updateSelectionModeAvailableActions(
-                    videosTabUiState.selectedTypedNodes.toSet(),
-                    NodeSourceType.CLOUD_DRIVE
-                )
-            }
-        }
+    LaunchedEffect(currentTabIndex) {
+        if (currentTabIndex == MediaScreen.Albums.ordinal) albumsTabViewModel.initialize()
     }
 
     LaunchedEffect(playlistsTabUiState) {
@@ -453,7 +436,7 @@ fun MediaMainScreen(
                 timelineTabActionUiState = timelineTabActionUiState,
                 timelineFilterUiState = timelineFilterUiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
-                videosTabUiState = videosTabUiState,
+                videosSelectionUiState = videosSelectionUiState,
                 playlistsTabUiState = playlistsTabUiState,
                 timelineItemCount = timelineTabUiState.displayedPhotos.size,
                 timelineSelectedCount = selectedPhotoIds.size,
@@ -582,6 +565,7 @@ fun MediaMainScreen(
                                         timelineTabUiState = timelineTabUiState,
                                         timelineFilterUiState = timelineFilterUiState,
                                         mediaCameraUploadUiState = mediaCameraUploadUiState,
+                                        videosSelectionUiState = videosSelectionUiState,
                                         selectedPhotoIds = selectedPhotoIds,
                                         showTimelineSortDialog = showTimelineSortDialog,
                                         selectedTimePeriod = selectedTimePeriod,
@@ -600,7 +584,7 @@ fun MediaMainScreen(
                                             } else {
                                                 onNavigateToTimelinePhotoPreview(
                                                     MediaTimelinePhotoPreviewNavKey(
-                                                        id = it.photo.id,
+                                                        id = it,
                                                         sortType = timelineTabUiState.currentSort.toLegacySort().name,
                                                         filterType = timelineFilterUiState.mediaType.name,
                                                         mediaSource = timelineFilterUiState.mediaSource.toLegacyPhotosSource().name
@@ -621,6 +605,20 @@ fun MediaMainScreen(
                                         dismissVideoPlaylistRemovedDialog = {
                                             showVideoPlaylistRemovedDialog = false
                                         },
+                                        onCurrentVideosSearchQueryRequest = {
+                                            onCurrentVideosSearchQueryRequest().let {
+                                                if (it != videosTabQuery) {
+                                                    videosTabQuery = it
+                                                }
+                                            }
+                                        },
+                                        updateSelectionModeAvailableActions = { selectedNodes, nodeSourceType ->
+                                            selectedVideoNodes = selectedNodes
+                                            updateSelectionModeAvailableActions(
+                                                selectedNodes.toSet(),
+                                                NodeSourceType.CLOUD_DRIVE
+                                            )
+                                        }
                                     )
                                 }
                             )
@@ -665,6 +663,7 @@ private fun MediaScreen.MediaContent(
     timelineTabUiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
+    videosSelectionUiState: VideosTabUiState.Selection,
     selectedPhotoIds: Set<Long>,
     showTimelineSortDialog: Boolean,
     selectedTimePeriod: MediaTimePeriod,
@@ -672,8 +671,8 @@ private fun MediaScreen.MediaContent(
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortDialogDismissed: () -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
-    onTimelinePhotoClick: (node: PhotoNodeUiState) -> Unit,
-    onTimelinePhotoSelected: (node: PhotoNodeUiState) -> Unit,
+    onTimelinePhotoClick: (id: Long) -> Unit,
+    onTimelinePhotoSelected: (id: Long) -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     navigationHandler: NavigationHandler,
@@ -684,6 +683,8 @@ private fun MediaScreen.MediaContent(
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     showVideoPlaylistRemovedDialog: Boolean,
     dismissVideoPlaylistRemovedDialog: () -> Unit,
+    onCurrentVideosSearchQueryRequest: () -> Unit,
+    updateSelectionModeAvailableActions: (selectedNodes: List<TypedNode>, nodeSourceType: NodeSourceType) -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -727,7 +728,12 @@ private fun MediaScreen.MediaContent(
             )
         }
 
-        MediaScreen.Videos -> VideosTabRoute(navigationHandler = navigationHandler)
+        MediaScreen.Videos -> VideosTabRoute(
+            videosSelectionUiState = videosSelectionUiState,
+            navigationHandler = navigationHandler,
+            onCurrentVideosSearchQueryRequest = onCurrentVideosSearchQueryRequest,
+            updateSelectionModeAvailableActions = updateSelectionModeAvailableActions
+        )
 
         MediaScreen.Playlists -> VideoPlaylistsTabRoute(
             showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
@@ -741,12 +747,12 @@ private fun MediaScreen.MediaContent(
 private fun getSelectionModeType(
     timelineSelectedPhotoCount: Int,
     albumsSelectedUserAlbumsCount: Int,
-    videosTabUiState: VideosTabUiState,
+    videosSelectionUiState: VideosTabUiState.Selection,
     playlistsTabUiState: VideoPlaylistsTabUiState,
 ): MediaSelectionModeType = when {
     timelineSelectedPhotoCount > 0 -> MediaSelectionModeType.Timeline
     albumsSelectedUserAlbumsCount > 0 -> MediaSelectionModeType.Albums
-    videosTabUiState is VideosTabUiState.Data && videosTabUiState.selectedTypedNodes.isNotEmpty() -> MediaSelectionModeType.Videos
+    videosSelectionUiState.count > 0 -> MediaSelectionModeType.Videos
     playlistsTabUiState is VideoPlaylistsTabUiState.Data && playlistsTabUiState.selectedPlaylists.isNotEmpty() -> MediaSelectionModeType.Playlists
     else -> MediaSelectionModeType.None
 }
@@ -808,7 +814,7 @@ private fun PhotosMainScreenPreview() {
             onMediaTimePeriodSelected = {},
             onNavigateToCameraUploadsProgressScreen = {},
             albumsTabUiState = AlbumsTabUiState(),
-            videosTabUiState = VideosTabUiState.Data(),
+            videosSelectionUiState = VideosTabUiState.Selection(),
             playlistsTabUiState = VideoPlaylistsTabUiState.Data(),
             nodeActionUiState = NodeActionState(),
             selectionModeType = MediaSelectionModeType.None,

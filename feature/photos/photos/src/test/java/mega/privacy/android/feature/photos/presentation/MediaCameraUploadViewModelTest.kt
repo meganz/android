@@ -24,7 +24,9 @@ import mega.privacy.android.domain.usecase.photos.SetCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.photos.SetEnableCameraUploadBannerDismissedTimestampUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
+import mega.privacy.android.feature.photos.model.MediaType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,7 +40,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -269,8 +271,20 @@ class MediaCameraUploadViewModelTest {
     @Test
     fun `test that CU page is not displayed when the photos are not empty`() = runTest {
         val photos = persistentListOf(
-            PhotosNodeContentItem.HeaderItem(
-                time = LocalDateTime.now()
+            PhotosNodeContentItemV2(
+                key = -1L,
+                contentType = PhotosNodeContentType.Header,
+                id = 1L,
+                mediaType = MediaType.Image,
+                day = 1,
+                month = 1,
+                year = 1,
+                fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isFavourite = false,
+                isSensitive = false
             )
         )
         whenever(isCameraUploadsEnabledUseCase()) doReturn false

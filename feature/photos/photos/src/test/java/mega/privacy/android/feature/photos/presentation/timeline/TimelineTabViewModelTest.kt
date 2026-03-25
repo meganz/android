@@ -2,38 +2,32 @@ package mega.privacy.android.feature.photos.presentation.timeline
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.entity.photos.PhotoResult
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
-import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
-import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelineMediaUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
-import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
-import mega.privacy.android.domain.entity.photos.FilterMediaType
-import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
-import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
-import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedNodeMapper
-import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -50,8 +44,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import kotlin.random.Random
+import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -59,15 +54,12 @@ class TimelineTabViewModelTest {
 
     private lateinit var underTest: TimelineTabViewModel
 
-    private val monitorTimelinePhotosUseCase: MonitorTimelinePhotosUseCase = mock()
-    private val photoUiStateMapper: PhotoUiStateMapper = mock()
-    private val fileTypeIconMapper: FileTypeIconMapper = mock()
-    private val photosNodeListCardMapper: PhotosNodeListCardMapper = mock()
+    private val monitorTimelineMediaUseCase: MonitorTimelineMediaUseCase = mock()
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase = mock()
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase = mock()
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
-    private val photoToTypedNodeMapper = PhotoToTypedNodeMapper()
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
     private val analyticsTracker: AnalyticsTracker = mock()
 
     private val isHiddenNodesEnabledFlow = MutableStateFlow(false)
@@ -77,15 +69,12 @@ class TimelineTabViewModelTest {
         Analytics.initialise(analyticsTracker)
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn isHiddenNodesEnabledFlow
         underTest = TimelineTabViewModel(
-            monitorTimelinePhotosUseCase = monitorTimelinePhotosUseCase,
-            photoUiStateMapper = photoUiStateMapper,
-            fileTypeIconMapper = fileTypeIconMapper,
-            photosNodeListCardMapper = photosNodeListCardMapper,
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-            photoToTypedNodeMapper = photoToTypedNodeMapper
+            monitorTimelineMediaUseCase = monitorTimelineMediaUseCase,
+            durationInSecondsTextMapper = durationInSecondsTextMapper
         )
     }
 
@@ -93,97 +82,79 @@ class TimelineTabViewModelTest {
     fun tearDown() {
         Analytics.initialise(null)
         reset(
-            monitorTimelinePhotosUseCase,
-            photoUiStateMapper,
-            fileTypeIconMapper,
-            photosNodeListCardMapper,
+            monitorTimelineMediaUseCase,
             getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase,
+            durationInSecondsTextMapper,
             analyticsTracker
         )
     }
 
     @Test
     fun `test that photos are fetched successfully`() = runTest {
-        val now = LocalDateTime.now()
-        val mockFileTypeInfo = mock<VideoFileTypeInfo>()
-        val photo1 = mock<Photo.Image> {
-            on { id } doReturn 1L
-            on { modificationTime } doReturn now
-            on { fileTypeInfo } doReturn mockFileTypeInfo
+        val now = ZonedDateTime.now()
+        val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+            on { extension } doReturn ".jpg"
         }
-        val photoResult1 = PhotoResult(
-            photo = photo1,
-            isMarkedSensitive = false
-        )
-        val photoUiState1 = mock<PhotoUiState.Image>()
-        whenever(
-            photoUiStateMapper.invoke(photo = photo1)
-        ) doReturn photoUiState1
-        val photo2 = mock<Photo.Video> {
-            on { id } doReturn 2L
-            on { modificationTime } doReturn now.minusDays(1)
-            on { fileTypeInfo } doReturn mockFileTypeInfo
+        val photo1 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 1L)
+            on { modificationTime } doReturn now.toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn true
         }
-        val photoResult2 = PhotoResult(
-            photo = photo2,
-            isMarkedSensitive = true
-        )
-        val photosResult = TimelinePhotosResult(
-            allPhotos = listOf(photoResult1, photoResult2),
-            nonSensitivePhotos = listOf(photoResult1)
-        )
-        val sortResult = mock<TimelineSortedPhotosResult> {
-            on { sortedPhotos } doReturn emptyList()
+        val videoDuration = Duration.ZERO
+        val mockVideoFileTypeInfo = mock<VideoFileTypeInfo> {
+            on { extension } doReturn ".mp4"
+            on { duration } doReturn videoDuration
+        }
+        val photo2 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 2L)
+            on { modificationTime } doReturn now.minusDays(1).toEpochSecond()
+            on { type } doReturn mockVideoFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
         }
         whenever(
-            monitorTimelinePhotosUseCase.sortPhotos(
-                photos = photosResult.nonSensitivePhotos,
+            durationInSecondsTextMapper(
+                duration = videoDuration
+            )
+        ) doReturn "0:16"
+        whenever(
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = listOf(photo1, photo2),
                 sortOrder = SortOrder.ORDER_MODIFICATION_DESC
             )
-        ) doReturn sortResult
-        val photoUiState2 = mock<PhotoUiState.Video>()
+        ) doReturn listOf(photo2, photo1)
         whenever(
-            photoUiStateMapper.invoke(photo = photo2)
-        ) doReturn photoUiState2
-        whenever(
-            monitorTimelinePhotosUseCase.invoke(request = any())
-        ) doReturn flowOf(photosResult)
-        whenever(
-            photosNodeListCardMapper.invoke(photosDateResults = any())
-        ) doReturn persistentListOf()
+            monitorTimelineMediaUseCase.invoke(request = any())
+        ) doReturn flowOf(listOf(photo1, photo2))
 
         underTest.uiState.test {
-            assertThat(expectMostRecentItem().allPhotos.size).isEqualTo(2)
+            assertThat(expectMostRecentItem().displayedPhotos.size).isEqualTo(3) // 2 Photos 1 Header
         }
-        verify(monitorTimelinePhotosUseCase).invoke(isA<TimelinePhotosRequest>())
-        verify(monitorTimelinePhotosUseCase).sortPhotos(
-            photos = photosResult.nonSensitivePhotos,
+        verify(monitorTimelineMediaUseCase).invoke(isA<TimelinePhotosRequest>())
+        verify(monitorTimelineMediaUseCase).sortMedia(
+            nodes = listOf(photo1, photo2),
             sortOrder = SortOrder.ORDER_MODIFICATION_DESC
         )
     }
 
     @Test
     fun `test that all photos are resorted when the sort order changes`() = runTest {
-        val photosResult = mock<TimelinePhotosResult> {
-            on { allPhotos } doReturn emptyList()
-            on { nonSensitivePhotos } doReturn emptyList()
-        }
-        whenever(monitorTimelinePhotosUseCase(request = any())) doReturn flowOf(photosResult)
-        val sortResult = mock<TimelineSortedPhotosResult> {
-            on { sortedPhotos } doReturn emptyList()
-        }
         whenever(
-            monitorTimelinePhotosUseCase.sortPhotos(
-                photos = eq(emptyList()),
+            monitorTimelineMediaUseCase.invoke(request = any())
+        ) doReturn flowOf(emptyList())
+        whenever(
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = eq(emptyList()),
                 sortOrder = any()
             )
-        ) doReturn sortResult
-        whenever(
-            photosNodeListCardMapper.invoke(photosDateResults = any())
-        ) doReturn persistentListOf()
+        ) doReturn emptyList()
 
         underTest.onSortOptionsChange(value = TimelineTabSortOptions.Oldest)
 
@@ -192,8 +163,8 @@ class TimelineTabViewModelTest {
                 expectMostRecentItem().currentSort
             ).isEqualTo(TimelineTabSortOptions.Oldest)
         }
-        verify(monitorTimelinePhotosUseCase).sortPhotos(
-            photos = any(),
+        verify(monitorTimelineMediaUseCase).sortMedia(
+            nodes = any(),
             sortOrder = eq(SortOrder.ORDER_MODIFICATION_ASC)
         )
     }
@@ -202,23 +173,15 @@ class TimelineTabViewModelTest {
     @EnumSource(TimelineGridSize::class)
     fun `test that the correct grid size is set`(gridSize: TimelineGridSize) =
         runTest {
-            val photosResult = mock<TimelinePhotosResult> {
-                on { allPhotos } doReturn emptyList()
-                on { nonSensitivePhotos } doReturn emptyList()
-            }
-            whenever(monitorTimelinePhotosUseCase(request = any())) doReturn flowOf(photosResult)
-            val sortResult = mock<TimelineSortedPhotosResult> {
-                on { sortedPhotos } doReturn emptyList()
-            }
             whenever(
-                monitorTimelinePhotosUseCase.sortPhotos(
-                    photos = eq(emptyList()),
+                monitorTimelineMediaUseCase.invoke(request = any())
+            ) doReturn flowOf(emptyList())
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = eq(emptyList()),
                     sortOrder = any()
                 )
-            ) doReturn sortResult
-            whenever(
-                photosNodeListCardMapper.invoke(photosDateResults = any())
-            ) doReturn persistentListOf()
+            ) doReturn emptyList()
 
             underTest.onGridSizeChange(
                 size = gridSize,
@@ -234,54 +197,45 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when grid size is changed and the camera upload page is displayed and the media source is not cloud drive`() =
         runTest {
-            val photosResult = mock<TimelinePhotosResult> {
-                on { allPhotos } doReturn emptyList()
-                on { nonSensitivePhotos } doReturn emptyList()
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn true
+            }
+            val videoDuration = Duration.ZERO
+            val mockVideoFileTypeInfo = mock<VideoFileTypeInfo> {
+                on { extension } doReturn ".mp4"
+                on { duration } doReturn videoDuration
+            }
+            val photo2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 2L)
+                on { modificationTime } doReturn now.plusMonths(2).toEpochSecond()
+                on { type } doReturn mockVideoFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
             }
             whenever(
-                monitorTimelinePhotosUseCase.invoke(request = any())
-            ) doReturn flowOf(photosResult)
-            val now = LocalDateTime.now()
-            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
-            val photo1 = mock<Photo.Image> {
-                on { id } doReturn 1L
-                on { modificationTime } doReturn now
-                on { fileTypeInfo } doReturn mockFileTypeInfo
-            }
-            val photoResult1 = PhotoResult(
-                photo = photo1,
-                isMarkedSensitive = false
-            )
-            val photo1UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo1)
-            ) doReturn photo1UiState
-            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
-            val photo2 = mock<Photo.Image> {
-                on { id } doReturn 2L
-                on { modificationTime } doReturn now.plusMonths(2)
-                on { fileTypeInfo } doReturn mockTextFileTypeInfo
-            }
-            val photoResult2 = PhotoResult(
-                photo = photo2,
-                isMarkedSensitive = false
-            )
-            val photo2UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo2)
-            ) doReturn photo2UiState
-            val sortResult = mock<TimelineSortedPhotosResult> {
-                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
-            }
-            whenever(
-                monitorTimelinePhotosUseCase.sortPhotos(
-                    photos = eq(emptyList()),
-                    sortOrder = any()
+                durationInSecondsTextMapper(
+                    duration = videoDuration
                 )
-            ) doReturn sortResult
+            ) doReturn "0:16"
             whenever(
-                photosNodeListCardMapper.invoke(photosDateResults = any())
-            ) doReturn persistentListOf()
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo1, photo2),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo2, photo1)
+            whenever(
+                monitorTimelineMediaUseCase.invoke(request = any())
+            ) doReturn flowOf(listOf(photo1, photo2))
 
             underTest.uiState.test { cancelAndConsumeRemainingEvents() }
             underTest.onGridSizeChange(
@@ -312,54 +266,45 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is enabled when grid size is changed and the camera upload page is not displayed and the media source is cloud drive`() =
         runTest {
-            val photosResult = mock<TimelinePhotosResult> {
-                on { allPhotos } doReturn emptyList()
-                on { nonSensitivePhotos } doReturn emptyList()
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn true
+            }
+            val videoDuration = Duration.ZERO
+            val mockVideoFileTypeInfo = mock<VideoFileTypeInfo> {
+                on { extension } doReturn ".mp4"
+                on { duration } doReturn videoDuration
+            }
+            val photo2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 2L)
+                on { modificationTime } doReturn now.minusDays(1).toEpochSecond()
+                on { type } doReturn mockVideoFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
             }
             whenever(
-                monitorTimelinePhotosUseCase.invoke(request = any())
-            ) doReturn flowOf(photosResult)
-            val now = LocalDateTime.now()
-            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
-            val photo1 = mock<Photo.Image> {
-                on { id } doReturn 1L
-                on { modificationTime } doReturn now
-                on { fileTypeInfo } doReturn mockFileTypeInfo
-            }
-            val photoResult1 = PhotoResult(
-                photo = photo1,
-                isMarkedSensitive = false
-            )
-            val photo1UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo1)
-            ) doReturn photo1UiState
-            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
-            val photo2 = mock<Photo.Image> {
-                on { id } doReturn 2L
-                on { modificationTime } doReturn now.plusMonths(2)
-                on { fileTypeInfo } doReturn mockTextFileTypeInfo
-            }
-            val photoResult2 = PhotoResult(
-                photo = photo2,
-                isMarkedSensitive = false
-            )
-            val photo2UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo2)
-            ) doReturn photo2UiState
-            val sortResult = mock<TimelineSortedPhotosResult> {
-                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
-            }
-            whenever(
-                monitorTimelinePhotosUseCase.sortPhotos(
-                    photos = eq(emptyList()),
-                    sortOrder = any()
+                durationInSecondsTextMapper(
+                    duration = videoDuration
                 )
-            ) doReturn sortResult
+            ) doReturn "0:16"
             whenever(
-                photosNodeListCardMapper.invoke(photosDateResults = any())
-            ) doReturn persistentListOf()
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo1, photo2),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo2, photo1)
+            whenever(
+                monitorTimelineMediaUseCase.invoke(request = any())
+            ) doReturn flowOf(listOf(photo1, photo2))
 
             underTest.uiState.test { cancelAndConsumeRemainingEvents() }
             underTest.onGridSizeChange(
@@ -376,54 +321,45 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when CU page is enabled and the media source is not cloud drive`() =
         runTest {
-            val photosResult = mock<TimelinePhotosResult> {
-                on { allPhotos } doReturn emptyList()
-                on { nonSensitivePhotos } doReturn emptyList()
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn true
+            }
+            val videoDuration = Duration.ZERO
+            val mockVideoFileTypeInfo = mock<VideoFileTypeInfo> {
+                on { extension } doReturn ".mp4"
+                on { duration } doReturn videoDuration
+            }
+            val photo2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 2L)
+                on { modificationTime } doReturn now.minusDays(1).toEpochSecond()
+                on { type } doReturn mockVideoFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
             }
             whenever(
-                monitorTimelinePhotosUseCase.invoke(request = any())
-            ) doReturn flowOf(photosResult)
-            val now = LocalDateTime.now()
-            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
-            val photo1 = mock<Photo.Image> {
-                on { id } doReturn 1L
-                on { modificationTime } doReturn now
-                on { fileTypeInfo } doReturn mockFileTypeInfo
-            }
-            val photoResult1 = PhotoResult(
-                photo = photo1,
-                isMarkedSensitive = false
-            )
-            val photo1UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo1)
-            ) doReturn photo1UiState
-            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
-            val photo2 = mock<Photo.Image> {
-                on { id } doReturn 2L
-                on { modificationTime } doReturn now.plusMonths(2)
-                on { fileTypeInfo } doReturn mockTextFileTypeInfo
-            }
-            val photoResult2 = PhotoResult(
-                photo = photo2,
-                isMarkedSensitive = false
-            )
-            val photo2UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo2)
-            ) doReturn photo2UiState
-            val sortResult = mock<TimelineSortedPhotosResult> {
-                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
-            }
-            whenever(
-                monitorTimelinePhotosUseCase.sortPhotos(
-                    photos = eq(emptyList()),
-                    sortOrder = any()
+                durationInSecondsTextMapper(
+                    duration = videoDuration
                 )
-            ) doReturn sortResult
+            ) doReturn "0:16"
             whenever(
-                photosNodeListCardMapper.invoke(photosDateResults = any())
-            ) doReturn persistentListOf()
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo1, photo2),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo2, photo1)
+            whenever(
+                monitorTimelineMediaUseCase.invoke(request = any())
+            ) doReturn flowOf(listOf(photo1, photo2))
 
             underTest.updateSortActionBasedOnCUPageEnablement(
                 isEnableCameraUploadPageShowing = true,
@@ -439,54 +375,45 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when CU page is disabled and the media source is cloud drive`() =
         runTest {
-            val photosResult = mock<TimelinePhotosResult> {
-                on { allPhotos } doReturn emptyList()
-                on { nonSensitivePhotos } doReturn emptyList()
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn true
+            }
+            val videoDuration = Duration.ZERO
+            val mockVideoFileTypeInfo = mock<VideoFileTypeInfo> {
+                on { extension } doReturn ".mp4"
+                on { duration } doReturn videoDuration
+            }
+            val photo2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 2L)
+                on { modificationTime } doReturn now.minusDays(1).toEpochSecond()
+                on { type } doReturn mockVideoFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
             }
             whenever(
-                monitorTimelinePhotosUseCase.invoke(request = any())
-            ) doReturn flowOf(photosResult)
-            val now = LocalDateTime.now()
-            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
-            val photo1 = mock<Photo.Image> {
-                on { id } doReturn 1L
-                on { modificationTime } doReturn now
-                on { fileTypeInfo } doReturn mockFileTypeInfo
-            }
-            val photoResult1 = PhotoResult(
-                photo = photo1,
-                isMarkedSensitive = false
-            )
-            val photo1UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo1)
-            ) doReturn photo1UiState
-            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
-            val photo2 = mock<Photo.Image> {
-                on { id } doReturn 2L
-                on { modificationTime } doReturn now.plusMonths(2)
-                on { fileTypeInfo } doReturn mockTextFileTypeInfo
-            }
-            val photoResult2 = PhotoResult(
-                photo = photo2,
-                isMarkedSensitive = false
-            )
-            val photo2UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo2)
-            ) doReturn photo2UiState
-            val sortResult = mock<TimelineSortedPhotosResult> {
-                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
-            }
-            whenever(
-                monitorTimelinePhotosUseCase.sortPhotos(
-                    photos = eq(emptyList()),
-                    sortOrder = any()
+                durationInSecondsTextMapper(
+                    duration = videoDuration
                 )
-            ) doReturn sortResult
+            ) doReturn "0:16"
             whenever(
-                photosNodeListCardMapper.invoke(photosDateResults = any())
-            ) doReturn persistentListOf()
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo1, photo2),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo2, photo1)
+            whenever(
+                monitorTimelineMediaUseCase.invoke(request = any())
+            ) doReturn flowOf(listOf(photo1, photo2))
 
             underTest.updateSortActionBasedOnCUPageEnablement(
                 isEnableCameraUploadPageShowing = true,
@@ -502,23 +429,15 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when CU page is disabled and no photos to display`() =
         runTest {
-            val photosResult = mock<TimelinePhotosResult> {
-                on { allPhotos } doReturn emptyList()
-                on { nonSensitivePhotos } doReturn emptyList()
-            }
-            whenever(monitorTimelinePhotosUseCase(request = any())) doReturn flowOf(photosResult)
-            val sortResult = mock<TimelineSortedPhotosResult> {
-                on { sortedPhotos } doReturn emptyList()
-            }
             whenever(
-                monitorTimelinePhotosUseCase.sortPhotos(
-                    photos = eq(emptyList()),
+                monitorTimelineMediaUseCase.invoke(request = any())
+            ) doReturn flowOf(emptyList())
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = eq(emptyList()),
                     sortOrder = any()
                 )
-            ) doReturn sortResult
-            whenever(
-                photosNodeListCardMapper.invoke(photosDateResults = any())
-            ) doReturn persistentListOf()
+            ) doReturn emptyList()
 
             underTest.updateSortActionBasedOnCUPageEnablement(
                 isEnableCameraUploadPageShowing = false,
@@ -534,54 +453,45 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is enabled when CU page is disabled and the camera upload page is not displayed and the media source is cloud drive`() =
         runTest {
-            val photosResult = mock<TimelinePhotosResult> {
-                on { allPhotos } doReturn emptyList()
-                on { nonSensitivePhotos } doReturn emptyList()
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn true
+            }
+            val videoDuration = Duration.ZERO
+            val mockVideoFileTypeInfo = mock<VideoFileTypeInfo> {
+                on { extension } doReturn ".mp4"
+                on { duration } doReturn videoDuration
+            }
+            val photo2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 2L)
+                on { modificationTime } doReturn now.plusMonths(2).toEpochSecond()
+                on { type } doReturn mockVideoFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
             }
             whenever(
-                monitorTimelinePhotosUseCase.invoke(request = any())
-            ) doReturn flowOf(photosResult)
-            val now = LocalDateTime.now()
-            val mockFileTypeInfo = mock<VideoFileTypeInfo>()
-            val photo1 = mock<Photo.Image> {
-                on { id } doReturn 1L
-                on { modificationTime } doReturn now
-                on { fileTypeInfo } doReturn mockFileTypeInfo
-            }
-            val photoResult1 = PhotoResult(
-                photo = photo1,
-                isMarkedSensitive = false
-            )
-            val photo1UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo1)
-            ) doReturn photo1UiState
-            val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
-            val photo2 = mock<Photo.Image> {
-                on { id } doReturn 2L
-                on { modificationTime } doReturn now.plusMonths(2)
-                on { fileTypeInfo } doReturn mockTextFileTypeInfo
-            }
-            val photoResult2 = PhotoResult(
-                photo = photo2,
-                isMarkedSensitive = false
-            )
-            val photo2UiState = mock<PhotoUiState.Image>()
-            whenever(
-                photoUiStateMapper.invoke(photo = photo2)
-            ) doReturn photo2UiState
-            val sortResult = mock<TimelineSortedPhotosResult> {
-                on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
-            }
-            whenever(
-                monitorTimelinePhotosUseCase.sortPhotos(
-                    photos = eq(emptyList()),
-                    sortOrder = any()
+                durationInSecondsTextMapper(
+                    duration = videoDuration
                 )
-            ) doReturn sortResult
+            ) doReturn "0:16"
             whenever(
-                photosNodeListCardMapper.invoke(photosDateResults = any())
-            ) doReturn persistentListOf()
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo1, photo2),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo2, photo1)
+            whenever(
+                monitorTimelineMediaUseCase.invoke(request = any())
+            ) doReturn flowOf(listOf(photo1, photo2))
 
             underTest.uiState.test { cancelAndConsumeRemainingEvents() }
             underTest.updateSortActionBasedOnCUPageEnablement(
@@ -658,59 +568,534 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that the action state is ready when the displayed photos are set`() = runTest {
-        val photosResult = mock<TimelinePhotosResult> {
-            on { allPhotos } doReturn emptyList()
-            on { nonSensitivePhotos } doReturn emptyList()
+        val now = ZonedDateTime.now()
+        val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+            on { extension } doReturn ".jpg"
+        }
+        val photo1 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 1L)
+            on { modificationTime } doReturn now.toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn true
+        }
+        val videoDuration = Duration.ZERO
+        val mockVideoFileTypeInfo = mock<VideoFileTypeInfo> {
+            on { extension } doReturn ".mp4"
+            on { duration } doReturn videoDuration
+        }
+        val photo2 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 2L)
+            on { modificationTime } doReturn now.plusMonths(2).toEpochSecond()
+            on { type } doReturn mockVideoFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
         }
         whenever(
-            monitorTimelinePhotosUseCase.invoke(request = any())
-        ) doReturn flowOf(photosResult)
-        val now = LocalDateTime.now()
-        val mockFileTypeInfo = mock<VideoFileTypeInfo>()
-        val photo1 = mock<Photo.Image> {
-            on { id } doReturn 1L
-            on { modificationTime } doReturn now
-            on { fileTypeInfo } doReturn mockFileTypeInfo
-        }
-        val photoResult1 = PhotoResult(
-            photo = photo1,
-            isMarkedSensitive = false
-        )
-        val photo1UiState = mock<PhotoUiState.Image>()
-        whenever(
-            photoUiStateMapper.invoke(photo = photo1)
-        ) doReturn photo1UiState
-        val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
-        val photo2 = mock<Photo.Image> {
-            on { id } doReturn 2L
-            on { modificationTime } doReturn now.plusMonths(2)
-            on { fileTypeInfo } doReturn mockTextFileTypeInfo
-        }
-        val photoResult2 = PhotoResult(
-            photo = photo2,
-            isMarkedSensitive = false
-        )
-        val photo2UiState = mock<PhotoUiState.Image>()
-        whenever(
-            photoUiStateMapper.invoke(photo = photo2)
-        ) doReturn photo2UiState
-        val sortResult = mock<TimelineSortedPhotosResult> {
-            on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
-        }
-        whenever(
-            monitorTimelinePhotosUseCase.sortPhotos(
-                photos = eq(emptyList()),
-                sortOrder = any()
+            durationInSecondsTextMapper(
+                duration = videoDuration
             )
-        ) doReturn sortResult
+        ) doReturn "0:16"
         whenever(
-            photosNodeListCardMapper.invoke(photosDateResults = any())
-        ) doReturn persistentListOf()
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = listOf(photo1, photo2),
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+            )
+        ) doReturn listOf(photo2, photo1)
+        whenever(
+            monitorTimelineMediaUseCase.invoke(request = any())
+        ) doReturn flowOf(listOf(photo1, photo2))
 
         underTest.uiState.test { cancelAndConsumeRemainingEvents() }
 
         underTest.actionUiState.test {
             assertThat(expectMostRecentItem().isReady).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that photosInDay contains one entry per distinct calendar day`() = runTest {
+        val now = ZonedDateTime.now()
+        val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+            on { extension } doReturn ".jpg"
+        }
+        val photo1 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 1L)
+            on { modificationTime } doReturn now.toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        val photo2 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 2L)
+            on { modificationTime } doReturn now.plusHours(1).toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        val photo3 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 3L)
+            on { modificationTime } doReturn now.minusDays(1).toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn
+                flowOf(listOf(photo1, photo2, photo3))
+        whenever(
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = listOf(photo1, photo2, photo3),
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+            )
+        ) doReturn listOf(photo1, photo2, photo3)
+
+        underTest.uiState.test {
+            val item = expectMostRecentItem()
+            assertThat(item.daysCardPhotos.size).isEqualTo(2)
+            assertThat(item.daysCardPhotos.all { it.period == PhotosNodeListCardPeriod.Day }).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that photosInDay count reflects the number of photos grouped under each day`() =
+        runTest {
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            val photo2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 2L)
+                on { modificationTime } doReturn now.plusHours(1).toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            val photo3 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 3L)
+                on { modificationTime } doReturn now.plusHours(2).toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn
+                    flowOf(listOf(photo1, photo2, photo3))
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo1, photo2, photo3),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo1, photo2, photo3)
+
+            underTest.uiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.daysCardPhotos.size).isEqualTo(1)
+                assertThat(item.daysCardPhotos.first().count).isEqualTo(3)
+            }
+        }
+
+    @Test
+    fun `test that photosInDay uses the first photo of each day as the card representative`() =
+        runTest {
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            val photo2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 2L)
+                on { modificationTime } doReturn now.plusHours(2).toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn
+                    flowOf(listOf(photo1, photo2))
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo1, photo2),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo1, photo2)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().daysCardPhotos.first().id).isEqualTo(1L)
+            }
+        }
+
+    @Test
+    fun `test that photosInMonth contains one entry per distinct year-month`() = runTest {
+        val now = ZonedDateTime.now()
+        val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+            on { extension } doReturn ".jpg"
+        }
+        val photo1 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 1L)
+            on { modificationTime } doReturn now.toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        val photo2 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 2L)
+            on { modificationTime } doReturn now.plusDays(5).toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        val photo3 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 3L)
+            on { modificationTime } doReturn now.minusMonths(1).toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn
+                flowOf(listOf(photo1, photo2, photo3))
+        whenever(
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = listOf(photo1, photo2, photo3),
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+            )
+        ) doReturn listOf(photo1, photo2, photo3)
+
+        underTest.uiState.test {
+            val item = expectMostRecentItem()
+            assertThat(item.monthsCardPhotos.size).isEqualTo(2)
+            assertThat(item.monthsCardPhotos.all { it.period == PhotosNodeListCardPeriod.Month }).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that photosInMonth groups photos from the same month across different days into one card`() =
+        runTest {
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photos = (1..4).map { i ->
+                mock<TypedFileNode> {
+                    on { id } doReturn NodeId(longValue = i.toLong())
+                    on { modificationTime } doReturn now.plusDays(i.toLong()).toEpochSecond()
+                    on { type } doReturn mockImageFileTypeInfo
+                    on { isMarkedSensitive } doReturn false
+                    on { isSensitiveInherited } doReturn false
+                    on { isFavourite } doReturn false
+                }
+            }
+            whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn
+                    flowOf(photos)
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = photos,
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn photos
+
+            underTest.uiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.monthsCardPhotos.size).isEqualTo(1)
+                assertThat(item.monthsCardPhotos.first().count).isEqualTo(4)
+            }
+        }
+
+    @Test
+    fun `test that photosInMonth formattedDate shows month only when photo year matches current year`() =
+        runTest {
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn flowOf(
+                listOf(
+                    photo
+                )
+            )
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo)
+
+            val expectedDate = TimelineFormatters.month.format(now)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().monthsCardPhotos.first().formattedDate).isEqualTo(
+                    expectedDate
+                )
+            }
+        }
+
+    @Test
+    fun `test that photosInMonth formattedDate shows month and year when photo year differs from current year`() =
+        runTest {
+            val lastYear = ZonedDateTime.now().minusYears(1)
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 1L)
+                on { modificationTime } doReturn lastYear.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn flowOf(
+                listOf(
+                    photo
+                )
+            )
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo)
+
+            underTest.uiState.test {
+                val expected = TimelineFormatters.monthYear.format(lastYear)
+                assertThat(expectMostRecentItem().monthsCardPhotos.first().formattedDate).isEqualTo(
+                    expected
+                )
+            }
+        }
+
+    @Test
+    fun `test that photosInYear contains one entry per distinct year`() = runTest {
+        val now = ZonedDateTime.now()
+        val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+            on { extension } doReturn ".jpg"
+        }
+        val photo1 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 1L)
+            on { modificationTime } doReturn now.toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        val photo2 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 2L)
+            on { modificationTime } doReturn now.minusMonths(3).toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        val photo3 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 3L)
+            on { modificationTime } doReturn now.minusYears(1).toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn
+                flowOf(listOf(photo1, photo2, photo3))
+        whenever(
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = listOf(photo1, photo2, photo3),
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+            )
+        ) doReturn listOf(photo1, photo2, photo3)
+
+        underTest.uiState.test {
+            val item = expectMostRecentItem()
+            assertThat(item.yearsCardPhotos.size).isEqualTo(2)
+            assertThat(item.yearsCardPhotos.all { it.period == PhotosNodeListCardPeriod.Year }).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that photosInYear groups all photos from the same year into one card`() = runTest {
+        val now = ZonedDateTime.now().withMonth(7)
+        val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+            on { extension } doReturn ".jpg"
+        }
+        val photos = (1..6).map { i ->
+            mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = i.toLong())
+                on { modificationTime } doReturn now.minusMonths(i.toLong()).toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+        }
+        whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn flowOf(photos)
+        whenever(
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = photos,
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+            )
+        ) doReturn photos
+
+        underTest.uiState.test {
+            val item = expectMostRecentItem()
+            assertThat(item.yearsCardPhotos.size).isEqualTo(1)
+            assertThat(item.yearsCardPhotos.first().count).isEqualTo(6)
+        }
+    }
+
+    @Test
+    fun `test that photosInYear formattedDate shows the year correctly`() = runTest {
+        val lastYear = ZonedDateTime.now().minusYears(1)
+        val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+            on { extension } doReturn ".jpg"
+        }
+        val photo = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 1L)
+            on { modificationTime } doReturn lastYear.toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn flowOf(
+            listOf(
+                photo
+            )
+        )
+        whenever(
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = listOf(photo),
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+            )
+        ) doReturn listOf(photo)
+
+        underTest.uiState.test {
+            val expected = TimelineFormatters.year.format(lastYear)
+            assertThat(
+                expectMostRecentItem().yearsCardPhotos.first().formattedDate
+            ).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that photosInDay photosInMonth and photosInYear are all empty when there are no photos`() =
+        runTest {
+            whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn flowOf(
+                emptyList()
+            )
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = eq(emptyList()),
+                    sortOrder = any()
+                )
+            ) doReturn emptyList()
+
+            underTest.uiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.daysCardPhotos).isEmpty()
+                assertThat(item.monthsCardPhotos).isEmpty()
+                assertThat(item.yearsCardPhotos).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that photosInDay photosInMonth and photosInYear card keys match the node id of the first photo in each group`() =
+        runTest {
+            val now = ZonedDateTime.now()
+            val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+                on { extension } doReturn ".jpg"
+            }
+            val photo1 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 10L)
+                on { modificationTime } doReturn now.toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            val photo2 = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = 20L)
+                on { modificationTime } doReturn now.minusYears(1).toEpochSecond()
+                on { type } doReturn mockImageFileTypeInfo
+                on { isMarkedSensitive } doReturn false
+                on { isSensitiveInherited } doReturn false
+                on { isFavourite } doReturn false
+            }
+            whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn
+                    flowOf(listOf(photo1, photo2))
+            whenever(
+                monitorTimelineMediaUseCase.sortMedia(
+                    nodes = listOf(photo1, photo2),
+                    sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+                )
+            ) doReturn listOf(photo1, photo2)
+
+            underTest.uiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.daysCardPhotos.map { it.key }).containsExactly(10L, 20L).inOrder()
+                assertThat(item.monthsCardPhotos.map { it.key }).containsExactly(10L, 20L)
+                    .inOrder()
+                assertThat(item.yearsCardPhotos.map { it.key }).containsExactly(10L, 20L).inOrder()
+            }
+        }
+
+    @Test
+    fun `test that sensitive photos are correctly flagged in day month and year cards`() = runTest {
+        val now = ZonedDateTime.now()
+        val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
+            on { extension } doReturn ".jpg"
+        }
+        val sensitivePhoto = mock<TypedFileNode> {
+            on { id } doReturn NodeId(longValue = 1L)
+            on { modificationTime } doReturn now.toEpochSecond()
+            on { type } doReturn mockImageFileTypeInfo
+            on { isMarkedSensitive } doReturn true
+            on { isSensitiveInherited } doReturn false
+            on { isFavourite } doReturn false
+        }
+        whenever(monitorTimelineMediaUseCase.invoke(request = any())) doReturn
+                flowOf(listOf(sensitivePhoto))
+        whenever(
+            monitorTimelineMediaUseCase.sortMedia(
+                nodes = listOf(sensitivePhoto),
+                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
+            )
+        ) doReturn listOf(sensitivePhoto)
+
+        underTest.uiState.test {
+            val item = expectMostRecentItem()
+            assertThat(item.daysCardPhotos.first().isSensitive).isTrue()
+            assertThat(item.monthsCardPhotos.first().isSensitive).isTrue()
+            assertThat(item.yearsCardPhotos.first().isSensitive).isTrue()
         }
     }
 }

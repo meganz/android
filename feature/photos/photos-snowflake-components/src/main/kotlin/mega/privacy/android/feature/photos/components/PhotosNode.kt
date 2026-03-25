@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -12,9 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -26,8 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import coil3.decode.DataSource
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -132,7 +132,8 @@ private fun BasicPhotosNode(
             .crossfade(enable = true)
             .build()
     }
-    var contentScale by remember { mutableStateOf(ContentScale.Crop) }
+    val painter = rememberAsyncImagePainter(model = request)
+    val state by painter.state.collectAsStateWithLifecycle()
     Box(
         modifier = modifier
             .aspectRatio(1f)
@@ -154,7 +155,7 @@ private fun BasicPhotosNode(
                     .clip(RoundedCornerShape(4.dp))
             }
     ) {
-        AsyncImage(
+        Image(
             modifier = Modifier
                 .aspectRatio(1f)
                 .background(color = DSTokens.colors.background.surface1)
@@ -167,17 +168,15 @@ private fun BasicPhotosNode(
                         .blur(16.dp)
                 }
                 .testTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_FILE_TAG),
-            model = request,
-            onState = { state ->
-                contentScale =
-                    if (state is AsyncImagePainter.State.Success && state.result.dataSource == DataSource.MEMORY) {
-                        ContentScale.Inside
-                    } else {
-                        ContentScale.Crop
-                    }
-            },
+            painter = painter,
             contentDescription = null,
-            contentScale = contentScale,
+            contentScale = when (state) {
+                is AsyncImagePainter.State.Success if (state as AsyncImagePainter.State.Success).result.dataSource == DataSource.MEMORY -> {
+                    ContentScale.Inside
+                }
+
+                else -> ContentScale.Crop
+            },
         )
 
         if (shouldShowFavourite) {

@@ -54,8 +54,11 @@ class AlbumsTabViewModel @Inject constructor(
         field = MutableStateFlow(AlbumsTabUiState())
 
     private var addNewAlbumJob: Job? = null
+    private var isInitialized = false
 
-    init {
+    internal fun initialize() {
+        if (isInitialized) return
+        isInitialized = true
         monitorShowHiddenItems()
         monitorThemeMode()
         monitorAlbums()

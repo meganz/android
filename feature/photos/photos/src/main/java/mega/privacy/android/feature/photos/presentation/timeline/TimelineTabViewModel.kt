@@ -7,62 +7,62 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.entity.photos.PhotoResult
+import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
-import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelineMediaUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
-import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
-import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
-import mega.privacy.android.feature.photos.model.PhotoNodeUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
+import mega.privacy.android.feature.photos.model.MediaType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
-import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedNodeMapper
-import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
 import timber.log.Timber
+import java.time.Year
+import java.time.YearMonth
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class TimelineTabViewModel @Inject constructor(
-    private val monitorTimelinePhotosUseCase: MonitorTimelinePhotosUseCase,
-    private val photoUiStateMapper: PhotoUiStateMapper,
-    private val fileTypeIconMapper: FileTypeIconMapper,
-    private val photosNodeListCardMapper: PhotosNodeListCardMapper,
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
-    private val photoToTypedNodeMapper: PhotoToTypedNodeMapper,
+    private val monitorTimelineMediaUseCase: MonitorTimelineMediaUseCase,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) : ViewModel() {
 
-    private var isHiddenNodesEnabled: Boolean = false
+    private var allMediaInTypedFileNodes: List<TypedFileNode> = emptyList()
+    private var lastDisplayedPhotos: List<PhotosNodeContentItemV2> = emptyList()
     private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
     private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
 
@@ -103,18 +103,12 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     internal val uiState: StateFlow<TimelineTabUiState> by lazy {
-        combine(
-            monitorPhotos(),
-            monitorHiddenNodesEnabledUseCase().catch {
-                Timber.e(it, "Unable to monitor hidden nodes enabled")
-            }
-        ) { timelineTabUiState, isEnabled ->
-            isHiddenNodesEnabled = isEnabled
-            timelineTabUiState
-        }.asUiStateFlow(
-            scope = viewModelScope,
-            initialValue = TimelineTabUiState()
-        )
+        monitorPhotos()
+            .distinctUntilChanged()
+            .asUiStateFlow(
+                scope = viewModelScope,
+                initialValue = TimelineTabUiState()
+            )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -122,92 +116,247 @@ class TimelineTabViewModel @Inject constructor(
         combine(
             flow = photosFlow(),
             flow2 = gridSizeFlow,
-            transform = ::Pair
-        ).map { (photos, gridSize) ->
+            flow3 = monitorHiddenNodesEnabledUseCase().catch {
+                Timber.e(it, "Unable to monitor hidden nodes enabled")
+            },
+            transform = ::Triple
+        ).map { (mediaGroup, gridSize, isHiddenNodesEnabled) ->
             buildTimelineTabUiState(
-                allPhotos = photos.first,
-                sortResult = photos.second,
+                mediaGroup = mediaGroup,
                 gridSize = gridSize,
+                isHiddenNodesEnabled = isHiddenNodesEnabled
             )
         }
 
     private fun photosFlow() = combine(
-        flow = monitorTimelinePhotosUseCase(
+        flow = monitorTimelineMediaUseCase(
             request = TimelinePhotosRequest(
                 selectedFilterFlow = selectedFilterFlow
             )
         ).catch { Timber.e(it) },
         flow2 = sortOptionsFlow,
-    ) { photosResult, sortOptions ->
-        val sortResult = monitorTimelinePhotosUseCase.sortPhotos(
-            photos = photosResult.nonSensitivePhotos,
+    ) { nodes, sortOptions ->
+        val sortResult = monitorTimelineMediaUseCase.sortMedia(
+            nodes = nodes,
             sortOrder = sortOptions.sortOrder
         )
-        Pair(photosResult.allPhotos, sortResult)
+        buildMediaGroup(nodes = sortResult)
     }
 
-    private suspend fun buildTimelineTabUiState(
-        allPhotos: List<PhotoResult>,
-        sortResult: TimelineSortedPhotosResult,
-        gridSize: TimelineGridSize,
-    ): TimelineTabUiState = coroutineScope {
-        val displayedPhotos = async {
-            buildList {
-                sortResult.sortedPhotos.forEachIndexed { index, photoResult ->
-                    val shouldShowDate = index == 0 || needsDateSeparator(
-                        current = photoResult.photo,
-                        previous = sortResult.sortedPhotos[index - 1].photo,
-                        gridSize = gridSize
-                    )
-                    if (shouldShowDate) {
-                        add(
-                            PhotosNodeContentItem.HeaderItem(
-                                time = photoResult.photo.modificationTime
-                            )
-                        )
-                    }
-                    add(
-                        PhotosNodeContentItem.PhotoNodeItem(
-                            node = PhotoNodeUiState(
-                                photo = photoUiStateMapper(photoResult.photo),
-                                isSensitive = photoResult.isMarkedSensitive,
-                                defaultIcon = fileTypeIconMapper(photoResult.photo.fileTypeInfo.extension)
-                            )
-                        )
-                    )
-                }
+    private fun buildMediaGroup(nodes: List<TypedFileNode>): MediaGroup {
+        if (nodes.isEmpty()) {
+            return MediaGroup(
+                sortedPhotos = emptyList(),
+                photosInDay = emptyList(),
+                photosInMonth = emptyList(),
+                photosInYear = emptyList()
+            )
+        }
+
+        // Generate a map of days (12 March, 25 May, etc), months, and years to its total media.
+        val dayMap = LinkedHashMap<Long, Pair<TypedFileNode, Int>>()
+        val monthCountMap = HashMap<YearMonth, Int>()
+        val yearCountMap = HashMap<Int, Int>()
+        for (node in nodes) {
+            val key = TimelineDateCache.epochDay(node.modificationTime)
+            val zdt = TimelineDateCache.get(node.modificationTime)
+            val month = YearMonth.from(zdt)
+            val year = zdt.year
+            val current = dayMap[key]
+            if (current == null) {
+                dayMap[key] = node to 1
+            } else {
+                dayMap[key] = current.first to (current.second + 1)
             }
+            monthCountMap[month] = (monthCountMap[month] ?: 0) + (dayMap[key]?.second ?: 0)
+            yearCountMap[year] = (yearCountMap[year] ?: 0) + (dayMap[key]?.second ?: 0)
         }
-        val daysCardPhotos = async {
-            photosNodeListCardMapper(photosDateResults = sortResult.photosInDay)
+
+        val nowYear = Year.now()
+        val dayList = mutableListOf<PhotosNodeListCard>()
+        val monthList = mutableListOf<PhotosNodeListCard>()
+        val yearList = mutableListOf<PhotosNodeListCard>()
+
+        val seenMonths = HashSet<YearMonth>()
+        val seenYears = HashSet<Int>()
+
+        for ((node, count) in dayMap.values) {
+            val zdt = TimelineDateCache.get(node.modificationTime)
+            val year = zdt.year
+            val month = YearMonth.from(zdt)
+            val key = node.id.longValue
+            if (seenYears.add(year)) {
+                yearList.add(
+                    PhotosNodeListCard(
+                        period = PhotosNodeListCardPeriod.Year,
+                        key = key,
+                        id = node.id.longValue,
+                        day = zdt.dayOfMonth,
+                        month = zdt.monthValue,
+                        year = zdt.year,
+                        formattedDate = TimelineFormatters.year.format(zdt),
+                        thumbnailFilePath = node.thumbnailPath,
+                        previewFilePath = node.previewPath,
+                        extension = node.type.extension,
+                        isSensitive = node.isMarkedSensitive || node.isSensitiveInherited,
+                        count = yearCountMap[year] ?: count
+                    )
+                )
+            }
+
+            if (seenMonths.add(month)) {
+                val date = if (year == nowYear.value) {
+                    TimelineFormatters.month.format(zdt)
+                } else {
+                    TimelineFormatters.monthYear.format(zdt)
+                }
+                monthList.add(
+                    PhotosNodeListCard(
+                        period = PhotosNodeListCardPeriod.Month,
+                        key = key,
+                        id = node.id.longValue,
+                        day = zdt.dayOfMonth,
+                        month = zdt.monthValue,
+                        year = zdt.year,
+                        formattedDate = date,
+                        thumbnailFilePath = node.thumbnailPath,
+                        previewFilePath = node.previewPath,
+                        extension = node.type.extension,
+                        isSensitive = node.isMarkedSensitive || node.isSensitiveInherited,
+                        count = monthCountMap[month] ?: count
+                    )
+                )
+            }
+
+            val date = if (year == nowYear.value) {
+                TimelineFormatters.dayMonth.format(zdt)
+            } else {
+                TimelineFormatters.dayMonthYear.format(zdt)
+            }
+            dayList.add(
+                PhotosNodeListCard(
+                    period = PhotosNodeListCardPeriod.Day,
+                    key = key,
+                    id = node.id.longValue,
+                    day = zdt.dayOfMonth,
+                    month = zdt.monthValue,
+                    year = zdt.year,
+                    formattedDate = date,
+                    thumbnailFilePath = node.thumbnailPath,
+                    previewFilePath = node.previewPath,
+                    extension = node.type.extension,
+                    isSensitive = node.isMarkedSensitive || node.isSensitiveInherited,
+                    count = count
+                )
+            )
         }
-        val monthsCardPhotos = async {
-            photosNodeListCardMapper(photosDateResults = sortResult.photosInMonth)
-        }
-        val yearsCardPhotos = async {
-            photosNodeListCardMapper(photosDateResults = sortResult.photosInYear)
+
+        return MediaGroup(
+            sortedPhotos = nodes,
+            photosInDay = dayList,
+            photosInMonth = monthList,
+            photosInYear = yearList
+        )
+    }
+
+    private fun buildTimelineTabUiState(
+        mediaGroup: MediaGroup,
+        gridSize: TimelineGridSize,
+        isHiddenNodesEnabled: Boolean,
+    ): TimelineTabUiState {
+        allMediaInTypedFileNodes = mediaGroup.sortedPhotos
+        val newDisplayedPhotos = buildDisplayedPhotos(mediaGroup, gridSize)
+        val displayedPhotos = if (newDisplayedPhotos == lastDisplayedPhotos) {
+            lastDisplayedPhotos
+        } else {
+            lastDisplayedPhotos = newDisplayedPhotos
+            newDisplayedPhotos
         }
         actionFlow.update { it.copy(isReady = true) }
-        TimelineTabUiState(
+        return TimelineTabUiState(
             isLoading = false,
-            allPhotos = allPhotos,
-            displayedPhotos = displayedPhotos.await(),
-            daysCardPhotos = daysCardPhotos.await(),
-            monthsCardPhotos = monthsCardPhotos.await(),
-            yearsCardPhotos = yearsCardPhotos.await(),
+            displayedPhotos = displayedPhotos,
+            daysCardPhotos = mediaGroup.photosInDay,
+            monthsCardPhotos = mediaGroup.photosInMonth,
+            yearsCardPhotos = mediaGroup.photosInYear,
             gridSize = gridSize,
             currentSort = sortOptionsFlow.value,
+            isHiddenNodesEnabled = isHiddenNodesEnabled
         )
+    }
+
+    private fun buildDisplayedPhotos(
+        mediaGroup: MediaGroup,
+        gridSize: TimelineGridSize,
+    ): List<PhotosNodeContentItemV2> = buildList {
+        mediaGroup.sortedPhotos.forEachIndexed { index, node ->
+            val currentTime = TimelineDateCache.get(node.modificationTime)
+            val shouldShowDate = index == 0 || needsDateSeparator(
+                currentTime = currentTime,
+                previousTime = TimelineDateCache.get(
+                    mediaGroup.sortedPhotos[index - 1].modificationTime
+                ),
+                gridSize = gridSize
+            )
+            val mediaType =
+                if (node.type is ImageFileTypeInfo) MediaType.Image else MediaType.Video
+            val isSensitive = node.isMarkedSensitive || node.isSensitiveInherited
+            val duration = if (node.type is VideoFileTypeInfo) {
+                durationInSecondsTextMapper(duration = (node.type as VideoFileTypeInfo).duration)
+            } else {
+                ""
+            }
+
+            if (shouldShowDate) {
+                add(
+                    PhotosNodeContentItemV2(
+                        key = -node.id.longValue,
+                        contentType = PhotosNodeContentType.Header,
+                        id = node.id.longValue,
+                        mediaType = mediaType,
+                        day = currentTime.dayOfMonth,
+                        month = currentTime.monthValue,
+                        year = currentTime.year,
+                        fullModificationTime = node.modificationTime,
+                        thumbnailFilePath = node.thumbnailPath,
+                        previewFilePath = node.previewPath,
+                        extension = node.type.extension,
+                        isFavourite = node.isFavourite,
+                        isSensitive = isSensitive,
+                        duration = duration
+                    )
+                )
+            }
+
+            add(
+                PhotosNodeContentItemV2(
+                    key = node.id.longValue,
+                    contentType = PhotosNodeContentType.PhotoNode,
+                    id = node.id.longValue,
+                    mediaType = mediaType,
+                    day = currentTime.dayOfMonth,
+                    month = currentTime.monthValue,
+                    year = currentTime.year,
+                    fullModificationTime = node.modificationTime,
+                    thumbnailFilePath = node.thumbnailPath,
+                    previewFilePath = node.previewPath,
+                    extension = node.type.extension,
+                    isFavourite = node.isFavourite,
+                    isSensitive = isSensitive,
+                    duration = duration
+                )
+            )
+        }
     }
 
     private fun needsDateSeparator(
-        current: Photo,
-        previous: Photo,
+        currentTime: ZonedDateTime,
+        previousTime: ZonedDateTime,
         gridSize: TimelineGridSize,
     ): Boolean = if (gridSize == TimelineGridSize.Large) {
-        current.modificationTime != previous.modificationTime
+        currentTime != previousTime
     } else {
-        current.modificationTime.month != previous.modificationTime.month
+        currentTime.month != previousTime.month
     }
 
     internal fun onSortOptionsChange(value: TimelineTabSortOptions) {
@@ -301,11 +450,7 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     internal fun retrieveTypedNodeFromSelection(selectedIds: Set<Long>): List<TypedNode> {
-        val nodes = uiState.value.allPhotos
-            .asSequence()
-            .filter { it.photo.id in selectedIds }
-            .map { photoToTypedNodeMapper(it.photo) }
-            .toList()
+        val nodes = allMediaInTypedFileNodes.filter { it.id.longValue in selectedIds }
         _selectedPhotosInTypedNodesFlow.update { nodes }
         return nodes
     }
@@ -313,4 +458,11 @@ class TimelineTabViewModel @Inject constructor(
     internal fun onMediaTimePeriodSelected(value: MediaTimePeriod) {
         selectedTimePeriod = value
     }
+
+    private data class MediaGroup(
+        val sortedPhotos: List<TypedFileNode>,
+        val photosInDay: List<PhotosNodeListCard>,
+        val photosInMonth: List<PhotosNodeListCard>,
+        val photosInYear: List<PhotosNodeListCard>,
+    )
 }

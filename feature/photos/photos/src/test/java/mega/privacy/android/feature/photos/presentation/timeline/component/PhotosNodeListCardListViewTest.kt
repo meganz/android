@@ -14,8 +14,8 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoNodeListCardItem
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,27 +45,47 @@ class PhotosNodeListCardListViewTest {
         val secondDate = "secondDate"
         val thirdDate = "thirdDate"
         val photos = persistentListOf(
-            PhotosNodeListCard.Days(
-                date = firstDate,
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = false
-                ),
-                photosCount = 10
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Day,
+                key = 1L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = firstDate,
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = false,
+                count = 10
             ),
-            PhotosNodeListCard.Months(
-                date = secondDate,
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = true
-                ),
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Month,
+                key = 2L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = secondDate,
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = true,
+                count = 10
             ),
-            PhotosNodeListCard.Years(
-                date = thirdDate,
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = false
-                ),
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Year,
+                key = 3L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = thirdDate,
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = false,
+                count = 10
             )
         )
         composeRuleScope {
@@ -82,21 +102,20 @@ class PhotosNodeListCardListViewTest {
     @Test
     fun `test that the image item is displayed`() {
         val photoId = 1L
-        val photo = mock<PhotoUiState.Image> {
-            on { id } doReturn photoId
-            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
-                mimeType = "",
-                extension = "jpg"
-            )
-        }
         val photos = persistentListOf(
-            PhotosNodeListCard.Days(
-                date = "2 September",
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = false
-                ),
-                photosCount = 10
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Day,
+                key = 3L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = "2 September",
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = false,
+                count = 10
             )
         )
         composeRuleScope {
@@ -111,21 +130,20 @@ class PhotosNodeListCardListViewTest {
     @Test
     fun `test that the photo count is displayed when the photos count is greater than 1 and the period is days`() {
         val photoId = 1L
-        val photo = mock<PhotoUiState.Image> {
-            on { id } doReturn photoId
-            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
-                mimeType = "",
-                extension = "jpg"
-            )
-        }
         val photos = persistentListOf(
-            PhotosNodeListCard.Days(
-                date = "2 September",
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = false
-                ),
-                photosCount = 10
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Day,
+                key = 3L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = "2 September",
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = false,
+                count = 10
             )
         )
         composeRuleScope {
@@ -140,21 +158,20 @@ class PhotosNodeListCardListViewTest {
     @Test
     fun `test that the photo count does not exist when the photos count is less than 1 and the period is days`() {
         val photoId = 1L
-        val photo = mock<PhotoUiState.Image> {
-            on { id } doReturn photoId
-            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
-                mimeType = "",
-                extension = "jpg"
-            )
-        }
         val photos = persistentListOf(
-            PhotosNodeListCard.Days(
-                date = "2 September",
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = false
-                ),
-                photosCount = 0
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Day,
+                key = 3L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = "2 September",
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = false,
+                count = 0
             )
         )
         composeRuleScope {
@@ -175,13 +192,19 @@ class PhotosNodeListCardListViewTest {
             )
         }
         val photos = persistentListOf(
-            PhotosNodeListCard.Days(
-                date = "2 September",
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = false
-                ),
-                photosCount = 1
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Day,
+                key = 3L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = "2 September",
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = false,
+                count = 1
             )
         )
         composeRuleScope {
@@ -194,20 +217,20 @@ class PhotosNodeListCardListViewTest {
     @Test
     fun `test that the photo count does not exist when the period is not days`() {
         val photoId = 1L
-        val photo = mock<PhotoUiState.Image> {
-            on { id } doReturn photoId
-            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
-                mimeType = "",
-                extension = "jpg"
-            )
-        }
         val photos = persistentListOf(
-            PhotosNodeListCard.Years(
-                date = "2025",
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = false
-                ),
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Year,
+                key = 3L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = "2025",
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = false,
+                count = 1
             )
         )
         composeRuleScope {
@@ -220,21 +243,20 @@ class PhotosNodeListCardListViewTest {
     @Test
     fun `test that the photo counter for days is successfully clicked`() {
         val photoId = 1L
-        val photo = mock<PhotoUiState.Image> {
-            on { id } doReturn photoId
-            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
-                mimeType = "",
-                extension = "jpg"
-            )
-        }
         val photos = persistentListOf(
-            PhotosNodeListCard.Days(
-                date = "2 September",
-                photoItem = PhotoNodeListCardItem(
-                    photo = photo,
-                    isMarkedSensitive = false
-                ),
-                photosCount = 10
+            PhotosNodeListCard(
+                period = PhotosNodeListCardPeriod.Day,
+                key = 3L,
+                id = photoId,
+                day = 1,
+                month = 1,
+                year = 1,
+                formattedDate = "2 September",
+                thumbnailFilePath = null,
+                previewFilePath = null,
+                extension = "",
+                isSensitive = false,
+                count = 10
             )
         )
         composeRuleScope {
@@ -257,11 +279,13 @@ class PhotosNodeListCardListViewTest {
 
     private fun ComposeContentTestRule.setView(
         photos: ImmutableList<PhotosNodeListCard> = persistentListOf(),
+        isHiddenNodesEnabled: Boolean = false,
         onClick: (photo: PhotosNodeListCard) -> Unit = {},
     ) {
         setContent {
             PhotosNodeListCardListView(
                 photos = photos,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
                 onClick = onClick
             )
         }

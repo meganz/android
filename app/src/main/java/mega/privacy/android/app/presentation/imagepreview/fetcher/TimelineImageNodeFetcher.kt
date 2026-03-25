@@ -6,26 +6,29 @@ import android.os.Bundle
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.ImageNode
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.FilterCameraUploadImageNodesUseCase
-import mega.privacy.android.domain.usecase.FilterCloudDriveImageNodesUseCase
-import mega.privacy.android.domain.usecase.photos.MonitorTimelineNodesUseCase
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.photos.FilterCameraUploadMediaUseCase
+import mega.privacy.android.domain.usecase.photos.FilterCloudDriveMediaUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorMediaTypedNodesUseCase
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import javax.inject.Inject
 
 class TimelineImageNodeFetcher @Inject constructor(
-    private val monitorTimelineNodesUseCase: MonitorTimelineNodesUseCase,
-    private val filterCloudDriveImageNodesUseCase: FilterCloudDriveImageNodesUseCase,
-    private val filterCameraUploadImageNodesUseCase: FilterCameraUploadImageNodesUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val monitorMediaTypedNodesUseCase: MonitorMediaTypedNodesUseCase,
+    private val filterCloudDriveMediaUseCase: FilterCloudDriveMediaUseCase,
+    private val filterCameraUploadMediaUseCase: FilterCameraUploadMediaUseCase,
 ) : ImageNodeFetcher {
 
     override fun monitorImageNodes(bundle: Bundle): Flow<List<ImageNode>> {
@@ -35,21 +38,22 @@ class TimelineImageNodeFetcher @Inject constructor(
         val source = bundle.serializable<TimelinePhotosSource>(TIMELINE_MEDIA_SOURCE)
             ?: TimelinePhotosSource.ALL_PHOTOS
 
-        return monitorTimelineNodesUseCase().mapLatest { imageNodes ->
+        return monitorMediaTypedNodesUseCase().mapLatest { imageNodes ->
             val filteredImageNodes = filterImageNodes(imageNodes, mediaType, source)
-            sortImageNodes(filteredImageNodes, sortType)
+            val sortResult = sortImageNodes(filteredImageNodes, sortType)
+            sortResult.toImageNodes()
         }.flowOn(defaultDispatcher)
     }
 
     private suspend fun filterImageNodes(
-        imageNodes: List<ImageNode>,
+        imageNodes: List<TypedFileNode>,
         mediaType: FilterMediaType,
         source: TimelinePhotosSource,
-    ): List<ImageNode> {
+    ): List<TypedFileNode> {
         val filteredImageNodes = when (source) {
             TimelinePhotosSource.ALL_PHOTOS -> imageNodes
-            TimelinePhotosSource.CLOUD_DRIVE -> filterCloudDriveImageNodesUseCase(imageNodes)
-            TimelinePhotosSource.CAMERA_UPLOAD -> filterCameraUploadImageNodesUseCase(imageNodes)
+            TimelinePhotosSource.CLOUD_DRIVE -> filterCloudDriveMediaUseCase(imageNodes)
+            TimelinePhotosSource.CAMERA_UPLOAD -> filterCameraUploadMediaUseCase(imageNodes)
         }
 
         return when (mediaType) {
@@ -59,11 +63,55 @@ class TimelineImageNodeFetcher @Inject constructor(
         }
     }
 
-    private fun sortImageNodes(imageNodes: List<ImageNode>, sortType: Sort): List<ImageNode> {
+    private fun sortImageNodes(
+        imageNodes: List<TypedFileNode>,
+        sortType: Sort,
+    ): List<TypedFileNode> {
         return when (sortType) {
-            Sort.NEWEST -> imageNodes.sortedWith(compareByDescending<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
-            Sort.OLDEST -> imageNodes.sortedWith(compareBy<ImageNode> { it.modificationTime }.thenByDescending { it.id.longValue })
+            Sort.NEWEST -> imageNodes.sortedWith(compareByDescending<TypedFileNode> { it.modificationTime }.thenByDescending { it.id.longValue })
+            Sort.OLDEST -> imageNodes.sortedWith(compareBy<TypedFileNode> { it.modificationTime }.thenByDescending { it.id.longValue })
             else -> imageNodes
+        }
+    }
+
+    private fun List<TypedFileNode>.toImageNodes(): List<ImageNode> = map {
+        object : ImageNode {
+            override val id = it.id
+            override val name = it.name
+            override val size = it.size
+            override val label = it.label
+            override val nodeLabel = it.nodeLabel
+            override val parentId = it.parentId
+            override val base64Id = it.base64Id
+            override val restoreId = it.restoreId
+            override val creationTime = it.creationTime
+            override val modificationTime = it.modificationTime
+            override val thumbnailPath = null
+            override val previewPath = null
+            override val fullSizePath = null
+            override val type = it.type
+            override val isFavourite = it.isFavourite
+            override val isMarkedSensitive = it.isMarkedSensitive
+            override val isSensitiveInherited = it.isSensitiveInherited
+            override val exportedData = it.exportedData
+            override val isTakenDown = it.isTakenDown
+            override val isIncomingShare = it.isIncomingShare
+            override val fingerprint = it.fingerprint
+            override val originalFingerprint = it.originalFingerprint
+            override val isNodeKeyDecrypted = it.isNodeKeyDecrypted
+            override val hasThumbnail = it.hasThumbnail
+            override val hasPreview = it.hasPreview
+            override val downloadThumbnail: suspend (String) -> String = { _ -> "" }
+            override val downloadPreview: suspend (String) -> String = { _ -> "" }
+            override val downloadFullImage: (String, Boolean, () -> Unit) -> Flow<ImageProgress> =
+                { _, _, _ -> flowOf() }
+            override val latitude = 0.0
+            override val longitude = 0.0
+            override val serializedData = it.serializedData
+            override val isAvailableOffline: Boolean = it.isAvailableOffline
+            override val versionCount: Int = it.versionCount
+            override val description: String? = it.description
+            override val tags: List<String>? = it.tags
         }
     }
 

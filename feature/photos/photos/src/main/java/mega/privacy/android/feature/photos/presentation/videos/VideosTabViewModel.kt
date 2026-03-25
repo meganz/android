@@ -17,14 +17,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -44,6 +43,8 @@ import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -64,6 +65,23 @@ class VideosTabViewModel @Inject constructor(
 ) : ViewModel() {
     private val queryFlow = MutableStateFlow<String?>(null)
     private val selectedVideoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
+    private var areAllSelected: Boolean = false
+
+    internal val selectionUiState: StateFlow<VideosTabUiState.Selection> =
+        selectedVideoIdsFlow
+            .map { ids ->
+                VideosTabUiState.Selection(
+                    count = ids.size,
+                    areAllSelected = areAllSelected
+                )
+            }
+            .asUiStateFlow(
+                viewModelScope,
+                VideosTabUiState.Selection(
+                    count = 0,
+                    areAllSelected = false
+                )
+            )
 
     private val navigateToVideoPlayerFlow =
         MutableStateFlow<StateEventWithContent<NavKey>>(consumed())
@@ -232,7 +250,9 @@ class VideosTabViewModel @Inject constructor(
     }
 
     internal fun selectAllVideos() {
+        areAllSelected = false
         val state = uiState.value as? VideosTabUiState.Data ?: return
+        areAllSelected = true
         val allIds = state.allVideoEntities.map { it.id.longValue }
         selectedVideoIdsFlow.update { allIds }
     }

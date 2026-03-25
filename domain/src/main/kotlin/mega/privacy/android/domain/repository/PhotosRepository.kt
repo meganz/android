@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import java.io.File
@@ -32,6 +33,7 @@ interface PhotosRepository {
     /**
      * Monitor photos
      */
+    @Deprecated("Please consider using monitorMediaTypedNodes")
     fun monitorPhotos(): Flow<List<Photo>>
 
     /**
@@ -251,4 +253,14 @@ interface PhotosRepository {
      * Reset the enable camera upload banner dismissed timestamp.
      */
     suspend fun resetEnableCameraUploadBannerDismissedTimestamp()
+
+    /**
+     * Retrieve all media in a list of [TypedNode]s.
+     */
+    suspend fun getMediaTypedNodes(): List<TypedNode>
+
+    /**
+     * Monitor the media in a list of [TypedNode]s.
+     */
+    val monitorMediaTypedNodes: Flow<List<TypedNode>>
 }

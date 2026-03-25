@@ -30,6 +30,7 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
+@Deprecated("Please use MonitorTimelineMediaUseCase for better memory efficiency.")
 class MonitorTimelinePhotosUseCase @Inject constructor(
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,

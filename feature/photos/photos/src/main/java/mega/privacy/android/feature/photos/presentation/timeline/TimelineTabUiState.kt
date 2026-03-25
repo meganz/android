@@ -2,24 +2,23 @@ package mega.privacy.android.feature.photos.presentation.timeline
 
 import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.photos.PhotoResult
-import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.domain.entity.photos.FilterMediaType
-import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.shared.resources.R as sharedR
 
 data class TimelineTabUiState(
     val isLoading: Boolean = true,
-    val allPhotos: List<PhotoResult> = emptyList(),
-    val displayedPhotos: List<PhotosNodeContentItem> = emptyList(),
+    val displayedPhotos: List<PhotosNodeContentItemV2> = emptyList(),
     val daysCardPhotos: List<PhotosNodeListCard> = emptyList(),
     val monthsCardPhotos: List<PhotosNodeListCard> = emptyList(),
     val yearsCardPhotos: List<PhotosNodeListCard> = emptyList(),
     val gridSize: TimelineGridSize = TimelineGridSize.Default,
     val currentSort: TimelineTabSortOptions = TimelineTabSortOptions.Newest,
+    val isHiddenNodesEnabled: Boolean = false,
 )
 
 data class TimelineTabActionUiState(

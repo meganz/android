@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
-import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -30,7 +29,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -82,6 +80,7 @@ internal class AlbumsTabViewModelTest {
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase
         )
+        underTest.initialize()
     }
 
     @Test
@@ -193,6 +192,7 @@ internal class AlbumsTabViewModelTest {
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase
         )
+        underTest.initialize()
 
         underTest.uiState.test {
             val state = awaitItem()

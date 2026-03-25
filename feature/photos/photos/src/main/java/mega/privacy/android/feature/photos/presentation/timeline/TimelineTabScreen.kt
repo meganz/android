@@ -65,12 +65,11 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.MediaTimePeriodSelector
-import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridView
+import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridViewV2
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
@@ -102,8 +101,8 @@ internal fun TimelineTabRoute(
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onSortDialogDismissed: () -> Unit,
     onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
-    onPhotoClick: (node: PhotoNodeUiState) -> Unit,
-    onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
+    onPhotoClick: (id: Long) -> Unit,
+    onPhotoSelected: (id: Long) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
@@ -151,8 +150,8 @@ internal fun TimelineTabScreen(
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onSortDialogDismissed: () -> Unit,
     onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
-    onPhotoClick: (node: PhotoNodeUiState) -> Unit,
-    onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
+    onPhotoClick: (id: Long) -> Unit,
+    onPhotoSelected: (id: Long) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
@@ -401,8 +400,8 @@ private fun TimelineTabContent(
     shouldShowTimePeriodSelector: Boolean,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
-    onPhotoClick: (node: PhotoNodeUiState) -> Unit,
-    onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
+    onPhotoClick: (id: Long) -> Unit,
+    onPhotoSelected: (id: Long) -> Unit,
     onPhotosNodeListCardClick: (photo: PhotosNodeListCard) -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
     onRequestNotificationPermission: () -> Unit,
@@ -421,7 +420,7 @@ private fun TimelineTabContent(
     ) {
         when (selectedTimePeriod) {
             MediaTimePeriod.All -> {
-                PhotosNodeGridView(
+                PhotosNodeGridViewV2(
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag(TIMELINE_TAB_CONTENT_GRID_VIEW_TAG),
@@ -434,6 +433,7 @@ private fun TimelineTabContent(
                         }
                     ),
                     items = uiState.displayedPhotos,
+                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                     selectedPhotoIds = selectedPhotoIds,
                     gridSize = uiState.gridSize,
                     onGridSizeChange = onGridSizeChange,
@@ -469,6 +469,7 @@ private fun TimelineTabContent(
                     state = lazyListState,
                     contentPadding = PaddingValues(bottom = 50.dp),
                     photos = items,
+                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                     onClick = onPhotosNodeListCardClick,
                     header = {
                         if (selectedPhotoIds.isEmpty()) {

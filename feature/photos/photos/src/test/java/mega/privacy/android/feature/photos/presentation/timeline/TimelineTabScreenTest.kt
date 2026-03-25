@@ -14,11 +14,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
-import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.PhotoNodeUiState
-import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
+import mega.privacy.android.feature.photos.model.MediaType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
@@ -32,11 +31,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
@@ -173,8 +171,20 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentItem.HeaderItem(
-                            time = LocalDateTime.now()
+                        PhotosNodeContentItemV2(
+                            key = -1L,
+                            contentType = PhotosNodeContentType.Header,
+                            id = 1L,
+                            mediaType = MediaType.Image,
+                            day = 1,
+                            month = 1,
+                            year = 1,
+                            fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            extension = "",
+                            isFavourite = false,
+                            isSensitive = false
                         )
                     )
                 ),
@@ -194,8 +204,20 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentItem.HeaderItem(
-                            time = LocalDateTime.now()
+                        PhotosNodeContentItemV2(
+                            key = -1L,
+                            contentType = PhotosNodeContentType.Header,
+                            id = 1L,
+                            mediaType = MediaType.Image,
+                            day = 1,
+                            month = 1,
+                            year = 1,
+                            fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            extension = "",
+                            isFavourite = false,
+                            isSensitive = false
                         )
                     )
                 ),
@@ -214,8 +236,20 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentItem.HeaderItem(
-                            time = LocalDateTime.now()
+                        PhotosNodeContentItemV2(
+                            key = -1L,
+                            contentType = PhotosNodeContentType.Header,
+                            id = 1L,
+                            mediaType = MediaType.Image,
+                            day = 1,
+                            month = 1,
+                            year = 1,
+                            fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            extension = "",
+                            isFavourite = false,
+                            isSensitive = false
                         )
                     )
                 ),
@@ -233,8 +267,20 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentItem.HeaderItem(
-                            time = LocalDateTime.now(),
+                        PhotosNodeContentItemV2(
+                            key = -1L,
+                            contentType = PhotosNodeContentType.Header,
+                            id = 1L,
+                            mediaType = MediaType.Image,
+                            day = 1,
+                            month = 1,
+                            year = 1,
+                            fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            extension = "",
+                            isFavourite = false,
+                            isSensitive = false
                         )
                     ),
                 ),
@@ -263,24 +309,28 @@ class TimelineTabScreenTest {
     @Test
     fun `test that the photo is successfully clicked`() {
         val photoId = 1L
-        val photoUiState = mock<PhotoUiState.Image> {
-            on { id } doReturn photoId
-            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
-                mimeType = "",
-                extension = "jpg"
-            )
-        }
-        val node = PhotoNodeUiState(
-            photo = photoUiState,
-            isSensitive = false,
-            defaultIcon = mega.privacy.android.icon.pack.R.drawable.ic_3d_medium_solid,
-        )
         composeRuleScope {
-            val onPhotoClick = mock<(node: PhotoNodeUiState) -> Unit>()
+            val onPhotoClick = mock<(id: Long) -> Unit>()
             setScreen(
                 uiState = TimelineTabUiState(
                     isLoading = false,
-                    displayedPhotos = listOf(PhotosNodeContentItem.PhotoNodeItem(node = node))
+                    displayedPhotos = listOf(
+                        PhotosNodeContentItemV2(
+                            key = -photoId,
+                            contentType = PhotosNodeContentType.PhotoNode,
+                            id = photoId,
+                            mediaType = MediaType.Image,
+                            day = 1,
+                            month = 1,
+                            year = 1,
+                            fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            extension = "",
+                            isFavourite = false,
+                            isSensitive = false
+                        )
+                    )
                 ),
                 onPhotoClick = onPhotoClick,
             )
@@ -289,7 +339,7 @@ class TimelineTabScreenTest {
                 .performScrollTo()
                 .performClick()
 
-            verify(onPhotoClick).invoke(node)
+            verify(onPhotoClick).invoke(photoId)
         }
     }
 
@@ -301,8 +351,20 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentItem.HeaderItem(
-                            time = LocalDateTime.now(),
+                        PhotosNodeContentItemV2(
+                            key = -1L,
+                            contentType = PhotosNodeContentType.Header,
+                            id = 1L,
+                            mediaType = MediaType.Image,
+                            day = 1,
+                            month = 1,
+                            year = 1,
+                            fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            extension = "",
+                            isFavourite = false,
+                            isSensitive = false
                         )
                     ),
                 ),
@@ -338,8 +400,8 @@ class TimelineTabScreenTest {
         onGridSizeChange: (value: TimelineGridSize) -> Unit = {},
         onSortDialogDismissed: () -> Unit = {},
         onSortOptionChange: (value: TimelineTabSortOptions) -> Unit = {},
-        onPhotoClick: (node: PhotoNodeUiState) -> Unit = {},
-        onPhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
+        onPhotoClick: (id: Long) -> Unit = {},
+        onPhotoSelected: (id: Long) -> Unit = {},
         handleCameraUploadsPermissionsResult: () -> Unit = {},
         handleNotificationPermissionResult: () -> Unit = {},
         onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit = {},

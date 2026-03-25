@@ -12,11 +12,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
-import mega.privacy.android.feature.photos.model.PhotosNodeContentItem.PhotoNodeItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
-import java.time.LocalDateTime
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 
 @Composable
 internal fun rememberTimelineLazyListState(selectedTimePeriod: MediaTimePeriod): TimelineLazyListState {
@@ -100,39 +99,37 @@ internal class TimelineLazyListState(
 
     internal fun calculateScrollIndexBasedOnItemClick(
         photo: PhotosNodeListCard,
-        displayedPhotos: List<PhotosNodeContentItem>,
+        displayedPhotos: List<PhotosNodeContentItemV2>,
         daysCardPhotos: List<PhotosNodeListCard>,
         monthsCardPhotos: List<PhotosNodeListCard>,
-    ): Int = when (photo) {
-        is PhotosNodeListCard.Years -> {
+    ): Int = when (photo.period) {
+        PhotosNodeListCardPeriod.Year -> {
             val photo = monthsCardPhotos.find {
-                it as PhotosNodeListCard.Months
-                it.photoItem.photo.modificationTime.year == photo.photoItem.photo.modificationTime.year &&
-                        it.photoItem.photo.modificationTime.month == photo.photoItem.photo.modificationTime.month &&
-                        it.photoItem.photo.modificationTime.dayOfMonth == photo.photoItem.photo.modificationTime.dayOfMonth
+                it.year == photo.year &&
+                        it.month == photo.month &&
+                        it.day == photo.day
             }
             monthsCardPhotos.indexOf(photo)
         }
 
-        is PhotosNodeListCard.Months -> {
+        PhotosNodeListCardPeriod.Month -> {
             val photo = daysCardPhotos.find {
-                it as PhotosNodeListCard.Days
-                it.photoItem.photo.modificationTime.year == photo.photoItem.photo.modificationTime.year &&
-                        it.photoItem.photo.modificationTime.month == photo.photoItem.photo.modificationTime.month &&
-                        it.photoItem.photo.modificationTime.dayOfMonth == photo.photoItem.photo.modificationTime.dayOfMonth
+                it.year == photo.year &&
+                        it.month == photo.month &&
+                        it.day == photo.day
             }
             daysCardPhotos.indexOf(photo)
         }
 
-        is PhotosNodeListCard.Days -> {
-            val photo = displayedPhotos.find { it.key == photo.photoItem.photo.hashCode() }
+        PhotosNodeListCardPeriod.Day -> {
+            val photo = displayedPhotos.find { it.key == photo.key }
             displayedPhotos.indexOf(photo)
         }
     }
 
     internal fun calculateScrollIndexBasedOnTimePeriodClick(
         targetPeriod: MediaTimePeriod,
-        displayedPhotos: List<PhotosNodeContentItem>,
+        displayedPhotos: List<PhotosNodeContentItemV2>,
         daysCardPhotos: List<PhotosNodeListCard>,
         monthsCardPhotos: List<PhotosNodeListCard>,
         yearsCardPhotos: List<PhotosNodeListCard>,
@@ -143,15 +140,15 @@ internal class TimelineLazyListState(
         // Best case
         if (firstVisibleItemIndex == 0) return 0
 
-        val (isCUBannerVisible, targetModificationTime) = when (selectedTimePeriod) {
+        val (isCUBannerVisible, targetDate) = when (selectedTimePeriod) {
             MediaTimePeriod.All -> {
                 val isCUBannerVisible = totalItemsCount > displayedPhotos.size
-                val firstVisibleGridItem = findFirstVisibleGridItem<PhotoNodeItem>(
+                val firstVisibleGridItem = findFirstVisibleGridItem(
                     isCUBannerVisible = isCUBannerVisible,
                     firstVisibleItemIndex = firstVisibleItemIndex,
                     displayedPhotos = displayedPhotos
                 )
-                isCUBannerVisible to firstVisibleGridItem?.modificationTime
+                isCUBannerVisible to firstVisibleGridItem?.date
             }
 
             else -> {
@@ -163,18 +160,23 @@ internal class TimelineLazyListState(
                 val isCUBannerVisible = totalItemsCount > items.size
                 val itemStartIndex =
                     if (isCUBannerVisible) firstVisibleItemIndex - 1 else firstVisibleItemIndex
-                val targetModificationTime =
+                val targetDate =
                     if (itemStartIndex >= 0 && itemStartIndex < items.size) {
-                        items[itemStartIndex].photoItem.photo.modificationTime
+                        val item = items[itemStartIndex]
+                        GridFirstVisibleDateItemResult(
+                            day = item.day,
+                            month = item.month,
+                            year = item.year
+                        )
                     } else null
-                isCUBannerVisible to targetModificationTime
+                isCUBannerVisible to targetDate
             }
         }
-        return if (targetModificationTime != null) {
+        return if (targetDate != null) {
             calculateScrollIndexBasedOnTimePeriodClick(
                 isCUBannerVisible = isCUBannerVisible,
                 targetPeriod = targetPeriod,
-                targetModificationTime = targetModificationTime,
+                targetDate = targetDate,
                 displayedPhotos = displayedPhotos,
                 daysCardPhotos = daysCardPhotos,
                 monthsCardPhotos = monthsCardPhotos,
@@ -186,54 +188,48 @@ internal class TimelineLazyListState(
     private fun calculateScrollIndexBasedOnTimePeriodClick(
         isCUBannerVisible: Boolean,
         targetPeriod: MediaTimePeriod,
-        targetModificationTime: LocalDateTime,
-        displayedPhotos: List<PhotosNodeContentItem>,
+        targetDate: GridFirstVisibleDateItemResult,
+        displayedPhotos: List<PhotosNodeContentItemV2>,
         daysCardPhotos: List<PhotosNodeListCard>,
         monthsCardPhotos: List<PhotosNodeListCard>,
         yearsCardPhotos: List<PhotosNodeListCard>,
-    ): Int {
-        return when (targetPeriod) {
-            MediaTimePeriod.Days -> {
-                daysCardPhotos.indexOfFirst {
-                    it.photoItem.photo.modificationTime.year == targetModificationTime.year &&
-                            it.photoItem.photo.modificationTime.month == targetModificationTime.month &&
-                            it.photoItem.photo.modificationTime.dayOfMonth == targetModificationTime.dayOfMonth
-                }
+    ): Int = when (targetPeriod) {
+        MediaTimePeriod.Days -> {
+            daysCardPhotos.indexOfFirst {
+                it.year == targetDate.year &&
+                        it.month == targetDate.month &&
+                        it.day == targetDate.day
             }
+        }
 
-            MediaTimePeriod.Months -> {
-                monthsCardPhotos.indexOfFirst {
-                    it.photoItem.photo.modificationTime.year == targetModificationTime.year &&
-                            it.photoItem.photo.modificationTime.month == targetModificationTime.month
-                }
+        MediaTimePeriod.Months -> {
+            monthsCardPhotos.indexOfFirst {
+                it.year == targetDate.year && it.month == targetDate.month
             }
+        }
 
-            MediaTimePeriod.Years -> {
-                yearsCardPhotos.indexOfFirst {
-                    it.photoItem.photo.modificationTime.year == targetModificationTime.year
-                }
+        MediaTimePeriod.Years -> {
+            yearsCardPhotos.indexOfFirst {
+                it.year == targetDate.year
             }
+        }
 
-            MediaTimePeriod.All -> {
-                val firstVisibleGridItem =
-                    findFirstVisibleGridItem<PhotosNodeContentItem.HeaderItem>(
-                        isCUBannerVisible = isCUBannerVisible,
-                        firstVisibleItemIndex = if (isCUBannerVisible) 1 else 0,
-                        displayedPhotos = displayedPhotos,
-                        filter = {
-                            it.time.month == targetModificationTime.month && it.time.year == targetModificationTime.year
-                        }
-                    )
-                firstVisibleGridItem?.index ?: 0
-            }
+        MediaTimePeriod.All -> {
+            val firstVisibleGridItem = findFirstVisibleGridItem(
+                isCUBannerVisible = isCUBannerVisible,
+                firstVisibleItemIndex = if (isCUBannerVisible) 1 else 0,
+                displayedPhotos = displayedPhotos,
+                filter = { it.month == targetDate.month && it.year == targetDate.year }
+            )
+            firstVisibleGridItem?.index ?: 0
         }
     }
 
-    private inline fun <reified T : PhotosNodeContentItem> findFirstVisibleGridItem(
+    private inline fun findFirstVisibleGridItem(
         isCUBannerVisible: Boolean,
         firstVisibleItemIndex: Int,
-        displayedPhotos: List<PhotosNodeContentItem>,
-        filter: (T) -> Boolean = { true },
+        displayedPhotos: List<PhotosNodeContentItemV2>,
+        filter: (PhotosNodeContentItemV2) -> Boolean = { true },
     ): GridFirstVisibleItemResult? {
         val startIndex = if (isCUBannerVisible) {
             // When the firstVisibleItemIndex is 0 and the CU banner is visible, we need to use the next index.
@@ -244,18 +240,15 @@ internal class TimelineLazyListState(
 
         for (i in startIndex until displayedPhotos.size) {
             val item = displayedPhotos[i]
-            if (item is T && filter(item)) {
-                return when (item) {
-                    is PhotoNodeItem -> GridFirstVisibleItemResult(
-                        index = i,
-                        modificationTime = item.node.photo.modificationTime
+            if (filter(item)) {
+                return GridFirstVisibleItemResult(
+                    index = i,
+                    date = GridFirstVisibleDateItemResult(
+                        day = item.day,
+                        month = item.month,
+                        year = item.year
                     )
-
-                    is PhotosNodeContentItem.HeaderItem -> GridFirstVisibleItemResult(
-                        index = i,
-                        modificationTime = item.time
-                    )
-                }
+                )
             }
         }
         return null
@@ -263,7 +256,13 @@ internal class TimelineLazyListState(
 
     private data class GridFirstVisibleItemResult(
         val index: Int,
-        val modificationTime: LocalDateTime,
+        val date: GridFirstVisibleDateItemResult,
+    )
+
+    private data class GridFirstVisibleDateItemResult(
+        val day: Int,
+        val month: Int,
+        val year: Int,
     )
 }
 

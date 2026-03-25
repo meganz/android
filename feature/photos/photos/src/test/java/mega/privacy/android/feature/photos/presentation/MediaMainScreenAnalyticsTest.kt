@@ -27,8 +27,9 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
-import mega.privacy.android.feature.photos.model.PhotoNodeUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
+import mega.privacy.android.feature.photos.model.MediaType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType
@@ -59,7 +60,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 /** Test class for MediaMainScreen analytics tracking */
 @Config(sdk = [33])
@@ -125,8 +126,9 @@ class MediaMainScreenAnalyticsTest {
         selectionModeType: MediaSelectionModeType = MediaSelectionModeType.None,
         timelineTabActionUiState: TimelineTabActionUiState = TimelineTabActionUiState(),
         timelineTabUiState: TimelineTabUiState = TimelineTabUiState(),
+        videosSelectionUiState: VideosTabUiState.Selection = VideosTabUiState.Selection(),
         selectedPhotosInTypedNode: () -> List<TypedNode> = { emptyList() },
-        onTimelinePhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
+        onTimelinePhotoSelected: (id: Long) -> Unit = {},
         mediaCameraUploadUiState: MediaCameraUploadUiState = MediaCameraUploadUiState(),
         nodeActionUiState: NodeActionState = NodeActionState(),
     ) {
@@ -139,7 +141,7 @@ class MediaMainScreenAnalyticsTest {
                     timelineTabUiState = timelineTabUiState,
                     timelineTabActionUiState = timelineTabActionUiState,
                     mediaCameraUploadUiState = mediaCameraUploadUiState,
-                    videosTabUiState = VideosTabUiState.Loading,
+                    videosSelectionUiState = videosSelectionUiState,
                     playlistsTabUiState = VideoPlaylistsTabUiState.Loading,
                     nodeActionUiState = nodeActionUiState,
                     selectionModeType = selectionModeType,
@@ -283,8 +285,20 @@ class MediaMainScreenAnalyticsTest {
     fun `test that filter button pressed event is tracked when filter action is clicked`() {
         val timelineTabUiState = TimelineTabUiState(
             displayedPhotos = listOf(
-                PhotosNodeContentItem.HeaderItem(
-                    time = LocalDateTime.now()
+                PhotosNodeContentItemV2(
+                    key = -1L,
+                    contentType = PhotosNodeContentType.Header,
+                    id = 1L,
+                    mediaType = MediaType.Image,
+                    day = 1,
+                    month = 1,
+                    year = 1,
+                    fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+                    thumbnailFilePath = null,
+                    previewFilePath = null,
+                    extension = "",
+                    isFavourite = false,
+                    isSensitive = false
                 )
             )
         )

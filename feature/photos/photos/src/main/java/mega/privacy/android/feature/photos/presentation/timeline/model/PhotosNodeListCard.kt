@@ -2,36 +2,23 @@ package mega.privacy.android.feature.photos.presentation.timeline.model
 
 import mega.privacy.android.feature.photos.model.PhotoUiState
 
-sealed class PhotosNodeListCard(
-    open val date: String,
-    open val photoItem: PhotoNodeListCardItem,
-    open val key: String,
-) {
+data class PhotosNodeListCard(
+    val period: PhotosNodeListCardPeriod,
+    val key: Long,
+    val id: Long,
+    val day: Int,
+    val month: Int,
+    val year: Int,
+    val formattedDate: String,
+    val thumbnailFilePath: String?,
+    val previewFilePath: String?,
+    val extension: String,
+    val isSensitive: Boolean,
+    val count: Int,
+)
 
-    data class Years(
-        override val date: String,
-        override val photoItem: PhotoNodeListCardItem,
-    ) : PhotosNodeListCard(date, photoItem, date) {
-        override val key: String
-            get() = date
-    }
-
-    data class Months(
-        override val date: String,
-        override val photoItem: PhotoNodeListCardItem,
-    ) : PhotosNodeListCard(date, photoItem, date) {
-        override val key: String
-            get() = date
-    }
-
-    data class Days(
-        override val date: String,
-        override val photoItem: PhotoNodeListCardItem,
-        val photosCount: Int,
-    ) : PhotosNodeListCard(date, photoItem, date) {
-        override val key: String
-            get() = date
-    }
+enum class PhotosNodeListCardPeriod {
+    Day, Month, Year
 }
 
 data class PhotoNodeListCardItem(

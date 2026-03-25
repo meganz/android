@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,10 +27,9 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.shared.nodes.components.NodeLabelCircle
-import mega.privacy.android.shared.nodes.components.TagsRow
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.VideoItemView
 import mega.privacy.android.feature.photos.components.VideosFilterButtonView
@@ -41,9 +41,11 @@ import mega.privacy.android.feature.photos.presentation.videos.view.VideosFilter
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
+import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.TagsRow
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -63,7 +65,10 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun VideosTabRoute(
+    videosSelectionUiState: VideosTabUiState.Selection,
     navigationHandler: NavigationHandler,
+    onCurrentVideosSearchQueryRequest: () -> Unit,
+    updateSelectionModeAvailableActions: (selectedNodes: List<TypedNode>, nodeSourceType: NodeSourceType) -> Unit,
     viewModel: VideosTabViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -76,8 +81,21 @@ fun VideosTabRoute(
         navigationHandler.navigate(it)
     }
 
+    LaunchedEffect(uiState) {
+        if (uiState is VideosTabUiState.Data) {
+            onCurrentVideosSearchQueryRequest()
+            if (videosSelectionUiState.count != (uiState as VideosTabUiState.Data).selectedTypedNodes.size) {
+                updateSelectionModeAvailableActions(
+                    (uiState as VideosTabUiState.Data).selectedTypedNodes,
+                    NodeSourceType.CLOUD_DRIVE
+                )
+            }
+        }
+    }
+
     VideosTabScreen(
         uiState = uiState,
+        videosSelectionUiState = videosSelectionUiState,
         onClick = viewModel::onItemClicked,
         onLongClick = viewModel::onItemLongClicked,
         onSortNodes = viewModel::setCloudSortOrder,
@@ -89,6 +107,7 @@ fun VideosTabRoute(
 @Composable
 internal fun VideosTabScreen(
     uiState: VideosTabUiState,
+    videosSelectionUiState: VideosTabUiState.Selection,
     onClick: (item: VideoUiEntity) -> Unit,
     onLongClick: (item: VideoUiEntity) -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
@@ -191,7 +210,7 @@ internal fun VideosTabScreen(
                                 duration = videoItem.durationString,
                                 isFavourite = videoItem.isFavourite,
                                 isSelected = videoItem.isSelected,
-                                isSelectionMode = uiState.isSelectionMode,
+                                isSelectionMode = videosSelectionUiState.count > 0,
                                 isSharedWithPublicLink = videoItem.isSharedItems,
                                 labelView = {
                                     videoItem.nodeLabel?.let { label ->
@@ -257,6 +276,8 @@ internal fun VideosTabScreen(
                     }
                 }
             }
+
+            is VideosTabUiState.Selection -> Unit
         }
 
         if (showLocationBottomSheet) {

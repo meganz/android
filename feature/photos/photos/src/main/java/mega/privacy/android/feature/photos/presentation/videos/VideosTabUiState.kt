@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.photos.presentation.videos
 
 import androidx.compose.runtime.Stable
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 
 
 @Stable
@@ -24,16 +24,21 @@ sealed interface VideosTabUiState {
         val query: String? = null,
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
         val selectedTypedNodes: List<TypedNode> = emptyList(),
-        val showHiddenItems: Boolean = false
+        val showHiddenItems: Boolean = false,
     ) : VideosTabUiState {
         /**
          * The highlight text for search by tags or description
          */
         val highlightText get() = query.orEmpty()
+    }
 
+    data class Selection(
+        val count: Int = 0,
+        val areAllSelected: Boolean = false,
+    ) : VideosTabUiState {
         /**
          * The selection mode whether is enabled
          */
-        val isSelectionMode get() = selectedTypedNodes.isNotEmpty()
+        val isSelectionMode get() = count > 0
     }
 }

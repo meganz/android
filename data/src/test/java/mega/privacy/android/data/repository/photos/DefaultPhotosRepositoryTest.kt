@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -22,6 +23,7 @@ import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
+import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
@@ -34,8 +36,12 @@ import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
@@ -95,6 +101,9 @@ class DefaultPhotosRepositoryTest {
     private val uiPreferencesGateway = mock<UIPreferencesGateway>()
     private val mediaTimelinePreferencesGateway = mock<MediaTimelinePreferencesGateway>()
     private val photoMapper = mock<PhotoMapper>()
+    private val typedNodeMapper = mock<TypedNodeMapper>()
+    private val ioDispatcher = UnconfinedTestDispatcher()
+    private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val mockBase64Id = "mockBase64Id"
     private val defaultVideoType =
@@ -139,7 +148,7 @@ class DefaultPhotosRepositoryTest {
             )
         ) doReturn image
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo)
             .isInstanceOf(StaticImageFileTypeInfo::class.java)
@@ -174,7 +183,7 @@ class DefaultPhotosRepositoryTest {
             )
         ) doReturn image
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(GifFileTypeInfo::class.java)
     }
@@ -205,7 +214,7 @@ class DefaultPhotosRepositoryTest {
             )
         ) doReturn image
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(RawFileTypeInfo::class.java)
     }
@@ -239,7 +248,7 @@ class DefaultPhotosRepositoryTest {
             )
         ) doReturn image
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo).isInstanceOf(VideoFileTypeInfo::class.java)
     }
@@ -252,7 +261,7 @@ class DefaultPhotosRepositoryTest {
         whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue))
             .thenReturn(megaNode)
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
         assertThat(actualPhoto?.fileTypeInfo == null)
     }
@@ -271,13 +280,13 @@ class DefaultPhotosRepositoryTest {
                 )
             }
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
         assertThat(underTest.getTimelineFilterPreferences()).isNull()
     }
 
     @Test
     fun `test that getpreferences returns the right preferences`() = runTest {
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
 
         val expectedPrefStringMap = mock<MegaStringMap>()
         expectedPrefStringMap["cc"] = "abc"
@@ -302,7 +311,7 @@ class DefaultPhotosRepositoryTest {
 
     @Test
     fun `test that setpreferences give the right value`() = runTest {
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
 
         val expectedMegaStringMapValue = mapOf(Pair("abc", "def"))
         val expectedPrefStringMap = mock<MegaStringMap>()
@@ -350,12 +359,12 @@ class DefaultPhotosRepositoryTest {
             .isEqualTo(expectedMegaStringMapValue.toString())
     }
 
-    private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultPhotosRepository(
+    private fun createUnderTest() = DefaultPhotosRepository(
         nodeRepository = nodeRepository,
         megaApiFacade = megaApiGateway,
         megaApiFolder = megaApiFolder,
-        appScope = coroutineScope,
-        ioDispatcher = UnconfinedTestDispatcher(),
+        appScope = appScope,
+        ioDispatcher = ioDispatcher,
         fileGateway = fileGateway,
         fileTypeInfoMapper = fileTypeInfoMapper,
         imageNodeFileMapper = imageNodeFileMapper,
@@ -376,6 +385,7 @@ class DefaultPhotosRepositoryTest {
         uiPreferencesGateway = uiPreferencesGateway,
         mediaTimelinePreferencesGateway = mediaTimelinePreferencesGateway,
         photoMapper = photoMapper,
+        typedNodeMapper = typedNodeMapper
     )
 
     private fun createMegaNode(
@@ -540,7 +550,7 @@ class DefaultPhotosRepositoryTest {
                 )
             ) doReturn video
 
-            underTest = createUnderTest(this)
+            underTest = createUnderTest()
             val actualPhotos = underTest.getPhotosByFolderId(NodeId(-1L), recursive = true)
             assertThat(actualPhotos).isNotEmpty()
         }
@@ -629,7 +639,7 @@ class DefaultPhotosRepositoryTest {
                 )
             ) doReturn video
 
-            underTest = createUnderTest(this)
+            underTest = createUnderTest()
             val actualPhotos = underTest.getPhotosByFolderId(NodeId(-1L), recursive = false)
             assertThat(actualPhotos).isNotEmpty()
         }
@@ -710,7 +720,7 @@ class DefaultPhotosRepositoryTest {
                 )
             ) doReturn video
 
-            underTest = createUnderTest(this)
+            underTest = createUnderTest()
             val actualPhotos = underTest.getPhotosByFolderId(
                 NodeId(-1L),
                 recursive = true,
@@ -794,7 +804,7 @@ class DefaultPhotosRepositoryTest {
                 )
             ) doReturn video
 
-            underTest = createUnderTest(this)
+            underTest = createUnderTest()
             val actualPhotos = underTest.getPhotosByFolderId(
                 NodeId(-1L),
                 recursive = false,
@@ -883,7 +893,7 @@ class DefaultPhotosRepositoryTest {
             )
         ) doReturn video
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
 
         underTest.loadNextPageOfPhotos()
 
@@ -934,7 +944,7 @@ class DefaultPhotosRepositoryTest {
             )
         ).thenReturn(emptyList())
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
 
         underTest.loadNextPageOfPhotos()
 
@@ -968,11 +978,249 @@ class DefaultPhotosRepositoryTest {
             )
         ).thenReturn(expectedImageNode)
 
-        underTest = createUnderTest(this)
+        underTest = createUnderTest()
 
         val result = underTest.getImageNodeFromChatMessage(chatId, messageId)
 
         assertThat(result).isNotNull()
         assertThat(result).isEqualTo(expectedImageNode)
     }
+
+    @Test
+    fun `test that monitorMediaTypedNodes emits initial list on subscription`() = runTest {
+        val filter = mock<MegaSearchFilter>()
+        val token = mock<MegaCancelToken>()
+        val node = createMegaNode(handle = 1L, name = "photo.jpg")
+        whenever(
+            megaSearchFilterMapper(
+                parentHandle = null,
+                searchQuery = "",
+                searchTarget = SearchTarget.ROOT_NODES,
+                searchCategory = SearchCategory.ALL_MEDIA,
+            )
+        ).thenReturn(filter)
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+        whenever(
+            megaApiGateway.searchWithFilter(
+                filter,
+                MegaApiJava.ORDER_MODIFICATION_DESC,
+                token
+            )
+        ).thenReturn(listOf(node))
+        whenever(megaApiGateway.isInRubbish(node)).thenReturn(false)
+        val typedNode = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(1L))
+        }
+        whenever(typedNodeMapper(megaNode = node, folderTypeData = null, offline = null))
+            .thenReturn(typedNode)
+
+        underTest = createUnderTest()
+
+        underTest.monitorMediaTypedNodes.test {
+            assertThat(awaitItem()).containsExactly(typedNode)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorMediaTypedNodes emits updated list when a valid node is added`() =
+        runTest(ioDispatcher) {
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            val existingNode = createMegaNode(handle = 1L, name = "photo.jpg")
+            val newMegaNode = createMegaNode(handle = 2L, name = "photo2.jpg")
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdatesFlow)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = null,
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL_MEDIA,
+                )
+            ).thenReturn(filter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter,
+                    MegaApiJava.ORDER_MODIFICATION_DESC,
+                    token
+                )
+            ).thenReturn(listOf(existingNode))
+            whenever(megaApiGateway.isInRubbish(existingNode)).thenReturn(false)
+            val existingTypedNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(1L))
+            }
+            whenever(
+                typedNodeMapper(
+                    megaNode = existingNode,
+                    folderTypeData = null,
+                    offline = null
+                )
+            ).thenReturn(existingTypedNode)
+            val newFileNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(2L))
+                on { type }.thenReturn(mock<StaticImageFileTypeInfo>())
+            }
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(2L))).thenReturn(false)
+            whenever(nodeRepository.isNodeInCloudDrive(handle = 2L)).thenReturn(true)
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = 2L)).thenReturn(newMegaNode)
+            val newTypedNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(2L))
+            }
+            whenever(typedNodeMapper(megaNode = newMegaNode, folderTypeData = null, offline = null))
+                .thenReturn(newTypedNode)
+
+            underTest = createUnderTest()
+
+            underTest.monitorMediaTypedNodes.test {
+                assertThat(awaitItem()).containsExactly(existingTypedNode)
+                nodeUpdatesFlow.emit(NodeUpdate(mapOf(newFileNode to listOf(NodeChanges.New))))
+                val updated = awaitItem()
+                assertThat(updated).containsExactly(existingTypedNode, newTypedNode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitorMediaTypedNodes removes node from list when it is moved to rubbish bin`() =
+        runTest(ioDispatcher) {
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            val node = createMegaNode(handle = 1L, name = "photo.jpg")
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdatesFlow)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = null,
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL_MEDIA,
+                )
+            ).thenReturn(filter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter,
+                    MegaApiJava.ORDER_MODIFICATION_DESC,
+                    token
+                )
+            ).thenReturn(listOf(node))
+            whenever(megaApiGateway.isInRubbish(node)).thenReturn(false)
+            val typedNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(1L))
+            }
+            whenever(typedNodeMapper(megaNode = node, folderTypeData = null, offline = null))
+                .thenReturn(typedNode)
+            val updatedFileNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(1L))
+            }
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(1L))).thenReturn(true)
+
+            underTest = createUnderTest()
+
+            underTest.monitorMediaTypedNodes.test {
+                assertThat(awaitItem()).containsExactly(typedNode)
+                nodeUpdatesFlow.emit(
+                    NodeUpdate(mapOf(updatedFileNode to listOf(NodeChanges.Remove)))
+                )
+                assertThat(awaitItem()).isEmpty()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitorMediaTypedNodes does not emit when unchanged node update is received`() =
+        runTest {
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            val node = createMegaNode(handle = 1L, name = "photo.jpg")
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdatesFlow)
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = null,
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL_MEDIA,
+                )
+            ).thenReturn(filter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter,
+                    MegaApiJava.ORDER_MODIFICATION_DESC,
+                    token
+                )
+            ).thenReturn(listOf(node))
+            whenever(megaApiGateway.isInRubbish(node)).thenReturn(false)
+            val typedNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(1L))
+            }
+            whenever(typedNodeMapper(megaNode = node, folderTypeData = null, offline = null))
+                .thenReturn(typedNode)
+            val unchangedFileNode = mock<FileNode> {
+                on { id }.thenReturn(NodeId(1L))
+                on { type }.thenReturn(mock<StaticImageFileTypeInfo>())
+            }
+            whenever(nodeRepository.isNodeInRubbishBin(NodeId(1L))).thenReturn(false)
+            whenever(nodeRepository.isNodeInCloudDrive(handle = 1L)).thenReturn(true)
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = 1L)).thenReturn(node)
+            whenever(typedNodeMapper(megaNode = node, folderTypeData = null, offline = null))
+                .thenReturn(typedNode)
+
+            underTest = createUnderTest()
+
+            underTest.monitorMediaTypedNodes.test {
+                assertThat(awaitItem()).containsExactly(typedNode)
+                nodeUpdatesFlow.emit(
+                    NodeUpdate(mapOf(unchangedFileNode to listOf(NodeChanges.Attributes)))
+                )
+                expectNoEvents()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitorMediaTypedNodes shared flow replays last value to new subscriber`() =
+        runTest(ioDispatcher) {
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            val node = createMegaNode(handle = 1L, name = "photo.jpg")
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = null,
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL_MEDIA,
+                )
+            ).thenReturn(filter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter,
+                    MegaApiJava.ORDER_MODIFICATION_DESC,
+                    token
+                )
+            ).thenReturn(listOf(node))
+            whenever(megaApiGateway.isInRubbish(node)).thenReturn(false)
+            val typedNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(1L))
+            }
+            whenever(typedNodeMapper(megaNode = node, folderTypeData = null, offline = null))
+                .thenReturn(typedNode)
+
+            underTest = createUnderTest()
+
+            // First subscriber
+            underTest.monitorMediaTypedNodes.test {
+                assertThat(awaitItem()).containsExactly(typedNode)
+                cancelAndConsumeRemainingEvents()
+            }
+            // Second subscriber
+            underTest.monitorMediaTypedNodes.test {
+                assertThat(awaitItem()).containsExactly(typedNode)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 }

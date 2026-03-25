@@ -26,25 +26,22 @@ import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.components.chip.SelectionChipStyle
 import mega.android.core.ui.components.list.SecondaryHeaderListItem
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
-import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoNodeListCardItem
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.icon.pack.R as IconPackR
-import java.time.LocalDateTime
-import kotlin.time.Duration
 
 @Composable
 internal fun PhotosNodeListCardListView(
     photos: List<PhotosNodeListCard>,
+    isHiddenNodesEnabled: Boolean,
     onClick: (photo: PhotosNodeListCard) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -57,7 +54,7 @@ internal fun PhotosNodeListCardListView(
         totalItems = photos.size,
         state = state,
         tooltipText = { index ->
-            photos.getOrNull(index)?.date.orEmpty()
+            photos.getOrNull(index)?.formattedDate.orEmpty()
         }
     ) {
         header?.let {
@@ -74,7 +71,7 @@ internal fun PhotosNodeListCardListView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = if (index == 0) 8.dp else 0.dp),
-                text = photo.date
+                text = photo.formattedDate
             )
 
             Box(
@@ -85,27 +82,31 @@ internal fun PhotosNodeListCardListView(
                     .clip(shape = RoundedCornerShape(16.dp))
             ) {
                 val context = LocalContext.current
-                val request = remember(photo) {
+                val request = remember(photo.id) {
                     ImageRequest.Builder(context)
                         .data(
                             MediaThumbnailRequest(
-                                id = photo.photoItem.photo.id,
+                                id = photo.id,
                                 isPreview = true,
-                                thumbnailFilePath = photo.photoItem.photo.thumbnailFilePath,
-                                previewFilePath = photo.photoItem.photo.previewFilePath,
+                                thumbnailFilePath = photo.thumbnailFilePath,
+                                previewFilePath = photo.previewFilePath,
                                 isPublicNode = false,
-                                fileExtension = photo.photoItem.photo.fileTypeInfo.extension
+                                fileExtension = photo.extension
                             )
                         )
                         .crossfade(enable = true)
                         .build()
                 }
+                val isSensitiveBlur = isHiddenNodesEnabled && photo.isSensitive
                 AsyncImage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(4f / 3f)
-                        .alpha(0.5f.takeIf { photo.photoItem.isMarkedSensitive } ?: 1f)
-                        .blur(16.dp.takeIf { photo.photoItem.isMarkedSensitive } ?: 0.dp)
+                        .conditional(isSensitiveBlur) {
+                            Modifier
+                                .alpha(0.5f)
+                                .blur(16.dp)
+                        }
                         .testTag(PHOTOS_NODE_LIST_CARD_LIST_VIEW_IMAGE_TAG),
                     model = request,
                     contentDescription = null,
@@ -114,7 +115,7 @@ internal fun PhotosNodeListCardListView(
                     contentScale = ContentScale.Crop
                 )
 
-                if (photo is PhotosNodeListCard.Days && photo.photosCount > 1) {
+                if (photo.period == PhotosNodeListCardPeriod.Day && photo.count > 1) {
                     MegaChip(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
@@ -122,7 +123,7 @@ internal fun PhotosNodeListCardListView(
                             .testTag(PHOTOS_NODE_LIST_CARD_LIST_VIEW_PHOTO_COUNT_TAG),
                         onClick = { onClick(photo) },
                         selected = false,
-                        text = "+${photo.photosCount}",
+                        text = "+${photo.count}",
                         style = SelectionChipStyle,
                     )
                 }
@@ -136,90 +137,51 @@ internal fun PhotosNodeListCardListView(
 private fun PhotosNodeListCardListViewPreview() {
     AndroidThemeForPreviews {
         PhotosNodeListCardListView(
-            photos = persistentListOf(
-                PhotosNodeListCard.Days(
-                    date = "2022-01-01",
-                    photoItem = PhotoNodeListCardItem(
-                        photo = PhotoUiState.Image(
-                            id = 1L,
-                            albumPhotoId = null,
-                            parentId = 0L,
-                            name = "test.jpg",
-                            isFavourite = false,
-                            creationTime = LocalDateTime.now(),
-                            modificationTime = LocalDateTime.now(),
-                            thumbnailFilePath = null,
-                            previewFilePath = null,
-                            fileTypeInfo = VideoFileTypeInfo(
-                                mimeType = "video/mp4",
-                                extension = "mp4",
-                                duration = Duration.ZERO
-                            ),
-                            size = 0L,
-                            isTakenDown = false,
-                            isSensitive = false,
-                            isSensitiveInherited = false,
-                            base64Id = null,
-                        ),
-                        isMarkedSensitive = false
-                    ),
-                    photosCount = 10
+            photos = listOf(
+                PhotosNodeListCard(
+                    period = PhotosNodeListCardPeriod.Day,
+                    key = 3L,
+                    id = 3L,
+                    day = 1,
+                    month = 1,
+                    year = 1,
+                    formattedDate = "2022-01-01",
+                    thumbnailFilePath = null,
+                    previewFilePath = null,
+                    extension = "",
+                    isSensitive = false,
+                    count = 10
                 ),
-                PhotosNodeListCard.Months(
-                    date = "2022-01-02",
-                    photoItem = PhotoNodeListCardItem(
-                        photo = PhotoUiState.Image(
-                            id = 1L,
-                            albumPhotoId = null,
-                            parentId = 0L,
-                            name = "test.jpg",
-                            isFavourite = false,
-                            creationTime = LocalDateTime.now(),
-                            modificationTime = LocalDateTime.now(),
-                            thumbnailFilePath = null,
-                            previewFilePath = null,
-                            fileTypeInfo = VideoFileTypeInfo(
-                                mimeType = "video/mp4",
-                                extension = "mp4",
-                                duration = Duration.ZERO
-                            ),
-                            size = 0L,
-                            isTakenDown = false,
-                            isSensitive = false,
-                            isSensitiveInherited = false,
-                            base64Id = null,
-                        ),
-                        isMarkedSensitive = true
-                    ),
+                PhotosNodeListCard(
+                    period = PhotosNodeListCardPeriod.Month,
+                    key = 3L,
+                    id = 3L,
+                    day = 1,
+                    month = 1,
+                    year = 1,
+                    formattedDate = "2022-01-02",
+                    thumbnailFilePath = null,
+                    previewFilePath = null,
+                    extension = "",
+                    isSensitive = false,
+                    count = 10
                 ),
-                PhotosNodeListCard.Years(
-                    date = "2022-02-02",
-                    photoItem = PhotoNodeListCardItem(
-                        photo = PhotoUiState.Image(
-                            id = 1L,
-                            albumPhotoId = null,
-                            parentId = 0L,
-                            name = "test.jpg",
-                            isFavourite = false,
-                            creationTime = LocalDateTime.now(),
-                            modificationTime = LocalDateTime.now(),
-                            thumbnailFilePath = null,
-                            previewFilePath = null,
-                            fileTypeInfo = VideoFileTypeInfo(
-                                mimeType = "video/mp4",
-                                extension = "mp4",
-                                duration = Duration.ZERO
-                            ),
-                            size = 0L,
-                            isTakenDown = false,
-                            isSensitive = false,
-                            isSensitiveInherited = false,
-                            base64Id = null,
-                        ),
-                        isMarkedSensitive = false
-                    ),
+                PhotosNodeListCard(
+                    period = PhotosNodeListCardPeriod.Year,
+                    key = 3L,
+                    id = 3L,
+                    day = 1,
+                    month = 1,
+                    year = 1,
+                    formattedDate = "2022-02-02",
+                    thumbnailFilePath = null,
+                    previewFilePath = null,
+                    extension = "",
+                    isSensitive = false,
+                    count = 10
                 )
             ),
+            isHiddenNodesEnabled = false,
             onClick = {}
         )
     }
