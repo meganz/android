@@ -33,8 +33,8 @@ class NewTextFileNodeDialogViewModel @Inject constructor(
         val parentOrRootNodeId =
             if (parentNodeId.longValue != -1L) parentNodeId else getRootNodeUseCase()?.id
                 ?: throw IllegalStateException("Root node not found")
-        isValidTextFileUseCase(trimmedFileName)
         validateNodeNameUseCase(trimmedFileName, parentOrRootNodeId)
+        isValidTextFileUseCase(trimmedFileName)
         parentOrRootNodeId to trimmedFileName
     }
 }
