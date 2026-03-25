@@ -1158,7 +1158,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 outgoingShares.filter { megaShare -> megaShare != null && megaShare.isVerified }
             if (verifiedOutgoingShares.isNotEmpty()) {
                 text = resources.getQuantityString(
-                    R.plurals.general_num_shared_with,
+                    sharedR.plurals.general_num_shared_with_count,
                     verifiedOutgoingShares.size,
                     verifiedOutgoingShares.size,
                 )

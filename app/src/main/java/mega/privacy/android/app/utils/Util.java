@@ -391,9 +391,9 @@ public class Util {
 
         Context context = MegaApplication.getInstance().getApplicationContext();
         if (gbSize < TB) {
-            sizeString = context.getString(R.string.label_file_size_giga_byte, decf.format(gbSize));
+            sizeString = context.getString(mega.privacy.android.shared.resources.R.string.label_file_size_gigabytes, decf.format(gbSize));
         } else {
-            sizeString = context.getString(R.string.label_file_size_tera_byte, decf.format(gbSize / TB));
+            sizeString = context.getString(mega.privacy.android.shared.resources.R.string.label_file_size_terabytes, decf.format(gbSize / TB));
         }
 
         return sizeString;

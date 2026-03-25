@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.view.extension.fileInfo
@@ -76,7 +77,7 @@ internal fun NodeOptionsBottomSheetContent(
         uiState.outgoingShares.isEmpty() -> null
         uiState.outgoingShares.size == 1 -> uiState.outgoingShares[0].user
         else -> pluralStringResource(
-            R.plurals.general_num_shared_with,
+            SharedR.plurals.general_num_shared_with_count,
             uiState.outgoingShares.size,
             uiState.outgoingShares.size,
         )

@@ -1,6 +1,6 @@
 package mega.privacy.android.core.formatter.mapper
 
-import mega.privacy.android.core.formatter.R
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.core.formatter.model.FormattedSize
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -20,14 +20,14 @@ class FormattedSizeMapper @Inject constructor() {
         val decimalFormatter = DecimalFormat("###.##")
         return if (size < 1024) {
             FormattedSize(
-                if (usePlaceholder) R.string.label_file_size_giga_byte
+                if (usePlaceholder) SharedR.string.label_file_size_gigabytes
                 else
                     mega.privacy.android.shared.resources.R.string.general_giga_byte_standalone,
                 decimalFormatter.format(size)
             )
         } else {
             FormattedSize(
-                if (usePlaceholder) R.string.label_file_size_tera_byte
+                if (usePlaceholder) SharedR.string.label_file_size_terabytes
                 else
                     mega.privacy.android.shared.resources.R.string.general_tera_byte_standalone,
                 decimalFormatter.format(size / 1024)

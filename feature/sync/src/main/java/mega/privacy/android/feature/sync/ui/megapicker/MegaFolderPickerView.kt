@@ -305,7 +305,7 @@ private fun FolderNode.folderInfo(): String {
     return if (childFolderCount == 0 && childFileCount == 0) {
         stringResource(R.string.sync_file_browser_empty_folder)
     } else if (childFolderCount == 0 && childFileCount > 0) {
-        pluralStringResource(R.plurals.num_files_with_parameter, childFileCount, childFileCount)
+        pluralStringResource(SharedR.plurals.num_of_files_with_parameter, childFileCount, childFileCount)
     } else if (childFileCount == 0 && childFolderCount > 0) {
         pluralStringResource(
             SharedR.plurals.num_of_folders_with_parameter,

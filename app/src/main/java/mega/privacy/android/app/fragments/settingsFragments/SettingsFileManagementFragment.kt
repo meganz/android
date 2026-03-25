@@ -356,7 +356,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
      */
     fun resetRubbishInfo() {
         Timber.i("Updating size after clean the Rubbish Bin")
-        val emptyString = getString(R.string.label_file_size_byte, INITIAL_VALUE)
+        val emptyString = getString(sharedR.string.label_file_size_bytes, INITIAL_VALUE)
         rubbishFileManagement?.summary =
             getString(R.string.settings_advanced_features_size, emptyString)
         myAccountInfo.formattedUsedRubbish = emptyString

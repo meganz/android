@@ -8,7 +8,6 @@ import androidx.compose.ui.text.intl.Locale
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.shared.resources.R as SharedR
-import mega.privacy.android.shared.nodes.R as NodesR
 
 /**
  * Represents different types of node subtitles that can be resolved to localized strings
@@ -76,7 +75,7 @@ fun NodeSubtitleText.text(): String {
             if (time != 0L) {
                 val formattedDate = formatModifiedDate(locale, time)
                 stringResource(
-                    NodesR.string.file_subtitle_format,
+                    SharedR.string.file_info_subtitle_format,
                     fileSizeText,
                     formattedDate
                 )
@@ -106,7 +105,7 @@ fun NodeSubtitleText.text(): String {
 
                 else -> {
                     pluralStringResource(
-                        NodesR.plurals.num_folders_num_files,
+                        SharedR.plurals.num_of_folders_num_of_files,
                         childFolderCount,
                         childFolderCount
                     ) + pluralStringResource(
@@ -123,7 +122,7 @@ fun NodeSubtitleText.text(): String {
                 0 -> if (!isVerified) user else ""
                 1 -> if (isVerified) userFullName else ""
                 else -> pluralStringResource(
-                    NodesR.plurals.general_num_shared_with,
+                    SharedR.plurals.general_num_shared_with_count,
                     shareCount,
                     shareCount
                 )

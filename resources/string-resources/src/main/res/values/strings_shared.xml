@@ -2273,12 +2273,12 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
-    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <!-- Pluralized file count used to display the number of files, e.g. "3 files" -->
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
     </plurals>
-    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <!-- Pluralized folder count used to display the number of folders, e.g. "2 folders" -->
     <plurals name="num_of_folders_with_parameter">
         <item quantity="one">%d folder</item>
         <item quantity="other">%d folders</item>
@@ -2486,4 +2486,37 @@
     <string name="upload_bottom_sheet_action_menu_scan_document">Scan document</string>
     <!--Upload bottom sheet actions to capture image-->
     <string name="upload_bottom_sheet_action_menu_take_picture">Capture</string>
+    <!-- Displayed when a folder contains no files or subfolders -->
+    <string name="file_browser_folder_empty">Empty folder</string>
+    <!-- Format for file subtitle combining file size and modification date, e.g. "1.2 MB · Mar 25" -->
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <!-- File size label for bytes (B), e.g. "1.5 B". Uses non-breaking space before unit. -->
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <!-- File size label for kilobytes (KB), e.g. "1.5 KB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_kilobytes">%s&#160;KB</string>
+    <!-- File size label for megabytes (MB), e.g. "1.5 MB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_megabytes">%s&#160;MB</string>
+    <!-- File size label for gigabytes (GB), e.g. "1.5 GB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_gigabytes">%s&#160;GB</string>
+    <!-- File size label for terabytes (TB), e.g. "1.5 TB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_terabytes">%s&#160;TB</string>
+    <!-- File size label for petabytes (PB), e.g. "1.5 PB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <!-- File size label for exabytes (EB), e.g. "1.5 EB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <!-- First part of a combined folder and file count string, e.g. "2 folders, " (note trailing comma and space) -->
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="one">%d folder,</item>
+        <item quantity="other">%d folders,</item>
+    </plurals>
+    <!-- Second part of a combined folder and file count string, e.g. "3 files" (appended after the folder count) -->
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    <!-- Shows how many people a node (file or folder) is shared with, e.g. "Shared with 5 people" -->
+    <plurals name="general_num_shared_with_count">
+        <item quantity="one">Shared with %d person</item>
+        <item quantity="other">Shared with %d people</item>
+    </plurals>
 </resources>

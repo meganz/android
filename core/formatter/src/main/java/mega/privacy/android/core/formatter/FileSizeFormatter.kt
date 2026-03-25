@@ -1,6 +1,7 @@
 package mega.privacy.android.core.formatter
 
 import android.content.Context
+import mega.privacy.android.shared.resources.R as SharedR
 import java.text.DecimalFormat
 import kotlin.math.round
 
@@ -21,7 +22,7 @@ fun formatFileSize(size: Long, context: Context): String {
     return when {
         size < kilobyte -> {
             context.getString(
-                R.string.label_file_size_byte,
+                SharedR.string.label_file_size_bytes,
                 size.toString()
             )
         }
@@ -31,7 +32,7 @@ fun formatFileSize(size: Long, context: Context): String {
             val kbValue = size / kilobyte
             val roundedKb = round(kbValue).toLong()
             context.getString(
-                R.string.label_file_size_kilo_byte,
+                SharedR.string.label_file_size_kilobytes,
                 roundedKb.toString()
             )
         }
@@ -41,7 +42,7 @@ fun formatFileSize(size: Long, context: Context): String {
             val df = DecimalFormat("#.#")
             val mbValue = size / megabyte
             context.getString(
-                R.string.label_file_size_mega_byte,
+                SharedR.string.label_file_size_megabytes,
                 df.format(mbValue)
             )
         }
@@ -51,7 +52,7 @@ fun formatFileSize(size: Long, context: Context): String {
             val df = DecimalFormat("#.##")
             val gbValue = size / gigabyte
             context.getString(
-                R.string.label_file_size_giga_byte,
+                SharedR.string.label_file_size_gigabytes,
                 df.format(gbValue)
             )
         }
@@ -61,7 +62,7 @@ fun formatFileSize(size: Long, context: Context): String {
             val df = DecimalFormat("#.##")
             val tbValue = size / terabyte
             context.getString(
-                R.string.label_file_size_tera_byte,
+                SharedR.string.label_file_size_terabytes,
                 df.format(tbValue)
             )
         }
@@ -71,7 +72,7 @@ fun formatFileSize(size: Long, context: Context): String {
             val df = DecimalFormat("#.##")
             val pbValue = size / petabyte
             context.getString(
-                R.string.label_file_size_peta_byte,
+                SharedR.string.label_file_size_petabytes,
                 df.format(pbValue)
             )
         }
@@ -81,7 +82,7 @@ fun formatFileSize(size: Long, context: Context): String {
             val df = DecimalFormat("#.##")
             val ebValue = size / exabyte
             context.getString(
-                R.string.label_file_size_exa_byte,
+                SharedR.string.label_file_size_exabytes,
                 df.format(ebValue)
             )
         }

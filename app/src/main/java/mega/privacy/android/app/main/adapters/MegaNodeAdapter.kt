@@ -37,6 +37,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
@@ -1405,7 +1406,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 }
             } else {
                 subtitle = context.resources
-                    .getQuantityString(R.plurals.general_num_shared_with, sl.size, sl.size)
+                    .getQuantityString(SharedR.plurals.general_num_shared_with_count, sl.size, sl.size)
             }
         }
 

@@ -381,7 +381,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             content = context.getString(
                 R.string.message_compression_size_over_limit,
                 context.getString(
-                    R.string.label_file_size_mega_byte,
+                    sharedR.string.label_file_size_megabytes,
                     getVideoCompressionSizeLimitUseCase().toString()
                 )
             ),

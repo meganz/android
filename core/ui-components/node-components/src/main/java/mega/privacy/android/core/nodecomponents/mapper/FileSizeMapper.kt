@@ -1,6 +1,6 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
-import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as SharedR
 import javax.inject.Inject
 
 /**
@@ -15,31 +15,31 @@ class FileSizeMapper @Inject constructor() {
     operator fun invoke(size: Long): Pair<Int, Double> {
         return when {
             size < KILOBYTE -> {
-                NodesR.string.label_file_size_byte to size.toDouble()
+                SharedR.string.label_file_size_bytes to size.toDouble()
             }
 
             size < MEGABYTE -> {
-                NodesR.string.label_file_size_kilo_byte to (size / KILOBYTE)
+                SharedR.string.label_file_size_kilobytes to (size / KILOBYTE)
             }
 
             size < GIGABYTE -> {
-                NodesR.string.label_file_size_mega_byte to (size / MEGABYTE)
+                SharedR.string.label_file_size_megabytes to (size / MEGABYTE)
             }
 
             size < TERABYTE -> {
-                NodesR.string.label_file_size_giga_byte to (size / GIGABYTE)
+                SharedR.string.label_file_size_gigabytes to (size / GIGABYTE)
             }
 
             size < PETABYTE -> {
-                NodesR.string.label_file_size_tera_byte to (size / TERABYTE)
+                SharedR.string.label_file_size_terabytes to (size / TERABYTE)
             }
 
             size < EXABYTE -> {
-                NodesR.string.label_file_size_peta_byte to (size / PETABYTE)
+                SharedR.string.label_file_size_petabytes to (size / PETABYTE)
             }
 
             else -> {
-                NodesR.string.label_file_size_exa_byte to (size / EXABYTE)
+                SharedR.string.label_file_size_exabytes to (size / EXABYTE)
             }
         }
     }
