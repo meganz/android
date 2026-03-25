@@ -49,6 +49,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFile02Image
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFilePlus02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFileScanImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFileSearch02ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFileTextImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFileUploadImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFilterImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderArrowImageVector
@@ -149,9 +150,11 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinSolidHomeImageVect
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidImage01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidLink01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidMenu01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinSolidMessageChatCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidPhone01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidPlayCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinSolidRectangleVideoStackImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinSolidVideoImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowDownCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowDownImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineArrowUpImageVector
@@ -300,6 +303,9 @@ public object IconPack : IconPackInterface {
 
                 override val FileSearch02: ImageVector by lazy {
                         createMediumThinOutlineFileSearch02ImageVector() }
+
+                override val FileText: ImageVector by lazy {
+                        createMediumThinOutlineFileTextImageVector() }
 
                 override val FileUpload: ImageVector by lazy {
                         createMediumThinOutlineFileUploadImageVector() }
@@ -586,6 +592,9 @@ public object IconPack : IconPackInterface {
                 override val Menu01: ImageVector by lazy { createMediumThinSolidMenu01ImageVector()
                         }
 
+                override val MessageChatCircle: ImageVector by lazy {
+                        createMediumThinSolidMessageChatCircleImageVector() }
+
                 override val Phone01: ImageVector by lazy {
                         createMediumThinSolidPhone01ImageVector() }
 
@@ -594,6 +603,8 @@ public object IconPack : IconPackInterface {
 
                 override val RectangleVideoStack: ImageVector by lazy {
                         createMediumThinSolidRectangleVideoStackImageVector() }
+
+                override val Video: ImageVector by lazy { createMediumThinSolidVideoImageVector() }
             }
         }
     }

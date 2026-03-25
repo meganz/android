@@ -151,6 +151,7 @@ interface IconPackInterface {
                 val fileQuestion01: ImageVector
                 val FileScan: ImageVector
                 val FileSearch02: ImageVector
+                val FileText: ImageVector
                 val FileUpload: ImageVector
                 val Folder: ImageVector
                 val FolderArrow: ImageVector
@@ -256,9 +257,11 @@ interface IconPackInterface {
                 val Image01: ImageVector
                 val Link01: ImageVector
                 val Menu01: ImageVector
+                val MessageChatCircle: ImageVector
                 val Phone01: ImageVector
                 val PlayCircle: ImageVector
                 val RectangleVideoStack: ImageVector
+                val Video: ImageVector
             }
         }
     }
