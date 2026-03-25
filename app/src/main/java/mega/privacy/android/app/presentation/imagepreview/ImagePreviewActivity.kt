@@ -508,7 +508,7 @@ class ImagePreviewActivity : BaseActivity() {
                     val error = UCrop.getError(data)
                     showSnackbar(
                         SNACKBAR_TYPE,
-                        error?.message ?: getString(R.string.general_text_error),
+                        error?.message ?: getString(sharedR.string.general_text_error),
                         INVALID_HANDLE
                     )
                 }

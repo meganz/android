@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
@@ -195,7 +196,7 @@ class GroupChatInfoViewModel @Inject constructor(
                     setOpenInviteWithChatIdUseCase(chatId)
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(error = R.string.general_text_error) }
+                    _state.update { it.copy(error = sharedR.string.general_text_error) }
                 }.onSuccess { result ->
                     _state.update {
                         it.copy(resultSetOpenInvite = result)

@@ -67,7 +67,7 @@ fun TakeDownDialog(
         ),
         positiveButtonText = stringResource(sharedR.string.general_ok),
         onPositiveButtonClicked = onDismiss,
-        negativeButtonText = stringResource(NodesR.string.dispute_takendown_file),
+        negativeButtonText = stringResource(sharedR.string.dispute_takendown_file),
         onNegativeButtonClicked = {
             megaNavigator.openDisputeTakedownLink(context)
             onDismiss()

@@ -69,7 +69,7 @@ fun NewFolderNodeDialog(
         onConsumed = viewModel::clearError
     ) {
         errorMessage = when (it) {
-            is EmptyNodeNameException -> context.getString(NodesR.string.invalid_string)
+            is EmptyNodeNameException -> context.getString(sharedR.string.general_invalid_string)
             is DotNameException -> context.getString(sharedR.string.general_invalid_dot_name_warning)
             is DoubleDotNameException -> context.getString(sharedR.string.general_invalid_double_dot_name_warning)
             is InvalidNodeNameException -> context.getString(

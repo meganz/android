@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.data.extensions.findItemByHandle
 import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
@@ -275,7 +276,7 @@ class StartConversationViewModel @Inject constructor(
                     )
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(result = -1L, error = R.string.general_text_error) }
+                    _state.update { it.copy(result = -1L, error = sharedR.string.general_text_error) }
                 }.onSuccess { chatHandle -> _state.update { it.copy(result = chatHandle) } }
             }
         } else {
@@ -294,7 +295,7 @@ class StartConversationViewModel @Inject constructor(
                     getNoteToSelfChatUseCase()
                 }.onFailure { exception ->
                     Timber.e(exception)
-                    _state.update { it.copy(error = R.string.general_text_error) }
+                    _state.update { it.copy(error = sharedR.string.general_text_error) }
                 }.onSuccess { noteToSelfChatRoom ->
                     noteToSelfChatRoom?.let {
                         Timber.d("Note to self chat found: ${noteToSelfChatRoom.chatId}")

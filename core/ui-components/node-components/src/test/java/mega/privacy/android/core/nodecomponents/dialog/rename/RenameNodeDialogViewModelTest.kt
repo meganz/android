@@ -197,7 +197,7 @@ class RenameNodeDialogViewModelTest {
     }
 
     private fun provideValidationParameters(): List<Pair<InvalidNameType, Int>> = listOf(
-        InvalidNameType.BLANK_NAME to NodesR.string.invalid_string,
+        InvalidNameType.BLANK_NAME to sharedR.string.general_invalid_string,
         InvalidNameType.INVALID_NAME to sharedR.string.general_invalid_characters_defined,
         InvalidNameType.NAME_ALREADY_EXISTS to NodesR.string.same_file_name_warning,
         InvalidNameType.NO_EXTENSION to NodesR.string.file_without_extension_warning,

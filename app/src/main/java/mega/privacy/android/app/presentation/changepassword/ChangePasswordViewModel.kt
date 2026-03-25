@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
@@ -161,7 +162,7 @@ internal class ChangePasswordViewModel @Inject constructor(
                         )
                     } else {
                         it.copy(
-                            snackBarMessage = R.string.general_text_error,
+                            snackBarMessage = sharedR.string.general_text_error,
                             loadingMessage = null
                         )
                     }
@@ -170,7 +171,7 @@ internal class ChangePasswordViewModel @Inject constructor(
     }.onFailure {
         _uiState.update {
             it.copy(
-                snackBarMessage = R.string.general_text_error,
+                snackBarMessage = sharedR.string.general_text_error,
                 loadingMessage = null
             )
         }

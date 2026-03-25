@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity,MissingTranslation">
     <!-- New folder dialog strings -->
-    <string name="invalid_string">Incorrect</string>
     <string name="same_item_name_warning">There is already an item with the same name</string>
 
     <!-- New text file dialog strings -->
@@ -27,7 +26,6 @@
         <item quantity="one">%d version not deleted</item>
         <item quantity="other">%d versions not deleted</item>
     </plurals>
-    <string name="general_text_error">General text error</string>
     <string name="version_history_deleted">Version history deleted</string>
     <string name="context_correctly_moved_to_rubbish">Context correctly moved to rubbish</string>
     <string name="context_no_moved">Context no moved</string>
@@ -50,10 +48,7 @@
     <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
-    <!-- Answer for confirmation dialog. -->
-    <string name="general_ok">OK</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">Dispute takedown</string>
     <!-- End of take down dialog strings -->
 
     <!-- Start of empty strings -->
@@ -85,14 +80,11 @@
     <string name="button_plans_almost_full_warning">See plans</string>
     <string name="button_custom_almost_full_warning">Custom plan</string>
     <string name="button_bonus_almost_full_warning">Get Bonus</string>
-    <string name="general_upgrade_button">Upgrade</string>
     <!-- End of Storage Status Dialog M3 strings -->
 
     <!-- Start of Rename dialog resources -->
     <!-- Error shown when the user writes a file name without extension -->
     <string name="file_without_extension_warning">To proceed you need to type a file extension</string>
-    <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Item renamed</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Change anyway</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
@@ -121,8 +113,6 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">No network connection</string>
 
-    <!-- Menu item to make a node available offline -->
-    <string name="node_menu_action_make_available_offline">Make available offline</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_upload">Upload</string>
     <string name="general_allow">Allow</string>

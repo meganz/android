@@ -470,7 +470,7 @@ class AlbumsViewModelTest {
                 val item = awaitItem()
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
-                    R.string.invalid_string,
+                    sharedR.string.general_invalid_string,
                     item.createDialogErrorMessage
                 )
             }

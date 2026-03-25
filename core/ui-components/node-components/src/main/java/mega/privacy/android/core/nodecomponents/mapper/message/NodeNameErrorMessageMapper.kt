@@ -21,7 +21,7 @@ class NodeNameErrorMessageMapper @Inject constructor() {
             InvalidNameType.BLANK_NAME -> if (isFolder) {
                 sharedR.string.create_new_folder_dialog_error_message_empty_folder_name
             } else {
-                NodesR.string.invalid_string
+                sharedR.string.general_invalid_string
             }
 
             InvalidNameType.INVALID_NAME -> sharedR.string.general_invalid_characters_defined

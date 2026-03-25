@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -314,7 +315,7 @@ class StartConversationViewModelTest {
             underTest.state.map { it.error }.drop(1).test {
                 connectivityFlow.emit(true)
                 underTest.openNoteToSelf()
-                assertThat(awaitItem()).isEqualTo(R.string.general_text_error)
+                assertThat(awaitItem()).isEqualTo(sharedR.string.general_text_error)
             }
         }
 
@@ -328,7 +329,7 @@ class StartConversationViewModelTest {
             underTest.state.map { it.error }.drop(1).test {
                 connectivityFlow.emit(true)
                 underTest.onContactTap(testContact)
-                assertThat(awaitItem()).isEqualTo(R.string.general_text_error)
+                assertThat(awaitItem()).isEqualTo(sharedR.string.general_text_error)
             }
         }
 

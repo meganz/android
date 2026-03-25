@@ -1192,7 +1192,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 val name = emojiEditText.text.toString()
                 if (name.isEmpty()) {
                     Timber.w("Input is empty")
-                    emojiEditText.error = getString(R.string.invalid_string)
+                    emojiEditText.error = getString(sharedR.string.general_invalid_string)
                     emojiEditText.requestFocus()
                 } else {
                     viewModel.updateNickName(name)

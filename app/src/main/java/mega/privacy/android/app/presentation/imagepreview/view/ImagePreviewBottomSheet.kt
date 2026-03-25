@@ -293,7 +293,7 @@ internal fun ImagePreviewBottomSheet(
                 if (isDisputeMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.AlertTriangle),
-                        text = stringResource(id = R.string.dispute_takendown_file),
+                        text = stringResource(id = sharedR.string.dispute_takendown_file),
                         onActionClicked = onClickDispute,
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_DISPUTE),

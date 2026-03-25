@@ -36,6 +36,7 @@ import com.google.common.primitives.Longs
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -579,7 +580,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                                         Timber.e("ERROR: NULL media file Uri")
                                         showSnackbar(
                                             Constants.SNACKBAR_TYPE,
-                                            getString(R.string.general_text_error)
+                                            getString(sharedR.string.general_text_error)
                                         )
                                     } else {
                                         pdfIntent.setDataAndType(
@@ -593,7 +594,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                                         Timber.e("ERROR: NULL media file Uri")
                                         showSnackbar(
                                             Constants.SNACKBAR_TYPE,
-                                            getString(R.string.general_text_error)
+                                            getString(sharedR.string.general_text_error)
                                         )
                                     } else {
                                         pdfIntent.setDataAndType(
@@ -624,14 +625,14 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                                             Timber.e("ERROR: HTTP server get local link")
                                             showSnackbar(
                                                 Constants.SNACKBAR_TYPE,
-                                                getString(R.string.general_text_error)
+                                                getString(sharedR.string.general_text_error)
                                             )
                                         }
                                     } else {
                                         Timber.e("ERROR: HTTP server get local link")
                                         showSnackbar(
                                             Constants.SNACKBAR_TYPE,
-                                            getString(R.string.general_text_error)
+                                            getString(sharedR.string.general_text_error)
                                         )
                                     }
                                 } else {

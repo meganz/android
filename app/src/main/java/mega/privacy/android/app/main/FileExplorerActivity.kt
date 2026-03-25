@@ -2082,7 +2082,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         if (file == null) {
-            showSnackbar(getString(R.string.general_text_error))
+            showSnackbar(getString(sharedR.string.general_text_error))
             return
         }
 
@@ -2107,7 +2107,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 } ?: viewModel.uploadFile(file, parentHandle, getPitagTrigger())
             }.onFailure {
                 Timber.e(it, "Cannot check name collisions")
-                showSnackbar(getString(R.string.general_text_error))
+                showSnackbar(getString(sharedR.string.general_text_error))
             }
         }
     }

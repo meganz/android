@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
@@ -436,7 +437,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
             else -> {
                 Timber.e("Error when asking for change mail link: ${e.errorString}___${e.errorCode}")
-                showAlert(R.string.general_text_error, R.string.general_error_word)
+                showAlert(sharedR.string.general_text_error, R.string.general_error_word)
             }
         }
     }
@@ -453,7 +454,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
             else -> {
                 Timber.e("Error when asking for the cancellation link: ${e.errorString}___${e.errorCode}")
-                showAlert(R.string.general_text_error, R.string.general_error_word)
+                showAlert(sharedR.string.general_text_error, R.string.general_error_word)
             }
         }
     }
@@ -476,7 +477,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
             else -> {
                 Timber.e("An error occurred trying to disable Two-Factor Authentication")
-                showAlert(R.string.general_text_error, R.string.error_disable_2fa)
+                showAlert(sharedR.string.general_text_error, R.string.error_disable_2fa)
             }
         }
     }
@@ -511,7 +512,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                 }
             }
 
-            else -> showAlert(R.string.general_text_error, INVALID_VALUE)
+            else -> showAlert(sharedR.string.general_text_error, INVALID_VALUE)
         }
     }
 

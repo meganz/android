@@ -553,7 +553,7 @@ private fun handleSave(
                 requireNotNull(bitmap)
                 saveBitmap(bitmap, qrFilePath)
                 onSaveQRCode()
-            }.onFailure { snackBarHostState.showAutoDurationSnackbar(activity.getString(R.string.general_text_error)) }
+            }.onFailure { snackBarHostState.showAutoDurationSnackbar(activity.getString(sharedResR.string.general_text_error)) }
         }
     }
 }

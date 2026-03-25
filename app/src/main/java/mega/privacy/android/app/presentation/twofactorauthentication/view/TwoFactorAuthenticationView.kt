@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
@@ -190,7 +191,7 @@ internal fun TwoFactorAuthenticationView(
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                snackBarHostState.showAutoDurationSnackbar(context.resources.getString(R.string.general_text_error))
+                snackBarHostState.showAutoDurationSnackbar(context.resources.getString(sharedR.string.general_text_error))
             }
         }
 

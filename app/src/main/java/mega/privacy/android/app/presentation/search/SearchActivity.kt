@@ -613,7 +613,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
             startActivity(intent)
         } ?: run {
             showMegaSnackbar(
-                message = getString(R.string.general_text_error),
+                message = getString(sharedR.string.general_text_error),
                 actionLabel = null,
                 duration = MegaSnackbarDuration.Short
             )

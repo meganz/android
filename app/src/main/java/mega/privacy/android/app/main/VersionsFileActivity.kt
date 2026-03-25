@@ -566,7 +566,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     showSnackbar(getString(R.string.version_restored))
                 }
             } else {
-                showSnackbar(getString(R.string.general_text_error))
+                showSnackbar(getString(sharedR.string.general_text_error))
             }
         }
     }
@@ -684,14 +684,14 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             } else {
                                 showSnackbar(
                                     Constants.SNACKBAR_TYPE,
-                                    getString(R.string.general_text_error),
+                                    getString(sharedR.string.general_text_error),
                                     -1
                                 )
                             }
                         } else {
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
-                                getString(R.string.general_text_error),
+                                getString(sharedR.string.general_text_error),
                                 -1
                             )
                         }

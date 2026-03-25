@@ -191,7 +191,7 @@ internal fun TestPasswordComposeView(
         file?.let {
             printRecoveryKey(context, it, onPrintRecoveryKeyCompleted)
         } ?: run {
-            errorAlertMessage = context.getString(R.string.general_text_error)
+            errorAlertMessage = context.getString(sharedResR.string.general_text_error)
         }
     }
 

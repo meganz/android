@@ -760,7 +760,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         when {
             title.isEmpty() -> {
                 Timber.w("Input is empty")
-                input.error = getString(R.string.invalid_string)
+                input.error = getString(sharedR.string.general_invalid_string)
                 input.requestFocus()
             }
 

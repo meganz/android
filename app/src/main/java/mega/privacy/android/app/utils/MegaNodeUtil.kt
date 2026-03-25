@@ -889,7 +889,7 @@ object MegaNodeUtil {
             dialog.dismiss()
             listener?.onCancelClicked()
         }
-        builder.setNegativeButton(context.getString(R.string.dispute_takendown_file)) { dialog, _ ->
+        builder.setNegativeButton(context.getString(sharedR.string.dispute_takendown_file)) { dialog, _ ->
             context.launchUrl(Constants.DISPUTE_URL)
             dialog.dismiss()
             listener?.onDisputeClicked()

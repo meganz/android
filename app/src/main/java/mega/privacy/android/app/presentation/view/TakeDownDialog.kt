@@ -86,7 +86,7 @@ fun TakeDownDialog(
         dismissButton = {
             TextButton(onClick = onDeny) {
                 Text(
-                    text = stringResource(R.string.dispute_takendown_file),
+                    text = stringResource(sharedResR.string.dispute_takendown_file),
                     color = MaterialTheme.colors.accent_900_accent_050,
                 )
             }

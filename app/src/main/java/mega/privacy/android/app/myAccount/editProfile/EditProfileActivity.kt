@@ -426,7 +426,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             }
 
             else -> {
-                firstMessageId = R.string.general_text_error
+                firstMessageId = sharedR.string.general_text_error
                 secondMessageId = R.string.general_error_word
             }
         }

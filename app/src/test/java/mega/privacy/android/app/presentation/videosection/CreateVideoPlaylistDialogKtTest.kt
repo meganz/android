@@ -55,13 +55,13 @@ class CreateVideoPlaylistDialogKtTest {
     @Test
     fun `test that the error message is displayed correctly when errorMessage is invalid_string`() {
         setComposeContent(
-            errorMessage = R.string.invalid_string,
+            errorMessage = sharedR.string.general_invalid_string,
             isInputValid = { false }
         )
 
         composeTestRule.onNodeWithTag(ERROR_MESSAGE_TEST_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(ERROR_MESSAGE_TEST_TAG)
-            .assertTextEquals(fromId(R.string.invalid_string))
+            .assertTextEquals(fromId(sharedR.string.general_invalid_string))
     }
 
     @Test
@@ -105,7 +105,7 @@ class CreateVideoPlaylistDialogKtTest {
     @Test
     fun `test that the error message is not displayed when isInputValid is true`() {
         setComposeContent(
-            errorMessage = R.string.invalid_string,
+            errorMessage = sharedR.string.general_invalid_string,
             isInputValid = { true }
         )
 
@@ -140,7 +140,7 @@ class CreateVideoPlaylistDialogKtTest {
     @Test
     fun `test that with input clicking the positive dialog button calls the correct function`() {
         val expectedTitle = "New playlist"
-        val inputPlaceholderText = R.string.invalid_string
+        val inputPlaceholderText = sharedR.string.general_invalid_string
         val onDialogPositiveButtonClicked = mock<(String) -> Unit>()
 
         setComposeContent(

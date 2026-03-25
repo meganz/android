@@ -259,7 +259,7 @@ internal class AddToAlbumViewModel @Inject constructor(
 
         createAlbumJob = viewModelScope.launch {
             val errorMessageRes = when {
-                albumName.isEmpty() -> R.string.invalid_string
+                albumName.isEmpty() -> sharedR.string.general_invalid_string
                 albumName.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
                 albumName.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
                 "[\\\\*/:<>?\"|]".toRegex()
@@ -400,7 +400,7 @@ internal class AddToAlbumViewModel @Inject constructor(
 
         createPlaylistJob = viewModelScope.launch {
             val errorMessageRes = when {
-                playlistName.isBlank() -> R.string.invalid_string
+                playlistName.isBlank() -> sharedR.string.general_invalid_string
                 playlistName.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
                 playlistName.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
                 "[\\\\*/:<>?\"|]".toRegex()

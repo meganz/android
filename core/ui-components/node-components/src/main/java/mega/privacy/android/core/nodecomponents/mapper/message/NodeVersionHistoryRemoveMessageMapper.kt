@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.mapper.message
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import javax.inject.Inject
 
@@ -39,7 +40,7 @@ class NodeVersionHistoryRemoveMessageMapper @Inject constructor(
             "$firstLine\n$secondLine\n$thirdLine"
         }
 
-        is Throwable -> context.getString(NodesR.string.general_text_error)
+        is Throwable -> context.getString(sharedR.string.general_text_error)
 
         else -> context.getString(NodesR.string.version_history_deleted)
     }

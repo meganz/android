@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_ACTION
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_LINK_TO_RESET
@@ -488,7 +489,7 @@ internal class ChangePasswordViewModelTest {
             onUserClickChangePassword("")
             uiState.test {
                 val state = awaitItem()
-                assertEquals(state.snackBarMessage, R.string.general_text_error)
+                assertEquals(state.snackBarMessage, sharedR.string.general_text_error)
                 assertNull(state.loadingMessage)
                 assertFalse(state.isPasswordChanged)
             }

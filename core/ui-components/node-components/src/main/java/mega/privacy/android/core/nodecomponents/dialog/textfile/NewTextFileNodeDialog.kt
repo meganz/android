@@ -101,7 +101,7 @@ fun NewTextFileNodeDialog(
 
 @Composable
 private fun NodeNameException.text(): String = when (this) {
-    is EmptyNodeNameException -> stringResource(NodesR.string.invalid_string)
+    is EmptyNodeNameException -> stringResource(sharedR.string.general_invalid_string)
     is DotNameException -> stringResource(sharedR.string.general_invalid_dot_name_warning)
     is DoubleDotNameException -> stringResource(sharedR.string.general_invalid_double_dot_name_warning)
     is InvalidNodeNameException -> stringResource(

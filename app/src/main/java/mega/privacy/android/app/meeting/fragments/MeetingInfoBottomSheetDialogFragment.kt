@@ -136,7 +136,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
         } else {
             showSnackbar(
                 requireContext(),
-                getString(R.string.general_text_error)
+                getString(sharedR.string.general_text_error)
             )
         }
     }
@@ -215,7 +215,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
         when {
             TextUtil.isTextEmpty(title) -> {
                 Timber.w("Input is empty")
-                input.error = getString(R.string.invalid_string)
+                input.error = getString(sharedR.string.general_invalid_string)
                 input.requestFocus()
             }
 

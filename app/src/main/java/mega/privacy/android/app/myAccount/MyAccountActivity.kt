@@ -795,7 +795,7 @@ internal class MyAccountActivity : PasscodeActivity(),
 
                     if (password.isEmpty()) {
                         setEditTextError(
-                            getString(R.string.invalid_string),
+                            getString(sharedR.string.general_invalid_string),
                             editLayout,
                             errorIcon
                         )

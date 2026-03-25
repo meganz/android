@@ -15,6 +15,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.changepassword.extensions.toStrengthAttribute
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
@@ -107,11 +108,11 @@ class ChangePasswordComposeViewTest {
 
     @Test
     fun `test that snackbar will be shown when snackbar message not null`() {
-        setComposeContent(ChangePasswordUIState(snackBarMessage = R.string.general_text_error))
+        setComposeContent(ChangePasswordUIState(snackBarMessage = sharedR.string.general_text_error))
 
         composeTestRule.onNodeWithTag(SNACKBAR_TEST_TAG)
             .assertIsDisplayed()
-            .assert(hasAnyChild(hasText(fromId(R.string.general_text_error))))
+            .assert(hasAnyChild(hasText(fromId(sharedR.string.general_text_error))))
     }
 
     @Test
@@ -138,7 +139,7 @@ class ChangePasswordComposeViewTest {
         setComposeContent(
             ChangePasswordUIState(
                 isCurrentPassword = true,
-                passwordError = R.string.general_text_error
+                passwordError = sharedR.string.general_text_error
             )
         )
 
@@ -165,7 +166,7 @@ class ChangePasswordComposeViewTest {
         setComposeContent(
             ChangePasswordUIState(
                 passwordStrength = PasswordStrength.MEDIUM,
-                passwordError = R.string.general_text_error
+                passwordError = sharedR.string.general_text_error
             )
         )
 

@@ -303,7 +303,7 @@ class QRCodeViewModel @Inject constructor(
                     // The module has not been installed, but it is currently installing.
                     // Therefore, just let the user click the scan QR button again.
                     if (error !is BarcodeScannerModuleIsNotInstalled) {
-                        setResultMessage(R.string.general_text_error)
+                        setResultMessage(sharedR.string.general_text_error)
                     }
                 }
         }

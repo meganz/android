@@ -952,7 +952,7 @@ class VideoSectionViewModel @Inject constructor(
         title: String,
     ): Boolean {
         val errorMessage = when {
-            title.isBlank() -> R.string.invalid_string
+            title.isBlank() -> sharedR.string.general_invalid_string
             title.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
             title.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
             "[\\\\*/:<>?\"|]".toRegex()

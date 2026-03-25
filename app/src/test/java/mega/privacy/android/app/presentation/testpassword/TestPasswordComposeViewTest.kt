@@ -149,11 +149,11 @@ class TestPasswordComposeViewTest {
 
     @Test
     fun `test that snackbar will be shown when snackbar message not null`() {
-        setComposeContent(TestPasswordUIState(userMessage = triggered(R.string.general_text_error)))
+        setComposeContent(TestPasswordUIState(userMessage = triggered(sharedR.string.general_text_error)))
 
         composeTestRule.onNodeWithTag(SNACKBAR_TAG)
             .assertIsDisplayed()
-            .assert(hasAnyChild(hasText(fromId(R.string.general_text_error))))
+            .assert(hasAnyChild(hasText(fromId(sharedR.string.general_text_error))))
     }
 
     @Test
@@ -257,7 +257,7 @@ class TestPasswordComposeViewTest {
 
         composeTestRule.onNodeWithTag(SNACKBAR_TAG)
             .assertIsDisplayed()
-            .assert(hasAnyChild(hasText(fromId(R.string.general_text_error))))
+            .assert(hasAnyChild(hasText(fromId(sharedR.string.general_text_error))))
     }
 
     @Test

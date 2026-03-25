@@ -344,7 +344,7 @@ object MegaNodeDialogUtil {
                 showDialogError(
                     typeText,
                     errorText,
-                    context.getString(R.string.invalid_string)
+                    context.getString(sharedR.string.general_invalid_string)
                 )
             }
 

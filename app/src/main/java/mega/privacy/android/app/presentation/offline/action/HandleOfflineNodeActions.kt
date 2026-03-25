@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -284,7 +285,7 @@ private suspend fun openUrlFile(
             snackBarHostState = snackBarHostState
         )
     } ?: run {
-        snackBarHostState?.showAutoDurationSnackbar(message = context.getString(R.string.general_text_error))
+        snackBarHostState?.showAutoDurationSnackbar(message = context.getString(sharedR.string.general_text_error))
     }
 }
 

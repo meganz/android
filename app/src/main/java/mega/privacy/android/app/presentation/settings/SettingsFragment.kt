@@ -473,7 +473,7 @@ class SettingsFragment :
             } else {
                 showInfoDialog(
                     R.string.general_error_word,
-                    R.string.general_text_error
+                    sharedResR.string.general_text_error
                 )
             }
         }

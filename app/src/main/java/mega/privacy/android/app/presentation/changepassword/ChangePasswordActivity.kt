@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
@@ -231,7 +232,7 @@ class ChangePasswordActivity : PasscodeActivity() {
     private fun showAlert() {
         Util.showAlert(
             this,
-            getString(R.string.general_text_error),
+            getString(sharedR.string.general_text_error),
             getString(R.string.general_error_word)
         )
     }

@@ -85,7 +85,7 @@ class MyAccountDeepLinkHandler @Inject constructor(
                         ResetPasswordLinkException.LinkInvalid -> sharedR.string.general_invalid_link
                         ResetPasswordLinkException.LinkExpired -> R.string.recovery_link_expired
                         ResetPasswordLinkException.LinkAccessDenied -> R.string.error_not_logged_with_correct_account
-                        else -> R.string.general_text_error
+                        else -> sharedR.string.general_text_error
                     }.let { errorStringId -> snackbarEventQueue.queueMessage(errorStringId) }
 
                     emptyList()

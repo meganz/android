@@ -6,6 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,7 +41,7 @@ class NodeVersionHistoryRemoveMessageMapperTest {
 
     @Test
     fun `test that message shown is as expected when any exception is thrown`() {
-        val expected = context.getString(NodesR.string.general_text_error)
+        val expected = context.getString(sharedR.string.general_text_error)
         val result = mapper(Throwable())
         assertThat(result).isEqualTo(expected)
     }

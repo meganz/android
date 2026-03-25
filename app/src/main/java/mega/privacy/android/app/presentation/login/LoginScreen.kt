@@ -76,7 +76,7 @@ fun LoginScreen(
             when ((e as? MegaException)?.errorCode ?: Int.MIN_VALUE) {
                 MegaError.API_EKEY -> showIncorrectRkDialog = true
                 MegaError.API_EBLOCKED -> viewModel.setSnackbarMessageId(R.string.error_reset_account_blocked)
-                else -> viewModel.setSnackbarMessageId(R.string.general_text_error)
+                else -> viewModel.setSnackbarMessageId(sharedR.string.general_text_error)
             }
         }
     }
@@ -194,7 +194,7 @@ fun LoginScreen(
             onPositiveButtonClicked = {
                 val value = recoveryKeyInput.trim()
                 if (value.isEmpty()) {
-                    recoveryKeyError = context.getString(R.string.invalid_string)
+                    recoveryKeyError = context.getString(sharedR.string.general_invalid_string)
                 } else {
                     keyboardController?.hide()
                     viewModel.checkRecoveryKey(recoveryKeyLink, value)

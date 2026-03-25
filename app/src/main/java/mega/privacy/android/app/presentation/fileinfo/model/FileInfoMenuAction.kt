@@ -53,7 +53,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
 
     object DisputeTakedown : MenuActionString(
         IconPack.Medium.Thin.Outline.AlertTriangle,
-        R.string.dispute_takendown_file,
+        sharedR.string.dispute_takendown_file,
         TEST_TAG_DISPUTE_TAKE_DOWN_ACTION
     ), FileInfoMenuAction {
         override val orderInCategory = 105

@@ -711,7 +711,7 @@ class ChatInfoViewModel @Inject constructor(
                         Timber.e(exception)
                         triggerSnackbarMessage(
                             getStringFromStringResMapper(
-                                R.string.general_text_error
+                                sharedR.string.general_text_error
                             )
                         )
                     }.onSuccess { chatId ->
@@ -745,7 +745,7 @@ class ChatInfoViewModel @Inject constructor(
                         Timber.d(exception)
                         triggerSnackbarMessage(
                             getStringFromStringResMapper(
-                                R.string.general_text_error
+                                sharedR.string.general_text_error
                             )
                         )
                     }.onSuccess { chatCallId ->
@@ -1003,7 +1003,7 @@ class ChatInfoViewModel @Inject constructor(
                     Timber.e(exception)
                     triggerSnackbarMessage(
                         getStringFromStringResMapper(
-                            R.string.general_text_error
+                            sharedR.string.general_text_error
                         )
                     )
                 }.onSuccess { isAllowAddParticipantsEnabled ->

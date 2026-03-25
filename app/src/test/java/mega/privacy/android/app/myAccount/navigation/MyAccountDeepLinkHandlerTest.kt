@@ -294,7 +294,7 @@ class MyAccountDeepLinkHandlerTest {
             .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
 
         assertThat(actual).isEmpty()
-        verify(snackbarEventQueue).queueMessage(R.string.general_text_error)
+        verify(snackbarEventQueue).queueMessage(sharedR.string.general_text_error)
     }
 
     @ParameterizedTest

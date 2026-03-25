@@ -237,7 +237,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                             ResetPasswordLinkException.LinkInvalid -> getString(sharedR.string.general_invalid_link)
                             ResetPasswordLinkException.LinkExpired -> getString(R.string.recovery_link_expired)
                             ResetPasswordLinkException.LinkAccessDenied -> getString(R.string.error_not_logged_with_correct_account)
-                            else -> getString(R.string.general_text_error)
+                            else -> getString(sharedR.string.general_text_error)
                         }
                         setError(errorMessage)
                     }

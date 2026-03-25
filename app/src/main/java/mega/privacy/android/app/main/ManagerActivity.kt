@@ -5097,7 +5097,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         if (nodes.isNullOrEmpty()) {
             showSnackbar(
                 SNACKBAR_TYPE,
-                getString(R.string.general_text_error),
+                getString(sharedR.string.general_text_error),
                 MEGACHAT_INVALID_HANDLE
             )
             return

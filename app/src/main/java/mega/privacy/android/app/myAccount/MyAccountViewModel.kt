@@ -1138,7 +1138,7 @@ class MyAccountViewModel @Inject constructor(
                             errorMessageRes = if (exception is ConfirmCancelAccountException.IncorrectPassword) {
                                 R.string.old_password_provided_incorrect
                             } else {
-                                R.string.general_text_error
+                                sharedR.string.general_text_error
                             },
                         )
                     }
@@ -1259,7 +1259,7 @@ class MyAccountViewModel @Inject constructor(
                             errorMessageRes = when (exception) {
                                 is ConfirmChangeEmailException.EmailAlreadyInUse -> R.string.mail_already_used
                                 is ConfirmChangeEmailException.IncorrectPassword -> R.string.old_password_provided_incorrect
-                                else -> R.string.general_text_error
+                                else -> sharedR.string.general_text_error
                             }
                         )
                     }
@@ -1285,7 +1285,7 @@ class MyAccountViewModel @Inject constructor(
         when (result) {
             API_OK -> actionSuccess.invoke(context.getString(R.string.pass_changed_alert))
             API_EARGS -> actionError.invoke(context.getString(R.string.old_password_provided_incorrect))
-            else -> actionError.invoke(context.getString(R.string.general_text_error))
+            else -> actionError.invoke(context.getString(sharedR.string.general_text_error))
         }
     }
 
