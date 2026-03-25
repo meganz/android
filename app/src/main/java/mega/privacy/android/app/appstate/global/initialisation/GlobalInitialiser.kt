@@ -25,16 +25,20 @@ class GlobalInitialiser @Inject constructor(
     private val appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>,
     private val postLoginInitialisers: Set<@JvmSuppressWildcards PostLoginInitialiser>,
 ) {
-    private var onPreLoginJob: Job? = null
+    private var onAppStartJob: Job? = null
     private var onPostLoginJob: Job? = null
 
     fun onAppStart() {
-        appStartInitialisers.forEach {
-            coroutineScope.launch {
-                try {
-                    it()
-                } catch (e: Exception) {
-                    Timber.e(e, "Error during auth viewmodel initialisation")
+        if (onAppStartJob?.isActive != true) {
+            onAppStartJob = coroutineScope.launch {
+                appStartInitialisers.forEach {
+                    launch {
+                        try {
+                            it()
+                        } catch (e: Exception) {
+                            Timber.e(e, "Error during auth viewmodel initialisation")
+                        }
+                    }
                 }
             }
         }
