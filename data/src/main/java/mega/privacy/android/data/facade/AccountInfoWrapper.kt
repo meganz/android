@@ -49,11 +49,6 @@ interface AccountInfoWrapper {
     fun submitSubscriptions(purchase: MegaPurchase)
 
     /**
-     * Subscription payment method
-     */
-    val subscriptionMethodId: Int
-
-    /**
      * Resets account info.
      */
     suspend fun resetAccountInfo()

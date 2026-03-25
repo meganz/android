@@ -607,27 +607,27 @@ internal class MyAccountViewModelTest {
         Arguments.of(
             AccountType.PRO_FLEXI,
             accountDetailsWithValidSubscription(AccountType.PRO_FLEXI),
-            false
+            true
         ),
         Arguments.of(
             AccountType.BUSINESS,
             accountDetailsWithValidSubscription(AccountType.BUSINESS),
-            false
+            true
         ),
         Arguments.of(
             AccountType.STARTER,
             accountDetailsWithValidSubscription(AccountType.STARTER),
-            false
+            true
         ),
         Arguments.of(
             AccountType.BASIC,
             accountDetailsWithValidSubscription(AccountType.BASIC),
-            false
+            true
         ),
         Arguments.of(
             AccountType.ESSENTIAL,
             accountDetailsWithValidSubscription(AccountType.ESSENTIAL),
-            false
+            true
         ),
         Arguments.of(
             AccountType.PRO_I,

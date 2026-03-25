@@ -1,10 +1,10 @@
 package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -21,7 +21,10 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.payment.UpgradeSource
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaCurrency
@@ -45,7 +48,7 @@ import kotlin.test.assertNull
 class DefaultBillingRepositoryTest {
     private lateinit var underTest: BillingRepository
 
-    private val accountInfoWrapper = mock<AccountInfoWrapper>()
+    private val accountRepository = mock<AccountRepository>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val paymentMethodFlagsCache = mock<Cache<PaymentMethodFlags>>()
     private val pricingCache = mock<Cache<Pricing>>()
@@ -72,7 +75,7 @@ class DefaultBillingRepositoryTest {
     @Before
     fun setUp() {
         underTest = DefaultBillingRepository(
-            accountInfoWrapper = accountInfoWrapper,
+            accountRepository = accountRepository,
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             paymentMethodFlagsCache = paymentMethodFlagsCache,
@@ -300,8 +303,13 @@ class DefaultBillingRepositoryTest {
     fun `test that getCurrentPaymentMethod returns PaymentMethod correctly`() {
         runTest {
             val paymentMethod = PaymentMethod.GOOGLE_WALLET
+            val accountDetail = AccountDetail(
+                levelDetail = mock<AccountLevelDetail> {
+                    on { subscriptionMethodId }.thenReturn(3)
+                }
+            )
 
-            whenever(accountInfoWrapper.subscriptionMethodId).thenReturn(3)
+            whenever(accountRepository.monitorAccountDetail()).thenReturn(flowOf(accountDetail))
 
             val actual = underTest.getCurrentPaymentMethod()
             assertThat(actual).isEqualTo(paymentMethod)

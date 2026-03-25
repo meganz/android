@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -63,6 +64,8 @@ import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -244,9 +247,10 @@ class MyAccountViewModel @Inject constructor(
 
         viewModelScope.launch {
             flow {
-                emitAll(monitorUserUpdates()
-                    .catch { Timber.w("Exception monitoring user updates: $it") }
-                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
+                emitAll(
+                    monitorUserUpdates()
+                        .catch { Timber.w("Exception monitoring user updates: $it") }
+                        .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
             }.collect {
                 when (it) {
                     UserChanges.Email -> refreshCurrentUserEmail()
@@ -290,11 +294,13 @@ class MyAccountViewModel @Inject constructor(
             monitorAccountDetailUseCase()
                 .catch { Timber.w("Exception monitoring account details: $it") }
                 .collectLatest { accountDetail ->
+                    val isProSubscription = isProSubscriptionCheck(accountDetail.levelDetail)
                     _state.update {
                         it.copy(
                             subscriptionDetails = accountDetail.levelDetail,
                             accountType = accountDetail.levelDetail?.accountType
                                 ?: AccountType.FREE,
+                            isProSubscription = isProSubscription
                         )
                     }
                 }
@@ -353,9 +359,12 @@ class MyAccountViewModel @Inject constructor(
     /**
      * Checks the User's Subscription type
      */
-    private fun checkSubscription() {
+    private suspend fun checkSubscription() {
+        val currentSubscriptionMethodId = monitorAccountDetailUseCase()
+            .catch { emit(AccountDetail()) }
+            .firstOrNull()?.levelDetail?.subscriptionMethodId
         PlatformInfo.entries.firstOrNull {
-            it.subscriptionMethodId == myAccountInfo.subscriptionMethodId
+            it.subscriptionMethodId == currentSubscriptionMethodId
         }?.run {
             when {
                 isSubscriptionAndGatewaySame(subscriptionMethodId) -> {
@@ -1310,14 +1319,12 @@ class MyAccountViewModel @Inject constructor(
                 getPaymentMethodUseCase(false)
 
                 val businessProFlexiStatus = getBusinessStatusUseCase()
-                val isProSubscription = isProSubscriptionCheck()
                 _state.update { state ->
                     state.copy(
                         isBusinessAccount = accountDetails.isBusinessAccount &&
                                 accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
                         isProFlexiAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                         businessProFlexiStatus = businessProFlexiStatus,
-                        isProSubscription = isProSubscription,
                     )
                 }
             }.onFailure {
@@ -1353,27 +1360,15 @@ class MyAccountViewModel @Inject constructor(
 
     /**
      * To check if user has active Pro subscription and update UI state
+     *
+     * @param subscriptionDetails
      */
-    private fun isProSubscriptionCheck(): Boolean {
-        val subscriptionList =
-            state.value.subscriptionDetails?.accountSubscriptionDetailList
-        val planDetail = state.value.subscriptionDetails?.accountPlanDetail
-        val isActiveProSubscription = when (planDetail?.accountType) {
-            AccountType.PRO_LITE,
-            AccountType.PRO_I,
-            AccountType.PRO_II,
-            AccountType.PRO_III,
-                -> {
-                if (subscriptionList?.size == 1) {
-                    planDetail.accountType == subscriptionList.firstOrNull()?.subscriptionLevel
-                } else {
-                    false
-                }
-            }
-
-            else -> false
-        }
-        return isActiveProSubscription ?: false
+    private fun isProSubscriptionCheck(subscriptionDetails: AccountLevelDetail?): Boolean {
+        val subscriptionList = subscriptionDetails?.accountSubscriptionDetailList ?: return false
+        val planDetail = subscriptionDetails.accountPlanDetail
+        return subscriptionList.size == 1
+                && planDetail?.accountType?.isPaid == true
+                && planDetail.accountType == subscriptionList.first().subscriptionLevel
     }
 
     /**

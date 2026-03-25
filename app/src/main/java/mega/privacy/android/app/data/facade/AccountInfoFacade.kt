@@ -72,9 +72,6 @@ class AccountInfoFacade @Inject constructor(
 
     override suspend fun resetAccountInfo() = myAccountInfo.resetDefaults()
 
-    override val subscriptionMethodId: Int
-        get() = myAccountInfo.subscriptionMethodId
-
     override fun submitSubscriptions(purchase: MegaPurchase) {
         Timber.d("submit subscription: $purchase")
         val token = purchase.token

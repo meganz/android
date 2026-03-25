@@ -514,7 +514,6 @@ class MyAccountWidgetViewModelTest {
             usedIncoming = 0L,
             totalStorage = totalStorage,
             usedStorage = usedStorage,
-            subscriptionMethodId = 0
         ),
         levelDetail: AccountLevelDetail? = AccountLevelDetail(
             accountType = accountType,
@@ -523,7 +522,8 @@ class MyAccountWidgetViewModelTest {
             proExpirationTime = 0L,
             accountSubscriptionCycle = mega.privacy.android.domain.entity.AccountSubscriptionCycle.UNKNOWN,
             accountPlanDetail = null,
-            accountSubscriptionDetailList = emptyList()
+            accountSubscriptionDetailList = emptyList(),
+            subscriptionMethodId = 0,
         ),
     ): AccountDetail {
         return AccountDetail(

@@ -123,6 +123,7 @@ internal class AccountDetailMapperTest {
                     accountSubscriptionCycleMapper(expectedSubscriptionRenewCycle),
                     accountPlanDetailMapper(megaAccountPlan),
                     accountSubscriptionDetailListMapper(megaAccountDetails),
+                    expectedSubscriptionMethodId,
                 ),
             ).thenReturn(
                 AccountLevelDetail(
@@ -133,6 +134,7 @@ internal class AccountDetailMapperTest {
                     accountSubscriptionCycle = expectedAccountSubscriptionCycle,
                     accountPlanDetail = null,
                     accountSubscriptionDetailList = listOf(),
+                    subscriptionMethodId = expectedSubscriptionMethodId,
                 )
             )
             val actual = underTest(

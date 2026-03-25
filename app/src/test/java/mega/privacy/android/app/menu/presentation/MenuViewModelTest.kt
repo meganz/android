@@ -719,7 +719,6 @@ class MenuViewModelTest {
             usedIncoming = 0L,
             totalStorage = totalStorage,
             usedStorage = usedStorage,
-            subscriptionMethodId = 0
         ),
         levelDetail: AccountLevelDetail? = AccountLevelDetail(
             accountType = accountType,
@@ -728,7 +727,8 @@ class MenuViewModelTest {
             accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
             proExpirationTime = 0L,
             accountPlanDetail = null,
-            accountSubscriptionDetailList = emptyList()
+            accountSubscriptionDetailList = emptyList(),
+            subscriptionMethodId = 0,
         ),
     ): AccountDetail {
         return AccountDetail(

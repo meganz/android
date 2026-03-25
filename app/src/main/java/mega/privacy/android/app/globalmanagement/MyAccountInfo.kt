@@ -56,9 +56,6 @@ class MyAccountInfo @Inject constructor(
     var numVersions = INVALID_VALUE
     var previousVersionsSize = INVALID_VALUE.toLong()
 
-    // Added the subscriptionMethodId parameter for subscription dialog
-    var subscriptionMethodId = -1
-
     /**
      * Resets all values by default.
      * It's mandatory to add here any new attribute included
@@ -164,7 +161,6 @@ class MyAccountInfo @Inject constructor(
             subscriptionStatus = accountInfo.subscriptionStatus
             subscriptionRenewTime = accountInfo.subscriptionRenewTime
             proExpirationTime = accountInfo.proExpiration
-            subscriptionMethodId = accountInfo.subscriptionMethodId
         }
 
         isAccountDetailsFinished = true

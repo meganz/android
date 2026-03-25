@@ -11,7 +11,6 @@ internal typealias AccountStorageDetailMapper = (
     @JvmSuppressWildcards List<MegaNode>,
     @JvmSuppressWildcards Long,
     @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards Int,
 ) -> @JvmSuppressWildcards AccountStorageDetail
 
 internal fun toAccountStorageDetail(
@@ -21,12 +20,10 @@ internal fun toAccountStorageDetail(
     inShares: List<MegaNode>,
     totalStorage: Long,
     usedStorage: Long,
-    subscriptionMethodId: Int,
 ) = AccountStorageDetail(
     usedCloudDrive = rootNode?.let { node -> details.getStorageUsed(node.handle) } ?: 0L,
     usedRubbish = rubbishNode?.let { node -> details.getStorageUsed(node.handle) } ?: 0L,
     usedIncoming = inShares.sumOf { node -> details.getStorageUsed(node.handle) },
     totalStorage = totalStorage,
     usedStorage = usedStorage,
-    subscriptionMethodId = subscriptionMethodId,
 )
