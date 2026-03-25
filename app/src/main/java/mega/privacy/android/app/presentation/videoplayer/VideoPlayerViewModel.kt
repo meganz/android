@@ -1293,13 +1293,38 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Pauses playback for a non-user reason (e.g. system / app policy). Clears
+     * [allowUpdatePausedByUser] around the gateway pause so ExoPlayer does not treat this stop as a
+     * user request, keeping [shouldResumeOnAudioFocusGain] accurate for code that resumes after
+     * transient interruptions. If the player was already not playing, only UI state is set to paused.
+     */
+    internal fun pausePlaybackNonUserInitiated() {
+        if (mediaPlayerGateway.getPlayWhenReady()) {
+            allowUpdatePausedByUser = false
+            mediaPlayerGateway.setPlayWhenReady(false)
+        }
+        updatePlaybackState(MediaPlaybackState.Paused)
+    }
+
     internal fun onPlayWhenReadyChanged(state: MediaPlaybackState, isPausedByUser: Boolean) {
         updatePlaybackState(state)
         if (allowUpdatePausedByUser) {
-            this.isPausedByUser = isPausedByUser
+            when {
+                isPausedByUser -> this.isPausedByUser = true
+                state == MediaPlaybackState.Playing -> this.isPausedByUser = false
+                // Paused for other reasons (audio focus, remote, etc.): keep user pause intent so
+                // AUDIOFOCUS_GAIN does not resume after the user explicitly tapped pause.
+            }
         }
         allowUpdatePausedByUser = true
     }
+
+    /**
+     * When `false`, the user explicitly paused and playback must not auto-resume on audio focus
+     * gain until they press play.
+     */
+    internal fun shouldResumeOnAudioFocusGain(): Boolean = !isPausedByUser
 
     internal fun handleAutoReplayIfPaused() {
         val shouldAutoReplay = uiState.value.mediaPlaybackState == MediaPlaybackState.Paused &&

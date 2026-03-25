@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
@@ -169,11 +170,19 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         AudioManager.OnAudioFocusChangeListener { focusChange ->
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                    mediaPlayerGateway.setPlayWhenReady(false)
+                    videoPlayerViewModel.pausePlaybackNonUserInitiated()
                 }
 
                 AudioManager.AUDIOFOCUS_GAIN -> {
-                    mediaPlayerGateway.setPlayWhenReady(true)
+                    // Do not resume when the activity is not visible (e.g. app in background).
+                    // Otherwise transient focus loss (ringtone, notification sounds) can call
+                    // AUDIOFOCUS_GAIN after the user left the player, incorrectly restarting video.
+                    // Do not resume when the user explicitly paused — wait for their play action.
+                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) &&
+                        videoPlayerViewModel.shouldResumeOnAudioFocusGain()
+                    ) {
+                        mediaPlayerGateway.setPlayWhenReady(true)
+                    }
                 }
             }
         }

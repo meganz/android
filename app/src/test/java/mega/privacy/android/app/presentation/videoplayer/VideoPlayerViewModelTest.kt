@@ -1383,10 +1383,36 @@ class VideoPlayerViewModelTest {
     }
 
     @Test
+    fun `test that shouldResumeOnAudioFocusGain is false after user pause and stays false on non user pause`() =
+        runTest {
+            initViewModel()
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = false)
+            advanceUntilIdle()
+            assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
+        }
+
+    @Test
+    fun `test that shouldResumeOnAudioFocusGain is true after user resumes playback`() = runTest {
+        initViewModel()
+        underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+        advanceUntilIdle()
+        assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
+
+        underTest.onPlayWhenReadyChanged(MediaPlaybackState.Playing, isPausedByUser = false)
+        advanceUntilIdle()
+        assertThat(underTest.shouldResumeOnAudioFocusGain()).isTrue()
+    }
+
+    @Test
     fun `test that pauseForBackground sets Paused and isAutoReplay when player was playing`() =
         runTest {
             whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
             initViewModel()
+            clearInvocations(mediaPlayerGateway)
             underTest.pauseForBackground()
             advanceUntilIdle()
             verify(mediaPlayerGateway).setPlayWhenReady(false)
@@ -1403,14 +1429,67 @@ class VideoPlayerViewModelTest {
         runTest {
             whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
             initViewModel()
+            clearInvocations(mediaPlayerGateway)
             underTest.pauseForBackground()
             advanceUntilIdle()
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
                 assertThat(actual.isAutoReplay).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    fun `test that pauseForBackground does not drive gateway pause when user already paused`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            initViewModel()
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.pauseForBackground()
+            advanceUntilIdle()
+
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+                assertThat(actual.isAutoReplay).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that pausePlaybackNonUserInitiated does not mark paused by user so focus gain can resume`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            initViewModel()
+            clearInvocations(mediaPlayerGateway)
+            underTest.pausePlaybackNonUserInitiated()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            // ExoPlayer reports app-driven setPlayWhenReady as USER_REQUEST; allowUpdatePausedByUser
+            // is cleared for this pause so the next callback does not flip isPausedByUser.
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            assertThat(underTest.shouldResumeOnAudioFocusGain()).isTrue()
+        }
+
+    @Test
+    fun `test that pausePlaybackNonUserInitiated when already paused keeps shouldResumeOnAudioFocusGain false if user paused`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            initViewModel()
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+            underTest.pausePlaybackNonUserInitiated()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
+            assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
         }
 
     @Test
