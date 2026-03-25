@@ -66,7 +66,8 @@ internal fun OpenPasswordLinkDialog(
 ) {
     PasswordInputDialog(
         modifier = modifier.testTag(OPEN_PASSWORD_TAG),
-        title = stringResource(sharedR.string.password_dialog_hint),
+        title = stringResource(sharedR.string.pdf_viewer_dialog_title_enter_password),
+        description = stringResource(sharedR.string.link_password_dialog_message),
         positiveButtonText = stringResource(sharedR.string.general_decrypt),
         onPositiveButtonClicked = onConfirm,
         negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),

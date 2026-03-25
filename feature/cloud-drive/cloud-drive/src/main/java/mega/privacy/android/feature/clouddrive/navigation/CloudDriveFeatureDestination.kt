@@ -14,8 +14,8 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.shares
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
-import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -80,7 +80,7 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 },
                 onNavigateToFolderLink = { folderLinkUri ->
                     navigationHandler.back() //to dismiss the dialog
-                    navigationHandler.navigate(LegacyFolderLinkNavKey(folderLinkUri))
+                    navigationHandler.navigate(FolderLinkNavKey(folderLinkUri))
                 },
             )
 

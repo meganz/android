@@ -2519,4 +2519,6 @@
         <item quantity="one">Shared with %d person</item>
         <item quantity="other">Shared with %d people</item>
     </plurals>
+    <!-- Two line message for the decryption key dialog prompting user to enter the password -->
+    <string name="link_password_dialog_message">Enter the password to open this link.\nDon’t have it? Contact the sender.</string>
 </resources>

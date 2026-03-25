@@ -38,8 +38,16 @@ class OpenPasswordLinkDialogTest {
     fun `test that dialog displays correct title`() {
         initComposeRuleContent()
 
-        val title = context.getString(sharedR.string.password_dialog_hint)
+        val title = context.getString(sharedR.string.pdf_viewer_dialog_title_enter_password)
         composeRule.onNodeWithText(title).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that dialog displays correct description`() {
+        initComposeRuleContent()
+
+        val description = context.getString(sharedR.string.link_password_dialog_message)
+        composeRule.onNodeWithText(description).assertIsDisplayed()
     }
 
     @Test
