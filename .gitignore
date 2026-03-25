@@ -100,3 +100,5 @@ review.md
 
 *.keystore
 google-services.json
+
+firebase-debug.log
