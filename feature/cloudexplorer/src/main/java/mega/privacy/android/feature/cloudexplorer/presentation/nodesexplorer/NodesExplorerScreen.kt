@@ -25,8 +25,6 @@ import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudE
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.nodes.components.NodeGridViewItem
-import mega.privacy.android.shared.nodes.components.NodeListViewItem
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
@@ -47,7 +45,7 @@ fun NodesExplorerScreen(
 ) {
     ExplorerScreen(
         explorerModeData = explorerModeData,
-        hideTabs = true,
+        isInnerNavigation = true,
         nodeExplorerId = nodeExplorerId,
         nodeSourceType = nodeSourceType,
         onNavigateBack = onNavigateBack,
@@ -79,7 +77,6 @@ internal fun NodesExplorerScreenContent(
             items.filterNot { it.isSensitive }
         }
     }
-
     val onItemClicked: (NodeUiItem<TypedNode>) -> Unit = { item ->
         when {
             item.isFolderNode -> onFolderClick(item.id)

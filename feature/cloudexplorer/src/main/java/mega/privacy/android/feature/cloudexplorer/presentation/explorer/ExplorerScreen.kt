@@ -26,6 +26,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.toMode
+import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerContent
+import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerContent
 import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
@@ -38,7 +40,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 fun ExplorerScreen(
     explorerModeData: ExplorerModeData,
-    hideTabs: Boolean,
+    isInnerNavigation: Boolean,
     nodeExplorerId: NodeId,
     nodeSourceType: NodeSourceType,
     onNavigateBack: () -> Unit,
@@ -61,11 +63,19 @@ fun ExplorerScreen(
         }
     val nodesExplorerUiState by nodesExplorerViewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
     val nodesExplorerUiStateShared by nodesExplorerViewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
-    val incomingSharesExplorerViewModel = if (!hideTabs && explorerModeData.isIncomingAvailable)
+    val incomingSharesExplorerViewModel =
+        if (!isInnerNavigation && explorerModeData.isIncomingAvailable)
         hiltViewModel<IncomingSharesExplorerViewModel>() else null
     val incomingSharesExplorerUiStateShared =
         incomingSharesExplorerViewModel?.nodeExplorerSharedUiState?.collectAsStateWithLifecycle()
-
+    val favouritesExplorerViewModel =
+        if (!isInnerNavigation) hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
+            factory.create(
+                args = FavouritesExplorerViewModel.Args(showFiles = !explorerModeData.isFolderPicker)
+            )
+        } else null
+    val favouritesExplorerUiStateShared =
+        favouritesExplorerViewModel?.nodeExplorerSharedUiState?.collectAsStateWithLifecycle()
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -74,12 +84,12 @@ fun ExplorerScreen(
             .semantics { testTagsAsResourceId = true },
         topBar = {
             MegaTopAppBar(
-                navigationType = if (hideTabs) {
+                navigationType = if (isInnerNavigation) {
                     AppBarNavigationType.Back { onNavigateBack() }
                 } else {
                     AppBarNavigationType.Close { onNavigateBack() }
                 },
-                title = if (hideTabs) {
+                title = if (isInnerNavigation) {
                     nodesExplorerUiState.folderName.text
                 } else {
                     stringResource(explorerModeData.titleStringId)
@@ -140,7 +150,7 @@ fun ExplorerScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
             beyondViewportPageCount = 1,
-            hideTabs = hideTabs,
+            hideTabs = isInnerNavigation,
             cells = {
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(
@@ -193,7 +203,32 @@ fun ExplorerScreen(
                         )
                     }
                 }
-                //Add favourites tab
+                if (favouritesExplorerUiStateShared?.value != null) {
+                    addTextTabWithScrollableContent(
+                        tabItem = TabItems(
+                            title = stringResource(sharedR.string.video_section_title_favourite_playlist),
+                            testTag = FAVOURITES_TAB_TAG
+                        ),
+                    ) { _, modifier ->
+                        FavouritesExplorerContent(
+                            uiStateShared = favouritesExplorerUiStateShared.value,
+                            onNavigateBack = onNavigateBack,
+                            consumeNavigateBack = favouritesExplorerViewModel::onNavigateBackEventConsumed,
+                            onFolderClick = {
+                                onNavigateToFolder(
+                                    NodesExplorerNavKey(
+                                        nodeId = it,
+                                        nodeSourceType = favouritesExplorerUiStateShared.value.nodeSourceType,
+                                        explorerMode = explorerModeData.toMode()
+                                    )
+                                )
+                            },
+                            onFileClick = favouritesExplorerViewModel::fileClicked,
+                            onRefreshNodes = favouritesExplorerViewModel::refreshNodes,
+                            modifier = modifier
+                        )
+                    }
+                }
                 if (explorerModeData.isChatAvailable) {
                     //Add chat tab
                 }
@@ -211,6 +246,7 @@ internal const val CLOUD_EXPLORER_VIEW_TAG = "cloud_explorer_view"
 internal const val ACTION_BUTTONS_VIEW_TAG = "$CLOUD_EXPLORER_VIEW_TAG:action_buttons"
 internal const val CLOUD_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:cloud_tab"
 internal const val INCOMING_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:incoming_tab"
+internal const val FAVOURITES_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:favourites_tab"
 internal const val CLOUD_TAB_INDEX = 0
 internal const val INCOMING_TAB_INDEX = 1
 internal const val FAVOURITES_TAB_INDEX = 2

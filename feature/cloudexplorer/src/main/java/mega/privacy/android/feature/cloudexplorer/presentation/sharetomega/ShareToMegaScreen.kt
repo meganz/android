@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,7 +23,7 @@ fun ShareToMegaScreen(
 
         ExplorerScreen(
             explorerModeData = ExplorerModeData.ShareFilesToMega,
-            hideTabs = false,
+            isInnerNavigation = false,
             nodeExplorerId = dataUiState.rootNodeId,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             onNavigateBack = onNavigateBack,

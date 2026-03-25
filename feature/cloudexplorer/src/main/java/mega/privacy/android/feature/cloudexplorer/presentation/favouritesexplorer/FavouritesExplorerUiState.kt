@@ -4,5 +4,5 @@ package mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplor
  * UI state for [FavouritesExplorerViewModel].
  */
 data class FavouritesExplorerUiState(
-    val anyData: Boolean = false,
+    val showFiles: Boolean = false,
 )

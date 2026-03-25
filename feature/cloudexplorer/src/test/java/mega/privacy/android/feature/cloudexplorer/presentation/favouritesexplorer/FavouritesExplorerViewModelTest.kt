@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer
 
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
@@ -10,6 +9,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
@@ -22,6 +23,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -68,7 +71,7 @@ class FavouritesExplorerViewModelTest {
         } doReturn emptyList()
     }
 
-    private fun initViewModel() {
+    private fun initViewModel(showFiles: Boolean = false) {
         viewModel = FavouritesExplorerViewModel(
             monitorNodeUpdatesByIdUseCase,
             monitorStorageStateUseCase,
@@ -76,24 +79,53 @@ class FavouritesExplorerViewModelTest {
             monitorShowHiddenItemsUseCase,
             nodeUiItemMapper,
             getAllFavoritesUseCase,
+            args = FavouritesExplorerViewModel.Args(showFiles),
         )
     }
 
-    @Test
-    fun `test that initial state is correct`() = runTest {
-        initViewModel()
+    private fun nodeUiItem(node: TypedNode): NodeUiItem<TypedNode> =
+        NodeUiItem(node = node, isSelected = false)
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that initial state reflects showFiles from args`(
+        showFiles: Boolean,
+    ) = runTest {
+        initViewModel(showFiles = showFiles)
         advanceUntilIdle()
 
-        viewModel.favouritesExplorerUiState.test {
-            val actual = awaitItem()
-            assertThat(actual).isNotNull()
-        }
+        assertThat(viewModel.favouritesExplorerUiState.value.showFiles).isEqualTo(showFiles)
     }
 
     @Test
-    fun `test that nodes are loaded`() = runTest {
-        val nodes = emptyList<TypedNode>()
-        val nodeUiItems = emptyList<NodeUiItem<TypedNode>>()
+    fun `test that loadNodes passes only folder favourites as items when showFiles is false`() =
+        runTest {
+            val folder = mock<TypedFolderNode>()
+            val file = mock<TypedFileNode>()
+            val nodes = listOf<TypedNode>(folder, file)
+            val foldersOnly = listOf<TypedNode>(folder)
+            val nodeUiItems = listOf(nodeUiItem(folder))
+            whenever(getAllFavoritesUseCase()) doReturn flowOf(nodes)
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = foldersOnly,
+                    existingItems = emptyList(),
+                    nodeSourceType = NodeSourceType.FAVOURITES,
+                )
+            ) doReturn nodeUiItems
+
+            initViewModel(showFiles = false)
+            advanceUntilIdle()
+
+            assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
+        }
+
+    @Test
+    fun `test that loadNodes passes all favourites as items when showFiles is true`() = runTest {
+        val folder = mock<TypedFolderNode>()
+        val file = mock<TypedFileNode>()
+        val nodes = listOf<TypedNode>(folder, file)
+        val nodeUiItems = listOf(nodeUiItem(folder), nodeUiItem(file))
         whenever(getAllFavoritesUseCase()) doReturn flowOf(nodes)
         whenever(
             nodeUiItemMapper(
@@ -103,22 +135,29 @@ class FavouritesExplorerViewModelTest {
             )
         ) doReturn nodeUiItems
 
-        initViewModel()
+        initViewModel(showFiles = true)
         advanceUntilIdle()
 
-        verify(getAllFavoritesUseCase, times(1)).invoke()
         assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
     }
 
     @Test
     fun `test that nodes are refreshed`() = runTest {
-        val nodes = emptyList<TypedNode>()
-        val nodeUiItems = emptyList<NodeUiItem<TypedNode>>()
+        val folder = mock<TypedFolderNode>()
+        val nodes = listOf<TypedNode>(folder)
+        val nodeUiItems = listOf(nodeUiItem(folder))
         whenever(getAllFavoritesUseCase()) doReturn flowOf(nodes)
         whenever(
             nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = emptyList(),
+                nodeSourceType = NodeSourceType.FAVOURITES,
+            )
+        ) doReturn nodeUiItems
+        whenever(
+            nodeUiItemMapper(
+                nodeList = nodes,
+                existingItems = nodeUiItems,
                 nodeSourceType = NodeSourceType.FAVOURITES,
             )
         ) doReturn nodeUiItems
@@ -134,13 +173,21 @@ class FavouritesExplorerViewModelTest {
 
     @Test
     fun `test that node updates are monitored`() = runTest {
-        val nodes = emptyList<TypedNode>()
-        val nodeUiItems = emptyList<NodeUiItem<TypedNode>>()
+        val folder = mock<TypedFolderNode>()
+        val nodes = listOf<TypedNode>(folder)
+        val nodeUiItems = listOf(nodeUiItem(folder))
         whenever(getAllFavoritesUseCase()) doReturn flowOf(nodes)
         whenever(
             nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = emptyList(),
+                nodeSourceType = NodeSourceType.FAVOURITES,
+            )
+        ) doReturn nodeUiItems
+        whenever(
+            nodeUiItemMapper(
+                nodeList = nodes,
+                existingItems = nodeUiItems,
                 nodeSourceType = NodeSourceType.FAVOURITES,
             )
         ) doReturn nodeUiItems
