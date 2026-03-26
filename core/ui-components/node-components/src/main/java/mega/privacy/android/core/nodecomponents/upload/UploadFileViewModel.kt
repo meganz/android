@@ -32,6 +32,14 @@ class UploadFileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UploadFileUiState())
     val uiState = _uiState.asStateFlow()
 
+    /**
+     * Proceed the given list of URIs for upload under the specified parent node,
+     * handling storage quotas and file name collisions, and triggering appropriate UI events.
+     *
+     * @param uris List of [Uri] files to be uploaded.
+     * @param parentNodeId [NodeId] for the parent folder node where files will be uploaded. If invalid, falls back to root node.
+     * @param pitagTrigger [PitagTrigger] to indicate whether to trigger PiTAG for this upload.
+     */
     fun proceedUris(uris: List<Uri>, parentNodeId: NodeId, pitagTrigger: PitagTrigger) {
         viewModelScope.launch {
             runCatching {

@@ -17,7 +17,10 @@ internal fun openNameCollisionActivity(
             if (collisions.size == 1) {
                 putExtra(Constants.INTENT_EXTRA_SINGLE_COLLISION_RESULT, collisions.first())
             } else {
-                putExtra(Constants.INTENT_EXTRA_COLLISION_RESULTS, arrayListOf(collisions))
+                putParcelableArrayListExtra(
+                    Constants.INTENT_EXTRA_COLLISION_RESULTS,
+                    ArrayList(collisions)
+                )
             }
         }
 

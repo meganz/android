@@ -6,17 +6,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.shared.nodes.R as NodesR
 import java.io.IOException
 
 @Composable
@@ -31,6 +32,7 @@ fun UploadingFiles(
     val megaNavigator = rememberMegaNavigator()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resource = LocalResources.current
     val snackbarHostState = LocalSnackBarHostState.current
 
     EventEffect(
@@ -59,9 +61,9 @@ fun UploadingFiles(
         onConsumed = viewModel::onConsumeUploadErrorEvent
     ) { error ->
         if (error is IOException) {
-            snackbarHostState?.showAutoDurationSnackbar(context.getString(NodesR.string.error_not_enough_free_space))
+            snackbarHostState?.showAutoDurationSnackbar(resource.getString(NodesR.string.error_not_enough_free_space))
         } else {
-            snackbarHostState?.showAutoDurationSnackbar(context.getString(NodesR.string.error_temporary_unavaible))
+            snackbarHostState?.showAutoDurationSnackbar(resource.getString(NodesR.string.error_temporary_unavaible))
         }
     }
 

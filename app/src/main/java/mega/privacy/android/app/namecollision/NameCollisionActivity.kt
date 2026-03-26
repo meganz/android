@@ -3,7 +3,6 @@ package mega.privacy.android.app.namecollision
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -40,6 +39,8 @@ import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
@@ -63,27 +64,11 @@ class NameCollisionActivity : PasscodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
-            @Suppress("UNCHECKED_CAST")
-            val collisionsList = with(intent) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS, ArrayList::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    getSerializableExtra(INTENT_EXTRA_COLLISION_RESULTS)
-                } as ArrayList<NameCollisionUiEntity>?
-            }
+            val collisionsList =
+                intent.parcelableArrayList<NameCollisionUiEntity>(INTENT_EXTRA_COLLISION_RESULTS)
 
-            val singleCollision = with(intent) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    getSerializableExtra(
-                        INTENT_EXTRA_SINGLE_COLLISION_RESULT,
-                        NameCollisionUiEntity::class.java
-                    )
-                } else {
-                    @Suppress("DEPRECATION")
-                    getSerializableExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
-                } as NameCollisionUiEntity?
-            }
+            val singleCollision =
+                intent.parcelable<NameCollisionUiEntity>(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
 
             when {
                 collisionsList != null -> viewModel.setData(
@@ -559,7 +544,7 @@ class NameCollisionActivity : PasscodeActivity() {
             context: Context,
             collisions: ArrayList<NameCollision>,
         ): Intent = Intent(context, NameCollisionActivity::class.java).apply {
-            putExtra(
+            putParcelableArrayListExtra(
                 INTENT_EXTRA_COLLISION_RESULTS,
                 collisions.map { it.toUiEntity() }.toCollection(ArrayList())
             )
