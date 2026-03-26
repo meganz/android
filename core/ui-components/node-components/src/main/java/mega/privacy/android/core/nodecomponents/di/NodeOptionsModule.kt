@@ -13,6 +13,7 @@ import mega.privacy.android.core.nodecomponents.menu.provider.IncomingSharesMenu
 import mega.privacy.android.core.nodecomponents.menu.provider.LinksMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.NodeMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.OutgoingSharesMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.RecentsBucketMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.RubbishBinMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.TimelineMenuOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlaylistOptionProvider
@@ -45,6 +46,12 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindFavouritesOptionsProvider(
         optionsProvider: FavouritesMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindRecentsBucketOptionsProvider(
+        optionsProvider: RecentsBucketMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 
     @Binds
