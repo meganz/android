@@ -7,9 +7,14 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 enum class AlbumSortOption(
     override val displayName: Int,
-    override val testTag: String
+    override val testTag: String,
+    override val defaultSortDirection: SortDirection,
 ) : SortOptionItem {
-    Modified(sharedR.string.action_sort_by_modified, "album_sort_option:sort_modified")
+    Modified(
+        sharedR.string.action_sort_by_modified,
+        "album_sort_option:sort_modified",
+        defaultSortDirection = SortDirection.Descending,
+    )
 }
 
 @Stable

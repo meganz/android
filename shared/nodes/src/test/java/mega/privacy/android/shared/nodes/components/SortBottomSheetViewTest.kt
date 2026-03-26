@@ -16,6 +16,7 @@ import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import mega.privacy.android.domain.entity.node.SortDirection
 
 @RunWith(AndroidJUnit4::class)
 class SortBottomSheetViewTest {
@@ -27,10 +28,11 @@ class SortBottomSheetViewTest {
     private enum class FakeSortOption(
         override val displayName: Int,
         override val testTag: String = "sort_option:$displayName",
+        override val defaultSortDirection: SortDirection,
     ) : SortOptionItem {
-        Name(R.string.action_sort_by_name),
-        Date(R.string.action_sort_by_created),
-        Size(R.string.action_sort_by_size),
+        Name(R.string.action_sort_by_name, defaultSortDirection = SortDirection.Ascending),
+        Date(R.string.action_sort_by_created, defaultSortDirection = SortDirection.Descending),
+        Size(R.string.action_sort_by_size, defaultSortDirection = SortDirection.Descending),
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

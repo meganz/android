@@ -140,10 +140,10 @@ fun <T : SortOptionItem> SortBottomSheet(
 }
 
 /**
- * Extension function to create a SortBottomSheetResult from a SortOptionItem with default ascending order.
+ * Creates a [SortBottomSheetResult] using this option’s [SortOptionItem.defaultSortDirection].
  */
 private fun <T : SortOptionItem> T.toSortResult(): SortBottomSheetResult<T> =
-    SortBottomSheetResult(this, SortDirection.Ascending)
+    SortBottomSheetResult(this, defaultSortDirection)
 
 /**
  * Extension function to toggle the sort order of an existing SortBottomSheetResult.
@@ -158,11 +158,12 @@ private fun <T : SortOptionItem> SortBottomSheetResult<T>.toggleOrder(): SortBot
 private enum class PreviewSortOption(
     override val displayName: Int,
     override val testTag: String = "sort_option:$displayName",
+    override val defaultSortDirection: SortDirection,
 ) : SortOptionItem {
-    Name(sharedR.string.action_sort_by_name),
-    Date(sharedR.string.action_sort_by_created),
-    Size(sharedR.string.action_sort_by_size),
-    Label(sharedR.string.action_sort_by_label),
+    Name(sharedR.string.action_sort_by_name, defaultSortDirection = SortDirection.Ascending),
+    Date(sharedR.string.action_sort_by_created, defaultSortDirection = SortDirection.Descending),
+    Size(sharedR.string.action_sort_by_size, defaultSortDirection = SortDirection.Descending),
+    Label(sharedR.string.action_sort_by_label, defaultSortDirection = SortDirection.Ascending),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

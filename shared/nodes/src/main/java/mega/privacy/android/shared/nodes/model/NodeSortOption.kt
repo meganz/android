@@ -8,15 +8,37 @@ import mega.privacy.android.shared.resources.R as sharedR
 enum class NodeSortOption(
     @StringRes override val displayName: Int,
     override val testTag: String = "$displayName",
+    override val defaultSortDirection: SortDirection,
 ) : SortOptionItem {
-    Name(sharedR.string.action_sort_by_name),
-    Favourite(sharedR.string.action_sort_by_favorite),
-    Label(sharedR.string.action_sort_by_label),
-    Created(sharedR.string.search_dropdown_chip_filter_type_date_added),
-    Modified(sharedR.string.search_dropdown_chip_filter_type_last_modified),
-    Size(sharedR.string.action_sort_by_size),
-    ShareCreated(sharedR.string.action_sort_by_share_created),
-    LinkCreated(sharedR.string.action_sort_by_link_created);
+    Name(sharedR.string.action_sort_by_name, defaultSortDirection = SortDirection.Ascending),
+
+    Favourite(
+        sharedR.string.action_sort_by_favorite,
+        defaultSortDirection = SortDirection.Descending
+    ),
+
+    Label(sharedR.string.action_sort_by_label, defaultSortDirection = SortDirection.Ascending),
+
+    Created(
+        sharedR.string.search_dropdown_chip_filter_type_date_added,
+        defaultSortDirection = SortDirection.Descending,
+    ),
+
+    Modified(
+        sharedR.string.search_dropdown_chip_filter_type_last_modified,
+        defaultSortDirection = SortDirection.Descending,
+    ),
+
+    Size(sharedR.string.action_sort_by_size, defaultSortDirection = SortDirection.Descending),
+
+    ShareCreated(
+        sharedR.string.action_sort_by_share_created,
+        defaultSortDirection = SortDirection.Descending,
+    ),
+    LinkCreated(
+        sharedR.string.action_sort_by_link_created,
+        defaultSortDirection = SortDirection.Descending,
+    );
 
     /**
      * Get available sort options based on the node source type
