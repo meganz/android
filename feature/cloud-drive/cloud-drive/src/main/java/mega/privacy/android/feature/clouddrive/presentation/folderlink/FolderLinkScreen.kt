@@ -133,10 +133,14 @@ internal fun FolderLinkScreen(
                     modifier = Modifier.testTag(FOLDER_LINK_APP_BAR_TAG),
                     title = uiState.title.text,
                     subtitle = uiState.subTitle?.text,
-                    navigationType = AppBarNavigationType.Back {
-                        viewModel.processAction(
-                            FolderLinkAction.BackPressed
-                        )
+                    navigationType = if (uiState.isRootFolder) {
+                        AppBarNavigationType.Close {
+                            viewModel.processAction(FolderLinkAction.BackPressed)
+                        }
+                    } else {
+                        AppBarNavigationType.Back {
+                            viewModel.processAction(FolderLinkAction.BackPressed)
+                        }
                     },
                     trailingIcons = {
                         TransfersToolbarWidget {
