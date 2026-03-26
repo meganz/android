@@ -13,7 +13,7 @@ import mega.privacy.android.app.meeting.activity.legacyMeetingScreen
 import mega.privacy.android.app.meeting.activity.legacyWaitingRoomScreen
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
-import mega.privacy.android.app.presentation.audiosection.audioSectionLegacyDestination
+import mega.privacy.android.app.presentation.audiosection.audioSectionDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.navigation.authenticityCredentialsLegacyDestination
@@ -111,6 +111,9 @@ class LegacyCoreActivityFeatureGraph(
                 removeDestination = navigationHandler::remove,
                 returnResult = navigationHandler::returnResult
             )
-            audioSectionLegacyDestination(navigationHandler::back)
+            audioSectionDestination(
+                removeDestination = navigationHandler::back,
+                navigationHandler = navigationHandler,
+            )
         }
 }

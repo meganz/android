@@ -62,7 +62,7 @@ class HomeChipsWidgetViewModelTest {
         }
     }
 
-    @ParameterizedTest(name = "when the AudiosChipInHome is {0}")
+    @ParameterizedTest(name = "when the isAudiosChipVisible is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that isAudiosChipVisible is updated correctly`(
         isAudiosChipVisible: Boolean,

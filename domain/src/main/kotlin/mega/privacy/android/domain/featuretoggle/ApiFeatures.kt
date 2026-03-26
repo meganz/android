@@ -138,6 +138,16 @@ enum class ApiFeatures(
         experimentName = "wnfd",
         description = "Enable Whats New feature dialog",
         defaultValue = false
+    ),
+
+    /**
+     * Audio Section Revamp feature flag (AND-22975).
+     * Callers use `AudioSectionNavKey`; the app host gates Compose (`AudioNavKey`) vs legacy activity.
+     */
+    AudioSectionRevamp(
+        experimentName = "asr1",
+        description = "Navigate to the new Compose-based Audio section instead of the legacy one",
+        defaultValue = false
     );
 
     companion object : FeatureFlagValueProvider {

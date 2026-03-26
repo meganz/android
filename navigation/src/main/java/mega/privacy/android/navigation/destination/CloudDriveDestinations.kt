@@ -75,6 +75,12 @@ data class CloudDriveMediaDiscoveryNavKey(
 data object FavouritesNavKey : NavKey
 
 /**
+ * Audio section route args
+ */
+@Serializable
+data object AudioNavKey : NavKey
+
+/**
  * Search route args
  */
 @Serializable

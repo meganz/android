@@ -25,9 +25,9 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.destination.AudioSectionNavKey
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.FavouritesNavKey
-import mega.privacy.android.navigation.destination.LegacyAudioSectionNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.VideoSectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -94,7 +94,7 @@ private fun HomeChips(
                 leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Music),
                 onClick = {
                     Analytics.tracker.trackEvent(AudiosChipButtonPressedEvent)
-                    onNavigate(LegacyAudioSectionNavKey)
+                    onNavigate(AudioSectionNavKey)
                 },
             )
         }
@@ -137,11 +137,11 @@ private fun HomeChips(
 private fun HomeChipsPreview() {
     AndroidThemeForPreviews {
         LazyColumn {
-            listOf(false, true).forEach {
+            listOf(false, true).forEach { allVisible ->
                 item {
                     HomeChips(
-                        isVideosChipVisible = it,
-                        isAudiosChipVisible = it,
+                        isVideosChipVisible = allVisible,
+                        isAudiosChipVisible = allVisible,
                         onNavigate = {}
                     )
                 }

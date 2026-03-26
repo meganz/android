@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.feature.clouddrive.presentation.favourites.favouritesScreen
+import mega.privacy.android.feature.clouddrive.presentation.audio.audioScreen
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.folderLinkScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
@@ -87,6 +88,11 @@ class CloudDriveFeatureDestination : FeatureDestination {
             folderLinkScreen(
                 navigationHandler = navigationHandler,
                 transferHandler = transferHandler
+            )
+
+            audioScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
             )
         }
 }

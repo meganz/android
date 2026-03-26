@@ -402,4 +402,4 @@ data class FileExplorerNavKey(val action: String) : NavKey {
 }
 
 @Serializable
-data object LegacyAudioSectionNavKey : NavKey
+data object AudioSectionNavKey : NavKey

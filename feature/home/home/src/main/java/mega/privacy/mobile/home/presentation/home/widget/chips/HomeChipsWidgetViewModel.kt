@@ -18,8 +18,8 @@ import javax.inject.Inject
 /**
  * ViewModel for [HomeChipsWidget].
  *
- * Reads the [ApiFeatures.MediaRevampPhase2] flag and produces an ordered list of [HomeChip]s,
- * hiding the Videos chip when the flag is enabled.
+ * Reads [ApiFeatures.MediaRevampPhase2] and [ApiFeatures.AudiosChipInHome].
+ * The Audios chip navigates to `AudioSectionNavKey`; the app gates Compose vs legacy audio by flag.
  */
 @HiltViewModel
 class HomeChipsWidgetViewModel @Inject constructor(
@@ -29,11 +29,11 @@ class HomeChipsWidgetViewModel @Inject constructor(
     val uiState: StateFlow<HomeChipsUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             monitorMediaRevampPhase2Flag().catch { Timber.e(it) },
-            monitorAudiosChipInHomeFlag().catch { Timber.e(it) }
+            monitorAudiosChipInHomeFlag().catch { Timber.e(it) },
         ) { isMediaRevampPhase2Enabled, isAudiosChipVisible ->
             HomeChipsUiState(
                 isMediaRevampPhase2Enabled = isMediaRevampPhase2Enabled,
-                isAudiosChipVisible = isAudiosChipVisible
+                isAudiosChipVisible = isAudiosChipVisible,
             )
         }.asUiStateFlow(viewModelScope, HomeChipsUiState())
     }
