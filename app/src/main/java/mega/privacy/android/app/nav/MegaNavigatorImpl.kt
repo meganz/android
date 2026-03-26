@@ -729,6 +729,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                         mode = params.mode.value,
                         nodeSourceType = params.nodeSourceType,
                         fileName = params.fileName,
+                        fromHome = params.fromHome,
                     )
                 ),
                 legacyNavigation = {

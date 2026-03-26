@@ -7006,6 +7006,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                     nodeSourceType = it.nodeSourceType,
                                     mode = textEditorModeFromValue(it.mode),
                                     fileName = it.fileName,
+                                    fromHome = it.fromHome,
                                 )
                         }
                         megaNavigator.openTextEditor(

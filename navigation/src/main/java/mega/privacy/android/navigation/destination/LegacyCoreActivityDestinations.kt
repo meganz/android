@@ -271,6 +271,8 @@ data class LegacyTextEditorNavKey(
     val mode: String = TextEditorMode.View.value,
     val nodeSourceType: Int? = null,
     val fileName: String? = null,
+    /** When true (e.g. new text file from Home), matches legacy home-page flag for uploads. */
+    val fromHome: Boolean = false,
     val localPath: String? = null,
     val chatId: Long? = null,
     val messageId: Long? = null,

@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -126,7 +127,9 @@ private fun buildTextEditorIntent(context: Context, navKey: LegacyTextEditorNavK
                 mode = navKey.mode,
                 nodeSourceType = navKey.nodeSourceType,
                 fileName = navKey.fileName,
-            )
+            ).apply {
+                putExtra(FROM_HOME_PAGE, navKey.fromHome)
+            }
     }
 }
 
@@ -176,6 +179,7 @@ private fun buildTextEditorViewModelArgs(
                 showShare = shouldShowShare(nodeSourceType),
                 transferHandler = transferHandler,
                 isFromSharedFolder = isFromSharedFolder(nodeSourceType),
+                fromHome = navKey.fromHome,
             )
         }
     }
@@ -265,12 +269,14 @@ private fun TextEditorComposeContent(
         navKey.localPath,
         navKey.nodeHandle,
         navKey.nodeSourceType,
+        navKey.mode,
         navigationHandler,
         viewTypeToNodeSourceTypeMapper,
     ) {
         val nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE
         val sourceType = navKey.nodeSourceType
         val showNodeOptions = navKey.chatId == null && navKey.localPath == null
+            && textEditorModeFromValue(navKey.mode) != TextEditorMode.Create
         {
             if (showNodeOptions) {
                 navigationHandler.navigate(

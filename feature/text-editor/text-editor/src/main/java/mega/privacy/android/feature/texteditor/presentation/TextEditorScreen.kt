@@ -34,11 +34,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -55,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -92,7 +90,6 @@ fun TextEditorScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
     val isEditable = uiState.mode == TextEditorMode.Edit || uiState.mode == TextEditorMode.Create
-    var pendingBackAfterSave by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     val scrollBarState = rememberScrollToHideBarState(uiState.mode, scope)
@@ -139,15 +136,8 @@ fun TextEditorScreen(
         when {
             barsHidden -> scrollBarState.revealBar()
             uiState.showDiscardDialog -> viewModel.dismissDiscardDialog()
-            uiState.mode == TextEditorMode.Edit && viewModel.isContentDirty() ->
-                viewModel.requestShowDiscardDialog()
-            uiState.mode == TextEditorMode.Edit ->
-                if (viewModel.shouldPopDestinationOnCleanEditExit()) onBack()
-                else viewModel.setViewMode()
-            uiState.mode == TextEditorMode.Create -> {
-                pendingBackAfterSave = true
-                viewModel.saveFile()
-            }
+            uiState.mode == TextEditorMode.Edit -> viewModel.handleClose()
+            uiState.mode == TextEditorMode.Create -> viewModel.handleClose()
             else -> onBack()
         }
     }
@@ -162,16 +152,32 @@ fun TextEditorScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val changesSavedMessage = stringResource(sharedR.string.general_changes_saved)
     val lineTooltipTemplate = stringResource(sharedR.string.text_editor_fast_scroll_line_tooltip)
-    LaunchedEffect(uiState.saveSuccessEvent) {
-        if (uiState.saveSuccessEvent == triggered) {
-            viewModel.consumeSaveSuccessEvent()
-            if (pendingBackAfterSave) {
-                pendingBackAfterSave = false
-                onBack()
-            } else {
-                snackbarHostState.showSnackbar(changesSavedMessage)
-            }
-        }
+    EventEffect(
+        event = uiState.saveSuccessEvent,
+        onConsumed = viewModel::consumeSaveSuccessEvent,
+    ) {
+        snackbarHostState.showSnackbar(changesSavedMessage)
+    }
+
+    EventEffect(
+        event = uiState.exitAfterCreateDiscardEvent,
+        onConsumed = viewModel::consumeExitAfterCreateDiscardEvent,
+    ) {
+        onBack()
+    }
+
+    EventEffect(
+        event = uiState.exitAfterCreateSaveEvent,
+        onConsumed = viewModel::consumeExitAfterCreateSaveEvent,
+    ) {
+        onBack()
+    }
+
+    EventEffect(
+        event = uiState.closeEvent,
+        onConsumed = viewModel::consumeCloseEvent,
+    ) {
+        onBack()
     }
 
     MegaScaffold(
@@ -187,7 +193,6 @@ fun TextEditorScreen(
                 scope = scope,
                 lazyListState = lazyListState,
                 viewModel = viewModel,
-                onSetPendingBack = { pendingBackAfterSave = true },
                 onBack = onBack,
                 onOpenNodeOptions = onOpenNodeOptions,
             )
@@ -212,7 +217,6 @@ fun TextEditorScreen(
                 }
 
                 uiState.errorEvent == triggered -> {
-                    SideEffect { pendingBackAfterSave = false }
                     TextEditorErrorContent(
                         message = uiState.errorMessage?.takeIf { it.isNotBlank() }
                             ?: stringResource(sharedR.string.general_request_failed_message),
@@ -237,6 +241,7 @@ fun TextEditorScreen(
                             onChunkFocused = onChunkFocused,
                             showLineNumbers = uiState.showLineNumbers,
                             readOnly = !isEditable,
+                            requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
                         )
                         TextEditorFastScrollbar(
                             state = lazyListState,
@@ -260,6 +265,7 @@ fun TextEditorScreen(
                 }
             }
             val showBottomBar = uiState.mode != TextEditorMode.Edit
+                    && uiState.mode != TextEditorMode.Create
                     && uiState.bottomBarActions.isNotEmpty()
                     && !uiState.isLoading
             LaunchedEffect(showBottomBar) {
@@ -311,7 +317,6 @@ private fun CollapsingTopBar(
     scope: CoroutineScope,
     lazyListState: LazyListState,
     viewModel: TextEditorComposeViewModel,
-    onSetPendingBack: () -> Unit,
     onBack: () -> Unit,
     onOpenNodeOptions: () -> Unit,
 ) {
@@ -331,28 +336,17 @@ private fun CollapsingTopBar(
                         Unit
                     }
                 }
-                val onClose = remember(viewModel, onBack) {
-                    {
-                        if (viewModel.isContentDirty()) {
-                            viewModel.requestShowDiscardDialog()
-                        } else if (viewModel.shouldPopDestinationOnCleanEditExit()) {
-                            onBack()
-                        } else {
-                            viewModel.setViewMode()
-                        }
-                    }
+                val onClose = remember(viewModel) {
+                    { viewModel.handleClose() }
                 }
-                val onSave = remember(viewModel) {
-                    {
-                        onSetPendingBack()
-                        viewModel.saveFile()
-                    }
+                val onSaveToolbar = remember(viewModel) {
+                    { viewModel.saveFile() }
                 }
                 when (mode) {
-                    TextEditorMode.Edit -> TextEditorEditModeTopAppBar(
+                    TextEditorMode.Edit, TextEditorMode.Create -> TextEditorEditModeTopAppBar(
                         title = fileName,
                         onClose = onClose,
-                        onSave = onSave,
+                        onSave = onSaveToolbar,
                         onMenuAction = viewModel::onMenuAction,
                         onTitleClick = onTitleClick,
                     )

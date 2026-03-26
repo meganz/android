@@ -36,6 +36,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -73,6 +74,7 @@ internal class TextEditorComposeViewModelTest {
         showShare: Boolean = true,
         transferHandler: TransferHandler = this.transferHandler,
         isFromSharedFolder: Boolean = false,
+        fromHome: Boolean = false,
         localPath: String? = null,
         defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
     ) {
@@ -86,6 +88,7 @@ internal class TextEditorComposeViewModelTest {
                 showShare = showShare,
                 transferHandler = transferHandler,
                 isFromSharedFolder = isFromSharedFolder,
+                fromHome = fromHome,
                 localPath = localPath,
             ),
             defaultDispatcher = defaultDispatcher,
@@ -262,6 +265,139 @@ internal class TextEditorComposeViewModelTest {
         underTest.getOrCreateChunkState(0)
         assertThat(underTest.isContentDirty()).isFalse()
     }
+
+    @Test
+    fun `test that confirmDiscard in Create mode closes dialog and emits exitAfterCreateDiscardEvent`() {
+        initUnderTest(mode = TextEditorMode.Create)
+        underTest.requestShowDiscardDialog()
+        assertThat(underTest.uiState.value.showDiscardDialog).isTrue()
+
+        underTest.confirmDiscard()
+
+        val state = underTest.uiState.value
+        assertThat(state.showDiscardDialog).isFalse()
+        assertThat(state.exitAfterCreateDiscardEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that consumeExitAfterCreateDiscardEvent resets exitAfterCreateDiscardEvent`() {
+        initUnderTest(mode = TextEditorMode.Create)
+        underTest.confirmDiscard()
+        assertThat(underTest.uiState.value.exitAfterCreateDiscardEvent).isEqualTo(triggered)
+
+        underTest.consumeExitAfterCreateDiscardEvent()
+        assertThat(underTest.uiState.value.exitAfterCreateDiscardEvent).isEqualTo(consumed)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that saveFile forwards fromHome from Args to save use case`() = runTest {
+        val saveResult = TextEditorSaveResult.UploadRequired(
+            tempPath = "/tmp/new.txt",
+            parentHandle = 1L,
+            isEditMode = false,
+            fromHome = true,
+        )
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            .thenReturn(saveResult)
+        initUnderTest(mode = TextEditorMode.Create, fromHome = true)
+        advanceUntilIdle()
+
+        underTest.saveFile()
+        advanceUntilIdle()
+
+        val fromHomeCaptor = argumentCaptor<Boolean>()
+        verify(saveTextContentForTextEditorUseCase).invoke(
+            any(),
+            any(),
+            any(),
+            any(),
+            fromHomeCaptor.capture(),
+            any(),
+        )
+        assertThat(fromHomeCaptor.firstValue).isTrue()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that confirmDiscard in Create mode does not invoke save use case`() = runTest {
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            .thenReturn(
+                TextEditorSaveResult.UploadRequired(
+                    tempPath = "/tmp/x.txt",
+                    parentHandle = 1L,
+                    isEditMode = false,
+                    fromHome = false,
+                ),
+            )
+        initUnderTest(mode = TextEditorMode.Create)
+        advanceUntilIdle()
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { replace(0, length, "edited") }
+
+        underTest.confirmDiscard()
+        advanceUntilIdle()
+
+        verify(saveTextContentForTextEditorUseCase, never()).invoke(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that saveFile in Create mode emits exitAfterCreateSaveEvent and not saveSuccessEvent`() =
+        runTest {
+            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+                .thenReturn(
+                    TextEditorSaveResult.UploadRequired(
+                        tempPath = "/tmp/new.txt",
+                        parentHandle = 1L,
+                        isEditMode = false,
+                        fromHome = false,
+                    )
+                )
+            initUnderTest(mode = TextEditorMode.Create)
+            advanceUntilIdle()
+
+            underTest.saveFile()
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.exitAfterCreateSaveEvent).isEqualTo(triggered)
+            assertThat(state.saveSuccessEvent).isEqualTo(consumed)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that saveFile in Edit mode emits saveSuccessEvent and not exitAfterCreateSaveEvent`() =
+        runTest {
+            val lines = listOf("hello")
+            doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+                .invoke(any(), anyOrNull(), any())
+            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+                .thenReturn(
+                    TextEditorSaveResult.UploadRequired(
+                        tempPath = "/tmp/edit.txt",
+                        parentHandle = 1L,
+                        isEditMode = true,
+                        fromHome = false,
+                    )
+                )
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+            advanceUntilIdle()
+
+            underTest.saveFile()
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.saveSuccessEvent).isEqualTo(triggered)
+            assertThat(state.exitAfterCreateSaveEvent).isEqualTo(consumed)
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
@@ -826,5 +962,88 @@ internal class TextEditorComposeViewModelTest {
 
         underTest.setEditMode()
         assertThat(underTest.getChunkCount()).isEqualTo(3)
+    }
+
+    @Test
+    fun `test that handleClose emits closeEvent when Create mode has no edits`() {
+        initUnderTest(mode = TextEditorMode.Create)
+        underTest.getOrCreateChunkState(0)
+
+        underTest.handleClose()
+
+        assertThat(underTest.uiState.value.closeEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that handleClose shows discard dialog when Create mode has edits`() {
+        initUnderTest(mode = TextEditorMode.Create)
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { replace(0, length, "edited") }
+
+        underTest.handleClose()
+
+        assertThat(underTest.uiState.value.showDiscardDialog).isTrue()
+        assertThat(underTest.uiState.value.closeEvent).isEqualTo(consumed)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that handleClose emits closeEvent when Edit mode opened as Edit has no edits`() =
+        runTest {
+            val lines = listOf("line1")
+            doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+                .invoke(any(), anyOrNull(), any())
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+            advanceUntilIdle()
+
+            underTest.handleClose()
+
+            assertThat(underTest.uiState.value.closeEvent).isEqualTo(triggered)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that handleClose switches to View mode when Edit mode opened as View has no edits`() =
+        runTest {
+            val lines = listOf("line1")
+            doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+                .invoke(any(), anyOrNull(), any())
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+
+            underTest.setEditMode()
+            underTest.handleClose()
+
+            assertThat(underTest.uiState.value.mode).isEqualTo(TextEditorMode.View)
+            assertThat(underTest.uiState.value.closeEvent).isEqualTo(consumed)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that handleClose shows discard dialog when Edit mode has edits`() = runTest {
+        val lines = (1..100).map { "line$it" }
+        doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { replace(0, length, "modified") }
+
+        underTest.handleClose()
+
+        assertThat(underTest.uiState.value.showDiscardDialog).isTrue()
+        assertThat(underTest.uiState.value.closeEvent).isEqualTo(consumed)
+    }
+
+    @Test
+    fun `test that consumeCloseEvent resets closeEvent`() {
+        initUnderTest(mode = TextEditorMode.Create)
+        underTest.getOrCreateChunkState(0)
+        underTest.handleClose()
+        assertThat(underTest.uiState.value.closeEvent).isEqualTo(triggered)
+
+        underTest.consumeCloseEvent()
+        assertThat(underTest.uiState.value.closeEvent).isEqualTo(consumed)
     }
 }

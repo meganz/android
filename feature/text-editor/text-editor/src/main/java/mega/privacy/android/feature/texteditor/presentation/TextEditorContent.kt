@@ -18,12 +18,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
@@ -31,6 +34,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -39,6 +43,9 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.first
+import timber.log.Timber
 
 /** Line height used for both line numbers and text field so the gutter aligns with content. */
 internal val EditorLineHeight = 20.sp
@@ -74,6 +81,8 @@ internal fun TextEditorContent(
     onChunkFocused: ((chunkIndex: Int) -> Unit)?,
     showLineNumbers: Boolean,
     readOnly: Boolean,
+    /** When true (e.g. Create mode), first chunk requests focus and shows the IME once content is shown. */
+    requestInitialFocusOnFirstChunk: Boolean = false,
 ) {
     val onSurfaceColor = MaterialTheme.colorScheme.onSurface
     val textStyle = remember(onSurfaceColor) { editorTextStyle(onSurfaceColor) }
@@ -108,6 +117,7 @@ internal fun TextEditorContent(
                     },
                     showLineNumbers = showLineNumbers,
                     textStyle = textStyle,
+                    requestInitialFocusOnFirstChunk = requestInitialFocusOnFirstChunk,
                 )
             }
         }
@@ -164,7 +174,19 @@ private fun EditModeLazyColumn(
     onChunkFocused: (Int) -> Unit,
     showLineNumbers: Boolean,
     textStyle: TextStyle,
+    requestInitialFocusOnFirstChunk: Boolean,
 ) {
+    val firstChunkFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(requestInitialFocusOnFirstChunk) {
+        if (!requestInitialFocusOnFirstChunk) return@LaunchedEffect
+        lazyListState.scrollToItem(0)
+        snapshotFlow { lazyListState.layoutInfo.totalItemsCount }
+            .first { it > 0 }
+        runCatching { firstChunkFocusRequester.requestFocus() }
+            .onFailure { Timber.w(it, "Initial focus request failed") }
+        keyboardController?.show()
+    }
     LazyColumn(
         state = lazyListState,
         modifier = Modifier
@@ -193,6 +215,11 @@ private fun EditModeLazyColumn(
                 maxLineNumber = totalLineCount,
                 showLineNumbers = showLineNumbers,
                 textStyle = textStyle,
+                focusRequester = if (idx == 0 && requestInitialFocusOnFirstChunk) {
+                    firstChunkFocusRequester
+                } else {
+                    null
+                },
             )
         }
     }
@@ -235,6 +262,7 @@ private fun EditableChunkItem(
     maxLineNumber: Int,
     showLineNumbers: Boolean,
     textStyle: TextStyle,
+    focusRequester: FocusRequester? = null,
 ) {
     val layoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
     EditorChunkLayout(
@@ -254,6 +282,9 @@ private fun EditableChunkItem(
             readOnly = readOnly,
             textStyle = textStyle,
             modifier = Modifier
+                .then(
+                    if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier,
+                )
                 .onFocusChanged { if (it.isFocused) onFocused() }
                 .clearAndSetSemantics { },
             lineLimits = TextFieldLineLimits.MultiLine(),

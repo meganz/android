@@ -36,7 +36,7 @@ class SaveTextContentForTextEditorUseCase @Inject constructor(
     /**
      * Save text for the given parameters.
      * @param isFromSharedFolder When true (e.g. incoming/outgoing shares), save as new file with (1)(2) naming. When false and Edit mode, overwrite the same file.
-     * @param fromHome Legacy parameter kept for backward compatibility with the legacy text editor. The Compose editor always passes false; use [isFromSharedFolder] instead.
+     * @param fromHome Legacy parameter: when true (e.g. new file from Home), forwarded to upload handling. The Compose editor passes this from navigation args when applicable.
      * @return [TextEditorSaveResult]. Throws on error; caller (e.g. ViewModel) should catch and map to UI state.
      */
     suspend operator fun invoke(

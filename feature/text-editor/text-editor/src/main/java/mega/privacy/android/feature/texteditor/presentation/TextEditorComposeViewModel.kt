@@ -189,6 +189,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val showShare: Boolean = true,
         val transferHandler: TransferHandler,
         val isFromSharedFolder: Boolean = false,
+        /** When true (e.g. new file from Home), forwarded to upload as [TransferTriggerEvent.StartUpload.TextFile.fromHomePage]. */
+        val fromHome: Boolean = false,
         val chatId: Long? = null,
         val messageId: Long? = null,
         val localPath: String? = null,
@@ -343,14 +345,61 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         rebuildStartLineCache()
     }
 
+    /**
+     * Handles close action from the UI (back press or close button in edit/create mode).
+     * If content is dirty, shows the discard dialog. Otherwise, either pops back
+     * (Create mode, or Edit mode opened as Edit) or switches to View mode.
+     */
+    fun handleClose() {
+        if (isContentDirty()) {
+            requestShowDiscardDialog()
+        } else {
+            val mode = _uiState.value.mode
+            when {
+                mode == TextEditorMode.Create -> emitCloseEvent()
+                mode == TextEditorMode.Edit && shouldPopDestinationOnCleanEditExit() -> emitCloseEvent()
+                mode == TextEditorMode.Edit -> setViewMode()
+                else -> emitCloseEvent()
+            }
+        }
+    }
+
+    private fun emitCloseEvent() {
+        _uiState.update { it.copy(closeEvent = triggered) }
+    }
+
+    fun consumeCloseEvent() {
+        _uiState.update { it.copy(closeEvent = consumed) }
+    }
+
     /** Shows the discard-changes confirmation dialog. */
     fun requestShowDiscardDialog() {
         _uiState.update { it.copy(showDiscardDialog = true) }
     }
 
-    /** User confirmed discard: reverts content and switches to View mode. */
+    /**
+     * User confirmed discard: in Create mode, emits [TextEditorComposeUiState.exitAfterCreateDiscardEvent]
+     * so the UI pops without saving; in Edit mode, reverts content and switches to View mode.
+     */
     fun confirmDiscard() {
-        setViewMode(discardChanges = true)
+        if (_uiState.value.mode == TextEditorMode.Create) {
+            _uiState.update {
+                it.copy(
+                    showDiscardDialog = false,
+                    exitAfterCreateDiscardEvent = triggered,
+                )
+            }
+        } else {
+            setViewMode(discardChanges = true)
+        }
+    }
+
+    fun consumeExitAfterCreateDiscardEvent() {
+        _uiState.update { it.copy(exitAfterCreateDiscardEvent = consumed) }
+    }
+
+    fun consumeExitAfterCreateSaveEvent() {
+        _uiState.update { it.copy(exitAfterCreateSaveEvent = consumed) }
     }
 
     /** User dismissed the discard dialog. */
@@ -369,13 +418,14 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             val fullTextToSave = withContext(defaultDispatcher) {
                 snapshot.joinToString("\n")
             }
+            val wasCreateMode = state.mode == TextEditorMode.Create
             runCatching {
                 saveTextContentForTextEditorUseCase(
                     nodeHandle = args.nodeHandle,
                     text = fullTextToSave,
                     fileName = state.fileName.ifEmpty { "untitled.txt" },
                     mode = state.mode,
-                    fromHome = false,
+                    fromHome = args.fromHome,
                     isFromSharedFolder = args.isFromSharedFolder,
                 )
             }.fold(
@@ -396,7 +446,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                                             fromHomePage = saveResult.fromHome,
                                         )
                                     ),
-                                    saveSuccessEvent = triggered,
+                                    saveSuccessEvent = if (wasCreateMode) consumed else triggered,
+                                    exitAfterCreateSaveEvent = if (wasCreateMode) triggered else consumed,
                                 )
                             }
                             clearEditState()
