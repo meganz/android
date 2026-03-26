@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -21,6 +22,7 @@ class GetLinkSelectionMenuItem @Inject constructor(
         false
     } else {
         hasNodeAccessPermission && noNodeTakenDown && noNodeInBackups
+                && selectedNodes.all { it.isNotS4Container() }
                 && !(selectedNodes.size == 1 && selectedNodes.first().exportedData != null)
     }
 

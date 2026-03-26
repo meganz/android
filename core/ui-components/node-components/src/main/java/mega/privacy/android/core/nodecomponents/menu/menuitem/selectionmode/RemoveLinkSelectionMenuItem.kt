@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -17,12 +18,11 @@ class RemoveLinkSelectionMenuItem @Inject constructor(
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
         nodeSourceType: NodeSourceType,
-    ): Boolean =
-        if (nodeSourceType == NodeSourceType.LINKS && selectedNodes.size > 1) {
-            true
-        } else {
-            noNodeTakenDown
-                    && selectedNodes.size == 1
-                    && selectedNodes.all { it.exportedData != null }
-        }
+    ): Boolean = noNodeTakenDown &&
+            hasNodeAccessPermission &&
+            selectedNodes.all {
+                it.exportedData?.publicLink != null
+                        && it.isNotS4Container()
+                        && it.isNodeKeyDecrypted
+            }
 }

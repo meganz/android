@@ -3,9 +3,12 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 class GetLinkSelectionMenuItemTest {
@@ -107,7 +110,7 @@ class GetLinkSelectionMenuItemTest {
         }
 
     @Test
-    fun `test shouldDisplay returns false when nodeSourceType is Links`() =
+    fun `test shouldDisplay returns true when nodeSourceType is Links and single node selected`() =
         runTest {
             val getLinkMenuItem = GetLinkSelectionMenuItem(mock<GetLinkMenuAction>())
 
@@ -124,7 +127,7 @@ class GetLinkSelectionMenuItemTest {
         }
 
     @Test
-    fun `test shouldDisplay returns true when selectedNodes size is 1 and nodeSourceType is Links`() =
+    fun `test shouldDisplay returns false when noNodeInBackups is false and nodeSourceType is Links`() =
         runTest {
             val getLinkMenuItem = GetLinkSelectionMenuItem(mock<GetLinkMenuAction>())
 
@@ -135,6 +138,28 @@ class GetLinkSelectionMenuItemTest {
                 noNodeInBackups = false,
                 noNodeTakenDown = true,
                 nodeSourceType = NodeSourceType.LINKS
+            )
+
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test shouldDisplay returns false when any node is S4 container`() =
+        runTest {
+            val s4ContainerNode = mock<TypedFolderNode> {
+                on { id } doReturn NodeId(456L)
+                on { isTakenDown } doReturn false
+                on { isS4Container } doReturn true
+            }
+            val getLinkMenuItem = GetLinkSelectionMenuItem(mock<GetLinkMenuAction>())
+
+            val result = getLinkMenuItem.shouldDisplay(
+                hasNodeAccessPermission = true,
+                selectedNodes = listOf(s4ContainerNode),
+                canBeMovedToTarget = false,
+                noNodeInBackups = true,
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()

@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RenameMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -13,26 +13,20 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CopySelectionMenuItemTest {
+class RenameSelectionMenuItemTest {
+
+    private val underTest = RenameSelectionMenuItem(mock<RenameMenuAction>())
 
     private val mockFileNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(123L)
-        on { isTakenDown } doReturn false
-    }
-
-    private val mockTakenDownNode = mock<TypedFileNode> {
-        on { id } doReturn NodeId(999L)
-        on { isTakenDown } doReturn true
     }
 
     @Test
-    fun `test shouldDisplay returns true when noNodeTakenDown is true`() = runTest {
-        val copyMenuItem = CopySelectionMenuItem(mock<CopyMenuAction>())
-
-        val result = copyMenuItem.shouldDisplay(
+    fun `test that shouldDisplay returns true when all conditions are met`() = runTest {
+        val result = underTest.shouldDisplay(
             hasNodeAccessPermission = true,
             selectedNodes = listOf(mockFileNode),
-            canBeMovedToTarget = true,
+            canBeMovedToTarget = false,
             noNodeInBackups = true,
             noNodeTakenDown = true,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -42,15 +36,13 @@ class CopySelectionMenuItemTest {
     }
 
     @Test
-    fun `test shouldDisplay returns false when noNodeTakenDown is false`() = runTest {
-        val copyMenuItem = CopySelectionMenuItem(mock<CopyMenuAction>())
-
-        val result = copyMenuItem.shouldDisplay(
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mockTakenDownNode),
-            canBeMovedToTarget = true,
+    fun `test that shouldDisplay returns false when hasNodeAccessPermission is false`() = runTest {
+        val result = underTest.shouldDisplay(
+            hasNodeAccessPermission = false,
+            selectedNodes = listOf(mockFileNode),
+            canBeMovedToTarget = false,
             noNodeInBackups = true,
-            noNodeTakenDown = false,
+            noNodeTakenDown = true,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
@@ -58,12 +50,9 @@ class CopySelectionMenuItemTest {
     }
 
     @Test
-    fun `test shouldDisplay ignores other parameters and only checks noNodeTakenDown and isNotS4Container`() = runTest {
-        val copyMenuItem = CopySelectionMenuItem(mock<CopyMenuAction>())
-
-        // Test with various combinations of other parameters - should only depend on noNodeTakenDown
-        val result1 = copyMenuItem.shouldDisplay(
-            hasNodeAccessPermission = false,
+    fun `test that shouldDisplay returns false when noNodeInBackups is false`() = runTest {
+        val result = underTest.shouldDisplay(
+            hasNodeAccessPermission = true,
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = false,
             noNodeInBackups = false,
@@ -71,32 +60,38 @@ class CopySelectionMenuItemTest {
             nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
-        val result2 = copyMenuItem.shouldDisplay(
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mockFileNode),
-            canBeMovedToTarget = true,
-            noNodeInBackups = true,
-            noNodeTakenDown = false,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
-        )
-
-        assertThat(result1).isTrue() // Should be true because noNodeTakenDown = true
-        assertThat(result2).isFalse() // Should be false because noNodeTakenDown = false
+        assertThat(result).isFalse()
     }
 
     @Test
-    fun `test shouldDisplay returns false when any node is S4 container`() = runTest {
+    fun `test that shouldDisplay returns false when multiple nodes selected`() = runTest {
+        val mockFileNode2 = mock<TypedFileNode> {
+            on { id } doReturn NodeId(456L)
+        }
+
+        val result = underTest.shouldDisplay(
+            hasNodeAccessPermission = true,
+            selectedNodes = listOf(mockFileNode, mockFileNode2),
+            canBeMovedToTarget = false,
+            noNodeInBackups = true,
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+        )
+
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `test that shouldDisplay returns false when node is S4 container`() = runTest {
         val s4ContainerNode = mock<TypedFolderNode> {
             on { id } doReturn NodeId(456L)
-            on { isTakenDown } doReturn false
             on { isS4Container } doReturn true
         }
-        val copyMenuItem = CopySelectionMenuItem(mock<CopyMenuAction>())
 
-        val result = copyMenuItem.shouldDisplay(
+        val result = underTest.shouldDisplay(
             hasNodeAccessPermission = true,
             selectedNodes = listOf(s4ContainerNode),
-            canBeMovedToTarget = true,
+            canBeMovedToTarget = false,
             noNodeInBackups = true,
             noNodeTakenDown = true,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE

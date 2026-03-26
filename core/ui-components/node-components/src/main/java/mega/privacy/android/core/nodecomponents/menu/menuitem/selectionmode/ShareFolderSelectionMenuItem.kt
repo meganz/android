@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -11,7 +12,7 @@ import javax.inject.Inject
 
 class ShareFolderSelectionMenuItem @Inject constructor(
     override val menuAction: ShareFolderMenuAction,
-    private val isOutShareUseCase: IsOutShareUseCase
+    private val isOutShareUseCase: IsOutShareUseCase,
 ) : NodeSelectionMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
@@ -24,7 +25,9 @@ class ShareFolderSelectionMenuItem @Inject constructor(
         val hasNoOutShare = none { isOutShareUseCase(it) }
         val isSingleSelection = size <= 1
 
-        isNotEmpty() && all { it is FolderNode } && (hasNoOutShare || isSingleSelection)
+        isNotEmpty() &&
+                all { it is FolderNode && it.isNotS4Container() } &&
+                (hasNoOutShare || isSingleSelection)
     }
 
     override val showAsActionOrder: Int?

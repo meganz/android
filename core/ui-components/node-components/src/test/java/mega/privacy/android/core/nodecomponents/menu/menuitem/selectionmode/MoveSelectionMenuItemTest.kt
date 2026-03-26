@@ -128,4 +128,26 @@ class MoveSelectionMenuItemTest {
 
         assertThat(result).isFalse()
     }
+
+    @Test
+    fun `test shouldDisplay returns false when any node is S4 container`() = runTest {
+        val s4ContainerNode = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(456L)
+            on { isTakenDown } doReturn false
+            on { isIncomingShare } doReturn false
+            on { isS4Container } doReturn true
+        }
+        val moveMenuItem = MoveSelectionMenuItem(mock<MoveMenuAction>())
+
+        val result = moveMenuItem.shouldDisplay(
+            hasNodeAccessPermission = true,
+            selectedNodes = listOf(s4ContainerNode),
+            canBeMovedToTarget = true,
+            noNodeInBackups = true,
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+        )
+
+        assertThat(result).isFalse()
+    }
 }

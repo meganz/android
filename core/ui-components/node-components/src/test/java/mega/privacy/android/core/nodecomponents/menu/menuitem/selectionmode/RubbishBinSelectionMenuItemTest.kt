@@ -173,4 +173,26 @@ class RubbishBinSelectionMenuItemTest {
         assertThat(result1).isTrue()
         assertThat(result2).isTrue() // Should be the same regardless of noNodeTakenDown
     }
+
+    @Test
+    fun `test shouldDisplay returns false when any node is S4 container`() = runTest {
+        val s4ContainerNode = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(456L)
+            on { isTakenDown } doReturn false
+            on { isIncomingShare } doReturn false
+            on { isS4Container } doReturn true
+        }
+        val rubbishBinMenuItem = RubbishBinSelectionMenuItem(mock<TrashMenuAction>())
+
+        val result = rubbishBinMenuItem.shouldDisplay(
+            hasNodeAccessPermission = true,
+            selectedNodes = listOf(s4ContainerNode),
+            canBeMovedToTarget = true,
+            noNodeInBackups = true,
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+        )
+
+        assertThat(result).isFalse()
+    }
 }

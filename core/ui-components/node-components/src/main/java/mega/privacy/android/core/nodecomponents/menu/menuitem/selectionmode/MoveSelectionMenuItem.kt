@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -18,9 +19,12 @@ class MoveSelectionMenuItem @Inject constructor(
         noNodeTakenDown: Boolean,
         nodeSourceType: NodeSourceType,
     ): Boolean =
-        hasNodeAccessPermission
-                && selectedNodes.none { it.isIncomingShare }
-                && noNodeInBackups
+        hasNodeAccessPermission &&
+                noNodeInBackups &&
+                selectedNodes.run {
+                    none { it.isIncomingShare } &&
+                            all { it.isNotS4Container() }
+                }
 
     override val showAsActionOrder: Int
         get() = 160
