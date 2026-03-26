@@ -16,7 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.barteksc.pdfviewer.PDFView
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
+import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 import timber.log.Timber
+import java.io.File
 
 /**
  * Composable that renders a PDF document using AndroidView wrapping PDFView.
@@ -132,4 +134,58 @@ internal fun PdfViewerContent(
  */
 private fun Dp.toPx(context: Context): Float {
     return value * context.resources.displayMetrics.density
+}
+
+/**
+ * Resolves a display [Uri] from [PdfViewerSource] for [PdfViewerContent].
+ *
+ * In-memory PDF bytes (e.g. after downloading a remote URL) are provided via UI state, not here.
+ */
+internal fun getPdfUri(source: PdfViewerSource?): Uri? {
+    if (source == null) return null
+
+    return when (source) {
+        is PdfViewerSource.CloudNode -> {
+            val uri = source.contentUri.toUri(source.isLocalContent)
+            Timber.d("CloudNode PDF URI: $uri (sourceType=${source.nodeSourceType})")
+            uri
+        }
+
+        is PdfViewerSource.Offline ->
+            Uri.fromFile(File(source.localPath))
+
+        is PdfViewerSource.ChatAttachment -> {
+            val uri = source.contentUri.toUri(source.isLocalContent)
+            Timber.d("Chat PDF URI: $uri")
+            uri
+        }
+
+        is PdfViewerSource.FileLink ->
+            source.contentUri.toUri(source.isLocalContent)
+
+        is PdfViewerSource.FolderLink -> {
+            val uri = source.contentUri.toUri(source.isLocalContent)
+            Timber.d("FolderLink PDF URI: $uri")
+            uri
+        }
+
+        is PdfViewerSource.ZipFile ->
+            source.uri
+
+        is PdfViewerSource.ExternalFile ->
+            source.uri
+    }
+}
+
+/**
+ * Convert content URI string to Android Uri.
+ *
+ * @param isLocalContent True if the content is a local file path
+ */
+private fun String.toUri(isLocalContent: Boolean): Uri {
+    return if (isLocalContent) {
+        Uri.fromFile(File(this))
+    } else {
+        Uri.parse(this)
+    }
 }

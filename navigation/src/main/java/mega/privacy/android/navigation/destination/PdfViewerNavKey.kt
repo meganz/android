@@ -11,11 +11,10 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
  * @param contentUri The content URI string for the PDF (local file path or remote URL)
  * @param isLocalContent True if content is local, false if remote streaming
  * @param shouldStopHttpServer True if HTTP server should be stopped when done (for remote content)
- * @param nodeSourceType The source type of the node (Cloud Drive, Chat, etc.)
+ * @param nodeSourceType The source type of the node (cloud drive, chat, folder link, etc.)
  * @param mimeType The MIME type of the file
  * @param chatId The chat ID if opening from chat (optional)
  * @param messageId The message ID if opening from chat (optional)
- * @param isFolderLink True if opening from a folder link
  * @param title Optional title to display in the toolbar
  */
 @Serializable
@@ -28,7 +27,6 @@ data class PdfViewerNavKey(
     val mimeType: String = "application/pdf",
     val chatId: Long? = null,
     val messageId: Long? = null,
-    val isFolderLink: Boolean = false,
     val title: String? = null,
 ) : NoSessionNavKey.Optional {
 

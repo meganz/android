@@ -7,7 +7,6 @@ import mega.privacy.android.feature.pdfviewer.presentation.pdfViewerScreen
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.destination.FileInfoNavKey
 
 /**
  * Feature destination for the PDF Viewer module.
@@ -23,9 +22,6 @@ object PdfViewerFeatureDestination : FeatureDestination {
             // Register the PDF viewer screen
             pdfViewerScreen(
                 onBack = navigationHandler::back,
-                onNavigateToFileInfo = { handle ->
-                    navigationHandler.navigate(FileInfoNavKey(handle))
-                },
                 onOpenNodeOptions = { handle, sourceType ->
                     navigationHandler.navigate(
                         NodeOptionsBottomSheetNavKey(
@@ -34,6 +30,7 @@ object PdfViewerFeatureDestination : FeatureDestination {
                         )
                     )
                 },
+                navigationHandler = navigationHandler,
                 onTransfer = transferHandler::setTransferEvent,
             )
         }

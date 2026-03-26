@@ -20,7 +20,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param modifier Modifier for the dialog
  */
 @Composable
-fun PdfViewerPasswordDialog(
+internal fun PdfViewerPasswordDialog(
     password: String,
     errorText: String?,
     onPasswordChange: (String) -> Unit,
