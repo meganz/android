@@ -42,6 +42,7 @@ import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomS
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
+import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
@@ -77,7 +78,7 @@ internal fun HomeScreen(
     val megaResultContract = rememberMegaResultContract()
     val rootFolderId = NodeId(-1L)
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
-    var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
+    val uploadUrisEventState = rememberUploadUrisEventState()
     var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
@@ -85,7 +86,7 @@ internal fun HomeScreen(
         parentId = rootFolderId,
         onFilesSelected = { uris ->
             pitagTrigger = PitagTrigger.Picker
-            uploadUris = uris
+            uploadUrisEventState.trigger(uris)
         },
         megaNavigator = megaNavigator,
         megaResultContract = megaResultContract
@@ -94,7 +95,7 @@ internal fun HomeScreen(
     val captureHandler = rememberCaptureHandler(
         onPhotoCaptured = { uri ->
             pitagTrigger = PitagTrigger.CameraCapture
-            uploadUris = listOf(uri)
+            uploadUrisEventState.trigger(listOf(uri))
         },
         megaResultContract = megaResultContract
     )
@@ -228,12 +229,12 @@ internal fun HomeScreen(
     UploadingFiles(
         nameCollisionLauncher = nameCollisionLauncher,
         parentNodeId = rootFolderId,
-        uris = uploadUris,
+        urisEvent = uploadUrisEventState.event,
+        onUrisConsumed = uploadUrisEventState::consume,
         pitagTrigger = pitagTrigger,
         onStartUpload = { transferTriggerEvent ->
             transferHandler.setTransferEvent(transferTriggerEvent)
             pitagTrigger = PitagTrigger.NotApplicable
-            uploadUris = emptyList()
         },
     )
 

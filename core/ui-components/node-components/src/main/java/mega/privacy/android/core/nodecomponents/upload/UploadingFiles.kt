@@ -3,13 +3,19 @@ package mega.privacy.android.core.nodecomponents.upload
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -24,7 +30,8 @@ import java.io.IOException
 fun UploadingFiles(
     nameCollisionLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     parentNodeId: NodeId,
-    uris: List<Uri>,
+    urisEvent: StateEventWithContent<List<Uri>>,
+    onUrisConsumed: () -> Unit,
     pitagTrigger: PitagTrigger,
     onStartUpload: (TransferTriggerEvent) -> Unit,
     viewModel: UploadFileViewModel = hiltViewModel(),
@@ -67,14 +74,36 @@ fun UploadingFiles(
         }
     }
 
-    LaunchedEffect(uris) {
-        if (uris.isNotEmpty()) {
-            viewModel.proceedUris(
-                uris = uris,
-                parentNodeId = parentNodeId,
-                pitagTrigger = pitagTrigger,
-            )
-        }
+    EventEffect(
+        urisEvent,
+        onConsumed = onUrisConsumed,
+    ) { uris ->
+        viewModel.proceedUris(
+            uris = uris,
+            parentNodeId = parentNodeId,
+            pitagTrigger = pitagTrigger,
+        )
     }
+}
+
+@Stable
+class UploadUrisEventState internal constructor(
+    initialEvent: StateEventWithContent<List<Uri>>,
+) {
+    var event: StateEventWithContent<List<Uri>> by mutableStateOf(initialEvent)
+        private set
+
+    fun trigger(uris: List<Uri>) {
+        event = triggered(uris)
+    }
+
+    fun consume() {
+        event = consumed()
+    }
+}
+
+@Composable
+fun rememberUploadUrisEventState(): UploadUrisEventState {
+    return remember { UploadUrisEventState(consumed()) }
 }
 
