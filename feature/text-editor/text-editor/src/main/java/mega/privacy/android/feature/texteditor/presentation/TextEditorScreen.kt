@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.texteditor.presentation
 
+import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.animate
@@ -46,6 +48,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,9 +67,13 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.math.abs
 
@@ -86,9 +93,57 @@ fun TextEditorScreen(
     viewModel: TextEditorComposeViewModel,
     onBack: () -> Unit,
     onOpenNodeOptions: () -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit = {},
+    onShare: (localPath: String?, fileName: String?) -> Unit = { _, _ -> },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
+    val megaNavigator = rememberMegaNavigator()
+    val megaResultContract = rememberMegaResultContract()
+    val shareChooserTitle = stringResource(sharedR.string.general_share)
+
+    val sendToChatLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.sendToChatActivityResultContract,
+    ) { result ->
+        result?.let { viewModel.attachNodesToChat(it) }
+    }
+
+    EventEffect(
+        event = uiState.transferEvent,
+        onConsumed = viewModel::consumeTransferEvent,
+    ) { event ->
+        onTransfer(event)
+    }
+
+    EventEffect(
+        event = uiState.nodeEffectEvent,
+        onConsumed = viewModel::consumeNodeEffectEvent,
+    ) { effect ->
+        when (effect) {
+            is TextEditorNodeEffect.ManageLink ->
+                megaNavigator.openGetLinkActivity(context, effect.nodeHandle)
+
+            is TextEditorNodeEffect.SendToChat ->
+                sendToChatLauncher.launch(longArrayOf(effect.nodeHandle))
+
+            is TextEditorNodeEffect.Share -> {
+                val publicLink = effect.resolvedPublicLink
+                if (!publicLink.isNullOrBlank()) {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, effect.fileName.orEmpty())
+                        putExtra(Intent.EXTRA_TEXT, publicLink)
+                    }
+                    context.startActivity(
+                        Intent.createChooser(intent, shareChooserTitle)
+                    )
+                } else {
+                    onShare(effect.localPath, effect.fileName)
+                }
+            }
+        }
+    }
     val isEditable = uiState.mode == TextEditorMode.Edit || uiState.mode == TextEditorMode.Create
     val scope = rememberCoroutineScope()
 
@@ -151,6 +206,7 @@ fun TextEditorScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val changesSavedMessage = stringResource(sharedR.string.general_changes_saved)
+    val genericErrorMessage = stringResource(sharedR.string.general_request_failed_message)
     val lineTooltipTemplate = stringResource(sharedR.string.text_editor_fast_scroll_line_tooltip)
     EventEffect(
         event = uiState.saveSuccessEvent,
@@ -171,6 +227,20 @@ fun TextEditorScreen(
         onConsumed = viewModel::consumeExitAfterCreateSaveEvent,
     ) {
         onBack()
+    }
+
+    EventEffect(
+        event = uiState.shareErrorEvent,
+        onConsumed = viewModel::consumeShareErrorEvent,
+    ) {
+        snackbarHostState.showSnackbar(genericErrorMessage)
+    }
+
+    EventEffect(
+        event = uiState.sendToChatErrorEvent,
+        onConsumed = viewModel::consumeSendToChatErrorEvent,
+    ) {
+        snackbarHostState.showSnackbar(genericErrorMessage)
     }
 
     EventEffect(

@@ -18,6 +18,9 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @param exitAfterCreateDiscardEvent One-shot event when Create mode user confirms discard; UI should pop without save.
  * @param exitAfterCreateSaveEvent One-shot event when Create mode save completes successfully; UI should pop back.
  * @param isRestoringContent True while content is being reverted/updated in background (e.g. discard); show loading overlay.
+ * @param nodeEffectEvent One-shot effect for manage link, share, or send to chat; consumed by the app host.
+ * @param shareErrorEvent One-shot event fired when the share public-link could not be resolved; the UI shows a snackbar.
+ * @param sendToChatErrorEvent One-shot event fired when attaching nodes to chat fails; the UI shows a snackbar.
  */
 data class TextEditorComposeUiState(
     val fileName: String = "",
@@ -32,6 +35,9 @@ data class TextEditorComposeUiState(
     val saveSuccessEvent: StateEvent = consumed,
     val isRestoringContent: Boolean = false,
     val bottomBarActions: List<TextEditorBottomBarAction> = emptyList(),
+    val nodeEffectEvent: StateEventWithContent<TextEditorNodeEffect> = consumed(),
+    val shareErrorEvent: StateEvent = consumed,
+    val sendToChatErrorEvent: StateEvent = consumed,
     val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val isFullyLoaded: Boolean = true,
     val totalLineCount: Int = 0,

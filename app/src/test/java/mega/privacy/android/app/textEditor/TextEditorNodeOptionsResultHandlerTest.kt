@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -40,6 +41,19 @@ internal class TextEditorNodeOptionsResultHandlerTest {
                 )
             )
         ).isTrue()
+    }
+
+    @Test
+    fun `test that Transfer StartDownloadForPreview result returns false`() {
+        val event = TransferTriggerEvent.StartDownloadForPreview(
+            node = mock<TypedNode>(),
+            isOpenWith = true,
+        )
+        assertThat(
+            shouldCloseTextEditorOnNodeOptionsResult(
+                NodeOptionsBottomSheetResult.Transfer(event)
+            )
+        ).isFalse()
     }
 
     @Test

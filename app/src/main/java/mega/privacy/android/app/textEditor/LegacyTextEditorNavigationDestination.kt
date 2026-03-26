@@ -4,14 +4,12 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import de.palm.composestateevents.EventEffect
+import java.io.File
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -21,6 +19,7 @@ import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
@@ -33,6 +32,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel
 import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
@@ -46,12 +46,15 @@ import nz.mega.sdk.MegaApiJava
 
 /**
  * Returns true when the node options bottom sheet result indicates the editor should close
- * (e.g. user navigated away or triggered a transfer — the current node may no longer be valid).
+ * (e.g. user navigated away or triggered a transfer where the current node may no longer be valid).
+ * Preview / Open-with downloads ([TransferTriggerEvent.StartDownloadForPreview]) do not close the editor.
  */
 internal fun shouldCloseTextEditorOnNodeOptionsResult(
     result: NodeOptionsBottomSheetResult?,
 ): Boolean = when (result) {
-    is NodeOptionsBottomSheetResult.Transfer -> true
+    is NodeOptionsBottomSheetResult.Transfer ->
+        result.event !is TransferTriggerEvent.StartDownloadForPreview
+
     is NodeOptionsBottomSheetResult.Navigation ->
         result.navKey !is ChangeLabelBottomSheet &&
                 result.navKey !is ChangeLabelBottomSheetMultiple &&
@@ -90,14 +93,32 @@ private fun isFromSharedFolder(nodeSourceType: Int?): Boolean {
     )
 }
 
-/** True when Share should be shown for this source type (not folder link, versions, incoming shares, or chat). */
-private fun shouldShowShare(nodeSourceType: Int?): Boolean {
+/**
+ * True when Share should be shown for this source type.
+ * Matches [TextEditorActivity.refreshMenuOptionsVisibility]: rubbish bin hides Share (only Remove + line numbers);
+ * also hidden for folder link, versions, incoming shares, and chat.
+ */
+internal fun shouldShowShare(nodeSourceType: Int?): Boolean {
     if (nodeSourceType == null) return true
     return nodeSourceType !in setOf(
+        RUBBISH_BIN_ADAPTER,
         FOLDER_LINK_ADAPTER,
         VERSIONS_ADAPTER,
         INCOMING_SHARES_ADAPTER,
         FROM_CHAT,
+    )
+}
+
+/** True when Send to chat should be shown (cloud opens only; hidden for rubbish, versions, links, chat, offline). */
+internal fun shouldShowSendToChat(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return true
+    return nodeSourceType !in setOf(
+        RUBBISH_BIN_ADAPTER,
+        VERSIONS_ADAPTER,
+        FOLDER_LINK_ADAPTER,
+        FILE_LINK_ADAPTER,
+        FROM_CHAT,
+        OFFLINE_ADAPTER,
     )
 }
 
@@ -136,11 +157,10 @@ private fun buildTextEditorIntent(context: Context, navKey: LegacyTextEditorNavK
 }
 
 /**
- * Builds [TextEditorComposeViewModel.Args] from [navKey] and [transferHandler].
+ * Builds [TextEditorComposeViewModel.Args] from [navKey].
  */
 private fun buildTextEditorViewModelArgs(
     navKey: LegacyTextEditorNavKey,
-    transferHandler: TransferHandler,
 ): TextEditorComposeViewModel.Args {
     val nodeSourceType = navKey.nodeSourceType
     return when {
@@ -152,7 +172,7 @@ private fun buildTextEditorViewModelArgs(
                 inExcludedAdapterForGetLinkAndEdit = true,
                 showDownload = true,
                 showShare = false,
-                transferHandler = transferHandler,
+                showSendToChat = false,
                 chatId = navKey.chatId,
                 messageId = navKey.messageId,
             )
@@ -165,7 +185,7 @@ private fun buildTextEditorViewModelArgs(
                 inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(sourceType),
                 showDownload = shouldShowDownload(sourceType),
                 showShare = shouldShowShare(sourceType),
-                transferHandler = transferHandler,
+                showSendToChat = false,
                 localPath = navKey.localPath,
             )
         }
@@ -179,7 +199,7 @@ private fun buildTextEditorViewModelArgs(
                 inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
                 showDownload = shouldShowDownload(nodeSourceType),
                 showShare = shouldShowShare(nodeSourceType),
-                transferHandler = transferHandler,
+                showSendToChat = shouldShowSendToChat(nodeSourceType),
                 isFromSharedFolder = isFromSharedFolder(nodeSourceType),
                 fromHome = navKey.fromHome,
             )
@@ -191,7 +211,8 @@ private fun buildTextEditorViewModelArgs(
  * Legacy text editor destination. Uses [FeatureFlagGate] with [ApiFeatures.TextEditorCompose]:
  * when enabled shows [TextEditorScreen]; when disabled starts [TextEditorActivity] and pops.
  * Tapping More opens the Node Options Bottom Sheet (cloud node only). When the user deletes or
- * moves the node (result Navigation or Transfer), the editor is closed.
+ * moves the node (Navigation or most Transfer results), the editor is closed; preview/Open-with
+ * downloads ([TransferTriggerEvent.StartDownloadForPreview]) stay on the editor and forward the transfer.
  */
 fun EntryProviderScope<NavKey>.legacyTextEditorScreen(
     navigationHandler: NavigationHandler,
@@ -226,6 +247,13 @@ private fun TextEditorEntry(
             navigationHandler.monitorResult<NodeOptionsBottomSheetResult>(NodeOptionsBottomSheetNavKey.RESULT)
                 .distinctUntilChanged()
                 .collect { result ->
+                    if (result is NodeOptionsBottomSheetResult.Transfer &&
+                        result.event is TransferTriggerEvent.StartDownloadForPreview
+                    ) {
+                        transferHandler.setTransferEvent(result.event)
+                        navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
+                        return@collect
+                    }
                     if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
                         navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
                         removeDestination()
@@ -262,8 +290,8 @@ private fun TextEditorComposeContent(
     transferHandler: TransferHandler,
     viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
 ) {
-    val args = remember(navKey, transferHandler) {
-        buildTextEditorViewModelArgs(navKey, transferHandler)
+    val args = remember(navKey) {
+        buildTextEditorViewModelArgs(navKey)
     }
     val onOpenNodeOptions: () -> Unit = remember(
         navKey.chatId,
@@ -291,20 +319,28 @@ private fun TextEditorComposeContent(
         }
     }
 
+    val context = LocalContext.current
+    val onShare: (String?, String?) -> Unit = remember {
+        { localPath, fileName ->
+            if (!localPath.isNullOrBlank()) {
+                val file = File(localPath)
+                if (file.exists()) {
+                    val name = fileName?.ifBlank { null } ?: file.name
+                    FileUtil.shareUri(context, name, FileUtil.getUriForFile(context, file))
+                }
+            }
+        }
+    }
+
     val viewModel =
         hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
             factory.create(args)
         }
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    EventEffect(
-        event = uiState.transferEvent,
-        onConsumed = viewModel::consumeTransferEvent,
-    ) { content ->
-        transferHandler.setTransferEvent(content)
-    }
     TextEditorScreen(
         viewModel = viewModel,
         onBack = removeDestination,
         onOpenNodeOptions = onOpenNodeOptions,
+        onTransfer = { transferHandler.setTransferEvent(it) },
+        onShare = onShare,
     )
 }

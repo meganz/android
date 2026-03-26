@@ -10,7 +10,9 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Actions for the text editor bottom floating bar.
- * Designer order: Download, Manage Link, Share, Edit. SendToChat is reserved for a later phase.
+ * [orderInCategory] defines display order in [mega.android.core.ui.components.toolbar.MegaFloatingToolbar]
+ * (sorted ascending). Target order: Download, Get link, Share, Send to chat, Edit (Edit last).
+ * Visibility still comes from [TextEditorBottomBarActionsMapper].
  */
 sealed interface TextEditorBottomBarAction : MenuActionWithIcon {
 
@@ -58,7 +60,7 @@ sealed interface TextEditorBottomBarAction : MenuActionWithIcon {
         override fun getIconPainter(): Painter =
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Edit)
 
-        override val orderInCategory = 200
+        override val orderInCategory = 230
         override val testTag = "text_editor_bottom_bar:edit"
     }
 
@@ -70,7 +72,7 @@ sealed interface TextEditorBottomBarAction : MenuActionWithIcon {
         override fun getIconPainter(): Painter =
             rememberVectorPainter(IconPack.Medium.Thin.Outline.MessageArrowUp)
 
-        override val orderInCategory = 210
+        override val orderInCategory = 200
         override val testTag = "text_editor_bottom_bar:send_to_chat"
     }
 }

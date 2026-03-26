@@ -17,24 +17,31 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartDownloadNode
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorComposeUiState
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeActionRequest
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
-import mega.privacy.android.navigation.contract.TransferHandler
 import timber.log.Timber
 
 /** Number of lines per chunk in both view and edit modes.
  * Unified so that item indices match 1:1 across mode switches, eliminating scroll jumps. */
 internal const val CHUNK_SIZE = 200
+
+/** Same value as [nz.mega.sdk.MegaApiJava.INVALID_HANDLE]; avoids SDK dependency in the feature module. */
+private const val INVALID_NODE_HANDLE = -1L
 
 /** Chunk size for gradual file read; balances responsiveness and I/O overhead. */
 private const val CHUNK_SIZE_LINES = 500
@@ -57,7 +64,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getNodeAccessUseCase: GetNodeAccessUseCase,
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper,
-    private val nodeActionHandler: TextEditorNodeActionHandler,
+    private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
+    private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
+    private val exportNodeUseCase: ExportNodeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -156,6 +165,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         args.inExcludedAdapterForGetLinkAndEdit,
                         args.showDownload,
                         args.showShare,
+                        args.showSendToChat,
                     )
                 }.getOrElse { null to emptyList() }
                 _uiState.update {
@@ -187,7 +197,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val inExcludedAdapterForGetLinkAndEdit: Boolean = false,
         val showDownload: Boolean = true,
         val showShare: Boolean = true,
-        val transferHandler: TransferHandler,
+        val showSendToChat: Boolean = false,
         val isFromSharedFolder: Boolean = false,
         /** When true (e.g. new file from Home), forwarded to upload as [TransferTriggerEvent.StartUpload.TextFile.fromHomePage]. */
         val fromHome: Boolean = false,
@@ -476,6 +486,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         _uiState.update { it.copy(transferEvent = consumed()) }
     }
 
+    fun consumeNodeEffectEvent() {
+        _uiState.update { it.copy(nodeEffectEvent = consumed()) }
+    }
+
+    fun consumeShareErrorEvent() {
+        _uiState.update { it.copy(shareErrorEvent = consumed) }
+    }
+
+    fun consumeSendToChatErrorEvent() {
+        _uiState.update { it.copy(sendToChatErrorEvent = consumed) }
+    }
+
     fun consumeSaveSuccessEvent() {
         _uiState.update { it.copy(saveSuccessEvent = consumed) }
     }
@@ -485,11 +507,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             TextEditorTopBarAction.LineNumbers -> {
                 _uiState.update { it.copy(showLineNumbers = !it.showLineNumbers) }
             }
-            // TODO: Wire Download, GetLink, SendToChat, Share when top-bar variants are needed (currently bottom-bar only)
-            TextEditorTopBarAction.Download,
-            TextEditorTopBarAction.GetLink,
-            TextEditorTopBarAction.SendToChat,
-            TextEditorTopBarAction.Share,
+
+            TextEditorTopBarAction.Download -> emitDownloadTransferEvent()
+
+            TextEditorTopBarAction.GetLink -> emitManageLinkEffect()
+            TextEditorTopBarAction.Share -> emitShareEffect()
+            TextEditorTopBarAction.SendToChat -> emitSendToChatEffect()
+
             TextEditorTopBarAction.Save,
             TextEditorTopBarAction.More,
                 -> Unit
@@ -498,32 +522,111 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     fun onBottomBarAction(action: TextEditorBottomBarAction) {
         when (action) {
-            is TextEditorBottomBarAction.Download -> {
-                nodeActionHandler.handle(
-                    viewModelScope,
-                    TextEditorNodeActionRequest.Download(args.nodeHandle),
-                    args.transferHandler,
-                )
-            }
+            is TextEditorBottomBarAction.Download -> emitDownloadTransferEvent()
 
-            is TextEditorBottomBarAction.GetLink -> {
-                nodeActionHandler.handle(
-                    viewModelScope,
-                    TextEditorNodeActionRequest.GetLink(args.nodeHandle),
-                    args.transferHandler,
-                )
-            }
-
-            is TextEditorBottomBarAction.Share -> {
-                nodeActionHandler.handle(
-                    viewModelScope,
-                    TextEditorNodeActionRequest.Share(args.nodeHandle),
-                    args.transferHandler,
-                )
-            }
-
+            is TextEditorBottomBarAction.GetLink -> emitManageLinkEffect()
+            is TextEditorBottomBarAction.Share -> emitShareEffect()
+            is TextEditorBottomBarAction.SendToChat -> emitSendToChatEffect()
             is TextEditorBottomBarAction.Edit -> setEditMode()
-            is TextEditorBottomBarAction.SendToChat -> {}
+        }
+    }
+
+    private fun emitDownloadTransferEvent() {
+        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        viewModelScope.launch {
+            val node = getNodeByIdUseCase(NodeId(args.nodeHandle))
+            if (node != null) {
+                _uiState.update {
+                    it.copy(
+                        transferEvent = triggered(
+                            StartDownloadNode(nodes = listOf(node), withStartMessage = true)
+                        )
+                    )
+                }
+            } else {
+                Timber.w("Text editor: node %d not found for download", args.nodeHandle)
+            }
+        }
+    }
+
+    private fun emitManageLinkEffect() {
+        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        _uiState.update {
+            it.copy(nodeEffectEvent = triggered(TextEditorNodeEffect.ManageLink(args.nodeHandle)))
+        }
+    }
+
+    private fun emitShareEffect() {
+        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        val name = _uiState.value.fileName.ifBlank { args.fileName.orEmpty() }.ifBlank { null }
+        if (!args.localPath.isNullOrBlank()) {
+            _uiState.update {
+                it.copy(
+                    nodeEffectEvent = triggered(
+                        TextEditorNodeEffect.Share(
+                            nodeHandle = args.nodeHandle,
+                            localPath = args.localPath,
+                            fileName = name,
+                        ),
+                    ),
+                )
+            }
+            return
+        }
+        viewModelScope.launch {
+            runCatching {
+                val node = getNodeByIdUseCase(NodeId(args.nodeHandle))
+                node?.exportedData?.publicLink
+                    ?: exportNodeUseCase(
+                        nodeToExport = NodeId(args.nodeHandle),
+                        callerName = "TextEditor:share",
+                    )
+            }.onSuccess { publicLink ->
+                _uiState.update {
+                    it.copy(
+                        nodeEffectEvent = triggered(
+                            TextEditorNodeEffect.Share(
+                                nodeHandle = args.nodeHandle,
+                                localPath = null,
+                                fileName = name,
+                                resolvedPublicLink = publicLink,
+                            ),
+                        ),
+                    )
+                }
+            }.onFailure { e ->
+                Timber.e(e, "Text editor: failed to resolve public link for share")
+                _uiState.update { it.copy(shareErrorEvent = triggered) }
+            }
+        }
+    }
+
+    private fun emitSendToChatEffect() {
+        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        _uiState.update {
+            it.copy(nodeEffectEvent = triggered(TextEditorNodeEffect.SendToChat(args.nodeHandle)))
+        }
+    }
+
+    /**
+     * Attaches nodes to chat conversations after the user picks recipients in the send-to-chat
+     * picker. Converts user handles to 1-on-1 chat IDs, then attaches via [AttachMultipleNodesUseCase].
+     */
+    fun attachNodesToChat(result: SendToChatResult) {
+        viewModelScope.launch {
+            runCatching {
+                val chatIdsFromUserHandles = result.userHandles.toList().mapNotNull { userHandle ->
+                    runCatching { get1On1ChatIdUseCase(userHandle) }.getOrNull()
+                }
+                val allChatIds = chatIdsFromUserHandles + result.chatIds.toList()
+                attachMultipleNodesUseCase(
+                    nodeIds = result.nodeIds.map { NodeId(it) },
+                    chatIds = allChatIds,
+                )
+            }.onFailure { e ->
+                Timber.e(e, "Text editor: failed to attach nodes to chat")
+                _uiState.update { it.copy(sendToChatErrorEvent = triggered) }
+            }
         }
     }
 

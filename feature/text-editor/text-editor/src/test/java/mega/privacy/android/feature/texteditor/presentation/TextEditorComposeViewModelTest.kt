@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.texteditor.presentation
 
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,19 +14,25 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel.Args
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeActionRequest
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
-import mega.privacy.android.navigation.contract.TransferHandler
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -34,7 +41,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -49,16 +55,25 @@ internal class TextEditorComposeViewModelTest {
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getNodeAccessUseCase: GetNodeAccessUseCase = mock()
+    private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
+    private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
+    private val exportNodeUseCase: ExportNodeUseCase = mock()
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
         TextEditorBottomBarActionsMapper()
-    private val nodeActionHandler: TextEditorNodeActionHandler = mock()
-    private val transferHandler: TransferHandler = mock()
 
     private lateinit var underTest: TextEditorComposeViewModel
 
     @BeforeEach
     fun resetMocks() {
-        reset(getTextContentForTextEditorUseCase, saveTextContentForTextEditorUseCase, getNodeByIdUseCase, getNodeAccessUseCase, nodeActionHandler, transferHandler)
+        reset(
+            getTextContentForTextEditorUseCase,
+            saveTextContentForTextEditorUseCase,
+            getNodeByIdUseCase,
+            getNodeAccessUseCase,
+            attachMultipleNodesUseCase,
+            get1On1ChatIdUseCase,
+            exportNodeUseCase,
+        )
         runBlocking {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
             whenever(getNodeAccessUseCase(any())).thenReturn(null)
@@ -72,7 +87,7 @@ internal class TextEditorComposeViewModelTest {
         inExcludedAdapterForGetLinkAndEdit: Boolean = false,
         showDownload: Boolean = true,
         showShare: Boolean = true,
-        transferHandler: TransferHandler = this.transferHandler,
+        showSendToChat: Boolean = false,
         isFromSharedFolder: Boolean = false,
         fromHome: Boolean = false,
         localPath: String? = null,
@@ -86,7 +101,7 @@ internal class TextEditorComposeViewModelTest {
                 inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit,
                 showDownload = showDownload,
                 showShare = showShare,
-                transferHandler = transferHandler,
+                showSendToChat = showSendToChat,
                 isFromSharedFolder = isFromSharedFolder,
                 fromHome = fromHome,
                 localPath = localPath,
@@ -97,7 +112,9 @@ internal class TextEditorComposeViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getNodeAccessUseCase = getNodeAccessUseCase,
             textEditorBottomBarActionsMapper = textEditorBottomBarActionsMapper,
-            nodeActionHandler = nodeActionHandler,
+            attachMultipleNodesUseCase = attachMultipleNodesUseCase,
+            get1On1ChatIdUseCase = get1On1ChatIdUseCase,
+            exportNodeUseCase = exportNodeUseCase,
         )
     }
 
@@ -189,11 +206,35 @@ internal class TextEditorComposeViewModelTest {
         assertThat(underTest.uiState.value.isLoading).isFalse()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that onMenuAction Download does not crash`() {
-        initUnderTest()
+    fun `test that onMenuAction Download emits StartDownloadNode transferEvent when node exists`() = runTest {
+        val node = mock<TypedNode>()
+        runBlocking { whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(node) }
+        initUnderTest(nodeHandle = 5L)
+        advanceUntilIdle()
+
         underTest.onMenuAction(TextEditorTopBarAction.Download)
-        assertThat(underTest.uiState.value.showLineNumbers).isFalse()
+        advanceUntilIdle()
+
+        val event = underTest.uiState.value.transferEvent
+        check(event is StateEventWithContentTriggered<*>)
+        val content = event.content
+        assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
+        assertThat((content as TransferTriggerEvent.StartDownloadNode).nodes).containsExactly(node)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onMenuAction Download does not emit transferEvent when node is null`() = runTest {
+        runBlocking { whenever(getNodeByIdUseCase(any())).thenReturn(null) }
+        initUnderTest(nodeHandle = 5L)
+        advanceUntilIdle()
+
+        underTest.onMenuAction(TextEditorTopBarAction.Download)
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.transferEvent).isEqualTo(consumed())
     }
 
     @Test
@@ -209,26 +250,37 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
-    fun `test that onMenuAction SendToChat does not change state`() {
-        initUnderTest()
-        val before = underTest.uiState.value
+    fun `test that onMenuAction SendToChat triggers SendToChat node effect`() {
+        initUnderTest(nodeHandle = 12L)
         underTest.onMenuAction(TextEditorTopBarAction.SendToChat)
-        val after = underTest.uiState.value
-        assertThat(after).isEqualTo(before)
+        val ev = underTest.uiState.value.nodeEffectEvent
+        check(ev is StateEventWithContentTriggered<*>)
+        assertThat(ev.content).isEqualTo(TextEditorNodeEffect.SendToChat(12L))
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+
     @Test
-    fun `test that onMenuAction Download GetLink Share do not change state`() = runTest {
-        initUnderTest()
-        advanceUntilIdle()
-        val before = underTest.uiState.value
-        underTest.onMenuAction(TextEditorTopBarAction.Download)
-        assertThat(underTest.uiState.value).isEqualTo(before)
+    fun `test that onMenuAction GetLink triggers ManageLink node effect`() {
+        initUnderTest(nodeHandle = 9L)
         underTest.onMenuAction(TextEditorTopBarAction.GetLink)
-        assertThat(underTest.uiState.value).isEqualTo(before)
+        val ev = underTest.uiState.value.nodeEffectEvent
+        check(ev is StateEventWithContentTriggered<*>)
+        assertThat(ev.content).isEqualTo(TextEditorNodeEffect.ManageLink(9L))
+    }
+
+    @Test
+    fun `test that onMenuAction Share triggers Share node effect`() {
+        initUnderTest(nodeHandle = 3L, fileName = "doc.txt")
         underTest.onMenuAction(TextEditorTopBarAction.Share)
-        assertThat(underTest.uiState.value).isEqualTo(before)
+        val ev = underTest.uiState.value.nodeEffectEvent
+        check(ev is StateEventWithContentTriggered<*>)
+        assertThat(ev.content).isEqualTo(
+            TextEditorNodeEffect.Share(
+                nodeHandle = 3L,
+                localPath = null,
+                fileName = "doc.txt",
+            ),
+        )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -517,51 +569,57 @@ internal class TextEditorComposeViewModelTest {
         assertThat(underTest.uiState.value.mode).isEqualTo(TextEditorMode.Edit)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that onBottomBarAction Download calls nodeActionHandler with Download request`() {
+    fun `test that onBottomBarAction Download emits StartDownloadNode transferEvent when node exists`() = runTest {
+        val node = mock<TypedNode>()
+        runBlocking { whenever(getNodeByIdUseCase(NodeId(42L))).thenReturn(node) }
         initUnderTest(nodeHandle = 42L, mode = TextEditorMode.View)
-        underTest.onBottomBarAction(TextEditorBottomBarAction.Download)
+        advanceUntilIdle()
 
-        verify(nodeActionHandler).handle(
-            any(),
-            eq(TextEditorNodeActionRequest.Download(42L)),
-            eq(transferHandler),
-        )
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Download)
+        advanceUntilIdle()
+
+        val event = underTest.uiState.value.transferEvent
+        check(event is StateEventWithContentTriggered<*>)
+        val content = event.content
+        assertThat(content).isInstanceOf(TransferTriggerEvent.StartDownloadNode::class.java)
+        assertThat((content as TransferTriggerEvent.StartDownloadNode).nodes).containsExactly(node)
     }
 
     @Test
-    fun `test that onBottomBarAction GetLink calls nodeActionHandler with GetLink request`() {
+    fun `test that onBottomBarAction GetLink triggers ManageLink node effect`() {
         initUnderTest(nodeHandle = 99L, mode = TextEditorMode.View)
         underTest.onBottomBarAction(TextEditorBottomBarAction.GetLink)
-
-        verify(nodeActionHandler).handle(
-            any(),
-            eq(TextEditorNodeActionRequest.GetLink(99L)),
-            eq(transferHandler),
-        )
+        val ev = underTest.uiState.value.nodeEffectEvent
+        check(ev is StateEventWithContentTriggered<*>)
+        assertThat(ev.content).isEqualTo(TextEditorNodeEffect.ManageLink(99L))
     }
 
     @Test
-    fun `test that onBottomBarAction Share calls nodeActionHandler with Share request`() {
-        initUnderTest(nodeHandle = 7L, mode = TextEditorMode.View)
+    fun `test that onBottomBarAction Share triggers Share node effect`() {
+        initUnderTest(nodeHandle = 7L, mode = TextEditorMode.View, fileName = "a.txt")
         underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
-
-        verify(nodeActionHandler).handle(
-            any(),
-            eq(TextEditorNodeActionRequest.Share(7L)),
-            eq(transferHandler),
+        val ev = underTest.uiState.value.nodeEffectEvent
+        check(ev is StateEventWithContentTriggered<*>)
+        assertThat(ev.content).isEqualTo(
+            TextEditorNodeEffect.Share(
+                nodeHandle = 7L,
+                localPath = null,
+                fileName = "a.txt",
+            ),
         )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that onBottomBarAction SendToChat does not change state`() = runTest {
+    fun `test that onBottomBarAction SendToChat triggers SendToChat node effect`() = runTest {
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
-        val before = underTest.uiState.value
         underTest.onBottomBarAction(TextEditorBottomBarAction.SendToChat)
-        val after = underTest.uiState.value
-        assertThat(after).isEqualTo(before)
+        val ev = underTest.uiState.value.nodeEffectEvent
+        check(ev is StateEventWithContentTriggered<*>)
+        assertThat(ev.content).isEqualTo(TextEditorNodeEffect.SendToChat(1L))
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -931,6 +989,211 @@ internal class TextEditorComposeViewModelTest {
 
         underTest.consumeTransferEvent()
         assertThat(underTest.uiState.value.transferEvent).isEqualTo(consumed())
+    }
+
+    @Test
+    fun `test that consumeNodeEffectEvent resets node effect`() {
+        initUnderTest(nodeHandle = 2L)
+        underTest.onBottomBarAction(TextEditorBottomBarAction.GetLink)
+        check(underTest.uiState.value.nodeEffectEvent is StateEventWithContentTriggered<*>)
+        underTest.consumeNodeEffectEvent()
+        assertThat(underTest.uiState.value.nodeEffectEvent).isEqualTo(consumed())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onBottomBarAction Share emits resolvedPublicLink when exportNodeUseCase returns a link`() =
+        runTest {
+            val publicLink = "https://mega.nz/file/abc123"
+            runBlocking {
+                whenever(getNodeByIdUseCase(NodeId(5L))).thenReturn(null)
+                whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(publicLink)
+            }
+            initUnderTest(nodeHandle = 5L, fileName = "doc.txt")
+            advanceUntilIdle()
+
+            underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+            advanceUntilIdle()
+
+            val ev = underTest.uiState.value.nodeEffectEvent
+            check(ev is StateEventWithContentTriggered<*>)
+            assertThat(ev.content).isEqualTo(
+                TextEditorNodeEffect.Share(
+                    nodeHandle = 5L,
+                    localPath = null,
+                    fileName = "doc.txt",
+                    resolvedPublicLink = publicLink,
+                ),
+            )
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onBottomBarAction Share uses existing public link from node when already exported`() =
+        runTest {
+            val existingLink = "https://mega.nz/file/existing"
+            val node = mock<TypedNode>()
+            whenever(node.exportedData).thenReturn(ExportedData(publicLink = existingLink, publicLinkCreationTime = 0L))
+            runBlocking { whenever(getNodeByIdUseCase(NodeId(7L))).thenReturn(node) }
+            initUnderTest(nodeHandle = 7L, fileName = "report.pdf")
+            advanceUntilIdle()
+
+            underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+            advanceUntilIdle()
+
+            val ev = underTest.uiState.value.nodeEffectEvent
+            check(ev is StateEventWithContentTriggered<*>)
+            assertThat(ev.content).isEqualTo(
+                TextEditorNodeEffect.Share(
+                    nodeHandle = 7L,
+                    localPath = null,
+                    fileName = "report.pdf",
+                    resolvedPublicLink = existingLink,
+                ),
+            )
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onBottomBarAction Share triggers shareErrorEvent when exportNodeUseCase throws`() =
+        runTest {
+            runBlocking {
+                whenever(getNodeByIdUseCase(any())).thenReturn(null)
+                whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenThrow(RuntimeException("export failed"))
+            }
+            initUnderTest(nodeHandle = 5L)
+            advanceUntilIdle()
+
+            underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.shareErrorEvent).isEqualTo(triggered)
+        }
+
+    @Test
+    fun `test that GetLink and SendToChat are no-op when node handle is invalid`() {
+        initUnderTest(nodeHandle = -1L)
+        underTest.onBottomBarAction(TextEditorBottomBarAction.GetLink)
+        assertThat(underTest.uiState.value.nodeEffectEvent).isEqualTo(consumed())
+        underTest.onBottomBarAction(TextEditorBottomBarAction.SendToChat)
+        assertThat(underTest.uiState.value.nodeEffectEvent).isEqualTo(consumed())
+    }
+
+    @Test
+    fun `test that onBottomBarAction Download is no-op when node handle is invalid`() {
+        initUnderTest(nodeHandle = -1L)
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Download)
+        assertThat(underTest.uiState.value.transferEvent).isEqualTo(consumed())
+    }
+
+    @Test
+    fun `test that onBottomBarAction Share is no-op when node handle is invalid`() {
+        initUnderTest(nodeHandle = -1L)
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+        assertThat(underTest.uiState.value.nodeEffectEvent).isEqualTo(consumed())
+        assertThat(underTest.uiState.value.shareErrorEvent).isEqualTo(consumed)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that consumeShareErrorEvent resets shareErrorEvent`() = runTest {
+        runBlocking {
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenThrow(RuntimeException())
+        }
+        initUnderTest(nodeHandle = 5L)
+        advanceUntilIdle()
+
+        underTest.onBottomBarAction(TextEditorBottomBarAction.Share)
+        advanceUntilIdle()
+        check(underTest.uiState.value.shareErrorEvent == triggered)
+
+        underTest.consumeShareErrorEvent()
+        assertThat(underTest.uiState.value.shareErrorEvent).isEqualTo(consumed)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that attachNodesToChat passes combined chatIds from user handles and direct chatIds`() =
+        runTest {
+            val chatIdFromHandle1 = 100L
+            val chatIdFromHandle2 = 200L
+            whenever(get1On1ChatIdUseCase(10L)).thenReturn(chatIdFromHandle1)
+            whenever(get1On1ChatIdUseCase(20L)).thenReturn(chatIdFromHandle2)
+            initUnderTest(nodeHandle = 5L)
+
+            val result = SendToChatResult(
+                nodeIds = longArrayOf(5L),
+                chatIds = longArrayOf(300L),
+                userHandles = longArrayOf(10L, 20L),
+            )
+            underTest.attachNodesToChat(result)
+            advanceUntilIdle()
+
+            val chatIdsCaptor = argumentCaptor<List<Long>>()
+            verify(attachMultipleNodesUseCase).invoke(any(), chatIdsCaptor.capture())
+            assertThat(chatIdsCaptor.firstValue).containsExactly(100L, 200L, 300L)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that attachNodesToChat skips user handles that fail to resolve`() = runTest {
+        whenever(get1On1ChatIdUseCase(10L)).thenReturn(100L)
+        whenever(get1On1ChatIdUseCase(20L)).thenThrow(RuntimeException("resolve failed"))
+        initUnderTest(nodeHandle = 5L)
+
+        val result = SendToChatResult(
+            nodeIds = longArrayOf(5L),
+            chatIds = longArrayOf(),
+            userHandles = longArrayOf(10L, 20L),
+        )
+        underTest.attachNodesToChat(result)
+        advanceUntilIdle()
+
+        val chatIdsCaptor = argumentCaptor<List<Long>>()
+        verify(attachMultipleNodesUseCase).invoke(any(), chatIdsCaptor.capture())
+        assertThat(chatIdsCaptor.firstValue).containsExactly(100L)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that attachNodesToChat emits sendToChatErrorEvent when attachMultipleNodesUseCase throws`() =
+        runTest {
+            whenever(get1On1ChatIdUseCase(any())).thenReturn(100L)
+            whenever(attachMultipleNodesUseCase(any(), any()))
+                .thenThrow(RuntimeException("attach failed"))
+            initUnderTest(nodeHandle = 5L)
+
+            val result = SendToChatResult(
+                nodeIds = longArrayOf(5L),
+                chatIds = longArrayOf(),
+                userHandles = longArrayOf(10L),
+            )
+            underTest.attachNodesToChat(result)
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.sendToChatErrorEvent).isEqualTo(triggered)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that consumeSendToChatErrorEvent resets sendToChatErrorEvent`() = runTest {
+        whenever(get1On1ChatIdUseCase(any())).thenReturn(100L)
+        whenever(attachMultipleNodesUseCase(any(), any()))
+            .thenThrow(RuntimeException("attach failed"))
+        initUnderTest(nodeHandle = 5L)
+
+        val result = SendToChatResult(
+            nodeIds = longArrayOf(5L),
+            chatIds = longArrayOf(),
+            userHandles = longArrayOf(10L),
+        )
+        underTest.attachNodesToChat(result)
+        advanceUntilIdle()
+        check(underTest.uiState.value.sendToChatErrorEvent == triggered)
+
+        underTest.consumeSendToChatErrorEvent()
+        assertThat(underTest.uiState.value.sendToChatErrorEvent).isEqualTo(consumed)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

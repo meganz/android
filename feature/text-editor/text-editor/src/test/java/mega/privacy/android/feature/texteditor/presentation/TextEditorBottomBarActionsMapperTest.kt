@@ -15,12 +15,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that View mode with owner and not exported returns Download GetLink Share Edit`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            false,
-            false,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).hasSize(4)
         assertThat(result[0]).isEqualTo(TextEditorBottomBarAction.Download)
@@ -33,12 +34,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     fun `test that Edit mode returns empty list`() {
         assertThat(
             underTest(
-                TextEditorMode.Edit,
-                AccessPermission.OWNER,
-                false,
-                false,
-                true,
-                true,
+                mode = TextEditorMode.Edit,
+                accessPermission = AccessPermission.OWNER,
+                isNodeExported = false,
+                inExcludedAdapterForGetLinkAndEdit = false,
+                showDownload = true,
+                showShare = true,
+                showSendToChat = false,
             ),
         ).isEmpty()
     }
@@ -47,12 +49,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     fun `test that Create mode returns empty list`() {
         assertThat(
             underTest(
-                TextEditorMode.Create,
-                AccessPermission.OWNER,
-                false,
-                false,
-                true,
-                true,
+                mode = TextEditorMode.Create,
+                accessPermission = AccessPermission.OWNER,
+                isNodeExported = false,
+                inExcludedAdapterForGetLinkAndEdit = false,
+                showDownload = true,
+                showShare = true,
+                showSendToChat = false,
             ),
         ).isEmpty()
     }
@@ -60,12 +63,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that Get Link is hidden when access is not OWNER`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.READWRITE,
-            false,
-            false,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.READWRITE,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.GetLink)
         assertThat(result).contains(TextEditorBottomBarAction.Download)
@@ -76,12 +80,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that Get Link is hidden when node is exported`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            true,
-            false,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = true,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.GetLink)
     }
@@ -89,12 +94,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that Get Link is hidden when in excluded adapter`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            false,
-            true,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = true,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.GetLink)
     }
@@ -102,12 +108,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that Download is hidden when showDownload is false`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            false,
-            false,
-            false,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = false,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.Download)
         assertThat(result).contains(TextEditorBottomBarAction.Share)
@@ -116,12 +123,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that Share is hidden when showShare is false`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            false,
-            false,
-            true,
-            false,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = false,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.Share)
     }
@@ -129,12 +137,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that Edit is hidden when access is READ only`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.READ,
-            false,
-            false,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.READ,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.Edit)
         assertThat(result).contains(TextEditorBottomBarAction.Download)
@@ -144,12 +153,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that Edit is hidden when in excluded adapter`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            false,
-            true,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = true,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.Edit)
     }
@@ -158,12 +168,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     fun `test that Edit is shown for FULL and READWRITE access`() {
         listOf(AccessPermission.FULL, AccessPermission.READWRITE).forEach { access ->
             val result = underTest(
-                TextEditorMode.View,
-                access,
-                false,
-                false,
-                true,
-                true,
+                mode = TextEditorMode.View,
+                accessPermission = access,
+                isNodeExported = false,
+                inExcludedAdapterForGetLinkAndEdit = false,
+                showDownload = true,
+                showShare = true,
+                showSendToChat = false,
             )
             assertThat(result).contains(TextEditorBottomBarAction.Edit)
             assertThat(result).doesNotContain(TextEditorBottomBarAction.GetLink)
@@ -173,12 +184,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that unknown access and export yields no Get Link`() {
         val result = underTest(
-            TextEditorMode.View,
-            null,
-            null,
-            false,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = null,
+            isNodeExported = null,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.GetLink)
         assertThat(result).doesNotContain(TextEditorBottomBarAction.Edit)
@@ -189,12 +201,13 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that Get Link is hidden when node export state is null`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            null,
-            false,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = null,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).doesNotContain(TextEditorBottomBarAction.GetLink)
         assertThat(result).contains(TextEditorBottomBarAction.Download)
@@ -203,30 +216,52 @@ internal class TextEditorBottomBarActionsMapperTest {
     @Test
     fun `test that showDownload false with excluded adapter shows only Share`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            false,
-            true,
-            false,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = true,
+            showDownload = false,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).containsExactly(TextEditorBottomBarAction.Share)
     }
 
     @Test
-    fun `test that actions are in designer order when all four shown`() {
+    fun `test that actions are in designer order Download GetLink Share Edit`() {
         val result = underTest(
-            TextEditorMode.View,
-            AccessPermission.OWNER,
-            false,
-            false,
-            true,
-            true,
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
         )
         assertThat(result).containsExactly(
             TextEditorBottomBarAction.Download,
             TextEditorBottomBarAction.GetLink,
             TextEditorBottomBarAction.Share,
+            TextEditorBottomBarAction.Edit,
+        )
+    }
+
+    @Test
+    fun `test that SendToChat is before Edit when both shown`() {
+        val result = underTest(
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = true,
+        )
+        assertThat(result).containsExactly(
+            TextEditorBottomBarAction.Download,
+            TextEditorBottomBarAction.GetLink,
+            TextEditorBottomBarAction.Share,
+            TextEditorBottomBarAction.SendToChat,
             TextEditorBottomBarAction.Edit,
         )
     }
