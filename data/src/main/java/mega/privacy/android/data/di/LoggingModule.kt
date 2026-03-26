@@ -56,12 +56,12 @@ internal abstract class LoggingModule {
         @SdkLogger
         @Provides
         fun provideSdkFileLogger(): LogWriterGateway =
-            FileLogWriter(LoggerFactory.getLogger(TimberMegaLogger::class.java))
+            FileLogWriter { LoggerFactory.getLogger(TimberMegaLogger::class.java) }
 
         @Singleton
         @ChatLogger
         @Provides
         fun provideChatFileLogger(): LogWriterGateway =
-            FileLogWriter(LoggerFactory.getLogger(TimberChatLogger::class.java))
+            FileLogWriter { LoggerFactory.getLogger(TimberChatLogger::class.java) }
     }
 }
