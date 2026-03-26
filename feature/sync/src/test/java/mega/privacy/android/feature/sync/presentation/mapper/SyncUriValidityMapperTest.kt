@@ -108,7 +108,8 @@ class SyncUriValidityMapperTest {
     }
 
     @Test
-    fun `test that selecting DCIM folder shows snackbar`() = runTest {
+    fun `test that selecting DCIM folder shows snackbar when isDCIMSelectionEnabled is false`() =
+        runTest {
         val documentUri = "content://storage/emulated/0/DCIM"
         val dcimPath = "/storage/emulated/0/DCIM"
         val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"

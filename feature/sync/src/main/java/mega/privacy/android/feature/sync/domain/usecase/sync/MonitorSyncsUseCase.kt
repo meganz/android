@@ -52,7 +52,7 @@ internal class MonitorSyncsUseCaseImpl @Inject constructor(
                     val conflictingSyncs = validSyncs.filter {
                         val result = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                             nodeId = it.remoteFolder.id,
-                            shouldCheckCameraUploads = true,
+                            isSyncFolderSelection = true,
                             shouldExcludeCurrentDevice = true,
                             useCache = true,
                         )

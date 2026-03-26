@@ -1838,7 +1838,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         val primaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
         val primaryUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
             nodeId = NodeId(primaryHandle),
-            shouldCheckCameraUploads = false,
+            isSyncFolderSelection = false,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -1860,7 +1860,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             val secondaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
             val secondaryUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = NodeId(secondaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )

@@ -318,7 +318,7 @@ internal class SettingsCameraUploadsViewModelTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = anyValueClass(),
-                shouldCheckCameraUploads = any(),
+                isSyncFolderSelection = any(),
                 shouldExcludeCurrentDevice = any(),
                 useCache = any(),
             )
@@ -1337,7 +1337,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 whenever(
                     isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                         nodeId = anyValueClass(),
-                        shouldCheckCameraUploads = any(),
+                        isSyncFolderSelection = any(),
                         shouldExcludeCurrentDevice = any(),
                         useCache = any()
                     )
@@ -1810,7 +1810,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 whenever(
                     isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                         nodeId = anyValueClass(),
-                        shouldCheckCameraUploads = any(),
+                        isSyncFolderSelection = any(),
                         shouldExcludeCurrentDevice = any(),
                         useCache = any()
                     )

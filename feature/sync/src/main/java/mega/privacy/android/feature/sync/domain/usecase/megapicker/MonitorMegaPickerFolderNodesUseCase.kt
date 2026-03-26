@@ -116,15 +116,36 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
         } else {
             null
         }
+        // Check if RestrictSyncAcrossDevices feature flag is enabled
+        // When disabled (default), folders used by Sync/Backup on OTHER devices are allowed to be selected
+        // (Sync-Sync across devices is allowed), but folders used by Camera/Media Uploads on
+        // other devices are still blocked
+        // When enabled, reverts to old behavior (blocks Sync-Sync across devices)
+        val restrictSyncAcrossDevices = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices)
+        }.getOrElse { false }
+
         val syncBackupInfoListOtherDevice = runCatching {
             if (isFeatureEnabled) {
                 getBackupInfoUseCase()
-                    .filter {
-                        (it.deviceId != null && it.deviceId != currentDeviceId) &&
-                                (it.type == BackupInfoType.BACKUP_UPLOAD
-                                        || it.type == BackupInfoType.TWO_WAY_SYNC
-                                        || it.type == BackupInfoType.CAMERA_UPLOADS
-                                        || it.type == BackupInfoType.MEDIA_UPLOADS)
+                    .filter { backup ->
+                        (backup.deviceId != null && backup.deviceId != currentDeviceId) &&
+                                when (backup.type) {
+                                    // Camera/Media Uploads from other devices - always check
+                                    BackupInfoType.CAMERA_UPLOADS,
+                                    BackupInfoType.MEDIA_UPLOADS,
+                                        -> true
+
+                                    // Sync from other devices
+                                    BackupInfoType.TWO_WAY_SYNC,
+                                        -> {
+                                        // Include if feature flag is enabled (revert to old behavior)
+                                        // Exclude if feature flag is disabled (allow Sync-Sync across devices)
+                                        restrictSyncAcrossDevices
+                                    }
+
+                                    else -> false
+                                }
                     }
             } else {
                 emptyList()
@@ -222,7 +243,12 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
         val matchingBackupInfoOtherDevice = if (nodePath != null) {
             syncBackupInfoListOtherDevice.firstOrNull { backupInfo ->
                 val backupPath = backupPaths[backupInfo.rootHandle]
-                backupPath != null && isNodeInBackupPath(nodePath, backupPath)
+                backupPath != null && isNodeInBackupPath(
+                    nodeId = node.id,
+                    nodePath = nodePath,
+                    backupRootHandle = backupInfo.rootHandle,
+                    backupPath = backupPath,
+                )
             }
         } else null
 
@@ -240,20 +266,24 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
     }
 
     /**
-     * Checks if the node is in the backup hierarchy using path comparison.
-     * Returns true if nodePath IS the backup or is INSIDE the backup (not a parent of it).
+     * Checks if the node is the backup root or inside the backup tree.
+     *
+     * The backup root is matched by [NodeId] so we do not treat two different folders as the same
+     * when paths are ambiguous (e.g. same display name or same leaf segment only).
+     * Descendants are detected via path prefix using [UriPath.isSubPathOf].
      */
-    private fun isNodeInBackupPath(nodePath: String, backupPath: String): Boolean {
+    private fun isNodeInBackupPath(
+        nodeId: NodeId,
+        nodePath: String,
+        backupRootHandle: NodeId,
+        backupPath: String,
+    ): Boolean {
+        if (nodeId == backupRootHandle) return true
+
         val normalizedNodePath = nodePath.trimEnd('/')
         val normalizedBackupPath = backupPath.trimEnd('/')
+        if (normalizedBackupPath.isEmpty()) return false
 
-        return when {
-            // Exact match: node IS the backup folder
-            normalizedNodePath == normalizedBackupPath -> true
-            // Node is INSIDE the backup folder (backup is an ancestor of node)
-            UriPath(normalizedNodePath).isSubPathOf(UriPath(normalizedBackupPath)) -> true
-            // Otherwise: node is a parent of backup or unrelated
-            else -> false
-        }
+        return UriPath(normalizedNodePath).isSubPathOf(UriPath(normalizedBackupPath))
     }
 }

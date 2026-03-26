@@ -875,7 +875,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 val folderUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = newPrimaryFolderNodeId,
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = false,
                 )
@@ -967,7 +967,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 // Validate against sync/backup remote folders FIRST
                 val folderUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = newSecondaryFolderNodeId,
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = false,
                 )

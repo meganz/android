@@ -82,7 +82,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -107,7 +107,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -131,7 +131,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -162,7 +162,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -170,7 +170,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(secondaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -194,7 +194,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -230,7 +230,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -258,7 +258,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -284,7 +284,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -308,7 +308,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -332,7 +332,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -358,7 +358,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -384,7 +384,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -410,7 +410,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
-                    shouldCheckCameraUploads = false,
+                    isSyncFolderSelection = false,
                     shouldExcludeCurrentDevice = false,
                     useCache = true,
                 )
@@ -437,7 +437,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -445,7 +445,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(secondaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -472,7 +472,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -480,7 +480,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(secondaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -507,7 +507,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -515,7 +515,7 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(secondaryHandle),
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )

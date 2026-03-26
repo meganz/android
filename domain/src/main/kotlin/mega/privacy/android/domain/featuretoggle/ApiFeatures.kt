@@ -123,6 +123,25 @@ enum class ApiFeatures(
     ),
 
     /**
+     * Restrict syncing the same cloud folder across different devices.
+     *
+     * When disabled (default):
+     * - Sync folder selection excludes Sync/Backup from OTHER devices (allows Sync-Sync across devices)
+     * - Camera Uploads folder selection still checks Sync/Backup from ALL devices (blocks CU-Sync)
+     *
+     * When enabled:
+     * - All folder selections check Sync/Backup from ALL devices
+     *
+     * Default: false (sync across devices is allowed by default)
+     */
+    RestrictSyncAcrossDevices(
+        experimentName = "dsad",
+        description = "Restrict syncing the same cloud folder across different devices",
+        singleCheckPerRun = true,
+        defaultValue = false
+    ),
+
+    /**
      * Enable Audios chip in Home screen
      */
     AudiosChipInHome(

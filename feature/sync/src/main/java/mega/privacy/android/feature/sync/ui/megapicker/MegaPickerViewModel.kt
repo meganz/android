@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.FolderUsageResult
@@ -104,7 +103,7 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                             state.value.currentFolder?.let { currentFolder ->
                                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                                     nodeId = currentFolder.id,
-                                    shouldCheckCameraUploads = true,
+                                    isSyncFolderSelection = true,
                                     shouldExcludeCurrentDevice = false,
                                     useCache = false,
                                 )
@@ -325,8 +324,6 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                 folderName,
             ).catch {
                 Timber.e(it)
-            }.onCompletion {
-                _state.update { it.copy(isLoading = false) }
             }.collectLatest { result ->
                 _state.update {
                     it.copy(

@@ -26,18 +26,28 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
 
     suspend operator fun invoke(
         nodeId: NodeId,
-        shouldCheckCameraUploads: Boolean,
+        isSyncFolderSelection: Boolean,
         shouldExcludeCurrentDevice: Boolean,
         useCache: Boolean,
     ): FolderUsageResult {
         // Check if DCIMSelectionAsSyncBackup feature flag is enabled
-        val isFeatureEnabled = runCatching {
+        val isDCIMFeatureEnabled = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
         }.getOrElse {
             false
         }
-        if (isFeatureEnabled.not()) {
+        if (isDCIMFeatureEnabled.not()) {
             return FolderUsageResult.NotUsed
+        }
+
+        // Check if RestrictSyncAcrossDevices feature flag is enabled
+        // When disabled (default), Sync folder selection will exclude Sync/Backup from other devices,
+        // allowing the same folder to be synced across different devices
+        // When enabled, reverts to old behavior (blocks Sync-Sync across devices)
+        val restrictSyncAcrossDevices = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices)
+        }.getOrElse {
+            false
         }
 
         val allBackups = if (useCache) {
@@ -54,10 +64,25 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
 
         val backups = allBackups
             .filterNot { shouldExcludeCurrentDevice && currentDeviceId != null && it.deviceId == currentDeviceId }
-            .filter {
-                it.type == BackupInfoType.BACKUP_UPLOAD
-                        || it.type == BackupInfoType.TWO_WAY_SYNC
-                        || (shouldCheckCameraUploads && (it.type == BackupInfoType.CAMERA_UPLOADS || it.type == BackupInfoType.MEDIA_UPLOADS))
+            .filter { backup ->
+                when (backup.type) {
+                    BackupInfoType.CAMERA_UPLOADS, BackupInfoType.MEDIA_UPLOADS -> {
+                        // When selecting a Sync folder, always check for CU/MU conflicts from all devices
+                        isSyncFolderSelection
+                    }
+
+                    BackupInfoType.TWO_WAY_SYNC,
+                    BackupInfoType.BACKUP_UPLOAD,
+                    BackupInfoType.UP_SYNC,
+                    BackupInfoType.DOWN_SYNC,
+                        -> {
+                        // When selecting a CU/MU folder, always check for Sync/Backup conflicts
+                        // When selecting a Sync folder, only check if kill switch is enabled
+                        !isSyncFolderSelection || restrictSyncAcrossDevices
+                    }
+
+                    else -> false
+                }
             }
 
         for (backup in backups) {

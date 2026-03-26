@@ -63,7 +63,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -80,7 +80,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         val result = underTest(
             nodeId,
-            shouldCheckCameraUploads = true,
+            isSyncFolderSelection = true,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -99,13 +99,15 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         }
         whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+            .thenReturn(false)
         whenever(getBackupInfoUseCase()).thenReturn(listOf(cameraUploadsBackup))
         whenever(determineNodeRelationshipUseCase(nodeId, NodeId(1L)))
             .thenReturn(NodeRelationship.ExactMatch)
 
         val result = underTest(
             nodeId,
-            shouldCheckCameraUploads = true,
+            isSyncFolderSelection = true,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -124,13 +126,15 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             }
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false)
             whenever(getBackupInfoUseCase()).thenReturn(listOf(cameraUploadsBackup))
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(1L)))
                 .thenReturn(NodeRelationship.ExactMatch)
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -155,6 +159,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             }
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false)
             whenever(getBackupInfoUseCase()).thenReturn(
                 listOf(
                     cameraUploadsBackup,
@@ -168,7 +174,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -187,7 +193,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result =
             underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true
             )
@@ -207,6 +213,9 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         }
         whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+            .thenReturn(true) // Kill switch enabled - check Sync/Backup conflicts
+        whenever(getDeviceIdUseCase()).thenReturn(deviceId)
         whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
         whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
             .thenReturn(NodeRelationship.ExactMatch)
@@ -214,7 +223,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result =
             underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true
             )
@@ -248,6 +257,9 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             )
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(true) // Kill switch enabled - check Sync/Backup conflicts
+            whenever(getDeviceIdUseCase()).thenReturn(deviceId)
             whenever(getBackupInfoUseCase()).thenReturn(backups)
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(3L)))
                 .thenReturn(NodeRelationship.NoMatch)
@@ -256,7 +268,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -305,7 +317,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -334,7 +346,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         val result = underTest(
             parentNodeId,
-            shouldCheckCameraUploads = true,
+            isSyncFolderSelection = true,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -361,7 +373,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         val result = underTest(
             childNodeId,
-            shouldCheckCameraUploads = true,
+            isSyncFolderSelection = true,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -396,7 +408,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         val result = underTest(
             parentNodeId,
-            shouldCheckCameraUploads = true,
+            isSyncFolderSelection = true,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -429,7 +441,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         val result = underTest(
             childNodeId,
-            shouldCheckCameraUploads = true,
+            isSyncFolderSelection = true,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -447,6 +459,9 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+            .thenReturn(true) // Kill switch enabled - check Sync/Backup conflicts
+        whenever(getDeviceIdUseCase()).thenReturn(deviceId)
         val backupInfo = mock<BackupInfo> {
             on { rootHandle }.thenReturn(backupNodeId)
             on { this.deviceId }.thenReturn(deviceId)
@@ -458,7 +473,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         val result = underTest(
             parentNodeId,
-            shouldCheckCameraUploads = true,
+            isSyncFolderSelection = true,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -474,6 +489,9 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+            .thenReturn(true) // Kill switch enabled - check Sync/Backup conflicts
+        whenever(getDeviceIdUseCase()).thenReturn(deviceId)
         val backupInfo = mock<BackupInfo> {
             on { rootHandle }.thenReturn(backupNodeId)
             on { this.deviceId }.thenReturn(deviceId)
@@ -485,7 +503,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         val result = underTest(
             childNodeId,
-            shouldCheckCameraUploads = true,
+            isSyncFolderSelection = true,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )
@@ -493,10 +511,10 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         assertThat(result).isEqualTo(FolderUsageResult.UsedBySyncOrBackupChild(deviceId))
     }
 
-    // New test cases for shouldCheckCameraUploads and shouldExcludeCurrentDevice parameters
+    // New test cases for isSyncFolderSelection and shouldExcludeCurrentDevice parameters
 
     @Test
-    fun `test that when shouldCheckCameraUploads is false, camera uploads are skipped and backups are checked`() =
+    fun `test that when isSyncFolderSelection is false, camera uploads are skipped and backups are checked`() =
         runTest {
             val nodeId = NodeId(1L)
             val deviceId = "backup-device-id"
@@ -508,13 +526,15 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false)
             whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
             whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
                 .thenReturn(NodeRelationship.ExactMatch)
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -526,16 +546,18 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         }
 
     @Test
-    fun `test that when shouldCheckCameraUploads is false and no backups match, returns NotUsed`() =
+    fun `test that when isSyncFolderSelection is false and no backups match, returns NotUsed`() =
         runTest {
             val nodeId = NodeId(99L)
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false)
             whenever(getBackupInfoUseCase()).thenReturn(emptyList())
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -565,6 +587,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false)
             whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
             whenever(getBackupInfoUseCase()).thenReturn(backups)
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(10L)))
@@ -572,7 +596,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = true,
             )
@@ -597,6 +621,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(true) // Kill switch enabled - check Sync/Backup conflicts
             whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
             whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
             whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
@@ -604,7 +630,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -612,7 +638,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             // Should find the backup even though it's from current device
             val expected = FolderUsageResult.UsedBySyncOrBackup(currentDeviceId)
             assertThat(result).isEqualTo(expected)
-            verifyNoInteractions(getDeviceIdUseCase)
         }
 
     @Test
@@ -637,6 +662,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(true) // RestrictSyncAcrossDevices enabled - check all devices (sync across devices disabled, so should exclude other device syncs)
             whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
             whenever(getBackupInfoUseCase()).thenReturn(backups)
             whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
@@ -644,7 +671,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = true,
             )
@@ -677,6 +704,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false)
             whenever(getBackupInfoUseCase()).thenReturn(
                 listOf(
                     cameraUploadsBackup,
@@ -691,7 +720,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = true,
             )
@@ -701,7 +730,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         }
 
     @Test
-    fun `test that when shouldCheckCameraUploads is false and shouldExcludeCurrentDevice is true, only other device backups are checked`() =
+    fun `test that when isSyncFolderSelection is false and shouldExcludeCurrentDevice is true, only other device backups are checked`() =
         runTest {
             val nodeId = NodeId(5L)
             val currentDeviceId = "current-device-id"
@@ -722,6 +751,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false)
             whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
             whenever(getBackupInfoUseCase()).thenReturn(backups)
             whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
@@ -729,7 +760,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             val result = underTest(
                 nodeId,
-                shouldCheckCameraUploads = false,
+                isSyncFolderSelection = false,
                 shouldExcludeCurrentDevice = true,
                 useCache = true,
             )
@@ -739,5 +770,228 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             assertThat(result).isEqualTo(expected)
             // Verify getDeviceIdUseCase was called (once per backup during filtering)
             verify(getDeviceIdUseCase, atLeastOnce()).invoke()
+        }
+
+    @Test
+    fun `test that when RestrictSyncAcrossDevices is disabled and isSyncFolderSelection is true, Sync from other devices is excluded`() =
+        runTest {
+            val nodeId = NodeId(5L)
+            val currentDeviceId = "current-device-id"
+            val otherDeviceId = "other-device-id"
+
+            // Camera Uploads from other device - should still be checked
+            val cameraUploadsBackup = mock<BackupInfo> {
+                on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+                on { rootHandle }.thenReturn(NodeId(1L))
+                on { this.deviceId }.thenReturn(otherDeviceId)
+            }
+            // Sync from other device - should be EXCLUDED when RestrictSyncAcrossDevices is disabled (sync across devices allowed)
+            val otherDeviceSyncBackup = mock<BackupInfo> {
+                on { rootHandle }.thenReturn(nodeId)
+                on { this.deviceId }.thenReturn(otherDeviceId)
+                on { type }.thenReturn(BackupInfoType.TWO_WAY_SYNC)
+            }
+
+            val backups = listOf(cameraUploadsBackup, otherDeviceSyncBackup)
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false) // Sync across devices is allowed
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getBackupInfoUseCase()).thenReturn(backups)
+            whenever(determineNodeRelationshipUseCase(nodeId, NodeId(1L)))
+                .thenReturn(NodeRelationship.NoMatch)
+
+            val result = underTest(
+                nodeId,
+                isSyncFolderSelection = true, // Sync folder selection
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
+            )
+
+            // Should NOT find the other device's Sync backup (excluded when sync across devices is allowed)
+            // Should check Camera Uploads but no match
+            assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
+        }
+
+    @Test
+    fun `test that when RestrictSyncAcrossDevices is enabled and isSyncFolderSelection is true, Sync from current device is checked`() =
+        runTest {
+            val nodeId = NodeId(5L)
+            val currentDeviceId = "current-device-id"
+
+            // Sync from current device - should be checked when kill switch is enabled
+            val currentDeviceSyncBackup = mock<BackupInfo> {
+                on { rootHandle }.thenReturn(nodeId)
+                on { this.deviceId }.thenReturn(currentDeviceId)
+                on { type }.thenReturn(BackupInfoType.TWO_WAY_SYNC)
+            }
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(true) // Kill switch enabled - check Sync/Backup conflicts
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(currentDeviceSyncBackup))
+            whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
+                .thenReturn(NodeRelationship.ExactMatch)
+
+            val result = underTest(
+                nodeId,
+                isSyncFolderSelection = true, // Sync folder selection
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
+            )
+
+            // Should find the current device's Sync backup
+            val expected = FolderUsageResult.UsedBySyncOrBackup(currentDeviceId)
+            assertThat(result).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that when RestrictSyncAcrossDevices is disabled and isSyncFolderSelection is true, Camera Uploads from all devices are still checked`() =
+        runTest {
+            val nodeId = NodeId(5L)
+            val currentDeviceId = "current-device-id"
+            val otherDeviceId = "other-device-id"
+
+            // Camera Uploads from other device - should still be checked
+            val cameraUploadsBackup = mock<BackupInfo> {
+                on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+                on { rootHandle }.thenReturn(nodeId)
+                on { this.deviceId }.thenReturn(otherDeviceId)
+            }
+            // Sync from other device - should be EXCLUDED
+            val otherDeviceSyncBackup = mock<BackupInfo> {
+                on { rootHandle }.thenReturn(nodeId)
+                on { this.deviceId }.thenReturn(otherDeviceId)
+                on { type }.thenReturn(BackupInfoType.TWO_WAY_SYNC)
+            }
+
+            val backups = listOf(cameraUploadsBackup, otherDeviceSyncBackup)
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false) // Sync across devices is allowed
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getBackupInfoUseCase()).thenReturn(backups)
+            whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
+                .thenReturn(NodeRelationship.ExactMatch)
+
+            val result = underTest(
+                nodeId,
+                isSyncFolderSelection = true, // Sync folder selection
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
+            )
+
+            // Should find the Camera Uploads from other device (not excluded)
+            assertThat(result).isEqualTo(FolderUsageResult.UsedByCameraUpload)
+        }
+
+    @Test
+    fun `test that when RestrictSyncAcrossDevices is disabled and isSyncFolderSelection is false, all Sync from all devices are checked`() =
+        runTest {
+            val nodeId = NodeId(5L)
+            val currentDeviceId = "current-device-id"
+            val otherDeviceId = "other-device-id"
+
+            // Sync from other device - should still be checked when isSyncFolderSelection is false
+            val otherDeviceSyncBackup = mock<BackupInfo> {
+                on { rootHandle }.thenReturn(nodeId)
+                on { this.deviceId }.thenReturn(otherDeviceId)
+                on { type }.thenReturn(BackupInfoType.TWO_WAY_SYNC)
+            }
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false) // Sync across devices is allowed
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(otherDeviceSyncBackup))
+            whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
+                .thenReturn(NodeRelationship.ExactMatch)
+
+            val result = underTest(
+                nodeId,
+                isSyncFolderSelection = false, // CU/MU folder selection
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
+            )
+
+            // Should find the other device's Sync backup (not excluded when isSyncFolderSelection is false)
+            val expected = FolderUsageResult.UsedBySyncOrBackup(otherDeviceId)
+            assertThat(result).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that when RestrictSyncAcrossDevices is enabled, Sync from all devices are checked`() =
+        runTest {
+            val nodeId = NodeId(5L)
+            val currentDeviceId = "current-device-id"
+            val otherDeviceId = "other-device-id"
+
+            // Sync from other device - should be checked when RestrictSyncAcrossDevices is enabled
+            val otherDeviceSyncBackup = mock<BackupInfo> {
+                on { rootHandle }.thenReturn(nodeId)
+                on { this.deviceId }.thenReturn(otherDeviceId)
+                on { type }.thenReturn(BackupInfoType.TWO_WAY_SYNC)
+            }
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(true) //enabled - revert to old behavior
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(otherDeviceSyncBackup))
+            whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
+                .thenReturn(NodeRelationship.ExactMatch)
+
+            val result = underTest(
+                nodeId,
+                isSyncFolderSelection = true, // Sync folder selection
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
+            )
+
+            // Should find the other device's Sync backup
+            val expected = FolderUsageResult.UsedBySyncOrBackup(otherDeviceId)
+            assertThat(result).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that when isSyncFolderSelection is false, current device Sync is checked`() =
+        runTest {
+            val nodeId = NodeId(5L)
+            val currentDeviceId = "current-device-id"
+
+            // Sync from current device - should be checked when selecting CU folder
+            val currentDeviceSyncBackup = mock<BackupInfo> {
+                on { rootHandle }.thenReturn(nodeId)
+                on { this.deviceId }.thenReturn(currentDeviceId)
+                on { type }.thenReturn(BackupInfoType.TWO_WAY_SYNC)
+            }
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false) // Sync across devices is allowed
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(currentDeviceSyncBackup))
+            whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
+                .thenReturn(NodeRelationship.ExactMatch)
+
+            val result = underTest(
+                nodeId,
+                isSyncFolderSelection = false, // Camera Uploads folder selection
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
+            )
+
+            // Should find the current device's Sync backup (CU-Sync on same device should be blocked)
+            val expected = FolderUsageResult.UsedBySyncOrBackup(currentDeviceId)
+            assertThat(result).isEqualTo(expected)
         }
 }

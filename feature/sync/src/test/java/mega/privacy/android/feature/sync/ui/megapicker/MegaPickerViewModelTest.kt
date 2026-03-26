@@ -1124,7 +1124,7 @@ internal class MegaPickerViewModelTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = false,
             )
@@ -1157,7 +1157,7 @@ internal class MegaPickerViewModelTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = false,
             )
@@ -1190,7 +1190,7 @@ internal class MegaPickerViewModelTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = false,
             )
@@ -1223,7 +1223,7 @@ internal class MegaPickerViewModelTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = false,
             )
@@ -1258,7 +1258,7 @@ internal class MegaPickerViewModelTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = currentFolderId,
-                    shouldCheckCameraUploads = true,
+                    isSyncFolderSelection = true,
                     shouldExcludeCurrentDevice = false,
                     useCache = false,
                 )
@@ -1294,7 +1294,7 @@ internal class MegaPickerViewModelTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = false,
                 useCache = false,
             )

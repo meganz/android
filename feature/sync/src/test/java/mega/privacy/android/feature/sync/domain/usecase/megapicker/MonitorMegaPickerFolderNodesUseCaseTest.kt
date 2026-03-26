@@ -123,7 +123,6 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
     fun `test that isSelectEnabled is true when currentFolder is not root`() = runTest {
         val rootFolderId = NodeId(123L)
         val childFolderId = NodeId(456L)
-        val rootFolder: FolderNode = mock { on { id } doReturn rootFolderId }
         val childFolder: FolderNode = mock { on { id } doReturn childFolderId }
         whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(false)
@@ -358,6 +357,8 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             }
             whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(true) // feature flag enabled - check all devices for sync/backup conflicts
             whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
@@ -458,7 +459,6 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
 
             val rootFolderId = NodeId(123L)
             val parentFolderId = NodeId(456L)
-            val syncedChildId = NodeId(789L)
             val backupRootHandle = NodeId(789L) // synced child is the backup root
 
             val rootFolder: FolderNode = mock { on { id } doReturn rootFolderId }
@@ -498,6 +498,186 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
                 // Parent should NOT be disabled (not grayed out)
                 assertThat(result.nodes[0].isDisabled).isFalse()
                 assertThat(result.nodes[0].isUsedBySyncOrBackup).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+    @Test
+    fun `test that when RestrictSyncAcrossDevices is disabled folder used by Sync on other device is NOT marked as used`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val currentFolderId = NodeId(456L)
+            val syncedFolderId = NodeId(789L)
+            val currentDeviceId = "currentDevice"
+            val otherDeviceId = "otherDevice"
+
+            val currentFolder: FolderNode = mock { on { id } doReturn currentFolderId }
+            val syncedFolder: TypedFolderNode = mock { on { id } doReturn syncedFolderId }
+
+            val backupInfo = mock<BackupInfo> {
+                on { rootHandle } doReturn syncedFolderId
+                on { type } doReturn BackupInfoType.TWO_WAY_SYNC
+                on { deviceId } doReturn otherDeviceId
+            }
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false) // Sync across devices is allowed (default)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(listOf(syncedFolder)))
+            whenever(getFullNodePathByIdUseCase(syncedFolderId)).thenReturn("/Cloud Drive/SyncedFolder")
+
+            underTest(currentFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                // Folder used by Sync on OTHER device should NOT be marked as used when sync across devices is allowed
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isFalse()
+                assertThat(result.nodes[0].isDisabled).isFalse()
+                assertThat(result.isSelectEnabled).isTrue()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when RestrictSyncAcrossDevices is disabled folder used by Camera Uploads on other device IS marked as used`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val currentFolderId = NodeId(456L)
+            val cuFolderId = NodeId(789L)
+            val currentDeviceId = "currentDevice"
+            val otherDeviceId = "otherDevice"
+
+            val currentFolder: FolderNode = mock { on { id } doReturn currentFolderId }
+            val cuFolder: TypedFolderNode = mock { on { id } doReturn cuFolderId }
+
+            val backupInfo = mock<BackupInfo> {
+                on { rootHandle } doReturn cuFolderId
+                on { type } doReturn BackupInfoType.CAMERA_UPLOADS
+                on { deviceId } doReturn otherDeviceId
+            }
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(false) // Sync across devices is allowed (default)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(mapOf(otherDeviceId to "Other Device"))
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(listOf(cuFolder)))
+            whenever(getFullNodePathByIdUseCase(cuFolderId)).thenReturn("/Cloud Drive/CameraUploads")
+
+            underTest(currentFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                // Folder used by Camera Uploads on OTHER device should still be marked as used
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isTrue()
+                assertThat(result.nodes[0].isDisabled).isTrue()
+                assertThat(result.isSelectEnabled).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that folder is not marked used when path string matches backup but node id differs`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val currentFolderId = NodeId(456L)
+            val localFolderId = NodeId(200L)
+            val backupRootHandle = NodeId(100L)
+            val currentDeviceId = "currentDevice"
+            val otherDeviceId = "otherDevice"
+
+            val currentFolder: FolderNode = mock { on { id } doReturn currentFolderId }
+            val localFolder: TypedFolderNode = mock { on { id } doReturn localFolderId }
+
+            val backupInfo = mock<BackupInfo> {
+                on { rootHandle } doReturn backupRootHandle
+                on { type } doReturn BackupInfoType.TWO_WAY_SYNC
+                on { deviceId } doReturn otherDeviceId
+            }
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(true)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(listOf(localFolder)))
+            // Same path string as backup folder but a different node (e.g. leaf name only / ambiguous path)
+            whenever(getFullNodePathByIdUseCase(backupRootHandle)).thenReturn("Photos")
+            whenever(getFullNodePathByIdUseCase(localFolderId)).thenReturn("Photos")
+
+            underTest(currentFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isFalse()
+                assertThat(result.nodes[0].isDisabled).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when RestrictSyncAcrossDevices is enabled folder used by Sync on other device IS marked as used`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val currentFolderId = NodeId(456L)
+            val syncedFolderId = NodeId(789L)
+            val currentDeviceId = "currentDevice"
+            val otherDeviceId = "otherDevice"
+
+            val currentFolder: FolderNode = mock { on { id } doReturn currentFolderId }
+            val syncedFolder: TypedFolderNode = mock { on { id } doReturn syncedFolderId }
+
+            val backupInfo = mock<BackupInfo> {
+                on { rootHandle } doReturn syncedFolderId
+                on { type } doReturn BackupInfoType.TWO_WAY_SYNC
+                on { deviceId } doReturn otherDeviceId
+            }
+
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices))
+                .thenReturn(true) // feature flag enabled - check all devices for sync/backup conflicts
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(mapOf(otherDeviceId to "Other Device"))
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(listOf(syncedFolder)))
+            whenever(getFullNodePathByIdUseCase(syncedFolderId)).thenReturn("/Cloud Drive/SyncedFolder")
+
+            underTest(currentFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                // Folder used by Sync on OTHER device should be marked as used
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isTrue()
+                assertThat(result.nodes[0].isDisabled).isTrue()
+                assertThat(result.isSelectEnabled).isFalse()
                 awaitComplete()
                 cancelAndIgnoreRemainingEvents()
             }

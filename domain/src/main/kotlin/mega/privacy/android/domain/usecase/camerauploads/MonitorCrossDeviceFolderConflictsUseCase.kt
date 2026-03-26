@@ -69,7 +69,7 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
     private suspend fun checkFolderUsage(handle: Long): FolderUsageResult {
         return isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
             nodeId = NodeId(handle),
-            shouldCheckCameraUploads = false,
+            isSyncFolderSelection = false,
             shouldExcludeCurrentDevice = false,
             useCache = true,
         )

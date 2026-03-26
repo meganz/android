@@ -382,7 +382,7 @@ internal class MonitorSyncsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = conflictingSync.remoteFolder.id,
-                    shouldCheckCameraUploads = true,
+                    isSyncFolderSelection = true,
                     shouldExcludeCurrentDevice = true,
                     useCache = true,
                 )
@@ -407,7 +407,7 @@ internal class MonitorSyncsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = sync.remoteFolder.id,
-                    shouldCheckCameraUploads = true,
+                    isSyncFolderSelection = true,
                     shouldExcludeCurrentDevice = true,
                     useCache = true,
                 )
@@ -433,7 +433,7 @@ internal class MonitorSyncsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = conflictingSync.remoteFolder.id,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = true,
             )
@@ -458,7 +458,7 @@ internal class MonitorSyncsUseCaseTest {
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = sync.remoteFolder.id,
-                    shouldCheckCameraUploads = true,
+                    isSyncFolderSelection = true,
                     shouldExcludeCurrentDevice = true,
                     useCache = true,
                 )
@@ -484,7 +484,7 @@ internal class MonitorSyncsUseCaseTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = conflictingSync.remoteFolder.id,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = true,
             )
@@ -512,7 +512,7 @@ internal class MonitorSyncsUseCaseTest {
                 whenever(
                     isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                         nodeId = sync.remoteFolder.id,
-                        shouldCheckCameraUploads = true,
+                        isSyncFolderSelection = true,
                         shouldExcludeCurrentDevice = true,
                         useCache = true,
                     )

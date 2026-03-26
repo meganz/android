@@ -77,7 +77,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -116,7 +116,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -141,7 +141,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -164,7 +164,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -187,7 +187,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -212,7 +212,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -235,7 +235,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -258,7 +258,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -283,7 +283,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )
@@ -305,7 +305,7 @@ class SyncRemoteFolderValidityMapperTest {
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId,
-                shouldCheckCameraUploads = true,
+                isSyncFolderSelection = true,
                 shouldExcludeCurrentDevice = true,
                 useCache = false
             )

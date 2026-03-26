@@ -111,17 +111,19 @@ class SyncUriValidityMapper @Inject constructor(
         val isNewDCIMLogicEnabled =
             getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
 
+        Timber.d("Checking path against Camera Uploads and Media Uploads. Path: $path, Primary: $primaryFolderPath, Media: $mediaUploadPath, Local DCIM: $localDCIMFolderPath, isNewDCIMLogicEnabled: $isNewDCIMLogicEnabled")
+
         val isCameraMatch = isCameraUploadsEnabledUseCase() &&
                 primaryFolderPath.isNotEmpty() &&
-                path.startsWith(primaryFolderPath)
+                determinePathRelationship(primaryFolderPath, path) != PathRelationship.NO_MATCH
 
         val isMediaMatch = isMediaUploadsEnabledUseCase() &&
                 mediaUploadPath.isNotEmpty() &&
-                path.startsWith(mediaUploadPath)
+                determinePathRelationship(mediaUploadPath, path) != PathRelationship.NO_MATCH
 
         val isLegacyDCIMMatch = !isNewDCIMLogicEnabled &&
                 localDCIMFolderPath.isNotEmpty() &&
-                path.startsWith(localDCIMFolderPath)
+                determinePathRelationship(localDCIMFolderPath, path) != PathRelationship.NO_MATCH
 
         return if (isCameraMatch) {
             SyncValidityResult.ShowSnackbar(
