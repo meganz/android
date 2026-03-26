@@ -3,7 +3,6 @@ package mega.privacy.android.feature.photos.presentation.component
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -72,6 +71,7 @@ fun PhotosNodeGridView(
     onClick: (node: PhotoNodeUiState) -> Unit,
     onLongClick: (node: PhotoNodeUiState) -> Unit,
     modifier: Modifier = Modifier,
+    disabledPhotoIds: Set<Long> = emptySet(),
     lazyGridState: LazyGridState = rememberLazyGridState(),
     contentPadding: PaddingValues = PaddingValues(),
     header: (@Composable () -> Unit)? = null,
@@ -151,17 +151,15 @@ fun PhotosNodeGridView(
 
                 is PhotoNodeItem -> {
                     PhotoNodeBody(
-                        modifier = Modifier
-                            .animateItem()
-                            .combinedClickable(
-                                onClick = { onClick(contentType.node) },
-                                onLongClick = { onLongClick(contentType.node) }
-                            ),
+                        modifier = Modifier.animateItem(),
                         spanCount = spanCount,
                         node = contentType.node,
                         isPreview = isPreview,
                         isSelected = contentType.node.photo.id in selectedPhotoIds,
-                        shouldShowFavourite = contentType.node.photo.isFavourite
+                        shouldShowFavourite = contentType.node.photo.isFavourite,
+                        enabled = contentType.node.photo.id !in disabledPhotoIds,
+                        onClick = { onClick(contentType.node) },
+                        onLongClick = { onLongClick(contentType.node) },
                     )
                 }
             }
@@ -268,6 +266,9 @@ private fun PhotoNodeBody(
     isSelected: Boolean,
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
 ) {
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
@@ -292,7 +293,10 @@ private fun PhotoNodeBody(
                 ),
                 isSensitive = node.isSensitive,
                 isSelected = isSelected,
-                shouldShowFavourite = shouldShowFavourite
+                shouldShowFavourite = shouldShowFavourite,
+                enabled = enabled,
+                onClick = onClick,
+                onLongClick = onLongClick,
             )
         }
 
@@ -312,7 +316,10 @@ private fun PhotoNodeBody(
                 ),
                 isSensitive = node.isSensitive,
                 isSelected = isSelected,
-                shouldShowFavourite = shouldShowFavourite
+                shouldShowFavourite = shouldShowFavourite,
+                enabled = enabled,
+                onClick = onClick,
+                onLongClick = onLongClick,
             )
         }
     }

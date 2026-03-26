@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,13 +50,19 @@ fun ImagePhotosNode(
     isSelected: Boolean,
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
 ) {
     BasicPhotosNode(
         modifier = modifier,
         thumbnailRequest = thumbnailRequest,
         isSensitive = isSensitive,
         isSelected = isSelected,
-        shouldShowFavourite = shouldShowFavourite
+        shouldShowFavourite = shouldShowFavourite,
+        enabled = enabled,
+        onClick = onClick,
+        onLongClick = onLongClick,
     )
 }
 
@@ -67,6 +74,9 @@ fun VideoPhotosNode(
     isSelected: Boolean,
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
 ) {
     Box(modifier = modifier) {
         BasicPhotosNode(
@@ -74,7 +84,10 @@ fun VideoPhotosNode(
             thumbnailRequest = thumbnailRequest,
             isSensitive = isSensitive,
             isSelected = isSelected,
-            shouldShowFavourite = shouldShowFavourite
+            shouldShowFavourite = shouldShowFavourite,
+            enabled = enabled,
+            onClick = onClick,
+            onLongClick = onLongClick,
         )
 
         if (duration.isNotEmpty()) {
@@ -108,6 +121,9 @@ private fun BasicPhotosNode(
     isSelected: Boolean,
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val request = remember(thumbnailRequest) {
@@ -120,6 +136,11 @@ private fun BasicPhotosNode(
     Box(
         modifier = modifier
             .aspectRatio(1f)
+            .combinedClickable(
+                enabled = enabled,
+                onClick = { onClick?.invoke() },
+                onLongClick = { onLongClick?.invoke() }
+            )
             .conditional(isSelected) {
                 Modifier
                     .border(
@@ -134,6 +155,9 @@ private fun BasicPhotosNode(
             modifier = Modifier
                 .aspectRatio(1f)
                 .background(color = DSTokens.colors.background.surface1)
+                .conditional(!enabled) {
+                    this.alpha(0.5f)
+                }
                 .conditional(isSensitive) {
                     this
                         .alpha(0.5f)

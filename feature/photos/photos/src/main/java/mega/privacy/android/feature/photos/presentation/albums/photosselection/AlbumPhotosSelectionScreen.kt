@@ -261,6 +261,7 @@ private fun AlbumPhotosSelectionContent(
         PhotosNodeGridView(
             items = state.photosNodeContentItems,
             selectedPhotoIds = state.selectedPhotoIds,
+            disabledPhotoIds = state.albumPhotoIds,
             gridSize = TimelineGridSize.entries[selectedGridSizeOrdinal],
             onGridSizeChange = {
                 selectedGridSizeOrdinal = it.ordinal
