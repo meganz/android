@@ -62,7 +62,9 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     @Assisted private val args: Args,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(FolderLinkUiState())
+    private val _uiState = MutableStateFlow(
+        FolderLinkUiState(url = args.uriString)
+    )
     val uiState: StateFlow<FolderLinkUiState> = _uiState.asStateFlow()
     private var browseFolderJob: Job? = null
 

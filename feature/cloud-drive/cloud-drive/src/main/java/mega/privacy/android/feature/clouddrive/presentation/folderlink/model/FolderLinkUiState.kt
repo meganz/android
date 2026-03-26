@@ -15,6 +15,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @Immutable
 data class FolderLinkUiState(
+    val url: String? = null,
     val contentState: FolderLinkContentState = FolderLinkContentState.Loading,
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
     val isFolderLoggedIn: Boolean = false,

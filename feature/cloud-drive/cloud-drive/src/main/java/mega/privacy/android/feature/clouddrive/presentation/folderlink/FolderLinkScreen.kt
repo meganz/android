@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -30,6 +31,7 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
@@ -50,7 +52,9 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trackAnalyticsEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkShareAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.startShareIntent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.DecryptionKeyDialog
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.ExpiredLinkView
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.UnavailableLinkView
@@ -82,6 +86,7 @@ internal fun FolderLinkScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val singleNodeActionHandler: SingleNodeActionHandler = rememberSingleNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler,
@@ -138,6 +143,16 @@ internal fun FolderLinkScreen(
                             onNavigate(TransfersNavKey())
                         }
                     },
+                    actions = buildList {
+                        if (isLoaded && uiState.isRootFolder) {
+                            add(MenuActionWithClick(FolderLinkShareAction) {
+                                context.startShareIntent(
+                                    link = uiState.url,
+                                    title = uiState.title.get(context)
+                                )
+                            })
+                        }
+                    }
                 )
             }
         },

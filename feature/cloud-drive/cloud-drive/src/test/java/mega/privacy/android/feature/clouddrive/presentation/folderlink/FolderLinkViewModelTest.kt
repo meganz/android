@@ -140,6 +140,21 @@ internal class FolderLinkViewModelTest {
     }
 
     @Test
+    fun `test that url is set in uiState when uriString is provided`() = runTest {
+        val url = "https://mega.nz/folder/abc"
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        stubNodeUiItemMapper()
+        initViewModel(FolderLinkViewModel.Args(uriString = url))
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().url).isEqualTo(url)
+        }
+    }
+
+    @Test
     fun `test that init does not call loginToFolderUseCase when uriString is null`() = runTest {
         whenever(hasCredentialsUseCase()).thenReturn(false)
         initViewModel(FolderLinkViewModel.Args(uriString = null))
