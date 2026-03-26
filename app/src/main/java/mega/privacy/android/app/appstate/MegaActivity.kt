@@ -83,6 +83,8 @@ import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewMod
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
+import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList
@@ -98,6 +100,7 @@ import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.shared.rememberSharedViewModelStoreNavEntryDecorator
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
+import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
@@ -181,6 +184,30 @@ class MegaActivity : FragmentActivity() {
                 } ?: Timber.w("Action send multiple but nothing to share")
                 intent.action = null
                 intent.removeExtra(Intent.EXTRA_STREAM)
+            }
+
+            Constants.ACTION_SHORTCUT_UPLOAD -> {
+                Timber.d("Shortcut upload action received")
+                navigationResultManager.returnResult(
+                    HomeFabOptionsBottomSheetNavKey.KEY,
+                    HomeFabOption.UploadFiles
+                )
+                intent.action = null
+            }
+
+            Constants.ACTION_SHORTCUT_SCAN_DOCUMENT -> {
+                Timber.d("Shortcut scan document action received")
+                navigationResultManager.returnResult(
+                    HomeFabOptionsBottomSheetNavKey.KEY,
+                    HomeFabOption.ScanDocument
+                )
+                intent.action = null
+            }
+
+            Constants.ACTION_SHORTCUT_CHAT -> {
+                Timber.d("Shortcut chat action received")
+                navigationEventQueue.emit(ChatListNavKey())
+                intent.action = null
             }
         }
     }
