@@ -26,6 +26,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkDialogNavKey
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
@@ -53,7 +54,8 @@ internal fun shouldCloseTextEditorOnNodeOptionsResult(
     is NodeOptionsBottomSheetResult.Transfer -> true
     is NodeOptionsBottomSheetResult.Navigation ->
         result.navKey !is ChangeLabelBottomSheet &&
-                result.navKey !is ChangeLabelBottomSheetMultiple
+                result.navKey !is ChangeLabelBottomSheetMultiple &&
+                result.navKey !is RemoveNodeLinkDialogNavKey
 
     else -> false
 }

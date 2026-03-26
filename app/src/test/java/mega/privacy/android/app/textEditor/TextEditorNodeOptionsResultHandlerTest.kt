@@ -2,6 +2,7 @@ package mega.privacy.android.app.textEditor
 
 import androidx.navigation3.runtime.NavKey
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkDialogNavKey
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
@@ -90,6 +91,17 @@ internal class TextEditorNodeOptionsResultHandlerTest {
             shouldCloseTextEditorOnNodeOptionsResult(
                 NodeOptionsBottomSheetResult.Navigation(
                     ChangeLabelBottomSheetMultiple(nodeIds = listOf(1L, 2L))
+                )
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that shouldCloseTextEditorOnNodeOptionsResult returns false when navigation is RemoveNodeLinkDialogNavKey`() {
+        assertThat(
+            shouldCloseTextEditorOnNodeOptionsResult(
+                NodeOptionsBottomSheetResult.Navigation(
+                    RemoveNodeLinkDialogNavKey(nodes = "[1]")
                 )
             )
         ).isFalse()
