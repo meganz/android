@@ -83,6 +83,7 @@ include(":feature:pdfviewer")
 include(":core:ui-components:shared-components")
 include(":shared:nodes")
 include(":shared:chats")
+include(":shared:account")
 
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts

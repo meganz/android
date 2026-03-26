@@ -69,6 +69,18 @@ class MyFeatureViewModelTest {
 - Assertions with **Google Truth**: `assertThat(...).isEqualTo(...)`.
 - Verification: `verify(mock).invoke(args)`, `argumentCaptor<T>()`.
 - Flow stubs: `stub { on { invoke() } doReturn flow { emit(...); awaitCancellation() } }`.
+- **Property mocking**: When stubbing properties on mock objects, use `this.propertyName` to avoid ambiguity:
+   ```kotlin
+   // Correct:
+   mock<AccountLevelDetail> {
+       on { this.accountType } doReturn accountType
+   }
+
+   // Incorrect — Mockito may resolve to the wrong property:
+   mock<AccountLevelDetail> {
+       on { accountType } doReturn accountType
+   }
+
 
 ## Required Imports
 
