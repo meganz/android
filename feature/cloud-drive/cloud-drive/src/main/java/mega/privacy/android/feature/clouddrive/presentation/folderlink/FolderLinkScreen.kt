@@ -45,6 +45,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuActi
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SaveToMegaMenuAction
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -202,6 +203,16 @@ internal fun FolderLinkScreen(
                 .padding(contentPadding.excludingBottomPadding()),
             bottomPadding = contentPadding.calculateBottomPadding(),
             onShowSortBottomSheet = { showSortBottomSheet = true },
+            onMediaDiscoveryClicked = {
+                viewModel.processAction(FolderLinkAction.DeselectAllItems)
+                val mediaHandle = uiState.currentFolderNode?.id?.longValue ?: -1
+                megaNavigator.openMediaDiscoveryActivity(
+                    context = context,
+                    folderId = NodeId(mediaHandle),
+                    folderName = uiState.title.get(context),
+                    isFromFolderLink = true,
+                )
+            }
         )
     }
 
@@ -259,6 +270,7 @@ internal fun FolderLinkContent(
     spanCount: Int,
     onNavigate: (NavKey) -> Unit,
     onAction: (FolderLinkAction) -> Unit,
+    onMediaDiscoveryClicked: () -> Unit,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onShowSortBottomSheet: () -> Unit = {},
@@ -356,6 +368,8 @@ internal fun FolderLinkContent(
                                 onChangeViewTypeClicked = {
                                     onAction(FolderLinkAction.ChangeViewTypeClicked)
                                 },
+                                showMediaDiscoveryButton = uiState.hasMediaItems,
+                                onEnterMediaDiscoveryClick = onMediaDiscoveryClicked,
                                 inSelectionMode = uiState.isInSelectionMode,
                             )
                         }

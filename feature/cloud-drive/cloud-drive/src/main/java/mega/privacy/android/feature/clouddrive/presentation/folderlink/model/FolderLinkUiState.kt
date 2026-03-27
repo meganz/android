@@ -27,6 +27,7 @@ data class FolderLinkUiState(
     val rootNode: TypedFolderNode? = null,
     val currentFolderNode: TypedFolderNode? = null,
     val openedFileNode: TypedFileNode? = null,
+    val hasMediaItems: Boolean = false,
 ) {
     /**
      * True if current folder if the root directory of folder link

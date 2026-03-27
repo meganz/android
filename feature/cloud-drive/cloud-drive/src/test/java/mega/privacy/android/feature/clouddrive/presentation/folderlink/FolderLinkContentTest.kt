@@ -141,6 +141,7 @@ class FolderLinkContentTest {
                     spanCount = 2,
                     onNavigate = {},
                     onAction = {},
+                    onMediaDiscoveryClicked = {},
                 )
             }
         }

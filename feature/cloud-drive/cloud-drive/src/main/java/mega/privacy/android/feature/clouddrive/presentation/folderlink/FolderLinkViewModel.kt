@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
@@ -53,6 +54,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
+    private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
@@ -168,12 +170,13 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                 parentHandle = currentFolder.id.longValue,
                 order = _uiState.value.selectedSortOrder,
             )
-            nodeUiItemMapper(children)
-        }.onSuccess { items ->
+            val hasMediaItems = containsMediaItemUseCase(children)
+            val items = nodeUiItemMapper(children)
             _uiState.update {
                 it.copy(
                     contentState = FolderLinkContentState.Loaded,
                     items = items,
+                    hasMediaItems = hasMediaItems,
                 )
             }
         }.onFailure { error ->
@@ -267,12 +270,14 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                 val result =
                     fetchFolderNodesUseCase(folderSubHandle, _uiState.value.selectedSortOrder)
                 val nodeUiItems = nodeUiItemMapper(result.childrenNodes)
+                val hasMediaItems = containsMediaItemUseCase(result.childrenNodes)
                 _uiState.update {
                     it.copy(
                         contentState = FolderLinkContentState.Loaded,
                         items = nodeUiItems,
                         rootNode = result.rootNode,
                         currentFolderNode = result.parentNode,
+                        hasMediaItems = hasMediaItems,
                     )
                 }
             }.onFailure { throwable ->
@@ -372,22 +377,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             }
             _uiState.update { it.copy(currentFolderNode = newParentNode) }
 
-            runCatching {
-                getFolderLinkChildrenNodesUseCase(
-                    parentHandle = newParentNode.id.longValue,
-                    order = _uiState.value.selectedSortOrder,
-                )
-            }.onSuccess { children ->
-                _uiState.update {
-                    it.copy(
-                        contentState = FolderLinkContentState.Loaded,
-                        items = nodeUiItemMapper(children),
-                    )
-                }
-            }.onFailure { throwable ->
-                Timber.e(throwable)
-                _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
-            }
+            refreshCurrentFolder()
         }
     }
 

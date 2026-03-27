@@ -23,6 +23,7 @@ import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
@@ -60,6 +61,7 @@ internal class FolderLinkViewModelTest {
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase = mock()
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
+    private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
@@ -78,6 +80,7 @@ internal class FolderLinkViewModelTest {
             fetchFolderNodesUseCase = fetchFolderNodesUseCase,
             getFolderLinkChildrenNodesUseCase = getFolderLinkChildrenNodesUseCase,
             getFolderParentNodeUseCase = getFolderParentNodeUseCase,
+            containsMediaItemUseCase = containsMediaItemUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
@@ -96,6 +99,7 @@ internal class FolderLinkViewModelTest {
             fetchFolderNodesUseCase,
             getFolderLinkChildrenNodesUseCase,
             getFolderParentNodeUseCase,
+            containsMediaItemUseCase,
             nodeUiItemMapper,
             monitorSortCloudOrderUseCase,
             setCloudSortOrderUseCase,
@@ -951,5 +955,39 @@ internal class FolderLinkViewModelTest {
             advanceUntilIdle()
 
             verify(getFolderLinkChildrenNodesUseCase).invoke(eq(5L), eq(SortOrder.ORDER_DEFAULT_DESC))
+        }
+
+    @Test
+    fun `test that hasMediaItems is true when fetchNodes returns children with media items`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            stubNodeUiItemMapper()
+            whenever(containsMediaItemUseCase(any())).thenReturn(true)
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().hasMediaItems).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that hasMediaItems is false when fetchNodes returns children without media items`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            stubNodeUiItemMapper()
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().hasMediaItems).isFalse()
+            }
         }
 }
