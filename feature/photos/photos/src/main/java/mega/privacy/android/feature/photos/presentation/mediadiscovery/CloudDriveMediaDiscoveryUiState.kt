@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.photos.MediaListItem
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
-import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 
 data class CloudDriveMediaDiscoveryUiState(
     val backEvent: StateEvent = consumed,
@@ -31,7 +31,7 @@ data class CloudDriveMediaDiscoveryUiState(
     val isBusinessAccountExpired: Boolean = false,
     val isHiddenNodesEnabled: Boolean = false,
     val showHiddenNodes: Boolean = false,
-    val selectedPeriod: MediaDiscoveryPeriod = MediaDiscoveryPeriod.All,
+    val selectedPeriod: MediaTimePeriod = MediaTimePeriod.All,
     val scrollStartIndex: Int = 0,
     val scrollStartOffset: Int = 0,
     val fromFolderLink: Boolean = false,

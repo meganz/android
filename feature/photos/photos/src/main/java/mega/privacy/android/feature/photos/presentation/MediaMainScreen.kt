@@ -79,7 +79,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSort
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
@@ -314,7 +314,7 @@ fun MediaMainRoute(
         handleNotificationPermissionResult = mediaCameraUploadViewModel::updateNotificationPermission,
         onCUBannerDismissRequest = mediaCameraUploadViewModel::dismissCUBanner,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-        onPhotoTimePeriodSelected = timelineViewModel::onPhotoTimePeriodSelected,
+        onMediaTimePeriodSelected = timelineViewModel::onMediaTimePeriodSelected,
         onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen,
         onUpdateVideosSearchQuery = videosTabViewModel::searchQuery,
         onUpdatePlaylistSearchQuery = videoPlaylistsTabViewModel::searchQuery,
@@ -341,7 +341,7 @@ fun MediaMainScreen(
     selectedPhotoIds: Set<Long>,
     selectionModeType: MediaSelectionModeType,
     selectedPhotosInTypedNode: () -> List<TypedNode>,
-    selectedTimePeriod: PhotoModificationTimePeriod,
+    selectedTimePeriod: MediaTimePeriod,
     multiNodeActionHandler: MultiNodeActionHandler,
     navigationHandler: NavigationHandler,
     timelineFilterUiState: TimelineFilterUiState,
@@ -360,7 +360,7 @@ fun MediaMainScreen(
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
-    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
+    onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
     onUpdateVideosSearchQuery: (value: String?) -> Unit,
     onUpdatePlaylistSearchQuery: (value: String?) -> Unit,
@@ -616,7 +616,7 @@ fun MediaMainScreen(
                                         handleNotificationPermissionResult = handleNotificationPermissionResult,
                                         onCUBannerDismissRequest = onCUBannerDismissRequest,
                                         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                                        onPhotoTimePeriodSelected = onPhotoTimePeriodSelected,
+                                        onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                                         showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
                                         dismissVideoPlaylistRemovedDialog = {
                                             showVideoPlaylistRemovedDialog = false
@@ -667,7 +667,7 @@ private fun MediaScreen.MediaContent(
     timelineFilterUiState: TimelineFilterUiState,
     selectedPhotoIds: Set<Long>,
     showTimelineSortDialog: Boolean,
-    selectedTimePeriod: PhotoModificationTimePeriod,
+    selectedTimePeriod: MediaTimePeriod,
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortDialogDismissed: () -> Unit,
@@ -681,7 +681,7 @@ private fun MediaScreen.MediaContent(
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
-    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
+    onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     showVideoPlaylistRemovedDialog: Boolean,
     dismissVideoPlaylistRemovedDialog: () -> Unit,
     modifier: Modifier = Modifier,
@@ -712,7 +712,7 @@ private fun MediaScreen.MediaContent(
                 handleNotificationPermissionResult = handleNotificationPermissionResult,
                 onCUBannerDismissRequest = onCUBannerDismissRequest,
                 onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
+                onMediaTimePeriodSelected = onMediaTimePeriodSelected
             )
         }
 
@@ -761,7 +761,7 @@ private fun PhotosMainScreenPreview() {
             timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             selectedPhotoIds = setOf(),
-            selectedTimePeriod = PhotoModificationTimePeriod.All,
+            selectedTimePeriod = MediaTimePeriod.All,
             showTimelineFilter = false,
             selectedPhotosInTypedNode = { emptyList() },
             setEnableCUPage = {},
@@ -805,7 +805,7 @@ private fun PhotosMainScreenPreview() {
             handleNotificationPermissionResult = {},
             onCUBannerDismissRequest = {},
             onNavigateToUpgradeAccount = {},
-            onPhotoTimePeriodSelected = {},
+            onMediaTimePeriodSelected = {},
             onNavigateToCameraUploadsProgressScreen = {},
             albumsTabUiState = AlbumsTabUiState(),
             videosTabUiState = VideosTabUiState.Data(),

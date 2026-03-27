@@ -34,7 +34,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlay
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadStatusToolbarAction
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.view.VideosTabToolbar
 import mega.privacy.android.icon.pack.IconPack
@@ -54,7 +54,7 @@ internal fun MediaTopBar(
     playlistsTabUiState: VideoPlaylistsTabUiState,
     timelineItemCount: Int,
     timelineSelectedCount: Int,
-    selectedTimePeriod: PhotoModificationTimePeriod,
+    selectedTimePeriod: MediaTimePeriod,
     videosTabQuery: String?,
     playlistsTabQuery: String?,
     onClearTimelinePhotosSelection: () -> Unit,
@@ -79,7 +79,7 @@ internal fun MediaTopBar(
         timelineTabActionUiState.isReady
     ) {
         derivedStateOf {
-            currentTabIndex == MediaScreen.Timeline.ordinal && selectedTimePeriod == PhotoModificationTimePeriod.All && timelineTabActionUiState.isReady
+            currentTabIndex == MediaScreen.Timeline.ordinal && selectedTimePeriod == MediaTimePeriod.All && timelineTabActionUiState.isReady
         }
     }
     val isTimelineFilterApplied by remember(

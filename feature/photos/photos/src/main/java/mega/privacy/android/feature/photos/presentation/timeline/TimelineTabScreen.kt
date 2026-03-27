@@ -14,17 +14,11 @@ import android.provider.Settings
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.rememberScrollState
@@ -63,8 +56,6 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.chip.MegaChip
-import mega.android.core.ui.components.chip.SelectionChipStyle
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -78,13 +69,14 @@ import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
+import mega.privacy.android.feature.photos.presentation.component.MediaTimePeriodSelector
 import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridView
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.state.rememberTimelineLazyListState
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
@@ -103,7 +95,7 @@ internal fun TimelineTabRoute(
     timelineFilterUiState: TimelineFilterUiState,
     selectedPhotoIds: Set<Long>,
     showTimelineSortDialog: Boolean,
-    selectedTimePeriod: PhotoModificationTimePeriod,
+    selectedTimePeriod: MediaTimePeriod,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -116,7 +108,7 @@ internal fun TimelineTabRoute(
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
-    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
+    onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -141,7 +133,7 @@ internal fun TimelineTabRoute(
         handleNotificationPermissionResult = handleNotificationPermissionResult,
         onCUBannerDismissRequest = onCUBannerDismissRequest,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-        onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
+        onMediaTimePeriodSelected = onMediaTimePeriodSelected
     )
 }
 
@@ -152,7 +144,7 @@ internal fun TimelineTabScreen(
     timelineFilterUiState: TimelineFilterUiState,
     selectedPhotoIds: Set<Long>,
     showTimelineSortDialog: Boolean,
-    selectedTimePeriod: PhotoModificationTimePeriod,
+    selectedTimePeriod: MediaTimePeriod,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -165,7 +157,7 @@ internal fun TimelineTabScreen(
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
-    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
+    onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -211,12 +203,12 @@ internal fun TimelineTabScreen(
     if (uiState.isLoading.not()) {
         LaunchedEffect(shouldScrollToIndex, selectedTimePeriod) {
             if (shouldScrollToIndex > -1) {
-                val isCUBannerVisible = if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
+                val isCUBannerVisible = if (selectedTimePeriod == MediaTimePeriod.All) {
                     timelineLazyListState.totalItemsCount > uiState.displayedPhotos.size
                 } else {
                     val items = when (selectedTimePeriod) {
-                        PhotoModificationTimePeriod.Years -> uiState.yearsCardPhotos
-                        PhotoModificationTimePeriod.Months -> uiState.monthsCardPhotos
+                        MediaTimePeriod.Years -> uiState.yearsCardPhotos
+                        MediaTimePeriod.Months -> uiState.monthsCardPhotos
                         else -> uiState.daysCardPhotos
                     }
                     timelineLazyListState.totalItemsCount > items.size
@@ -293,7 +285,7 @@ internal fun TimelineTabScreen(
                 lazyListState = timelineLazyListState.lazyListState,
                 selectedTimePeriod = selectedTimePeriod,
                 shouldShowTimePeriodSelector = shouldShowTimePeriodSelector,
-                onPhotoTimePeriodSelected = {
+                onMediaTimePeriodSelected = {
                     val scrollIndex =
                         timelineLazyListState.calculateScrollIndexBasedOnTimePeriodClick(
                             targetPeriod = it,
@@ -305,13 +297,13 @@ internal fun TimelineTabScreen(
                     if (scrollIndex > -1) {
                         shouldScrollToIndex = scrollIndex
                     }
-                    onPhotoTimePeriodSelected(it)
+                    onMediaTimePeriodSelected(it)
                 },
                 onGridSizeChange = onGridSizeChange,
                 onPhotoClick = onPhotoClick,
                 onPhotoSelected = onPhotoSelected,
                 onPhotosNodeListCardClick = { photo ->
-                    onPhotoTimePeriodSelected(PhotoModificationTimePeriod.entries[selectedTimePeriod.ordinal + 1])
+                    onMediaTimePeriodSelected(MediaTimePeriod.entries[selectedTimePeriod.ordinal + 1])
                     shouldScrollToIndex =
                         timelineLazyListState.calculateScrollIndexBasedOnItemClick(
                             photo = photo,
@@ -405,9 +397,9 @@ private fun TimelineTabContent(
     selectedPhotoIds: Set<Long>,
     lazyGridState: LazyGridState,
     lazyListState: LazyListState,
-    selectedTimePeriod: PhotoModificationTimePeriod,
+    selectedTimePeriod: MediaTimePeriod,
     shouldShowTimePeriodSelector: Boolean,
-    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
+    onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
@@ -428,7 +420,7 @@ private fun TimelineTabContent(
         )
     ) {
         when (selectedTimePeriod) {
-            PhotoModificationTimePeriod.All -> {
+            MediaTimePeriod.All -> {
                 PhotosNodeGridView(
                     modifier = Modifier
                         .fillMaxSize()
@@ -466,8 +458,8 @@ private fun TimelineTabContent(
 
             else -> {
                 val items = when (selectedTimePeriod) {
-                    PhotoModificationTimePeriod.Years -> uiState.yearsCardPhotos
-                    PhotoModificationTimePeriod.Months -> uiState.monthsCardPhotos
+                    MediaTimePeriod.Years -> uiState.yearsCardPhotos
+                    MediaTimePeriod.Months -> uiState.monthsCardPhotos
                     else -> uiState.daysCardPhotos
                 }
                 PhotosNodeListCardListView(
@@ -497,59 +489,16 @@ private fun TimelineTabContent(
         }
 
         if (selectedPhotoIds.isEmpty()) {
-            PhotoModificationTimePeriodSelector(
+            MediaTimePeriodSelector(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .align(Alignment.BottomCenter)
-                    .testTag(TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG),
+                    .testTag(TIMELINE_TAB_CONTENT_MEDIA_TIME_PERIOD_SELECTOR_TAG),
                 isVisible = shouldShowTimePeriodSelector,
                 selectedTimePeriod = selectedTimePeriod,
-                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
+                onMediaTimePeriodSelected = onMediaTimePeriodSelected
             )
-        }
-    }
-}
-
-@Composable
-private fun PhotoModificationTimePeriodSelector(
-    isVisible: Boolean,
-    selectedTimePeriod: PhotoModificationTimePeriod,
-    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    AnimatedVisibility(
-        modifier = modifier,
-        visible = isVisible,
-        exit = slideOutVertically { it },
-        enter = slideInVertically { it },
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            PhotoModificationTimePeriod.entries.forEachIndexed { index, timePeriod ->
-                MegaChip(
-                    onClick = {
-                        trackTimePeriodSelection(timePeriod)
-                        onPhotoTimePeriodSelected(timePeriod)
-                    },
-                    selected = selectedTimePeriod == timePeriod,
-                    text = stringResource(id = timePeriod.stringResId),
-                    style = SelectionChipStyle,
-                )
-
-                if (index != PhotoModificationTimePeriod.entries.lastIndex) {
-                    Spacer(
-                        modifier = Modifier
-                            .width(8.dp)
-                            .testTag(PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_SPACER_TAG)
-                    )
-                }
-            }
         }
     }
 }
@@ -587,21 +536,21 @@ private fun getVideoPermissionByVersion() =
         READ_EXTERNAL_STORAGE
     }
 
-private fun trackTimePeriodSelection(timePeriod: PhotoModificationTimePeriod) {
+private fun trackTimePeriodSelection(timePeriod: MediaTimePeriod) {
     when (timePeriod) {
-        PhotoModificationTimePeriod.Years -> Analytics.tracker.trackEvent(
+        MediaTimePeriod.Years -> Analytics.tracker.trackEvent(
             MediaScreenYearsFilterSelectedEvent
         )
 
-        PhotoModificationTimePeriod.Months -> Analytics.tracker.trackEvent(
+        MediaTimePeriod.Months -> Analytics.tracker.trackEvent(
             MediaScreenMonthsFilterSelectedEvent
         )
 
-        PhotoModificationTimePeriod.Days -> Analytics.tracker.trackEvent(
+        MediaTimePeriod.Days -> Analytics.tracker.trackEvent(
             MediaScreenDaysFilterSelectedEvent
         )
 
-        PhotoModificationTimePeriod.All -> Analytics.tracker.trackEvent(
+        MediaTimePeriod.All -> Analytics.tracker.trackEvent(
             MediaScreenAllFilterSelectedEvent
         )
     }
@@ -642,7 +591,7 @@ private fun TimelineTabScreenPreview() {
             timelineFilterUiState = TimelineFilterUiState(),
             selectedPhotoIds = setOf(),
             showTimelineSortDialog = false,
-            selectedTimePeriod = PhotoModificationTimePeriod.All,
+            selectedTimePeriod = MediaTimePeriod.All,
             clearCameraUploadsCompletedMessage = {},
             setEnableCUPage = {},
             onNavigateToCameraUploadsSettings = {},
@@ -655,7 +604,7 @@ private fun TimelineTabScreenPreview() {
             handleNotificationPermissionResult = {},
             onCUBannerDismissRequest = {},
             onNavigateToUpgradeAccount = {},
-            onPhotoTimePeriodSelected = {}
+            onMediaTimePeriodSelected = {}
         )
     }
 }
@@ -671,7 +620,7 @@ internal const val TIMELINE_TAB_CONTENT_GRID_VIEW_TAG =
     "timeline_tab_content:grid_view"
 internal const val TIMELINE_TAB_CONTENT_LIST_VIEW_TAG =
     "timeline_tab_content:list_view"
-internal const val TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG =
-    "timeline_tab_content:selector_photo_modification_time_period"
-internal const val PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_SPACER_TAG =
-    "photo_modification_time_period_selector:spacer"
+internal const val TIMELINE_TAB_CONTENT_MEDIA_TIME_PERIOD_SELECTOR_TAG =
+    "timeline_tab_content:selector_media_time_period"
+internal const val MEDIA_TIME_PERIOD_SELECTOR_SPACER_TAG =
+    "media_time_period_selector:spacer"

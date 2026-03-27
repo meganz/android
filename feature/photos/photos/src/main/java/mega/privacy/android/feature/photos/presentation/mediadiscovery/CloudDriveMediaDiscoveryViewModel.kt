@@ -41,7 +41,7 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedFileNodeMapper
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -315,7 +315,7 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
         }
     }
 
-    fun updatePeriod(mediaDiscoveryPeriod: MediaDiscoveryPeriod) {
+    fun updatePeriod(mediaDiscoveryPeriod: MediaTimePeriod) {
         _state.update {
             it.copy(selectedPeriod = mediaDiscoveryPeriod)
         }
@@ -325,7 +325,7 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
         when (dateCard) {
             is DateCard.YearsCard -> {
                 updatePeriodStateAndScrollOffset(
-                    MediaDiscoveryPeriod.Months,
+                    MediaTimePeriod.Months,
                     _state.value.monthsCardList.indexOfFirst {
                         it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
                     }
@@ -334,7 +334,7 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
 
             is DateCard.MonthsCard -> {
                 updatePeriodStateAndScrollOffset(
-                    MediaDiscoveryPeriod.Days,
+                    MediaTimePeriod.Days,
                     _state.value.daysCardList.indexOfFirst {
                         it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
                     }
@@ -343,7 +343,7 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
 
             is DateCard.DaysCard -> {
                 updatePeriodStateAndScrollOffset(
-                    MediaDiscoveryPeriod.All,
+                    MediaTimePeriod.All,
                     _state.value.mediaListItemList.indexOfFirst { item ->
                         when (item) {
                             is VideoItem -> item.video.id == dateCard.photo.id
@@ -357,7 +357,7 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
     }
 
     private fun updatePeriodStateAndScrollOffset(
-        selectedPeriod: MediaDiscoveryPeriod,
+        selectedPeriod: MediaTimePeriod,
         startIndex: Int = 0,
         startOffset: Int = 0,
     ) {

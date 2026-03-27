@@ -24,7 +24,7 @@ import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PHOTOS_NODE_BODY_IMAGE_NODE_TAG
 import mega.privacy.android.feature.photos.presentation.timeline.component.ENABLE_CAMERA_UPLOADS_CONTENT_ENABLE_BUTTON_TAG
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import org.junit.After
@@ -168,7 +168,7 @@ class TimelineTabScreenTest {
     @Test
     fun `test that the grid view is displayed when the selected time period is All`() {
         composeRuleScope {
-            val selectedTimePeriod = PhotoModificationTimePeriod.All
+            val selectedTimePeriod = MediaTimePeriod.All
             setScreen(
                 uiState = TimelineTabUiState(
                     isLoading = false,
@@ -189,7 +189,7 @@ class TimelineTabScreenTest {
     @Test
     fun `test that the grid view is displayed when the selected time period is not All`() {
         composeRuleScope {
-            val selectedTimePeriod = PhotoModificationTimePeriod.Years
+            val selectedTimePeriod = MediaTimePeriod.Years
             setScreen(
                 uiState = TimelineTabUiState(
                     isLoading = false,
@@ -222,7 +222,7 @@ class TimelineTabScreenTest {
                 selectedPhotoIds = setOf(),
             )
 
-            onNodeWithTag(TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG).assertIsDisplayed()
+            onNodeWithTag(TIMELINE_TAB_CONTENT_MEDIA_TIME_PERIOD_SELECTOR_TAG).assertIsDisplayed()
         }
     }
 
@@ -241,7 +241,7 @@ class TimelineTabScreenTest {
                 selectedPhotoIds = setOf(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L),
             )
 
-            onNodeWithTag(TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG).assertDoesNotExist()
+            onNodeWithTag(TIMELINE_TAB_CONTENT_MEDIA_TIME_PERIOD_SELECTOR_TAG).assertDoesNotExist()
         }
     }
 
@@ -296,7 +296,7 @@ class TimelineTabScreenTest {
     @Test
     fun `test that the photo time period is successfully selected`() {
         composeRuleScope {
-            val onPhotoTimePeriodSelected = mock<(PhotoModificationTimePeriod) -> Unit>()
+            val onMediaTimePeriodSelected = mock<(MediaTimePeriod) -> Unit>()
             setScreen(
                 uiState = TimelineTabUiState(
                     isLoading = false,
@@ -307,14 +307,14 @@ class TimelineTabScreenTest {
                     ),
                 ),
                 selectedPhotoIds = setOf(),
-                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
+                onMediaTimePeriodSelected = onMediaTimePeriodSelected
             )
 
-            PhotoModificationTimePeriod.entries.forEach {
+            MediaTimePeriod.entries.forEach {
                 val text = context.getString(it.stringResId)
                 onNodeWithText(text, useUnmergedTree = true).performClick()
 
-                verify(onPhotoTimePeriodSelected).invoke(it)
+                verify(onMediaTimePeriodSelected).invoke(it)
             }
         }
     }
@@ -331,7 +331,7 @@ class TimelineTabScreenTest {
         timelineFilterUiState: TimelineFilterUiState = TimelineFilterUiState(),
         selectedPhotoIds: Set<Long> = setOf(),
         showTimelineSortDialog: Boolean = false,
-        selectedTimePeriod: PhotoModificationTimePeriod = PhotoModificationTimePeriod.All,
+        selectedTimePeriod: MediaTimePeriod = MediaTimePeriod.All,
         clearCameraUploadsCompletedMessage: () -> Unit = {},
         onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit = {},
         setEnableCUPage: (Boolean) -> Unit = {},
@@ -344,7 +344,7 @@ class TimelineTabScreenTest {
         handleNotificationPermissionResult: () -> Unit = {},
         onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit = {},
         onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit = {},
-        onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit = {},
+        onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit = {},
     ) {
         setContent {
             TimelineTabScreen(
@@ -366,7 +366,7 @@ class TimelineTabScreenTest {
                 handleNotificationPermissionResult = handleNotificationPermissionResult,
                 onCUBannerDismissRequest = onCUBannerDismissRequest,
                 onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
+                onMediaTimePeriodSelected = onMediaTimePeriodSelected
             )
         }
     }

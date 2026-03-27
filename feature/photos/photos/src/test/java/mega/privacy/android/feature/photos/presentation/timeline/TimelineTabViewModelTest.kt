@@ -33,7 +33,7 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedNodeMapper
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -642,14 +642,14 @@ class TimelineTabViewModelTest {
     fun `test that time period All is selected by default`() = runTest {
         val actual = underTest.selectedTimePeriod
 
-        assertThat(actual).isEqualTo(PhotoModificationTimePeriod.All)
+        assertThat(actual).isEqualTo(MediaTimePeriod.All)
     }
 
     @ParameterizedTest
-    @EnumSource(PhotoModificationTimePeriod::class)
-    fun `test that the selected time period is successfully updated`(timePeriod: PhotoModificationTimePeriod) =
+    @EnumSource(MediaTimePeriod::class)
+    fun `test that the selected time period is successfully updated`(timePeriod: MediaTimePeriod) =
         runTest {
-            underTest.onPhotoTimePeriodSelected(value = timePeriod)
+            underTest.onMediaTimePeriodSelected(value = timePeriod)
 
             val actual = underTest.selectedTimePeriod
 

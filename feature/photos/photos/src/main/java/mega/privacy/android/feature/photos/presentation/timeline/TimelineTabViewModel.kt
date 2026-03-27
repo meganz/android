@@ -40,7 +40,7 @@ import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedNodeMapper
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
@@ -73,7 +73,7 @@ class TimelineTabViewModel @Inject constructor(
      * We don't need to put this in [TimelineTabUiState] because there is no need to rebuild the
      * uiState when this property changes.
      */
-    internal var selectedTimePeriod by mutableStateOf(PhotoModificationTimePeriod.All)
+    internal var selectedTimePeriod by mutableStateOf(MediaTimePeriod.All)
     private val _selectedPhotosInTypedNodesFlow =
         MutableStateFlow<List<TypedNode>>(value = emptyList())
     internal val selectedPhotosInTypedNodesFlow = _selectedPhotosInTypedNodesFlow.asStateFlow()
@@ -309,7 +309,7 @@ class TimelineTabViewModel @Inject constructor(
         return nodes
     }
 
-    internal fun onPhotoTimePeriodSelected(value: PhotoModificationTimePeriod) {
+    internal fun onMediaTimePeriodSelected(value: MediaTimePeriod) {
         selectedTimePeriod = value
     }
 }

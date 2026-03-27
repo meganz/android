@@ -93,10 +93,10 @@ import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoveryFilterDialog
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoverySortDialog
-import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.component.MediaTimePeriodSelector
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryCardListView
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryLoadingView
-import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -304,7 +304,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
     selectAllItems: () -> Unit,
     deselectAllItems: () -> Unit,
     onMoreOptionsClicked: () -> Unit,
-    onPeriodSelected: (MediaDiscoveryPeriod) -> Unit,
+    onPeriodSelected: (MediaTimePeriod) -> Unit,
     onCardClick: (DateCard) -> Unit,
     onFabClicked: () -> Unit,
     onUploadFilesClicked: () -> Unit,
@@ -458,7 +458,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
 
                 else -> {
                     when (uiState.selectedPeriod) {
-                        MediaDiscoveryPeriod.All -> {
+                        MediaTimePeriod.All -> {
                             MediaDiscoveryGridView(
                                 uiState = uiState,
                                 onBack = onBack,
@@ -475,9 +475,9 @@ internal fun CloudDriveMediaDiscoveryScreen(
 
                         else -> {
                             val dateCards = when (uiState.selectedPeriod) {
-                                MediaDiscoveryPeriod.Years -> uiState.yearsCardList
-                                MediaDiscoveryPeriod.Months -> uiState.monthsCardList
-                                MediaDiscoveryPeriod.Days -> uiState.daysCardList
+                                MediaTimePeriod.Years -> uiState.yearsCardList
+                                MediaTimePeriod.Months -> uiState.monthsCardList
+                                MediaTimePeriod.Days -> uiState.daysCardList
                                 else -> uiState.daysCardList
                             }
                             MediaDiscoveryCardListView(
@@ -493,9 +493,9 @@ internal fun CloudDriveMediaDiscoveryScreen(
                 }
             }
 
-            MediaDiscoveryPeriodChip(
-                selectedMediaDiscoveryPeriod = uiState.selectedPeriod,
-                onTimeBarTabSelected = onPeriodSelected,
+            MediaTimePeriodSelector(
+                selectedTimePeriod = uiState.selectedPeriod,
+                onMediaTimePeriodSelected = onPeriodSelected,
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
@@ -578,7 +578,7 @@ private fun MediaDiscoveryGridView(
 
     LaunchedEffect(uiState.scrollStartIndex) {
         if (uiState.scrollStartIndex > 0) {
-            val startIndex = if (uiState.selectedPeriod == MediaDiscoveryPeriod.All) {
+            val startIndex = if (uiState.selectedPeriod == MediaTimePeriod.All) {
                 uiState.scrollStartIndex
             } else {
                 // Since CardListView has two headers, the index needs to be incremented by 2.

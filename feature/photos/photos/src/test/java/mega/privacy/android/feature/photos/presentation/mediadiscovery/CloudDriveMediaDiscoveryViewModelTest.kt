@@ -37,7 +37,7 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedFileNodeMapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -395,11 +395,11 @@ class CloudDriveMediaDiscoveryViewModelTest {
 
     @Test
     fun `test that onTimeBarTabSelected updates selectedTimeBarTab`() = runTest {
-        underTest.updatePeriod(MediaDiscoveryPeriod.Years)
+        underTest.updatePeriod(MediaTimePeriod.Years)
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.selectedPeriod).isEqualTo(MediaDiscoveryPeriod.Years)
+            assertThat(state.selectedPeriod).isEqualTo(MediaTimePeriod.Years)
         }
     }
 
@@ -412,7 +412,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.selectedPeriod).isEqualTo(MediaDiscoveryPeriod.Months)
+            assertThat(state.selectedPeriod).isEqualTo(MediaTimePeriod.Months)
         }
     }
 
@@ -425,7 +425,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.selectedPeriod).isEqualTo(MediaDiscoveryPeriod.Days)
+            assertThat(state.selectedPeriod).isEqualTo(MediaTimePeriod.Days)
         }
     }
 
@@ -438,7 +438,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.selectedPeriod).isEqualTo(MediaDiscoveryPeriod.All)
+            assertThat(state.selectedPeriod).isEqualTo(MediaTimePeriod.All)
         }
     }
 

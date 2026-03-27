@@ -36,7 +36,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterU
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
-import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -145,7 +145,7 @@ class MediaMainScreenAnalyticsTest {
                     selectionModeType = selectionModeType,
                     selectedPhotoIds = setOf(),
                     selectedPhotosInTypedNode = selectedPhotosInTypedNode,
-                    selectedTimePeriod = PhotoModificationTimePeriod.All,
+                    selectedTimePeriod = MediaTimePeriod.All,
                     multiNodeActionHandler = mock<MultiNodeActionHandler>(),
                     navigationHandler = mock(),
                     timelineFilterUiState = TimelineFilterUiState(),
@@ -162,7 +162,7 @@ class MediaMainScreenAnalyticsTest {
                     handleCameraUploadsPermissionsResult = {},
                     onCUBannerDismissRequest = {},
                     onNavigateToUpgradeAccount = {},
-                    onPhotoTimePeriodSelected = {},
+                    onMediaTimePeriodSelected = {},
                     onNavigateToCameraUploadsProgressScreen = {},
                     onUpdateVideosSearchQuery = {},
                     onUpdatePlaylistSearchQuery = {},
