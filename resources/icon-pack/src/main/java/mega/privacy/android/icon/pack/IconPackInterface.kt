@@ -127,6 +127,7 @@ interface IconPackInterface {
                 val CheckCircle: ImageVector
                 val CheckStack: ImageVector
                 val ChevronRight: ImageVector
+                val ChevronLeft: ImageVector
                 val CircleSmall: ImageVector
                 val ClockPlay: ImageVector
                 val ClockRotate: ImageVector
