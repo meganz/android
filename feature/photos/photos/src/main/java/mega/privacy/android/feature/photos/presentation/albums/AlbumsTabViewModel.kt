@@ -91,7 +91,7 @@ class AlbumsTabViewModel @Inject constructor(
             }
         ).map { albums ->
             val albumsUiState = albums.map { albumUiStateMapper(it) }
-            uiState.update { it.copy(albums = albumsUiState) }
+            uiState.update { it.copy(albums = albumsUiState, isLoading = false) }
         }
             .catch { Timber.e(it) }
             .launchIn(viewModelScope)

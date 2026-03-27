@@ -85,7 +85,7 @@ internal class AlbumsTabViewModelTest {
     }
 
     @Test
-    fun `test that initial state is correct`() = runTest {
+    fun `test that initial state has isLoading true`() = runTest {
         whenever(mockAlbumsDataProvider.order).thenReturn(1)
         whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(emptyList()))
         initViewModel()
@@ -93,6 +93,33 @@ internal class AlbumsTabViewModelTest {
         underTest.uiState.test {
             val initialState = awaitItem()
             assertThat(initialState.albums).isEmpty()
+            assertThat(initialState.isLoading).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isLoading is false after albums are loaded`() = runTest {
+        val mockAlbums = createMockAlbums()
+        val expectedAlbumUiState1 = AlbumUiState(
+            mediaAlbum = mockAlbums[0],
+            title = LocalizedText.Literal("Album 1"),
+            isExported = false
+        )
+        val expectedAlbumUiState2 = AlbumUiState(
+            mediaAlbum = mockAlbums[1],
+            title = LocalizedText.Literal("Album 2"),
+            isExported = false
+        )
+
+        whenever(mockAlbumsDataProvider.order).thenReturn(1)
+        whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(mockAlbums))
+        whenever(mockAlbumUiStateMapper(mockAlbums[0])).thenReturn(expectedAlbumUiState1)
+        whenever(mockAlbumUiStateMapper(mockAlbums[1])).thenReturn(expectedAlbumUiState2)
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isFalse()
         }
     }
 
