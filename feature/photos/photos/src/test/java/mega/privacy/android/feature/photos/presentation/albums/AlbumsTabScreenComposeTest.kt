@@ -75,12 +75,32 @@ class AlbumsTabScreenComposeTest {
     }
 
     @Test
+    fun `test that skeleton is displayed when loading`() {
+        val uiState = AlbumsTabUiState(isLoading = true)
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(ALBUMS_SCREEN_SKELETON)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that skeleton is not displayed when not loading`() {
+        val uiState = AlbumsTabUiState(isLoading = false, albums = emptyList())
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(ALBUMS_SCREEN_SKELETON)
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun `test that albums are displayed correctly`() {
         val albums = listOf(
             createMockAlbum(id = 1L, title = "Album 1"),
             createMockAlbum(id = 2L, title = "Album 2")
         )
-        val uiState = AlbumsTabUiState(albums = albums)
+        val uiState = AlbumsTabUiState(isLoading = false, albums = albums)
         setComposeContent(uiState)
 
         // Verify all album grid items are displayed
@@ -97,7 +117,7 @@ class AlbumsTabScreenComposeTest {
 
     @Test
     fun `test that new album dialog is visible when event triggered`() {
-        val uiState = AlbumsTabUiState(albums = emptyList())
+        val uiState = AlbumsTabUiState(isLoading = false, albums = emptyList())
 
         setComposeContent(uiState, showNewAlbumDialogEvent = triggered)
 
@@ -108,7 +128,7 @@ class AlbumsTabScreenComposeTest {
 
     @Test
     fun `test that on confirm dialog should trigger add new album callback`() {
-        val uiState = AlbumsTabUiState(albums = emptyList())
+        val uiState = AlbumsTabUiState(isLoading = false, albums = emptyList())
         val mockCallback: (String) -> Unit = mock()
 
         setComposeContent(
@@ -132,6 +152,7 @@ class AlbumsTabScreenComposeTest {
     fun `test that remove album confirmation dialog is visible when deleteAlbumsConfirmationEvent is triggered`() {
         val selectedAlbum = createMockUserAlbum(1L, "Album 1")
         val uiState = AlbumsTabUiState(
+            isLoading = false,
             albums = emptyList(),
             selectedUserAlbums = setOf(selectedAlbum),
             deleteAlbumsConfirmationEvent = triggered
@@ -156,6 +177,7 @@ class AlbumsTabScreenComposeTest {
             createMockUserAlbum(2L, "Album 2")
         )
         val uiState = AlbumsTabUiState(
+            isLoading = false,
             albums = emptyList(),
             selectedUserAlbums = selectedAlbums,
             deleteAlbumsConfirmationEvent = triggered
@@ -176,6 +198,7 @@ class AlbumsTabScreenComposeTest {
     @Test
     fun `test that remove album confirmation dialog is not visible when event is consumed`() {
         val uiState = AlbumsTabUiState(
+            isLoading = false,
             albums = emptyList(),
             deleteAlbumsConfirmationEvent = consumed
         )
@@ -191,6 +214,7 @@ class AlbumsTabScreenComposeTest {
     fun `test that on confirm remove album dialog should trigger deleteAlbums and resetDeleteAlbumsConfirmationEvent`() {
         val selectedAlbum = createMockUserAlbum(1L, "Album 1")
         val uiState = AlbumsTabUiState(
+            isLoading = false,
             albums = emptyList(),
             selectedUserAlbums = setOf(selectedAlbum),
             deleteAlbumsConfirmationEvent = triggered
@@ -221,6 +245,7 @@ class AlbumsTabScreenComposeTest {
     fun `test that on dismiss remove album dialog should trigger resetDeleteAlbumsConfirmationEvent`() {
         val selectedAlbum = createMockUserAlbum(1L, "Album 1")
         val uiState = AlbumsTabUiState(
+            isLoading = false,
             albums = emptyList(),
             selectedUserAlbums = setOf(selectedAlbum),
             deleteAlbumsConfirmationEvent = triggered

@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 
 data class AlbumsTabUiState(
+    val isLoading: Boolean = true,
     val albums: List<AlbumUiState> = emptyList(),
     val selectedUserAlbums: Set<MediaAlbum.User> = emptySet(),
     val addNewAlbumErrorMessage: StateEventWithContent<String> = consumed(),
