@@ -41,9 +41,6 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
-import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
-import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -104,10 +101,6 @@ class AlbumContentViewModelTest {
     private val getAlbumPhotosUseCase = mock<GetAlbumPhotosUseCase>()
     private val albumUiStateMapper = mock<AlbumUiStateMapper>()
     private val legacyMediaSystemAlbumMapper = mock<LegacyMediaSystemAlbumMapper>()
-    private val observeAlbumPhotosAddingProgress = mock<ObserveAlbumPhotosAddingProgress>()
-    private val updateAlbumPhotosAddingProgressCompleted =
-        mock<UpdateAlbumPhotosAddingProgressCompleted>()
-    private val observeAlbumPhotosRemovingProgress = mock<ObserveAlbumPhotosRemovingProgress>()
     private val updateAlbumPhotosRemovingProgressCompleted =
         mock<UpdateAlbumPhotosRemovingProgressCompleted>()
     private val disableExportAlbumsUseCase = mock<DisableExportAlbumsUseCase>()
@@ -156,9 +149,6 @@ class AlbumContentViewModelTest {
             getAlbumPhotosUseCase,
             albumUiStateMapper,
             legacyMediaSystemAlbumMapper,
-            observeAlbumPhotosAddingProgress,
-            updateAlbumPhotosAddingProgressCompleted,
-            observeAlbumPhotosRemovingProgress,
             updateAlbumPhotosRemovingProgressCompleted,
             disableExportAlbumsUseCase,
             removeFavouritesUseCase,
@@ -196,8 +186,6 @@ class AlbumContentViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(emptyFlow())
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
-        whenever(observeAlbumPhotosAddingProgress(mock())).thenReturn(emptyFlow())
-        whenever(observeAlbumPhotosRemovingProgress(mock())).thenReturn(emptyFlow())
         whenever(monitorThemeModeUseCase()).thenReturn(themeModeFlow)
     }
 
@@ -212,9 +200,6 @@ class AlbumContentViewModelTest {
             getAlbumPhotosUseCase = getAlbumPhotosUseCase,
             albumUiStateMapper = albumUiStateMapper,
             legacyMediaSystemAlbumMapper = legacyMediaSystemAlbumMapper,
-            observeAlbumPhotosAddingProgress = observeAlbumPhotosAddingProgress,
-            updateAlbumPhotosAddingProgressCompleted = updateAlbumPhotosAddingProgressCompleted,
-            observeAlbumPhotosRemovingProgress = observeAlbumPhotosRemovingProgress,
             updateAlbumPhotosRemovingProgressCompleted = updateAlbumPhotosRemovingProgressCompleted,
             disableExportAlbumsUseCase = disableExportAlbumsUseCase,
             removeFavouritesUseCase = removeFavouritesUseCase,
@@ -405,8 +390,6 @@ class AlbumContentViewModelTest {
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
         whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
         whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
-        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
 
         createViewModel(AlbumContentNavKey(id = mockUserAlbum.id.id, type = "custom"))
 
@@ -415,16 +398,6 @@ class AlbumContentViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().linkRemovedSuccessEvent).isEqualTo(triggered)
         }
-    }
-
-    @Test
-    fun `test that updatePhotosAddingProgressCompleted calls use case`() = runTest {
-        createViewModel()
-        val albumId = AlbumId(123L)
-
-        underTest.updatePhotosAddingProgressCompleted(albumId)
-
-        verify(updateAlbumPhotosAddingProgressCompleted).invoke(albumId)
     }
 
     @Test
@@ -527,8 +500,6 @@ class AlbumContentViewModelTest {
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
         whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
         whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
-        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
 
         createViewModel(AlbumContentNavKey(id = mockUserAlbum.id.id, type = "custom"))
 
@@ -556,8 +527,6 @@ class AlbumContentViewModelTest {
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
             whenever(validateAndUpdateUserAlbumUseCase(any(), any())).thenAnswer {
                 throw AlbumNameValidationException.Exists
             }
@@ -618,8 +587,6 @@ class AlbumContentViewModelTest {
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
 
             createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
@@ -730,9 +697,6 @@ class AlbumContentViewModelTest {
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(listOf(legacyPhoto)))
             whenever(photoUiStateMapper(legacyPhoto)).thenReturn(photo)
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
 
             createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
@@ -757,8 +721,6 @@ class AlbumContentViewModelTest {
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
         whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
         whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
-        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
 
         createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
@@ -919,8 +881,6 @@ class AlbumContentViewModelTest {
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(photos))
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
             whenever(photoUiStateMapper(photo1)).thenReturn(photo1UiState)
             whenever(photoUiStateMapper(photo2)).thenReturn(photo2UiState)
             whenever(photoUiStateMapper(photo3)).thenReturn(photo3UiState)
@@ -1072,8 +1032,6 @@ class AlbumContentViewModelTest {
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(photos))
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
             whenever(photoUiStateMapper(photo1)).thenReturn(photo1UiState)
             whenever(photoUiStateMapper(photo2)).thenReturn(photo2UiState)
             whenever(photoUiStateMapper(photo3)).thenReturn(photo3UiState)
@@ -1130,9 +1088,6 @@ class AlbumContentViewModelTest {
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf(listOf(legacyPhoto)))
             whenever(photoUiStateMapper(legacyPhoto)).thenReturn(photo)
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
             whenever(legacyPhotosSortMapper(any())).thenReturn(Sort.OLDEST)
 
             createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
@@ -1233,8 +1188,6 @@ class AlbumContentViewModelTest {
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
             whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
             whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-            whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
 
             createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 

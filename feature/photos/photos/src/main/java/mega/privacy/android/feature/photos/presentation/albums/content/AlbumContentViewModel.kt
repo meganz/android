@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.media.MediaAlbum
@@ -44,8 +43,6 @@ import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
-import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
-import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.extension.mapAsync
@@ -56,9 +53,6 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
-import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
-import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -87,13 +81,13 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.MediaScreenAlbumAddItemsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import timber.log.Timber
-import mega.privacy.android.shared.nodes.R as NodesR
 
 @HiltViewModel(assistedFactory = AlbumContentViewModel.Factory::class)
 class AlbumContentViewModel @AssistedInject constructor(
@@ -105,9 +99,6 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val getAlbumPhotosUseCase: GetAlbumPhotosUseCase,
     private val albumUiStateMapper: AlbumUiStateMapper,
     private val legacyMediaSystemAlbumMapper: LegacyMediaSystemAlbumMapper,
-    private val observeAlbumPhotosAddingProgress: ObserveAlbumPhotosAddingProgress,
-    private val updateAlbumPhotosAddingProgressCompleted: UpdateAlbumPhotosAddingProgressCompleted,
-    private val observeAlbumPhotosRemovingProgress: ObserveAlbumPhotosRemovingProgress,
     private val updateAlbumPhotosRemovingProgressCompleted: UpdateAlbumPhotosRemovingProgressCompleted,
     private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase,
     private val removeFavouritesUseCase: RemoveFavouritesUseCase,
@@ -344,8 +335,6 @@ class AlbumContentViewModel @AssistedInject constructor(
 
         observeAlbum(albumId)
         observeAlbumPhotos(albumId, refresh = false)
-        observePhotosAddingProgress(albumId)
-        observePhotosRemovingProgress(albumId)
     }
 
     private fun observeAlbum(albumId: AlbumId) {
@@ -399,53 +388,9 @@ class AlbumContentViewModel @AssistedInject constructor(
         return filteredPhotos.toImmutableList()
     }
 
-    private fun observePhotosRemovingProgress(albumId: AlbumId) {
-        observeAlbumPhotosRemovingProgress(albumId)
-            .onEach(::handlePhotosRemovingProgress)
-            .launchIn(viewModelScope)
-    }
-
-    private fun handlePhotosRemovingProgress(progress: AlbumPhotosRemovingProgress?) {
-        _state.update {
-            it.copy(
-                isRemovingPhotos = progress?.isProgressing ?: false,
-                totalRemovedPhotos = progress?.totalRemovedPhotos ?: 0,
-            )
-        }
-    }
-
     fun updatePhotosRemovingProgressCompleted(albumId: AlbumId) {
         viewModelScope.launch {
             updateAlbumPhotosRemovingProgressCompleted(albumId)
-        }
-    }
-
-    private fun observePhotosAddingProgress(albumId: AlbumId) {
-        observeAlbumPhotosAddingProgress(albumId)
-            .onEach(::handlePhotosAddingProgress)
-            .launchIn(viewModelScope)
-    }
-
-    private fun handlePhotosAddingProgress(progress: AlbumPhotosAddingProgress?) {
-        if (progress?.isProgressing == false && _state.value.photos.isEmpty()) {
-            _state.update {
-                it.copy(isLoading = true)
-            }
-            albumId?.let { observeAlbumPhotos(it, true) }
-        }
-
-        _state.update {
-            it.copy(
-                isAddingPhotos = progress?.isProgressing ?: false,
-                totalAddedPhotos = progress?.totalAddedPhotos ?: 0,
-                showProgressMessage = progress?.isAsync == false,
-            )
-        }
-    }
-
-    fun updatePhotosAddingProgressCompleted(albumId: AlbumId) {
-        viewModelScope.launch {
-            updateAlbumPhotosAddingProgressCompleted(albumId)
         }
     }
 

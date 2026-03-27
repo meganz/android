@@ -41,10 +41,6 @@ import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
  */
 data class AlbumContentUiState(
     val isLoading: Boolean = true,
-    val isAddingPhotos: Boolean = false,
-    val totalAddedPhotos: Int = 0,
-    val isRemovingPhotos: Boolean = false,
-    val totalRemovedPhotos: Int = 0,
     val uiAlbum: AlbumUiState? = null,
     val photos: ImmutableList<PhotoUiState> = persistentListOf(),
     val selectedPhotos: ImmutableSet<PhotoUiState> = persistentSetOf(),
@@ -75,9 +71,4 @@ data class AlbumContentUiState(
     val addMoreItemsEvent: StateEvent = consumed,
     val visibleBottomBarActions: ImmutableList<AlbumContentSelectionAction> = persistentListOf(),
     val showHiddenNodesOnboardingEvent: StateEventWithContent<Boolean> = consumed(),
-) {
-    val isAddingPhotosProgressCompleted: Boolean
-        get() = !isAddingPhotos && totalAddedPhotos > 0
-    val isRemovingPhotosProgressCompleted: Boolean
-        get() = !isRemovingPhotos && totalRemovedPhotos > 0
-}
+)

@@ -49,7 +49,6 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.sheets.SheetActionHeader
@@ -70,8 +69,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuActi
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -98,6 +95,8 @@ import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
@@ -449,7 +448,7 @@ internal fun AlbumContentScreen(
         },
     ) { innerPadding ->
         val isLoadingEmpty =
-            uiState.photos.isEmpty() && (uiState.isLoading || uiState.isAddingPhotos)
+            uiState.photos.isEmpty() && uiState.isLoading
         val hasPhotos = uiState.photos.isNotEmpty()
 
         when {
@@ -470,14 +469,6 @@ internal fun AlbumContentScreen(
                         .fillMaxSize()
                         .padding(top = innerPadding.calculateTopPadding()),
                 ) {
-                    if (uiState.isAddingPhotos || uiState.isRemovingPhotos) {
-                        InfiniteProgressBarIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(ALBUM_CONTENT_SCREEN_LOADING_PROGRESS)
-                        )
-                    }
-
                     AlbumDynamicContentGrid(
                         modifier = Modifier
                             .fillMaxSize()
