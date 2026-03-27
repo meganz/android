@@ -597,7 +597,7 @@ class LoginViewModel @AssistedInject constructor(
                     R.string.account_confirmed
                 }
             } else {
-                (result.exceptionOrNull() as QuerySignupLinkException).messageId
+                (result.exceptionOrNull() as? QuerySignupLinkException)?.messageId
             }
 
             _state.update { state ->
