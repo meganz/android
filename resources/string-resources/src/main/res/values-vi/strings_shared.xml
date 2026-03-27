@@ -1896,7 +1896,7 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Xóa khỏi Ngoại Tuyến</string>
     <string name="offline_item_deletion_confirmation_title">Xóa khỏi Lưu Ngoại Tuyến?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="other">%1$d tệp tin</item>
+        <item quantity="other">%d tệp tin</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="other">%d thư mục</item>
@@ -1948,4 +1948,18 @@
     <string name="folder_link_unavailable_tos_violation">Đường liên kết thư mục đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ.</string>
     <string name="link_decryption_key_dialog_title">Nhập chìa khóa giải mã</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Chìa khóa giải mã không hợp lệ</string>
+    <string name="upload_bottom_sheet_action_upload_files">Tải lên tệp tin</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Tải lên thư mục</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Quét tài liệu</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">Chụp</string>
+    <string name="file_browser_folder_empty">Thư&#160;mục rỗng</string>
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <string name="label_file_size_kilobytes">%s&#160;KB</string>
+    <string name="label_file_size_megabytes">%s&#160;MB</string>
+    <string name="label_file_size_gigabytes">%s&#160;GB</string>
+    <string name="label_file_size_terabytes">%s&#160;TB</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="other">%d tệp tin</item>
+    </plurals>
+    <string name="general_title_incoming_shares">Mục chia sẻ nhận được</string>
 </resources>

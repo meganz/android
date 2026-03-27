@@ -2110,8 +2110,8 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Çevrim dışından kaldır</string>
     <string name="offline_item_deletion_confirmation_title">Çevrim dışından kaldırılsın mı?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d dosya</item>
-        <item quantity="other">%1$d dosya</item>
+        <item quantity="one">%d dosya</item>
+        <item quantity="other">%d dosya</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="one">%d klasör</item>
@@ -2192,4 +2192,19 @@
     <string name="folder_link_unavailable_tos_violation">Hizmet Şartlarımızı ihlal ettiği için klasör bağlantısı kaldırıldı.</string>
     <string name="link_decryption_key_dialog_title">Şifre çözme anahtarını girin</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Geçersiz şifre çözme anahtarı</string>
+    <string name="upload_bottom_sheet_action_upload_files">Dosya yükle</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Klasör yükle</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Belge tarat</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">Yakala</string>
+    <string name="file_browser_folder_empty">Boş klasör</string>
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <string name="label_file_size_kilobytes">%s&#160;KB</string>
+    <string name="label_file_size_megabytes">%s&#160;MB</string>
+    <string name="label_file_size_gigabytes">%s&#160;GB</string>
+    <string name="label_file_size_terabytes">%s&#160;TB</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="one">%d dosya</item>
+        <item quantity="other">%d dosya</item>
+    </plurals>
+    <string name="general_title_incoming_shares">Gelen paylaşımlar</string>
 </resources>

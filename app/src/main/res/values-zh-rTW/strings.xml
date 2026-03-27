@@ -2875,11 +2875,11 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s訂閱</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">您目前使用%1$s訂閱MEGA。您必須透過%2$s單獨取消它，因為MEGA無法為您取消。造訪我們的幫助中心瞭解更多資訊。</string>
+    <string name="message_android_platform_subscription">您目前使用%1$s訂閱MEGA。您必須透過%2$s單獨取消它，因為MEGA無法為您取消。造訪我們的說明中心瞭解更多資訊。</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">您目前有一個MEGA訂閱。它會在帳戶刪除後自動取消，造訪我們的幫助中心瞭解更多資訊。</string>
+    <string name="message_other_platform_subscription">您目前有一個MEGA訂閱。它會在帳戶刪除後自動取消，造訪我們的說明中心瞭解更多資訊。</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">您目前在Apple中有一個MEGA訂閱。您必須從您的Apple帳戶中單獨將它取消，因為MEGA無法為您取消訂閱。造訪我們的幫助中心瞭解更多資訊。</string>
+    <string name="message_itunes_platform_subscription">您目前在Apple中有一個MEGA訂閱。您必須從您的Apple帳戶中單獨將它取消，因為MEGA無法為您取消訂閱。造訪我們的說明中心瞭解更多資訊。</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">造訪%1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->

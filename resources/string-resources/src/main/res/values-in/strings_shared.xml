@@ -2006,7 +2006,7 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Hapus dari Offline</string>
     <string name="offline_item_deletion_confirmation_title">Hapus dari Nonaktif?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="other">%1$d berkas</item>
+        <item quantity="other">%d file</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="other">%d folder</item>
@@ -2092,4 +2092,37 @@
     <string name="folder_link_unavailable_tos_violation">Tautan folder telah dihapus karena melanggar Persyaratan Layanan kami.</string>
     <string name="link_decryption_key_dialog_title">Masukkan kunci dekripsi</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Decryption key salah</string>
+    <string name="device_center_bottom_sheet_item_remove_connection">Hapus koneksi</string>
+    <string name="device_center_snackbar_message_connection_removed">Koneksi terhapus</string>
+    <string name="sync_folder_connection_dialog_title">Folder terhubung ke perangkat lain</string>
+    <string name="sync_folder_connection_dialog_message">Folder ini terhubung ke perangkat %1$s anda, kemungkinan besar karena MEGA dihapus instalasinya tanpa keluar dari akun. Sebuah folder hanya dapat disinkronkan ke satu perangkat dalam satu waktu. Hapus koneksi yang ada untuk menyinkronkannya di sini.</string>
+    <string name="sync_folder_connection_this_device">Terhubung ke %1$s</string>
+    <string name="general_dialog_discard_changes_message">Semua perubahan yang belum disimpan akan hilang</string>
+    <string name="general_changes_saved">Perubahan disimpan</string>
+    <string name="node_option_save_to_mega">Simpan ke MEGA</string>
+    <string name="saf_passcode_lock_enabled_message">Untuk menjelajahi file MEGA anda, nonaktifkan kode sandi anda di aplikasi MEGA. Buka Pengaturan, lalu ketuk Keamanan.</string>
+    <string name="saf_no_internet_message">Hubungkan ke internet untuk menjelajahi file MEGA anda. File yang disimpan untuk akses offline tersedia di aplikasi MEGA.</string>
+    <string name="search_pdf_placeholder">Cari dokumen</string>
+    <string name="pdf_viewer_search_placeholder">Cari dokumen</string>
+    <string name="folder_link_subtitle">Tautan folder</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Masukkan kata sandi untuk membuka file ini</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Kata sandi salah</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Baris %1$d</string>
+    <string name="select_videos_search_empty_view_description">Cari video di drive Cloud anda</string>
+    <string name="new_text_file_invalid_extension_error_message">Gunakan ekstensi file yang valid (misalnya .txt)</string>
+    <string name="link_decryption_key_dialog_message">Masukkan kunci untuk membuka tautan ini.\nTidak memilikinya? Hubungi pengirimnya.</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Pindai dokumen</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">Ambil foto</string>
+    <string name="upload_bottom_sheet_action_upload_files">Unggah berkas</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Unggah folder</string>
+    <string name="label_file_size_megabytes">%s MB</string>
+    <string name="label_file_size_terabytes">%s TB</string>
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <string name="label_file_size_kilobytes">%s KB</string>
+    <string name="label_file_size_gigabytes">%s GB</string>
+    <string name="file_browser_folder_empty">Folder kosong</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="other">%d file</item>
+    </plurals>
+    <string name="general_title_incoming_shares">Berbagi Masuk</string>
 </resources>

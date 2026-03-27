@@ -2193,12 +2193,12 @@
     <string name="offline_screen_remove_from_offline_selection_menu">حذف من غير متصل بالانترنت</string>
     <string name="offline_item_deletion_confirmation_title">إزالة من “غير متصل“؟</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="zero">%1$d ملف</item>
-        <item quantity="one">%1$d ملف</item>
-        <item quantity="two">%1$d ملفان</item>
-        <item quantity="few">%1$d ملفات</item>
-        <item quantity="many">%1$d ملفاً</item>
-        <item quantity="other">%1$d ملف</item>
+        <item quantity="zero">%d ملف</item>
+        <item quantity="one">%d ملف</item>
+        <item quantity="two">%d ملفان</item>
+        <item quantity="few">%d ملفات</item>
+        <item quantity="many">%d ملفاً</item>
+        <item quantity="other">%d ملف</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="zero">%d مجلد</item>
@@ -2396,7 +2396,7 @@
     <string name="search_pdf_placeholder">ابحث في المستند</string>
     <string name="pdf_viewer_search_placeholder">ابحث في المستند</string>
     <string name="folder_link_subtitle">رابط المجلد</string>
-    <string name="pdf_viewer_dialog_text_enter_password">أدخل كلمة المرور لفتح هذا الملف.</string>
+    <string name="pdf_viewer_dialog_text_enter_password">أدخل كلمة المرور لفتح هذا الملف</string>
     <string name="pdf_viewer_dialog_error_incorrect_password">كلمة مرور غير صحيحة</string>
     <string name="recovering_info">جاري التحميل&#8230;</string>
     <string name="general_hi">مرحبا</string>
@@ -2431,4 +2431,46 @@
     <string name="folder_link_unavailable_tos_violation">تمت إزالة رابط المجلد لأنه ينتهك شروط الخدمة الخاصة بنا.</string>
     <string name="link_decryption_key_dialog_title">أدخل مفتاح فك التشفير</string>
     <string name="link_decryption_key_dialog_error_invalid_key">مفتاح فك التشفير غير صالح</string>
+    <string name="text_editor_fast_scroll_line_tooltip">سطر %1$d</string>
+    <string name="select_videos_search_empty_view_description">ابحث عن مقاطع الفيديو في السواقة السحابية الخاص بك</string>
+    <string name="new_text_file_invalid_extension_error_message">استخدم لاحقة ملف صالح (مثلاً .txt)</string>
+    <string name="link_decryption_key_dialog_message">أدخل المفتاح لفتح هذا الرابط.\nلا تمتلكه؟ تواصل مع المُرسل.</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">مسح المستند ضوئيًا</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">التقاط</string>
+    <string name="upload_bottom_sheet_action_upload_files">ترفيع ملفات</string>
+    <string name="upload_bottom_sheet_action_upload_folder">ترفيع مجلد</string>
+    <string name="label_file_size_megabytes">%s&#160;ميغابايت</string>
+    <string name="label_file_size_terabytes">%s تيرابايت</string>
+    <string name="label_file_size_bytes">%s&#160;بايت</string>
+    <string name="label_file_size_kilobytes">%s كيلوبايت</string>
+    <string name="label_file_size_gigabytes">%s&#160;غيغابايت</string>
+    <string name="file_browser_folder_empty">مجلد فارغ</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="zero">%d ملف</item>
+        <item quantity="one">%d ملف</item>
+        <item quantity="two">%d ملفان</item>
+        <item quantity="few">%d ملفات</item>
+        <item quantity="many">%d ملفاً</item>
+        <item quantity="other">%d ملف</item>
+    </plurals>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="zero">%d مجلد،</item>
+        <item quantity="one">%d مجلد،</item>
+        <item quantity="two">%d مجلدان،</item>
+        <item quantity="few">%d مجلدات،</item>
+        <item quantity="many">%d مجلد،</item>
+        <item quantity="other">%d مجلد،</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="zero">تمت المشاركة مع %d شخص</item>
+        <item quantity="one">تمت المشاركة مع %d شخص</item>
+        <item quantity="two">تمت المشاركة مع %d شخصان</item>
+        <item quantity="few">تمت المشاركة مع %d أشخاص</item>
+        <item quantity="many">تمت المشاركة مع %d شخص</item>
+        <item quantity="other">تمت المشاركة مع %d أشخاص</item>
+    </plurals>
+    <string name="link_password_dialog_message">أدخل كلمة المرور لفتح هذا الرابط.\nلا تملكها؟ تواصل مع صاحب الرابط.</string>
+    <string name="general_title_incoming_shares">مشاركات واردة</string>
 </resources>
