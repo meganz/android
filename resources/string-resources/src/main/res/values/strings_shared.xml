@@ -1165,6 +1165,8 @@
     <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">How it works</string>
+    <!-- Label for any ‘Incoming shares’ button or title -->
+    <string name="general_title_incoming_shares">Incoming shares</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
     <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
@@ -1739,14 +1741,12 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months.
-    is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years.
-    is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1783,11 +1783,9 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
-    is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
-    is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2277,12 +2275,12 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
-    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <!-- Pluralized file count used to display the number of files, e.g. "3 files" -->
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
     </plurals>
-    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <!-- Pluralized folder count used to display the number of folders, e.g. "2 folders" -->
     <plurals name="num_of_folders_with_parameter">
         <item quantity="one">%d folder</item>
         <item quantity="other">%d folders</item>
@@ -2457,6 +2455,8 @@
     <!-- Media Discovery filter Videos-->
     <string name="media_discovery_filter_videos">Videos</string>
     <!-- Placeholder text for searching pdf document -->
+    <string name="search_pdf_placeholder">Search document</string>
+    <!-- Placeholder text for searching pdf document -->
     <string name="pdf_viewer_search_placeholder">Search document</string>
     <!-- Appbar subtitle of folder link screen-->
     <string name="folder_link_subtitle">Folder link</string>
@@ -2477,7 +2477,155 @@
     <!-- Title for the decryption key dialog when a folder/file link requires a key -->
     <string name="link_decryption_key_dialog_title">Enter decryption key</string>
     <!-- Two line message for the decryption key dialog prompting user to enter the key -->
-    <string name="link_decryption_key_dialog_message">Enter the key to open this link.\nDon’t have it? Contact the sender.</string>
+    <string name="link_decryption_key_dialog_message">Enter the key to open this link.\nDon’t have it? Contact the link owner.</string>
     <!-- Error message shown when an invalid decryption key is entered -->
     <string name="link_decryption_key_dialog_error_invalid_key">Invalid decryption key</string>
+    <!--Upload bottom sheet actions to upload files-->
+    <string name="upload_bottom_sheet_action_upload_files">Upload files</string>
+    <!--Upload bottom sheet actions to upload folder-->
+    <string name="upload_bottom_sheet_action_upload_folder">Upload folder</string>
+    <!--Upload bottom sheet actions to scan document-->
+    <string name="upload_bottom_sheet_action_menu_scan_document">Scan document</string>
+    <!--Upload bottom sheet actions to capture image-->
+    <string name="upload_bottom_sheet_action_menu_take_picture">Capture</string>
+    <!-- Displayed when a folder contains no files or subfolders -->
+    <string name="file_browser_folder_empty">Empty folder</string>
+    <!-- Format for file subtitle combining file size and modification date, e.g. "1.2 MB · Mar 25" -->
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <!-- File size label for bytes (B), e.g. "1.5 B". Uses non-breaking space before unit. -->
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <!-- File size label for kilobytes (KB), e.g. "1.5 KB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_kilobytes">%s&#160;KB</string>
+    <!-- File size label for megabytes (MB), e.g. "1.5 MB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_megabytes">%s&#160;MB</string>
+    <!-- File size label for gigabytes (GB), e.g. "1.5 GB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_gigabytes">%s&#160;GB</string>
+    <!-- File size label for terabytes (TB), e.g. "1.5 TB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_terabytes">%s&#160;TB</string>
+    <!-- File size label for petabytes (PB), e.g. "1.5 PB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <!-- File size label for exabytes (EB), e.g. "1.5 EB". Uses non-breaking space before unit. -->
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <!-- First part of a combined folder and file count string, e.g. "2 folders, " (note trailing comma and space) -->
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="one">%d folder,</item>
+        <item quantity="other">%d folders,</item>
+    </plurals>
+    <!-- Second part of a combined folder and file count string, e.g. "3 files" (appended after the folder count) -->
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="one">%d file</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    <!-- Shows how many people a node (file or folder) is shared with, e.g. "Shared with 5 people" -->
+    <plurals name="general_num_shared_with_count">
+        <item quantity="one">Shared with %d person</item>
+        <item quantity="other">Shared with %d people</item>
+    </plurals>
+    <!-- Two line message for the decryption key dialog prompting user to enter the password -->
+    <string name="link_password_dialog_message">Enter the password to open this link.\nDon’t have it? Contact the sender.</string>
+    <!-- Snackbar message shown when moving nodes fails (standalone) -->
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="one">%d item failed to move</item>
+        <item quantity="other">%d items failed to move</item>
+    </plurals>
+    <!-- Snackbar message shown when moving nodes succeeds (standalone) -->
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="one">%d item moved successfully</item>
+        <item quantity="other">%d items moved successfully</item>
+    </plurals>
+    <!-- Success part of a concatenated snackbar when move has mixed results -->
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="one">%d item moved successfully</item>
+        <item quantity="other">%d items moved successfully</item>
+    </plurals>
+    <!-- Failure part of a concatenated snackbar when move has mixed results -->
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="one">%d item failed to move</item>
+        <item quantity="other">%d items failed to move</item>
+    </plurals>
+    <!-- Snackbar message for items successfully moved to the rubbish bin -->
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="one">%d item moved to rubbish</item>
+        <item quantity="other">%d items moved to rubbish</item>
+    </plurals>
+    <!-- Snackbar message for items that failed to move to the rubbish bin -->
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="one">%d item failed to move to rubbish</item>
+        <item quantity="other">%d items failed to move to rubbish</item>
+    </plurals>
+    <!-- Combined message: multiple items moved to rubbish, but 1 item failed -->
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="one">%d item moved to rubbish, 1 item failed</item>
+        <item quantity="other">%d items moved to rubbish, 1 item failed</item>
+    </plurals>
+    <!-- Combined message: 1 item moved to rubbish, but multiple items failed -->
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="one">1 item moved to rubbish, %d items failed</item>
+        <item quantity="other">1 item moved to rubbish, %d items failed</item>
+    </plurals>
+    <!-- Snackbar message when items are successfully removed from rubbish bin (standalone) -->
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d item removed from rubbish</item>
+        <item quantity="other">%d items removed from rubbish</item>
+    </plurals>
+    <!-- Snackbar message when removing items from rubbish bin fails (standalone) -->
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">%d item failed to remove from rubbish</item>
+        <item quantity="other">%d items failed to remove from rubbish</item>
+    </plurals>
+    <!-- Success part of a concatenated snackbar when rubbish removal has mixed results -->
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d item removed from rubbish</item>
+        <item quantity="other">%d items removed from rubbish</item>
+    </plurals>
+    <!-- Failure part of a concatenated snackbar when rubbish removal has mixed results -->
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">%d item failed to remove from rubbish</item>
+        <item quantity="other">%d items failed to remove from rubbish</item>
+    </plurals>
+    <!-- Snackbar message shown when copying nodes fails (standalone) -->
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="one">%d item failed to copy</item>
+        <item quantity="other">%d items failed to copy</item>
+    </plurals>
+    <!-- Snackbar message shown when copying nodes succeeds (standalone) -->
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="one">%d item copied successfully</item>
+        <item quantity="other">%d items copied successfully</item>
+    </plurals>
+    <!-- Success part of a concatenated snackbar when copy has mixed results -->
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="one">%d item copied successfully</item>
+        <item quantity="other">%d items copied successfully</item>
+    </plurals>
+    <!-- Failure part of a concatenated snackbar when copy has mixed results -->
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="one">%d item failed to copy</item>
+        <item quantity="other">%d items failed to copy</item>
+    </plurals>
+    <!-- Snackbar message when sharing folders from Cloud Drive fails (standalone) -->
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="one">%d folder failed to share</item>
+        <item quantity="other">%d folders failed to share</item>
+    </plurals>
+    <!-- Snackbar message when sharing folders from Cloud Drive succeeds (standalone) -->
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="one">%d folder shared successfully</item>
+        <item quantity="other">%d folders shared successfully</item>
+    </plurals>
+    <!-- Failure part of a concatenated snackbar when folder sharing has mixed results -->
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="one">%d folder failed to share</item>
+        <item quantity="other">%d folders failed to share</item>
+    </plurals>
+    <!-- Snackbar message for items that failed to restore from rubbish bin -->
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">%d item failed to restore from rubbish</item>
+        <item quantity="other">%d items failed to restore from rubbish</item>
+    </plurals>
+    <!-- Snackbar message for items successfully restored from rubbish bin -->
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">%d item restored from rubbish</item>
+        <item quantity="other">%d items restored from rubbish</item>
+    </plurals>
 </resources>

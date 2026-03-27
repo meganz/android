@@ -2028,7 +2028,7 @@
     <string name="offline_screen_remove_from_offline_selection_menu">เอาออกจากออฟไลน์</string>
     <string name="offline_item_deletion_confirmation_title">เอาออกจากออฟไลน์หรือไม่</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="other">%1$d ไฟล์</item>
+        <item quantity="other">%d ไฟล์</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="other">%d โฟลเดอร์</item>
@@ -2141,4 +2141,18 @@
     <string name="folder_link_unavailable_tos_violation">ลิงก์โฟลเดอร์ถูกลบออกเนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <string name="link_decryption_key_dialog_title">กรอกคีย์เพื่อถอดรหัสลับ</string>
     <string name="link_decryption_key_dialog_error_invalid_key">คีย์ถอดรหัสลับไม่ถูกต้อง</string>
+    <string name="upload_bottom_sheet_action_upload_files">อัปโหลดไฟล์</string>
+    <string name="upload_bottom_sheet_action_upload_folder">อัปโหลดโฟลเดอร์</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">สแกนเอกสาร</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">จับภาพ</string>
+    <string name="file_browser_folder_empty">โฟลเดอร์ว่าง</string>
+    <string name="label_file_size_bytes">%s B</string>
+    <string name="label_file_size_kilobytes">%s KB</string>
+    <string name="label_file_size_megabytes">%s MB</string>
+    <string name="label_file_size_gigabytes">%s&#160;GB</string>
+    <string name="label_file_size_terabytes">%s TB</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="other">%d ไฟล์</item>
+    </plurals>
+    <string name="general_title_incoming_shares">แชร์ขาเข้า</string>
 </resources>

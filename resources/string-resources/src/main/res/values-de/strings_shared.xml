@@ -2029,8 +2029,8 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Aus Offline-Daten entfernen</string>
     <string name="offline_item_deletion_confirmation_title">Aus Offline-Bereich entfernen?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d Datei</item>
-        <item quantity="other">%1$d Dateien</item>
+        <item quantity="one">%d Datei</item>
+        <item quantity="other">%d Dateien</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="one">%d Ordner</item>
@@ -2190,4 +2190,19 @@
     <string name="folder_link_unavailable_tos_violation">Der Ordnerlink wurde entfernt, da er gegen unsere Nutzungsbedingungen verstieß.</string>
     <string name="link_decryption_key_dialog_title">Schlüssel eingeben</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Ungültiger Schlüssel</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Dokument scannen</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">Foto machen</string>
+    <string name="upload_bottom_sheet_action_upload_files">Dateien hochladen</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Ordner hochladen</string>
+    <string name="label_file_size_megabytes">%s MB</string>
+    <string name="label_file_size_terabytes">%s&#160;TB</string>
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <string name="label_file_size_kilobytes">%s&#160;KB</string>
+    <string name="label_file_size_gigabytes">%s GB</string>
+    <string name="file_browser_folder_empty">Leerer Ordner</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="one">%d Datei</item>
+        <item quantity="other">%d Dateien</item>
+    </plurals>
+    <string name="general_title_incoming_shares">An Sie freigegebene Ordner</string>
 </resources>

@@ -34,6 +34,8 @@ buildscript {
         classpath(plugin.kotlin.gradle)
         classpath(lib.kotlin.serialisation)
         classpath(plugin.benchmark.baseline.profile)
+        classpath(lib.okhttp3)
+        classpath(lib.okio)
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:${plugin.versions.jfrog.artifactory.get()}")
     }
 }
@@ -99,7 +101,7 @@ extra["targetSdkVersion"] = 36
 extra["buildTools"] = "36.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20260324.160650-rel"
+extra["megaSdkVersion"] = "20260327.044201-rel"
 
 
 //JDK and Java Version

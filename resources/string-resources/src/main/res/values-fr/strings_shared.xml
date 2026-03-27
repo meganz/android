@@ -2157,9 +2157,9 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Supprimer de Hors&#160;ligne</string>
     <string name="offline_item_deletion_confirmation_title">Supprimer de Hors&#160;ligne ?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d fichier</item>
-        <item quantity="many">%1$d fichiers</item>
-        <item quantity="other">%1$d fichiers</item>
+        <item quantity="one">%d fichier</item>
+        <item quantity="many">%d fichiers</item>
+        <item quantity="other">%d fichiers</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="one">%d dossier</item>
@@ -2167,9 +2167,9 @@
         <item quantity="other">%d dossiers</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d dossier&#160;·&#160;</item>
-        <item quantity="many">%1$d dossiers&#160;·&#160;</item>
-        <item quantity="other">%1$d dossiers&#160;·&#160;</item>
+        <item quantity="one">“%1$d dossier, “</item>
+        <item quantity="many">“%1$d dossiers, “</item>
+        <item quantity="other">“%1$d dossiers, “</item>
     </plurals>
     <string name="general_first_name">Prénom</string>
     <string name="general_last_name">Nom</string>
@@ -2247,16 +2247,157 @@
     <string name="starter_account">Starter</string>
     <string name="account_upgrade_account_buy_button_title_starter">Acheter Starter</string>
     <string name="upgrade_account_successful_starter_yearly">Merci pour votre abonnement annuel à Starter</string>
-    <string name="media_discovery_screen_dropdown_action_zoom_in">Zoomer avant</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Zoomer</string>
     <string name="media_discovery_filter_all_media">Tous les médias</string>
     <string name="media_discovery_filter_images">Images</string>
     <string name="media_discovery_filter_videos">Vidéos</string>
-    <string name="media_discovery_screen_dropdown_action_zoom_out">Zoomer arrière</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Dézoomer</string>
     <string name="search_pdf_placeholder">Rechercher dans le document</string>
     <string name="pdf_viewer_search_placeholder">Rechercher dans le document</string>
     <string name="folder_link_subtitle">Lien du dossier</string>
-    <string name="pdf_viewer_dialog_title_enter_password">Saisissez un mot de passe</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Entrer un mot de passe</string>
     <string name="folder_link_unavailable_tos_violation">Le lien de dossier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
-    <string name="link_decryption_key_dialog_title">Saisir la clé de déchiffrement</string>
+    <string name="link_decryption_key_dialog_title">Entrer la clé de déchiffrement</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Clé de déchiffrement invalide</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Numériser un document</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">Prendre une photo</string>
+    <string name="upload_bottom_sheet_action_upload_files">Téléverser des fichiers</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Téléverser un dossier</string>
+    <string name="label_file_size_megabytes">%s&#160;Mo</string>
+    <string name="label_file_size_terabytes">%s&#160;To</string>
+    <string name="label_file_size_bytes">%s&#160;o</string>
+    <string name="label_file_size_kilobytes">%s&#160;ko</string>
+    <string name="label_file_size_gigabytes">%s&#160;Go</string>
+    <string name="file_browser_folder_empty">Dossier vide</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="one">%d fichier</item>
+        <item quantity="many">%d fichiers</item>
+        <item quantity="other">%d fichiers</item>
+    </plurals>
+    <string name="pdf_viewer_dialog_text_enter_password">Veuillez entrer le mot de passe pour ouvrir ce fichier</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Mot de passe incorrect</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Ligne %1$d</string>
+    <string name="select_videos_search_empty_view_description">Rechercher des vidéos dans votre disque Cloud</string>
+    <string name="new_text_file_invalid_extension_error_message">Utilisez une extension de fichier valide (par exemple .txt)</string>
+    <string name="link_decryption_key_dialog_message">Entrez la clé pour ouvrir ce lien.\nVous ne l\’avez pas ? Contactez le propriétaire du lien.</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;Po</string>
+    <string name="label_file_size_exabytes">%s&#160;Eo</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="one">%d dossier,</item>
+        <item quantity="many">%d dossiers,</item>
+        <item quantity="other">%d dossiers,</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="one">Partagé avec %d personne</item>
+        <item quantity="many">Partagé avec %d personnes</item>
+        <item quantity="other">Partagé avec %d personnes</item>
+    </plurals>
+    <string name="link_password_dialog_message">Entrez le mot de passe pour ouvrir ce lien.\nVous ne l\’avez pas ? Contactez le propriétaire du lien.</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="one">%d élément n\’a pas pu être déplacé</item>
+        <item quantity="many">%d éléments n\’ont pas pu être déplacés</item>
+        <item quantity="other">%d éléments n\’ont pas pu être déplacés</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="one">%d élément déplacé avec succès</item>
+        <item quantity="many">%d éléments déplacés avec succès</item>
+        <item quantity="other">%d éléments déplacés avec succès</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="one">%d élément déplacé avec succès</item>
+        <item quantity="many">%d éléments déplacés avec succès</item>
+        <item quantity="other">%d éléments déplacés avec succès</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="one">%d élément n\’a pas pu être déplacé</item>
+        <item quantity="many">%d éléments n\’ont pas pu être déplacés</item>
+        <item quantity="other">%d éléments n\’ont pas pu être déplacés</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="one">%d élément déplacé vers la Corbeille</item>
+        <item quantity="many">%d éléments déplacés vers la Corbeille</item>
+        <item quantity="other">%d éléments déplacés vers la Corbeille</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="one">%d élément n\’a pas pu être déplacé dans la Corbeille</item>
+        <item quantity="many">%d éléments n\’ont pas pu être déplacés dans la Corbeille</item>
+        <item quantity="other">%d éléments n\’ont pas pu être déplacés dans la Corbeille</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="one">%d élément déplacé vers la Corbeille, 1 élément a échoué</item>
+        <item quantity="many">%d éléments déplacés vers la Corbeille, 1 élément a échoué</item>
+        <item quantity="other">%d éléments déplacés vers la Corbeille, 1 élément a échoué</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="one">1 élément déplacé vers la Corbeille, %d élément a échoué</item>
+        <item quantity="many">1 élément déplacé vers la Corbeille, %d éléments ont échoué</item>
+        <item quantity="other">1 élément déplacé vers la Corbeille, %d éléments ont échoué</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d élément retiré de la Corbeille</item>
+        <item quantity="many">%d éléments retirés de la Corbeille</item>
+        <item quantity="other">%d éléments retirés de la Corbeille</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">%d élément n\’a pas pu être retiré de la Corbeille</item>
+        <item quantity="many">%d éléments n\’ont pas pu être retirés de la Corbeille</item>
+        <item quantity="other">%d éléments n\’ont pas pu être retirés de la Corbeille</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d élément retiré de la Corbeille</item>
+        <item quantity="many">%d éléments retirés de la Corbeille</item>
+        <item quantity="other">%d éléments retirés de la Corbeille</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">%d élément n\’a pas pu être retiré de la Corbeille</item>
+        <item quantity="many">%d éléments n\’ont pas pu être retirés de la Corbeille</item>
+        <item quantity="other">%d éléments n\’ont pas pu être retirés de la Corbeille</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="one">%d élément n\’a pas pu être copié</item>
+        <item quantity="many">%d éléments n\’ont pas pu être copiés</item>
+        <item quantity="other">%d éléments n\’ont pas pu être copiés</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="one">%d élément copié avec succès</item>
+        <item quantity="many">%d éléments copiés avec succès</item>
+        <item quantity="other">%d éléments copiés avec succès</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="one">%d élément copié avec succès</item>
+        <item quantity="many">%d éléments copiés avec succès</item>
+        <item quantity="other">%d éléments copiés avec succès</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="one">%d élément n\’a pas pu être copié</item>
+        <item quantity="many">%d éléments n\’ont pas pu être copiés</item>
+        <item quantity="other">%d éléments n\’ont pas pu être copiés</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="one">%d dossier n\’a pas pu être partagé</item>
+        <item quantity="many">%d dossiers n\’ont pas pu être partagés</item>
+        <item quantity="other">%d dossiers n\’ont pas pu être partagés</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="one">%d dossier partagé avec succès</item>
+        <item quantity="many">%d dossiers partagés avec succès</item>
+        <item quantity="other">%d dossiers partagés avec succès</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="one">%d dossier n\’a pas pu être partagé</item>
+        <item quantity="many">%d dossiers n\’ont pas pu être partagés</item>
+        <item quantity="other">%d dossiers n\’ont pas pu être partagés</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">%d élément n\’a pas pu être restauré depuis la Corbeille</item>
+        <item quantity="many">%d éléments n\’ont pas pu être restaurés depuis la Corbeille</item>
+        <item quantity="other">%d éléments n\’ont pas pu être restaurés depuis la Corbeille</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">%d élément restauré depuis la Corbeille</item>
+        <item quantity="many">%d éléments restaurés depuis la Corbeille</item>
+        <item quantity="other">%d éléments restaurés depuis la Corbeille</item>
+    </plurals>
+    <string name="general_title_incoming_shares">Partages entrants</string>
 </resources>

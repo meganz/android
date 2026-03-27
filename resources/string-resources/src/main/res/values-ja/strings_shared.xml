@@ -2050,13 +2050,13 @@
     <string name="offline_screen_remove_from_offline_selection_menu">オフラインから削除</string>
     <string name="offline_item_deletion_confirmation_title">オフラインから削除しますか？</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="other">%1$d個のファイル</item>
+        <item quantity="other">%d 個のファイル</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="other">%d個のフォルダ</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">%1$d個のフォルダ&#160;・&#160;</item>
+        <item quantity="other">“%1$d個のフォルダ、 “</item>
     </plurals>
     <string name="general_install_label">インストール</string>
     <string name="general_app_update_download_success_message">アプリのアップデートをダウンロードしました</string>
@@ -2151,5 +2151,92 @@
     <string name="new_text_file_invalid_extension_error_message">有効なファイル拡張子を使用してください（例：.txt）</string>
     <string name="link_decryption_key_dialog_title">復号キーを入力してください</string>
     <string name="link_decryption_key_dialog_error_invalid_key">復号キーが無効です</string>
-    <string name="link_decryption_key_dialog_message">このリンクを開くにはキーを入力してください。\nお持ちでない場合は、送信者に連絡してください。</string>
+    <string name="link_decryption_key_dialog_message">このリンクを開くにはキーを入力してください。\nお持ちでない場合は、リンク所有者に連絡してください。</string>
+    <string name="upload_bottom_sheet_action_upload_files">ファイルをアップロード</string>
+    <string name="upload_bottom_sheet_action_upload_folder">フォルダをアップロード</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">ドキュメントをスキャン</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">キャプチャ</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="other">%d個のフォルダ、</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="other">%d人と共有</item>
+    </plurals>
+    <string name="file_browser_folder_empty">フォルダが空です</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="other">%d 個のファイル</item>
+    </plurals>
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <string name="label_file_size_kilobytes">%s&#160;KB</string>
+    <string name="label_file_size_megabytes">%s&#160;MB</string>
+    <string name="label_file_size_gigabytes">%s&#160;GB</string>
+    <string name="label_file_size_terabytes">%s&#160;TB</string>
+    <string name="link_password_dialog_message">このリンクを開くにはパスワードを入力してください。\nパスワードをお持ちでない場合は、リンクの所有者に連絡してください。</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="other">%d個の項目を移動できませんでした</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="other">%d個の項目を移動しました</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="other">%d個の項目をごみ箱に移動しました</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="other">%d個の項目を移動できませんでした</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="other">%d個の項目をごみ箱に移動しました</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="other">%d個の項目をごみ箱に移動できませんでした</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="other">%d個の項目をごみ箱に移動しました（1個失敗）</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="other">1個の項目をごみ箱に移動しました（%d 個失敗）</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="other">%d個の項目をごみ箱から削除しました</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="other">%d個の項目をごみ箱から削除できませんでした</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="other">%d個の項目をごみ箱から削除しました</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="other">%d個の項目をごみ箱から削除できませんでした</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="other">%d個の項目をコピーできませんでした</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="other">%d個の項目をコピーしました</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="other">%d個の項目をコピーしました</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="other">%d個の項目をコピーできませんでした</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="other">%d個のフォルダを共有できませんでした</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="other">%d個のフォルダを共有しました</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="other">%d個のフォルダを共有できませんでした</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="other">%d個の項目をごみ箱から復元できませんでした</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="other">%d個の項目をごみ箱から復元しました</item>
+    </plurals>
+    <string name="general_title_incoming_shares">受信共有</string>
 </resources>

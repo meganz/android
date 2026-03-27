@@ -2224,10 +2224,10 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Usuń z lokalnych</string>
     <string name="offline_item_deletion_confirmation_title">Usunąć z trybu lokalnego?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d plik</item>
-        <item quantity="few">%1$d plików</item>
-        <item quantity="many">%1$d plików</item>
-        <item quantity="other">%1$d plików</item>
+        <item quantity="one">%d plik</item>
+        <item quantity="few">%d plików</item>
+        <item quantity="many">%d plików</item>
+        <item quantity="other">%d plików</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="one">%d katalog</item>
@@ -2236,10 +2236,10 @@
         <item quantity="other">%d katalogów</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d katalog&#160;·&#160;</item>
-        <item quantity="few">%1$d katalogów&#160;·&#160;</item>
-        <item quantity="many">%1$d katalogów&#160;·&#160;</item>
-        <item quantity="other">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="one">“%1$d folder, “</item>
+        <item quantity="few">“%1$d folderów, “</item>
+        <item quantity="many">“%1$d foldery, “</item>
+        <item quantity="other">“%1$d foldery, “</item>
     </plurals>
     <string name="general_install_label">Zainstaluj</string>
     <string name="general_app_update_download_success_message">Pobrano aktualizację aplikacji</string>
@@ -2334,5 +2334,164 @@
     <string name="link_decryption_key_dialog_title">Wprowadź klucz deszyfrujący</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Nieprawidłowy klucz</string>
     <string name="new_text_file_invalid_extension_error_message">Użyj prawidłowego rozszerzenia pliku (np. .txt)</string>
-    <string name="link_decryption_key_dialog_message">Wpisz klucz, aby otworzyć ten link.\nNie masz go? Skontaktuj się z nadawcą.</string>
+    <string name="link_decryption_key_dialog_message">Wprowadź klucz, aby otworzyć ten link.\nNie masz go? Skontaktuj się z właścicielem linku.</string>
+    <string name="upload_bottom_sheet_action_upload_files">Wgraj pliki</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Wgraj katalog</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Zeskanuj dokument</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">Zrób zdjęcie</string>
+    <string name="file_browser_folder_empty">Pusty katalog</string>
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <string name="label_file_size_kilobytes">%s KB</string>
+    <string name="label_file_size_megabytes">%s&#160;MB</string>
+    <string name="label_file_size_gigabytes">%s GB</string>
+    <string name="label_file_size_terabytes">%s TB</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="one">%d plik</item>
+        <item quantity="few">%d plików</item>
+        <item quantity="many">%d plików</item>
+        <item quantity="other">%d plików</item>
+    </plurals>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="one">%d folder,</item>
+        <item quantity="few">%d foldery,</item>
+        <item quantity="many">%d foldery,</item>
+        <item quantity="other">%d foldery,</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="one">Udostępniono %d osobie</item>
+        <item quantity="few">Udostępniono %d osobom</item>
+        <item quantity="many">Udostępniono %d osobom</item>
+        <item quantity="other">Udostępniono %d osobom</item>
+    </plurals>
+    <string name="link_password_dialog_message">Wprowadź hasło, aby otworzyć ten link.\nNie masz hasła? Skontaktuj się z właścicielem linku.</string>
+    <string name="general_title_incoming_shares">Udostępnienia przychodzące</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="one">%d nie udało się przenieść elementu</item>
+        <item quantity="few">%d nie udało się przenieść elementów</item>
+        <item quantity="many">%d nie udało się przenieść elementów</item>
+        <item quantity="other">%d nie udało się przenieść elementów</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="one">%d element przeniesiony pomyślnie</item>
+        <item quantity="few">%d elementy przeniesione pomyślnie</item>
+        <item quantity="many">%d elementy przeniesione pomyślnie</item>
+        <item quantity="other">%d elementy przeniesione pomyślnie</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="one">%d element przeniesiony pomyślnie</item>
+        <item quantity="few">%d elementy przeniesione pomyślnie</item>
+        <item quantity="many">%d elementy przeniesione pomyślnie</item>
+        <item quantity="other">%d elementy przeniesione pomyślnie</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="one">%d nie udało się przenieść elementu</item>
+        <item quantity="few">%d nie udało się przenieść elementów</item>
+        <item quantity="many">%d nie udało się przenieść elementów</item>
+        <item quantity="other">%d nie udało się przenieść elementów</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="one">%d Przeniesiono do kosza</item>
+        <item quantity="few">%d Przeniesiono do kosza</item>
+        <item quantity="many">%d Przeniesiono do kosza</item>
+        <item quantity="other">%d Przeniesiono do kosza</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="one">Pozycja %d nie została przeniesiona do kosza</item>
+        <item quantity="few">Pozycje %d nie zostały przeniesione do kosza</item>
+        <item quantity="many">Pozycje %d nie zostały przeniesione do kosza</item>
+        <item quantity="other">Pozycje %d nie zostały przeniesione do kosza</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="one">%d element przeniesiony do kosza, 1 element nie powiódł się</item>
+        <item quantity="few">%d elementy przeniesione do kosza, 1 element nie powiódł się</item>
+        <item quantity="many">%d elementy przeniesione do kosza, 1 element nie powiódł się</item>
+        <item quantity="other">%d elementy przeniesione do kosza, 1 element nie powiódł się</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="one">1 pozycja przeniesiona do kosza, %d pozycja nie powiodła się</item>
+        <item quantity="few">1 pozycja przeniesiona do kosza, %d pozycje nie powiodły się</item>
+        <item quantity="many">1 pozycja przeniesiona do kosza, %d pozycje nie powiodły się</item>
+        <item quantity="other">1 pozycja przeniesiona do kosza, %d pozycje nie powiodły się</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d przedmiot usunięty z kosza na śmieci</item>
+        <item quantity="few">%d przedmioty usunięte z kosza na śmieci</item>
+        <item quantity="many">%d przedmioty usunięte z kosza na śmieci</item>
+        <item quantity="other">%d przedmioty usunięte z kosza na śmieci</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">%d nie udało się usunąć z kosza na śmieci</item>
+        <item quantity="few">%d nie udało się usunąć z kosza na śmieci</item>
+        <item quantity="many">%d nie udało się usunąć z kosza na śmieci</item>
+        <item quantity="other">%d nie udało się usunąć z kosza na śmieci</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d przedmiot usunięty z kosza na śmieci</item>
+        <item quantity="few">%d przedmioty usunięte z kosza na śmieci</item>
+        <item quantity="many">%d przedmioty usunięte z kosza na śmieci</item>
+        <item quantity="other">%d przedmioty usunięte z kosza na śmieci</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">%d nie udało się usunąć z kosza na śmieci</item>
+        <item quantity="few">%d nie udało się usunąć z kosza na śmieci</item>
+        <item quantity="many">%d nie udało się usunąć z kosza na śmieci</item>
+        <item quantity="other">%d nie udało się usunąć z kosza na śmieci</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="one">%d nie udało się skopiować elementu</item>
+        <item quantity="few">%d nie udało się skopiować elementów</item>
+        <item quantity="many">%d nie udało się skopiować elementów</item>
+        <item quantity="other">%d nie udało się skopiować elementów</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="one">%d element skopiowany pomyślnie</item>
+        <item quantity="few">%d elementy skopiowane pomyślnie</item>
+        <item quantity="many">%d elementy skopiowane pomyślnie</item>
+        <item quantity="other">%d elementy skopiowane pomyślnie</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="one">%d element skopiowany pomyślnie</item>
+        <item quantity="few">%d elementy skopiowane pomyślnie</item>
+        <item quantity="many">%d elementy skopiowane pomyślnie</item>
+        <item quantity="other">%d elementy skopiowane pomyślnie</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="one">%d nie udało się skopiować elementu</item>
+        <item quantity="few">%d nie udało się skopiować elementów</item>
+        <item quantity="many">%d nie udało się skopiować elementów</item>
+        <item quantity="other">%d nie udało się skopiować elementów</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="one">Nie udało się udostępnić folderu %d</item>
+        <item quantity="few">Nie udało się udostępnić folderów %d</item>
+        <item quantity="many">Nie udało się udostępnić folderów %d</item>
+        <item quantity="other">Nie udało się udostępnić folderów %d</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="one">%d folder został udostępniony pomyślnie</item>
+        <item quantity="few">%d foldery zostały udostępnione pomyślnie</item>
+        <item quantity="many">%d foldery zostały udostępnione pomyślnie</item>
+        <item quantity="other">%d foldery zostały udostępnione pomyślnie</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="one">Nie udało się udostępnić folderu %d</item>
+        <item quantity="few">Nie udało się udostępnić folderów %d</item>
+        <item quantity="many">Nie udało się udostępnić folderów %d</item>
+        <item quantity="other">Nie udało się udostępnić folderów %d</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">%d elementu nie udało się przywrócić z kosza</item>
+        <item quantity="few">%d elementów nie udało się przywrócić z kosza</item>
+        <item quantity="many">%d elementów nie udało się przywrócić z kosza</item>
+        <item quantity="other">%d elementów nie udało się przywrócić z kosza</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">%d element przywrócony z kosza</item>
+        <item quantity="few">%d elementy przywrócone z kosza</item>
+        <item quantity="many">%d elementy przywrócone z kosza</item>
+        <item quantity="other">%d elementy przywrócone z kosza</item>
+    </plurals>
 </resources>

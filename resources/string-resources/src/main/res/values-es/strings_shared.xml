@@ -2115,9 +2115,9 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Eliminar desde Sin conexión</string>
     <string name="offline_item_deletion_confirmation_title">¿Eliminar desde Sin conexión?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d archivo</item>
-        <item quantity="many">%1$dde archivos</item>
-        <item quantity="other">%1$d archivos</item>
+        <item quantity="one">%d archivo</item>
+        <item quantity="many">%d de archivos</item>
+        <item quantity="other">%d archivos</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="one">%d carpeta</item>
@@ -2229,4 +2229,20 @@
     <string name="folder_link_unavailable_tos_violation">El enlace de carpeta ha sido eliminado por infringir nuestros Términos de servicio.</string>
     <string name="link_decryption_key_dialog_title">Introducir la clave de descifrado</string>
     <string name="link_decryption_key_dialog_error_invalid_key">La clave de descifrado no es válida</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Escanear documento</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">Capturar</string>
+    <string name="upload_bottom_sheet_action_upload_files">Subir archivos</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Subir carpeta</string>
+    <string name="label_file_size_megabytes">%s MB</string>
+    <string name="label_file_size_terabytes">%s&#160;TB</string>
+    <string name="label_file_size_bytes">%s B</string>
+    <string name="label_file_size_kilobytes">%s&#160;KB</string>
+    <string name="label_file_size_gigabytes">%s GB</string>
+    <string name="file_browser_folder_empty">Carpeta vacía</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="one">%d archivo</item>
+        <item quantity="many">%d de archivos</item>
+        <item quantity="other">%d archivos</item>
+    </plurals>
+    <string name="general_title_incoming_shares">Compartido conmigo</string>
 </resources>

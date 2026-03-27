@@ -1996,7 +1996,7 @@
     <string name="offline_screen_remove_from_offline_selection_menu">从离线中移除</string>
     <string name="offline_item_deletion_confirmation_title">要从离线中移除吗？</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="other">%1$d个文件</item>
+        <item quantity="other">%d个文件</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="other">%d个文件夹</item>
@@ -2145,4 +2145,18 @@
     <string name="folder_link_unavailable_tos_violation">该文件夹链接因违反我们的服务条款而被移除。</string>
     <string name="link_decryption_key_dialog_title">请输入解密密钥</string>
     <string name="link_decryption_key_dialog_error_invalid_key">解密密钥无效</string>
+    <string name="upload_bottom_sheet_action_upload_files">上传文件</string>
+    <string name="upload_bottom_sheet_action_upload_folder">上传文件夹</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">扫描文件</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">拍照</string>
+    <string name="file_browser_folder_empty">空文件夹</string>
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <string name="label_file_size_kilobytes">%s&#160;KB</string>
+    <string name="label_file_size_megabytes">%s MB</string>
+    <string name="label_file_size_gigabytes">%s GB</string>
+    <string name="label_file_size_terabytes">%s&#160;TB</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="other">%d个文件</item>
+    </plurals>
+    <string name="general_title_incoming_shares">传入的共享</string>
 </resources>

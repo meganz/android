@@ -2154,9 +2154,9 @@
     <string name="offline_screen_remove_from_offline_selection_menu">Eliminați din offline</string>
     <string name="offline_item_deletion_confirmation_title">Elimini din Ofline?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d fișier</item>
-        <item quantity="few">%1$d fișiere</item>
-        <item quantity="other">%1$d de fișiere</item>
+        <item quantity="one">%d fișier</item>
+        <item quantity="few">%d fișiere</item>
+        <item quantity="other">%d de fișiere</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="one">%d folder</item>
@@ -2262,4 +2262,21 @@
     <string name="folder_link_unavailable_tos_violation">Linkul folderului a fost eliminat deoarece a încălcat Termenii de utilizare a serviciului.</string>
     <string name="link_decryption_key_dialog_title">Introduceți cheia de decriptare</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Cheie de decriptare nevalidă</string>
+    <string name="upload_bottom_sheet_action_upload_files">Încarcă fișiere</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Încarcă un folder</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Scanează un document</string>
+    <string name="upload_bottom_sheet_action_menu_take_picture">Captura</string>
+    <string name="file_browser_folder_empty">Folder gol</string>
+    <string name="label_file_size_bytes">%s&#160;B</string>
+    <string name="label_file_size_kilobytes">%s KB</string>
+    <string name="label_file_size_megabytes">%s MB</string>
+    <string name="label_file_size_gigabytes">%s GB</string>
+    <string name="label_file_size_terabytes">%s TB</string>
+    <plurals name="num_of_folders_num_of_files_2">
+        <item quantity="one">%d fișier</item>
+        <item quantity="few">%d fișiere</item>
+        <item quantity="other">%d de fișiere</item>
+    </plurals>
+    <string name="general_title_incoming_shares">Partajări primite</string>
+    <string name="select_videos_search_empty_view_description">Caută videoclipuri în discul tău din cloud</string>
 </resources>
