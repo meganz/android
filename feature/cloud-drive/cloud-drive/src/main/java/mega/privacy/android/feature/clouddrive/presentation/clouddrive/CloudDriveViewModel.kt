@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
+import mega.privacy.android.shared.account.overquota.OverQuotaStatus
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges

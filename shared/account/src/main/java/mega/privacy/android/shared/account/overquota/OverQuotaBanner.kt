@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.components.banners
+package mega.privacy.android.shared.account.overquota
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
@@ -251,4 +251,3 @@ class OverQuotaStatusWarningProvider : PreviewParameterProvider<OverQuotaStatus>
         ),
     ).asSequence()
 }
-

@@ -23,8 +23,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
+import mega.privacy.android.shared.account.overquota.OverQuotaStatus
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusMapper
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId

@@ -17,9 +17,9 @@ import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel.Companion.MAX_COMPLETED_TRANSFER_FOR_STATE
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
+import mega.privacy.android.shared.account.overquota.OverQuotaIssue
+import mega.privacy.android.shared.account.overquota.OverQuotaStatus
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType

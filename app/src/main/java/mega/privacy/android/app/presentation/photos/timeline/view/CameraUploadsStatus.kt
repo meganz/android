@@ -35,7 +35,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.clouddrive.ui.StorageOverQuotaBanner
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import mega.privacy.android.feature.photos.R as featurePhotosR
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
@@ -282,7 +282,7 @@ internal fun FullStorageBanner(
     onUpgradeClicked: () -> Unit = {}
 ) {
     StorageOverQuotaBanner(
-        storageCapacity = StorageOverQuotaCapacity.FULL,
+        storageCapacity = StorageOverQuotaCapacity.Full,
         onStorageAlmostFullWarningDismiss = {},
         onUpgradeClicked = onUpgradeClicked
     )

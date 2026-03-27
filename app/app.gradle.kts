@@ -213,6 +213,7 @@ configurations.matching { it.name.contains("AndroidTest", ignoreCase = true) }.c
 dependencies {
     // Modules
     implementation(project(":shared:nodes"))
+    implementation(project(":shared:account"))
     implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))

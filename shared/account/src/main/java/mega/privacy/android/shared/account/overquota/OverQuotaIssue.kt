@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.components.banners
+package mega.privacy.android.shared.account.overquota
 
 /**
  * Class to represent the over quota status

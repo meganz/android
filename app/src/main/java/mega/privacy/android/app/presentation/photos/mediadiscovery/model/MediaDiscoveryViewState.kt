@@ -8,8 +8,8 @@ import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.MediaListItem
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity.DEFAULT
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity.Default
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.photos.Photo
@@ -80,7 +80,7 @@ data class MediaDiscoveryViewState(
     @StringRes val errorMessage: Int? = null,
     val accountType: AccountType? = null,
     val isHiddenNodesOnboarded: Boolean = false,
-    val storageCapacity: StorageOverQuotaCapacity = DEFAULT,
+    val storageCapacity: StorageOverQuotaCapacity = Default,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
     val isClearSelectedPhotos: Boolean = true,

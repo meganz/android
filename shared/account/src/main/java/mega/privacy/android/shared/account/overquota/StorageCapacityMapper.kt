@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.components.banners
+package mega.privacy.android.shared.account.overquota
 
 import mega.privacy.android.domain.entity.StorageState
 import javax.inject.Inject
@@ -19,8 +19,8 @@ class StorageCapacityMapper @Inject constructor() {
         storageState: StorageState,
         shouldShow: Boolean,
     ): StorageOverQuotaCapacity = when (storageState) {
-        StorageState.Red, StorageState.PayWall -> StorageOverQuotaCapacity.FULL
-        StorageState.Orange -> if (shouldShow) StorageOverQuotaCapacity.ALMOST_FULL else StorageOverQuotaCapacity.DEFAULT
-        else -> StorageOverQuotaCapacity.DEFAULT
+        StorageState.Red, StorageState.PayWall -> StorageOverQuotaCapacity.Full
+        StorageState.Orange -> if (shouldShow) StorageOverQuotaCapacity.AlmostFull else StorageOverQuotaCapacity.Default
+        else -> StorageOverQuotaCapacity.Default
     }
 }

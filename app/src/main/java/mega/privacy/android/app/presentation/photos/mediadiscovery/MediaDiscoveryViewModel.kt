@@ -39,8 +39,8 @@ import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -803,7 +803,7 @@ class MediaDiscoveryViewModel @Inject constructor(
      * Reset storage capacity to default
      */
     fun setStorageCapacityAsDefault() {
-        _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
+        _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.Default) }
         viewModelScope.launch {
             runCatching {
                 setAlmostFullStorageBannerClosingTimestampUseCase()

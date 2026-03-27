@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.components.banners
+package mega.privacy.android.shared.account.overquota
 
 import mega.privacy.android.domain.entity.StorageState
 import javax.inject.Inject
@@ -9,11 +9,11 @@ import javax.inject.Inject
 class OverQuotaStatusMapper @Inject constructor() {
 
     /**
-     * Invocation method
-     * Map the [mega.privacy.android.domain.entity.StorageState] to [OverQuotaIssue]
-     * @param storageState The [mega.privacy.android.domain.entity.StorageState] object
-     * @param shouldShowWarning true if the banner should be shown
-     * @return The mapped [OverQuotaIssue]
+     * Invoke
+     *
+     * @param storageState
+     * @param transferOverQuota
+     * @param freeAccount
      */
     operator fun invoke(
         storageState: StorageState,

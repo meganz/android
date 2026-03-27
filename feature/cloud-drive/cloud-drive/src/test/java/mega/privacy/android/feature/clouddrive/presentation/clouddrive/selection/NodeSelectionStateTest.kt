@@ -3,7 +3,7 @@ package mega.privacy.android.feature.clouddrive.presentation.clouddrive.selectio
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
+import mega.privacy.android.shared.account.overquota.OverQuotaStatus
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType

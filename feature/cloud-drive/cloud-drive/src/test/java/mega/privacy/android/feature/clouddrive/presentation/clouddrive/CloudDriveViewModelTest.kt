@@ -18,9 +18,9 @@ import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
+import mega.privacy.android.shared.account.overquota.OverQuotaIssue
+import mega.privacy.android.shared.account.overquota.OverQuotaStatus
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState

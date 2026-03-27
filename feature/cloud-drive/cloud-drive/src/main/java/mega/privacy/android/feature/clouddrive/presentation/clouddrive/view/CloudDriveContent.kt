@@ -39,9 +39,9 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaErrorBanner
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaWarningBanner
+import mega.privacy.android.shared.account.overquota.OverQuotaErrorBanner
+import mega.privacy.android.shared.account.overquota.OverQuotaIssue
+import mega.privacy.android.shared.account.overquota.OverQuotaWarningBanner
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner

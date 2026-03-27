@@ -2,9 +2,9 @@ package mega.privacy.android.app.presentation.clouddrive.mapper
 
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -22,14 +22,14 @@ internal class StorageCapacityMapperTest {
     }
 
     private fun provideParameters(): Stream<Arguments> = Stream.of(
-        Arguments.of(StorageState.PayWall, true, StorageOverQuotaCapacity.FULL),
-        Arguments.of(StorageState.PayWall, false, StorageOverQuotaCapacity.FULL),
-        Arguments.of(StorageState.Red, true, StorageOverQuotaCapacity.FULL),
-        Arguments.of(StorageState.Red, false, StorageOverQuotaCapacity.FULL),
-        Arguments.of(StorageState.Orange, true, StorageOverQuotaCapacity.ALMOST_FULL),
-        Arguments.of(StorageState.Orange, false, StorageOverQuotaCapacity.DEFAULT),
-        Arguments.of(StorageState.Green, true, StorageOverQuotaCapacity.DEFAULT),
-        Arguments.of(StorageState.Green, false, StorageOverQuotaCapacity.DEFAULT),
+        Arguments.of(StorageState.PayWall, true, StorageOverQuotaCapacity.Full),
+        Arguments.of(StorageState.PayWall, false, StorageOverQuotaCapacity.Full),
+        Arguments.of(StorageState.Red, true, StorageOverQuotaCapacity.Full),
+        Arguments.of(StorageState.Red, false, StorageOverQuotaCapacity.Full),
+        Arguments.of(StorageState.Orange, true, StorageOverQuotaCapacity.AlmostFull),
+        Arguments.of(StorageState.Orange, false, StorageOverQuotaCapacity.Default),
+        Arguments.of(StorageState.Green, true, StorageOverQuotaCapacity.Default),
+        Arguments.of(StorageState.Green, false, StorageOverQuotaCapacity.Default),
     )
 
     @ParameterizedTest(name = "test that if storageState is {0}, isFullStorageOverQuotaBannerEnabled is {1} and isAlmostFullStorageQuotaBannerEnabled is {2} and isDismissiblePeriodOver is {3} then storage capacity is {3}")

@@ -2,10 +2,10 @@ package mega.privacy.android.app.presentation.transfers.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.shared.account.overquota.OverQuotaStatus
 
 /**
  * UI state for Transfers screen.

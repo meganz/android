@@ -41,8 +41,8 @@ import mega.privacy.android.app.presentation.validator.toolbaractions.model.modi
 import mega.privacy.android.app.presentation.validator.toolbaractions.model.modifier.CloudDriveSyncsToolbarActionsModifierItem
 import mega.privacy.android.app.presentation.validator.toolbaractions.modifier.ToolbarActionsModifierItem.CloudDriveSyncs
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
@@ -1220,7 +1220,7 @@ class FileBrowserViewModel @Inject constructor(
      * Reset storage capacity to default
      */
     fun setStorageCapacityAsDefault() {
-        _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.DEFAULT) }
+        _state.update { it.copy(storageCapacity = StorageOverQuotaCapacity.Default) }
         viewModelScope.launch {
             runCatching {
                 setAlmostFullStorageBannerClosingTimestampUseCase()

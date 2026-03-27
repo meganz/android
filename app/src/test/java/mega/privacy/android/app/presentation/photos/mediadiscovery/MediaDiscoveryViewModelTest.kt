@@ -19,8 +19,8 @@ import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageCapacityMapper
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
@@ -203,7 +203,7 @@ class MediaDiscoveryViewModelTest {
                 shouldShow = any()
             )
         ).thenReturn(
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         )
     }
 
@@ -522,33 +522,33 @@ class MediaDiscoveryViewModelTest {
         Arguments.of(
             StorageState.Red,
             true,
-            StorageOverQuotaCapacity.FULL
+            StorageOverQuotaCapacity.Full
         ),
         Arguments.of(
             StorageState.Green,
             true,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         ), Arguments.of(
             StorageState.Orange,
             true,
-            StorageOverQuotaCapacity.ALMOST_FULL
+            StorageOverQuotaCapacity.AlmostFull
         ), Arguments.of(
             StorageState.Orange,
             false,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         ),
         Arguments.of(
             StorageState.Change,
             true,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         ), Arguments.of(
             StorageState.Unknown,
             true,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         ), Arguments.of(
             StorageState.PayWall,
             true,
-            StorageOverQuotaCapacity.DEFAULT
+            StorageOverQuotaCapacity.Default
         )
     )
 
@@ -664,7 +664,7 @@ class MediaDiscoveryViewModelTest {
         assertThat(currentState.errorMessage).isNull()
         assertThat(currentState.accountType).isNull()
         assertThat(currentState.isHiddenNodesOnboarded).isFalse()
-        assertThat(currentState.storageCapacity).isEqualTo(StorageOverQuotaCapacity.DEFAULT)
+        assertThat(currentState.storageCapacity).isEqualTo(StorageOverQuotaCapacity.Default)
         assertThat(currentState.isBusinessAccountExpired).isFalse()
         assertThat(currentState.hiddenNodeEnabled).isFalse()
         assertThat(currentState.isClearSelectedPhotos).isTrue()

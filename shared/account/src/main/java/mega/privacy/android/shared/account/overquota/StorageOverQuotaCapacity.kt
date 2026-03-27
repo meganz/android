@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.components.banners
+package mega.privacy.android.shared.account.overquota
 
 /**
  * Enum class to represent the storage over quota capacity
@@ -7,15 +7,15 @@ enum class StorageOverQuotaCapacity {
     /**
      * Almost full storage
      */
-    ALMOST_FULL,
+    AlmostFull,
 
     /**
      * Full storage
      */
-    FULL,
+    Full,
 
     /**
      * Default value
      */
-    DEFAULT
+    Default
 }

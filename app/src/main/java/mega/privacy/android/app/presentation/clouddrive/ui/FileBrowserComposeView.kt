@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.app.presentation.view.OverQuotaView
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
@@ -78,7 +78,7 @@ fun FileBrowserComposeView(
             WarningBanner(textString = stringResource(id = errorMessage), onCloseClick = null)
         }
 
-        if (uiState.storageCapacity != StorageOverQuotaCapacity.DEFAULT) {
+        if (uiState.storageCapacity != StorageOverQuotaCapacity.Default) {
             StorageOverQuotaBanner(
                 storageCapacity = uiState.storageCapacity,
                 onStorageAlmostFullWarningDismiss = onStorageAlmostFullWarningDismiss,

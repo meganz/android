@@ -74,7 +74,7 @@ import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
-import mega.privacy.android.core.nodecomponents.components.banners.StorageOverQuotaCapacity
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
@@ -180,7 +180,7 @@ fun MediaDiscoveryView(
 
 
     Column {
-        if (mediaDiscoveryViewState.storageCapacity != StorageOverQuotaCapacity.DEFAULT) {
+        if (mediaDiscoveryViewState.storageCapacity != StorageOverQuotaCapacity.Default) {
             StorageOverQuotaBanner(
                 storageCapacity = mediaDiscoveryViewState.storageCapacity,
                 onStorageAlmostFullWarningDismiss = onStorageAlmostFullWarningDismiss,
