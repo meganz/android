@@ -30,9 +30,9 @@ import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBot
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel
 import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen

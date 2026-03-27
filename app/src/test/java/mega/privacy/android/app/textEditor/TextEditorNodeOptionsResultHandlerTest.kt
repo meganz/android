@@ -122,6 +122,19 @@ internal class TextEditorNodeOptionsResultHandlerTest {
     }
 
     @Test
+    fun `test that Transfer result returns false when event is StartDownloadForPreview`() {
+        val event = TransferTriggerEvent.StartDownloadForPreview(
+            node = null,
+            isOpenWith = true,
+        )
+        assertThat(
+            shouldCloseTextEditorOnNodeOptionsResult(
+                NodeOptionsBottomSheetResult.Transfer(event)
+            )
+        ).isFalse()
+    }
+
+    @Test
     fun `test that AddToPlaylist result returns false`() {
         assertThat(
             shouldCloseTextEditorOnNodeOptionsResult(
