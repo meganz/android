@@ -20,10 +20,11 @@ import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.media.AudioManager.MODE_IN_COMMUNICATION
 import android.media.MediaPlayer
-import android.media.RingtoneManager
 import android.os.Build
 import android.os.Looper
 import android.os.Vibrator
+import android.provider.Settings
+import androidx.core.net.toUri
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -276,8 +277,10 @@ class AppRTCAudioManager @Inject constructor(
 
     private fun incomingCallSound() {
         if (audioManager == null || mediaPlayer?.isPlaying == true) return
-        val ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-            ?: return
+        val ringtoneUri = Settings.System.getString(
+            apprtcContext.contentResolver,
+            Settings.System.RINGTONE
+        )?.toUri() ?: return
         if (mediaPlayer != null) {
             stopSound()
         }
