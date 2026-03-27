@@ -34,8 +34,6 @@ buildscript {
         classpath(plugin.kotlin.gradle)
         classpath(lib.kotlin.serialisation)
         classpath(plugin.benchmark.baseline.profile)
-        classpath(lib.okhttp3)
-        classpath(lib.okio)
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:${plugin.versions.jfrog.artifactory.get()}")
     }
 }
