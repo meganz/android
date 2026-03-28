@@ -45,7 +45,6 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util.getPreferences
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
@@ -80,12 +79,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      */
     @Inject
     lateinit var cancelCancelTokenUseCase: CancelCancelTokenUseCase
-
-    /**
-     * [DatabaseHandler]
-     */
-    @Inject
-    lateinit var dbH: DatabaseHandler
 
     /**
      * [MegaApiAndroid]
@@ -534,7 +527,8 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      * The behaviour for action text and fab select buttons clicked
      */
     private fun buttonClicked() {
-        dbH.setLastCloudFolder(parentHandle.toString())
+        // dbH.setLastCloudFolder had no active reader; remove it as it caused ANRs with no benefit.
+        // The copy/move target path is already tracked elsewhere via SetMoveLatestTargetPathUseCase / SetCopyLatestTargetPathUseCase.
         (requireActivity() as FileExplorerActivity).let { activity ->
             if (activity.isMultiselect) {
                 Timber.d("Send several files to chat")
