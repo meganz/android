@@ -190,6 +190,5 @@ class NodeSelectionStateTest {
         showContactNotVerifiedBanner = false,
         nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         hasWritePermission = false,
-        isSearchRevampEnabled = false,
     )
 }

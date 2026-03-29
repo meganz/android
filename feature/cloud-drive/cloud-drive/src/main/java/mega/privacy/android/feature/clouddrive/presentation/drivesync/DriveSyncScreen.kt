@@ -43,13 +43,13 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.computeSelectedItemsCount
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.searchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
@@ -168,7 +168,12 @@ internal fun DriveSyncScreen(
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
                                 MenuActionWithClick(CommonAppBarAction.Search) {
                                     Analytics.tracker.trackEvent(CloudDriveSearchBarPressedEvent)
-                                    navigationHandler.navigate(cloudDriveUiState.searchNavKey)
+                                    navigationHandler.navigate(
+                                        SearchNavKey(
+                                            parentHandle = cloudDriveUiState.currentFolderId.longValue,
+                                            nodeSourceType = cloudDriveUiState.nodeSourceType
+                                        )
+                                    )
                                 }
                             )
 

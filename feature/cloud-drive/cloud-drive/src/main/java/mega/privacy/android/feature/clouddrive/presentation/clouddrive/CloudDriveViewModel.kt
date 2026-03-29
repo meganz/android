@@ -43,7 +43,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
@@ -58,7 +57,6 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
@@ -90,7 +88,6 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val monitorAlmostFullStorageBannerVisibilityUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val overQuotaStatusMapper: OverQuotaStatusMapper,
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
@@ -118,7 +115,6 @@ class CloudDriveViewModel @AssistedInject constructor(
         monitorNodeUpdates()
         monitorCloudSortOrder()
         monitorStorageOverQuota()
-        checkSearchRevampEnabled()
     }
 
     /**
@@ -475,15 +471,6 @@ class CloudDriveViewModel @AssistedInject constructor(
                     state.copy(hasWritePermission = false)
                 }
             }
-        }
-    }
-
-    private fun checkSearchRevampEnabled() {
-        viewModelScope.launch {
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.SearchRevamp) }
-                .onSuccess { isEnabled ->
-                    _uiState.update { it.copy(isSearchRevampEnabled = isEnabled) }
-                }
         }
     }
 

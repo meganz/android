@@ -31,7 +31,6 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
@@ -41,7 +40,6 @@ import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
@@ -87,7 +85,6 @@ class NewRubbishBinViewModelTest {
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val cleanRubbishBinUseCase = mock<CleanRubbishBinUseCase>()
     private val getNodesByIdInChunkUseCase = mock<GetNodesByIdInChunkUseCase>()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -112,7 +109,6 @@ class NewRubbishBinViewModelTest {
             getNodeByIdUseCase,
             nodeUiItemMapper,
             nodeSortConfigurationUiMapper,
-            getFeatureFlagValueUseCase,
         )
     }
 
@@ -136,7 +132,6 @@ class NewRubbishBinViewModelTest {
             cleanRubbishBinUseCase = cleanRubbishBinUseCase,
             navKey = RubbishBinNavKey(null),
             getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -555,20 +550,6 @@ class NewRubbishBinViewModelTest {
         whenever(nodeSortConfigurationUiMapper.invoke(SortOrder.ORDER_NONE)).thenReturn(
             NodeSortConfiguration.default
         )
-    }
-
-    @Test
-    fun `test that isSearchRevampEnabled is updated when feature flag is enabled`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SearchRevamp)).thenReturn(true)
-        stubCommon()
-
-        initViewModel()
-        testScheduler.advanceUntilIdle()
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.isSearchRevampEnabled).isTrue()
-        }
     }
 
     @AfterEach

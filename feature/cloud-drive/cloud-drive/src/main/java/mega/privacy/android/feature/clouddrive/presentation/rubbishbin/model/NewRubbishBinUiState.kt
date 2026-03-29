@@ -3,8 +3,6 @@ package mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
@@ -14,6 +12,8 @@ import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 
 /**
  * M3 UI State for RubbishBin using new NodeUiItem model
@@ -48,7 +48,6 @@ data class NewRubbishBinUiState(
     val messageEvent: StateEventWithContent<LocalizedText> = consumed(),
     val openedFileNode: TypedFileNode? = null,
     val openFolderEvent: StateEventWithContent<NodeId> = consumed(),
-    val isSearchRevampEnabled: Boolean = false,
 ) {
     val isLoading = nodesLoadingState == NodesLoadingState.Loading
 

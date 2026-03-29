@@ -46,7 +46,6 @@ import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.Rubb
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
@@ -157,17 +156,10 @@ internal fun RubbishBinScreen(
                     actions = if (uiState.items.isNotEmpty()) {
                         buildList {
                             add(MenuActionWithClick(RubbishBinAppBarAction.Search) {
-                                val searchNavKey = if (uiState.isSearchRevampEnabled) {
-                                    SearchNavKey(
-                                        parentHandle = uiState.currentFolderId.longValue,
-                                        nodeSourceType = NodeSourceType.RUBBISH_BIN
-                                    )
-                                } else {
-                                    LegacySearchNavKey(
-                                        parentHandle = uiState.currentFolderId.longValue,
-                                        nodeSourceType = NodeSourceType.RUBBISH_BIN
-                                    )
-                                }
+                                val searchNavKey =SearchNavKey(
+                                    parentHandle = uiState.currentFolderId.longValue,
+                                    nodeSourceType = NodeSourceType.RUBBISH_BIN
+                                )
                                 navigationHandler.navigate(searchNavKey)
                             })
                             if (isRootDirectory) {

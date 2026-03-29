@@ -34,10 +34,10 @@ import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.computeSelectedItemsCount
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.searchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
+import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
@@ -149,7 +149,12 @@ fun CloudDriveScreen(
                         if (uiState.items.isNotEmpty()) {
                             add(
                                 MenuActionWithClick(CommonAppBarAction.Search) {
-                                    navigationHandler.navigate(uiState.searchNavKey)
+                                    navigationHandler.navigate(
+                                        SearchNavKey(
+                                            parentHandle = uiState.currentFolderId.longValue,
+                                            nodeSourceType = uiState.nodeSourceType
+                                        )
+                                    )
                                 }
                             )
                         }

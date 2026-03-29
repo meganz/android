@@ -58,13 +58,11 @@ class HomeViewModel @Inject constructor(
                     list
                 },
             monitorConnectivityUseCase().catch { Timber.e(it) },
-            monitorSearchRevampFeatureFlag().catch { Timber.e(it) },
             monitorHomeCustomizationFeatureFlag().catch { Timber.e(it) },
-        ) { widgets, hasInternetConnection, isSearchRevampEnabled, isHomeCustomizationEnabled ->
+        ) { widgets, hasInternetConnection, isHomeCustomizationEnabled ->
             if (hasInternetConnection) {
                 HomeUiState.Data(
                     widgets = widgets,
-                    isSearchRevampEnabled = isSearchRevampEnabled,
                     isHomeCustomizationEnabled = isHomeCustomizationEnabled
                 )
             } else {
@@ -75,10 +73,6 @@ class HomeViewModel @Inject constructor(
             viewModelScope,
             HomeUiState.Loading,
         )
-    }
-
-    private fun monitorSearchRevampFeatureFlag() = flow {
-        emit(getFeatureFlagValueUseCase(AppFeatures.SearchRevamp))
     }
 
     private fun monitorHomeCustomizationFeatureFlag() = flow {

@@ -35,7 +35,6 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
@@ -46,7 +45,6 @@ import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenU
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.NewRubbishBinUiState
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
@@ -88,7 +86,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     private val cleanRubbishBinUseCase: CleanRubbishBinUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @Assisted private val navKey: RubbishBinNavKey,
 ) : ViewModel() {
     private val args = navKey
@@ -116,7 +113,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
         monitorViewTypeChanges()
         getCloudSortOrderAndRefresh()
         monitorAccountDetail()
-        checkSearchRevampEnabled()
     }
 
     private fun setupNodesLoading() {
@@ -466,15 +462,6 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     fun onOpenFolderEventConsumed() {
         _uiState.update {
             it.copy(openFolderEvent = consumed())
-        }
-    }
-
-    private fun checkSearchRevampEnabled() {
-        viewModelScope.launch {
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.SearchRevamp) }
-                .onSuccess { isEnabled ->
-                    _uiState.update { it.copy(isSearchRevampEnabled = isEnabled) }
-                }
         }
     }
 

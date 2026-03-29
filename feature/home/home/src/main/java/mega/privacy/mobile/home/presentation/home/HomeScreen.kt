@@ -48,11 +48,13 @@ import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -63,7 +65,6 @@ import mega.privacy.mobile.analytics.event.HomeSearchBarPressedEvent
 import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
 import mega.privacy.mobile.home.presentation.home.actions.HomeScreenAction
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
-import mega.privacy.mobile.home.presentation.home.model.searchNavKey
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -156,7 +157,12 @@ internal fun HomeScreen(
                     if (state is HomeUiState.Data) {
                         add(MenuActionWithClick(CommonAppBarAction.Search) {
                             Analytics.tracker.trackEvent(HomeSearchBarPressedEvent)
-                            navigationHandler.navigate(state.searchNavKey)
+                            navigationHandler.navigate(
+                                SearchNavKey(
+                                    parentHandle = -1L,
+                                    nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                                )
+                            )
                         })
 
                         if (state.isHomeCustomizationEnabled) {

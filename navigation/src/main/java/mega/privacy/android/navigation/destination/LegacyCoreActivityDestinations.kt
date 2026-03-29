@@ -128,6 +128,7 @@ data class FileContactInfoNavKey(
     val folderName: String,
 ) : NavKey
 
+@Deprecated("Use SearchNavKey instead, it will navigate to legacy screen if the SearchRevamp flag is not set")
 @Serializable
 data class LegacySearchNavKey(
     val nodeSourceType: NodeSourceType,
