@@ -29,8 +29,8 @@ import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
-import mega.privacy.android.shared.account.overquota.OverQuotaBanner
-import mega.privacy.android.shared.account.overquota.OverQuotaStatus
+import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
+import mega.privacy.android.shared.account.overquota.view.OverQuotaBanner
 import mega.privacy.android.core.transfers.extension.getProgressPercentString
 import mega.privacy.android.core.transfers.extension.getProgressSizeString
 import mega.privacy.android.core.transfers.extension.getSpeedString

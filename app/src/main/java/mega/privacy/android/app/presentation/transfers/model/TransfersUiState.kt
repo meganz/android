@@ -5,14 +5,11 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.shared.account.overquota.OverQuotaStatus
-
 /**
  * UI state for Transfers screen.
  *
  * @property activeTransfers List of in progress transfers.
  * @property selectedActiveTransfersIds List of selected in progress transfers ids. If not null, even empty, indicates selected mode is on.
- * @property overQuotaStatus Over-quota status (storage/transfer, blocking vs non-blocking).
  * @property areTransfersPaused Whether the transfers are paused.
  * @property completedTransfers List of successfully completed transfers.
  * @property selectedCompletedTransfersIds List of selected completed transfers. If not null, even empty, indicates selected mode is on.
@@ -25,7 +22,6 @@ import mega.privacy.android.shared.account.overquota.OverQuotaStatus
 data class TransfersUiState(
     val activeTransfers: List<InProgressTransfer> = listOf(),
     val selectedActiveTransfersIds: List<Long>? = null,
-    val overQuotaStatus: OverQuotaStatus = OverQuotaStatus(),
     val areTransfersPaused: Boolean = false,
     val completedTransfers: List<CompletedTransfer> = listOf(),
     val selectedCompletedTransfersIds: List<Int>? = null,

@@ -12,21 +12,15 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
-import mega.privacy.android.shared.account.overquota.OverQuotaStatus
-import mega.privacy.android.shared.account.overquota.OverQuotaStatusMapper
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.waitTimeToShowOffline
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -37,8 +31,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
@@ -55,7 +47,6 @@ import mega.privacy.android.domain.usecase.transfers.completed.DeleteFailedOrCan
 import mega.privacy.android.domain.usecase.transfers.completed.MonitorCompletedTransfersByStateWithLimitUseCase
 import mega.privacy.android.domain.usecase.transfers.errorstatus.ClearTransferErrorStatusUseCase
 import mega.privacy.android.domain.usecase.transfers.errorstatus.IsTransferInErrorStatusUseCase
-import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
@@ -71,8 +62,6 @@ import javax.inject.Inject
 class TransfersViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorInProgressTransfersUseCase: MonitorInProgressTransfersUseCase,
-    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
-    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
     private val pauseTransfersQueueUseCase: PauseTransfersQueueUseCase,
@@ -90,8 +79,6 @@ class TransfersViewModel @Inject constructor(
     private val clearTransferErrorStatusUseCase: ClearTransferErrorStatusUseCase,
     private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val overQuotaStatusMapper: OverQuotaStatusMapper,
     private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
 ) : ViewModel() {
@@ -102,7 +89,6 @@ class TransfersViewModel @Inject constructor(
     init {
         _uiState.update { it.copy(transferInError = isTransferInErrorStatusUseCase()) }
         monitorActiveTransfers()
-        monitorOverQuota()
         monitorPausedTransfers()
         monitorCompletedTransfers()
         monitorConnectivity()
@@ -133,35 +119,6 @@ class TransfersViewModel @Inject constructor(
                     ?.filter { id -> activeTransfers.any { it.uniqueId == id } }
             )
         }
-    }
-
-    private fun monitorOverQuota() {
-        viewModelScope.launch {
-            combine(
-                monitorStorageStateUseCase(),
-                monitorTransferOverQuotaUseCase(),
-                monitorAccountDetailUseCase().map { it.levelDetail?.accountType?.isPaid == false }
-            )
-            { storageState: StorageState, transferOverQuota: Boolean, isFreeAccount: Boolean ->
-                overQuotaStatusMapper(
-                    storageState = storageState,
-                    transferOverQuota = transferOverQuota,
-                    freeAccount = isFreeAccount,
-                )
-            }.catch { Timber.e(it) }
-                .collectLatest { overQuotaStatus ->
-                    _uiState.update {
-                        it.copy(overQuotaStatus = overQuotaStatus)
-                    }
-                }
-        }
-    }
-
-    /**
-     * Consume quota warning.
-     */
-    fun onConsumeQuotaWarning() {
-        _uiState.update { state -> state.copy(overQuotaStatus = OverQuotaStatus()) }
     }
 
     private fun monitorPausedTransfers() {

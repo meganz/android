@@ -12,6 +12,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusViewModel
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
@@ -42,6 +43,8 @@ private fun TransferRoute(
 ) {
     val viewModel = hiltViewModel<TransfersViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val overQuotaStatusViewModel = hiltViewModel<OverQuotaStatusViewModel>()
+    val overQuotaUiState by overQuotaStatusViewModel.uiState.collectAsStateWithLifecycle()
 
     val initialTabIndex = when (args.tab) {
         TransfersNavKey.Tab.Active -> ACTIVE_TAB_INDEX
@@ -89,7 +92,8 @@ private fun TransferRoute(
         onSelectAllCompletedTransfers = viewModel::selectAllCompletedTransfers,
         onSelectAllFailedTransfers = viewModel::selectAllFailedTransfers,
         onRetryTransfer = viewModel::retryFailedTransfer,
-        onConsumeQuotaWarning = viewModel::onConsumeQuotaWarning,
+        overQuotaStatus = overQuotaUiState.overQuotaStatus,
+        onConsumeQuotaWarning = overQuotaStatusViewModel::dismissWarning,
         onCancelActiveTransfer = viewModel::cancelActiveTransfer,
         onClearCompletedTransfer = viewModel::clearCompletedTransfer,
         onSetActiveTransferToCancel = viewModel::setActiveTransferToCancel,

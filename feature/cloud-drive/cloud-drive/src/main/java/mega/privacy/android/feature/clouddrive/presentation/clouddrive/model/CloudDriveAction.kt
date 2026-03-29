@@ -32,8 +32,4 @@ sealed interface CloudDriveAction {
      */
     data object NavigateBackEventConsumed : CloudDriveAction
 
-    /**
-     * Consume transfer over quota warning action
-     */
-    data object OverQuotaConsumptionWarning : CloudDriveAction
 }

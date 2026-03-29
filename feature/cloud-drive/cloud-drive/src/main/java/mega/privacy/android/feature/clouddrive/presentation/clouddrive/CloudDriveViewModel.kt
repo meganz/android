@@ -15,16 +15,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.shared.account.overquota.OverQuotaStatus
-import mega.privacy.android.shared.account.overquota.OverQuotaStatusMapper
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -36,11 +32,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
-import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -52,7 +44,6 @@ import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCas
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
@@ -85,12 +76,6 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
-    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
-    private val monitorAlmostFullStorageBannerVisibilityUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
-    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val overQuotaStatusMapper: OverQuotaStatusMapper,
-    private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
@@ -114,7 +99,6 @@ class CloudDriveViewModel @AssistedInject constructor(
         setupNodesLoading()
         monitorNodeUpdates()
         monitorCloudSortOrder()
-        monitorStorageOverQuota()
     }
 
     /**
@@ -127,7 +111,6 @@ class CloudDriveViewModel @AssistedInject constructor(
             is CloudDriveAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
             is CloudDriveAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
-            is CloudDriveAction.OverQuotaConsumptionWarning -> onConsumeOverQuotaWarning()
         }
     }
 
@@ -368,58 +351,6 @@ class CloudDriveViewModel @AssistedInject constructor(
     private fun onOpenedFileNodeHandled() {
         _uiState.update { state ->
             state.copy(openedFileNode = null)
-        }
-    }
-
-    /**
-     * Monitor storage over quota state
-     */
-    private fun monitorStorageOverQuota() {
-        viewModelScope.launch {
-            combine(
-                monitorStorageStateUseCase(),
-                monitorTransferOverQuotaUseCase(),
-                monitorAccountDetailUseCase().map { it.levelDetail?.accountType?.isPaid == false }
-            )
-            { storageState: StorageState, transferOverQuota: Boolean, isFreeAccount: Boolean ->
-                overQuotaStatusMapper(
-                    storageState = storageState,
-                    transferOverQuota = transferOverQuota,
-                    freeAccount = isFreeAccount,
-                )
-            }.catch { Timber.e(it) }
-                .collectLatest { overQuotaStatus ->
-                    _uiState.update {
-                        it.copy(overQuotaStatus = overQuotaStatus)
-                    }
-                }
-        }
-        viewModelScope.launch {
-            monitorAlmostFullStorageBannerVisibilityUseCase()
-                .catch { Timber.e(it) }
-                .collectLatest { shouldShowWarning ->
-                    _uiState.update {
-                        it.copy(
-                            shouldShowWarning = shouldShowWarning,
-                        )
-                    }
-                }
-        }
-    }
-
-    /**
-     * Consume transfer over quota warning.
-     */
-    private fun onConsumeOverQuotaWarning() {
-        _uiState.update { state ->
-            state.copy(
-                overQuotaStatus = OverQuotaStatus()
-            )
-        }
-        viewModelScope.launch {
-            runCatching {
-                setAlmostFullStorageBannerClosingTimestampUseCase()
-            }.onFailure { Timber.e(it) }
         }
     }
 

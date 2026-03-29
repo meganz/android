@@ -57,6 +57,7 @@ import mega.privacy.android.app.presentation.transfers.view.completed.CompletedT
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelAllTransfersDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelTransfersConfirmationDialog
 import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfersView
+import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
 import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
@@ -115,6 +116,7 @@ internal fun TransfersView(
     onSelectAllCompletedTransfers: () -> Unit,
     onSelectAllFailedTransfers: () -> Unit,
     onRetryTransfer: (CompletedTransfer) -> Unit,
+    overQuotaStatus: OverQuotaStatus = OverQuotaStatus(),
     onConsumeQuotaWarning: () -> Unit,
     onCancelActiveTransfer: (InProgressTransfer) -> Unit,
     onClearCompletedTransfer: (Int) -> Unit,

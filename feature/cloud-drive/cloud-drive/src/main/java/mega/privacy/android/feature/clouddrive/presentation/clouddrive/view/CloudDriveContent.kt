@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.view
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,18 +38,15 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
-import mega.privacy.android.shared.account.overquota.OverQuotaErrorBanner
-import mega.privacy.android.shared.account.overquota.OverQuotaIssue
-import mega.privacy.android.shared.account.overquota.OverQuotaWarningBanner
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
-import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
+import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -69,6 +65,10 @@ import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKe
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusViewModel
+import mega.privacy.android.shared.account.overquota.model.OverQuotaIssue
+import mega.privacy.android.shared.account.overquota.view.OverQuotaErrorBanner
+import mega.privacy.android.shared.account.overquota.view.OverQuotaWarningBanner
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
@@ -115,7 +115,9 @@ internal fun CloudDriveContent(
         creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
     ),
     onPrepareScanDocument: () -> Unit = {},
+    overQuotaStatusViewModel: OverQuotaStatusViewModel = hiltViewModel(),
 ) {
+    val overQuotaUiState by overQuotaStatusViewModel.uiState.collectAsStateWithLifecycle()
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
     var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -186,7 +188,7 @@ internal fun CloudDriveContent(
             .padding(contentPadding.excludingBottomPadding())
     ) {
         OverQuotaErrorBanner(
-            overQuotaStatus = uiState.overQuotaStatus,
+            overQuotaStatus = overQuotaUiState.overQuotaStatus,
             onUpgradeClicked = {
                 megaNavigator.openUpgradeAccount(context)
             },
@@ -194,7 +196,7 @@ internal fun CloudDriveContent(
         val showContactVerificationBanner =
             !uiState.isLoading && uiState.showContactNotVerifiedBanner && uiState.title.text.isNotEmpty()
         val showOverQuotaWarning =
-            uiState.overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && uiState.shouldShowWarning
+            overQuotaUiState.overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && overQuotaUiState.shouldShowWarning
         val topPadding =
             if ((showContactVerificationBanner || isTabContent) && !showOverQuotaWarning) 12.dp else 0.dp
 
@@ -291,9 +293,9 @@ internal fun CloudDriveContent(
                     bannerHeader = if (showOverQuotaWarning) {
                         {
                             OverQuotaWarningBanner(
-                                uiState.overQuotaStatus,
+                                overQuotaUiState.overQuotaStatus,
                                 onDismissed = {
-                                    onAction(CloudDriveAction.OverQuotaConsumptionWarning)
+                                    overQuotaStatusViewModel.dismissWarning()
                                 },
                                 onUpgradeClicked = {
                                     megaNavigator.openUpgradeAccount(context)
