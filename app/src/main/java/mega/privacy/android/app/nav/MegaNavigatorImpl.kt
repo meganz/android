@@ -11,6 +11,8 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.navigation3.runtime.NavKey
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -25,6 +27,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
@@ -96,6 +99,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.CancelAccountPlanActivity
@@ -392,35 +396,43 @@ internal class MegaNavigatorImpl @Inject constructor(
         enableAddToAlbum: Boolean?,
         serializedData: String?,
     ) {
-        val intent = mediaPlayerIntentMapper(
-            context = context,
-            contentUri = contentUri,
-            fileTypeInfo = fileNode.type,
-            sortOrder = sortOrder,
-            viewType = viewType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-            name = fileNode.name,
-            handle = fileNode.id.longValue,
-            parentHandle = fileNode.parentId.longValue,
-            isFolderLink = isFolderLink,
-            isMediaQueueAvailable = isMediaQueueAvailable,
-            searchedItems = searchedItems,
-            mediaQueueTitle = mediaQueueTitle,
-            collectionTitle = collectionTitle,
-            collectionId = collectionId,
-            enableAddToAlbum = enableAddToAlbum ?: run {
-                viewType in listOf(
-                    NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-                    NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
-                )
-            },
-            serializedData = serializedData,
-        )
-        context.startActivity(intent)
+        val scope = (context as? LifecycleOwner)?.lifecycleScope ?: applicationScope
+        scope.launch {
+            val intent = mediaPlayerIntentMapper(
+                context = context,
+                contentUri = contentUri,
+                fileTypeInfo = fileNode.type,
+                sortOrder = sortOrder,
+                viewType = viewType ?: NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                name = fileNode.name,
+                handle = fileNode.id.longValue,
+                parentHandle = fileNode.parentId.longValue,
+                isFolderLink = isFolderLink,
+                isMediaQueueAvailable = isMediaQueueAvailable,
+                searchedItems = searchedItems,
+                mediaQueueTitle = mediaQueueTitle,
+                collectionTitle = collectionTitle,
+                collectionId = collectionId,
+                enableAddToAlbum = enableAddToAlbum ?: run {
+                    viewType in listOf(
+                        NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                        NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
+                    )
+                },
+                serializedData = serializedData,
+            )
+            withContext(mainDispatcher) { context.startActivity(intent) }
+        }
     }
 
-    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
+    private suspend fun isVideoRevampEnabled(): Boolean =
+        runCatching { getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerRevamp) }
+            .getOrDefault(false)
+
+    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo, useRevamp: Boolean = false) = when {
         fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-            Intent(context, VideoPlayerComposeActivity::class.java)
+            if (useRevamp) Intent(context, VideoPlayerRevampActivity::class.java)
+            else Intent(context, VideoPlayerComposeActivity::class.java)
 
         fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
             Intent(context, AudioPlayerActivity::class.java)
@@ -461,7 +473,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             offlineParent = localFile.parent,
             searchedItems = searchedItems,
             collectionTitle = collectionTitle,
-            collectionId = collectionId
+            collectionId = collectionId,
         )
         context.startActivity(intent)
     }
@@ -472,7 +484,8 @@ internal class MegaNavigatorImpl @Inject constructor(
         message: NodeAttachmentMessage,
         fileNode: FileNode,
     ) {
-        val intent = getIntent(context, fileNode.type).apply {
+        val useRevamp = isVideoRevampEnabled()
+        val intent = getIntent(context, fileNode.type, useRevamp).apply {
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
             putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
             putExtra(INTENT_EXTRA_KEY_MSG_ID, message.msgId)
@@ -495,8 +508,9 @@ internal class MegaNavigatorImpl @Inject constructor(
         chatId: Long,
         name: String,
     ) {
+        val useRevamp = isVideoRevampEnabled()
         val fileType = getFileTypeInfoByNameUseCase(name)
-        val intent = getIntent(context, fileType).apply {
+        val intent = getIntent(context, fileType, useRevamp).apply {
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
             putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
             putExtra(INTENT_EXTRA_KEY_MSG_ID, messageId)

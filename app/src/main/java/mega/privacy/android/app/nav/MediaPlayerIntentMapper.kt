@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampActivity
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -28,6 +29,8 @@ import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -35,13 +38,14 @@ import javax.inject.Inject
  */
 class MediaPlayerIntentMapper @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
     /**
      * Create media player intent
      *
      * @return Intent for media player activity
      */
-    operator fun invoke(
+    suspend operator fun invoke(
         context: Context,
         contentUri: NodeContentUri,
         fileTypeInfo: FileTypeInfo,
@@ -63,7 +67,10 @@ class MediaPlayerIntentMapper @Inject constructor(
         enableAddToAlbum: Boolean = false,
         serializedData: String? = null,
     ): Intent {
-        val intent = getIntent(context, fileTypeInfo).apply {
+        val useRevamp = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerRevamp)
+        }.getOrDefault(false)
+        val intent = getIntent(context, fileTypeInfo, useRevamp).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
             putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, name)
@@ -112,9 +119,10 @@ class MediaPlayerIntentMapper @Inject constructor(
         return intent
     }
 
-    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo) = when {
+    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo, useRevamp: Boolean) = when {
         fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-            Intent(context, VideoPlayerComposeActivity::class.java)
+            if (useRevamp) Intent(context, VideoPlayerRevampActivity::class.java)
+            else Intent(context, VideoPlayerComposeActivity::class.java)
 
         fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
             Intent(context, AudioPlayerActivity::class.java)

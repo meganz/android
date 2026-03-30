@@ -7016,17 +7016,23 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         null
                     }
 
-                    is LegacyMediaPlayerNavKey -> mediaPlayerIntentMapper(
-                        context = this@ManagerActivity,
-                        contentUri = it.nodeContentUri,
-                        fileTypeInfo = it.fileTypeInfo,
-                        sortOrder = it.sortOrder,
-                        name = it.fileName,
-                        handle = it.fileHandle,
-                        parentHandle = it.parentHandle,
-                        isFolderLink = it.isFolderLink,
-                        viewType = it.nodeSourceType
-                    )
+                    is LegacyMediaPlayerNavKey -> {
+                        lifecycleScope.launch {
+                            val intent = mediaPlayerIntentMapper(
+                                context = this@ManagerActivity,
+                                contentUri = it.nodeContentUri,
+                                fileTypeInfo = it.fileTypeInfo,
+                                sortOrder = it.sortOrder,
+                                name = it.fileName,
+                                handle = it.fileHandle,
+                                parentHandle = it.parentHandle,
+                                isFolderLink = it.isFolderLink,
+                                viewType = it.nodeSourceType
+                            )
+                            startActivity(intent)
+                        }
+                        null
+                    }
 
                     else -> null
                 }?.let { intent -> startActivity(intent) }

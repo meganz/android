@@ -158,6 +158,16 @@ enum class ApiFeatures(
         experimentName = "acwlo",
         description = "Enable continue where you left off feature",
         defaultValue = false
+    ),
+
+    /**
+     * Video Player Revamp feature flag.
+     * When enabled, opens the revamped Video Player (VideoPlayerRevampActivity) instead of the legacy one.
+     */
+    VideoPlayerRevamp(
+        experimentName = "vprv",
+        description = "Open the revamped Video Player instead of the legacy one",
+        defaultValue = false
     );
 
     companion object : FeatureFlagValueProvider {

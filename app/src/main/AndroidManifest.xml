@@ -427,6 +427,11 @@
             android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
             android:windowSoftInputMode="adjustNothing" />
         <activity
+            android:name=".presentation.videoplayer.VideoPlayerRevampActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
             android:name=".mediaplayer.AudioPlayerActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing" />
