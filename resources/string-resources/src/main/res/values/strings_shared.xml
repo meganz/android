@@ -2632,6 +2632,8 @@
     </plurals>
     <!-- Label for any ‘Incoming shares’ button or title -->
     <string name="general_title_incoming_shares">Incoming shares</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audios[/A] [B]found[/B]</string>
     <!-- General error for file path or node cannot be resolved -->
     <string name="general_error_file_not_found">This file could not be found</string>
     <!-- PDF viewer error when the file is missing or corrupt while the device has network -->
