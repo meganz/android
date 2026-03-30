@@ -20,8 +20,11 @@ import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.RecentSearchDao
+import mega.privacy.android.data.database.dao.RecentlyUsedDao
+import mega.privacy.android.data.database.dao.RecentlyUsedTypeDao
 import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
+import mega.privacy.android.data.database.dao.TextEditorScrollDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
@@ -154,6 +157,12 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun homeWidgetConfigurationDao(): HomeWidgetConfigurationDao
 
     abstract fun recentSearchDao(): RecentSearchDao
+
+    abstract fun recentlyUsedDao(): RecentlyUsedDao
+
+    abstract fun recentlyUsedTypeDao(): RecentlyUsedTypeDao
+
+    abstract fun textEditorScrollDao(): TextEditorScrollDao
 
     companion object {
 
