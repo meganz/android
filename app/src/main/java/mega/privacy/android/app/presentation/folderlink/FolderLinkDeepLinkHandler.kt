@@ -3,14 +3,11 @@ package mega.privacy.android.app.presentation.folderlink
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
-import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
 import javax.inject.Inject
 
 /**
@@ -18,7 +15,6 @@ import javax.inject.Inject
  */
 class FolderLinkDeepLinkHandler @Inject constructor(
     snackbarEventQueue: SnackbarEventQueue,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : DeepLinkHandler(snackbarEventQueue) {
 
     override val navOptions: NavOptions = navOptions {
@@ -32,11 +28,7 @@ class FolderLinkDeepLinkHandler @Inject constructor(
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? {
         return if (regexPatternType == RegexPatternType.FOLDER_LINK) {
-            if (getFeatureFlagValueUseCase(AppFeatures.FolderLinkRevamp)) {
-                listOf(FolderLinkNavKey(uri.toString()))
-            } else {
-                listOf(LegacyFolderLinkNavKey(uri.toString()))
-            }
+            listOf(FolderLinkNavKey(uri.toString()))
         } else {
             null
         }

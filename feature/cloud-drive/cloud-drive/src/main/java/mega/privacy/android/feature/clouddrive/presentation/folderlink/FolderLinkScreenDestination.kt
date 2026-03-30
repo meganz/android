@@ -22,9 +22,9 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
         FeatureFlagGate(
             feature = AppFeatures.FolderLinkRevamp,
             disabled = {
-                navigationHandler.navigate(LegacyFolderLinkNavKey(key.uriString))
                 LaunchedEffect(Unit) {
                     navigationHandler.remove(key)
+                    navigationHandler.navigate(LegacyFolderLinkNavKey(key.uriString))
                 }
             }
         ) {
