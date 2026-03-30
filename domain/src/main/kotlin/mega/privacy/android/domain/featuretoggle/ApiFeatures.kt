@@ -167,6 +167,17 @@ enum class ApiFeatures(
         experimentName = "asr1",
         description = "Navigate to the new Compose-based Audio section instead of the legacy one",
         defaultValue = false
+    ),
+
+    /**
+     * Continue where you left off feature (AND-23051).
+     * When enabled, persists user progress (PDF page, video/audio position, text editor cursor)
+     * and shows a Home screen carousel widget for quick resume.
+     */
+    ContinueWhereLeftOff(
+        experimentName = "acwlo",
+        description = "Enable continue where you left off feature",
+        defaultValue = false
     );
 
     companion object : FeatureFlagValueProvider {

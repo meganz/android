@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 118
+    const val DATABASE_VERSION = 119
 
     /**
      * Database Name
@@ -109,4 +109,19 @@ object MegaDatabaseConstant {
      * Table for recent searches
      */
     const val TABLE_RECENT_SEARCH = "recent_search"
+
+    /**
+     * Table for recently used type lookup
+     */
+    const val TABLE_RECENTLY_USED_TYPE = "recently_used_type"
+
+    /**
+     * Table for recently used items (continue where you left off)
+     */
+    const val TABLE_RECENTLY_USED = "recently_used"
+
+    /**
+     * Table for text editor scroll state
+     */
+    const val TABLE_TEXT_EDITOR_SCROLL = "text_editor_scroll"
 }
