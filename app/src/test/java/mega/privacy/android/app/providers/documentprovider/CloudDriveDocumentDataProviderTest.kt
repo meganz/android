@@ -17,6 +17,8 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.AddNodeType
@@ -27,6 +29,7 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
+import mega.privacy.android.domain.usecase.node.GetOpenableLocalFileForCloudDriveSafUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -34,13 +37,18 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
+import java.io.File
+import java.io.FileNotFoundException
 
 /**
  * Unit tests for [CloudDriveDocumentDataProvider].
@@ -64,6 +72,8 @@ class CloudDriveDocumentDataProviderTest {
     private val addNodeType: AddNodeType = mock()
     private val documentIdToNodeIdMapper: DocumentIdToNodeIdMapper = mock()
     private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase = mock()
+    private val getOpenableLocalFileForCloudDriveSafUseCase: GetOpenableLocalFileForCloudDriveSafUseCase =
+        mock()
     private val mockedCredentials: UserCredentials = mock()
 
     private lateinit var underTest: CloudDriveDocumentDataProvider
@@ -94,6 +104,7 @@ class CloudDriveDocumentDataProviderTest {
             addNodeType,
             documentIdToNodeIdMapper,
             monitorPasscodeLockPreferenceUseCase,
+            getOpenableLocalFileForCloudDriveSafUseCase,
             mockedCredentials,
         )
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
@@ -127,6 +138,7 @@ class CloudDriveDocumentDataProviderTest {
             addNodeType = addNodeType,
             documentIdToNodeIdMapper = documentIdToNodeIdMapper,
             monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
+            getOpenableLocalFileForCloudDriveSafUseCase = getOpenableLocalFileForCloudDriveSafUseCase,
         )
     }
 
@@ -681,7 +693,8 @@ class CloudDriveDocumentDataProviderTest {
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
                 awaitItem() // LoadingChildren
-                val childData = awaitItem() // ChildData (filtered from first combine emission, empty)
+                val childData =
+                    awaitItem() // ChildData (filtered from first combine emission, empty)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
                 assertThat(data.children).isEmpty()
@@ -817,5 +830,97 @@ class CloudDriveDocumentDataProviderTest {
                 cancelAndIgnoreRemainingEvents()
             }
             verify(cloudDriveDocumentRowMapper, atLeastOnce()).invoke(typedNode, DOCUMENT_ID_PREFIX)
+        }
+
+    @Test
+    fun `test that openDocumentFile returns file from getOpenableLocalFileForCloudDriveSafUseCase`() =
+        runTest {
+            val handle = 100L
+            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+            val mockNode: FolderNode = mock()
+            val typedFileNode: TypedFileNode = mock()
+            val localFile = File.createTempFile("saf_open", ".bin").apply { deleteOnExit() }
+            whenever(getNodeByHandleUseCase.invoke(handle, false)).thenReturn(mockNode)
+            whenever(addNodeType.invoke(mockNode)).thenReturn(typedFileNode)
+            wheneverBlocking {
+                getOpenableLocalFileForCloudDriveSafUseCase.invoke(typedFileNode)
+            }.thenReturn(localFile)
+
+            val result = underTest.openDocumentFile(documentId)
+
+            assertThat(result).isEqualTo(localFile)
+            verifyBlocking(getOpenableLocalFileForCloudDriveSafUseCase) { invoke(typedFileNode) }
+        }
+
+    @Test
+    fun `test that openDocumentFile throws FileNotFoundException when node handle not found`() =
+        runTest {
+            val documentId = "$DOCUMENT_ID_PREFIX:999"
+            whenever(getNodeByHandleUseCase.invoke(999L, false)).thenReturn(null)
+
+            val error = assertThrows<FileNotFoundException> {
+                underTest.openDocumentFile(documentId)
+            }
+            assertThat(error).hasMessageThat().contains("Node not found")
+        }
+
+    @Test
+    fun `test that openDocumentFile throws FileNotFoundException when node is a folder`() =
+        runTest {
+            val handle = 200L
+            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+            val mockNode: FolderNode = mock()
+            val typedFolderNode: TypedFolderNode = mock()
+            whenever(getNodeByHandleUseCase.invoke(handle, false)).thenReturn(mockNode)
+            whenever(addNodeType.invoke(mockNode)).thenReturn(typedFolderNode)
+
+            val error = assertThrows<FileNotFoundException> {
+                underTest.openDocumentFile(documentId)
+            }
+            assertThat(error).hasMessageThat().contains("Document is not a file")
+        }
+
+    @Test
+    fun `test that openDocumentFile throws FileNotFoundException when document id is invalid`() =
+        runTest {
+            val invalidDocumentId = "invalid_id_without_prefix"
+
+            val error = assertThrows<FileNotFoundException> {
+                underTest.openDocumentFile(invalidDocumentId)
+            }
+            assertThat(error).hasMessageThat().contains("Invalid document id")
+        }
+    
+    @Test
+    fun `test that openDocumentFile wraps unexpected exception from getOpenableLocalFileForCloudDriveSafUseCase`() =
+        runTest {
+            val handle = 102L
+            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+            val mockNode: FolderNode = mock()
+            val typedFileNode: TypedFileNode = mock()
+            whenever(getNodeByHandleUseCase.invoke(handle, false)).thenReturn(mockNode)
+            whenever(addNodeType.invoke(mockNode)).thenReturn(typedFileNode)
+            wheneverBlocking {
+                getOpenableLocalFileForCloudDriveSafUseCase.invoke(typedFileNode)
+            }.thenThrow(IllegalStateException("unexpected"))
+
+            val error = assertThrows<FileNotFoundException> {
+                underTest.openDocumentFile(documentId)
+            }
+            assertThat(error).hasMessageThat().contains("Unable to open document: $documentId")
+        }
+
+    @Test
+    fun `test that openDocumentFile throws FileNotFoundException when documentIdToNodeIdMapper throws`() =
+        runTest {
+            val documentId = "$DOCUMENT_ID_PREFIX:1"
+            whenever(documentIdToNodeIdMapper.invoke(any(), any())).thenThrow(
+                IllegalStateException("mapper failed"),
+            )
+
+            val error = assertThrows<FileNotFoundException> {
+                underTest.openDocumentFile(documentId)
+            }
+            assertThat(error).hasMessageThat().contains("Unable to open document: $documentId")
         }
 }

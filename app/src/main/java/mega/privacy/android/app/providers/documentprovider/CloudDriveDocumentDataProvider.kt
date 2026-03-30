@@ -2,9 +2,9 @@ package mega.privacy.android.app.providers.documentprovider
 
 import android.content.Context
 import android.net.ConnectivityManager
-import androidx.annotation.VisibleForTesting
 import android.net.Network
 import android.net.NetworkCapabilities
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.getSystemService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AddNodeType
@@ -42,13 +43,17 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
+import mega.privacy.android.domain.usecase.node.GetOpenableLocalFileForCloudDriveSafUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
+import java.io.File
+import java.io.FileNotFoundException
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Data provider for the Cloud Drive document provider.
@@ -70,6 +75,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     private val addNodeType: AddNodeType,
     private val documentIdToNodeIdMapper: DocumentIdToNodeIdMapper,
     private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
+    private val getOpenableLocalFileForCloudDriveSafUseCase: GetOpenableLocalFileForCloudDriveSafUseCase,
 ) {
 
     /**
@@ -431,6 +437,24 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         }
     }
 
+    /** Local [File] for SAF [documentId]. @throws FileNotFoundException */
+    suspend fun openDocumentFile(documentId: String): File {
+        try {
+            val nodeId = documentIdToNodeIdMapper(documentId, CLOUD_DRIVE_ROOT_ID)
+                ?: throw FileNotFoundException("Invalid document id: $documentId")
+            val untypedNode = getNodeByHandleUseCase(nodeId.longValue)
+                ?: throw FileNotFoundException("Node not found: $documentId")
+            val fileNode = addNodeType(untypedNode) as? TypedFileNode
+                ?: throw FileNotFoundException("Document is not a file: $documentId")
+            return getOpenableLocalFileForCloudDriveSafUseCase(fileNode)
+        } catch (e: FileNotFoundException) {
+            throw e
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            throw FileNotFoundException("Unable to open document: $documentId")
+        }
+    }
 
     companion object {
         const val CLOUD_DRIVE_ROOT_ID = "mega_cloud_drive_root"

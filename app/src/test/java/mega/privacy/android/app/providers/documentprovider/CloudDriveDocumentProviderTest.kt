@@ -5,6 +5,7 @@ import android.content.ContentProvider
 import android.content.Context
 import android.database.Cursor
 import android.os.Build
+import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
 import android.provider.DocumentsContract.Document
 import android.provider.DocumentsContract.Root
@@ -27,12 +28,16 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.File
 import java.io.FileNotFoundException
 import java.lang.reflect.Field
 
@@ -563,13 +568,114 @@ class CloudDriveDocumentProviderTest {
         }
 
     @Test
-    fun `test that openDocument throws not yet implemented`() = runTest {
+    fun `test that openDocument throws FileNotFoundException when documentId is null`() = runTest {
         setStateWithCredentials()
         createProvider()
 
-        val e = assertThrows<NotImplementedError> {
+        val e = assertThrows<FileNotFoundException> {
+            underTest.openDocument(null, "r", null)
+        }
+        assertThat(e).hasMessageThat().contains("Invalid document id")
+    }
+
+    @Test
+    fun `test that openDocument throws FileNotFoundException when documentId is empty`() = runTest {
+        setStateWithCredentials()
+        createProvider()
+
+        val e = assertThrows<FileNotFoundException> {
+            underTest.openDocument("", "r", null)
+        }
+        assertThat(e).hasMessageThat().contains("Invalid document id")
+    }
+
+    @Test
+    fun `test that openDocument throws FileNotFoundException when documentId is root`() = runTest {
+        setStateWithCredentials()
+        createProvider()
+
+        val e = assertThrows<FileNotFoundException> {
+            underTest.openDocument(CLOUD_DRIVE_ROOT_ID, "r", null)
+        }
+        assertThat(e).hasMessageThat().contains("root")
+    }
+
+    @Test
+    fun `test that openDocument throws FileNotFoundException when mode is write`() = runTest {
+        setStateWithCredentials()
+        createProvider()
+
+        val e = assertThrows<FileNotFoundException> {
+            underTest.openDocument("$CLOUD_DRIVE_ROOT_ID:123", "w", null)
+        }
+        assertThat(e).hasMessageThat().contains("Write mode not supported")
+    }
+
+    @Test
+    fun `test that openDocument throws AuthenticationRequiredException when state is NotLoggedIn`() =
+        runTest {
+            dataProviderState.value = CloudDriveDocumentProviderUiState.NotLoggedIn
+            createProvider()
+
+            assertThrows<AuthenticationRequiredException> {
+                underTest.openDocument("$CLOUD_DRIVE_ROOT_ID:123", "r", null)
+            }
+        }
+
+    @Test
+    fun `test that openDocument throws FileNotFoundException when state is PasscodeLockEnabled`() =
+        runTest {
+            dataProviderState.value =
+                CloudDriveDocumentProviderUiState.PasscodeLockEnabled("test@mega.co.nz")
+            createProvider()
+
+            assertThrows<FileNotFoundException> {
+                underTest.openDocument("$CLOUD_DRIVE_ROOT_ID:123", "r", null)
+            }
+        }
+
+    @Test
+    fun `test that openDocument throws FileNotFoundException when state is Offline`() = runTest {
+        dataProviderState.value = CloudDriveDocumentProviderUiState.Offline("test@mega.co.nz")
+        createProvider()
+
+        assertThrows<FileNotFoundException> {
             underTest.openDocument("$CLOUD_DRIVE_ROOT_ID:123", "r", null)
         }
-        assertThat(e).hasMessageThat().contains("Not yet implemented")
     }
+
+    @Test
+    fun `test that openDocument returns readable ParcelFileDescriptor when openDocumentFile succeeds`() =
+        runTest {
+            setStateWithCredentials()
+            val tempFile = File.createTempFile("cloud_drive_doc", ".txt").apply {
+                writeText("hello")
+                deleteOnExit()
+            }
+            wheneverBlocking { mockDataProvider.openDocumentFile(any()) }.thenReturn(tempFile)
+            createProvider()
+
+            val pfd = underTest.openDocument("$CLOUD_DRIVE_ROOT_ID:123", "r", null)
+
+            assertThat(pfd).isNotNull()
+            ParcelFileDescriptor.AutoCloseInputStream(pfd).use { input ->
+                assertThat(String(input.readBytes())).isEqualTo("hello")
+            }
+            verifyBlocking(mockDataProvider) { openDocumentFile("$CLOUD_DRIVE_ROOT_ID:123") }
+        }
+
+    @Test
+    fun `test that openDocument throws FileNotFoundException when openDocumentFile throws FileNotFoundException`() =
+        runTest {
+            setStateWithCredentials()
+            wheneverBlocking { mockDataProvider.openDocumentFile(any()) }
+                .thenAnswer { throw FileNotFoundException("Node not found") }
+            createProvider()
+
+            val e = assertThrows<FileNotFoundException> {
+                underTest.openDocument("$CLOUD_DRIVE_ROOT_ID:123", "r", null)
+            }
+            assertThat(e).hasMessageThat().contains("Node not found")
+            verifyBlocking(mockDataProvider) { openDocumentFile("$CLOUD_DRIVE_ROOT_ID:123") }
+        }
 }

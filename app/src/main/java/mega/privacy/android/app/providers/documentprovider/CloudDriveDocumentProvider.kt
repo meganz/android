@@ -7,6 +7,7 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.os.OperationCanceledException
 import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
 import android.provider.DocumentsContract.Document
@@ -16,7 +17,10 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.R
@@ -25,7 +29,15 @@ import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentDat
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
+import java.io.File
 import java.io.FileNotFoundException
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+
 
 /**
  * Document provider that exposes the user's MEGA Cloud Drive via the Storage Access Framework.
@@ -56,6 +68,14 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         )
 
         private const val LOGIN_PENDING_INTENT_REQUEST_CODE = 1001
+
+        private const val OPEN_POLL_MS = 250L
+
+        /** Daemon dispatcher so open work is not on the viewer thread. */
+        private val openDocumentDispatcher: CoroutineDispatcher =
+            Executors.newCachedThreadPool { r ->
+                Thread(r, "CloudDriveDocOpen").apply { isDaemon = true }
+            }.asCoroutineDispatcher()
     }
 
     private val dependencyContainer: CloudDriveDocumentProviderEntryPoint by lazy {
@@ -243,12 +263,100 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         return getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
     }
 
+    /** Read-only open; not the root. @throws FileNotFoundException, AuthenticationRequiredException, OperationCanceledException */
     override fun openDocument(
-        p0: String?,
-        p1: String?,
-        p2: CancellationSignal?,
+        documentId: String?,
+        mode: String?,
+        signal: CancellationSignal?,
     ): ParcelFileDescriptor {
-        TODO("Not yet implemented")
+        if (documentId.isNullOrEmpty()) {
+            throw FileNotFoundException("Invalid document id: $documentId")
+        }
+        if (documentId == CLOUD_DRIVE_ROOT_ID) {
+            throw FileNotFoundException("Cannot open root as document")
+        }
+        if (mode != null && mode != "r") {
+            throw FileNotFoundException("Write mode not supported")
+        }
+
+        when (dataProvider.state.value) {
+            is CloudDriveDocumentProviderUiState.NotLoggedIn -> throwAuthenticationRequired()
+            is CloudDriveDocumentProviderUiState.PasscodeLockEnabled ->
+                throw FileNotFoundException(getPasscodeLockEnabledString())
+
+            is CloudDriveDocumentProviderUiState.Offline ->
+                throw FileNotFoundException(getOfflineString())
+
+            else -> Unit
+        }
+
+        if (signal?.isCanceled == true) {
+            throw OperationCanceledException("Cancelled before resolve")
+        }
+
+        val file = openLocalFileOffViewerThread(documentId, signal)
+        return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+    }
+
+    private fun openLocalFileOffViewerThread(
+        documentId: String,
+        signal: CancellationSignal?,
+    ): File {
+        // Launch on the dispatcher (not the Binder thread) so the Binder thread stays alive
+        // and responsive while polling the future — required for correct ParcelFileDescriptor handoff.
+        val future = CompletableFuture<File>()
+        applicationScope.launch(openDocumentDispatcher) {
+            try {
+                future.complete(dataProvider.openDocumentFile(documentId))
+            } catch (e: CancellationException) {
+                future.cancel(true)
+                throw e
+            } catch (e: Throwable) {
+                future.completeExceptionally(e)
+            }
+        }
+        return awaitOpenFutureResult(future, signal)
+    }
+
+    /** [Future.get] with short timeout to poll [signal]. */
+    private fun <T> awaitOpenFutureResult(future: Future<T>, signal: CancellationSignal?): T {
+        var restoreInterrupt = false
+        try {
+            while (true) {
+                if (signal?.isCanceled == true) {
+                    future.cancel(true)
+                    throw OperationCanceledException("Cancelled while resolving document")
+                }
+                try {
+                    return future.get(OPEN_POLL_MS, TimeUnit.MILLISECONDS)
+                } catch (e: ExecutionException) {
+                    mapOpenFailure(e.cause ?: e)
+                } catch (_: TimeoutException) {
+                } catch (_: InterruptedException) {
+                    restoreInterrupt = true
+                } catch (e: java.util.concurrent.CancellationException) {
+                    throw OperationCanceledException(e.message)
+                }
+            }
+        } finally {
+            if (restoreInterrupt) {
+                Thread.currentThread().interrupt()
+            }
+        }
+    }
+
+    /**
+     * Rethrows the async failure from [Future.get] with types SAF callers expect.
+     */
+    private fun mapOpenFailure(t: Throwable): Nothing {
+        when (t) {
+            is CancellationException -> throw OperationCanceledException(t.message)
+            is OperationCanceledException -> throw t
+            is FileNotFoundException -> throw t
+            is AuthenticationRequiredException -> throw t
+            else -> throw FileNotFoundException("Failed to open document: ${t.message}")
+                .also { it.initCause(t) }
+        }
     }
 
     override fun queryChildDocuments(
