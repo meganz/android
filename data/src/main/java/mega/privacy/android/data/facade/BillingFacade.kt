@@ -27,17 +27,22 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.data.extensions.getRequestListener
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.domain.entity.account.MegaSku
@@ -49,8 +54,8 @@ import mega.privacy.android.domain.exception.ProductNotFoundException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.repository.security.LoginRepository
+import mega.privacy.android.data.gateway.AppEventGateway
+import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -75,15 +80,15 @@ internal class BillingFacade @Inject constructor(
     private val verifyPurchaseGateway: VerifyPurchaseGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val skusCache: Cache<List<MegaSku>>,
-    private val accountInfoWrapper: AccountInfoWrapper,
+    private val megaApiGateway: MegaApiGateway,
     private val productDetailsListCache: Cache<List<ProductDetails>>,
     private val activeSubscription: Cache<MegaPurchase>,
     private val source: Cache<UpgradeSource>,
-    private val accountRepository: AccountRepository,
-    private val loginRepository: LoginRepository,
+    private val appEventGateway: AppEventGateway,
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
     private val mutex = Mutex()
     private val proceedPurchaseMutex = Mutex()
+    private val submittedPurchaseTokens = mutableSetOf<String>()
     private val billingEvent = MutableSharedFlow<BillingEvent>()
 
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
@@ -95,7 +100,7 @@ internal class BillingFacade @Inject constructor(
             ProcessLifecycleOwner.get().lifecycle.addObserver(this@BillingFacade)
         }
         applicationScope.launch(exceptionHandler) {
-            loginRepository.monitorFetchNodesFinish().collect {
+            appEventGateway.monitorFetchNodesFinish().collect {
                 if (it) {
                     queryPurchase()
                 }
@@ -106,7 +111,7 @@ internal class BillingFacade @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         applicationScope.launch(exceptionHandler) {
             ensureConnect()
-            if (accountRepository.isMegaApiLoggedIn()) {
+            if (megaApiGateway.isMegaApiLoggedIn() > 0) {
                 queryPurchase()
             }
         }
@@ -433,14 +438,40 @@ internal class BillingFacade @Inject constructor(
         }
     }
 
-    private fun updateAccountInfo(purchases: List<MegaPurchase>) {
+    private suspend fun updateAccountInfo(purchases: List<MegaPurchase>) {
         val max =
             purchases.maxWithOrNull(compareBy<MegaPurchase> { it.level }.thenByDescending { it.time })
         Timber.d("List of purchases: ${purchases.size}")
         Timber.d("Max purchase: $max")
         activeSubscription.set(max)
-        purchases.forEach { purchase ->
-            accountInfoWrapper.submitSubscriptions(purchase)
+        coroutineScope {
+            purchases.map { purchase ->
+                async { submitSubscriptions(purchase) }
+            }.awaitAll()
+        }
+    }
+
+    private suspend fun submitSubscriptions(purchase: MegaPurchase) {
+        Timber.d("submit subscription: $purchase")
+        val token = purchase.token
+        if (token in submittedPurchaseTokens) {
+            Timber.d("Purchase token already submitted, skipping: $token")
+            return
+        }
+        runCatching {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("submitPurchaseReceipt") { }
+                megaApiGateway.submitPurchaseReceipt(
+                    MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET,
+                    purchase.receipt,
+                    listener,
+                )
+            }
+        }.onSuccess {
+            token?.let { submittedPurchaseTokens.add(it) }
+        }.onFailure { error ->
+            Timber.e("PURCHASE WRONG: ${error.message}")
         }
     }
 }

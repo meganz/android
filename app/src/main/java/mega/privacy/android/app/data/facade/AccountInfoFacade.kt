@@ -5,17 +5,13 @@ import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.middlelayer.iab.BillingConstant.PAYMENT_GATEWAY
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.feature.payment.model.AccountTypeInt
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
@@ -35,8 +31,6 @@ class AccountInfoFacade @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val db: Lazy<DatabaseHandler>,
 ) : AccountInfoWrapper {
-    private val submittedPurchaseTokens = mutableSetOf<String>()
-
     override val storageCapacityUsedAsFormattedString: String
         get() = myAccountInfo.usedFormatted
     override val accountTypeId: Int
@@ -71,33 +65,6 @@ class AccountInfoFacade @Inject constructor(
     }
 
     override suspend fun resetAccountInfo() = myAccountInfo.resetDefaults()
-
-    override fun submitSubscriptions(purchase: MegaPurchase) {
-        Timber.d("submit subscription: $purchase")
-        val token = purchase.token
-        if (token in submittedPurchaseTokens) {
-            Timber.d("Purchase token already submitted, skipping: $token")
-            return
-        }
-        val json = purchase.receipt
-
-        val listener = OptionalMegaRequestListenerInterface(
-            onRequestFinish = { _, error ->
-                when (error.errorCode) {
-                    MegaError.API_OK, MegaError.API_EEXIST, MegaError.API_EEXPIRED -> {
-                        token?.let { submittedPurchaseTokens.add(it) }
-                    }
-
-                    else -> {
-                        Timber.e("PURCHASE WRONG: ${error.errorString} (${error.errorCode})")
-                    }
-                }
-            }
-        )
-
-        Timber.d("megaApi.submitPurchaseReceipt is invoked")
-        megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
-    }
 
     private fun getAccountTypeLabel(accountType: Int?) = with(context) {
         when (accountType) {

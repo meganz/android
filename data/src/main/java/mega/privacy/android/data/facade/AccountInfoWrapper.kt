@@ -1,6 +1,5 @@
 package mega.privacy.android.data.facade
 
-import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaRequest
 
 /**
@@ -41,12 +40,6 @@ interface AccountInfoWrapper {
      * @param request
      */
     suspend fun handleAccountDetail(request: MegaRequest)
-
-    /**
-     * submit subscription
-     * @param purchase
-     */
-    fun submitSubscriptions(purchase: MegaPurchase)
 
     /**
      * Resets account info.
