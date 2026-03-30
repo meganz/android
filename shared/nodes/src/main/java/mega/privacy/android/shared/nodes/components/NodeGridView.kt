@@ -110,7 +110,7 @@ internal fun <T : TypedNode> NodeGridView(
                 iconRes = nodeUiItem.iconRes,
                 thumbnailData = nodeUiItem.thumbnailData,
                 isTakenDown = nodeUiItem.isTakenDown,
-                modifier = modifier,
+                modifier = Modifier,
                 duration = nodeUiItem.duration,
                 isSelected = nodeUiItem.isSelected,
                 isInSelectionMode = inSelectionMode,

@@ -105,7 +105,7 @@ internal fun <T : TypedNode> NodeListView(
                 title = nodeUiItem.title.text,
                 subtitle = nodeUiItem.subtitle.text(),
                 icon = nodeUiItem.iconRes,
-                modifier = modifier,
+                modifier = Modifier,
                 description = nodeUiItem.formattedDescription?.text,
                 tags = nodeUiItem.tags,
                 thumbnailData = nodeUiItem.thumbnailData,
