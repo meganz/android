@@ -2,7 +2,6 @@ package mega.privacy.android.feature.photos.presentation.mediadiscovery
 
 import MediaGridViewItem
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -74,9 +73,9 @@ import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottom
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
-import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
+import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
@@ -91,9 +90,9 @@ import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
+import mega.privacy.android.feature.photos.presentation.component.MediaTimePeriodSelector
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoveryFilterDialog
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoverySortDialog
-import mega.privacy.android.feature.photos.presentation.component.MediaTimePeriodSelector
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryCardListView
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryLoadingView
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
@@ -101,6 +100,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
+import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -233,6 +233,9 @@ fun CloudDriveMediaDiscoveryRoute(
         onCaptureClicked = { captureHandler.onCaptureClicked() },
         onNewFolderClicked = { showNewFolderDialog = true },
         onNewTextFileClicked = { showNewTextFileDialog = true },
+        onOpenLinkClicked = {
+            navigationHandler.navigate(OpenLinkDialogNavKey)
+        },
         onDismissUploadSheet = { showUploadOptionsBottomSheet = false },
         onTransfersClicked = { navigationHandler.navigate(TransfersNavKey()) },
         onClickZoomIn = viewModel::zoomIn,
@@ -313,6 +316,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
     onCaptureClicked: () -> Unit,
     onNewFolderClicked: () -> Unit,
     onNewTextFileClicked: () -> Unit,
+    onOpenLinkClicked: () -> Unit,
     onDismissUploadSheet: () -> Unit,
     onTransfersClicked: () -> Unit,
     onClickZoomIn: () -> Unit,
@@ -516,6 +520,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
                 onCaptureClicked = onCaptureClicked,
                 onNewFolderClicked = onNewFolderClicked,
                 onNewTextFileClicked = onNewTextFileClicked,
+                onOpenLinkClicked = onOpenLinkClicked,
                 onDismissSheet = onDismissUploadSheet,
             )
         }
@@ -803,6 +808,7 @@ private fun CloudDriveMediaDiscoveryLoadingPreview() {
             onClickZoomOut = {},
             onSetCurrentSort = {},
             onSetCurrentMediaType = {},
+            onOpenLinkClicked = {}
         )
     }
 }
@@ -837,6 +843,7 @@ private fun CloudDriveMediaDiscoveryEmptyPreview() {
             onClickZoomOut = {},
             onSetCurrentSort = {},
             onSetCurrentMediaType = {},
+            onOpenLinkClicked = {}
         )
     }
 }

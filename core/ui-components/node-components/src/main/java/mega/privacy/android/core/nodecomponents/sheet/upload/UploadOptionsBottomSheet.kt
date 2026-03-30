@@ -30,6 +30,7 @@ import mega.privacy.mobile.analytics.event.CloudDriveNewTextFileMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveScanDocumentMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveUploadFilesMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveUploadFolderMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.OpenLinkMenuItemEvent
 
 /**
  * Material 3 bottom sheet for home FAB options.
@@ -43,6 +44,7 @@ fun UploadOptionsBottomSheet(
     onCaptureClicked: () -> Unit,
     onNewFolderClicked: () -> Unit,
     onNewTextFileClicked: () -> Unit,
+    onOpenLinkClicked: () -> Unit,
     onDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
@@ -123,6 +125,16 @@ fun UploadOptionsBottomSheet(
                     onDismissSheet()
                 },
             )
+            UploadOptionItem(
+                text = stringResource(id = sharedR.string.open_link_dialog_title),
+                icon = IconPack.Medium.Thin.Outline.Link01,
+                testTag = TEST_TAG_OPEN_LINK_ACTION,
+                onClick = {
+                    Analytics.tracker.trackEvent(OpenLinkMenuItemEvent)
+                    onOpenLinkClicked()
+                    onDismissSheet()
+                },
+            )
         }
     }
 }
@@ -139,6 +151,7 @@ private fun CreateNewNodeBottomSheetPreview() {
             onCaptureClicked = {},
             onNewFolderClicked = {},
             onNewTextFileClicked = {},
+            onOpenLinkClicked = {},
             onDismissSheet = {},
         )
     }
@@ -155,3 +168,5 @@ internal const val TEST_TAG_CAPTURE_ACTION = "$TEST_TAG_UPLOAD_OPTIONS_SHEET:cap
 internal const val TEST_TAG_NEW_FOLDER_ACTION = "$TEST_TAG_UPLOAD_OPTIONS_SHEET:new_folder_action"
 internal const val TEST_TAG_NEW_TEXT_FILE_ACTION =
     "$TEST_TAG_UPLOAD_OPTIONS_SHEET:new_text_file_action"
+internal const val TEST_TAG_OPEN_LINK_ACTION =
+    "$TEST_TAG_UPLOAD_OPTIONS_SHEET:open_link_action"

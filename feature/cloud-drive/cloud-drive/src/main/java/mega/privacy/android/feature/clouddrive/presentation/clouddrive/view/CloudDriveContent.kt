@@ -63,6 +63,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.account.overquota.OverQuotaStatusViewModel
@@ -372,9 +373,12 @@ internal fun CloudDriveContent(
                 onNewTextFileClicked = {
                     showNewTextFileDialog = true
                 },
+                onOpenLinkClicked = {
+                    navigationHandler.navigate(OpenLinkDialogNavKey)
+                },
                 onDismissSheet = {
                     onToggleShowUploadOptionsBottomSheet(false)
-                }
+                },
             )
         }
 

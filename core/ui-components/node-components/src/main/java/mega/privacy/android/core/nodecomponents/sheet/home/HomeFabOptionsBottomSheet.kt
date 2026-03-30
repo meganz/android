@@ -11,9 +11,9 @@ import mega.android.core.ui.components.list.SecondaryHeaderListItem
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionItem
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.HomeAddNewBackupMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeAddNewSyncMenuToolbarEvent
@@ -23,6 +23,7 @@ import mega.privacy.mobile.analytics.event.HomeNewTextFileMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeScanDocumentMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeUploadFilesMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeUploadFolderMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.OpenLinkMenuItemEvent
 
 /**
  * Material 3 bottom sheet for home FAB options with Upload, Sync, and Chat sections.
@@ -39,6 +40,7 @@ fun HomeFabOptionsBottomSheet(
     onAddNewSyncClicked: () -> Unit,
     onAddNewBackupClicked: () -> Unit,
     onNewChatClicked: () -> Unit,
+    onOpenLinkClicked: () -> Unit,
 ) {
     Column(
         modifier = modifier.testTag(TEST_TAG_HOME_FAB_OPTIONS_SHEET)
@@ -93,6 +95,15 @@ fun HomeFabOptionsBottomSheet(
             onClick = {
                 Analytics.tracker.trackEvent(HomeNewTextFileMenuToolbarEvent)
                 onCreateNewTextFileClicked()
+            },
+        )
+        UploadOptionItem(
+            text = stringResource(sharedResR.string.open_link_dialog_title),
+            icon = IconPack.Medium.Thin.Outline.Link01,
+            testTag = TEST_TAG_OPEN_LINK_ACTION,
+            onClick = {
+                Analytics.tracker.trackEvent(OpenLinkMenuItemEvent)
+                onOpenLinkClicked()
             },
         )
 
@@ -155,6 +166,7 @@ private fun HomeFabOptionsBottomSheetPreview() {
             onAddNewSyncClicked = {},
             onAddNewBackupClicked = {},
             onNewChatClicked = {},
+            onOpenLinkClicked = {},
         )
     }
 }
@@ -180,4 +192,5 @@ internal const val TEST_TAG_ADD_NEW_BACKUP_ACTION =
 internal const val TEST_TAG_CHAT_SECTION_HEADER =
     "$TEST_TAG_HOME_FAB_OPTIONS_SHEET:chat_section_header"
 internal const val TEST_TAG_NEW_CHAT_ACTION = "$TEST_TAG_HOME_FAB_OPTIONS_SHEET:new_chat_action"
+internal const val TEST_TAG_OPEN_LINK_ACTION = "$TEST_TAG_HOME_FAB_OPTIONS_SHEET:open_link_action"
 

@@ -37,6 +37,7 @@ class HomeFabOptionsBottomSheetTest {
     private val onAddNewSyncClicked = mock<() -> Unit>()
     private val onAddNewBackupClicked = mock<() -> Unit>()
     private val onNewChatClicked = mock<() -> Unit>()
+    private val onOpenLinkClicked = mock<() -> Unit>()
 
     @Test
     fun `test that sheet shows correctly`() {
@@ -55,6 +56,7 @@ class HomeFabOptionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_ADD_NEW_BACKUP_ACTION).assertExists()
             onNodeWithTag(TEST_TAG_CHAT_SECTION_HEADER).assertExists()
             onNodeWithTag(TEST_TAG_NEW_CHAT_ACTION).assertExists()
+            onNodeWithTag(TEST_TAG_OPEN_LINK_ACTION).assertExists()
         }
     }
 
@@ -165,6 +167,16 @@ class HomeFabOptionsBottomSheetTest {
         verify(onNewChatClicked).invoke()
     }
 
+    @Test
+    fun `test that clicking on open link option invokes onOpenLinkClicked`() {
+        initComposeTestRule()
+
+        composeTestRule.onNodeWithTag(TEST_TAG_OPEN_LINK_ACTION)
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        verify(onOpenLinkClicked).invoke()
+    }
+
     @OptIn(ExperimentalMaterial3Api::class)
     private fun initComposeTestRule() {
         composeTestRule.setContent {
@@ -177,6 +189,7 @@ class HomeFabOptionsBottomSheetTest {
                 onAddNewSyncClicked = onAddNewSyncClicked,
                 onAddNewBackupClicked = onAddNewBackupClicked,
                 onNewChatClicked = onNewChatClicked,
+                onOpenLinkClicked = onOpenLinkClicked,
             )
         }
     }

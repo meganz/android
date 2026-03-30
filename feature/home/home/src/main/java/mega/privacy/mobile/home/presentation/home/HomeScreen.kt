@@ -1,6 +1,5 @@
 package mega.privacy.mobile.home.presentation.home
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,9 +41,9 @@ import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomS
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
-import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
+import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
@@ -54,6 +53,7 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -134,6 +134,8 @@ internal fun HomeScreen(
                 HomeFabOption.NewChat -> navigationHandler.navigate(
                     ChatListNavKey(createNewChat = true)
                 )
+
+                HomeFabOption.OpenLink -> navigationHandler.navigate(OpenLinkDialogNavKey)
             }
             navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)
         }

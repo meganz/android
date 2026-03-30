@@ -19,7 +19,8 @@ enum class HomeFabOption {
     CreateNewTextFile,
     AddNewSync,
     AddNewBackup,
-    NewChat
+    NewChat,
+    OpenLink,
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,6 +52,9 @@ fun EntryProviderScope<NavKey>.homeFabOptionsBottomSheetNavigation(
             },
             onNewChatClicked = {
                 returnResult(HomeFabOptionsBottomSheetNavKey.KEY, HomeFabOption.NewChat)
+            },
+            onOpenLinkClicked = {
+                returnResult(HomeFabOptionsBottomSheetNavKey.KEY, HomeFabOption.OpenLink)
             },
         )
     }
