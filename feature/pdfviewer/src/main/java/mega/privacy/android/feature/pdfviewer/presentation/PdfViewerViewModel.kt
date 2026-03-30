@@ -16,6 +16,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
@@ -54,6 +56,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val getLastPageViewedInPdfUseCase: GetLastPageViewedInPdfUseCase,
     private val setOrUpdateLastPageViewedInPdfUseCase: SetOrUpdateLastPageViewedInPdfUseCase,
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -71,6 +74,17 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     init {
         initializeFromArgs()
         observeSearchPipeline()
+        observeConnectivity()
+    }
+
+    private fun observeConnectivity() {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .catch { Timber.e(it, "Connectivity monitoring failed") }
+                .collect { connected ->
+                    _state.update { it.copy(isOnline = connected) }
+                }
+        }
     }
 
     private fun initializeFromArgs() {
@@ -115,8 +129,8 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                     _state.update {
                         it.copy(
                             isLoading = false,
+                            error = PdfViewerError.StreamingError(null),
                         )
-                        //todo error message
                     }
                 }
             }.onFailure { error ->
@@ -124,8 +138,8 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 _state.update {
                     it.copy(
                         isLoading = false,
+                        error = PdfViewerError.StreamingError(error.message),
                     )
-                    // todo error message
                 }
             }
         }
@@ -292,11 +306,33 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     }
 
     fun onLoadError(error: PdfViewerError) {
-        _state.update {
-            it.copy(
+        _state.update { current ->
+            val resolvedError = when {
+                error is PdfViewerError.PasswordProtected &&
+                        current.currentPassword != null ->
+                    PdfViewerError.InvalidPassword
+
+                else -> error
+            }
+            current.copy(
                 isLoading = false,
-                error = error,
+                error = resolvedError,
             )
+        }
+    }
+
+    /**
+     * Call when the user edits the password field so the inline "incorrect password" hint clears
+     * while the dialog stays open.
+     */
+    fun onPasswordDialogInputChanged() {
+        _state.update { current ->
+            when (current.error) {
+                is PdfViewerError.InvalidPassword ->
+                    current.copy(error = PdfViewerError.PasswordProtected)
+
+                else -> current
+            }
         }
     }
 
@@ -305,7 +341,6 @@ internal class PdfViewerViewModel @AssistedInject constructor(
             it.copy(
                 currentPassword = password,
                 showPasswordDialog = false,
-                passwordAttempts = it.passwordAttempts - 1,
                 isLoading = true,
                 error = null,
             )
@@ -321,6 +356,11 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     fun retryLoad() {
         _state.update { it.copy(isLoading = true, error = null) }
+        if (!args.isLocalContent &&
+            (args.contentUri.startsWith("http://") || args.contentUri.startsWith("https://"))
+        ) {
+            loadPdfBytes(args.contentUri)
+        }
     }
 
     fun clearError() {

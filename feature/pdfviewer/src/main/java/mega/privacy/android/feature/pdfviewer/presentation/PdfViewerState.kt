@@ -61,13 +61,13 @@ data class PdfViewerSearchState(
  * UI state for the PDF Viewer screen.
  *
  * @param isLoading Whether the PDF is currently loading
+ * @param isOnline Whether the device has an internet connection
  * @param source The source of the PDF document
  * @param title The title to display in the toolbar
  * @param currentPage The current page number (1-indexed)
  * @param totalPages The total number of pages in the PDF
  * @param isToolbarVisible Whether the toolbar is currently visible
  * @param showPasswordDialog Whether to show the password dialog
- * @param passwordAttempts The number of password attempts remaining
  * @param currentPassword The current password (if entered)
  * @param error The current error state, if any
  * @param isExternalFile Whether this is an external file (from intent)
@@ -82,13 +82,13 @@ data class PdfViewerSearchState(
  */
 internal data class PdfViewerState(
     val isLoading: Boolean = true,
+    val isOnline: Boolean = true,
     val source: PdfViewerSource? = null,
     val title: String? = null,
     val currentPage: Int = 1,
     val totalPages: Int = 0,
     val isToolbarVisible: Boolean = true,
     val showPasswordDialog: Boolean = false,
-    val passwordAttempts: Int = 3,
     val currentPassword: String? = null,
     val error: PdfViewerError? = null,
     val isExternalFile: Boolean = false,

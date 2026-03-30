@@ -2632,4 +2632,12 @@
     </plurals>
     <!-- Label for any ‘Incoming shares’ button or title -->
     <string name="general_title_incoming_shares">Incoming shares</string>
+    <!-- General error for file path or node cannot be resolved -->
+    <string name="general_error_file_not_found">This file could not be found</string>
+    <!-- PDF viewer error when the file is missing or corrupt while the device has network -->
+    <string name="pdf_viewer_error_corrupt_or_missing">Error. The PDF file is corrupted or does not exist.</string>
+    <!-- PDF viewer error when the device is offline -->
+    <string name="pdf_viewer_error_no_network">No network connection. Please reconnect to open the file.</string>
+    <!-- PDF viewer error when streaming or downloading the PDF fails -->
+    <string name="pdf_viewer_error_streaming">An error occurred while trying to open the file</string>
 </resources>

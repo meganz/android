@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.shockwave.pdfium.PdfTextMatch
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -15,8 +16,10 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
+import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 import mega.privacy.android.feature.pdfviewer.search.FakePdfSearchEngine
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngineFactory
@@ -25,8 +28,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,6 +53,7 @@ class PdfViewerViewModelTest {
     private val setOrUpdateLastPageViewedInPdfUseCase =
         mock<SetOrUpdateLastPageViewedInPdfUseCase>()
     private val getDataBytesFromUrlUseCase = mock<GetDataBytesFromUrlUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val context = mock<Context>()
 
     private val defaultArgs = PdfViewerViewModel.Args(
@@ -67,7 +74,8 @@ class PdfViewerViewModelTest {
         reset(
             getLastPageViewedInPdfUseCase,
             setOrUpdateLastPageViewedInPdfUseCase,
-            getDataBytesFromUrlUseCase
+            getDataBytesFromUrlUseCase,
+            monitorConnectivityUseCase,
         )
 
         // Mock ContentResolver so PdfSearchEngine doesn't crash when opening URIs in tests.
@@ -78,6 +86,7 @@ class PdfViewerViewModelTest {
         whenever(resources.displayMetrics).thenReturn(displayMetrics)
         whenever(context.resources).thenReturn(resources)
         whenever(getLastPageViewedInPdfUseCase(12345L)).thenReturn(1)
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
     }
 
     private fun initViewModel(
@@ -93,6 +102,7 @@ class PdfViewerViewModelTest {
             getLastPageViewedInPdfUseCase = getLastPageViewedInPdfUseCase,
             setOrUpdateLastPageViewedInPdfUseCase = setOrUpdateLastPageViewedInPdfUseCase,
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             ioDispatcher = testDispatcher,
         )
     }
@@ -229,23 +239,34 @@ class PdfViewerViewModelTest {
     fun `test that retryLoad sets loading to true and clears error`() = runTest {
         underTest = initViewModel()
 
-        // Verify initial state has isLoading=true and error=null
-        underTest.retryLoad()
-        // Since retryLoad() sets values that are already the default, StateFlow won't emit
-        // So we verify the state directly
-        assertThat(underTest.state.value.isLoading).isTrue()
-        assertThat(underTest.state.value.error).isNull()
+        underTest.state.test {
+            awaitItem() // consume initial state
+
+            underTest.onLoadError(PdfViewerError.FileNotFound)
+            val errorState = awaitItem()
+            assertThat(errorState.isLoading).isFalse()
+            assertThat(errorState.error).isEqualTo(PdfViewerError.FileNotFound)
+
+            underTest.retryLoad()
+            val retriedState = awaitItem()
+            assertThat(retriedState.isLoading).isTrue()
+            assertThat(retriedState.error).isNull()
+        }
     }
 
     @Test
     fun `test that clearError sets error to null`() = runTest {
         underTest = initViewModel()
 
-        // Verify that after clearError(), the error is null
-        underTest.clearError()
-        // Since error is already null in the default state, StateFlow won't emit
-        // So we verify the state directly
-        assertThat(underTest.state.value.error).isNull()
+        underTest.state.test {
+            awaitItem() // consume initial state
+
+            underTest.onLoadError(PdfViewerError.FileNotFound)
+            assertThat(awaitItem().error).isEqualTo(PdfViewerError.FileNotFound)
+
+            underTest.clearError()
+            assertThat(awaitItem().error).isNull()
+        }
     }
 
     @Test
@@ -337,6 +358,135 @@ class PdfViewerViewModelTest {
         }
 
     @Test
+    fun `test that observeConnectivity updates isOnline to true when connected`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isOnline).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that observeConnectivity updates isOnline to false when disconnected`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isOnline).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that onLoadError resolves PasswordProtected to InvalidPassword when password was already submitted`() =
+        runTest {
+            underTest = initViewModel()
+            underTest.submitPassword("wrongPassword")
+            advanceUntilIdle()
+
+            underTest.state.test {
+                awaitItem() // consume current state
+
+                underTest.onLoadError(PdfViewerError.PasswordProtected)
+                assertThat(awaitItem().error).isEqualTo(PdfViewerError.InvalidPassword)
+            }
+        }
+
+    @Test
+    fun `test that onLoadError keeps PasswordProtected when no password was submitted yet`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                awaitItem() // consume initial state
+
+                underTest.onLoadError(PdfViewerError.PasswordProtected)
+                assertThat(awaitItem().error).isEqualTo(PdfViewerError.PasswordProtected)
+            }
+        }
+
+    @Test
+    fun `test that onLoadError sets non-password errors directly`() = runTest {
+        underTest = initViewModel()
+
+        underTest.state.test {
+            awaitItem() // consume initial state
+
+            underTest.onLoadError(PdfViewerError.FileNotFound)
+            assertThat(awaitItem().error).isEqualTo(PdfViewerError.FileNotFound)
+        }
+    }
+
+    @Test
+    fun `test that onPasswordDialogInputChanged clears InvalidPassword error to PasswordProtected`() =
+        runTest {
+            underTest = initViewModel()
+            underTest.submitPassword("wrong")
+            advanceUntilIdle()
+            underTest.onLoadError(PdfViewerError.PasswordProtected) // triggers InvalidPassword resolution
+
+            underTest.state.test {
+                awaitItem() // consume current state
+
+                underTest.onPasswordDialogInputChanged()
+                assertThat(awaitItem().error).isEqualTo(PdfViewerError.PasswordProtected)
+            }
+        }
+
+    @Test
+    fun `test that onPasswordDialogInputChanged does not change state when error is not InvalidPassword`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                awaitItem() // consume initial state (error = null)
+
+                underTest.onPasswordDialogInputChanged()
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that retryLoad triggers loadPdfBytes for remote https URL`() = runTest {
+        whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+        underTest = initViewModel(
+            args = defaultArgs.copy(
+                contentUri = "https://example.com/test.pdf",
+                isLocalContent = false,
+            )
+        )
+        advanceUntilIdle()
+
+        underTest.onLoadComplete(1)
+        advanceUntilIdle()
+
+        underTest.retryLoad()
+        advanceUntilIdle()
+
+        // getDataBytesFromUrlUseCase should have been called at least once (initial load + retry)
+        verify(getDataBytesFromUrlUseCase, atLeast(2)).invoke(any())
+    }
+
+    @Test
+    fun `test that retryLoad does not trigger loadPdfBytes for local content`() = runTest {
+        underTest = initViewModel(
+            args = defaultArgs.copy(
+                contentUri = "file:///sdcard/test.pdf",
+                isLocalContent = true,
+            )
+        )
+        advanceUntilIdle()
+
+        underTest.retryLoad()
+        advanceUntilIdle()
+
+        verifyNoInteractions(getDataBytesFromUrlUseCase)
+    }
+
+    @Test
     fun `test that search pipeline updates state with results when engine returns matches`() =
         runTest {
             val fakeEngine = FakePdfSearchEngine()
@@ -367,6 +517,46 @@ class PdfViewerViewModelTest {
                 val state = awaitItem()
                 assertThat(state.searchState.results).hasSize(1)
                 assertThat(state.searchState.isSearching).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that state has StreamingError and isLoading false when getDataBytesFromUrlUseCase returns null`() =
+        runTest {
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(null)
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.error).isInstanceOf(PdfViewerError.StreamingError::class.java)
+            }
+        }
+
+    @Test
+    fun `test that state has StreamingError and isLoading false when getDataBytesFromUrlUseCase throws`() =
+        runTest {
+            whenever(getDataBytesFromUrlUseCase(any())).thenThrow(RuntimeException("network failure"))
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.error).isInstanceOf(PdfViewerError.StreamingError::class.java)
+            }
+        }
+
+    @Test
+    fun `test that isOnline reflects last emission when connectivity changes from true to false`() =
+        runTest {
+            whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true, false))
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().isOnline).isFalse()
             }
         }
 }

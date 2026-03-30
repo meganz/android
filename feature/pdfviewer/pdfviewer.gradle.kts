@@ -54,7 +54,7 @@ dependencies {
     // Compose
     implementation(androidx.compose.activity)
     implementation(androidx.compose.viewmodel)
-    implementation(platform(androidx.compose.bom))
+    implementation(androidx.bundles.compose.bom)
     implementation(androidx.material3)
 
     // State events (for EventEffect)

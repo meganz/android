@@ -5,7 +5,9 @@ package mega.privacy.android.feature.pdfviewer.presentation.model
  */
 internal sealed class PdfViewerError {
     /**
-     * Failed to load PDF file
+     * Failed to load PDF file.
+     *
+     * @param message Internal detail for logging/debugging only. Never displayed to the user.
      */
     data class LoadError(val message: String?) : PdfViewerError()
 
@@ -15,9 +17,9 @@ internal sealed class PdfViewerError {
     data object PasswordProtected : PdfViewerError()
 
     /**
-     * Invalid password provided
+     * Invalid password provided. User can retry indefinitely in the password dialog.
      */
-    data class InvalidPassword(val attemptsRemaining: Int) : PdfViewerError()
+    data object InvalidPassword : PdfViewerError()
 
     /**
      * File not found
@@ -31,11 +33,15 @@ internal sealed class PdfViewerError {
 
     /**
      * Streaming error
+     *
+     * @param message Internal detail for logging/debugging only. Never displayed to the user.
      */
     data class StreamingError(val message: String?) : PdfViewerError()
 
     /**
      * Generic error
+     *
+     * @param throwable Internal detail for logging/debugging only. Never displayed to the user.
      */
     data class Generic(val throwable: Throwable) : PdfViewerError()
 }
