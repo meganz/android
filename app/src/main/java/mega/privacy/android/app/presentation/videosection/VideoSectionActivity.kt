@@ -281,6 +281,7 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                             fileTypeIconMapper = fileTypeIconMapper,
                             listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
                             nodeActionHandler = bottomSheetActionHandler,
+                            nodeActionsViewModel = nodeActionsViewModel,
                             navHostController = navHostController,
                             bottomSheetNavigator = bottomSheetNavigator
                         )

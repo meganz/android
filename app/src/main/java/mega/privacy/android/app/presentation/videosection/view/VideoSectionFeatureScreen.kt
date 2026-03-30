@@ -26,6 +26,7 @@ import mega.privacy.android.app.presentation.node.model.menuaction.HideDropdownM
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.UnhideDropdownMenuAction
 import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.cannotOpenFileDialogNavigation
 import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetNavigation
 import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
@@ -245,6 +246,7 @@ internal fun VideoSectionScreen(
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
     retryActionCallback: () -> Unit,
     nodeActionHandler: NodeActionHandler,
+    nodeActionsViewModel: NodeActionsViewModel,
     scaffoldState: ScaffoldState,
     fileTypeIconMapper: FileTypeIconMapper,
     listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
@@ -270,6 +272,7 @@ internal fun VideoSectionScreen(
         onMenuAction = onMenuAction,
         retryActionCallback = retryActionCallback,
         nodeActionHandler = nodeActionHandler,
+        nodeActionsViewModel = nodeActionsViewModel,
         scaffoldState = scaffoldState,
         fileTypeIconMapper = fileTypeIconMapper,
         listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
@@ -287,6 +290,7 @@ internal fun VideoSectionNavHost(
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
     retryActionCallback: () -> Unit,
     nodeActionHandler: NodeActionHandler,
+    nodeActionsViewModel: NodeActionsViewModel,
     scaffoldState: ScaffoldState,
     fileTypeIconMapper: FileTypeIconMapper,
     listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
@@ -494,6 +498,10 @@ internal fun VideoSectionNavHost(
                 nodeActionHandler = nodeActionHandler,
                 navHostController = navHostController,
                 fileTypeIconMapper = fileTypeIconMapper
+            )
+            cannotOpenFileDialogNavigation(
+                navHostController = navHostController,
+                nodeActionsViewModel = nodeActionsViewModel,
             )
             changeLabelBottomSheetNavigation(navHostController)
             changeNodeExtensionDialogNavigation(navHostController)
