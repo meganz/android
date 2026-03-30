@@ -83,14 +83,11 @@ import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewMod
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
-import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
-import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
@@ -100,10 +97,7 @@ import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.shared.rememberSharedViewModelStoreNavEntryDecorator
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
-import mega.privacy.android.navigation.destination.ChatListNavKey
-import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.android.navigation.destination.ShareToMegaNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -134,6 +128,9 @@ class MegaActivity : FragmentActivity() {
     @Inject
     lateinit var fetchNodeProvider: FetchNodeProvider
 
+    @Inject
+    lateinit var intentActionHandler: MegaActivityIntentActionHandler
+
     private val passcodeViewModel: PasscodeCheckViewModel by viewModels()
 
     private val globalStateViewModel: GlobalStateViewModel by viewModels()
@@ -154,62 +151,11 @@ class MegaActivity : FragmentActivity() {
     }
 
     private suspend fun consumeActions() {
-        when (intent.action) {
-            Constants.ACTION_REFRESH -> {
-                globalStateViewModel.refreshSession(RefreshEvent.ManualRefresh)
-                intent.action = null
-            }
-
-            Constants.ACTION_REFRESH_API_SERVER -> {
-                globalStateViewModel.refreshSession(RefreshEvent.ChangeEnvironment)
-                intent.action = null
-            }
-
-            ACTION_DEEP_LINKS -> {
-                intent.dataString?.let { data ->
-                    navigationEventQueue.emit(DeepLinksDialogNavKey(data))
-                    intent.action = null
-                    intent.data = null
-                }
-            }
-
-            RefreshEvent.SdkReload.name -> {
-                globalStateViewModel.refreshSession(RefreshEvent.SdkReload)
-                intent.action = null
-            }
-
-            Intent.ACTION_SEND_MULTIPLE, Intent.ACTION_SEND -> {
-                getShareUris()?.let { shareUris ->
-                    navigationEventQueue.emit(ShareToMegaNavKey(shareUris))
-                } ?: Timber.w("Action send multiple but nothing to share")
-                intent.action = null
-                intent.removeExtra(Intent.EXTRA_STREAM)
-            }
-
-            Constants.ACTION_SHORTCUT_UPLOAD -> {
-                Timber.d("Shortcut upload action received")
-                navigationResultManager.returnResult(
-                    HomeFabOptionsBottomSheetNavKey.KEY,
-                    HomeFabOption.UploadFiles
-                )
-                intent.action = null
-            }
-
-            Constants.ACTION_SHORTCUT_SCAN_DOCUMENT -> {
-                Timber.d("Shortcut scan document action received")
-                navigationResultManager.returnResult(
-                    HomeFabOptionsBottomSheetNavKey.KEY,
-                    HomeFabOption.ScanDocument
-                )
-                intent.action = null
-            }
-
-            Constants.ACTION_SHORTCUT_CHAT -> {
-                Timber.d("Shortcut chat action received")
-                navigationEventQueue.emit(ChatListNavKey())
-                intent.action = null
-            }
-        }
+        intentActionHandler.handleAction(
+            intent = intent,
+            refreshSession = globalStateViewModel::refreshSession,
+            getShareUris = ::getShareUris,
+        )
     }
 
     private fun getShareUris() = with(intent) {
