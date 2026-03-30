@@ -183,6 +183,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     override fun onCreate() {
         super.onCreate()
         Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
+        // startForegroundService() requires startForeground() within a short window. The media
+        // notification is posted asynchronously from createPlayerControlNotification(); if that
+        // callback runs late, the system throws ForegroundServiceDidNotStartInTimeException.
+        startForegroundWithMediaPlaybackType(createNotificationForStartForeground())
         if (!isNotificationCreated) {
             createPlayerControlNotification()
             isNotificationCreated = true
@@ -316,26 +320,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 onNotificationPostedCallback = { notificationId, notification, ongoing ->
                     if (ongoing) {
                         // Make sure the service will not get destroyed while playing media.
-                        try {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                startForeground(
-                                    notificationId, notification,
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
-                                    } else {
-                                        0
-                                    },
-                                )
-                            } else {
-                                startForeground(notificationId, notification)
-                            }
-                        } catch (e: Exception) {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                                && e is ForegroundServiceStartNotAllowedException
-                            ) {
-                                Timber.e("App not in a valid state to start foreground service: ${e.message}")
-                            }
-                        }
+                        startForegroundWithMediaPlaybackType(notification)
                         currentNotification = notification
                     } else {
                         // Make notification cancellable.
@@ -360,10 +345,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         if (command == COMMAND_PAUSE || command == COMMAND_RESUME || command == COMMAND_STOP) {
             currentNotification?.let {
                 crashReporter.log("currentNotification is not null")
-                startForeground(PLAYBACK_NOTIFICATION_ID, it)
+                startForegroundWithMediaPlaybackType(it)
             } ?: run {
                 crashReporter.log("currentNotification is null and create new notification")
-                startForeground(PLAYBACK_NOTIFICATION_ID, createNotificationForStartForeground())
+                startForegroundWithMediaPlaybackType(createNotificationForStartForeground())
             }
         }
         when (command) {
@@ -413,6 +398,32 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             }
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun startForegroundWithMediaPlaybackType(notification: Notification) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    PLAYBACK_NOTIFICATION_ID,
+                    notification,
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                    } else {
+                        0
+                    },
+                )
+            } else {
+                startForeground(PLAYBACK_NOTIFICATION_ID, notification)
+            }
+        } catch (e: Exception) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && e is ForegroundServiceStartNotAllowedException
+            ) {
+                Timber.e("App not in a valid state to start foreground service: ${e.message}")
+            } else {
+                throw e
+            }
+        }
     }
 
     @SuppressLint("ServiceCast")
