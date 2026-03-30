@@ -965,6 +965,33 @@ public class PDFView extends RelativeLayout {
         }
     }
 
+    /**
+     * Maps a rectangle from PDF page coordinates to canvas-local coordinates.
+     * <p>
+     * This is intended for use inside {@code onDrawAll} callbacks where the canvas
+     * has already been translated to the page origin. The returned rect is relative
+     * to (0,0) at the top-left of the rendered page.
+     *
+     * @param page       the 0-based page index
+     * @param pdfRect    rectangle in PDF coordinate space (origin bottom-left, units in points)
+     * @param pageWidth  the rendered page width on canvas (already zoom-scaled)
+     * @param pageHeight the rendered page height on canvas (already zoom-scaled)
+     * @return rectangle in canvas-local coordinates, or empty rect if mapping fails
+     */
+    public RectF mapRectToCanvas(int page, RectF pdfRect, float pageWidth, float pageHeight) {
+        if (pdfFile == null) {
+            return new RectF();
+        }
+        return pdfFile.mapRectToDevice(
+                page,
+                0,                  // startX: page origin on canvas
+                0,                  // startY: page origin on canvas
+                (int) pageWidth,    // sizeX: zoomed page width
+                (int) pageHeight,   // sizeY: zoomed page height
+                pdfRect
+        );
+    }
+
     public void fitToWidth(int page) {
         if (state != State.SHOWN) {
             Log.e(TAG, "Cannot fit, document not rendered yet");

@@ -53,6 +53,8 @@ data class PdfViewerSearchState(
 ) {
     val totalMatches: Int get() = results.size
     val hasResults: Boolean get() = results.isNotEmpty()
+
+    val label = "${currentMatchIndex + 1}/${totalMatches}"
 }
 
 /**

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
+import mega.privacy.android.feature.pdfviewer.presentation.components.PdfSearchResultsBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerContent
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerSearchTopBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerTopBar
@@ -139,7 +140,12 @@ internal fun PdfViewerScreen(
 
                     // Floating search results bar (bottom-center)
                     if (searchState.isSearchActive && searchState.hasResults) {
-                        // TODO: show PdfSearchResultsBar with current result index and total count, and next/previous buttons
+                        PdfSearchResultsBar(
+                            label = uiState.searchState.label,
+                            onPrev = onNavigateToPreviousMatch,
+                            onNext = onNavigateToNextMatch,
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                        )
                     }
 
                     // Bottom bar for external files

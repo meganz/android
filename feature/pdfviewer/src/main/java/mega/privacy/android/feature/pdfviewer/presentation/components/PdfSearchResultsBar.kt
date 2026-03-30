@@ -1,10 +1,13 @@
 package mega.privacy.android.feature.pdfviewer.presentation.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -39,6 +42,7 @@ import mega.privacy.android.icon.pack.IconPack
  * @param onNext Callback when next match button is clicked
  * @param modifier Modifier for the composable
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PdfSearchResultsBar(
     label: String,
@@ -46,11 +50,12 @@ fun PdfSearchResultsBar(
     onNext: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val bottomPadding = if (WindowInsets.isImeVisible) 0.dp else 16.dp
     Box(
         modifier = modifier
             .fillMaxWidth()
             .imePadding()
-            .padding(bottom = 16.dp),
+            .padding(bottom = bottomPadding),
     ) {
         CardSurface(
             modifier = Modifier.align(Alignment.BottomCenter),
