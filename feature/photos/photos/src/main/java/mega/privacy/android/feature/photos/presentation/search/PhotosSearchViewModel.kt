@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -143,6 +144,7 @@ class PhotosSearchViewModel @Inject constructor(
         monitorTimelinePhotosUseCase
             .get()
             .invoke(TimelinePhotosRequest())
+            .catch { Timber.e(it) }
             .map { result -> result.allPhotos.map { it.photo } }
 
     private fun updateAlbums(albums: List<UIAlbum>) {

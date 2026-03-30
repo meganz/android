@@ -88,7 +88,8 @@ class TimelineTabViewModel @Inject constructor(
     private val selectedFilterFlow = MutableStateFlow<Map<String, String?>?>(null)
     internal val filterUiState: StateFlow<TimelineFilterUiState> by lazy {
         combine(
-            flow { emit(getTimelineFilterPreferencesUseCase()) },
+            flow { emit(getTimelineFilterPreferencesUseCase()) }
+                .catch { Timber.e(it) },
             selectedFilterFlow,
         ) { preferenceMap, newFilter ->
             timelineFilterUiStateMapper(
@@ -135,7 +136,7 @@ class TimelineTabViewModel @Inject constructor(
             request = TimelinePhotosRequest(
                 selectedFilterFlow = selectedFilterFlow
             )
-        ),
+        ).catch { Timber.e(it) },
         flow2 = sortOptionsFlow,
     ) { photosResult, sortOptions ->
         val sortResult = monitorTimelinePhotosUseCase.sortPhotos(

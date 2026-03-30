@@ -135,8 +135,15 @@ internal class BackupRepositoryImplTest {
     @NullAndEmptySource
     @ValueSource(strings = ["12345-6789"])
     fun `test that get device id returns the current device id`(deviceId: String?) = runTest {
+        whenever(megaApiGateway.isMegaApiLoggedIn()).thenReturn(1)
         whenever(megaApiGateway.getDeviceId()).thenReturn(deviceId)
         assertThat(underTest.getDeviceId()).isEqualTo(deviceId)
+    }
+
+    @Test
+    fun `test that get device id returns null when not logged in`() = runTest {
+        whenever(megaApiGateway.isMegaApiLoggedIn()).thenReturn(0)
+        assertThat(underTest.getDeviceId()).isNull()
     }
 
     @Test
