@@ -189,7 +189,7 @@ fun NodeGridViewItem(
                 }
             }
 
-            if (duration != null) {
+            if (!duration.isNullOrEmpty()) {
                 Box(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
