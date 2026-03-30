@@ -102,6 +102,10 @@ Build:            Convention plugins (build-logic/convention/), Version Catalogs
 
 > **ViewModel files**: When reviewing `*ViewModel.kt` files, also apply the conventions in [viewmodel-conventions.md](../viewmodel/viewmodel-conventions.md).
 
+> **UseCase files**: When reviewing `*UseCase.kt` files, also apply the conventions in [usecase-conventions.md](../usecase/usecase-conventions.md).
+
+> **Mapper files**: When reviewing `*Mapper.kt` files, also apply the conventions in [mapper-conventions.md](../mapper/mapper-conventions.md).
+
 ### 1. Architecture & Design
 
 **Checklist:**
@@ -443,6 +447,10 @@ suspend operator fun invoke(backup: Backup): BackupEntity? {
 ### 7. Testability
 
 > **ViewModel tests**: When reviewing ViewModel test files (`*ViewModelTest.kt`), also apply the conventions in [viewmodel-test-conventions.md](../viewmodel/viewmodel-test-conventions.md).
+
+> **UseCase tests**: When reviewing UseCase test files (`*UseCaseTest.kt`), also apply the conventions in [usecase-test-conventions.md](../usecase/usecase-test-conventions.md).
+
+> **Mapper tests**: When reviewing Mapper test files (`*MapperTest.kt`), also apply the conventions in [mapper-test-conventions.md](../mapper/mapper-test-conventions.md).
 
 **Checklist:**
 - [ ] ViewModel, UseCase and Repository implementation business logics have corresponding unit tests

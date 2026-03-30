@@ -111,6 +111,7 @@ alwaysApply: true
 - **Constructor Injection**: Use `@Inject` constructor for dependencies
 - **Repository Dependencies**: Use cases depend on repository interfaces, not implementations
 - **Flow Returns**: Use cases return `Flow` or `StateFlow` for reactive programming
+- **Use Cases**: See [usecase-conventions.md](.claude/skills/usecase/usecase-conventions.md) for UseCase conventions.
 
 ### State Management
 - See [viewmodel-conventions.md](.claude/skills/viewmodel/viewmodel-conventions.md) for ViewModel state management conventions.
@@ -171,9 +172,9 @@ alwaysApply: true
 
 ### Test Structure
 - **Repository Tests**: Test repository implementations with mocked dependencies
-- **Use Case Tests**: Test use cases with mocked repository dependencies
+- **Use Case Tests**: See [usecase-test-conventions.md](.claude/skills/usecase/usecase-test-conventions.md) for UseCase test conventions.
 - **ViewModel Tests**: See [viewmodel-test-conventions.md](.claude/skills/viewmodel/viewmodel-test-conventions.md) for ViewModel test conventions.
-- **Mapper Tests**: Test data mappers for all transformation scenarios
+- **Mapper Tests**: See [mapper-test-conventions.md](.claude/skills/mapper/mapper-test-conventions.md) for Mapper test conventions.
 
 ### Test Modules
 - **Core Test**: Shared test utilities and extensions
@@ -183,6 +184,7 @@ alwaysApply: true
 ## Data Layer Patterns
 
 ### Mappers
+- See [mapper-conventions.md](.claude/skills/mapper/mapper-conventions.md) for Mapper conventions.
 - **Entity Mappers**: Convert between domain entities and data entities
   ```kotlin
   internal class TransferMapper @Inject constructor(
