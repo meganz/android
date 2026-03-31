@@ -19,6 +19,19 @@ enum class ApiFeatures(
     override val singleCheckPerRun: Boolean = false,
 ) : ApiFeature {
     /**
+     * Continuous document scanner (AND-22951).
+     * When enabled, uses the custom continuous document scanner with real-time
+     * boundary detection, auto-capture, and page-flip detection.
+     * When disabled, the existing ML Kit Document Scanner is used.
+     */
+    ContinuousDocumentScanner(
+        experimentName = "cscan",
+        description = "Enable custom continuous document scanner",
+        singleCheckPerRun = true,
+        defaultValue = false
+    ),
+
+    /**
      * Call unlimited for pro users
      */
     CallUnlimitedProPlan(
