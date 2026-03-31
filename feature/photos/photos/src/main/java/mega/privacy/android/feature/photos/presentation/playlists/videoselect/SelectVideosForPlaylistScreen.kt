@@ -49,7 +49,7 @@ import mega.privacy.android.navigation.destination.SelectVideosSearchNavKey
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -174,7 +174,7 @@ fun SelectVideosForPlaylistScreen(
                     },
                 actions = buildList {
                     if (!areAllVideosSelected) {
-                        add(NodeSelectionAction.SelectAll)
+                        add(CommonMenuAction.SelectAll)
                     }
                     if (videoSelectedCount <= 0) {
                         add(SelectVideosMenuAction.Search)
@@ -182,7 +182,7 @@ fun SelectVideosForPlaylistScreen(
                 },
                 onActionPressed = { action ->
                     when (action) {
-                        NodeSelectionAction.SelectAll -> selectAll()
+                        CommonMenuAction.SelectAll -> selectAll()
                         SelectVideosMenuAction.Search -> navigateToSearchScreen()
                     }
                 }

@@ -29,13 +29,13 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.computeSelectedItemsCount
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -148,7 +148,7 @@ fun CloudDriveScreen(
                     actions = buildList {
                         if (uiState.items.isNotEmpty()) {
                             add(
-                                MenuActionWithClick(CommonAppBarAction.Search) {
+                                MenuActionWithClick(CommonMenuAction.Search) {
                                     navigationHandler.navigate(
                                         SearchNavKey(
                                             parentHandle = uiState.currentFolderId.longValue,
@@ -162,7 +162,7 @@ fun CloudDriveScreen(
                         if (!uiState.isCloudDriveRoot) {
                             add(
                                 MenuActionWithClick(
-                                    CommonAppBarAction.More
+                                    CommonMenuAction.More
                                 ) {
                                     Analytics.tracker.trackEvent(
                                         CloudDriveParentNodeMoreButtonPressedEvent

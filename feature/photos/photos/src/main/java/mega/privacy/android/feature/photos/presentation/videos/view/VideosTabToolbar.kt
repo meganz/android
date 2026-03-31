@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.testTag
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import java.util.Locale
 
 @Composable
@@ -30,13 +30,13 @@ fun VideosTabToolbar(
             navigationType = AppBarNavigationType.Close(onCancelSelectionClicked),
             title = String.format(Locale.ROOT, "%s", count),
             actions = if (!isAllSelected) {
-                listOf(NodeSelectionAction.SelectAll)
+                listOf(CommonMenuAction.SelectAll)
             } else {
                 emptyList()
             },
             onActionPressed = {
                 when (it) {
-                    is NodeSelectionAction.SelectAll -> onSelectAllClicked()
+                    is CommonMenuAction.SelectAll -> onSelectAllClicked()
                     else -> Unit
                 }
             }

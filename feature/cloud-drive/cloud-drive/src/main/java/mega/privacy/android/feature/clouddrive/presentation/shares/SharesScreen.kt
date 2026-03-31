@@ -32,7 +32,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -170,7 +170,7 @@ internal fun SharesScreen(
                     },
                     actions = buildList {
                         add(
-                            MenuActionWithClick(CommonAppBarAction.Search) {
+                            MenuActionWithClick(CommonMenuAction.Search) {
                                 val searchNavKey = selectedTab.toNodeSourceType().getSearchNavKey(
                                     folderId = -1L,
                                     isRevampEnabled = incomingSharesUiState.isSearchRevampEnabled

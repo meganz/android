@@ -10,13 +10,13 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideosMenuAction
 import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import org.junit.Rule
 import org.junit.Test
@@ -229,7 +229,7 @@ class SelectVideosForPlaylistScreenTest {
             selectAll = selectAll,
         )
 
-        composeTestRule.onNodeWithTag(NodeSelectionAction.SelectAll.testTag, useUnmergedTree = true)
+        composeTestRule.onNodeWithTag(CommonMenuAction.SelectAll.testTag, useUnmergedTree = true)
             .performClick()
 
         verify(selectAll).invoke()
@@ -291,7 +291,7 @@ class SelectVideosForPlaylistScreenTest {
             )
         )
 
-        composeTestRule.onNodeWithTag(NodeSelectionAction.SelectAll.testTag, useUnmergedTree = true)
+        composeTestRule.onNodeWithTag(CommonMenuAction.SelectAll.testTag, useUnmergedTree = true)
             .assertDoesNotExist()
     }
 

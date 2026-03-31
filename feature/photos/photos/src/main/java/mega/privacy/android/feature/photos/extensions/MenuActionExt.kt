@@ -11,7 +11,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.MediaScreenAddToAlbumButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenCopyButtonPressedEvent
@@ -31,7 +31,7 @@ internal fun MenuActionWithIcon.toTrackingEvent(): EventIdentifier? = when (this
     is SendToChatMenuAction -> MediaScreenRespondButtonPressedEvent
     is ShareMenuAction -> MediaScreenShareButtonPressedEvent
     is TrashMenuAction -> MediaScreenTrashButtonPressedEvent
-    is NodeSelectionAction.More -> MediaScreenMoreButtonPressedEvent
+    is CommonMenuAction.More -> MediaScreenMoreButtonPressedEvent
     is AddToAlbumMenuAction -> MediaScreenAddToAlbumButtonPressedEvent
     is CopyMenuAction -> MediaScreenCopyButtonPressedEvent
     is HideMenuAction -> MediaScreenHideButtonPressedEvent

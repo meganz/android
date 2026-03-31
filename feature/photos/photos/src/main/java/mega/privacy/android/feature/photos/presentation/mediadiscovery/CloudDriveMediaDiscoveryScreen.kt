@@ -76,7 +76,6 @@ import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -98,6 +97,7 @@ import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.Medi
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
@@ -380,7 +380,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
                                 isDropdownVisible = true
                             }
                         ),
-                        MenuActionWithClick(CommonAppBarAction.More) {
+                        MenuActionWithClick(CommonMenuAction.More) {
                             onMoreOptionsClicked()
                         }
                     )

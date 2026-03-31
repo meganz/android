@@ -93,8 +93,8 @@ import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedIte
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.R as NodesR
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
@@ -823,7 +823,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
             ).map { it.action }
 
             val visibleActions = if (availableActions.size > DEFAULT_MAX_VISIBLE_ITEMS) {
-                availableActions.take(DEFAULT_MAX_VISIBLE_ITEMS) + NodeSelectionAction.More
+                availableActions.take(DEFAULT_MAX_VISIBLE_ITEMS) + CommonMenuAction.More
             } else {
                 availableActions
             }

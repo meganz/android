@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.resources.R as sharedResR
 import java.util.Locale
 
@@ -27,14 +27,14 @@ fun NodeSelectionModeAppBar(
         },
         actions = buildList {
             if (isSelecting) {
-                add(NodeSelectionAction.Selecting)
+                add(CommonMenuAction.Selecting)
             } else if (!isAllSelected) {
-                add(NodeSelectionAction.SelectAll)
+                add(CommonMenuAction.SelectAll)
             }
         },
         onActionPressed = {
             when (it) {
-                is NodeSelectionAction.SelectAll -> onSelectAllClicked()
+                is CommonMenuAction.SelectAll -> onSelectAllClicked()
                 else -> Unit
             }
         }

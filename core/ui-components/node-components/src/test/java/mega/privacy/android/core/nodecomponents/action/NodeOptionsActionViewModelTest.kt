@@ -96,7 +96,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -1206,7 +1206,7 @@ class NodeOptionsActionViewModelTest {
                 assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
                 assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
                 assertThat(finalState.visibleActions[3]).isEqualTo(actions[3])
-                assertThat(finalState.visibleActions[4]).isEqualTo(NodeSelectionAction.More)
+                assertThat(finalState.visibleActions[4]).isEqualTo(CommonMenuAction.More)
             }
         }
 
@@ -1244,7 +1244,7 @@ class NodeOptionsActionViewModelTest {
                 assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
                 assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
                 assertThat(finalState.visibleActions[3]).isEqualTo(actions[3])
-                assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
+                assertThat(finalState.visibleActions).doesNotContain(CommonMenuAction.More)
             }
         }
 
@@ -1282,7 +1282,7 @@ class NodeOptionsActionViewModelTest {
                 assertThat(finalState.visibleActions[0]).isEqualTo(actions[0])
                 assertThat(finalState.visibleActions[1]).isEqualTo(actions[1])
                 assertThat(finalState.visibleActions[2]).isEqualTo(actions[2])
-                assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
+                assertThat(finalState.visibleActions).doesNotContain(CommonMenuAction.More)
             }
         }
 
@@ -1324,7 +1324,7 @@ class NodeOptionsActionViewModelTest {
                     actions[3],
                     actions[4]
                 )
-                assertThat(finalState.availableActions).doesNotContain(NodeSelectionAction.More)
+                assertThat(finalState.availableActions).doesNotContain(CommonMenuAction.More)
 
                 // Verify visibleActions contains first 4 actions + More (since we have 5 > DEFAULT_MAX_VISIBLE_ITEMS)
                 assertThat(finalState.visibleActions).hasSize(5)
@@ -1333,7 +1333,7 @@ class NodeOptionsActionViewModelTest {
                     actions[1],
                     actions[2],
                     actions[3],
-                    NodeSelectionAction.More
+                    CommonMenuAction.More
                 )
             }
         }
@@ -1382,7 +1382,7 @@ class NodeOptionsActionViewModelTest {
                     actions[1],
                     actions[2]
                 )
-                assertThat(finalState.visibleActions).doesNotContain(NodeSelectionAction.More)
+                assertThat(finalState.visibleActions).doesNotContain(CommonMenuAction.More)
 
                 // Verify both lists are equal
                 assertThat(finalState.visibleActions).isEqualTo(finalState.availableActions)
@@ -1441,7 +1441,7 @@ class NodeOptionsActionViewModelTest {
                     actions[4],
                     actions[0],
                     actions[1],
-                    NodeSelectionAction.More
+                    CommonMenuAction.More
                 )
             }
         }

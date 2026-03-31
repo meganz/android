@@ -8,7 +8,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 
 /**
  * Top app bar for the PDF Viewer.
@@ -35,8 +35,8 @@ internal fun PdfViewerTopBar(
         title = title.orEmpty(),
         navigationType = AppBarNavigationType.Back(onBack),
         actions = listOf(
-            MenuActionWithClick(CommonAppBarAction.Search) { onSearch() },
-            MenuActionWithClick(CommonAppBarAction.More) { onOpenNodeOptions() },
+            MenuActionWithClick(CommonMenuAction.Search) { onSearch() },
+            MenuActionWithClick(CommonMenuAction.More) { onOpenNodeOptions() },
         ),
     )
 }

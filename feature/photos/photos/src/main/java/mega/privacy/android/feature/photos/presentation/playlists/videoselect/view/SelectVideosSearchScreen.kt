@@ -44,6 +44,7 @@ import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.conditional
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
@@ -56,7 +57,6 @@ import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -164,11 +164,11 @@ fun SelectVideosSearchScreen(
                     navigationType = AppBarNavigationType.Close(onBackPressed),
                     actions = buildList {
                         if (videoSelectedCount > 0 && !areAllVideosSelected) {
-                            add(NodeSelectionAction.SelectAll)
+                            add(CommonMenuAction.SelectAll)
                         }
                     },
                     onActionPressed = {
-                        if (it is NodeSelectionAction.SelectAll) {
+                        if (it is CommonMenuAction.SelectAll) {
                             localKeyboardController?.hide()
                             selectAll()
                         }

@@ -44,7 +44,6 @@ import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -52,6 +51,7 @@ import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
@@ -157,7 +157,7 @@ internal fun HomeScreen(
                 },
                 actions = buildList {
                     if (state is HomeUiState.Data) {
-                        add(MenuActionWithClick(CommonAppBarAction.Search) {
+                        add(MenuActionWithClick(CommonMenuAction.Search) {
                             Analytics.tracker.trackEvent(HomeSearchBarPressedEvent)
                             navigationHandler.navigate(
                                 SearchNavKey(

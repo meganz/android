@@ -12,13 +12,13 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import org.junit.Rule
 import org.junit.Test
@@ -169,7 +169,7 @@ class VideoPlaylistDetailScreenTest {
     fun `test that VideoPlaylistBottomSheet is displayed when More action is clicked`() {
         setComposeContent()
 
-        NodeSelectionAction.More.testTag.apply {
+        CommonMenuAction.More.testTag.apply {
             assertIsDisplayedWithTag()
             getNodeWithTag().performClick()
         }
@@ -272,8 +272,8 @@ class VideoPlaylistDetailScreenTest {
             selectAll = { selectAllInvoked = true }
         )
 
-        NodeSelectionAction.SelectAll.testTag.assertIsDisplayedWithTag()
-        composeTestRule.onNodeWithTag(NodeSelectionAction.SelectAll.testTag, useUnmergedTree = true)
+        CommonMenuAction.SelectAll.testTag.assertIsDisplayedWithTag()
+        composeTestRule.onNodeWithTag(CommonMenuAction.SelectAll.testTag, useUnmergedTree = true)
             .performClick()
         composeTestRule.waitForIdle()
         assertThat(selectAllInvoked).isTrue()

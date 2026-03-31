@@ -30,7 +30,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.android.core.ui.extensions.LaunchedOnceEffect
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -82,7 +82,7 @@ fun RecentsScreen(
                     TransfersToolbarWidget { onNavigate(TransfersNavKey()) }
                 },
                 actions = listOf(
-                    MenuActionWithClick(CommonAppBarAction.More) {
+                    MenuActionWithClick(CommonMenuAction.More) {
                         showOptionsBottomSheet = true
                     }
                 )

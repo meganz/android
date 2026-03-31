@@ -73,7 +73,7 @@ import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -204,7 +204,7 @@ internal fun VideoPlaylistDetailScreen(
                     when {
                         videoSelectedCount > 0 -> {
                             if (!areAllVideosSelected) {
-                                add(NodeSelectionAction.SelectAll)
+                                add(CommonMenuAction.SelectAll)
                             }
                         }
 
@@ -212,13 +212,13 @@ internal fun VideoPlaylistDetailScreen(
                             add(VideoPlaylistDetailSelectionMenuAction.SortOrder)
                         }
 
-                        else -> add(NodeSelectionAction.More)
+                        else -> add(CommonMenuAction.More)
                     }
                 },
                 onActionPressed = { action ->
                     when (action) {
-                        is NodeSelectionAction.More -> showPlaylistBottomSheet = true
-                        is NodeSelectionAction.SelectAll -> selectAll()
+                        is CommonMenuAction.More -> showPlaylistBottomSheet = true
+                        is CommonMenuAction.SelectAll -> selectAll()
                         is VideoPlaylistDetailSelectionMenuAction.SortOrder ->
                             showSortBottomSheet = true
                     }

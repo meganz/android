@@ -16,7 +16,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -100,7 +100,7 @@ fun FavouritesScreen(
                     actions = buildList {
                         if (!uiState.isEmpty) {
                             add(
-                                MenuActionWithClick(CommonAppBarAction.Search) {
+                                MenuActionWithClick(CommonMenuAction.Search) {
                                     val searchNavKey = if (uiState.isSearchRevampEnabled) {
                                         SearchNavKey(
                                             parentHandle = -1L,

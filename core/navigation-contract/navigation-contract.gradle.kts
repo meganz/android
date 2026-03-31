@@ -12,6 +12,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":resources:string-resources"))
+    implementation(project(":resources:icon-pack"))
 
     // AndroidX
     implementation(androidx.navigation.compose)

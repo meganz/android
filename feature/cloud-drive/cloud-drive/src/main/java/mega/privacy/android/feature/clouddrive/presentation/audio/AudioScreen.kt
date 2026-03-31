@@ -20,7 +20,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -28,6 +27,7 @@ import mega.privacy.android.feature.clouddrive.presentation.audio.model.AudioUiS
 import mega.privacy.android.feature.clouddrive.presentation.audio.view.AudioContent
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
@@ -134,7 +134,7 @@ fun AudioScreen(
                     actions = buildList {
                         if (dataState != null && !dataState.isEmpty) {
                             add(
-                                MenuActionWithClick(CommonAppBarAction.Search) {
+                                MenuActionWithClick(CommonMenuAction.Search) {
                                     val searchNavKey = if (dataState.isSearchRevampEnabled) {
                                         SearchNavKey(
                                             parentHandle = -1L,

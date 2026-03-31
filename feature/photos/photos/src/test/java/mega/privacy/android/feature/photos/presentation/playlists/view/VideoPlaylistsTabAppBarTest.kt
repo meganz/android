@@ -7,7 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -78,7 +78,7 @@ class VideoPlaylistsTabAppBarTest {
         val mockOnSelectAllClicked = mock<() -> Unit>()
         setComposeContent(isAllSelected = false, onSelectAllClicked = mockOnSelectAllClicked)
         composeTestRule
-            .onNodeWithTag(NodeSelectionAction.SelectAll.testTag)
+            .onNodeWithTag(CommonMenuAction.SelectAll.testTag)
             .assertExists()
             .assertIsDisplayed()
             .performClick()
@@ -90,7 +90,7 @@ class VideoPlaylistsTabAppBarTest {
     fun `test that selectAll option is not displayed`() {
         setComposeContent(isAllSelected = true)
         composeTestRule
-            .onNodeWithTag(NodeSelectionAction.SelectAll.testTag)
+            .onNodeWithTag(CommonMenuAction.SelectAll.testTag)
             .assertIsNotDisplayed()
     }
 }

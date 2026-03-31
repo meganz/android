@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 
 /**
  * A bottom bar component for node selection mode that displays action buttons
@@ -64,7 +64,7 @@ fun NodeSelectionModeBottomBar(
         onActionPressed = { action ->
             onActionPressed(action)
 
-            if (action is NodeSelectionAction.More) {
+            if (action is CommonMenuAction.More) {
                 onMoreClicked()
                 showMoreBottomSheet = true
                 return@SelectionModeBottomBar
@@ -76,7 +76,7 @@ fun NodeSelectionModeBottomBar(
 
     if (showMoreBottomSheet) {
         NodeMoreOptionsBottomSheet(
-            actions = availableActions.filterNot { it is NodeSelectionAction.More },
+            actions = availableActions.filterNot { it is CommonMenuAction.More },
             sheetState = rememberModalBottomSheetState(),
             onDismissRequest = {
                 showMoreBottomSheet = false

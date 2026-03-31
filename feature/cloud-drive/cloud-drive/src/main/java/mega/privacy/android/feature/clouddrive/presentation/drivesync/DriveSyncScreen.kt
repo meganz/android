@@ -36,7 +36,7 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -166,7 +166,7 @@ internal fun DriveSyncScreen(
                     actions = buildList {
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
-                                MenuActionWithClick(CommonAppBarAction.Search) {
+                                MenuActionWithClick(CommonMenuAction.Search) {
                                     Analytics.tracker.trackEvent(CloudDriveSearchBarPressedEvent)
                                     navigationHandler.navigate(
                                         SearchNavKey(
@@ -178,7 +178,7 @@ internal fun DriveSyncScreen(
                             )
 
                             selectedTabIndex == 1 -> add(
-                                MenuActionWithClick(CommonAppBarAction.More) {
+                                MenuActionWithClick(CommonMenuAction.More) {
                                     showSyncSettings = true
                                 }
                             )
