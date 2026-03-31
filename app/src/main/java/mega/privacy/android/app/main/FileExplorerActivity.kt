@@ -431,7 +431,14 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         Timber.d("onCreate first")
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        binding = ActivityFileExplorerBinding.inflate(layoutInflater)
+        consumeInsetsWithToolbar(
+            type = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            customToolbar = binding.appBarLayoutExplorer
+        )
+        setContentView(binding.root)
         viewModel.checkFeatureFlag()
         credentials = runBlocking {
             runCatching {
@@ -614,13 +621,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (savedInstanceState != null) {
             folderSelected = savedInstanceState.getBoolean("folderSelected", false)
         }
-        enableEdgeToEdge()
-        binding = ActivityFileExplorerBinding.inflate(layoutInflater)
-        consumeInsetsWithToolbar(
-            type = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
-            customToolbar = binding.appBarLayoutExplorer
-        )
-        setContentView(binding.root)
         addStartUploadTransferView()
 
         setSupportActionBar(binding.toolbarExplorer)
