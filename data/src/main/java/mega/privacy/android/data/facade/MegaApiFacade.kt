@@ -573,6 +573,9 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getUserAvatarColor(userHandle: Long): String? =
         megaApi.getUserAvatarColor(userHandleToBase64(userHandle))
 
+    override suspend fun getUserAvatarSecondaryColor(userHandle: Long): String? =
+        megaApi.getUserAvatarSecondaryColor(userHandleToBase64(userHandle))
+
     override fun getUserAvatar(
         user: MegaUser,
         destinationPath: String,

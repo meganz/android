@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import androidx.core.graphics.toColorInt
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
@@ -322,6 +323,27 @@ internal class DefaultAvatarRepositoryTest {
             awaitComplete()
         }
     }
+
+    @Test
+    fun `test that getAvatarSecondaryColor returns color int when getUserAvatarSecondaryColor returns hex string`() =
+        runTest {
+            val userHandle = 456L
+            val hexColor = "#FF6A19"
+            whenever(megaApiGateway.getUserAvatarSecondaryColor(userHandle)).thenReturn(hexColor)
+            val result = underTest.getAvatarSecondaryColor(userHandle)
+            assertThat(result).isEqualTo(hexColor.toColorInt())
+        }
+
+    @Test
+    fun `test that getAvatarSecondaryColor returns fallback color when getUserAvatarSecondaryColor returns null`() =
+        runTest {
+            val userHandle = 789L
+            val fallbackColor = -12345
+            whenever(megaApiGateway.getUserAvatarSecondaryColor(userHandle)).thenReturn(null)
+            whenever(avatarWrapper.getSpecificAvatarColor(any())).thenReturn(fallbackColor)
+            val result = underTest.getAvatarSecondaryColor(userHandle)
+            assertThat(result).isEqualTo(fallbackColor)
+        }
 
     @Test
     fun `test that getAvatarFromBase64String returns correctly`() = runTest {

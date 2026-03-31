@@ -927,6 +927,14 @@ interface MegaApiGateway {
     suspend fun getUserAvatarColor(userHandle: Long): String?
 
     /**
+     * Get the secondary color for the avatar
+     *
+     * @param userHandle The user handle to get the secondary avatar color for.
+     * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
+     */
+    suspend fun getUserAvatarSecondaryColor(userHandle: Long): String?
+
+    /**
      * Get user avatar
      *
      * @param user

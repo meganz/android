@@ -46,6 +46,13 @@ interface AvatarRepository {
     suspend fun getAvatarColor(userHandle: Long): Int
 
     /**
+     * Get avatar secondary color for a user
+     *
+     * @param userHandle  User handle
+     */
+    suspend fun getAvatarSecondaryColor(userHandle: Long): Int
+
+    /**
      * Set avatar
      *
      * @param filePath

@@ -180,6 +180,11 @@ internal class DefaultAvatarRepository @Inject constructor(
             getColor(megaApiGateway.getUserAvatarColor(userHandle))
         }
 
+    override suspend fun getAvatarSecondaryColor(userHandle: Long): Int =
+        withContext(ioDispatcher) {
+            getColor(megaApiGateway.getUserAvatarSecondaryColor(userHandle))
+        }
+
     private fun getColor(color: String?): Int =
         color?.toColorInt() ?: avatarWrapper.getSpecificAvatarColor(AVATAR_PRIMARY_COLOR)
 
