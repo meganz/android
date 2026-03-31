@@ -17,8 +17,8 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
+import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
 import mega.privacy.android.domain.exception.MegaException
@@ -148,15 +148,15 @@ class UpgradeAccountViewModelTest {
             subscriptionProIIIYearly
         )
         val expectedList = listOf(
-            localisedSubscriptionProI,
-            localisedSubscriptionProII,
-            localisedSubscriptionProIII,
             LocalisedSubscription(
                 monthlySubscription = null,
                 yearlySubscription = subscriptionProLiteYearly,
                 localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
                 formattedSize = formattedSizeMapper,
             ),
+            localisedSubscriptionProI,
+            localisedSubscriptionProII,
+            localisedSubscriptionProIII,
         )
         whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
         whenever(getSubscriptionsUseCase()).thenReturn(
@@ -329,6 +329,84 @@ class UpgradeAccountViewModelTest {
                 Truth.assertThat(awaitItem()).isEqualTo(
                     UserAgeComplianceStatus.RequiresMinorRestriction
                 )
+            }
+        }
+
+    @Test
+    fun `test that yearly-only subscriptions are sorted by yearly price divided by 12`() =
+        runTest {
+            // Pro Lite: yearly only at 49.99 → 49.99/12 ≈ 4.17
+            // Pro I: yearly only at 99.99 → 99.99/12 ≈ 8.33
+            // Pro II: yearly only at 199.99 → 199.99/12 ≈ 16.67
+            // Expected sort order: Pro Lite, Pro I, Pro II (ascending by yearly/12)
+            val yearlyOnly = listOf(
+                subscriptionProIIYearly,
+                subscriptionProLiteYearly,
+                subscriptionProIYearly,
+            )
+            val expectedList = listOf(
+                LocalisedSubscription(
+                    monthlySubscription = null,
+                    yearlySubscription = subscriptionProLiteYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+                LocalisedSubscription(
+                    monthlySubscription = null,
+                    yearlySubscription = subscriptionProIYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+                LocalisedSubscription(
+                    monthlySubscription = null,
+                    yearlySubscription = subscriptionProIIYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+            )
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(emptyList(), yearlyOnly)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+            initViewModel()
+            underTest.state.map { it.localisedSubscriptionsList }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(expectedList)
+            }
+        }
+
+    @Test
+    fun `test that mixed monthly and yearly-only subscriptions are sorted correctly using yearly price divided by 12 as fallback`() =
+        runTest {
+            // Pro I: monthly at 9.99
+            // Pro Lite: yearly only at 49.99 → 49.99/12 ≈ 4.17
+            // Expected: Pro Lite (4.17) first, then Pro I (9.99)
+            val monthlyOnly = listOf(subscriptionProIMonthly)
+            val yearlyOnly = listOf(subscriptionProLiteYearly, subscriptionProIYearly)
+            val expectedList = listOf(
+                LocalisedSubscription(
+                    monthlySubscription = null,
+                    yearlySubscription = subscriptionProLiteYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+                LocalisedSubscription(
+                    monthlySubscription = subscriptionProIMonthly,
+                    yearlySubscription = subscriptionProIYearly,
+                    localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                    formattedSize = formattedSizeMapper,
+                ),
+            )
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(monthlyOnly, yearlyOnly)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+            initViewModel()
+            underTest.state.map { it.localisedSubscriptionsList }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(expectedList)
             }
         }
 

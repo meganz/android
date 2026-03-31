@@ -134,7 +134,7 @@ class UpgradeAccountViewModel @Inject constructor(
                         } else null
                     }.sortedBy { subscription ->
                         subscription.monthlySubscription?.amount?.value
-                            ?: subscription.yearlySubscription?.amount?.value
+                            ?: subscription.yearlySubscription?.amount?.value?.let { it / 12 }
                     }
                     _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
                 }.onFailure { error ->
