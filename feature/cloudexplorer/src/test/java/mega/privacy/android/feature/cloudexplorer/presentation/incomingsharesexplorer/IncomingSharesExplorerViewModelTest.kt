@@ -16,8 +16,8 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -41,7 +41,7 @@ class IncomingSharesExplorerViewModelTest {
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val nodeUiItemMapper = mock<NodeUiItemMapper>()
+    private val nodeViewItemMapper = mock<NodeViewItemMapper>()
     private val getIncomingSharesChildrenNodeUseCase = mock<GetIncomingSharesChildrenNodeUseCase>()
 
 
@@ -52,7 +52,7 @@ class IncomingSharesExplorerViewModelTest {
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             getIncomingSharesChildrenNodeUseCase,
         )
         whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
@@ -61,9 +61,8 @@ class IncomingSharesExplorerViewModelTest {
         whenever(monitorNodeUpdatesByIdUseCase(any(), any())) doReturn emptyFlow()
         wheneverBlocking { getIncomingSharesChildrenNodeUseCase(any()) } doReturn emptyList()
         wheneverBlocking {
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = emptyList(),
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
             )
         } doReturn emptyList()
@@ -75,7 +74,7 @@ class IncomingSharesExplorerViewModelTest {
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             getIncomingSharesChildrenNodeUseCase,
         )
     }
@@ -91,13 +90,12 @@ class IncomingSharesExplorerViewModelTest {
     @Test
     fun `test that nodes are loaded`() = runTest {
         val nodes = emptyList<ShareNode>()
-        val nodeUiItems = emptyList<NodeUiItem<TypedNode>>()
+        val nodeUiItems = emptyList<NodeViewItem<TypedNode>>()
 
         whenever(getIncomingSharesChildrenNodeUseCase(any())) doReturn nodes
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
             )
         ) doReturn nodeUiItems
@@ -112,13 +110,12 @@ class IncomingSharesExplorerViewModelTest {
     @Test
     fun `test that nodes are refreshed`() = runTest {
         val nodes = emptyList<ShareNode>()
-        val nodeUiItems = emptyList<NodeUiItem<TypedNode>>()
+        val nodeUiItems = emptyList<NodeViewItem<TypedNode>>()
 
         whenever(getIncomingSharesChildrenNodeUseCase(any())) doReturn nodes
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
             )
         ) doReturn nodeUiItems

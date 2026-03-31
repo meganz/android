@@ -17,8 +17,8 @@ import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -44,7 +44,7 @@ class FavouritesExplorerViewModelTest {
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val nodeUiItemMapper = mock<NodeUiItemMapper>()
+    private val nodeViewItemMapper = mock<NodeViewItemMapper>()
     private val getAllFavoritesUseCase = mock<GetAllFavoritesUseCase>()
 
     @BeforeEach
@@ -54,7 +54,7 @@ class FavouritesExplorerViewModelTest {
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             getAllFavoritesUseCase
         )
         whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
@@ -63,9 +63,8 @@ class FavouritesExplorerViewModelTest {
         whenever(monitorNodeUpdatesByIdUseCase(any(), any())) doReturn emptyFlow()
         whenever(getAllFavoritesUseCase()) doReturn emptyFlow()
         wheneverBlocking {
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = emptyList(),
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.FAVOURITES,
             )
         } doReturn emptyList()
@@ -77,14 +76,14 @@ class FavouritesExplorerViewModelTest {
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             getAllFavoritesUseCase,
             args = FavouritesExplorerViewModel.Args(showFiles),
         )
     }
 
-    private fun nodeUiItem(node: TypedNode): NodeUiItem<TypedNode> =
-        NodeUiItem(node = node, isSelected = false)
+    private fun nodeUiItem(node: TypedNode): NodeViewItem<TypedNode> =
+        NodeViewItem(node = node)
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
@@ -107,9 +106,8 @@ class FavouritesExplorerViewModelTest {
             val nodeUiItems = listOf(nodeUiItem(folder))
             whenever(getAllFavoritesUseCase()) doReturn flowOf(nodes)
             whenever(
-                nodeUiItemMapper(
+                nodeViewItemMapper(
                     nodeList = foldersOnly,
-                    existingItems = emptyList(),
                     nodeSourceType = NodeSourceType.FAVOURITES,
                 )
             ) doReturn nodeUiItems
@@ -128,9 +126,8 @@ class FavouritesExplorerViewModelTest {
         val nodeUiItems = listOf(nodeUiItem(folder), nodeUiItem(file))
         whenever(getAllFavoritesUseCase()) doReturn flowOf(nodes)
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.FAVOURITES,
             )
         ) doReturn nodeUiItems
@@ -148,16 +145,14 @@ class FavouritesExplorerViewModelTest {
         val nodeUiItems = listOf(nodeUiItem(folder))
         whenever(getAllFavoritesUseCase()) doReturn flowOf(nodes)
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.FAVOURITES,
             )
         ) doReturn nodeUiItems
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = nodeUiItems,
                 nodeSourceType = NodeSourceType.FAVOURITES,
             )
         ) doReturn nodeUiItems
@@ -178,16 +173,14 @@ class FavouritesExplorerViewModelTest {
         val nodeUiItems = listOf(nodeUiItem(folder))
         whenever(getAllFavoritesUseCase()) doReturn flowOf(nodes)
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = NodeSourceType.FAVOURITES,
             )
         ) doReturn nodeUiItems
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = nodeUiItems,
                 nodeSourceType = NodeSourceType.FAVOURITES,
             )
         ) doReturn nodeUiItems

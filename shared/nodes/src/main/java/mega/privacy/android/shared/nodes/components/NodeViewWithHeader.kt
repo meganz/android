@@ -34,18 +34,18 @@ import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemViewModel
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.TypedNodeItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NodeViewWithHeader(
-    items: List<NodeUiItem<TypedNode>>,
+fun <T : TypedNodeItem<TypedNode>> NodeViewWithHeader(
+    items: List<T>,
     nodeSourceType: NodeSourceType,
     nodesLoadingState: NodesLoadingState,
     emptyView: @Composable () -> Unit,
-    itemListView: @Composable (NodeUiItem<TypedNode>) -> Unit,
-    itemGridView: @Composable (NodeUiItem<TypedNode>) -> Unit,
+    itemListView: @Composable (T) -> Unit,
+    itemGridView: @Composable (T) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
@@ -113,14 +113,14 @@ fun NodeViewWithHeader(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun NodeViewWithHeaderLoaded(
+private fun <T : TypedNodeItem<TypedNode>> NodeViewWithHeaderLoaded(
     headerData: NodeHeaderItemUiState.Data,
-    items: List<NodeUiItem<TypedNode>>,
+    items: List<T>,
     nodeSourceType: NodeSourceType,
     nodesLoadingState: NodesLoadingState,
     emptyView: @Composable () -> Unit,
-    itemListView: @Composable (NodeUiItem<TypedNode>) -> Unit,
-    itemGridView: @Composable (NodeUiItem<TypedNode>) -> Unit,
+    itemListView: @Composable (T) -> Unit,
+    itemGridView: @Composable (T) -> Unit,
     onRefreshNodes: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier,
@@ -208,10 +208,10 @@ private fun NodeViewWithHeaderLoaded(
 }
 
 @Composable
-private fun NodesListView(
-    items: List<NodeUiItem<TypedNode>>,
+private fun <T : TypedNodeItem<TypedNode>> NodesListView(
+    items: List<T>,
     isNextPageLoading: Boolean,
-    itemView: @Composable (NodeUiItem<TypedNode>) -> Unit,
+    itemView: @Composable (T) -> Unit,
     nodeHeader: @Composable () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
@@ -246,11 +246,11 @@ private fun NodesListView(
 }
 
 @Composable
-private fun NodesGridView(
-    items: List<NodeUiItem<TypedNode>>,
+private fun <T : TypedNodeItem<TypedNode>> NodesGridView(
+    items: List<T>,
     isNextPageLoading: Boolean,
     spanCount: Int,
-    itemView: @Composable (NodeUiItem<TypedNode>) -> Unit,
+    itemView: @Composable (T) -> Unit,
     nodeHeader: @Composable () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,

@@ -14,7 +14,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,14 +23,14 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     monitorStorageStateUseCase: MonitorStorageStateUseCase,
     monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    nodeUiItemMapper: NodeUiItemMapper,
+    nodeViewItemMapper: NodeViewItemMapper,
     private val getIncomingSharesChildrenNodeUseCase: GetIncomingSharesChildrenNodeUseCase,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
     monitorStorageStateUseCase = monitorStorageStateUseCase,
     monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-    nodeUiItemMapper = nodeUiItemMapper,
+    nodeViewItemMapper = nodeViewItemMapper,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.INCOMING_SHARES,

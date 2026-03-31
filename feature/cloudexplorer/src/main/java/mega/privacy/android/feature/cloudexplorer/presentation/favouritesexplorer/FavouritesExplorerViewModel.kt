@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel.Args
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = FavouritesExplorerViewModel.Factory::class)
@@ -31,7 +32,7 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     monitorStorageStateUseCase: MonitorStorageStateUseCase,
     monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    nodeUiItemMapper: NodeUiItemMapper,
+    nodeViewItemMapper: NodeViewItemMapper,
     private val getAllFavoritesUseCase: GetAllFavoritesUseCase,
     @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
@@ -39,7 +40,7 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     monitorStorageStateUseCase = monitorStorageStateUseCase,
     monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-    nodeUiItemMapper = nodeUiItemMapper,
+    nodeViewItemMapper = nodeViewItemMapper,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.FAVOURITES,

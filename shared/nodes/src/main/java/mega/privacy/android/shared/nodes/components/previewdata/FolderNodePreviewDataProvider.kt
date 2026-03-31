@@ -11,7 +11,7 @@ import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.model.SelectableNodeItem
 import mega.privacy.android.shared.nodes.selection.SelectableTypedNode
 
-internal class FolderNodePreviewDataProvider :
+class FolderNodePreviewDataProvider :
     PreviewParameterProvider<List<SelectableTypedNode<TypedFolderNode>>> {
 
     private val nodeUIItem1 = SelectableNodeItem<TypedFolderNode>(

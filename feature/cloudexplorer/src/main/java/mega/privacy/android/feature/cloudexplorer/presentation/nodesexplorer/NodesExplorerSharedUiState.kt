@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 
 /**
  * UI state for [NodeExplorerSharedViewModel].
@@ -15,7 +15,7 @@ data class NodesExplorerSharedUiState(
     val currentFolderId: NodeId = NodeId(-1),
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
-    val items: List<NodeUiItem<TypedNode>> = emptyList(),
+    val items: List<NodeViewItem<TypedNode>> = emptyList(),
     val isHiddenNodeSettingsLoading: Boolean = true,
     val showHiddenNodes: Boolean = false,
     val isHiddenNodesEnabled: Boolean = false,

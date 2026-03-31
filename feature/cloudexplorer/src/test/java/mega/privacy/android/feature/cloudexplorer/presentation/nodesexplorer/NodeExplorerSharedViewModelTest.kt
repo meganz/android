@@ -23,8 +23,8 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -46,7 +46,7 @@ class NodeExplorerSharedViewModelTest {
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val nodeUiItemMapper = mock<NodeUiItemMapper>()
+    private val nodeViewItemMapper = mock<NodeViewItemMapper>()
 
     private val nodeId = NodeId(1234L)
     private val nodeSourceType = NodeSourceType.INCOMING_SHARES
@@ -59,7 +59,7 @@ class NodeExplorerSharedViewModelTest {
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
         )
         whenever(monitorStorageStateUseCase()) doReturn flowOf()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf()
@@ -78,7 +78,7 @@ class NodeExplorerSharedViewModelTest {
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             args = args
         ) {
             override fun loadNodes() = loadNodesImpl()
@@ -145,12 +145,11 @@ class NodeExplorerSharedViewModelTest {
     @Test
     fun `test that setItems should map nodes to UI items and update state`() = runTest {
         val nodes = listOf<TypedNode>(mock())
-        val nodeUiItems = listOf<NodeUiItem<TypedNode>>(mock())
+        val nodeUiItems = listOf<NodeViewItem<TypedNode>>(mock())
 
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = nodeSourceType,
             )
         ) doReturn nodeUiItems

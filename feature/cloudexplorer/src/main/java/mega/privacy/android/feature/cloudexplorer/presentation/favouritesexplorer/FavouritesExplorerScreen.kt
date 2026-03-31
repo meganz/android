@@ -13,7 +13,6 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -28,7 +27,7 @@ import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderP
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -38,7 +37,6 @@ internal fun FavouritesExplorerContent(
     onNavigateBack: () -> Unit,
     consumeNavigateBack: () -> Unit,
     onFolderClick: (NodeId) -> Unit,
-    onFileClick: (NodeUiItem<TypedNode>) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
 ) = with(uiStateShared) {
@@ -54,10 +52,9 @@ internal fun FavouritesExplorerContent(
             items.filterNot { it.isSensitive }
         }
     }
-    val onItemClicked: (NodeUiItem<TypedNode>) -> Unit = { item ->
+    val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
         when {
             item.isFolderNode -> onFolderClick(item.id)
-            isSelectionModeEnabled -> onFileClick(item)
         }
     }
     NodeViewWithHeader(
@@ -75,8 +72,6 @@ internal fun FavouritesExplorerContent(
                 description = it.formattedDescription?.text,
                 tags = it.tags,
                 thumbnailData = it.thumbnailData,
-                isSelected = it.isSelected,
-                isInSelectionMode = isSelectionModeEnabled && it.node is FileNode,
                 isTakenDown = it.isTakenDown,
                 showIsVerified = it.showIsVerified,
                 label = it.nodeLabel,
@@ -93,8 +88,6 @@ internal fun FavouritesExplorerContent(
                 thumbnailData = it.thumbnailData,
                 isTakenDown = it.isTakenDown,
                 duration = it.duration,
-                isSelected = it.isSelected,
-                isInSelectionMode = isSelectionModeEnabled && it.node is FileNode,
                 isFolderNode = it.isFolderNode,
                 isVideoNode = it.isVideoNode,
                 onClick = { onItemClicked(it) },
@@ -135,35 +128,6 @@ private fun EmptyFolderPreview() {
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},
-                onFileClick = {},
-                onRefreshNodes = {},
-            )
-        }
-    }
-}
-
-@Composable
-@CombinedThemePreviews
-fun FavouritesExplorerFilePickerScreenPreview(
-    @PreviewParameter(BooleanProvider::class) isList: Boolean,
-) {
-    AndroidThemeForPreviews {
-        CompositionLocalProvider(
-            LocalNodeHeaderPreviewData provides NodeHeaderItemUiState.Data(
-                viewType = if (isList) ViewType.LIST else ViewType.GRID,
-                nodeSortConfiguration = NodeSortConfiguration.default,
-            ),
-        ) {
-            FavouritesExplorerContent(
-                uiStateShared = NodesExplorerSharedUiState(
-                    nodesLoadingState = NodesLoadingState.FullyLoaded,
-                    isSelectionModeEnabled = true,
-                    items = previewFolders()
-                ),
-                onNavigateBack = {},
-                consumeNavigateBack = {},
-                onFolderClick = {},
-                onFileClick = {},
                 onRefreshNodes = {},
             )
         }
@@ -191,7 +155,6 @@ fun FavouritesExplorerFolderDestinationScreenPreview(
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},
-                onFileClick = {},
                 onRefreshNodes = {},
             )
         }

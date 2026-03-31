@@ -15,6 +15,7 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
@@ -31,8 +32,9 @@ import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeU
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.SelectableNodeItem
 import mega.privacy.android.shared.nodes.model.text
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -61,7 +63,6 @@ internal fun NodesExplorerScreenContent(
     onNavigateBack: () -> Unit,
     consumeNavigateBack: () -> Unit,
     onFolderClick: (NodeId) -> Unit,
-    onFileClick: (NodeUiItem<TypedNode>) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
 ) = with(uiStateShared) {
@@ -77,14 +78,22 @@ internal fun NodesExplorerScreenContent(
             items.filterNot { it.isSensitive }
         }
     }
-    val onItemClicked: (NodeUiItem<TypedNode>) -> Unit = { item ->
+
+    val selectionState = rememberNodeSelectionState()
+    val nodeUiItems = remember(visibleItems, selectionState.selectedNodeIds) {
+        visibleItems.map {
+            SelectableNodeItem(it, selectionState.selectedNodeIds.contains(it.id))
+        }
+    }
+
+    val onItemClicked: (SelectableNodeItem<TypedNode>) -> Unit = { item ->
         when {
             item.isFolderNode -> onFolderClick(item.id)
-            isSelectionModeEnabled -> onFileClick(item)
+            isSelectionModeEnabled -> selectionState.toggleSelection(item.id)
         }
     }
     NodeViewWithHeader(
-        items = visibleItems,
+        items = nodeUiItems,
         nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         nodesLoadingState = nodesLoadingState,
         emptyView = {
@@ -100,7 +109,7 @@ internal fun NodesExplorerScreenContent(
                 tags = it.tags,
                 thumbnailData = it.thumbnailData,
                 isSelected = it.isSelected,
-                isInSelectionMode = isSelectionModeEnabled,
+                isInSelectionMode = isSelectionModeEnabled && (it.node is FileNode),
                 showIsVerified = it.showIsVerified,
                 isTakenDown = it.isTakenDown,
                 label = it.nodeLabel,
@@ -119,7 +128,7 @@ internal fun NodesExplorerScreenContent(
                 isTakenDown = it.isTakenDown,
                 duration = it.duration,
                 isSelected = it.isSelected,
-                isInSelectionMode = isSelectionModeEnabled,
+                isInSelectionMode = isSelectionModeEnabled && (it.node is FileNode),
                 isFolderNode = it.isFolderNode,
                 isVideoNode = it.isVideoNode,
                 onClick = { onItemClicked(it) },
@@ -171,7 +180,6 @@ fun NodesExplorerScreenContentEmptyPreview() {
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},
-                onFileClick = {},
                 onRefreshNodes = {},
             )
         }
@@ -201,7 +209,6 @@ fun NodesExplorerScreenContentPreview(
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},
-                onFileClick = {},
                 onRefreshNodes = {},
             )
         }

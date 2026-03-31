@@ -23,8 +23,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import timber.log.Timber
 
 /**
@@ -35,7 +34,7 @@ abstract class NodeExplorerSharedViewModel(
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    private val nodeUiItemMapper: NodeUiItemMapper,
+    private val nodeViewItemMapper: NodeViewItemMapper,
     private val args: Args,
 ) : ViewModel() {
 
@@ -104,10 +103,9 @@ abstract class NodeExplorerSharedViewModel(
 
     fun setItems(nodes: List<TypedNode>, nodesLoadingState: NodesLoadingState) {
         viewModelScope.launch {
-            val nodeUiItems = nodeUiItemMapper(
+            val nodeUiItems = nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = args.nodeSourceType,
-                existingItems = nodeExplorerSharedUiState.value.items,
             )
 
             _nodedExplorerSharedUiState.update { state ->
@@ -123,10 +121,6 @@ abstract class NodeExplorerSharedViewModel(
         _nodedExplorerSharedUiState.update { state ->
             state.copy(navigateBack = consumed)
         }
-    }
-
-    fun fileClicked(item: NodeUiItem<TypedNode>) {
-
     }
 
     abstract fun loadNodes()

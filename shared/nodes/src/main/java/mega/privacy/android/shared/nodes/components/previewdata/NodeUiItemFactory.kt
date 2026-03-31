@@ -17,45 +17,39 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.nodes.extension.getSharesIcon
 import mega.privacy.android.shared.nodes.mapper.toSharedSubtitle
 import mega.privacy.android.shared.nodes.model.NodeSubtitleText
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 
-@Suppress("UNCHECKED_CAST")
 fun previewFolderNodeUiItem(
     id: Long = 1L,
     name: String = "Sample Folder $id",
-    isSelected: Boolean = false,
     childFolderCount: Int = 2,
     childFileCount: Int = 5,
-): NodeUiItem<TypedNode> =
-    NodeUiItem(
-        isSelected = isSelected,
-        title = LocalizedText.Literal(name),
-        subtitle = NodeSubtitleText.FolderSubtitle(
-            childFolderCount = childFolderCount,
-            childFileCount = childFileCount,
-        ),
-        iconRes = IconPackR.drawable.ic_folder_medium_solid,
-        isFolderNode = true,
-        node = previewTypedFolderNode(
-            id = id,
-            name = name,
-            childFolderCount = childFolderCount,
-            childFileCount = childFileCount,
-            isShared = false,
-            isIncomingShare = false,
-        ),
-    ) as NodeUiItem<TypedNode>
+): NodeViewItem<TypedNode> = NodeViewItem(
+    node = previewTypedFolderNode(
+        id = id,
+        name = name,
+        childFolderCount = childFolderCount,
+        childFileCount = childFileCount,
+        isShared = false,
+        isIncomingShare = false,
+    ),
+    title = LocalizedText.Literal(name),
+    subtitle = NodeSubtitleText.FolderSubtitle(
+        childFolderCount = childFolderCount,
+        childFileCount = childFileCount,
+    ),
+    iconRes = IconPackR.drawable.ic_folder_medium_solid,
+    isFolderNode = true,
+)
 
 /**
- * Preview [NodeUiItem] for incoming shared folders, with [NodeSubtitleText.SharedSubtitle] and
+ * Preview [NodeViewItem] for incoming shared folders, with [NodeSubtitleText.SharedSubtitle] and
  * access icons aligned with production mapping ([getSharesIcon]).
  *
  */
-@Suppress("UNCHECKED_CAST")
 fun previewIncomingShareFolderNodeUiItem(
     id: Long = 1L,
     name: String = "Shared folder $id",
-    isSelected: Boolean = false,
     access: AccessPermission = AccessPermission.READWRITE,
     shareCount: Int = 1,
     user: String? = "preview.user@example.com",
@@ -67,7 +61,7 @@ fun previewIncomingShareFolderNodeUiItem(
     isContactVerificationOn: Boolean = false,
     childFolderCount: Int = 2,
     childFileCount: Int = 5,
-): NodeUiItem<TypedNode> {
+): NodeViewItem<TypedNode> {
     val shareData = ShareData(
         user = user,
         userFullName = userFullName,
@@ -88,8 +82,8 @@ fun previewIncomingShareFolderNodeUiItem(
         isIncomingShare = true,
     )
     val shareFolderNode = ShareFolderNode(baseFolder, shareData)
-    return NodeUiItem(
-        isSelected = isSelected,
+    return NodeViewItem(
+        node = shareFolderNode,
         title = LocalizedText.Literal(name),
         subtitle = subtitle ?: shareData.toSharedSubtitle(),
         iconRes = IconPackR.drawable.ic_folder_medium_solid,
@@ -98,25 +92,14 @@ fun previewIncomingShareFolderNodeUiItem(
         showIsVerified = isContactVerificationOn && shareFolderNode.isIncomingShare &&
                 shareData.isContactCredentialsVerified,
         showFavourite = false,
-        node = shareFolderNode,
-    ) as NodeUiItem<TypedNode>
+    )
 }
 
 @Suppress("UNCHECKED_CAST")
 fun previewFileNodeUiItem(
     id: Long = 10L,
     name: String = "notes$id.txt",
-    isSelected: Boolean = false,
-): NodeUiItem<TypedNode> = NodeUiItem(
-    isSelected = isSelected,
-    title = LocalizedText.Literal(name),
-    subtitle = NodeSubtitleText.FileSubtitle(
-        fileSizeValue = 12_288L,
-        modificationTime = 1_700_000_000_000L,
-        showPublicLinkCreationTime = false,
-    ),
-    iconRes = IconPackR.drawable.ic_text_medium_solid,
-    isFolderNode = false,
+): NodeViewItem<TypedNode> = NodeViewItem(
     node = object : TypedFileNode {
         override val id = NodeId(id)
         override val name = name
@@ -149,7 +132,15 @@ fun previewFileNodeUiItem(
         override val hasThumbnail = false
         override val hasPreview = false
     },
-) as NodeUiItem<TypedNode>
+    title = LocalizedText.Literal(name),
+    subtitle = NodeSubtitleText.FileSubtitle(
+        fileSizeValue = 12_288L,
+        modificationTime = 1_700_000_000_000L,
+        showPublicLinkCreationTime = false,
+    ),
+    iconRes = IconPackR.drawable.ic_text_medium_solid,
+    isFolderNode = false,
+) as NodeViewItem<TypedNode>
 
 private fun previewTypedFolderNode(
     id: Long,

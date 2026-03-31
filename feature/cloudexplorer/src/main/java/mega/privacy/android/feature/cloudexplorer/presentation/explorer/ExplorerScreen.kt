@@ -172,7 +172,6 @@ fun ExplorerScreen(
                                 )
                             )
                         },
-                        onFileClick = {},
                         onRefreshNodes = nodesExplorerViewModel::refreshNodes,
                         modifier = modifier,
                     )
@@ -197,7 +196,6 @@ fun ExplorerScreen(
                                     )
                                 )
                             },
-                            onFileClick = {},
                             onRefreshNodes = incomingSharesExplorerViewModel::refreshNodes,
                             modifier = modifier
                         )
@@ -223,7 +221,6 @@ fun ExplorerScreen(
                                     )
                                 )
                             },
-                            onFileClick = favouritesExplorerViewModel::fileClicked,
                             onRefreshNodes = favouritesExplorerViewModel::refreshNodes,
                             modifier = modifier
                         )

@@ -22,7 +22,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.shared.nodes.R as NodesR
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = NodesExplorerViewModel.Factory::class)
@@ -31,7 +31,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     monitorStorageStateUseCase: MonitorStorageStateUseCase,
     monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    nodeUiItemMapper: NodeUiItemMapper,
+    nodeViewItemMapper: NodeViewItemMapper,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
@@ -42,7 +42,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     monitorStorageStateUseCase = monitorStorageStateUseCase,
     monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-    nodeUiItemMapper = nodeUiItemMapper,
+    nodeViewItemMapper = nodeViewItemMapper,
     args = args,
 ) {
 

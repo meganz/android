@@ -23,8 +23,8 @@ import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -49,7 +49,7 @@ class NodesExplorerViewModelTest {
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val nodeUiItemMapper = mock<NodeUiItemMapper>()
+    private val nodeViewItemMapper = mock<NodeViewItemMapper>()
     private val getFileBrowserNodeChildrenUseCase = mock<GetFileBrowserNodeChildrenUseCase>()
     private val getNodesByIdInChunkUseCase = mock<GetNodesByIdInChunkUseCase>()
     private val getNodeInfoByIdUseCase = mock<GetNodeInfoByIdUseCase>()
@@ -70,7 +70,7 @@ class NodesExplorerViewModelTest {
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             getFileBrowserNodeChildrenUseCase,
             getNodesByIdInChunkUseCase,
             getNodeInfoByIdUseCase,
@@ -91,7 +91,7 @@ class NodesExplorerViewModelTest {
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            nodeUiItemMapper = nodeUiItemMapper,
+            nodeViewItemMapper = nodeViewItemMapper,
             getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
             getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
             getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
@@ -112,13 +112,12 @@ class NodesExplorerViewModelTest {
     @Test
     fun `test that nodes are loaded`() = runTest {
         val nodes = listOf<TypedNode>(mock())
-        val nodeUiItems = emptyList<NodeUiItem<TypedNode>>()
+        val nodeUiItems = emptyList<NodeViewItem<TypedNode>>()
 
         whenever(getNodesByIdInChunkUseCase(nodeId)) doReturn flowOf(nodes to false)
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = nodeSourceType,
             )
         ) doReturn nodeUiItems
@@ -133,13 +132,12 @@ class NodesExplorerViewModelTest {
     @Test
     fun `test that nodes are refreshed`() = runTest {
         val nodes = listOf<TypedNode>(mock())
-        val nodeUiItems = emptyList<NodeUiItem<TypedNode>>()
+        val nodeUiItems = emptyList<NodeViewItem<TypedNode>>()
 
         whenever(getFileBrowserNodeChildrenUseCase(nodeId.longValue)) doReturn nodes
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = nodes,
-                existingItems = emptyList(),
                 nodeSourceType = nodeSourceType,
             )
         ) doReturn nodeUiItems
