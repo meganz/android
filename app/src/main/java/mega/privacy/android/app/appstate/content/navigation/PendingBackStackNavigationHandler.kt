@@ -63,6 +63,7 @@ class PendingBackStackNavigationHandler(
         Timber.d("PendingBackStackNavigationHandler::remove $navKey")
         backstack.pending = backstack.pending.filterNot { it == navKey }
         backstack.remove(navKey)
+        ensureNotEmpty()
     }
 
     override fun navigate(destination: NavKey, navOptions: NavOptions?) {
@@ -167,6 +168,7 @@ class PendingBackStackNavigationHandler(
         } else {
             replaceAuthRequiredDestinations(defaultLoginDestination)
         }
+        ensureNotEmpty()
     }
 
     fun onRootNodeChange(rootNodeState: RootNodeState) {
@@ -183,6 +185,7 @@ class PendingBackStackNavigationHandler(
             }
         } else {
             removeRootNodeRequiredDestinations(rootNodeState.refreshEvent)
+            ensureNotEmpty()
         }
     }
 
@@ -197,6 +200,7 @@ class PendingBackStackNavigationHandler(
         } else {
             if (backstack.contains(passcodeDestination)) {
                 backstack.removeAll { it == passcodeDestination }
+                ensureNotEmpty()
             }
         }
     }
@@ -240,6 +244,10 @@ class PendingBackStackNavigationHandler(
         }
         logBackStack("removeRootNodeRequiredDestinations")
         return rootNodeRequiredDestinations
+    }
+
+    private fun ensureNotEmpty() {
+        if (backstack.isEmpty()) backstack.add(defaultLandingScreen)
     }
 
     private fun isLoggedOut() = currentAuthStatus.isLoggedIn.not()

@@ -1,11 +1,11 @@
 package mega.privacy.android.feature.clouddrive.presentation.shares.links
 
-import android.net.Uri
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 
@@ -14,7 +14,7 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
  * @property uriString
  */
 @Serializable
-data class OpenPasswordLinkDialogNavKey(val uriString: String) : NoSessionNavKey.Optional
+data class OpenPasswordLinkDialogNavKey(val uriString: String) : NoSessionNavKey.Optional, DialogNavKey
 
 fun EntryProviderScope<NavKey>.openPasswordLinkDialog(
     onBack: () -> Unit,
