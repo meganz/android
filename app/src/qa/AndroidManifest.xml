@@ -21,6 +21,18 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+        <provider
+            android:name=".providers.documentprovider.CloudDriveDocumentProvider"
+            android:authorities="${cloudDriveDocumentProviderAuthority}"
+            android:enabled="true"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            tools:replace="android:enabled"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
         <activity
             android:name="mega.privacy.android.app.appstate.RerouteActivity"
             android:theme="@style/Theme.Mega.Starting"
