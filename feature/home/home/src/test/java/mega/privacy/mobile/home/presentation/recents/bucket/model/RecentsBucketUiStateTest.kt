@@ -4,12 +4,12 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
@@ -317,6 +317,8 @@ class RecentsBucketUiStateTest {
         assertThat(state.timestamp).isEqualTo(0L)
         assertThat(state.parentFolderName).isEqualTo(LocalizedText.Literal(""))
         assertThat(state.parentFolderHandle).isEqualTo(-1L)
+        assertThat(state.isHiddenNodesEnabled).isFalse()
+        assertThat(state.showHiddenNodes).isFalse()
         assertThat(state.excludeSensitives).isFalse()
         assertThat(state.navigateBack).isEqualTo(consumed)
     }
@@ -336,7 +338,8 @@ class RecentsBucketUiStateTest {
             parentFolderName = parentFolderName,
             parentFolderHandle = 999L,
             nodeSourceType = testNodeSourceType,
-            excludeSensitives = true,
+            isHiddenNodesEnabled = true,
+            showHiddenNodes = false,
             navigateBack = triggered
         )
 
@@ -347,8 +350,40 @@ class RecentsBucketUiStateTest {
         assertThat(state.timestamp).isEqualTo(1234567890L)
         assertThat(state.parentFolderName).isEqualTo(parentFolderName)
         assertThat(state.parentFolderHandle).isEqualTo(999L)
+        assertThat(state.isHiddenNodesEnabled).isTrue()
+        assertThat(state.showHiddenNodes).isFalse()
         assertThat(state.excludeSensitives).isTrue()
         assertThat(state.navigateBack).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that excludeSensitives is true when isHiddenNodesEnabled is true and showHiddenNodes is false`() {
+        val state = RecentsBucketUiState(
+            nodeSourceType = testNodeSourceType,
+            isHiddenNodesEnabled = true,
+            showHiddenNodes = false,
+        )
+        assertThat(state.excludeSensitives).isTrue()
+    }
+
+    @Test
+    fun `test that excludeSensitives is false when isHiddenNodesEnabled is true and showHiddenNodes is true`() {
+        val state = RecentsBucketUiState(
+            nodeSourceType = testNodeSourceType,
+            isHiddenNodesEnabled = true,
+            showHiddenNodes = true,
+        )
+        assertThat(state.excludeSensitives).isFalse()
+    }
+
+    @Test
+    fun `test that excludeSensitives is false when isHiddenNodesEnabled is false`() {
+        val state = RecentsBucketUiState(
+            nodeSourceType = testNodeSourceType,
+            isHiddenNodesEnabled = false,
+            showHiddenNodes = false,
+        )
+        assertThat(state.excludeSensitives).isFalse()
     }
 }
 

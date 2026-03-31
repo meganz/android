@@ -67,7 +67,10 @@ class RecentsBucketViewModel @AssistedInject constructor(
     ) {
         viewModelScope.launch {
             runCatching {
-                val bucket = getRecentActionBucketByIdUseCase(args.identifier)
+                val bucket = getRecentActionBucketByIdUseCase(
+                    id = args.identifier,
+                    excludeSensitives = excludeSensitives,
+                )
                 if (bucket != null) {
                     val nodeUiItems = nodeUiItemMapper(
                         nodeList = bucket.nodes,
@@ -81,7 +84,6 @@ class RecentsBucketViewModel @AssistedInject constructor(
                             fileCount = bucket.nodes.size,
                             timestamp = bucket.timestamp,
                             parentFolderName = parentFolderName,
-                            excludeSensitives = excludeSensitives
                         )
                     }
                 } else {
@@ -137,7 +139,13 @@ class RecentsBucketViewModel @AssistedInject constructor(
                     Timber.e(it, "Failed to monitor hidden nodes state")
                 }
                 .collectLatest { (isHiddenNodesEnabled, showHiddenNodes) ->
-                    loadBucket(excludeSensitives = isHiddenNodesEnabled && !showHiddenNodes)
+                    _uiState.update {
+                        it.copy(
+                            isHiddenNodesEnabled = isHiddenNodesEnabled,
+                            showHiddenNodes = showHiddenNodes,
+                        )
+                    }
+                    loadBucket()
                 }
         }
     }

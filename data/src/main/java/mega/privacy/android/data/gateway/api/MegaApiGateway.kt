@@ -1175,10 +1175,12 @@ interface MegaApiGateway {
      * Get recent action bucket by id
      *
      * @param id Id of the recent action bucket
+     * @param excludeSensitives Exclude sensitive nodes
      * @param listener [MegaRequestListenerInterface]
      */
     fun getRecentBucketById(
         id: String,
+        excludeSensitives: Boolean,
         listener: MegaRequestListenerInterface
     )
 

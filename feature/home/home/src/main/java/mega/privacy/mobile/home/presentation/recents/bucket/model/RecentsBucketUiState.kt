@@ -3,9 +3,9 @@ package mega.privacy.mobile.home.presentation.recents.bucket.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 
 /**
  * UI state for RecentsBucketScreen
@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param parentFolderHandle handle of the parent folder
  * @param nodeSourceType source type of the nodes
  * @param excludeSensitives whether sensitive items are excluded
+ * @param isHiddenNodesEnabled whether the hidden nodes feature is enabled
+ * @param showHiddenNodes whether to show hidden (sensitive) nodes
  * @param navigateBack event to navigate back
  */
 data class RecentsBucketUiState(
@@ -29,7 +31,8 @@ data class RecentsBucketUiState(
     val parentFolderName: LocalizedText = LocalizedText.Literal(""),
     val parentFolderHandle: Long = -1L,
     val nodeSourceType: NodeSourceType,
-    val excludeSensitives: Boolean = false,
+    val isHiddenNodesEnabled: Boolean = false,
+    val showHiddenNodes: Boolean = false,
     val navigateBack: StateEvent = consumed,
 ) {
 
@@ -65,4 +68,10 @@ data class RecentsBucketUiState(
      */
     val nodeIds: List<Long>
         get() = items.map { it.node.id.longValue }
+
+    /**
+     * Whether sensitive items are excluded from the bucket.
+     */
+    val excludeSensitives: Boolean = isHiddenNodesEnabled && !showHiddenNodes
+
 }

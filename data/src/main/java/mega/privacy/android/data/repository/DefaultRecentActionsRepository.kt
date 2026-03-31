@@ -78,12 +78,13 @@ internal class DefaultRecentActionsRepository @Inject constructor(
 
     override suspend fun getRecentActionBucketById(
         id: String,
+        excludeSensitives: Boolean,
     ): RecentActionBucketUnTyped? = withContext(ioDispatcher) {
         val result = suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("getRecentActionById") {
                 megaApiGateway.copyBucketList(it.recentActions)
             }
-            megaApiGateway.getRecentBucketById(id, listener)
+            megaApiGateway.getRecentBucketById(id, excludeSensitives, listener)
         }
 
         if (result.size() > 0) {

@@ -274,8 +274,8 @@ class DefaultRecentActionsRepositoryTest {
         val request = mock<MegaRequest> { on { recentActions }.thenReturn(bucketList) }
         val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
-        whenever(megaApiGateway.getRecentBucketById(any(), any())).thenAnswer {
-            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+        whenever(megaApiGateway.getRecentBucketById(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
                 megaApiJava,
                 request,
                 error
@@ -297,7 +297,7 @@ class DefaultRecentActionsRepositoryTest {
         )
         whenever(recentActionBucketMapper(any(), any())).thenReturn(expectedBucket)
 
-        val result = underTest.getRecentActionBucketById(targetId)
+        val result = underTest.getRecentActionBucketById(targetId, false)
 
         assertThat(result).isNotNull()
         assertThat(result?.id).isEqualTo(targetId)
@@ -315,8 +315,8 @@ class DefaultRecentActionsRepositoryTest {
             val request = mock<MegaRequest> { on { recentActions }.thenReturn(bucketList) }
             val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
-            whenever(megaApiGateway.getRecentBucketById(any(), any())).thenAnswer {
-                (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+            whenever(megaApiGateway.getRecentBucketById(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
                     megaApiJava,
                     request,
                     error
@@ -324,7 +324,7 @@ class DefaultRecentActionsRepositoryTest {
             }
             whenever(megaApiGateway.copyBucketList(any())).thenReturn(bucketList)
 
-            val result = underTest.getRecentActionBucketById("non-existent-id")
+            val result = underTest.getRecentActionBucketById("non-existent-id", false)
 
             assertThat(result).isNull()
         }
@@ -374,8 +374,8 @@ class DefaultRecentActionsRepositoryTest {
             val request = mock<MegaRequest> { on { recentActions }.thenReturn(bucketList) }
             val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
-            whenever(megaApiGateway.getRecentBucketById(any(), any())).thenAnswer {
-                (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+            whenever(megaApiGateway.getRecentBucketById(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
                     megaApiJava,
                     request,
                     error
@@ -386,8 +386,8 @@ class DefaultRecentActionsRepositoryTest {
             whenever(megaApiGateway.getNodesFromMegaNodeList(nodeList)).thenReturn(listOf(mock<MegaNode>()))
             whenever(recentActionBucketMapper(any(), any())).thenReturn(mock())
 
-            underTest.getRecentActionBucketById(targetId)
+            underTest.getRecentActionBucketById(targetId, false)
 
-            verify(megaApiGateway).getRecentBucketById(eq(targetId), any())
+            verify(megaApiGateway).getRecentBucketById(eq(targetId), any(), any())
         }
 }

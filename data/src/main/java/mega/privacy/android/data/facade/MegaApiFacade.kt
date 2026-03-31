@@ -713,8 +713,11 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getRecentActionsAsync(days, maxNodes, excludeSensitives, listener)
 
-    override fun getRecentBucketById(id: String, listener: MegaRequestListenerInterface) =
-        megaApi.getRecentActionById(id, listener)
+    override fun getRecentBucketById(
+        id: String,
+        excludeSensitives: Boolean,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.getRecentActionById(id, excludeSensitives, listener)
 
     override fun clearRecentActions(until: Long, listener: MegaRequestListenerInterface) {
         megaApi.clearRecentActionHistory(until, listener)

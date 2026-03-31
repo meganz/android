@@ -62,5 +62,6 @@ interface RecentActionsRepository {
      */
     suspend fun getRecentActionBucketById(
         id: String,
+        excludeSensitives: Boolean,
     ): RecentActionBucketUnTyped?
 }

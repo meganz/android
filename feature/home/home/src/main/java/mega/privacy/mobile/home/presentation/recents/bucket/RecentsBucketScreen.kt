@@ -279,6 +279,8 @@ internal fun RecentsBucketScreenContent(
                         showMediaDiscoveryButton = false,
                         showChangeViewType = false,
                         isListView = true,
+                        isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                        showHiddenNodes = uiState.showHiddenNodes,
                     )
                 }
             }

@@ -97,7 +97,7 @@ class RecentsBucketViewModelTest {
 
     @Test
     fun `test that initial state has isLoading true`() = runTest {
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
 
         initViewModel()
         advanceUntilIdle()
@@ -130,7 +130,7 @@ class RecentsBucketViewModelTest {
         val nodeUiItem2 = createMockNodeUiItem(node2)
         val expectedParentFolderName = LocalizedText.Literal(bucketFolderName)
 
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
         whenever(recentsParentFolderNameMapper(any())).thenReturn(expectedParentFolderName)
         whenever(
             nodeUiItemMapper(
@@ -181,7 +181,7 @@ class RecentsBucketViewModelTest {
             val nodeUiItem3 = createMockNodeUiItem(node3)
             val expectedParentFolderName = LocalizedText.Literal(bucketFolderName)
 
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
             whenever(recentsParentFolderNameMapper(any())).thenReturn(expectedParentFolderName)
             whenever(
                 nodeUiItemMapper(
@@ -221,7 +221,7 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that when bucket is null, isLoading is set to false and items remain empty`() =
         runTest {
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
 
             initViewModel()
             advanceUntilIdle()
@@ -237,7 +237,7 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that when use case throws exception, isLoading is set to false`() = runTest {
         val exception = RuntimeException("Test error")
-        whenever(getRecentActionBucketByIdUseCase(any())).thenThrow(exception)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenThrow(exception)
 
         initViewModel()
         advanceUntilIdle()
@@ -253,7 +253,7 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that use case is called with correct identifier`() = runTest {
         val testId = "custom_identifier"
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
 
         initViewModel(
             args = RecentsBucketViewModel.Args(
@@ -271,7 +271,7 @@ class RecentsBucketViewModelTest {
 
     @Test
     fun `test that excludeSensitives is false when hidden nodes disabled`() = runTest {
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
 
@@ -289,7 +289,7 @@ class RecentsBucketViewModelTest {
     fun `test that excludeSensitives is true when hidden nodes enabled and showHiddenNodes is false`() =
         runTest {
             val bucket = createMockRecentActionBucket()
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
             whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
             whenever(
                 nodeUiItemMapper(
@@ -319,7 +319,7 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that excludeSensitives is false when hidden nodes enabled and showHiddenNodes is true`() =
         runTest {
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
 
@@ -334,9 +334,43 @@ class RecentsBucketViewModelTest {
         }
 
     @Test
+    fun `test that isHiddenNodesEnabled is updated when monitorHiddenNodesEnabled emits true`() =
+        runTest {
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isHiddenNodesEnabled).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that showHiddenNodes is updated when monitorShowHiddenItems emits true`() =
+        runTest {
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.showHiddenNodes).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that getRecentActionBucketByIdUseCase is called with correct excludeSensitives value`() =
         runTest {
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
 
@@ -345,13 +379,14 @@ class RecentsBucketViewModelTest {
 
             verify(getRecentActionBucketByIdUseCase, atLeastOnce()).invoke(
                 id = testIdentifier,
+                excludeSensitives = true,
             )
         }
 
     @Test
     fun `test that bucket is reloaded when excludeSensitives changes from false to true`() =
         runTest {
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(
                 flowOf(false, true) // First false, then true
             )
@@ -362,7 +397,8 @@ class RecentsBucketViewModelTest {
 
             // Should be called at least twice: once on init, once when excludeSensitives changes
             verify(getRecentActionBucketByIdUseCase, atLeastOnce()).invoke(
-                id = testIdentifier,
+                id = any(),
+                excludeSensitives = any(),
             )
         }
 
@@ -370,7 +406,7 @@ class RecentsBucketViewModelTest {
     fun `test that bucket is reloaded when showHiddenNodes changes from false to true`() =
         runTest {
             val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(
                 flowOf(false, true)
@@ -382,7 +418,8 @@ class RecentsBucketViewModelTest {
             advanceUntilIdle()
 
             verify(getRecentActionBucketByIdUseCase, atLeastOnce()).invoke(
-                id = testIdentifier,
+                id = any(),
+                excludeSensitives = any(),
             )
         }
 
@@ -390,7 +427,7 @@ class RecentsBucketViewModelTest {
     fun `test that monitorNodeUpdates triggers navigateBack when NodeChanges_Remove is received`() =
         runTest {
             val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
             whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
                 .thenReturn(nodeUpdatesFlow)
 
@@ -423,7 +460,7 @@ class RecentsBucketViewModelTest {
             val nodeUiItem1 = createMockNodeUiItem(node1)
             val nodeUiItem2 = createMockNodeUiItem(node2)
 
-            whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
             whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
             whenever(
                 nodeUiItemMapper(
@@ -458,7 +495,7 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that monitorNodeUpdates handles multiple NodeChanges correctly`() = runTest {
         val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
         whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
             .thenReturn(nodeUpdatesFlow)
 
@@ -483,7 +520,7 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that monitorNodeUpdates handles rapid NodeChanges`() = runTest {
         val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
         whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
             .thenReturn(nodeUpdatesFlow)
 
@@ -508,7 +545,7 @@ class RecentsBucketViewModelTest {
 
     @Test
     fun `test that monitorNodeUpdates does not trigger navigateBack for Attributes`() = runTest {
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
         whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
             .thenReturn(flowOf(NodeChanges.Attributes))
 
@@ -525,7 +562,7 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that monitorNodeUpdates does not trigger loadBucket for Remove`() = runTest {
         val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
         whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
             .thenReturn(nodeUpdatesFlow)
 
@@ -548,7 +585,7 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that onNavigateBackEventConsumed consumes the navigate back event`() = runTest {
         val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
         whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
             .thenReturn(nodeUpdatesFlow)
 
@@ -584,7 +621,7 @@ class RecentsBucketViewModelTest {
         val nodeUiItem1 = createMockNodeUiItem(node1)
         val nodeUiItem2 = createMockNodeUiItem(node2)
 
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
         whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
         whenever(
             nodeUiItemMapper(
@@ -630,7 +667,7 @@ class RecentsBucketViewModelTest {
         val nodeUiItem2 = createMockNodeUiItem(node2)
         val nodeUiItem3 = createMockNodeUiItem(node3)
 
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
         whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
         whenever(
             nodeUiItemMapper(
@@ -682,7 +719,7 @@ class RecentsBucketViewModelTest {
         val nodeUiItem1 = createMockNodeUiItem(node1)
         val nodeUiItem2 = createMockNodeUiItem(node2)
 
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
         whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
         whenever(
             nodeUiItemMapper(
@@ -728,7 +765,7 @@ class RecentsBucketViewModelTest {
         val nodeUiItem2 = createMockNodeUiItem(node2, isSelected = true)
         val nodeUiItem3 = createMockNodeUiItem(node3, isSelected = true)
 
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
         whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
         whenever(
             nodeUiItemMapper(
@@ -774,7 +811,7 @@ class RecentsBucketViewModelTest {
         val nodeUiItem1 = createMockNodeUiItem(node1)
         val nodeUiItem2 = createMockNodeUiItem(node2)
 
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
         whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
         whenever(
             nodeUiItemMapper(
@@ -825,7 +862,7 @@ class RecentsBucketViewModelTest {
         val nodeUiItem2 = createMockNodeUiItem(node2)
         val nodeUiItem3 = createMockNodeUiItem(node3)
 
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
         whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
         whenever(
             nodeUiItemMapper(
@@ -873,7 +910,7 @@ class RecentsBucketViewModelTest {
         val nodeUiItem2 = createMockNodeUiItem(node2)
         val nodeUiItem3 = createMockNodeUiItem(node3)
 
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(bucket)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
         whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
         whenever(
             nodeUiItemMapper(
@@ -909,7 +946,7 @@ class RecentsBucketViewModelTest {
 
     @Test
     fun `test that selectAllItems works with empty list`() = runTest {
-        whenever(getRecentActionBucketByIdUseCase(any())).thenReturn(null)
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
 
         initViewModel()
         advanceUntilIdle()
