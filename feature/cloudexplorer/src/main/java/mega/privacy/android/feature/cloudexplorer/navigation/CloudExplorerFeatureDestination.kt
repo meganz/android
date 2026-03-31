@@ -7,7 +7,6 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.toData
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaScreen

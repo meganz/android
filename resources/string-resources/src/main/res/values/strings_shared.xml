@@ -2628,8 +2628,6 @@
     </plurals>
     <!-- Label for any ‘Incoming shares’ button or title -->
     <string name="general_title_incoming_shares">Incoming shares</string>
-    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audios[/A] [B]found[/B]</string>
     <!-- General error for file path or node cannot be resolved -->
     <string name="general_error_file_not_found">This file could not be found</string>
     <!-- PDF viewer error when the file is missing or corrupt while the device has network -->
@@ -2638,8 +2636,16 @@
     <string name="pdf_viewer_error_no_network">No network connection. Please reconnect to open the file.</string>
     <!-- PDF viewer error when streaming or downloading the PDF fails -->
     <string name="pdf_viewer_error_streaming">An error occurred while trying to open the file</string>
+    <!-- Text that indicates that there’s no audio to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_empty_hint_audio">[B]No[/B] [A]audios[/A] [B]found[/B]</string>
     <!-- Title for the open link dialog and bottom sheet action -->
     <string name="open_link_dialog_title">Open link</string>
     <!-- Hint text for the open link input field -->
     <string name="open_link_dialog_hint">Paste link</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

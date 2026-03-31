@@ -1941,7 +1941,7 @@
     <string name="copyright_action_disagree">同意しない</string>
     <string name="general_clear_all">すべてクリア</string>
     <string name="offline_remove_singular_item_success_message">1項目を削除しました</string>
-    <string name="offline_remove_multiple_item_success_message">%d 項目を削除しました</string>
+    <string name="offline_remove_multiple_item_success_message">%d項目を削除しました</string>
     <string name="create_new_album_input_album_name_placeholder">新規アルバム</string>
     <string name="album_send_decryption_key_separately_title">復号キーを別送する</string>
     <string name="album_send_decryption_key_separately_description">リンクと復号キーを別々に出力します。</string>
@@ -1968,9 +1968,9 @@
         <item quantity="other">%1$d項目</item>
     </plurals>
     <string name="section_saved_for_offline_new">オフライン</string>
-    <string name="title_bucket">%1$sとさらに%2$d</string>
-    <string name="create_action_bucket">[A]作成者は[/A]%sさん</string>
-    <string name="update_action_bucket">[A]更新者は[/A]%sさん</string>
+    <string name="title_bucket">%1$sとさらに%2$d件</string>
+    <string name="create_action_bucket">[A]作成者：[/A]%s</string>
+    <string name="update_action_bucket">[A]更新者：[/A]%s</string>
     <string name="label_yesterday">昨日</string>
     <string name="shared_items_verify_credentials_undecrypted_folder">[未復号フォルダ]</string>
     <string name="section_recents">最近</string>
@@ -1996,7 +1996,7 @@
     <string name="pro2_account">Pro II</string>
     <string name="pro3_account">Pro III</string>
     <string name="pro_flexi_account">Pro Flexi</string>
-    <string name="business_label">ビジネス</string>
+    <string name="business_label">Business</string>
     <string name="recovering_info">読み込み中&#8230;</string>
     <string name="section_my_account">私のアカウント</string>
     <string name="storage_usage_format">%2$s 中 %1$s が使用されました</string>
@@ -2050,13 +2050,13 @@
     <string name="offline_screen_remove_from_offline_selection_menu">オフラインから削除</string>
     <string name="offline_item_deletion_confirmation_title">オフラインから削除しますか？</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="other">%d 個のファイル</item>
+        <item quantity="other">%d個のファイル</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
         <item quantity="other">%d個のフォルダ</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">“%1$d個のフォルダ、 “</item>
+        <item quantity="other">「%1$d個のフォルダ」</item>
     </plurals>
     <string name="general_install_label">インストール</string>
     <string name="general_app_update_download_success_message">アプリのアップデートをダウンロードしました</string>
@@ -2074,8 +2074,8 @@
     <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;Iを購入</string>
     <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;IIを購入</string>
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;IIIを購入</string>
-    <string name="subscription_type_monthly">月ごと</string>
-    <string name="subscription_type_yearly">年間</string>
+    <string name="subscription_type_monthly">月払い</string>
+    <string name="subscription_type_yearly">年払い</string>
     <string name="choose_account_screen_only_price_per_month">月額わずか%1$s</string>
     <string name="cu_warning_banner_notification_disabled_warning">アップロードが失敗した場合や同期が停止した場合を知るには、通知をオンにしてください。</string>
     <string name="ssl_error_dialog_secure_connection_failed_title">安全な接続に失敗しました</string>
@@ -2095,7 +2095,7 @@
     <string name="album_import_rename_album_dialog_description">「%1$s」という名前のアルバムは既に存在します。保存するアルバムに新しい名前を入力してください。</string>
     <string name="album_import_rename_album_dialog_empty_name_error">アルバム名を入力してください</string>
     <string name="album_import_saving_dialog_progress_text">保存しています&#8230;</string>
-    <string name="album_import_snackbar_success_message">%1$s をクラウドドライブに保存しました</string>
+    <string name="album_import_snackbar_success_message">%1$sをクラウドドライブに保存しました</string>
     <string name="album_import_snackbar_error_message">%1$sをクラウドドライブに保存できません。後でもう一度お試しください。問題が解決しない場合は、リンクを共有してくれた相手に連絡してください。</string>
     <string name="album_import_storage_exceeded_dialog_title">アルバムを保存できません</string>
     <string name="album_import_storage_exceeded_dialog_description">このアルバムをクラウドドライブに保存するのに十分なストレージがありません。今すぐアップグレードしてストレージを増やしてください。</string>
@@ -2167,7 +2167,7 @@
     </plurals>
     <string name="file_browser_folder_empty">フォルダが空です</string>
     <plurals name="num_of_folders_num_of_files_2">
-        <item quantity="other">%d 個のファイル</item>
+        <item quantity="other">%d個のファイル</item>
     </plurals>
     <string name="label_file_size_bytes">%s&#160;B</string>
     <string name="label_file_size_kilobytes">%s&#160;KB</string>
@@ -2239,4 +2239,17 @@
         <item quantity="other">%d個の項目をごみ箱から復元しました</item>
     </plurals>
     <string name="general_title_incoming_shares">受信共有</string>
+    <string name="general_error_file_not_found">このファイルは見つかりませんでした</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">エラー。PDFファイルが破損しているか、存在しません。</string>
+    <string name="pdf_viewer_error_streaming">ファイルを開く際にエラーが発生しました</string>
+    <string name="pdf_viewer_error_no_network">ネットワーク接続がありません。ファイルを開くには再接続してください。</string>
+    <string name="homepage_empty_hint_audio">[B][A]音声[/A]は見つかりませんでした[/B]</string>
+    <string name="open_link_dialog_title">リンクを開く</string>
+    <string name="open_link_dialog_hint">リンクを貼り付ける</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

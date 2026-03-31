@@ -2037,8 +2037,8 @@
         <item quantity="other">%d Ordner</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d Ordner&#160;·&#160;</item>
-        <item quantity="other">%1$d Ordner&#160;·&#160;</item>
+        <item quantity="one">„%1$d Ordner, “</item>
+        <item quantity="other">„%1$d Ordner, “</item>
     </plurals>
     <string name="general_first_name">Vorname(n)</string>
     <string name="general_last_name">Familienname</string>
@@ -2205,4 +2205,122 @@
         <item quantity="other">%d Dateien</item>
     </plurals>
     <string name="general_title_incoming_shares">An Sie freigegebene Ordner</string>
+    <string name="pdf_viewer_error_no_network">Keine Netzverbindung. Bitte stellen Sie eine Verbindung her, um die Datei öffnen zu können.</string>
+    <string name="search_pdf_placeholder">Dokument durchsuchen</string>
+    <string name="pdf_viewer_search_placeholder">Dokument durchsuchen</string>
+    <string name="folder_link_subtitle">Ordnerlink</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Geben Sie das Passwort ein, um diese Datei zu öffnen</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Falsches Passwort</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Zeile %1$d</string>
+    <string name="select_videos_search_empty_view_description">Finden Sie Videos in Ihrem Cloud Drive</string>
+    <string name="new_text_file_invalid_extension_error_message">Verwenden Sie eine gültige Dateierweiterung (z. B. .txt)</string>
+    <string name="link_decryption_key_dialog_message">Geben Sie den Schlüssel ein, um diesen Link zu öffnen.\nWenn Sie den Schlüssel nicht haben, wenden Sie sich an den Eigentümer des Links.</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="one">%d Ordner,</item>
+        <item quantity="other">%d Ordner,</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="one">Für %d Person freigegeben</item>
+        <item quantity="other">Für %d Personen freigegeben</item>
+    </plurals>
+    <string name="link_password_dialog_message">Geben Sie das Passwort ein, um diesen Link zu öffnen.\nWenn Sie das Passwort nicht kennen, wenden Sie sich an den Eigentümer des Links.</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="one">%d Element konnte nicht verschoben werden</item>
+        <item quantity="other">%d Elemente konnten nicht verschoben werden</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="one">%d Element wurde verschoben</item>
+        <item quantity="other">%d Elemente wurden verschoben</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="one">%d Element wurde verschoben</item>
+        <item quantity="other">%d Elemente wurden verschoben</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="one">%d Element konnte nicht verschoben werden</item>
+        <item quantity="other">%d Elemente konnten nicht verschoben werden</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="one">%d Element in den Papierkorb verschoben</item>
+        <item quantity="other">%d Elemente in den Papierkorb verschoben</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="one">%d Element konnte nicht in den Papierkorb verschoben werden</item>
+        <item quantity="other">%d Elemente konnten nicht in den Papierkorb verschoben werden</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="one">%d Element in den Papierkorb verschoben, 1 Element konnte nicht verschoben werden</item>
+        <item quantity="other">%d Elemente in den Papierkorb verschoben, 1 Element konnte nicht verschoben werden</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="one">1 Element in den Papierkorb verschoben, %d Element konnte nicht verschoben werden</item>
+        <item quantity="other">1 Element in den Papierkorb verschoben, %d Elemente konnten nicht verschoben werden</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d Element aus dem Papierkorb entfernt</item>
+        <item quantity="other">%d Elemente aus dem Papierkorb entfernt</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">%d Element konnte nicht aus dem Papierkorb entfernt werden</item>
+        <item quantity="other">%d Elemente konnten nicht aus dem Papierkorb entfernt werden</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d Element aus dem Papierkorb entfernt</item>
+        <item quantity="other">%d Elemente aus dem Papierkorb entfernt</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">%d Element konnte nicht aus dem Papierkorb entfernt werden</item>
+        <item quantity="other">%d Elemente konnten nicht aus dem Papierkorb entfernt werden</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="one">%d Element konnte nicht kopiert werden</item>
+        <item quantity="other">%d Elemente konnten nicht kopiert werden</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="one">%d Element kopiert</item>
+        <item quantity="other">%d Elemente kopiert</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="one">%d Element kopiert</item>
+        <item quantity="other">%d Elemente kopiert</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="one">%d Element konnte nicht kopiert werden</item>
+        <item quantity="other">%d Elemente konnten nicht kopiert werden</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="one">%d Ordner konnte nicht freigegeben werden</item>
+        <item quantity="other">%d Ordner konnten nicht freigegeben werden</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="one">Ordner %d wurde freigegeben</item>
+        <item quantity="other">Ordner %d wurden freigegeben</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="one">%d Ordner konnte nicht freigegeben werden</item>
+        <item quantity="other">%d Ordner konnten nicht freigegeben werden</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">%d Element konnte nicht aus dem Papierkorb wiederhergestellt werden</item>
+        <item quantity="other">%d Elemente konnten nicht aus dem Papierkorb wiederhergestellt werden</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">%d Element aus dem Papierkorb wiederhergestellt</item>
+        <item quantity="other">%d Elemente aus dem Papierkorb wiederhergestellt</item>
+    </plurals>
+    <string name="general_error_file_not_found">Diese Datei wurde nicht gefunden</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Fehler. Die PDF-Datei ist beschädigt oder nicht vorhanden.</string>
+    <string name="pdf_viewer_error_streaming">Fehler beim Öffnen der Datei</string>
+    <string name="homepage_empty_hint_audio">[B]Keine[/B] [A]Audiodateien[/A] [B]gefunden[/B]</string>
+    <string name="open_link_dialog_hint">Link einfügen</string>
+    <string name="open_link_dialog_title">Link öffnen</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

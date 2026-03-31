@@ -1554,7 +1554,7 @@
         <item quantity="other">Aktarımlar yeniden deniyor, ilerlemeyi Etkin sekmesinde görebilirsiniz</item>
     </plurals>
     <!-- success message when a node was restore from Rubbish bin -->
-    <string name="context_correctly_node_restored">%s geri yüklendi</string>
+    <string name="context_correctly_node_restored">%s konumuna geri yüklendi</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Öğe taşındı</string>
     <!-- error message when a node was restore from Rubbish bin -->
@@ -1640,7 +1640,7 @@
     <!-- success message when moving a node -->
     <string name="node_moved_success_message">Öğe taşındı</string>
     <!-- success message when a node was restore from Rubbish bin to a location -->
-    <string name="node_restored_from_rubbish_bin_to_location">%s geri yüklendi</string>
+    <string name="node_restored_from_rubbish_bin_to_location">%s konumuna geri yüklendi</string>
     <!-- error message when a node failed to be restored from Rubbish bin -->
     <string name="node_restore_error_message">Bir hata oluştu. Öğe geri yüklenemedi.</string>
     <!-- Snackbar message to show when successfully left shared folder(s) along with one or more failures -->
@@ -2118,8 +2118,8 @@
         <item quantity="other">%d klasör</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d klasör&#160;·&#160;</item>
-        <item quantity="other">%1$d klasör&#160;·&#160;</item>
+        <item quantity="one">“%1$d klasör, “</item>
+        <item quantity="other">“%1$d klasör, “</item>
     </plurals>
     <string name="general_install_label">Yükle</string>
     <string name="general_app_update_download_success_message">Uygulama güncellemesi indirildi</string>
@@ -2207,4 +2207,136 @@
         <item quantity="other">%d dosya</item>
     </plurals>
     <string name="general_title_incoming_shares">Gelen paylaşımlar</string>
+    <string name="saf_passcode_lock_enabled_message">MEGA dosyalarınıza göz atmak için MEGA uygulamasından giriş kodu kilidinizi dışı bırakın. Ayarlar’a gidin, ardından Güvenlik öğesine dokunun.</string>
+    <string name="saf_no_internet_message">MEGA dosyalarınıza göz atmak için internete bağlanın. Çevrim dışı kullanım için kaydedilen dosyalar MEGA uygulamasında mevcuttur.</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Starter satın al</string>
+    <string name="upgrade_account_successful_starter_monthly">Aylık Starter aboneliğiniz için teşekkür ederiz</string>
+    <string name="upgrade_account_successful_starter_yearly">Yıllık Starter aboneliğiniz için teşekkür ederiz</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Basic satın al</string>
+    <string name="upgrade_account_successful_basic_monthly">Aylık Basic aboneliğiniz için teşekkür ederiz</string>
+    <string name="upgrade_account_successful_basic_yearly">Yıllık Basic aboneliğiniz için teşekkür ederiz</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Essential satın al</string>
+    <string name="upgrade_account_successful_essential_monthly">Aylık Essential aboneliğiniz için teşekkür ederiz</string>
+    <string name="upgrade_account_successful_essential_yearly">Yıllık Essential aboneliğiniz için teşekkür ederiz</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="one">%d öğe taşınamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="one">%d öğe başarıyla taşındı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="one">%d öğe başarıyla taşındı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="one">%d öğe taşınamadı</item>
+        <item quantity="other">%d öğe taşınamadı</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="one">%d öğe çöpe taşındı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="one">%d öğe çöpe taşınamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="one">%d öğe çöpe taşındı, 1 öğe taşınamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="one">1 öğe çöpe taşındı, %d öğe taşınamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d öğe çöpten kaldırıldı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">%d öğe çöpten kaldırılamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d öğe çöpten kaldırıldı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">%d öğe çöpten kaldırılamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="one">%d öğe kopyalanamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="one">%d öğe başarıyla kopyalandı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="one">%d öğe başarıyla kopyalandı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="one">%d öğe kopyalanamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="one">%d klasör paylaşılamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="one">%d klasör başarıyla paylaşıldı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="one">%d klasör paylaşılamadı</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">%d öğe çöpten geri yüklenemedi</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">%d öğe çöpten geri yüklendi</item>
+        <item quantity="other" />
+    </plurals>
+    <string name="search_pdf_placeholder">Belgede ara</string>
+    <string name="pdf_viewer_search_placeholder">Belgede ara</string>
+    <string name="folder_link_subtitle">Klasör bağlantısı</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Bu dosyayı açmak için şifreyi girin</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Yanlış şifre</string>
+    <string name="text_editor_fast_scroll_line_tooltip">%1$d. satır</string>
+    <string name="select_videos_search_empty_view_description">Bulut depolamanızda video arayın</string>
+    <string name="new_text_file_invalid_extension_error_message">Geçerli bir dosya uzantısı kullanın (örn. .txt)</string>
+    <string name="link_decryption_key_dialog_message">Bu bağlantıyı açmak için anahtarı girin.\nAnahtarınız yok mu? Bağlantı sahibiyle iletişime geçin.</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="one">%d klasör,</item>
+        <item quantity="other" />
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="one">%d kişiyle paylaşıldı</item>
+        <item quantity="other" />
+    </plurals>
+    <string name="link_password_dialog_message">Bu bağlantıyı açmak için şifreyi girin.\nŞifreniz yok mu? Bağlantı sahibiyle iletişime geçin.</string>
+    <string name="pdf_viewer_error_no_network">İnternet bağlantısı yok. Dosyayı açmak için lütfen yeniden bağlanın.</string>
+    <string name="general_error_file_not_found">Bu dosya bulunamadı</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Hata. PDF dosyası bozuk veya mevcut değil.</string>
+    <string name="pdf_viewer_error_streaming">Dosya açılmaya çalışılırken bir hata oluştu</string>
+    <string name="homepage_empty_hint_audio">[B]Hiç[/B] [A]ses[/A] [B]bulunamadı[/B]</string>
+    <string name="open_link_dialog_title">Bağlantıyı aç</string>
+    <string name="open_link_dialog_hint">Bağlantıyı yapıştırın</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

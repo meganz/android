@@ -429,7 +429,7 @@
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">Los siguientes caracteres no están permitidos: %1$s</string>
     <!-- Sync settings section title-->
-    <string name="settings_section_sync">Sincronizar</string>
+    <string name="settings_section_sync">Sincronización</string>
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
     <string name="transfers_scanning_folders_dialog_creating_folders_title">Creando carpetas&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
@@ -2245,4 +2245,144 @@
         <item quantity="other">%d archivos</item>
     </plurals>
     <string name="general_title_incoming_shares">Compartido conmigo</string>
+    <string name="pdf_viewer_error_no_network">Sin conexión. Conéctate para abrir el archivo.</string>
+    <string name="search_pdf_placeholder">Buscar documento</string>
+    <string name="pdf_viewer_search_placeholder">Buscar documento</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Introduce la contraseña para abrir este archivo</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Contraseña incorrecta</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Línea %1$d</string>
+    <string name="select_videos_search_empty_view_description">Busca vídeos en tu Nube</string>
+    <string name="new_text_file_invalid_extension_error_message">Usa una extensión de archivo válida (p. ej., .txt)</string>
+    <string name="link_decryption_key_dialog_message">Introduce la clave para abrir este enlace.\n¿No la tienes? Contacta al propietario del enlace.</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="one">%d carpeta,</item>
+        <item quantity="many">%d carpetas,</item>
+        <item quantity="other">%d carpetas,</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="one">Compartido con %d persona</item>
+        <item quantity="many">Compartido con %d personas</item>
+        <item quantity="other">Compartido con %d personas</item>
+    </plurals>
+    <string name="link_password_dialog_message">Introduce la contraseña para abrir este enlace.\n¿No la tienes? Contacta al propietario del enlace.</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="one">No se ha podido mover %d elemento</item>
+        <item quantity="many">No se han podido mover %d elementos</item>
+        <item quantity="other">No se han podido mover %d elementos</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="one">Se ha movido %d elemento</item>
+        <item quantity="many">Se han movido %d elementos</item>
+        <item quantity="other">Se han movido %d elementos</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="one">Se ha movido %d elemento</item>
+        <item quantity="many">Se han movido %d elementos</item>
+        <item quantity="other">Se han movido %d elementos</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="one">No se ha podido mover %d elemento</item>
+        <item quantity="many">No se han podido mover %d elementos</item>
+        <item quantity="other">No se han podido mover %d elementos</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="one">Se ha movido %d elemento a la papelera</item>
+        <item quantity="many">Se han movido %d elementos a la papelera</item>
+        <item quantity="other">Se han movido %d elementos a la papelera</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="one">No se ha podido mover %d elemento a la papelera</item>
+        <item quantity="many">No se han podido mover %d elementos a la papelera</item>
+        <item quantity="other">No se han podido mover %d elementos a la papelera</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="one">Se ha movido %d elemento a la papelera, 1 no se ha podido mover</item>
+        <item quantity="many">Se han movido %d de elementos a la papelera, 1 no se ha podido mover</item>
+        <item quantity="other">Se han movido %d elementos a la papelera, 1 no se ha podido mover</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="one">Se ha movido 1 elemento a la papelera, %d no se ha podido mover</item>
+        <item quantity="many">Se ha movido 1 elemento a la papelera, %d no se han podido mover</item>
+        <item quantity="other">Se ha movido 1 elemento a la papelera, %d no se han podido mover</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d elemento eliminado de la papelera</item>
+        <item quantity="many">%d de elementos eliminados de la papelera</item>
+        <item quantity="other">%d elementos eliminados de la papelera</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">No se ha podido eliminar %d elemento de la papelera</item>
+        <item quantity="many">No se han podido eliminar %d de elementos de la papelera</item>
+        <item quantity="other">No se han podido eliminar %d elementos de la papelera</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d elemento eliminado de la papelera</item>
+        <item quantity="many">%d de elementos eliminados de la papelera</item>
+        <item quantity="other">%d elementos eliminados de la papelera</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">No se ha podido eliminar %d elemento de la papelera</item>
+        <item quantity="many">No se han podido eliminar %d de elementos de la papelera</item>
+        <item quantity="other">No se han podido eliminar %d elementos de la papelera</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="one">No se ha podido copiar %d elemento</item>
+        <item quantity="many">No se han podido copiar %d de elementos</item>
+        <item quantity="other">No se han podido copiar %d elementos</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="one">Se ha copiado %d elemento</item>
+        <item quantity="many">Se han copiado %d de elementos</item>
+        <item quantity="other">Se han copiado %d elementos</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="one">Se ha copiado %d elemento</item>
+        <item quantity="many">Se han copiado %d de elementos</item>
+        <item quantity="other">Se han copiado %d elementos</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="one">No se ha podido copiar %d elemento</item>
+        <item quantity="many">No se han podido copiar %d de elementos</item>
+        <item quantity="other">No se han podido copiar %d elementos</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="one">No se ha podido compartir %d carpeta</item>
+        <item quantity="many">No se han podido compartir %d de carpetas</item>
+        <item quantity="other">No se han podido compartir %d carpetas</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="one">Se ha compartido %d carpeta</item>
+        <item quantity="many">Se han compartido %d de carpetas</item>
+        <item quantity="other">Se han compartido %d carpetas</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="one">No se ha podido compartir %d carpeta</item>
+        <item quantity="many">No se han podido compartir %d de carpetas</item>
+        <item quantity="other">No se han podido compartir %d carpetas</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">No se ha podido restaurar %d elemento de la papelera</item>
+        <item quantity="many">No se han podido restaurar %d de elementos de la papelera</item>
+        <item quantity="other">No se han podido restaurar %d elementos de la papelera</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">Se ha restaurado %d elemento de la papelera</item>
+        <item quantity="many">Se han restaurado %d de elementos de la papelera</item>
+        <item quantity="other">Se han restaurado %d elementos de la papelera</item>
+    </plurals>
+    <string name="general_error_file_not_found">Archivo no encontrado</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Error. El archivo PDF está dañado o no existe.</string>
+    <string name="pdf_viewer_error_streaming">No se ha podido abrir el archivo</string>
+    <string name="homepage_empty_hint_audio">[B]No[/B] se han [B]encontrado[/B] [A]audios/A]</string>
+    <string name="open_link_dialog_hint">Pegar enlace</string>
+    <string name="open_link_dialog_title">Abrir enlace</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

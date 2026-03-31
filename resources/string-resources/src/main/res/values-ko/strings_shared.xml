@@ -2022,7 +2022,7 @@
         <item quantity="other">폴더 %d개</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">폴더 %1$d개&#160;·&#160;</item>
+        <item quantity="other">“폴더 %1$d개, “</item>
     </plurals>
     <string name="recovering_info">불러오는 중&#8230;</string>
     <string name="storage_usage_format">%2$s 중 %1$s 이용함</string>
@@ -2228,4 +2228,13 @@
     <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
         <item quantity="other">폴더 %d개를 공유하지 못 했습니다</item>
     </plurals>
+    <string name="pdf_viewer_error_no_network">네트워크 연결이 없습니다. 파일을 열려면 다시 연결하세요.</string>
+    <string name="open_link_dialog_title">링크 열기</string>
+    <string name="open_link_dialog_hint">링크 붙여넣기</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

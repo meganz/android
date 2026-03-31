@@ -2112,8 +2112,8 @@
         <item quantity="other">%d mappen</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d map “</item>
-        <item quantity="other">“%1$d mappen “</item>
+        <item quantity="one">“%1$d map, “</item>
+        <item quantity="other">“%1$d mappen, “</item>
     </plurals>
     <string name="search_landing_title">Op zoek naar iets?</string>
     <string name="search_landing_subtitle">Zoek bestanden en mappen</string>
@@ -2323,4 +2323,17 @@
         <item quantity="one">%d item hersteld van prullenbak</item>
         <item quantity="other">%d items hersteld van prullenbak</item>
     </plurals>
+    <string name="pdf_viewer_error_no_network">Geen netwerk verbinding. Verbind opnieuw om het bestand te openen.</string>
+    <string name="open_link_dialog_title">Link openen</string>
+    <string name="open_link_dialog_hint">Link plakken</string>
+    <string name="general_error_file_not_found">Dit bestand kon niet gevonden worden</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Fout. Het PDF bestand is beschadigd of bestaat niet.</string>
+    <string name="pdf_viewer_error_streaming">Een fout heeft opgetreden tijdens het openen van het bestand</string>
+    <string name="homepage_empty_hint_audio">[B]Geen[/B] [A]audio[/A] [B]gevonden[/B]</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

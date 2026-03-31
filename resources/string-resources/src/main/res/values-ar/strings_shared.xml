@@ -2473,4 +2473,186 @@
     </plurals>
     <string name="link_password_dialog_message">أدخل كلمة المرور لفتح هذا الرابط.\nلا تملكها؟ تواصل مع صاحب الرابط.</string>
     <string name="general_title_incoming_shares">مشاركات واردة</string>
+    <string name="pdf_viewer_error_no_network">لا يوجد اتصال شبكة. لا إعادة الاتصال لفتح الملف.</string>
+    <string name="open_link_dialog_hint">لصق رابط</string>
+    <string name="open_link_dialog_title">فتح الرابط</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="zero">فشل نقل %d عنصر</item>
+        <item quantity="one">فشل نقل %d عنصر</item>
+        <item quantity="two">فشل نقل %d عنصرين</item>
+        <item quantity="few">فشل نقل %d عناصر</item>
+        <item quantity="many">فشل نقل %d عنصر</item>
+        <item quantity="other">فشل نقل %d عنصر</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="zero">تم نقل %d عنصر بنجاح</item>
+        <item quantity="one">تم نقل %d عنصر بنجاح</item>
+        <item quantity="two">تم نقل %d عنصرين بنجاح</item>
+        <item quantity="few">تم نقل %d عناصر بنجاح</item>
+        <item quantity="many">تم نقل %d عنصر بنجاح</item>
+        <item quantity="other">تم نقل %d عنصر بنجاح</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="zero">تم نقل %d عنصر بنجاح</item>
+        <item quantity="one">تم نقل %d عنصر بنجاح</item>
+        <item quantity="two">تم نقل %d عنصرين بنجاح</item>
+        <item quantity="few">تم نقل %d عناصر بنجاح</item>
+        <item quantity="many">تم نقل %d عنصر بنجاح</item>
+        <item quantity="other">تم نقل %d عنصر بنجاح</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="zero">فشل نقل %d عنصر</item>
+        <item quantity="one">فشل نقل %d عنصر</item>
+        <item quantity="two">فشل نقل %d عنصرين</item>
+        <item quantity="few">فشل نقل %d عناصر</item>
+        <item quantity="many">فشل نقل %d عنصر</item>
+        <item quantity="other">فشل نقل %d عنصر</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="zero">تم نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="one">تم نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="two">تم نقل %d عنصرين إلى سلة المحذوفات</item>
+        <item quantity="few">تم نقل %d عناصر إلى سلة المحذوفات</item>
+        <item quantity="many">تم نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="other">تم نقل %d عنصر إلى سلة المحذوفات</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="zero">فشل نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="one">فشل نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="two">فشل نقل %d عنصرين إلى سلة المحذوفات</item>
+        <item quantity="few">فشل نقل %d عناصر إلى سلة المحذوفات</item>
+        <item quantity="many">فشل نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="other">فشل نقل %d عنصر إلى سلة المحذوفات</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="zero">تم نقل %d عنصر إلى سلة المحذوفات، فشل 1 عنصر</item>
+        <item quantity="one">تم نقل %d عنصر إلى سلة المحذوفات، فشل 1 عنصر</item>
+        <item quantity="two">تم نقل %d عنصرين إلى سلة المحذوفات، فشل 1 عنصر</item>
+        <item quantity="few">تم نقل %d عناصر إلى سلة المحذوفات، فشل 1 عنصر</item>
+        <item quantity="many">تم نقل %d عنصر إلى سلة المحذوفات، فشل 1 عنصر</item>
+        <item quantity="other">تم نقل %d عنصر إلى سلة المحذوفات، فشل 1 عنصر</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="zero">تم نقل 1 عنصر إلى سلة المحذوفات دون أي فشل</item>
+        <item quantity="one">تم نقل 1 عنصر إلى سلة المحذوفات وفشل نقل عنصر واحد</item>
+        <item quantity="two">تم نقل 1 عنصر إلى سلة المحذوفات وفشل نقل عنصرين</item>
+        <item quantity="few">تم نقل 1 عنصر إلى سلة المحذوفات وفشل نقل %d عناصر</item>
+        <item quantity="many">تم نقل 1 عنصر إلى سلة المحذوفات وفشل نقل %d عنصر</item>
+        <item quantity="other">تم نقل 1 عنصر إلى سلة المحذوفات وفشل نقل %d عنصر</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="zero">لم يتم إزالة أي عنصر من سلة المحذوفات</item>
+        <item quantity="one">تم إزالة عنصر واحد من سلة المحذوفات</item>
+        <item quantity="two">تم إزالة %d عنصرين من سلة المحذوفات</item>
+        <item quantity="few">تم إزالة %d عناصر من سلة المحذوفات</item>
+        <item quantity="many">تم إزالة %d عنصر من سلة المحذوفات</item>
+        <item quantity="other">تم إزالة %d عنصر من سلة المحذوفات</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="zero">لم يتعذّر إزالة أي عنصر من سلة المحذوفات</item>
+        <item quantity="one">تعذّر إزالة عنصر واحد من سلة المحذوفات</item>
+        <item quantity="two">تعذّر إزالة %d عنصرين من سلة المحذوفات</item>
+        <item quantity="few">تعذّر إزالة %d عناصر من سلة المحذوفات</item>
+        <item quantity="many">تعذّر إزالة %d عنصر من سلة المحذوفات</item>
+        <item quantity="other">تعذّر إزالة %d عنصر من سلة المحذوفات</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="zero">لم يتم إزالة أي عنصر من سلة المحذوفات</item>
+        <item quantity="one">تمت إزالة عنصر واحد من سلة المحذوفات</item>
+        <item quantity="two">تمت إزالة %d عنصرين من سلة المحذوفات</item>
+        <item quantity="few">تمت إزالة %d عناصر من سلة المحذوفات</item>
+        <item quantity="many">تمت إزالة %d عنصر من سلة المحذوفات</item>
+        <item quantity="other">تمت إزالة %d عنصر من سلة المحذوفات</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="zero">لم يتعذّر إزالة أي عنصر من سلة المحذوفات</item>
+        <item quantity="one">تعذّر إزالة %d عنصر من سلة المحذوفات</item>
+        <item quantity="two">تعذّر إزالة %d عنصرين من سلة المحذوفات</item>
+        <item quantity="few">تعذّر إزالة %d عناصر من سلة المحذوفات</item>
+        <item quantity="many">تعذّر إزالة %d عنصر من سلة المحذوفات</item>
+        <item quantity="other">تعذّر إزالة %d عنصر من سلة المحذوفات</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="zero">لم يفشل نسخ أي عنصر</item>
+        <item quantity="one">فشل في نسخ %d عنصر</item>
+        <item quantity="two">فشل في نسخ %d عنصرين</item>
+        <item quantity="few">فشل في نسخ %d عناصر</item>
+        <item quantity="many">فشل في نسخ %d عنصر</item>
+        <item quantity="other">فشل في نسخ %d عنصر</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="zero">لم يتم نسخ أي عنصر بنجاح</item>
+        <item quantity="one">تم نسخ %d عنصر بنجاح</item>
+        <item quantity="two">تم نسخ %d عنصرين بنجاح</item>
+        <item quantity="few">تم نسخ %d عناصر بنجاح</item>
+        <item quantity="many">تم نسخ %d عنصر بنجاح</item>
+        <item quantity="other">تم نسخ %d عنصر بنجاح</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="zero">لم يتم نسخ أي عنصر بنجاح</item>
+        <item quantity="one">تم نسخ %d عنصر بنجاح</item>
+        <item quantity="two">تم نسخ %d عنصرين بنجاح</item>
+        <item quantity="few">تم نسخ %d عناصر بنجاح</item>
+        <item quantity="many">تم نسخ %d عنصر بنجاح</item>
+        <item quantity="other">تم نسخ %d عنصر بنجاح</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="zero">لم يفشل نسخ أي عنصر</item>
+        <item quantity="one">فشل نسخ %d عنصر</item>
+        <item quantity="two">فشل نسخ %d عنصرين</item>
+        <item quantity="few">فشل نسخ %d عناصر</item>
+        <item quantity="many">فشل نسخ %d عنصر</item>
+        <item quantity="other">فشل نسخ %d عنصر</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="zero">لم تفشل مشاركة أي مجلد</item>
+        <item quantity="one">فشل مشاركة %d مجلد</item>
+        <item quantity="two">فشل مشاركة %d مجلدين</item>
+        <item quantity="few">فشل مشاركة %d مجلدات</item>
+        <item quantity="many">فشل مشاركة %d مجلد</item>
+        <item quantity="other">فشل مشاركة %d مجلد</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="zero">لم تمت مشاركة أي مجلد بنجاح</item>
+        <item quantity="one">تمت مشاركة %d مجلد بنجاح</item>
+        <item quantity="two">تمت مشاركة %d مجلدين بنجاح</item>
+        <item quantity="few">تمت مشاركة %d مجلدات بنجاح</item>
+        <item quantity="many">تمت مشاركة %d مجلد بنجاح</item>
+        <item quantity="other">تمت مشاركة %d مجلد بنجاح</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="zero">لم تفشل مشاركة أي مجلد</item>
+        <item quantity="one">فشل مشاركة %d مجلد</item>
+        <item quantity="two">فشل مشاركة %d مجلدين</item>
+        <item quantity="few">فشل مشاركة %d مجلدات</item>
+        <item quantity="many">فشل مشاركة %d مجلد</item>
+        <item quantity="other">فشل مشاركة %d مجلد</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="zero">لم تفشل استعادة أي عنصر من سلة المحذوفات</item>
+        <item quantity="one">فشل استعادة %d عنصر من سلة المحذوفات</item>
+        <item quantity="two">فشل استعادة %d عنصرين من سلة المحذوفات</item>
+        <item quantity="few">فشل استعادة %d عناصر من سلة المحذوفات</item>
+        <item quantity="many">فشل استعادة %d عنصر من سلة المحذوفات</item>
+        <item quantity="other">فشل استعادة %d عنصر من سلة المحذوفات</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="zero">لم يتم استعادة أي عنصر من سلة المحذوفات</item>
+        <item quantity="one">تم استعادة %d عنصر من سلة المحذوفات</item>
+        <item quantity="two">تم استعادة %d عنصرين من سلة المحذوفات</item>
+        <item quantity="few">تم استعادة %d عناصر من سلة المحذوفات</item>
+        <item quantity="many">تم استعادة %d عنصر من سلة المحذوفات</item>
+        <item quantity="other">تم استعادة %d عنصر من سلة المحذوفات</item>
+    </plurals>
+    <string name="general_error_file_not_found">لم يتم العثور على هذا الملف</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">خطأ. ملف الـ PDF تالف أو غير موجود.</string>
+    <string name="pdf_viewer_error_streaming">حدث خطأ أثناء محاولة فتح الملف</string>
+    <string name="homepage_empty_hint_audio">[B]لم[/B] [B]يتم العثور على أي[/B] [A]ملفات صوتية[/A]</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

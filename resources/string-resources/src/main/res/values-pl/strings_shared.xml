@@ -2237,7 +2237,7 @@
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="one">“%1$d folder, “</item>
-        <item quantity="few">“%1$d folderów, “</item>
+        <item quantity="few">“%1$d foldery, “</item>
         <item quantity="many">“%1$d foldery, “</item>
         <item quantity="other">“%1$d foldery, “</item>
     </plurals>
@@ -2494,4 +2494,16 @@
         <item quantity="many">%d elementy przywrócone z kosza</item>
         <item quantity="other">%d elementy przywrócone z kosza</item>
     </plurals>
+    <string name="pdf_viewer_error_no_network">Brak połączenia z siecią. Proszę połączyć się ponownie, aby otworzyć plik.</string>
+    <string name="open_link_dialog_title">Otwórz link</string>
+    <string name="open_link_dialog_hint">Wklej link</string>
+    <string name="general_error_file_not_found">Nie można odnaleźć tego pliku</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Błąd. Plik PDF jest uszkodzony lub nie istnieje.</string>
+    <string name="pdf_viewer_error_streaming">Wystąpił błąd podczas próby otwierania pliku</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

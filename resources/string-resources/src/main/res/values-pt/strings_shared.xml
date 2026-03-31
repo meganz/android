@@ -2171,9 +2171,9 @@
         <item quantity="other">%d pastas</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d pasta&#160;·&#160;</item>
-        <item quantity="many">%1$d de pastas&#160;·&#160;</item>
-        <item quantity="other">%1$d pastas&#160;·&#160;</item>
+        <item quantity="one">%1$d pasta,</item>
+        <item quantity="many">%1$d de pastas,</item>
+        <item quantity="other">%1$d pastas,</item>
     </plurals>
     <string name="search_landing_title">Procurando alguma coisa?</string>
     <string name="search_landing_subtitle">Pesquisar arquivos e pastas</string>
@@ -2378,4 +2378,47 @@
         <item quantity="many">Não foi possível compartilhar %d de pastas</item>
         <item quantity="other">Não foi possível compartilhar %d pastas</item>
     </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d item eliminado da Lixeira</item>
+        <item quantity="many">%d de itens foram eliminados da Lixeira</item>
+        <item quantity="other">%d itens foram eliminados da Lixeira</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">Não foi possível eliminar %d item da Lixeira</item>
+        <item quantity="many">Não foi possível eliminar %d de itens da Lixeira</item>
+        <item quantity="other">Não foi possível eliminar %d itens da Lixeira</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d item foi eliminado da Lixeira</item>
+        <item quantity="many">%d de itens foram eliminados da Lixeira</item>
+        <item quantity="other">%d itens foram eliminados da Lixeira</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">Não foi possível eliminar %d item da Lixeira</item>
+        <item quantity="many">Não foi possível eliminar %d de itens da Lixeira</item>
+        <item quantity="other">Não foi possível eliminar %d itens da Lixeira</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">Não foi possível restaurar %d item da Lixeira</item>
+        <item quantity="many">Não foi possível restaurar %d de itens da Lixeira</item>
+        <item quantity="other">Não foi possível restaurar %d itens da Lixeira</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">%d item foi restaurado da Lixeira</item>
+        <item quantity="many">%d de itens foram restaurados da Lixeira</item>
+        <item quantity="other">%d itens foram restaurados da Lixeira</item>
+    </plurals>
+    <string name="pdf_viewer_error_no_network">Não há conexão de rede. Conecte-se novamente para abrir o arquivo.</string>
+    <string name="general_error_file_not_found">Não foi possível encontrar este arquivo</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Erro. O arquivo PDF está corrompido ou não existe.</string>
+    <string name="open_link_dialog_title">Abrir link</string>
+    <string name="open_link_dialog_hint">Colar link</string>
+    <string name="pdf_viewer_error_streaming">Ocorreu um erro ao tentar abrir o arquivo</string>
+    <string name="homepage_empty_hint_audio">[B]Nenhum[/B] [A]áudio[/A] [B]foi encontrado[/B]</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

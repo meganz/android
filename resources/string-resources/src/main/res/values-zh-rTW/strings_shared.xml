@@ -419,7 +419,7 @@
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">開始傳輸⋯</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
-    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">請不要關閉應用程式。如果關閉，未排入佇列的傳輸將遺失。</string>
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">請勿關閉應用程式。若關閉，未排入佇列的傳輸將遺失。</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="other">%1$d個資料夾</item>
@@ -445,9 +445,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">正在取消傳輸⋯</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">查詢必須至少有30個字元</string>
+    <string name="report_issue_error_minimum_characters">查詢內容至少須為30個字元</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">描述該問題，字數不少於30個字</string>
+    <string name="report_issue_description_placeholder_message">問題描述不得少於30個字元（15個中文字）</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">保持對話私密</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -1421,7 +1421,7 @@
     <!-- success message when renaming a node -->
     <string name="context_correctly_renamed">已重新命名項目</string>
     <!-- Homepage section. -->
-    <string name="general_section_home">首頁</string>
+    <string name="general_section_home">主畫面</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
         <item quantity="other">刪除某些連結失敗。請稍後再試。</item>
@@ -1845,7 +1845,7 @@
     <string name="payment_ads_free_intro_title">想要無廣告的MEGA嗎？</string>
     <string name="payment_ads_free_intro_description">升級到具有更多儲存空間和功能的Pro方案。我們的Pro方案每月僅%1$s起。</string>
     <plurals name="remove_links_warning_text">
-        <item quantity="other">連結將不再公開。</item>
+        <item quantity="other">連結將不再開放存取。</item>
     </plurals>
     <plurals name="alert_remove_several_shares">
         <item quantity="other">取消共享%1$d個資料夾？</item>
@@ -1930,10 +1930,10 @@
     <string name="offline_remove_singular_item_success_message">已移除1個項目</string>
     <string name="offline_remove_multiple_item_success_message">已移除%d個項目</string>
     <string name="create_new_album_input_album_name_placeholder">新相簿</string>
-    <string name="timeline_tab_cu_permission_warning_banner_description">為了確保我們不會遺失您的所有美好回憶，MEGA需要您的相簿完整存取權限。</string>
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">電池電量過低。請為裝置充電以開始上傳照片。</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">為了確保不遺失您的所有美好回憶，MEGA需要您相簿的完整存取權限。</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">電量不足。請為裝置充電以啟動相機上傳。</string>
     <string name="media_main_screen_camera_uploads_updated">已更新相機上傳</string>
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">相機上傳內容已是最新的</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">相機上傳已是最新狀態</string>
     <string name="camera_uploads_progress_screen_label_transfer_over_quota">已超出傳輸配額</string>
     <string name="camera_uploads_progress_screen_label_storage_over_quota">已超出儲存配額</string>
     <string name="camera_uploads_progress_screen_label_transfer_paused">已暫停</string>
@@ -1951,8 +1951,8 @@
     <string name="album_get_link_copy_link_action">複製連結</string>
     <string name="album_get_link_copy_key_action">複製金鑰</string>
     <string name="album_get_link_copy_key_success_message">金鑰已複製到剪貼簿</string>
-    <string name="album_get_link_share_link_dialog_title">同時共享解密金鑰？</string>
-    <string name="album_get_link_share_link_dialog_description">解密金鑰已匯出並將與連結一起共享。</string>
+    <string name="album_get_link_share_link_dialog_title">是否一併共享解密金鑰？</string>
+    <string name="album_get_link_share_link_dialog_description">解密金鑰已匯出，並將隨連結一併共享。</string>
     <string name="album_get_link_share_link_dialog_share_action_only_link">僅共享連結</string>
     <string name="album_get_link_share_link_dialog_share_action_link_key">共享連結和金鑰</string>
     <string name="album_get_link_share_link_with_key">連結：%1$s\n\n金鑰：%2$s</string>
@@ -2159,4 +2159,96 @@
         <item quantity="other">%d個檔案</item>
     </plurals>
     <string name="general_title_incoming_shares">傳入的共享</string>
+    <string name="pdf_viewer_error_no_network">沒有網路連線。請重新連線來開啟檔案。</string>
+    <string name="pdf_viewer_dialog_text_enter_password">輸入密碼以開啟檔案</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">密碼錯誤</string>
+    <string name="text_editor_fast_scroll_line_tooltip">第%1$d行</string>
+    <string name="select_videos_search_empty_view_description">搜尋雲端硬碟中的影片</string>
+    <string name="new_text_file_invalid_extension_error_message">請輸入正確的副檔名（例如 .txt）</string>
+    <string name="link_decryption_key_dialog_message">請輸入金鑰以開啟連結。\n若無金鑰，請聯繫連結擁有者。</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="other">%d個資料夾</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="other">已與%d個人共享</item>
+    </plurals>
+    <string name="link_password_dialog_message">輸入密碼以開啟此連結。\n若無密碼，請聯繫連結擁有者。</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="other">無法移動%d個項目</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="other">%d個項目已移動成功</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="other">%d個項目已移動成功</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="other">無法移動%d個項目</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="other">%d個項目已移到垃圾筒</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="other">無法將%d個項目移到垃圾筒</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="other">%d個項目已移到垃圾筒，1個失敗</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="other">1個項目已移到垃圾筒，%d個失敗</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="other">已從垃圾筒移除%d個項目</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="other">無法從垃圾筒移除%d個項目</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="other">已從垃圾筒移除%d個項目</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="other">無法從垃圾筒移除%d個項目</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="other">無法複製%d個項目</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="other">已成功複製%d個項目</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="other">已成功複製%d個項目</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="other">無法複製%d個項目</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="other">無法共享%d個資料夾</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="other">已成功共享%d個資料夾</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="other">無法共享%d個資料夾</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="other">%d個項目無法從垃圾筒還原</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="other">已從垃圾筒還原%d個項目</item>
+    </plurals>
+    <string name="general_error_file_not_found">找不到此檔案</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">錯誤。PDF檔案已損毀或不存在。</string>
+    <string name="pdf_viewer_error_streaming">嘗試開啟檔案時發生錯誤</string>
+    <string name="open_link_dialog_title">開啟連結</string>
+    <string name="open_link_dialog_hint">貼上連結</string>
+    <string name="homepage_empty_hint_audio">[B]找不到[/B][A]音訊檔案[/A]</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
+    <string name="cloud_explorer_select_destination_title">Select destination</string>
+    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
+    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
+    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
+    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>
