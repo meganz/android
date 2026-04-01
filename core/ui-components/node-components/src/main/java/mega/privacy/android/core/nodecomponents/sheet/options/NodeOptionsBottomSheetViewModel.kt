@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -23,8 +23,11 @@ import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -49,6 +52,8 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicNodeByIdUseCase: GetPublicNodeByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
+    private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
+    private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
 ) : ViewModel() {
@@ -103,10 +108,25 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                 }
             val typedNode = node.await()
             val permission = accessPermission.await()
-            typedNode?.let {
+
+            // Fallback for offline nodes when cloud node has been deleted
+            val effectiveNode =
+                typedNode ?: nodeSourceType.takeIf { it == NodeSourceType.OFFLINE }?.let {
+                    runCatching { getOfflineFileInformationByIdUseCase(NodeId(nodeId)) }
+                        .onFailure {
+                            Timber.e(
+                                it,
+                                "Failed to load offline file information for nodeId=$nodeId"
+                            )
+                        }
+                        .getOrNull()
+                        ?.let(offlineTypedNodeMapper::invoke)
+            }
+
+            effectiveNode?.let {
                 val bottomSheetItems = nodeBottomSheetActionMapper(
                     toolbarOptions = bottomSheetOptions,
-                    selectedNode = typedNode,
+                    selectedNode = effectiveNode,
                     isNodeInRubbish = isNodeInRubbish,
                     accessPermission = permission,
                     isInBackUps = isInBackUps.await(),
@@ -119,7 +139,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                         list.sortedBy { it.orderInGroup }.toList()
                     }
                     .values.toList()
-                val nodeUiItem = nodeUiItemMapper(listOf(typedNode)).firstOrNull()
+                val nodeUiItem = nodeUiItemMapper(listOf(effectiveNode)).firstOrNull()
 
                 uiState.update {
                     it.copy(

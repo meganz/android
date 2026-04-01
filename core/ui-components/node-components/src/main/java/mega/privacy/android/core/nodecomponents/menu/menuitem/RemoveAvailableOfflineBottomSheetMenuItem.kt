@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.model.OfflineTypedNode
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -24,7 +25,7 @@ class RemoveAvailableOfflineBottomSheetMenuItem @Inject constructor(
     ) = node.isAvailableOffline &&
             isNodeInRubbish.not() &&
             node.isTakenDown.not() &&
-            isFolderEmptyUseCase(node).not()
+            (node is OfflineTypedNode || isFolderEmptyUseCase(node).not())
 
     override val groupId = 6
 }

@@ -1,11 +1,12 @@
 package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
-import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
@@ -25,10 +26,21 @@ class ShareBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         isConnected: Boolean,
         nodeSourceType: NodeSourceType,
-    ) = node.isTakenDown.not()
-            && accessPermission == AccessPermission.OWNER
-            && isNodeInRubbish.not()
-            && node.isNotS4Container() && node.isNodeKeyDecrypted
+    ): Boolean {
+        // For offline nodes, show share if:
+        // - Files: always (share local file)
+        // - Folders: only if online (need to export link)
+        if (nodeSourceType == NodeSourceType.OFFLINE) {
+            return node.isTakenDown.not() &&
+                    (node !is TypedFolderNode || isConnected)
+        }
+
+        // For cloud nodes, require owner permission
+        return node.isTakenDown.not()
+                && accessPermission == AccessPermission.OWNER
+                && isNodeInRubbish.not()
+                && node.isNotS4Container() && node.isNodeKeyDecrypted
+    }
 
     override fun getOnClickFunction(
         node: TypedNode,

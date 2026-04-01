@@ -49,6 +49,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.ViewInFolder
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToPlaylistMenuAction
@@ -96,14 +97,17 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
@@ -154,6 +158,11 @@ class NodeActionClickHandlerTest {
     private val mockGetLocalFilePathUseCase = mock<GetLocalFilePathUseCase>()
     private val mockExportNodeUseCase = mock<ExportNodeUseCase>()
     private val mockGetNodeShareDataUseCase = mock<GetNodeShareDataUseCase>()
+    private val mockGetOfflineNodeInformationByNodeIdUseCase =
+        mock<GetOfflineNodeInformationByNodeIdUseCase>()
+    private val mockGetOfflineFileUseCase = mock<GetOfflineFileUseCase>()
+    private val mockNodeShareContentUrisIntentMapper = mock<NodeShareContentUrisIntentMapper>()
+    private val mockMonitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val mockUpdateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
     private val mockUpdateNodeFavoriteUseCase = mock<UpdateNodeFavoriteUseCase>()
 
@@ -1062,7 +1071,10 @@ class NodeActionClickHandlerTest {
         val action = ShareActionClickHandler(
             mockGetLocalFilePathUseCase,
             mockExportNodeUseCase,
-            mockGetFileUriUseCase
+            mockGetOfflineNodeInformationByNodeIdUseCase,
+            mockGetOfflineFileUseCase,
+            mockNodeShareContentUrisIntentMapper,
+            mockMonitorConnectivityUseCase
         )
         val menuAction = mock<ShareMenuAction>()
 
@@ -1074,7 +1086,10 @@ class NodeActionClickHandlerTest {
         val action = ShareActionClickHandler(
             mockGetLocalFilePathUseCase,
             mockExportNodeUseCase,
-            mockGetFileUriUseCase
+            mockGetOfflineNodeInformationByNodeIdUseCase,
+            mockGetOfflineFileUseCase,
+            mockNodeShareContentUrisIntentMapper,
+            mockMonitorConnectivityUseCase
         )
         val menuAction = mock<ShareMenuAction>()
 
@@ -1438,7 +1453,10 @@ class NodeActionClickHandlerTest {
             val action = ShareActionClickHandler(
                 mockGetLocalFilePathUseCase,
                 mockExportNodeUseCase,
-                mockGetFileUriUseCase
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
             )
             val menuAction = mock<ShareMenuAction>()
             val nodes = listOf(mockFileNode, mockFolderNode)
@@ -1507,7 +1525,10 @@ class NodeActionClickHandlerTest {
             ShareActionClickHandler(
                 mockGetLocalFilePathUseCase,
                 mockExportNodeUseCase,
-                mockGetFileUriUseCase
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(RemoveShareActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()

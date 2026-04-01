@@ -21,6 +21,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Mana
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.MoveSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveFromFavouritesSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveLinkSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveOfflineSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RenameSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RestoreSelectionMenuItem
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
+import mega.privacy.android.domain.qualifier.features.Offline
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.qualifier.features.Timeline
@@ -231,6 +233,23 @@ abstract class NodeSelectionModeModule {
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             downloadSelectionMenuItem,
             saveToMegaSelectionMenuItem,
+        )
+
+        /**
+         * Provide offline selection mode options
+         */
+        @Provides
+        @ElementsIntoSet
+        @Offline
+        @Singleton
+        fun provideOfflineToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            shareSelectionMenuItem: ShareSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            shareSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
     }
 }

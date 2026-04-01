@@ -6,10 +6,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -22,8 +21,11 @@ import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -48,6 +50,8 @@ class NodeOptionsBottomSheetViewModelTest {
     private val nodeBottomSheetActionMapper = mock<NodeBottomSheetActionMapper>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase = mock()
+    private val getOfflineFileInformationByIdUseCase = mock<GetOfflineFileInformationByIdUseCase>()
+    private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
 
     private val sampleFileNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
@@ -73,6 +77,8 @@ class NodeOptionsBottomSheetViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getPublicNodeByIdUseCase = getPublicNodeByIdUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
+            offlineTypedNodeMapper = offlineTypedNodeMapper,
+            getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
             snackbarEventQueue = snackbarEventQueue,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,

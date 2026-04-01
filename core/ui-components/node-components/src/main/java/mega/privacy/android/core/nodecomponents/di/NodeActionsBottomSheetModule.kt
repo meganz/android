@@ -50,6 +50,7 @@ import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
+import mega.privacy.android.domain.qualifier.features.Offline
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.qualifier.features.VideoPlaylist
@@ -361,6 +362,29 @@ abstract class NodeActionsBottomSheetModule {
             return setOf(
                 saveToMegaBottomSheetMenuItem,
                 downloadMenuAction,
+            )
+        }
+
+        /**
+         * Provide offline bottom sheet options
+         */
+        @Provides
+        @ElementsIntoSet
+        @Offline
+        @Singleton
+        fun provideOfflineBottomSheetOptions(
+            infoMenuAction: InfoBottomSheetMenuItem,
+            openWithMenuAction: OpenWithBottomSheetMenuItem,
+            shareMenuAction: ShareBottomSheetMenuItem,
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
+            return setOf(
+                infoMenuAction,
+                openWithMenuAction,
+                shareMenuAction,
+                downloadMenuAction,
+                removeOfflineMenuAction,
             )
         }
     }

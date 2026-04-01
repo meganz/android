@@ -12,6 +12,7 @@ import mega.privacy.android.core.nodecomponents.menu.provider.FolderLinkMenuOpti
 import mega.privacy.android.core.nodecomponents.menu.provider.IncomingSharesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.LinksMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.NodeMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.OfflineMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.OutgoingSharesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.RecentsBucketMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.RubbishBinMenuOptionsProvider
@@ -112,5 +113,11 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindFolderLinkOptionsProvider(
         provider: FolderLinkMenuOptionsProvider
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindOfflineOptionsProvider(
+        provider: OfflineMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 }

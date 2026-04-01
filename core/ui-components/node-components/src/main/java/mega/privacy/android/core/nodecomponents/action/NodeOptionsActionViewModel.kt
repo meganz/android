@@ -90,11 +90,11 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicL
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.R as NodesR
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
@@ -165,6 +165,11 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     @ApplicationContext private val applicationContext: Context,
     @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
+
+    /**
+     * Get the node source type for this view model
+     */
+    internal fun getNodeSourceType(): NodeSourceType? = nodeSourceType
 
     val uiState: StateFlow<NodeActionState>
         field: MutableStateFlow<NodeActionState> = MutableStateFlow(NodeActionState())
