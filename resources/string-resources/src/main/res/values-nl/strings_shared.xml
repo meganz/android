@@ -2330,10 +2330,4 @@
     <string name="pdf_viewer_error_corrupt_or_missing">Fout. Het PDF bestand is beschadigd of bestaat niet.</string>
     <string name="pdf_viewer_error_streaming">Een fout heeft opgetreden tijdens het openen van het bestand</string>
     <string name="homepage_empty_hint_audio">[B]Geen[/B] [A]audio[/A] [B]gevonden[/B]</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
-    <string name="cloud_explorer_select_destination_title">Select destination</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
-    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
-    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
-    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

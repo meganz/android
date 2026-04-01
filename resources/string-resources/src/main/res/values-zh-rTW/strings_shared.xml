@@ -2245,10 +2245,4 @@
     <string name="open_link_dialog_title">開啟連結</string>
     <string name="open_link_dialog_hint">貼上連結</string>
     <string name="homepage_empty_hint_audio">[B]找不到[/B][A]音訊檔案[/A]</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
-    <string name="cloud_explorer_select_destination_title">Select destination</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
-    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
-    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
-    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

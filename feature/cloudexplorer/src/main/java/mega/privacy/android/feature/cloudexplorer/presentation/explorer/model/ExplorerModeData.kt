@@ -15,7 +15,8 @@ sealed class ExplorerModeData(
     sealed class Upload : ExplorerModeData(
         isFolderPicker = true,
         actionStringId = sharedR.string.general_upload_label,
-        titleStringId = sharedR.string.cloud_explorer_select_destination_title,
+        //Update with new string "Select destination"
+        titleStringId = sharedR.string.general_select_folder,
         isIncomingAvailable = true,
         isChatAvailable = true,
     )
@@ -39,7 +40,8 @@ sealed class ExplorerModeData(
     data object Move : ExplorerModeData(
         isFolderPicker = true,
         actionStringId = sharedR.string.general_move,
-        titleStringId = sharedR.string.cloud_explorer_select_destination_title,
+        //Update with new string "Select destination"
+        titleStringId = sharedR.string.general_select_folder,
         isIncomingAvailable = true,
         isChatAvailable = false,
     )
@@ -47,15 +49,18 @@ sealed class ExplorerModeData(
     data object Copy : ExplorerModeData(
         isFolderPicker = true,
         actionStringId = sharedR.string.general_copy,
-        titleStringId = sharedR.string.cloud_explorer_select_destination_title,
+        //Update with new string "Select destination"
+        titleStringId = sharedR.string.general_select_folder,
         isIncomingAvailable = true,
         isChatAvailable = false,
     )
 
     data object SelectCUFolder : ExplorerModeData(
         isFolderPicker = true,
-        actionStringId = sharedR.string.cloud_explorer_use_this_folder_button,
-        titleStringId = sharedR.string.cloud_explorer_choose_folder_title,
+        //Update with new string "Use this folder"
+        actionStringId = sharedR.string.general_select,
+        //Update with new string "Choose folder"
+        titleStringId = sharedR.string.general_select_folder,
         isIncomingAvailable = true,
         isChatAvailable = false,
     )
@@ -63,7 +68,8 @@ sealed class ExplorerModeData(
     data object Import : ExplorerModeData(
         isFolderPicker = true,
         actionStringId = sharedR.string.general_action_save,
-        titleStringId = sharedR.string.cloud_explorer_select_destination_title,
+        //Update with new string "Select destination"
+        titleStringId = sharedR.string.general_select_folder,
         isIncomingAvailable = true,
         isChatAvailable = false,
     )
@@ -71,7 +77,8 @@ sealed class ExplorerModeData(
     data object AlbumImport : ExplorerModeData(
         isFolderPicker = true,
         actionStringId = sharedR.string.general_action_save,
-        titleStringId = sharedR.string.cloud_explorer_select_destination_title,
+        //Update with new string "Select destination"
+        titleStringId = sharedR.string.general_select_folder,
         isIncomingAvailable = false,
         isChatAvailable = false,
     )

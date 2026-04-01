@@ -2167,9 +2167,9 @@
         <item quantity="other">%d dossiers</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d dossier, “</item>
-        <item quantity="many">“%1$d dossiers, “</item>
-        <item quantity="other">“%1$d dossiers, “</item>
+        <item quantity="one">“«&#160;%1$d dossier,  »“</item>
+        <item quantity="many">“«&#160;%1$d dossiers,  »“</item>
+        <item quantity="other">“«&#160;%1$d dossiers,  »“</item>
     </plurals>
     <string name="general_first_name">Prénom</string>
     <string name="general_last_name">Nom</string>
@@ -2403,10 +2403,8 @@
     <string name="pdf_viewer_error_no_network">Il n’y a pas de connexion réseau. Veuillez vous reconnecter pour ouvrir le fichier.</string>
     <string name="open_link_dialog_hint">Copiez le lien</string>
     <string name="open_link_dialog_title">Ouvrir un lien</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
-    <string name="cloud_explorer_select_destination_title">Select destination</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
-    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
-    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
-    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
+    <string name="general_error_file_not_found">Ce fichier n\’a pas pu être trouvé</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Erreur. Le fichier PDF est corrompu ou n’existe pas.</string>
+    <string name="pdf_viewer_error_streaming">Une erreur est survenue lors de l\’ouverture du fichier</string>
+    <string name="homepage_empty_hint_audio">[B]Aucun[/B] [A]fichier audio[/A] [B]trouvé[/B]</string>
 </resources>

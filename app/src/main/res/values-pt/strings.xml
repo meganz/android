@@ -453,7 +453,7 @@
     <!-- Settings preference title for offline files -->
     <string name="settings_advanced_features_offline">Deletar arquivos offline</string>
     <!-- Settings preference title for delete account -->
-    <string name="settings_delete_account">Deletar conta</string>
+    <string name="settings_delete_account">Excluir conta</string>
     <!-- Size of files in offline or cache folders -->
     <string name="settings_advanced_features_size">Atualmente usando %s</string>
     <!-- Calculating Size of files in offline or cache folders -->
@@ -1645,7 +1645,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
     <string name="verify_2fa_subtitle_change_email">Alterar email</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
-    <string name="verify_2fa_subtitle_delete_account">Deletar conta</string>
+    <string name="verify_2fa_subtitle_delete_account">Excluir conta</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Desativar</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -3467,7 +3467,7 @@
         <item quantity="other">%1$d itens foram eliminados de “%2$s”</item>
     </plurals>
     <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">Reunião única</string>
+    <string name="meetings_list_one_off_meeting_label">Reunião pontual</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Retomar o vídeo?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->

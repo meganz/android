@@ -2379,10 +2379,4 @@
     <string name="homepage_empty_hint_audio">[B]No[/B] se han [B]encontrado[/B] [A]audios/A]</string>
     <string name="open_link_dialog_hint">Pegar enlace</string>
     <string name="open_link_dialog_title">Abrir enlace</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
-    <string name="cloud_explorer_select_destination_title">Select destination</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
-    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
-    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
-    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
 </resources>

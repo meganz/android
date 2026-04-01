@@ -91,7 +91,7 @@ tasks.register("clean", Delete::class) {
 
 // Define versions in a single place
 // App
-extra["appVersion"] = "16.2"
+extra["appVersion"] = "16.3"
 
 // Sdk and tools
 extra["compileSdkVersion"] = 36
@@ -101,7 +101,7 @@ extra["targetSdkVersion"] = 36
 extra["buildTools"] = "36.0.0"
 
 // Prebuilt MEGA SDK version
-extra["megaSdkVersion"] = "20260331.055938-dev"
+extra["megaSdkVersion"] = "20260401.134858-rel"
 
 
 //JDK and Java Version

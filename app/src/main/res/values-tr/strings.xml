@@ -3042,7 +3042,7 @@
     <!-- Warning informing transfers were cancelled. -->
     <string name="transfers_cancelled">Aktarımlar iptal edildi.</string>
     <!-- Title of the screen where a name collision has been detected and some options to choose are shown to the user. -->
-    <string name="title_duplicated_items">Yinelenen öğeler</string>
+    <string name="title_duplicated_items">Aynı adlı öğeler</string>
     <!-- Informs about a name collision, the file is trying to upload, move or copy already exists on the location. The placeholder is for the name of the file.-->
     <string name="file_already_exists_in_location">Hedefte [B]%1$s[/B] adlı bir dosya zaten mevcut.</string>
     <!-- Header giving more context about a name collision, informing there are different option to choose for the file. -->
@@ -4154,8 +4154,8 @@
     <string name="cloud_drive_subtitle_link_access_password">Bağlantıyı yalnızca şifreye sahip kişiler açabilir</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <plurals name="general_name_collision_file_apply_for_all">
-        <item quantity="one">Yinelenen öğeye uygula</item>
-        <item quantity="other">Tüm %1$d yinelenen öğeye uygula</item>
+        <item quantity="one">Aynı adlı öğeye uygula</item>
+        <item quantity="other">%1$d aynı adlı öğeye uygula</item>
     </plurals>
     <!-- Title of the meeting info screen -->
     <string name="meetings_info_title">Bilgi</string>

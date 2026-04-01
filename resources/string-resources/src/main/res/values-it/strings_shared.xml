@@ -403,7 +403,7 @@
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
     <string name="account_cancellation_instructions_click_main_menu">3. Cliccare sul menu principale.</string>
     <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_settings">4. Cliccare su [A]Impostazioni[/A].</string>
+    <string name="account_cancellation_instructions_click_settings">4. Clicca su [A]Impostazioni.[/A]</string>
     <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
     <string name="account_cancellation_instructions_click_plan">5. Cliccare su [A]Piano[/A].</string>
     <!-- Step 6: instruction step no.6 Click Cancel subscription of the MEGA account on MEGA website -->
@@ -725,7 +725,7 @@
     <!-- The additional security label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass e MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_description">Imposta password e date di scadenza per i link di file e cartelle.</string>
+    <string name="payment_ads_free_intro_additional_security_description">Rendi la tua vita online più sicura, veloce, e facile con il nostro gestore di password e la nostra VPN</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">Vedi i piani Pro</string>
     <!-- Label for call option on settings -->
@@ -1001,7 +1001,7 @@
     <!-- USP Carousel page 4 description-->
     <string name="carousel_page_description_slide_4">Chatta con amici e familiari, condividi foto o informazioni sensibili, fai videochiamate e pianifica riunioni. Sicurezza e privacy garantite.</string>
     <!-- Create account label-->
-    <string name="general_label_create_account">Crea un account MEGA</string>
+    <string name="general_label_create_account">Registrati</string>
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Nuova funzionalità: file e cartelle nascosti</string>
     <!-- Hidden nodes: hide files and folders feature -->
@@ -1131,7 +1131,7 @@
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">Dettagli dell\’abbonamento</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
-    <string name="choose_account_screen_subscription_information_description">Gli abbonamenti vengono rinnovati automaticamente per periodi di abbonamento successivi della stessa durata e allo stesso prezzo del periodo iniziale scelto.\n\nPuoi annullare il tuo abbonamento in qualsiasi momento, ma non nelle 24 ore precedenti la scadenza del prossimo pagamento dell\’abbonamento. [A]Scopri come gestire il tuo abbonamento nelle tue impostazioni.[/A]</string>
+    <string name="choose_account_screen_subscription_information_description">Gli abbonamenti vengono rinnovati automaticamente per periodi di abbonamento successivi della stessa durata e allo stesso prezzo del periodo iniziale scelto.\n\nPuoi annullare il tuo abbonamento in qualsiasi momento, ma non nelle 24 ore precedenti la scadenza del prossimo pagamento dell\’abbonamento. [A]Scopri come gestire il tuo abbonamento nelle tue impostazioni[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
     <string name="choose_account_screen_terms_and_policies_link_text">[A]Termini di servizio[/A] e [B]Politica sulla privacy[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
@@ -1147,7 +1147,7 @@
     <!-- General month label -->
     <string name="general_month">/mese</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s fatturato annualmente</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nfatturato annualmente</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d oggetto svelato</item>
@@ -1375,7 +1375,7 @@
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Potresti non avere alcuna app installata che supporta questo tipo di file</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Un errore è capitato, per favore, riprova.</string>
+    <string name="general_text_error">Un errore è stato riscontrato, riprova</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="general_select_create_folder">Seleziona o crea una nuova cartella</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
@@ -1756,15 +1756,15 @@
     <string name="campaign_name_special_offer">Offerta speciale: %1$d%% di sconto</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s per il primo %2$d mese</item>
-        <item quantity="many">%1$s per i primi %2$d di mesi</item>
-        <item quantity="other">%1$s per i primi %2$d mesi</item>
+        <item quantity="one">[B]%1$s[/B]\nper il primo mese</item>
+        <item quantity="many">[B]%1$s[/B]\nper i primi %2$d di mesi</item>
+        <item quantity="other">[B]%1$s[/B]\nper i primi %2$d mesi</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s per il primo %2$d anno</item>
-        <item quantity="many">%1$s per i primi %2$d di anni</item>
-        <item quantity="other">%1$s per i primi %2$d anni</item>
+        <item quantity="one">[B]%1$s[/B]\nper il primo anno</item>
+        <item quantity="many">[B]%1$s[/B]\nper i primi %2$d di anni</item>
+        <item quantity="other">[B]%1$s[/B]\nper i primi %2$d anni</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Suite della privacy MEGA</string>
@@ -1801,9 +1801,9 @@
         <item quantity="other">Il bonus scade tra %1$d giorni</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s per il primo mese</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nper il primo mese</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s per il primo anno</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nper il primo anno</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Solo tu puoi rivelare i file nascosti, singolarmente o visualizzando temporaneamente tutti gli oggetti nascosti dalle [A]impostazioni[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2131,10 +2131,59 @@
     <string name="pdf_viewer_error_no_network">Nessuna connessione. Per favore, connettiti per aprire il file.</string>
     <string name="open_link_dialog_hint">Incolla link</string>
     <string name="open_link_dialog_title">Apri link</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
-    <string name="cloud_explorer_select_destination_title">Select destination</string>
-    <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
-    <string name="cloud_explorer_choose_folder_title">Choose folder</string>
-    <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
-    <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="one">%d cartella,</item>
+        <item quantity="many">%d di cartelle,</item>
+        <item quantity="other">%d cartelle,</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="one">Condiviso con %d persona</item>
+        <item quantity="many">Condiviso con %d di persone</item>
+        <item quantity="other">Condiviso con %d persone</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="one">Impossibile spostare %d oggetto</item>
+        <item quantity="many">Impossibile spostare %d di oggetti</item>
+        <item quantity="other">Impossibile spostare %d oggetti</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="one">%d oggetto spostato con successo</item>
+        <item quantity="many">%d di oggetti spostati con successo</item>
+        <item quantity="other">%d oggetti spostati con successo</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="one">%d oggetto spostato con successo</item>
+        <item quantity="many">%d di oggetti spostati con successo</item>
+        <item quantity="other">%d oggetti spostati con successo</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="one">Impossibile spostare %d oggetto</item>
+        <item quantity="many">Impossibile spostare %d di oggetti</item>
+        <item quantity="other">Impossibile spostare %d oggetti</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="one">%d oggetto spostato nel cestino</item>
+        <item quantity="many">%d di oggetti spostati nel cestino</item>
+        <item quantity="other">%d oggetti spostati nel cestino</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="one">Impossibile spostare %d oggetto nel cestino</item>
+        <item quantity="many">Impossibile spostare %d di oggetti nel cestino</item>
+        <item quantity="other">Impossibile spostare %d oggetti nel cestino</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="one">%d oggetto spostato nel cestino, impossibile spostare 1 oggetto</item>
+        <item quantity="many">%d di oggetti spostati nel cestino, impossibile spostare 1 oggetto</item>
+        <item quantity="other">%d oggetti spostati nel cestino, impossibile spostare 1 oggetto</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="one">1 oggetto spostato nel cestino, impossibile spostare %d oggetto</item>
+        <item quantity="many">1 oggetto spostato nel cestino, impossibile spostare %d di oggetti</item>
+        <item quantity="other">1 oggetto spostato nel cestino, impossibile spostare %d oggetti</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d oggetto rimosso dal cestino</item>
+        <item quantity="many">%d di oggetti rimossi dal cestino</item>
+        <item quantity="other">%d oggetti rimossi dal cestino</item>
+    </plurals>
 </resources>

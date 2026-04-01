@@ -121,7 +121,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Nuovo su MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">Crea un account MEGA</string>
+    <string name="create_account">Registrati</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Inserisci la tua email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -149,7 +149,7 @@
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Il tuo link di conferma non è più valido. Il tuo account potrebbe essere stato già attivato o potresti aver annullato la tua registrazione.</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
-    <string name="top">Capisco che [B]se perdo la mia password, potrei perdere i miei dati[/B]. Leggi di più riguardo la [A]criptazione end-to-end di MEGA[/A]</string>
+    <string name="top">Capisco che [B]se perdo la mia password, potrei perdere i miei dati[/B]. Leggi di più riguardo la [A]criptazione end-to-end di MEGA[/A].</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">Per continuare devi accettare i nostri Termini di servizio</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -403,7 +403,7 @@
     <!-- menu item -->
     <string name="my_account_change_password">Modifica password</string>
     <!-- Dialog text overquota error -->
-    <string name="overquota_alert_text">Hai superato il limite del tuo spazio di archiviazione. Vuoi fare l’upgrade ad un account PRO?</string>
+    <string name="overquota_alert_text">Hai superato il limite del tuo spazio di archiviazione. Vuoi effettuare l’upgrade del tuo account?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Ultima sessione</string>
     <!-- message displayed while the app is changing the password -->
@@ -1393,7 +1393,7 @@
     <!-- Message shown when a link is being processing -->
     <string name="processing_link">Processando il link&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
-    <string name="passwd_weak">La tua password è facilmente intuibile. Rendi la tua password più lunga. Combina lettere maiuscole e minuscole. Aggiungi caratteri speciali. Non utilizzare nomi o parole del dizionario</string>
+    <string name="passwd_weak">La tua password è facilmente intuibile. Rendi la tua password più lunga. Combina lettere maiuscole e minuscole. Aggiungi caratteri speciali. Non utilizzare nomi o parole del dizionario.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
     <string name="passwd_medium">La tua password è abbastanza sicura per procedere, ma ti raccomandiamo di rafforzarla ulteriormente in futuro.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
@@ -1653,7 +1653,7 @@
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_enable_2fa">Un errore è stato riscontrato durante l’abilitazione dell’autenticazione a due fattori. Per favore, riprova.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
-    <string name="title_enable_2fa">Attiva autenticazione a due fattori (2FA)</string>
+    <string name="title_enable_2fa">Attiva l\’autenticazione a due fattori</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
     <string name="label_2fa_disabled">Autenticazione a due fattori disabilitata</string>
     <!-- Text of the button which action is to show the authentication apps -->
@@ -1709,7 +1709,7 @@
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Invia messaggio</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
-    <string name="pre_overquota_alert_text">Questa azione non può essere completata in quanto ti porterebbe oltre il tuo limite corrente di spazio di archiviazione. Vuoi fare l’upgrade a PRO?</string>
+    <string name="pre_overquota_alert_text">Questa azione non può essere completata in quanto ti porterebbe oltre il tuo limite corrente di spazio di archiviazione. Vuoi effettuare l’upgrade del tuo account?</string>
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">Archiviate</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
@@ -2030,9 +2030,9 @@
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A] [B]ha aggiunto %2$s e %3$s[/B]</string>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
     <plurals name="subtitle_notification_added_files">
-        <item quantity="one">[A]%1$s[/A] [B]ha aggiunto %2$d file.[/B]</item>
-        <item quantity="many">[A]%1$s[/A] [B]ha aggiunto %2$d file.[/B]</item>
-        <item quantity="other">[A]%1$s[/A] [B]ha aggiunto %2$d file.[/B]</item>
+        <item quantity="one">[A]%1$s [/A][B]ha aggiunto %2$d file.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]ha aggiunto %2$d file.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]ha aggiunto %2$d file.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items -->
     <plurals name="subtitle_notification_deleted_items">
@@ -2145,8 +2145,8 @@
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="one">Messaggio inoltrato</item>
-        <item quantity="many">Messaggio inoltrato</item>
-        <item quantity="other">Messaggio inoltrato</item>
+        <item quantity="many">Messaggi inoltrati</item>
+        <item quantity="other">Messaggi inoltrati</item>
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Posizione fissata</string>
@@ -4290,7 +4290,7 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensilmente</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Alcuni mesi non hanno %1$dgiorno. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
+        <item quantity="one">Alcuni mesi non hanno %1$d giorno. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
         <item quantity="many">Alcuni mesi non hanno %1$d giorni. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
         <item quantity="other">Alcuni mesi non hanno %1$d giorni. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
     </plurals>

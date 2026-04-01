@@ -1043,7 +1043,7 @@
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">傳輸配額不足</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
-    <string name="current_text_depleted_transfer_overquota">您佇列的下載已超出您IP位址目前可用的傳輸配額，因此傳輸已經中斷。請升級您的帳戶或等待%s再繼續。</string>
+    <string name="current_text_depleted_transfer_overquota">您佇列的下載已超出您IP位址目前可用的傳輸配額，因此下載已中斷。請升級您的帳戶或等待%s再繼續。</string>
     <!-- Text of the alert when the transfer quota is depleted. The placeholder indicates the time left for the transfer quota to be reset. For instance: 30m 45s -->
     <string name="text_depleted_transfer_overquota">此IP位址的傳輸配額已超過。請升級您的帳戶或等待%s才能繼續下載。</string>
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
@@ -2039,7 +2039,7 @@
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">發送您目前所在位置：[A]%1$s[/A]</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
-    <string name="explanation_send_location">此位置將使用不屬於MEGA點對點加密平台的第三方地圖業者開啟。</string>
+    <string name="explanation_send_location">此位置將透過MEGA點對點加密平台之外的第三方地圖服務開啟。</string>
     <!-- Title of the location marker set by the user -->
     <string name="title_marker_maps">發送這個位置</string>
     <!-- Title of the dialog shown when the location is disabled -->
@@ -2785,7 +2785,7 @@
     <!-- Setting which allows to hide or show the recent activity. -->
     <string name="hide_recent_setting">隱藏近期動態</string>
     <!-- Context of a setting which allows to hide or show the recent activity. -->
-    <string name="hide_recent_setting_context">隱藏首頁中的近期動態。</string>
+    <string name="hide_recent_setting_context">隱藏在主畫面的近期活動。</string>
     <!-- Title of a dialog informing the start screen can be modified. -->
     <string name="choose_start_screen_title">選擇您的開始畫面</string>
     <!-- Test of a dialog informing the start screen can be modified. -->
