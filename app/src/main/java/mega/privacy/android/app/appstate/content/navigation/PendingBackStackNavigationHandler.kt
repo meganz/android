@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationResultsHandler
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import timber.log.Timber
@@ -207,9 +208,16 @@ class PendingBackStackNavigationHandler(
 
     fun displayDialog(dialogDestination: NavKey) {
         if (backstack.base.isEmpty()) {
-            backstack.pending += dialogDestination
+            if (!backstack.pending.contains(dialogDestination)) {
+                backstack.pending += dialogDestination
+            }
         } else {
-            navigate(dialogDestination)
+            navigate(
+                dialogDestination,
+                navOptions {
+                    popUpTo(dialogDestination::class) { inclusive = true }
+                }
+            )
         }
     }
 

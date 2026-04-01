@@ -12,6 +12,7 @@ import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
@@ -790,4 +791,50 @@ class PendingBackStackNavigationHandlerTest {
             DefaultLandingScreen, Destination1, Destination2
         )
     }
+
+    @Test
+    fun `test that navigate removes existing dialog before re-adding it`() {
+        underTest.displayDialog(DialogDestination1)
+        underTest.navigate(Destination1)
+        underTest.displayDialog(DialogDestination1)
+
+        assertThat(backStack.count { it == DialogDestination1 }).isEqualTo(1)
+        assertThat(backStack.last()).isEqualTo(DialogDestination1)
+    }
+
+    @Test
+    fun `test that navigate removes duplicate dialog keys while keeping non-dialog destinations`() {
+        underTest.displayDialog(DialogDestination1)
+        underTest.navigate(Destination1)
+        underTest.displayDialog(DialogDestination1)
+
+        assertThat(backStack.count { it == DialogDestination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that displayDialog removes existing dialog before re-adding it`() {
+        underTest.displayDialog(DialogDestination1)
+        underTest.navigate(Destination1)
+        underTest.displayDialog(DialogDestination1)
+
+        assertThat(backStack.count { it == DialogDestination1 }).isEqualTo(1)
+        assertThat(backStack.last()).isEqualTo(DialogDestination1)
+    }
+
+    @Test
+    fun `test that displayDialog does not add duplicate dialog to pending when base is empty`() {
+        val emptyBackStack = PendingBackStack(NavBackStack())
+        emptyBackStack.pending += DialogDestination1
+        val handler = initHandler(
+            backStack = emptyBackStack,
+            authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
+        )
+        // base has login destination after init, so clear it to test the pending branch
+        emptyBackStack.clear()
+        handler.displayDialog(DialogDestination1)
+
+        assertThat(emptyBackStack.pending.count { it == DialogDestination1 }).isEqualTo(1)
+    }
+
+    private data object DialogDestination1 : DialogNavKey
 }

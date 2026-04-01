@@ -55,6 +55,10 @@ class NavOptions internal constructor(
             popUpTo = PopUpTo.Builder(routeClass = T::class).apply(block).build()
         }
 
+        fun popUpTo(routeClass: KClass<*>, block: PopUpTo.Builder.() -> Unit = {}) {
+            popUpTo = PopUpTo.Builder(routeClass = routeClass).apply(block).build()
+        }
+
         fun build() = NavOptions(launchSingleTop, popUpTo)
     }
 }
