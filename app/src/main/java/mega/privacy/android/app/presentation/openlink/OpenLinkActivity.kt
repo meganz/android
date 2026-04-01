@@ -8,7 +8,6 @@ import android.content.Intent.ACTION_MAIN
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -27,7 +26,6 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.MegaActivity.Companion.ACTION_DEEP_LINKS
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
-import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -182,14 +180,8 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
         enableEdgeToEdgeAndConsumeInsets()
 
         // Set orientation before super.onCreate() to ensure it takes effect
-        if (isAdaptiveLayoutEnabled) {
-            // Adaptive layout is enabled, let the system handle orientation
-            enableAdaptiveLayout { old, new ->
-                Timber.d("On size change in OpenLinkActivity from $old to $new")
-            }
-        } else {
-            // Force portrait orientation when adaptive layout is disabled
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        enableAdaptiveLayout { old, new ->
+            Timber.d("On size change in OpenLinkActivity from $old to $new")
         }
 
         super.onCreate(savedInstanceState)

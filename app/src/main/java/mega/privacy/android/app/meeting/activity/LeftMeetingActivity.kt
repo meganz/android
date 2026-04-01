@@ -1,7 +1,6 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -18,7 +17,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
-import mega.privacy.android.app.di.fetchIsAdaptiveLayoutEnabled
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
@@ -45,17 +43,8 @@ class LeftMeetingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdgeAndConsumeInsets()
 
-        lifecycleScope.launch {
-            // We have to handle this by using the fetchIsAdaptiveLayoutEnabled()
-            if (fetchIsAdaptiveLayoutEnabled()) {
-                // Adaptive layout is enabled, let the system handle orientation
-                enableAdaptiveLayout { old, new ->
-                    Timber.d("On size change in LeftMeetingActivity from $old to $new")
-                }
-            } else {
-                // Force portrait orientation when adaptive layout is disabled
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
+        enableAdaptiveLayout { old, new ->
+            Timber.d("On size change in LeftMeetingActivity from $old to $new")
         }
 
         super.onCreate(savedInstanceState)

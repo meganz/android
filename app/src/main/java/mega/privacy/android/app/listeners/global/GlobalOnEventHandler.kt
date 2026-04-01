@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.usecase.orientation.InitializeAdaptiveLayoutUseCase
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -39,7 +38,6 @@ class GlobalOnEventHandler @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val updateDomainNameUseCase: UpdateDomainNameUseCase,
-    private val initializeAdaptiveLayoutUseCase: InitializeAdaptiveLayoutUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
 ) {
     private val isMobileAdsInitializeCalled = AtomicBoolean(false)
@@ -73,7 +71,6 @@ class GlobalOnEventHandler @Inject constructor(
                 applicationScope.launch {
                     broadcastMiscStateUseCase(MiscLoadedState.FlagsReady)
                     updateDomainName()
-                    updateAdaptiveLayoutFeatureFlag()
                 }
                 MegaApplication.getInstance().checkEnabledCookies()
                 initialiseAdsIfNeeded()
@@ -137,12 +134,6 @@ class GlobalOnEventHandler @Inject constructor(
     private suspend fun updateDomainName() {
         runCatching { updateDomainNameUseCase() }
             .onFailure { Timber.e(it, "UpdateDomainNameUseCase failed") }
-    }
-
-    private suspend fun updateAdaptiveLayoutFeatureFlag() {
-        runCatching {
-            initializeAdaptiveLayoutUseCase()
-        }.onFailure { Timber.e(it, "Update the adaptive layout feature flag failed") }
     }
 
     private fun sendBroadcastUpdateAccountDetails() {

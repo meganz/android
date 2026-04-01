@@ -3,7 +3,6 @@ package mega.privacy.android.app.mediaplayer
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Bundle
@@ -39,7 +38,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
-import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -206,14 +204,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         enableEdgeToEdgeAndConsumeInsets()
 
         // Set orientation before super.onCreate() to ensure it takes effect
-        if (isAdaptiveLayoutEnabled) {
-            // Adaptive layout is enabled, let the system handle orientation
-            enableAdaptiveLayout { old, new ->
-                Timber.d("On size change in AudioPlayerActivity from $old to $new")
-            }
-        } else {
-            // Force portrait orientation when adaptive layout is disabled
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        enableAdaptiveLayout { old, new ->
+            Timber.d("On size change in AudioPlayerActivity from $old to $new")
         }
 
         super.onCreate(savedInstanceState)

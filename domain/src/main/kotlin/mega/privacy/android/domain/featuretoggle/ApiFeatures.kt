@@ -59,27 +59,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Controls whether Android 16+ orientation migration is enabled.
-     *
-     * When enabled (true):
-     * - Uses adaptive orientation handling for Android 16+ devices
-     * - Ignores fixed orientation settings on large screen devices
-     * - Allows system to handle orientation changes automatically
-     *
-     * When disabled (false):
-     * - Uses legacy orientation behavior
-     * - Maintains existing fixed orientation settings
-     * - Preserves backward compatibility with older Android versions
-     *
-     * Default: false (gradual rollout for safety)
-     */
-    Android16OrientationMigrationEnabled(
-        experimentName = "aome2",
-        description = "Enable Android 16+ orientation migration for large screen devices",
-        defaultValue = false
-    ),
-
-    /**
      * Age Signal Check feature flag
      *
      * Controls whether the app checks the user's age signal to hide Stripe payment method

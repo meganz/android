@@ -36,7 +36,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
-import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
@@ -158,15 +157,13 @@ class AudioPlayerFragment : Fragment() {
             BIND_AUTO_CREATE
         )
 
-        if (context?.isAdaptiveLayoutEnabled == true) {
-            // Re-apply artwork layout after any layout pass (e.g., rotation/size change)
-            playerGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-                playerViewHolder?.layoutArtwork()
-            }
-            playerViewHolder?.binding?.playerView?.viewTreeObserver?.addOnGlobalLayoutListener(
-                playerGlobalLayoutListener
-            )
+        // Re-apply artwork layout after any layout pass (e.g., rotation/size change)
+        playerGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+            playerViewHolder?.layoutArtwork()
         }
+        playerViewHolder?.binding?.playerView?.viewTreeObserver?.addOnGlobalLayoutListener(
+            playerGlobalLayoutListener
+        )
 
         observeFlow()
         delayHideToolbar()
@@ -186,10 +183,8 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (context?.isAdaptiveLayoutEnabled == true) {
-            playerViewHolder?.binding?.playerView?.viewTreeObserver?.let { vto ->
-                playerGlobalLayoutListener?.let { vto.removeOnGlobalLayoutListener(it) }
-            }
+        playerViewHolder?.binding?.playerView?.viewTreeObserver?.let { vto ->
+            playerGlobalLayoutListener?.let { vto.removeOnGlobalLayoutListener(it) }
         }
         playlistObserved = false
         // Close the dialog after fragment is destroyed to avoid adding dialog view repeatedly after screen is rotated.

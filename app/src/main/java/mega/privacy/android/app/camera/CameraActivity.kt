@@ -23,7 +23,6 @@ import mega.privacy.android.app.camera.preview.photoPreviewScreen
 import mega.privacy.android.app.camera.preview.videoPreviewScreen
 import mega.privacy.android.app.camera.setting.cameraSettingModal
 import mega.privacy.android.app.camera.setting.navigateCameraSettingModal
-import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
 import mega.privacy.android.app.usecase.orientation.compactScreen
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
@@ -42,20 +41,14 @@ internal class CameraActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Set orientation before super.onCreate() to ensure it takes effect
-        if (isAdaptiveLayoutEnabled) {
-            // Adaptive layout is enabled, let the system handle orientation
-            enableAdaptiveLayout { old, new ->
-                Timber.d("On size change in CameraActivity from $old to $new")
-                requestedOrientation =
-                    if (new.compactScreen()) {
-                        ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    } else {
-                        ActivityInfo.SCREEN_ORIENTATION_FULL_USER
-                    }
-            }
-        } else {
-            // Force portrait orientation when adaptive layout is disabled
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        enableAdaptiveLayout { old, new ->
+            Timber.d("On size change in CameraActivity from $old to $new")
+            requestedOrientation =
+                if (new.compactScreen()) {
+                    ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                } else {
+                    ActivityInfo.SCREEN_ORIENTATION_FULL_USER
+                }
         }
 
         super.onCreate(savedInstanceState)
