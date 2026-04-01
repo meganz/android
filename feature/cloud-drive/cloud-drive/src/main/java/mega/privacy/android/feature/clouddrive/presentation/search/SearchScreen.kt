@@ -62,6 +62,7 @@ import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
@@ -297,17 +298,6 @@ fun SearchScreen(
             }
         )
     }
-}
-
-@Composable
-fun NodeSelectionModeAppBar(
-    count: Int,
-    isAllSelected: Boolean,
-    isSelecting: Boolean,
-    onSelectAllClicked: () -> Unit,
-    onCancelSelectionClicked: () -> Unit,
-) {
-    TODO("Not yet implemented")
 }
 
 @Composable
