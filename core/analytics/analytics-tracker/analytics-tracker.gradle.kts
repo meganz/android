@@ -20,6 +20,10 @@ dependencies {
     // Analytics
     implementation(lib.mega.analytics)
 
+    // Firebase
+    implementation(platform(google.firebase.bom))
+    implementation(google.firebase.analytics)
+
     // DI
     implementation(lib.javax.inject)
 
