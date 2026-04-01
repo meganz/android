@@ -100,7 +100,6 @@ data class OverQuotaDialogNavKey(
     val overQuotaAlert: Boolean = true,
 ) : DialogNavKey, Parcelable
 
-
 /**
  * NavKey for folder link screen
  * @param uriString the uri string of the folder link

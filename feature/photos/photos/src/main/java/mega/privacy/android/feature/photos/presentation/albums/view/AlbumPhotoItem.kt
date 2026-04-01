@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.photos.presentation.albums.view
 
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
@@ -39,10 +38,6 @@ internal fun AlbumPhotoItem(
     val nodeModifier = modifier
         .width(width)
         .height(height)
-        .combinedClickable(
-            onClick = { onClick(photo) },
-            onLongClick = { onLongPress(photo) }
-        )
 
     when (photo) {
         is PhotoUiState.Image -> {
@@ -51,7 +46,9 @@ internal fun AlbumPhotoItem(
                 thumbnailRequest = request,
                 isSensitive = isSensitive,
                 isSelected = isSelected,
-                shouldShowFavourite = photo.isFavourite
+                shouldShowFavourite = photo.isFavourite,
+                onClick = { onClick(photo) },
+                onLongClick = { onLongPress(photo) },
             )
         }
 
@@ -62,7 +59,9 @@ internal fun AlbumPhotoItem(
                 isSensitive = isSensitive,
                 isSelected = isSelected,
                 shouldShowFavourite = photo.isFavourite,
-                duration = photo.duration
+                duration = photo.duration,
+                onClick = { onClick(photo) },
+                onLongClick = { onLongPress(photo) },
             )
         }
     }

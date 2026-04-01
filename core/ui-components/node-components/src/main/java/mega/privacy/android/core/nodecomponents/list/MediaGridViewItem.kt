@@ -28,14 +28,14 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.shared.nodes.components.NodeThumbnailView
-import mega.privacy.android.shared.nodes.components.THUMBNAIL_FILE_TEST_TAG
-import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.nodes.components.NodeThumbnailView
+import mega.privacy.android.shared.nodes.components.THUMBNAIL_FILE_TEST_TAG
+import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 
 /**
  * Composable to show media grid view item
@@ -66,7 +66,6 @@ fun MediaGridViewItem(
 ) {
     Box(
         modifier = modifier
-            .alpha(if (isSensitive) 0.5f else 1f)
             .aspectRatio(1f)
             .conditional(isSelected) {
                 Modifier
@@ -85,7 +84,8 @@ fun MediaGridViewItem(
         NodeThumbnailView(
             modifier = Modifier
                 .align(Alignment.Center)
-                .testTag(THUMBNAIL_FILE_TEST_TAG),
+                .testTag(THUMBNAIL_FILE_TEST_TAG)
+                .alpha(if (isSensitive) 0.5f else 1f),
             layoutType = ThumbnailLayoutType.MediaGrid,
             data = thumbnailData,
             defaultImage = defaultImage,
