@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
@@ -1351,54 +1350,6 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that the favourite toolbar item is not displayed when a selection is made and favourite feature is disabled`() =
-        runTest {
-            val node = mock<TypedFileNode>()
-            whenever(node.id.longValue).thenReturn(1L)
-            whenever(
-                getFileBrowserNodeChildrenUseCase(
-                    underTest.state.value.fileBrowserHandle
-                )
-            ) doReturn listOf(node)
-            whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getNodeAccessUseCase(nodeId = node.id)
-            ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.AllowMultipleSelectionsEnabled
-                )
-            ) doReturn false
-
-            underTest.refreshNodes()
-            underTest.onLongItemClicked(
-                NodeUIItem(
-                    node = node,
-                    isSelected = false,
-                    isInvisible = false
-                )
-            )
-            underTest.onItemClicked(
-                NodeUIItem(
-                    node = node,
-                    isSelected = false,
-                    isInvisible = false
-                )
-            )
-
-            underTest.state.test {
-                assertThat(
-                    expectMostRecentItem().toolbarActionsModifierItem!!.item.favouritesItem
-                ).isEqualTo(
-                    CloudDriveSyncsFavouritesActionModifierItem(
-                        canBeAdded = false,
-                        canBeRemoved = false
-                    )
-                )
-            }
-        }
-
-    @Test
     fun `test that the add to favourite toolbar item is displayed when there are non-favourite selected items`() =
         runTest {
             val node = mock<TypedFileNode> {
@@ -1414,11 +1365,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = node.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.AllowMultipleSelectionsEnabled
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1459,11 +1405,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = node.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.AllowMultipleSelectionsEnabled
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1504,11 +1445,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = node.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.AllowMultipleSelectionsEnabled
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1556,11 +1492,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = notFavouriteNode.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.AllowMultipleSelectionsEnabled
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1600,11 +1531,6 @@ class FileBrowserViewModelTest {
             whenever(
                 getNodeAccessUseCase(nodeId = node.id)
             ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.AllowMultipleSelectionsEnabled
-                )
-            ) doReturn true
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
@@ -1626,50 +1552,6 @@ class FileBrowserViewModelTest {
                 assertThat(
                     expectMostRecentItem().toolbarActionsModifierItem!!.item.addLabelItem.canBeAdded
                 ).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that the add label toolbar item is not displayed when the feature is disabled`() =
-        runTest {
-            val node = mock<TypedFileNode> {
-                on { id } doReturn NodeId(1L)
-            }
-            whenever(
-                getFileBrowserNodeChildrenUseCase(
-                    underTest.state.value.fileBrowserHandle
-                )
-            ) doReturn listOf(node)
-            whenever(getRubbishBinFolderUseCase()) doReturn null
-            whenever(
-                getNodeAccessUseCase(nodeId = node.id)
-            ) doReturn AccessPermission.UNKNOWN
-            whenever(
-                getFeatureFlagValueUseCase(
-                    ApiFeatures.AllowMultipleSelectionsEnabled
-                )
-            ) doReturn false
-
-            underTest.refreshNodes()
-            underTest.onLongItemClicked(
-                NodeUIItem(
-                    node = node,
-                    isSelected = false,
-                    isInvisible = false
-                )
-            )
-            underTest.onItemClicked(
-                NodeUIItem(
-                    node = node,
-                    isSelected = false,
-                    isInvisible = false
-                )
-            )
-
-            underTest.state.test {
-                assertThat(
-                    expectMostRecentItem().toolbarActionsModifierItem!!.item.addLabelItem.canBeAdded
-                ).isFalse()
             }
         }
 

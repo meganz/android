@@ -6,12 +6,10 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveFavouriteM
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.any
 import java.util.stream.Stream
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -34,11 +32,10 @@ class RemoveFromFavouritesSelectionMenuItemTest {
         on { isFavourite } doReturn true
     }
 
-    @ParameterizedTest(name = "noNodeTakenDown={0}, featureFlagEnabled={1}, selectedNodesKind={2} -> expected={3}")
+    @ParameterizedTest(name = "noNodeTakenDown={0}, selectedNodesKind={1} -> expected={2}")
     @MethodSource("provideShouldDisplayParameters")
     fun `test shouldDisplay returns expected result`(
         noNodeTakenDown: Boolean,
-        featureFlagEnabled: Boolean,
         selectedNodesKind: String,
         expected: Boolean,
     ) = runTest {
@@ -49,12 +46,8 @@ class RemoveFromFavouritesSelectionMenuItemTest {
             "mixed" -> listOf(mockFavouriteNode, mockNonFavouriteNode)
             else -> emptyList()
         }
-        val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-            onBlocking { invoke(any()) } doReturn featureFlagEnabled
-        }
         val menuItem = RemoveFromFavouritesSelectionMenuItem(
             mock<RemoveFavouriteMenuAction>(),
-            getFeatureFlagValueUseCase
         )
 
         val result = menuItem.shouldDisplay(
@@ -72,12 +65,11 @@ class RemoveFromFavouritesSelectionMenuItemTest {
     companion object {
         @JvmStatic
         fun provideShouldDisplayParameters(): Stream<Arguments> = Stream.of(
-            Arguments.of(true, true, "empty", false),
-            Arguments.of(false, true, "single_favourite", false),
-            Arguments.of(true, false, "single_favourite", false),
-            Arguments.of(true, true, "mixed", false),
-            Arguments.of(true, true, "single_favourite", true),
-            Arguments.of(true, true, "multiple_favourites", true),
+            Arguments.of(true, "empty", false),
+            Arguments.of(false, "single_favourite", false),
+            Arguments.of(true, "mixed", false),
+            Arguments.of(true, "single_favourite", true),
+            Arguments.of(true, "multiple_favourites", true),
         )
     }
 }

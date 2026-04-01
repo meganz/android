@@ -74,18 +74,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Flag to allow multiple selection for favorite/label in Cloud Drive.
-     * When enabled, users can select multiple favorites or labels at once.
-     *
-     * Default: false
-     */
-    AllowMultipleSelectionsEnabled(
-        experimentName = "mult1",
-        description = "Allow multiple selection for favorite/label in Cloud Drive",
-        defaultValue = false
-    ),
-
-    /**
      * Media Revamp phase 2 feature flag
      */
     MediaRevampPhase2(

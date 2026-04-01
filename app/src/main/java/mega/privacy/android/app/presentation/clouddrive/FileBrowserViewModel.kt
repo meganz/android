@@ -27,7 +27,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
@@ -912,7 +911,7 @@ class FileBrowserViewModel @Inject constructor(
             }
             val addLabelActionModeState = async {
                 runCatching {
-                    getAddLabelActionModifierItem()
+                    CloudDriveSyncsAddLabelActionModifierItem(canBeAdded = true)
                 }.getOrDefault(defaultValue = CloudDriveSyncsAddLabelActionModifierItem())
             }
             val addToActionModeState = getAddToActionModifierItem(
@@ -945,18 +944,7 @@ class FileBrowserViewModel @Inject constructor(
         )
     }
 
-    private suspend fun getFavouritesActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsFavouritesActionModifierItem {
-        // Check if the bugfix for allowing favorite in multiple selection is enabled
-        val isMultipleSelectionEnabled = isMultipleSelectionEnabled()
-        // Only show favorite options when the feature is enabled
-        if (!isMultipleSelectionEnabled) {
-            return CloudDriveSyncsFavouritesActionModifierItem(
-                canBeAdded = false,
-                canBeRemoved = false
-            )
-        }
-
-        // Count how many are favorites and how many are not
+    private fun getFavouritesActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsFavouritesActionModifierItem {
         val favouriteCount = selectedNodes.count { it.node.isFavourite }
         val nonFavouriteCount = selectedNodes.size - favouriteCount
         return CloudDriveSyncsFavouritesActionModifierItem(
@@ -965,21 +953,6 @@ class FileBrowserViewModel @Inject constructor(
         )
     }
 
-    private suspend fun getAddLabelActionModifierItem(): CloudDriveSyncsAddLabelActionModifierItem {
-        // Check if the feature for allowing label in multiple selection is enabled
-        val isMultipleSelectionEnabled = isMultipleSelectionEnabled()
-        // Always show "Add label" when multiple selection is enabled and nodes are selected
-        // The label dialog will handle both adding and removing labels
-        return CloudDriveSyncsAddLabelActionModifierItem(
-            canBeAdded = isMultipleSelectionEnabled
-        )
-    }
-
-    private suspend fun isMultipleSelectionEnabled() = runCatching {
-        getFeatureFlagValueUseCase(ApiFeatures.AllowMultipleSelectionsEnabled)
-    }.onFailure {
-        Timber.w(it, "Multiple selection flag check failed")
-    }.getOrElse { false }
 
     private fun getAddToActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsAddToActionModifierItem {
         val mediaNodes = selectedNodes.filter {
