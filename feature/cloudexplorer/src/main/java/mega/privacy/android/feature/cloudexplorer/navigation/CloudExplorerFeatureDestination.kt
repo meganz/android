@@ -14,7 +14,6 @@ import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.Share
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ChatExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
@@ -37,9 +36,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (NavKey) -> Unit,
     ) {
-        entry<ShareToMegaNavKey>(
-            metadata = transparentMetadata()
-        ) { key ->
+        entry<ShareToMegaNavKey> { key ->
             val viewModel =
                 hiltViewModel<ShareToMegaViewModel, ShareToMegaViewModel.Factory> { factory ->
                     factory.create(ShareToMegaViewModel.Args(shareUris = key.shareUris))
