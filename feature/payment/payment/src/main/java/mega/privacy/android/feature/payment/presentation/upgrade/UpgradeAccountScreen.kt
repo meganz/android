@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.payment.presentation.upgrade
 
 import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
@@ -40,8 +43,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
@@ -53,14 +56,13 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
-import mega.privacy.android.feature.payment.components.UpgradeAccountScreenTopBar
 import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
+import mega.privacy.android.feature.payment.components.UpgradeAccountScreenTopBar
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
-import mega.privacy.android.feature.payment.model.UpgradeAccountState
-import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.ProFeature
+import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -86,6 +88,8 @@ fun UpgradeAccountScreen(
     val context = LocalContext.current
     val resources = LocalResources.current
     val locale = Locale.getDefault()
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val lazyListState = rememberLazyListState()
     val topBarHeightPx =
@@ -184,7 +188,9 @@ fun UpgradeAccountScreen(
     }
 
     MegaScaffold(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        modifier = Modifier
+            .navigationBarsPadding()
+            .semantics { testTagsAsResourceId = true },
         topBar = {
             UpgradeAccountScreenTopBar(
                 alpha = alpha,
