@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -485,6 +486,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override fun monitorImageNodes(): Flow<List<ImageNode>> = imageNodesFlow
         .filterNotNull()
+        .map { nodes -> nodes.distinctBy { it.id } }
 
     private suspend fun checkMediaNode(node: Node): Boolean {
         return node is FileNode && (node.type is ImageFileTypeInfo || node.type is VideoFileTypeInfo)

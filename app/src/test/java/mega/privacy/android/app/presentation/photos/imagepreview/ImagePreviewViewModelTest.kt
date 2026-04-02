@@ -900,6 +900,39 @@ class ImagePreviewViewModelTest {
             )
         }
 
+    @Test
+    fun `test that duplicate image nodes are deduplicated in state`() = runTest {
+        val duplicateId = NodeId(123L)
+        val imageNode1 = mock<ImageNode> {
+            on { id } doReturn duplicateId
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+        }
+        val imageNode2 = mock<ImageNode> {
+            on { id } doReturn duplicateId
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+        }
+        val fetcher = mock<ImageNodeFetcher>()
+        whenever(fetcher.monitorImageNodes(any())) doReturn flowOf(
+            listOf(imageNode1, imageNode2)
+        )
+        whenever(monitorConnectivityUseCase()) doReturn flowOf(true)
+        wheneverBlocking { isHiddenNodesOnboardedUseCase() } doReturn false
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.DEFAULT)
+        whenever(savedStateHandle.get<Long>(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE))
+            .thenReturn(123L)
+        imageNodeFetchers[ImagePreviewFetcherSource.DEFAULT] = fetcher
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = expectMostRecentItem()
+            assertThat(state.imageNodes).hasSize(1)
+        }
+    }
+
     private fun createNonSensitiveNode(): ImageNode {
         return mock<ImageNode> {
             on { this.isMarkedSensitive } doReturn false

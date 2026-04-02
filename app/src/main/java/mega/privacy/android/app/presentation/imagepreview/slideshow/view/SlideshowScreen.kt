@@ -373,7 +373,6 @@ private fun SlideshowTopBar(
 
 @Composable
 private fun SlideShowContent(
-    modifier: Modifier = Modifier,
     topBar: @Composable () -> Unit,
     bottomBar: @Composable () -> Unit,
     pagerState: PagerState,
@@ -386,6 +385,7 @@ private fun SlideShowContent(
     onImageZooming: (ZoomableState) -> Unit,
     onCacheImageState: (ImageNode, ZoomableState) -> Unit,
     onImageDownloadStatus: (ImageNode, Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize()) {
         HorizontalPager(
@@ -393,7 +393,7 @@ private fun SlideShowContent(
                 .fillMaxSize(),
             state = pagerState,
             key = {
-                imageNodes.getOrNull(it)?.id?.longValue ?: "${System.currentTimeMillis()}_$it"
+                imageNodes.getOrNull(it)?.id?.longValue?.toString() ?: "empty_$it"
             },
         ) { index ->
             val imageNode = imageNodes[index]

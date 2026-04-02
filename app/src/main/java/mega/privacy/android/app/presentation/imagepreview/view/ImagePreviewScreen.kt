@@ -515,7 +515,7 @@ private fun ImagePreviewContent(
             state = pagerState,
             beyondViewportPageCount = 1,
             key = {
-                imageNodes.getOrNull(it)?.id?.longValue ?: "${System.currentTimeMillis()}_$it"
+                imageNodes.getOrNull(it)?.id?.longValue?.toString() ?: "empty_$it"
             },
         ) { index ->
             val imageNode = imageNodes.getOrNull(index)

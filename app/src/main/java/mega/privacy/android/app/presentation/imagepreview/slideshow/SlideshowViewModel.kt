@@ -113,7 +113,7 @@ class SlideshowViewModel @Inject constructor(
         combine(orderFlow, imageNodesFlow) { order, imageNodes ->
             val filteredImageNodes = imageNodes.filter {
                 it.type !is VideoFileTypeInfo && (it.hasThumbnail || it.hasPreview)
-            }
+            }.distinctBy { it.id }
 
             val settingOrder = order ?: SlideshowOrder.Shuffle
             val sortedItems = sortItems(

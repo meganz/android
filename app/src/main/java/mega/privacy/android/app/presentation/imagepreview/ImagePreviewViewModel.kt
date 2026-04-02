@@ -179,7 +179,7 @@ class ImagePreviewViewModel @Inject constructor(
                 showHiddenItems = showHiddenItems,
                 isPaid = accountType?.isPaid,
                 isBusinessAccountExpired = isBusinessAccountExpired,
-            )
+            ).distinctBy { it.id }
             val (currentImageNodeIndex, currentImageNode) = findCurrentImageNode(
                 filteredImageNodes
             )
