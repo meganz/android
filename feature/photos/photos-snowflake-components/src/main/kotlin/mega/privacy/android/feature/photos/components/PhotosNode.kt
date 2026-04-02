@@ -143,6 +143,9 @@ private fun BasicPhotosNode(
             )
             .conditional(isSelected) {
                 Modifier
+                    .conditional(!enabled) {
+                        this.alpha(0.5f)
+                    }
                     .border(
                         width = 2.dp,
                         color = DSTokens.colors.border.strongSelected,
