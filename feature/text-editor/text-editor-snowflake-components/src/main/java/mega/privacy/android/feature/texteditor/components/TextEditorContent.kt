@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.texteditor.presentation
+package mega.privacy.android.feature.texteditor.components
 
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
@@ -14,7 +14,8 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -29,6 +30,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.flow.first
+import mega.android.core.ui.tokens.theme.DSTokens
 import timber.log.Timber
 
 /** Line height used for both line numbers and text field so the gutter aligns with content. */
@@ -69,7 +72,7 @@ private val LineNumberTextSizeSmall = 10.sp
  */
 @Suppress("DEPRECATION") // LocalAutofill: prevents Compose from notifying platform autofill with large payload
 @Composable
-internal fun TextEditorContent(
+fun TextEditorContent(
     lazyListState: LazyListState,
     chunkCount: Int,
     totalLineCount: Int,
@@ -84,11 +87,20 @@ internal fun TextEditorContent(
     /** When true (e.g. Create mode), first chunk requests focus and shows the IME once content is shown. */
     requestInitialFocusOnFirstChunk: Boolean = false,
 ) {
-    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
-    val textStyle = remember(onSurfaceColor) { editorTextStyle(onSurfaceColor) }
+    val textColor = DSTokens.colors.text.primary
+    val textStyle = remember(textColor) { editorTextStyle(textColor) }
+    val selectionColors = TextSelectionColors(
+        handleColor = textColor,
+        backgroundColor = textColor.copy(alpha = 0.3f),
+    )
 
-    CompositionLocalProvider(LocalAutofill provides null) {
-        Box(modifier = Modifier.fillMaxSize().then(if (!readOnly) Modifier.imePadding() else Modifier)) {
+    CompositionLocalProvider(
+        LocalAutofill provides null,
+        LocalTextSelectionColors provides selectionColors,
+    ) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .then(if (!readOnly) Modifier.imePadding() else Modifier)) {
             if (readOnly) {
                 ViewModeLazyColumn(
                     lazyListState = lazyListState,
@@ -277,10 +289,12 @@ private fun EditableChunkItem(
         },
     ) {
         // TODO: revisit accessibility — clearAndSetSemantics strips TalkBack from editor chunks
+        val cursorColor = DSTokens.colors.text.primary
         BasicTextField(
             state = textFieldState,
             readOnly = readOnly,
             textStyle = textStyle,
+            cursorBrush = SolidColor(cursorColor),
             modifier = Modifier
                 .then(
                     if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier,
@@ -314,7 +328,8 @@ private fun EditorChunkLayout(
         modifier = modifier.fillMaxWidth(),
     ) { measurables, constraints ->
         val hasGutter = measurables.size > 1
-        val gutterWidthPx = if (hasGutter) with(density) { LineNumberGutterWidth.roundToPx() } else 0
+        val gutterWidthPx =
+            if (hasGutter) with(density) { LineNumberGutterWidth.roundToPx() } else 0
 
         val textPlaceable = measurables[0].measure(
             constraints.copy(
@@ -343,7 +358,7 @@ private fun EditorChunkLayout(
 @Composable
 private fun rememberGutterPaint(maxLineNumber: Int): Paint {
     val density = LocalDensity.current
-    val lineNumberColor = MaterialTheme.colorScheme.onSurface
+    val lineNumberColor = DSTokens.colors.text.secondary
     val digitCount = digitCountForMaxLine(maxLineNumber)
     return remember(digitCount, lineNumberColor) {
         Paint().apply {

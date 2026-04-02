@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.texteditor.presentation
+package mega.privacy.android.feature.texteditor.components
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.jupiter.api.Test
