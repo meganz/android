@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.texteditor.presentation
+package mega.privacy.android.feature.texteditor.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -46,7 +46,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.feature.texteditor.R
 
 private val thumbHeight = 40.dp
 private const val HIDE_DELAY_MILLIS = 900
@@ -79,7 +78,7 @@ private const val SCROLL_STEP_DELAY_MS = 16L
  *   without triggering recomposition on every scroll frame.
  */
 @Composable
-internal fun TextEditorFastScrollbar(
+fun TextEditorFastScrollbar(
     state: LazyListState,
     itemCount: Int,
     modifier: Modifier = Modifier,
@@ -246,7 +245,7 @@ internal fun TextEditorFastScrollbar(
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.ic_triangle_up_down_small_regular),
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = DSTokens.colors.icon.secondary,
                             modifier = Modifier.padding(8.dp),
                         )
                     }
@@ -265,7 +264,7 @@ internal fun TextEditorFastScrollbar(
                             .offset(x = (-40).dp)
                             .padding(end = 8.dp),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = DSTokens.colors.text.primary,
                     )
                 }
             }

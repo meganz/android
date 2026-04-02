@@ -66,6 +66,8 @@ import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.privacy.android.feature.texteditor.components.TextEditorContent
+import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
