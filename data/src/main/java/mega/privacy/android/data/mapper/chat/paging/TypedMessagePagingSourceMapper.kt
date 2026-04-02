@@ -4,9 +4,13 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.room.InvalidationTracker
 import dagger.Lazy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.chat.ChatDatabase
 import mega.privacy.android.data.database.entity.chat.MetaTypedMessageEntity
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
+import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,6 +22,7 @@ import javax.inject.Inject
 class TypedMessagePagingSourceMapper @Inject constructor(
     private val metaTypedEntityTypedMessageMapper: MetaTypedEntityTypedMessageMapper,
     private val database: Lazy<ChatDatabase>,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -31,6 +36,7 @@ class TypedMessagePagingSourceMapper @Inject constructor(
             entityPagingSource,
             metaTypedEntityTypedMessageMapper,
             database.get(),
+            ioDispatcher,
         )
     }
 
@@ -38,6 +44,7 @@ class TypedMessagePagingSourceMapper @Inject constructor(
         private val originalSource: PagingSource<Int, MetaTypedMessageEntity>,
         private val metaTypedMessageEntityMapper: MetaTypedEntityTypedMessageMapper,
         database: ChatDatabase,
+        private val ioDispatcher: CoroutineDispatcher,
     ) : PagingSource<Int, TypedMessage>() {
 
         private val invalidationObserver: InvalidationTracker.Observer =
@@ -69,8 +76,11 @@ class TypedMessagePagingSourceMapper @Inject constructor(
                 }
 
                 is LoadResult.Page -> {
+                    val mappedData = withContext(ioDispatcher) {
+                        originalResult.data.mapAsync { metaTypedMessageEntityMapper(it) }
+                    }
                     LoadResult.Page(
-                        data = originalResult.data.map { metaTypedMessageEntityMapper(it) },
+                        data = mappedData,
                         prevKey = originalResult.prevKey,
                         nextKey = originalResult.nextKey,
                     )
