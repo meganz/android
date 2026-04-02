@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -334,7 +335,10 @@ fun ExpandedSearchAppBar(
             )
         )
 
-        SideEffect {
+        LaunchedEffect(
+            key1 = shouldAutoFocus,
+            key2 = keyboardVisibleInPreviousConfiguration
+        ) {
             if (shouldAutoFocus && (initialLaunch.value || keyboardVisibleInPreviousConfiguration)) {
                 initialLaunch.value = false
                 focusRequester.requestFocus()
