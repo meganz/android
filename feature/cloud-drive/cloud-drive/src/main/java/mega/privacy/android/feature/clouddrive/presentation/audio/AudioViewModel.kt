@@ -7,22 +7,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
@@ -33,12 +30,10 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.audio.model.AudioAction
 import mega.privacy.android.feature.clouddrive.presentation.audio.model.AudioUiState
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeViewItem
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -51,7 +46,6 @@ class AudioViewModel @Inject constructor(
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
@@ -73,63 +67,58 @@ class AudioViewModel @Inject constructor(
         ::Pair
     )
 
-    private fun searchRevampFlow() = flow {
-        emit(
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.SearchRevamp) }
-                .onFailure { Timber.e(it) }
-                .getOrDefault(false)
-        )
-    }
-
     private fun nodeUpdatesTriggerFlow() = merge(
         monitorNodeUpdatesUseCase().map { }.catch { Timber.e(it) },
         monitorOfflineNodeUpdatesUseCase().map { }.catch { Timber.e(it) },
     ).onStart { emit(Unit) }
 
     private fun audioItemsFlow() = combine(
-        monitorSortCloudOrderUseCase().catch { Timber.e(it) }.filterNotNull(),
+        monitorSortCloudOrderUseCase()
+            .catch { Timber.e(it) }
+            .filterNotNull()
+            .onStart { emit(SortOrder.ORDER_DEFAULT_ASC) },
+        hiddenNodesFlow(),
         nodeUpdatesTriggerFlow(),
-    ) { sortOrder, _ -> sortOrder }
-        .flatMapLatest { sortOrder ->
-            flow {
-                runCatching {
-                    val nodes = searchUseCase(
-                        parentHandle = NodeId(-1),
-                        nodeSourceType = NodeSourceType.AUDIO,
-                        searchParameters = audioSearchParameters,
-                        isSingleActivityEnabled = true
-                    )
-                    val nodeViewItems = nodeViewItemMapper(
-                        nodeList = nodes,
-                        nodeSourceType = NodeSourceType.AUDIO,
-                    )
-                    emit(nodeViewItems to sortOrder)
-                }.onFailure {
-                    Timber.e(it)
-                    emit(emptyList<NodeViewItem<TypedNode>>() to sortOrder)
-                }
-            }
+    ) { sortOrder, (hiddenNodesEnabled, showHiddenNodes), _ ->
+        val nodes = runCatching {
+            searchUseCase(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.AUDIO,
+                searchParameters = audioSearchParameters,
+                isSingleActivityEnabled = true
+            )
+        }.onFailure { Timber.e(it) }
+            .getOrDefault(emptyList())
+        val nodeViewItems = nodeViewItemMapper(
+            nodeList = nodes,
+            nodeSourceType = NodeSourceType.AUDIO,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = hiddenNodesEnabled,
+            highlightedNames = null,
+            isContactVerificationOn = false,
+        )
+
+        val filteredNodes = if (hiddenNodesEnabled && showHiddenNodes.not()) {
+            nodeViewItems.filter { !it.isSensitive }
+        } else {
+            nodeViewItems
         }
+
+        filteredNodes to sortOrder
+    }
 
     val uiState by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             monitorViewTypeUseCase().catch { Timber.e(it); emit(ViewType.LIST) },
             audioItemsFlow(),
             openedFileNode,
-            searchRevampFlow(),
-            hiddenNodesFlow(),
-        ) { viewType, itemsAndSort, opened, searchRevamp, hiddenNodes ->
-            val (items, sortOrder) = itemsAndSort
-            val (isHiddenNodesEnabled, showHiddenNodes) = hiddenNodes
+        ) { viewType, (items, sortOrder), opened ->
             AudioUiState.Data(
                 items = items,
                 currentViewType = viewType,
                 openedFileNode = opened,
                 selectedSortOrder = sortOrder,
                 selectedSortConfiguration = nodeSortConfigurationUiMapper(sortOrder),
-                isSearchRevampEnabled = searchRevamp,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                showHiddenNodes = showHiddenNodes,
             )
         }.asUiStateFlow(
             viewModelScope,

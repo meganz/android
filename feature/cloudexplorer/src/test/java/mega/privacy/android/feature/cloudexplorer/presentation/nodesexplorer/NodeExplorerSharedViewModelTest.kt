@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -40,7 +41,7 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeExplorerSharedViewModelTest {
 
-    private lateinit var viewModel: NodeExplorerSharedViewModel
+    private lateinit var viewModel: TestNodeExplorerSharedViewModel
 
     private val monitorNodeUpdatesByIdUseCase = mock<MonitorNodeUpdatesByIdUseCase>()
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
@@ -73,17 +74,17 @@ class NodeExplorerSharedViewModelTest {
         loadNodesImpl: () -> Unit = {},
         refreshNodesImpl: () -> Unit = {},
     ) {
-        viewModel = object : NodeExplorerSharedViewModel(
-            monitorNodeUpdatesByIdUseCase,
-            monitorStorageStateUseCase,
-            monitorHiddenNodesEnabledUseCase,
-            monitorShowHiddenItemsUseCase,
-            nodeViewItemMapper,
-            args = args
-        ) {
-            override fun loadNodes() = loadNodesImpl()
-            override fun refreshNodes() = refreshNodesImpl()
-        }
+        viewModel = TestNodeExplorerSharedViewModel(
+            monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            nodeViewItemMapper = nodeViewItemMapper,
+            getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
+            args = args,
+            loadNodesImpl = loadNodesImpl,
+            refreshNodesImpl = refreshNodesImpl
+        )
     }
 
     @Test
@@ -151,10 +152,14 @@ class NodeExplorerSharedViewModelTest {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = nodeSourceType,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
 
-        viewModel.setItems(nodes, NodesLoadingState.FullyLoaded)
+        viewModel.setTestItems(nodes, NodesLoadingState.FullyLoaded)
         advanceUntilIdle()
 
         viewModel.nodeExplorerSharedUiState.test {
@@ -255,4 +260,30 @@ class NodeExplorerSharedViewModelTest {
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(testDispatcher)
     }
+}
+
+private class TestNodeExplorerSharedViewModel(
+    monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
+    monitorStorageStateUseCase: MonitorStorageStateUseCase,
+    monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    nodeViewItemMapper: NodeViewItemMapper,
+    getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    args: Args,
+    private val loadNodesImpl: () -> Unit = {},
+    private val refreshNodesImpl: () -> Unit = {},
+) : NodeExplorerSharedViewModel(
+    monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
+    monitorStorageStateUseCase = monitorStorageStateUseCase,
+    monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+    monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+    nodeViewItemMapper = nodeViewItemMapper,
+    getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+    args = args,
+) {
+    override fun loadNodes() = loadNodesImpl()
+    override fun refreshNodes() = refreshNodesImpl()
+
+    fun setTestItems(nodes: List<TypedNode>, nodesLoadingState: NodesLoadingState) =
+        setItems(nodes, nodesLoadingState)
 }

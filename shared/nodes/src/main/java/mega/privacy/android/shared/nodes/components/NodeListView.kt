@@ -39,7 +39,6 @@ import mega.privacy.android.shared.nodes.selection.SelectableTypedNode
  * @param modifier
  * @param showChangeViewType whether to show change view type button
  * @param listContentPadding the content padding of the list/lazyColumn
- * @param isContactVerificationOn whether contact verification is enabled
  */
 @Composable
 internal fun <T : TypedNode> NodeListView(
@@ -61,8 +60,6 @@ internal fun <T : TypedNode> NodeListView(
     showChangeViewType: Boolean = true,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     inSelectionMode: Boolean = false,
-    isContactVerificationOn: Boolean = false,
-    isHiddenNodesEnabled: Boolean = false,
     bannerHeader: (@Composable () -> Unit)? = null,
 ) {
     FastScrollLazyColumn(
@@ -120,8 +117,8 @@ internal fun <T : TypedNode> NodeListView(
                 label = nodeUiItem.nodeLabel,
                 showLink = nodeUiItem.showLink,
                 showFavourite = nodeUiItem.showFavourite,
-                isSensitive = nodeUiItem.isSensitive && isHiddenNodesEnabled,
-                showBlurEffect = nodeUiItem.showBlurEffect && isHiddenNodesEnabled,
+                isSensitive = nodeUiItem.isSensitive,
+                showBlurEffect = nodeUiItem.showBlurEffect,
                 isHighlighted = nodeUiItem.isHighlighted,
                 onMoreClicked = { onMenuClick(nodeUiItem.node) },
                 onItemClicked = { onItemClicked(nodeUiItem.node) },

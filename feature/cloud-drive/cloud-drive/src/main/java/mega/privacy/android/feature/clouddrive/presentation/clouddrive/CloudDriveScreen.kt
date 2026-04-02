@@ -31,8 +31,10 @@ import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.computeSelectedItemsCount
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.getSelectedItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
@@ -61,6 +63,7 @@ fun CloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    navigateToCloudDriveFolder: (TypedFolderNode, NodeSourceType) -> Unit,
     setNavigationBarVisibility: (Boolean) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel =
@@ -84,32 +87,30 @@ fun CloudDriveScreen(
     val selectionState = rememberNodeSelectionState()
     ReportSelectionMode(isInSelectionMode = selectionState.isInSelectionMode)
 
-    val selectedItemsCount by remember {
-        derivedStateOf {
-            uiState.computeSelectedItemsCount(
-                selectedIds = selectionState.selectedNodeIds,
-            )
-        }
-    }
     val isAllSelected by remember {
-        derivedStateOf { selectedItemsCount == uiState.visibleItemsCount && uiState.visibleItemsCount > 0 }
+        derivedStateOf {
+            val itemsCount =
+                (uiState as? CloudDriveUiState.Data)?.items?.size ?: 0
+            selectionState.selectedItemsCount == itemsCount && itemsCount > 0
+        }
     }
     val selectedNodes by remember {
         derivedStateOf {
-            val ids = selectionState.selectedNodeIds
-            uiState.items.mapNotNull { item ->
-                if (item.node.id in ids) item.node else null
-            }
+            uiState.getSelectedItems(selectionState.selectedNodeIds)
         }
     }
 
+
     // Select-all-during-partial-load: once fully loaded, select all items
-    LaunchedEffect(selectionState.selectAllAwaitingMoreItems, uiState.nodesLoadingState) {
-        if (selectionState.selectAllAwaitingMoreItems) {
-            selectionState.selectAll(
-                uiState.items.map { it.node.id }.toSet(),
-                uiState.nodesLoadingState
-            )
+    LaunchedEffect(selectionState.selectAllAwaitingMoreItems, uiState) {
+        val state = uiState
+        if (state is CloudDriveUiState.Data) {
+            if (selectionState.selectAllAwaitingMoreItems) {
+                selectionState.selectAll(
+                    state.items.map { it.node.id }.toSet(),
+                    state.nodesLoadingState
+                )
+            }
         }
     }
 
@@ -123,64 +124,81 @@ fun CloudDriveScreen(
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
-            if (selectionState.isInSelectionMode) {
-                NodeSelectionModeAppBar(
-                    modifier = Modifier.testTag(CLOUD_DRIVE_SELECTION_MODE_APP_BAR_TAG),
-                    count = selectedItemsCount,
-                    isAllSelected = isAllSelected,
-                    isSelecting = selectionState.selectAllAwaitingMoreItems,
-                    onSelectAllClicked = {
-                        val allIds = uiState.items.map { it.node.id }.toSet()
-                        selectionState.selectAll(allIds, uiState.nodesLoadingState)
-                    },
-                    onCancelSelectionClicked = { selectionState.deselectAll() }
-                )
-            } else {
-                MegaTopAppBar(
-                    modifier = Modifier.testTag(CLOUD_DRIVE_MAIN_APP_BAR_TAG),
-                    title = uiState.title.text,
-                    navigationType = AppBarNavigationType.Back(onBack),
-                    trailingIcons = {
-                        TransfersToolbarWidget {
-                            navigationHandler.navigate(TransfersNavKey())
+            when (val state = uiState) {
+                is CloudDriveUiState.Loading -> {
+                    MegaTopAppBar(
+                        modifier = Modifier.testTag(CLOUD_DRIVE_MAIN_APP_BAR_TAG),
+                        title = uiState.title.text,
+                        navigationType = AppBarNavigationType.Back(onBack),
+                        trailingIcons = {
+                            TransfersToolbarWidget {
+                                navigationHandler.navigate(TransfersNavKey())
+                            }
                         }
-                    },
-                    actions = buildList {
-                        if (uiState.items.isNotEmpty()) {
-                            add(
-                                MenuActionWithClick(CommonMenuAction.Search) {
-                                    navigationHandler.navigate(
-                                        SearchNavKey(
-                                            parentHandle = uiState.currentFolderId.longValue,
-                                            nodeSourceType = uiState.nodeSourceType
-                                        )
-                                    )
-                                }
-                            )
-                        }
+                    )
+                }
 
-                        if (!uiState.isCloudDriveRoot) {
-                            add(
-                                MenuActionWithClick(
-                                    CommonMenuAction.More
-                                ) {
-                                    Analytics.tracker.trackEvent(
-                                        CloudDriveParentNodeMoreButtonPressedEvent
-                                    )
-                                    val folderId = uiState.currentFolderId.longValue
-                                    if (folderId != -1L) {
-                                        navigationHandler.navigate(
-                                            NodeOptionsBottomSheetNavKey(
-                                                nodeHandle = folderId,
-                                                nodeSourceType = uiState.nodeSourceType,
-                                            )
-                                        )
-                                    }
+                is CloudDriveUiState.Data -> {
+                    if (selectionState.isInSelectionMode) {
+                        NodeSelectionModeAppBar(
+                            modifier = Modifier.testTag(CLOUD_DRIVE_SELECTION_MODE_APP_BAR_TAG),
+                            count = selectionState.selectedItemsCount,
+                            isAllSelected = isAllSelected,
+                            isSelecting = selectionState.selectAllAwaitingMoreItems,
+                            onSelectAllClicked = {
+                                val allIds = state.items.map { it.node.id }.toSet()
+                                selectionState.selectAll(allIds, state.nodesLoadingState)
+                            },
+                            onCancelSelectionClicked = { selectionState.deselectAll() }
+                        )
+                    } else {
+                        MegaTopAppBar(
+                            modifier = Modifier.testTag(CLOUD_DRIVE_MAIN_APP_BAR_TAG),
+                            title = uiState.title.text,
+                            navigationType = AppBarNavigationType.Back(onBack),
+                            trailingIcons = {
+                                TransfersToolbarWidget {
+                                    navigationHandler.navigate(TransfersNavKey())
                                 }
-                            )
-                        }
-                    },
-                )
+                            },
+                            actions = buildList {
+                                if (state.items.isNotEmpty()) {
+                                    add(
+                                        MenuActionWithClick(CommonMenuAction.Search) {
+                                            navigationHandler.navigate(
+                                                SearchNavKey(
+                                                    parentHandle = state.currentFolderId.longValue,
+                                                    nodeSourceType = uiState.nodeSourceType
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
+
+                                if (!state.isCloudDriveRoot) {
+                                    add(
+                                        MenuActionWithClick(
+                                            CommonMenuAction.More
+                                        ) {
+                                            Analytics.tracker.trackEvent(
+                                                CloudDriveParentNodeMoreButtonPressedEvent
+                                            )
+                                            val folderId = state.currentFolderId.longValue
+                                            if (folderId != -1L) {
+                                                navigationHandler.navigate(
+                                                    NodeOptionsBottomSheetNavKey(
+                                                        nodeHandle = folderId,
+                                                        nodeSourceType = uiState.nodeSourceType,
+                                                    )
+                                                )
+                                            }
+                                        }
+                                    )
+                                }
+                            },
+                        )
+                    }
+                }
             }
         },
         bottomBar = {
@@ -198,11 +216,15 @@ fun CloudDriveScreen(
             )
         },
         floatingActionButton = {
+            val visible = with(uiState as? CloudDriveUiState.Data) {
+                this?.isUploadAllowed == true && this.items.isEmpty()
+                    .not() && selectionState.isInSelectionMode.not()
+            }
             AddContentFab(
                 modifier = Modifier
                     .testTag(CLOUD_DRIVE_FAB_TAG)
                     .applyScrollToHideFabBehavior(),
-                visible = uiState.isUploadAllowed && !uiState.isEmpty && !selectionState.isInSelectionMode,
+                visible = visible,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
                     showUploadOptionsBottomSheet = true
@@ -225,8 +247,9 @@ fun CloudDriveScreen(
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
                 selectionState = selectionState,
                 isInSelectionMode = selectionState.isInSelectionMode,
-                selectedItemsCount = selectedItemsCount,
+                selectedItemsCount = selectionState.selectedItemsCount,
                 selectedNodes = selectedNodes,
+                navigateToFolder = navigateToCloudDriveFolder,
             )
         }
     )
@@ -235,12 +258,14 @@ fun CloudDriveScreen(
         setNavigationBarVisibility(!selectionState.isInSelectionMode)
     }
 
-    @SuppressLint("ComposeViewModelForwarding")
-    ScanDocumentHandler(
-        parentNodeId = uiState.currentFolderId,
-        megaNavigator = megaNavigator,
-        viewModel = scanDocumentViewModel
-    )
+    (uiState as? CloudDriveUiState.Data)?.currentFolderId?.let {
+        @SuppressLint("ComposeViewModelForwarding")
+        ScanDocumentHandler(
+            parentNodeId = it,
+            megaNavigator = megaNavigator,
+            viewModel = scanDocumentViewModel
+        )
+    }
 }
 
 internal const val CLOUD_DRIVE_FAB_TAG = "cloud_drive_screen:add_content_fab"

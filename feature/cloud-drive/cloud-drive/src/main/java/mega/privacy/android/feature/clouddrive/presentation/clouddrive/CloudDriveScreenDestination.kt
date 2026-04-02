@@ -1,16 +1,12 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -32,12 +28,16 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
     entry<CloudDriveNavKey> { key ->
         val viewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(
             creationCallback = { factory ->
-                factory.create(key)
+                val args = CloudDriveViewModel.Args(
+                    currentFolderId = NodeId(key.nodeHandle),
+                    title = LocalizedText.Literal(key.nodeName ?: ""),
+                    nodeSourceType = key.nodeSourceType,
+                    highlightedNodeId = key.highlightedNodeHandle?.let { NodeId(it) },
+                    highlightedNodeNames = key.highlightedNodeNames,
+                )
+                factory.create(args)
             }
         )
-        val snackbarHostState = LocalSnackBarHostState.current
-        val context = LocalContext.current
-        var hasShownSnackbar by rememberSaveable { mutableStateOf(false) }
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                 creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
@@ -57,7 +57,16 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
             onBack = onBack,
             onTransfer = onTransfer,
             setNavigationBarVisibility = setNavigationBarVisibility,
-            nodeOptionsActionViewModel = nodeOptionsActionViewModel
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigateToCloudDriveFolder = { folder, nodeSourceType ->
+                navigationHandler.navigate(
+                    CloudDriveNavKey(
+                        nodeHandle = folder.id.longValue,
+                        nodeName = folder.name,
+                        nodeSourceType = nodeSourceType,
+                    )
+                )
+            }
         )
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -49,16 +50,15 @@ import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ChangeViewTypeClicked
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ItemClicked
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateBackEventConsumed
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateToFolderEventConsumed
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
@@ -108,6 +108,7 @@ internal fun CloudDriveContent(
     isInSelectionMode: Boolean,
     selectedItemsCount: Int,
     selectedNodes: List<TypedNode>,
+    navigateToFolder: (TypedFolderNode, NodeSourceType) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -130,16 +131,6 @@ internal fun CloudDriveContent(
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     val uploadUrisEventState = rememberUploadUrisEventState()
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-
-    val uploadHandler = rememberUploadHandler(
-        parentId = uiState.currentFolderId,
-        onFilesSelected = { uris ->
-            pitagTrigger = PitagTrigger.Picker
-            uploadUrisEventState.trigger(uris)
-        },
-        megaNavigator = megaNavigator,
-        megaResultContract = megaResultContract
-    )
 
     val captureHandler = rememberCaptureHandler(
         onPhotoCaptured = { uri ->
@@ -195,9 +186,10 @@ internal fun CloudDriveContent(
             },
         )
         val showContactVerificationBanner =
-            !uiState.isLoading && uiState.showContactNotVerifiedBanner && uiState.title.text.isNotEmpty()
-        val showOverQuotaWarning =
+            (uiState as? CloudDriveUiState.Data)?.showContactNotVerifiedBanner == true && uiState.title.text.isNotEmpty()
+        val showOverQuotaWarning = (uiState as? CloudDriveUiState.Data)?.let {
             overQuotaUiState.overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && overQuotaUiState.shouldShowWarning
+        } ?: false
         val topPadding =
             if ((showContactVerificationBanner || isTabContent) && !showOverQuotaWarning) 12.dp else 0.dp
 
@@ -210,8 +202,8 @@ internal fun CloudDriveContent(
             )
         }
 
-        when {
-            uiState.isLoading -> {
+        when (uiState) {
+            is CloudDriveUiState.Loading -> {
                 NodesViewSkeleton(
                     isListView = isListView,
                     spanCount = spanCount,
@@ -219,228 +211,243 @@ internal fun CloudDriveContent(
                     delay = NodeSkeletons.defaultDelay,
                 )
             }
-
-            uiState.isEmpty -> {
-                CloudDriveEmptyView(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(bottom = 56.dp),
-                    isRootCloudDrive = uiState.isCloudDriveRoot,
-                    onAddItemsClicked = {
-                        Analytics.tracker.trackEvent(CloudDriveEmptyStateAddFilesPressedEvent)
-                        onToggleShowUploadOptionsBottomSheet(true)
-                    },
-                    showAddItems = uiState.isUploadAllowed
-                )
-            }
-
-            else -> {
-                val folderName = uiState.title.text
-
-                NodesView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-
-                listContentPadding = PaddingValues(
-                    top = topPadding,
-                    bottom = contentPadding.calculateSafeBottomPadding()
-                ),
-                listState = listState,
-                gridState = gridState,
-                spanCount = spanCount,
-                items = uiState.items,
-                isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                showHiddenNodes = uiState.showHiddenNodes,
-                onMenuClicked = {
-                    Analytics.tracker.trackEvent(CloudDriveChildNodeMoreButtonPressedEvent)
-                    navigationHandler.navigate(
-                        NodeOptionsBottomSheetNavKey(
-                            nodeHandle = it.id.longValue,
-                            nodeSourceType = uiState.nodeSourceType,
-                        )
+            is CloudDriveUiState.Data -> {
+                if (uiState.items.isEmpty()) {
+                    CloudDriveEmptyView(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(bottom = 56.dp),
+                        isRootCloudDrive = uiState.isCloudDriveRoot,
+                        onAddItemsClicked = {
+                            Analytics.tracker.trackEvent(CloudDriveEmptyStateAddFilesPressedEvent)
+                            onToggleShowUploadOptionsBottomSheet(true)
+                        },
+                        showAddItems = uiState.isUploadAllowed
                     )
-                },
-                onItemClicked = {
-                    if (isInSelectionMode) {
-                        selectionState.toggleSelection(it.id)
-                    } else {
-                        onAction(ItemClicked(it))
-                    }
-                },
-                onLongClicked = { selectionState.toggleSelection(it.id) },
-                    sortConfiguration = uiState.selectedSortConfiguration,
-                    isListView = isListView,
-                    onSortOrderClick = {
-                        Analytics.tracker.trackEvent(SortButtonPressedEvent)
-                        showSortBottomSheet = true
-                    },
-                    onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
-                    showMediaDiscoveryButton = uiState.isMediaDiscoveryAllowed,
-                    onEnterMediaDiscoveryClick = {
-                        navigationHandler.navigate(
-                            CloudDriveMediaDiscoveryNavKey(
-                                folderId = uiState.currentFolderId.longValue,
-                                folderName = folderName,
-                                fromFolderLink = false,
-                                nodeSourceType = uiState.nodeSourceType,
-                            )
-                        )
-                    },
-                    inSelectionMode = isInSelectionMode,
-                    isContactVerificationOn = uiState.isContactVerificationOn,
-                    bannerHeader = if (showOverQuotaWarning) {
-                        {
-                            OverQuotaWarningBanner(
-                                overQuotaUiState.overQuotaStatus,
-                                onDismissed = {
-                                    overQuotaStatusViewModel.dismissWarning()
-                                },
-                                onUpgradeClicked = {
-                                    megaNavigator.openUpgradeAccount(context)
-                                },
-                            )
-                        }
-                    } else null,
-                nodeSelectionState = selectionState,
-            )}
-        }
+                } else {
+                    val folderName = uiState.title.text
+                    var selectedFile: TypedFileNode? by remember { mutableStateOf(null) }
+                    NodesView(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
 
-        EventEffect(
-            event = uiState.navigateToFolderEvent,
-            onConsumed = { onAction(NavigateToFolderEventConsumed) }
-        ) { node ->
-            navigationHandler.navigate(
-                CloudDriveNavKey(
-                    nodeHandle = node.id.longValue,
-                    nodeName = node.name,
-                    nodeSourceType = uiState.nodeSourceType
-                )
-            )
-        }
-
-        EventEffect(
-            event = uiState.navigateBack,
-            onConsumed = { onAction(NavigateBackEventConsumed) }
-        ) {
-            onNavigateBack()
-        }
-
-        uiState.openedFileNode?.let { openedFileNode ->
-            HandleNodeAction3(
-                typedFileNode = openedFileNode,
-                snackBarHostState = snackbarHostState,
-                coroutineScope = coroutineScope,
-                onActionHandled = { onAction(OpenedFileNodeHandled) },
-                nodeSourceData = NodeSourceData.Default(uiState.nodeSourceType),
-                onDownloadEvent = onTransfer,
-                sortOrder = uiState.selectedSortOrder,
-                onNavigate = navigationHandler::navigate,
-            )
-        }
-
-        UploadingFiles(
-            nameCollisionLauncher = nameCollisionLauncher,
-            parentNodeId = uiState.currentFolderId,
-            urisEvent = uploadUrisEventState.event,
-            onUrisConsumed = uploadUrisEventState::consume,
-            pitagTrigger = pitagTrigger,
-            onStartUpload = { transferTriggerEvent ->
-                onTransfer(transferTriggerEvent)
-                pitagTrigger = PitagTrigger.NotApplicable
-            },
-        )
-
-        if (showUploadOptionsBottomSheet) {
-            UploadOptionsBottomSheet(
-                onUploadFilesClicked = {
-                    uploadHandler.onUploadFilesClicked()
-                },
-                onUploadFolderClicked = {
-                    uploadHandler.onUploadFolderClicked()
-                },
-                onScanDocumentClicked = {
-                    onPrepareScanDocument()
-                },
-                onCaptureClicked = {
-                    captureHandler.onCaptureClicked()
-                },
-                onNewFolderClicked = {
-                    showNewFolderDialog = true
-                },
-                onNewTextFileClicked = {
-                    showNewTextFileDialog = true
-                },
-                onOpenLinkClicked = {
-                    navigationHandler.navigate(OpenLinkDialogNavKey)
-                },
-                onDismissSheet = {
-                    onToggleShowUploadOptionsBottomSheet(false)
-                },
-            )
-        }
-
-        if (showNewFolderDialog) {
-            NewFolderNodeDialog(
-                parentNode = uiState.currentFolderId,
-                onCreateFolder = { folderId ->
-                    showNewFolderDialog = false
-                    coroutineScope.launch {
-                        if (folderId != null) {
+                        listContentPadding = PaddingValues(
+                            top = topPadding,
+                            bottom = contentPadding.calculateSafeBottomPadding()
+                        ),
+                        listState = listState,
+                        gridState = gridState,
+                        spanCount = spanCount,
+                        items = uiState.items,
+                        isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
+                        onMenuClicked = {
+                            Analytics.tracker.trackEvent(CloudDriveChildNodeMoreButtonPressedEvent)
                             navigationHandler.navigate(
-                                CloudDriveNavKey(
-                                    nodeHandle = folderId.longValue,
-                                    nodeSourceType = uiState.nodeSourceType
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = it.id.longValue,
+                                    nodeSourceType = uiState.nodeSourceType,
                                 )
                             )
-                        } else {
-                            snackbarHostState?.showAutoDurationSnackbar(resources.getString(sharedR.string.folder_not_created_error_message))
-                        }
-                    }
-                },
-                onDismiss = {
-                    showNewFolderDialog = false
-                }
-            )
-        }
-
-        if (showNewTextFileDialog) {
-            NewTextFileNodeDialog(
-                parentNode = uiState.currentFolderId,
-                onDismiss = {
-                    showNewTextFileDialog = false
-                }
-            )
-        }
-
-        if (showSortBottomSheet) {
-            SortBottomSheet(
-                title = stringResource(sharedR.string.action_sort_by_header),
-                options = NodeSortOption.getOptionsForSourceType(uiState.nodeSourceType),
-                sheetState = sortBottomSheetState,
-                selectedSort = SortBottomSheetResult(
-                    sortOptionItem = uiState.selectedSortConfiguration.sortOption,
-                    sortDirection = uiState.selectedSortConfiguration.sortDirection
-                ),
-                onSortOptionSelected = { result ->
-                    result?.let {
-                        it.sortOptionItem.trackAnalyticsEvent()
-                        onSortNodes(
-                            NodeSortConfiguration(
-                                sortOption = it.sortOptionItem,
-                                sortDirection = it.sortDirection
+                        },
+                        onItemClicked = {
+                            if (isInSelectionMode) {
+                                selectionState.toggleSelection(it.id)
+                            } else {
+                                if (it is TypedFileNode) {
+                                    selectedFile = it
+                                } else if (it is TypedFolderNode) {
+                                    navigateToFolder(it, uiState.nodeSourceType)
+                                }
+                            }
+                        },
+                        onLongClicked = { selectionState.toggleSelection(it.id) },
+                        sortConfiguration = uiState.selectedSortConfiguration,
+                        isListView = isListView,
+                        onSortOrderClick = {
+                            Analytics.tracker.trackEvent(SortButtonPressedEvent)
+                            showSortBottomSheet = true
+                        },
+                        onChangeViewTypeClicked = {
+                            onAction(
+                                ChangeViewTypeClicked(
+                                    when (uiState.currentViewType) {
+                                        ViewType.LIST -> ViewType.GRID
+                                        ViewType.GRID -> ViewType.LIST
+                                    }
+                                )
                             )
+                        },
+                        showMediaDiscoveryButton = uiState.isMediaDiscoveryAllowed,
+                        onEnterMediaDiscoveryClick = {
+                            navigationHandler.navigate(
+                                CloudDriveMediaDiscoveryNavKey(
+                                    folderId = uiState.currentFolderId.longValue,
+                                    folderName = folderName,
+                                    fromFolderLink = false,
+                                    nodeSourceType = uiState.nodeSourceType,
+                                )
+                            )
+                        },
+                        inSelectionMode = isInSelectionMode,
+                        bannerHeader = if (showOverQuotaWarning) {
+                            {
+                                OverQuotaWarningBanner(
+                                    overQuotaUiState.overQuotaStatus,
+                                    onDismissed = {
+                                        overQuotaStatusViewModel.dismissWarning()
+                                    },
+                                    onUpgradeClicked = {
+                                        megaNavigator.openUpgradeAccount(context)
+                                    },
+                                )
+                            }
+                        } else null,
+                        nodeSelectionState = selectionState,
+                    )
+
+                    selectedFile?.let { openedFileNode ->
+                        HandleNodeAction3(
+                            typedFileNode = openedFileNode,
+                            snackBarHostState = snackbarHostState,
+                            coroutineScope = coroutineScope,
+                            onActionHandled = { selectedFile = null },
+                            nodeSourceData = NodeSourceData.Default(uiState.nodeSourceType),
+                            onDownloadEvent = onTransfer,
+                            sortOrder = uiState.selectedSortOrder,
+                            onNavigate = navigationHandler::navigate,
                         )
-                        showSortBottomSheet = false
                     }
-                },
-                onDismissRequest = {
-                    showSortBottomSheet = false
+
                 }
-            )
+
+                EventEffect(
+                    event = uiState.navigateBack,
+                    onConsumed = { onAction(NavigateBackEventConsumed) }
+                ) {
+                    onNavigateBack()
+                }
+
+
+
+                UploadingFiles(
+                    nameCollisionLauncher = nameCollisionLauncher,
+                    parentNodeId = uiState.currentFolderId,
+                    urisEvent = uploadUrisEventState.event,
+                    onUrisConsumed = uploadUrisEventState::consume,
+                    pitagTrigger = pitagTrigger,
+                    onStartUpload = { transferTriggerEvent ->
+                        onTransfer(transferTriggerEvent)
+                        pitagTrigger = PitagTrigger.NotApplicable
+
+                    },
+                )
+
+                val uploadHandler = rememberUploadHandler(
+                    parentId = uiState.currentFolderId,
+                    onFilesSelected = { uris ->
+                        pitagTrigger = PitagTrigger.Picker
+                        uploadUrisEventState.trigger(uris)
+                    },
+                    megaNavigator = megaNavigator,
+                    megaResultContract = megaResultContract
+                )
+
+                if (showUploadOptionsBottomSheet) {
+                    UploadOptionsBottomSheet(
+                        onUploadFilesClicked = {
+                            uploadHandler.onUploadFilesClicked()
+                        },
+                        onUploadFolderClicked = {
+                            uploadHandler.onUploadFolderClicked()
+                        },
+                        onScanDocumentClicked = {
+                            onPrepareScanDocument()
+                        },
+                        onCaptureClicked = {
+                            captureHandler.onCaptureClicked()
+                        },
+                        onNewFolderClicked = {
+                            showNewFolderDialog = true
+                        },
+                        onNewTextFileClicked = {
+                            showNewTextFileDialog = true
+                        },
+                        onOpenLinkClicked = {
+                    navigationHandler.navigate(OpenLinkDialogNavKey)
+                },onDismissSheet = {
+                            onToggleShowUploadOptionsBottomSheet(false)
+                        },
+                    )
+                }
+
+                if (showNewFolderDialog) {
+                    NewFolderNodeDialog(
+                        parentNode = uiState.currentFolderId,
+                        onCreateFolder = { folderId ->
+                            showNewFolderDialog = false
+                            coroutineScope.launch {
+                                if (folderId != null) {
+                                    navigationHandler.navigate(
+                                        CloudDriveNavKey(
+                                            nodeHandle = folderId.longValue,
+                                            nodeSourceType = uiState.nodeSourceType
+                                        )
+                                    )
+                                } else {
+                                    snackbarHostState?.showAutoDurationSnackbar(
+                                        resources.getString(
+                                            sharedR.string.folder_not_created_error_message
+                                        )
+                                    )
+                                }
+                            }
+                        },
+                        onDismiss = {
+                            showNewFolderDialog = false
+                        }
+                    )
+                }
+
+                if (showNewTextFileDialog) {
+                    NewTextFileNodeDialog(
+                        parentNode = uiState.currentFolderId,
+                        onDismiss = {
+                            showNewTextFileDialog = false
+                        }
+                    )
+                }
+
+                if (showSortBottomSheet) {
+                    SortBottomSheet(
+                        title = stringResource(sharedR.string.action_sort_by_header),
+                        options = NodeSortOption.getOptionsForSourceType(uiState.nodeSourceType),
+                        sheetState = sortBottomSheetState,
+                        selectedSort = SortBottomSheetResult(
+                            sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                            sortDirection = uiState.selectedSortConfiguration.sortDirection
+                        ),
+                        onSortOptionSelected = { result ->
+                            result?.let {
+                                it.sortOptionItem.trackAnalyticsEvent()
+                                onSortNodes(
+                                    NodeSortConfiguration(
+                                        sortOption = it.sortOptionItem,
+                                        sortDirection = it.sortDirection
+                                    )
+                                )
+                                showSortBottomSheet = false
+                            }
+                        },
+                        onDismissRequest = {
+                            showSortBottomSheet = false
+                        }
+                    )
+                }
+            }
         }
+
     }
 }
 

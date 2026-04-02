@@ -25,7 +25,6 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
@@ -36,7 +35,6 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.audio.model.AudioAction
 import mega.privacy.android.feature.clouddrive.presentation.audio.model.AudioUiState
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -47,7 +45,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -69,7 +67,6 @@ class AudioViewModelTest {
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
@@ -87,7 +84,6 @@ class AudioViewModelTest {
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
@@ -105,7 +101,6 @@ class AudioViewModelTest {
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase,
-            getFeatureFlagValueUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
             monitorNodeUpdatesUseCase,
@@ -115,11 +110,12 @@ class AudioViewModelTest {
 
     private fun setupStubs(
         domainNodes: List<TypedNode> = emptyList(),
-        searchRevampEnabled: Boolean = false,
-    ) {
-        val viewItems = domainNodes.map {
+        uiNodes: List<NodeViewItem<TypedNode>> = domainNodes.map {
             NodeViewItem(it)
-        }
+        },
+        hiddenNodesEnabled: Boolean = false,
+        showHiddenItems: Boolean = false,
+    ) {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(
             flow {
                 emit(NodeUpdate(emptyMap()))
@@ -143,8 +139,8 @@ class AudioViewModelTest {
         whenever(nodeSortConfigurationUiMapper(any(), any())).thenReturn(
             NodeSortConfiguration.default
         )
-        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(hiddenNodesEnabled))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(showHiddenItems))
         searchUseCase.stub {
             onBlocking {
                 invoke(
@@ -158,18 +154,14 @@ class AudioViewModelTest {
         nodeViewItemMapper.stub {
             onBlocking {
                 invoke(
-                    nodeList = any(),
-                    nodeSourceType = any(),
-                    isPublicNodes = any(),
-                    showPublicLinkCreationTime = any(),
-                    highlightedNodeId = anyOrNull(),
-                    highlightedNames = anyOrNull(),
-                    isContactVerificationOn = any(),
+                    nodeList = domainNodes,
+                    nodeSourceType = NodeSourceType.AUDIO,
+                    highlightedNodeId = null,
+                    highlightedNames = null,
+                    isContactVerificationOn = false,
+                    isHiddenNodesEnabled = hiddenNodesEnabled,
                 )
-            } doReturn viewItems
-        }
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.SearchRevamp) } doReturn searchRevampEnabled
+            } doReturn uiNodes
         }
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
     }
@@ -186,7 +178,6 @@ class AudioViewModelTest {
                     assertThat(data.items).isEmpty()
                     assertThat(data.currentViewType).isEqualTo(ViewType.LIST)
                     assertThat(data.selectedSortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-                    assertThat(data.isSearchRevampEnabled).isFalse()
                 }
         }
 
@@ -244,30 +235,85 @@ class AudioViewModelTest {
         }
 
     @Test
-    fun `test that uiState reflects isHiddenNodesEnabled when monitorHiddenNodesEnabledUseCase emits true`() =
+    fun `test that isHiddenNodesEnabled is passed to the mapper`() =
         runTest {
-            setupStubs()
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            setupStubs(
+                hiddenNodesEnabled = true
+            )
 
             underTest.uiState
                 .filterIsInstance<AudioUiState.Data>()
                 .test {
-                    val loaded = awaitItem()
-                    assertThat(loaded.isHiddenNodesEnabled).isTrue()
+                    awaitItem()
+                    verify(nodeViewItemMapper, atLeastOnce()).invoke(
+                        nodeList = emptyList(),
+                        nodeSourceType = NodeSourceType.AUDIO,
+                        highlightedNodeId = null,
+                        highlightedNames = null,
+                        isContactVerificationOn = false,
+                        isHiddenNodesEnabled = true,
+                    )
                 }
         }
 
     @Test
-    fun `test that uiState reflects showHiddenNodes when monitorShowHiddenItemsUseCase emits true`() =
+    fun `test that uiState filters sensitive nodes when showHiddenItems is false and hiddenNodes is enabled`() =
         runTest {
-            setupStubs()
-            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            val sensitiveNode = mock<TypedFileNode> {
+                on { id } doReturn NodeId(1L)
+            }
+            val normalNode = mock<TypedFileNode> {
+                on { id } doReturn NodeId(2L)
+            }
+            val domainNodes = listOf(sensitiveNode, normalNode)
+            val uiNodes = listOf<NodeViewItem<TypedNode>>(
+                NodeViewItem(sensitiveNode, isSensitive = true),
+                NodeViewItem(normalNode, isSensitive = false),
+            )
+            setupStubs(
+                domainNodes = domainNodes,
+                uiNodes = uiNodes,
+                hiddenNodesEnabled = true,
+                showHiddenItems = false,
+            )
+
 
             underTest.uiState
                 .filterIsInstance<AudioUiState.Data>()
                 .test {
                     val loaded = awaitItem()
-                    assertThat(loaded.showHiddenNodes).isTrue()
+                    assertThat(loaded.items).hasSize(1)
+                    assertThat(loaded.items[0].node.id).isEqualTo(NodeId(2L))
+                }
+        }
+
+    @Test
+    fun `test that uiState does not filter sensitive nodes when showHiddenItems is true and hiddenNodes is enabled`() =
+        runTest {
+            val sensitiveNode = mock<TypedFileNode> {
+                on { id } doReturn NodeId(1L)
+            }
+            val normalNode = mock<TypedFileNode> {
+                on { id } doReturn NodeId(2L)
+            }
+            val domainNodes = listOf(sensitiveNode, normalNode)
+            val uiNodes = listOf<NodeViewItem<TypedNode>>(
+                NodeViewItem(sensitiveNode, isSensitive = true),
+                NodeViewItem(normalNode, isSensitive = false),
+            )
+            setupStubs(
+                domainNodes = domainNodes,
+                uiNodes = uiNodes,
+                hiddenNodesEnabled = true,
+                showHiddenItems = true,
+            )
+
+
+            underTest.uiState
+                .filterIsInstance<AudioUiState.Data>()
+                .test {
+                    val loaded = awaitItem()
+                    assertThat(loaded.items).hasSize(2)
                 }
         }
 

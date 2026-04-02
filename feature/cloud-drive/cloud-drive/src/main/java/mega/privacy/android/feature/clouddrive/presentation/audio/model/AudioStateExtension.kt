@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.clouddrive.model
+package mega.privacy.android.feature.clouddrive.presentation.audio.model
 
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -9,12 +9,12 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param selectedIds
  * @return selected nodes
  */
-fun CloudDriveUiState.getSelectedItems(selectedIds: Set<NodeId>): List<TypedNode> =
+fun AudioUiState.getSelectedItems(selectedIds: Set<NodeId>): List<TypedNode> =
     when (this) {
-        is CloudDriveUiState.Data -> {
+        is AudioUiState.Data -> {
             items.filter { it.id in selectedIds }
                 .map { it.node }
         }
 
-        is CloudDriveUiState.Loading -> emptyList()
+        is AudioUiState.Loading -> emptyList()
     }

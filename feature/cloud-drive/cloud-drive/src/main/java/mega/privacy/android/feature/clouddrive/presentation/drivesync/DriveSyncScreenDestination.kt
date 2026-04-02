@@ -3,9 +3,11 @@ package mega.privacy.android.feature.clouddrive.presentation.drivesync
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.decorator.withScreenViewEvent
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
@@ -29,7 +31,15 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
         val viewModel = hiltViewModel<DriveSyncViewModel>()
         val cloudDriveViewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(
             creationCallback = { factory ->
-                factory.create(CloudDriveNavKey(highlightedNodeHandle = key.highlightedNodeHandle))
+                val args = CloudDriveViewModel.Args(
+                    currentFolderId = NodeId(-1L),
+                    title = LocalizedText.Literal(""),
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                    highlightedNodeId = key.highlightedNodeHandle?.let { NodeId(it) },
+                    highlightedNodeNames = null,
+                )
+
+                factory.create(args)
             }
         )
         val nodeOptionsActionViewModel =
@@ -52,7 +62,16 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
             setNavigationBarVisibility = setNavigationVisibility,
             onTransfer = onTransfer,
             initialTabIndex = key.initialTabIndex,
-            nodeOptionsActionViewModel = nodeOptionsActionViewModel
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigateToCloudDriveFolder = { folder, nodeSourceType ->
+                navigationHandler.navigate(
+                    CloudDriveNavKey(
+                        nodeHandle = folder.id.longValue,
+                        nodeName = folder.name,
+                        nodeSourceType = nodeSourceType,
+                    )
+                )
+            }
         )
     }
 }

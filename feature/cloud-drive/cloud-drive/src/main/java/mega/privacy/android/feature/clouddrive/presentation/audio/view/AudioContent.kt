@@ -107,7 +107,7 @@ internal fun AudioContent(
             }
 
             is AudioUiState.Data -> when {
-                uiState.isEmpty -> {
+                uiState.items.isEmpty() -> {
                     MegaEmptyView(
                         imagePainter = painterResource(id = iconPackR.drawable.ic_audio_glass),
                         text = stringResource(id = sharedR.string.homepage_empty_hint_audio)
@@ -126,8 +126,6 @@ internal fun AudioContent(
                     spanCount = spanCount,
                     items = uiState.items,
                     isNextPageLoading = false,
-                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                    showHiddenNodes = uiState.showHiddenNodes,
                     onMenuClicked = {
                         showNodeOptionsBottomSheet(
                             NodeOptionsBottomSheetNavKey(
@@ -154,7 +152,6 @@ internal fun AudioContent(
                     showMediaDiscoveryButton = false,
                     onEnterMediaDiscoveryClick = {},
                     inSelectionMode = isInSelectionMode,
-                    isContactVerificationOn = false,
                     nodeSelectionState = selectionState,
                 )
             }

@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
@@ -32,6 +33,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     nodeViewItemMapper: NodeViewItemMapper,
+    getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
@@ -43,6 +45,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
     nodeViewItemMapper = nodeViewItemMapper,
+    getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     args = args,
 ) {
 

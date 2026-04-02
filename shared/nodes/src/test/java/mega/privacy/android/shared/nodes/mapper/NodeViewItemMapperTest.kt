@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -224,6 +225,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = listOf(mockFolderNode),
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(1)
@@ -249,6 +254,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = listOf(mockFileNode),
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(1)
@@ -275,6 +284,9 @@ class NodeViewItemMapperTest {
                 nodeList = listOf(mockFolderNode),
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 highlightedNodeId = NodeId(1L),
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -290,6 +302,9 @@ class NodeViewItemMapperTest {
                 nodeList = listOf(mockFolderNode),
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 highlightedNames = listOf("Test Folder"),
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -297,7 +312,7 @@ class NodeViewItemMapperTest {
         }
 
     @Test
-    fun `test that invoke sets showBlurEffect to true when node is sensitive and has supported file type`() =
+    fun `test that invoke sets showBlurEffect to true when node is sensitive and has supported file type and isHiddenNodesEnabled is true`() =
         runTest {
             val mockSensitiveImageNode = createMockFileNode(
                 id = 4L,
@@ -311,11 +326,40 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockSensitiveImageNode),
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = true,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
             assertThat(result[0].isSensitive).isTrue()
             assertThat(result[0].showBlurEffect).isTrue()
+        }
+
+    @Test
+    fun `test that invoke sets isSensitive to true when node is sensitive and isHiddenNodesEnabled is true`() =
+        runTest {
+            val mockSensitiveImageNode = createMockFileNode(
+                id = 4L,
+                name = "sensitive_image.jpg",
+                isMarkedSensitive = true,
+            )
+            whenever(mockSensitiveImageNode.type).thenReturn(
+                StaticImageFileTypeInfo("image/jpeg", "jpg")
+            )
+
+            val result = underTest(
+                nodeList = listOf(mockSensitiveImageNode),
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = true,
+                highlightedNames = null,
+                isContactVerificationOn = false,
+            )
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].isSensitive).isTrue()
         }
 
     @Test
@@ -333,6 +377,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockSensitiveImageNode),
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = true,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -352,6 +400,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockSensitiveNode),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = true,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -360,7 +412,7 @@ class NodeViewItemMapperTest {
 
     @Test
     fun `test that invoke sets showLink to true when node has exportedData`() = runTest {
-        val mockExportedData = mock<mega.privacy.android.domain.entity.node.ExportedData> {
+        val mockExportedData = mock<ExportedData> {
             whenever(it.publicLink).thenReturn("https://mega.app/test")
             whenever(it.publicLinkCreationTime).thenReturn(1234567890L)
         }
@@ -373,6 +425,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = listOf(mockNodeWithLink),
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(1)
@@ -391,6 +447,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockFavouriteNode),
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -410,6 +470,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockFavouriteIncomingShare),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -427,6 +491,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = listOf(mockNodeWithDescription),
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(1)
@@ -446,6 +514,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = listOf(mockNodeWithDescription),
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(1)
@@ -465,6 +537,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = listOf(mockNodeWithTags),
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(1)
@@ -482,6 +558,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = listOf(mockNodeWithTags),
             nodeSourceType = NodeSourceType.RUBBISH_BIN,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(1)
@@ -497,6 +577,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = nodeList,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(2)
@@ -519,6 +603,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockShareFolderNode),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -542,6 +630,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockShareFolderNode),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -563,6 +655,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockShareFileNode),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -589,6 +685,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockShareFileNode),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)
@@ -605,6 +705,10 @@ class NodeViewItemMapperTest {
         val result = underTest(
             nodeList = listOf(mockFolderNode),
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
         )
 
         assertThat(result).hasSize(1)
@@ -624,6 +728,10 @@ class NodeViewItemMapperTest {
             val result = underTest(
                 nodeList = listOf(mockShareFolderNode),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
 
             assertThat(result).hasSize(1)

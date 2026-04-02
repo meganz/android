@@ -213,58 +213,60 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `test that offline state is returned when disconnected and has no offline files`() = runTest {
-        stubConnectivity(connected = false)
-        stubHasOfflineFiles(hasOfflineFiles = false)
-        stubWidgetProviders()
-        monitorHomeWidgetConfigurationUseCase.stub {
-            on { invoke() } doReturn flow {
-                emit(emptyList())
-                awaitCancellation()
-            }
-        }
-
-        underTest.state.test {
-            // Find the Offline state (may skip Loading if flows emit immediately)
-            val actual = awaitItem().let { state ->
-                if (state is HomeUiState.Offline) {
-                    state
-                } else {
-                    // If first item was Loading, await the next one
-                    awaitItem() as HomeUiState.Offline
+    fun `test that offline state is returned when disconnected and has no offline files`() =
+        runTest {
+            stubConnectivity(connected = false)
+            stubHasOfflineFiles(hasOfflineFiles = false)
+            stubWidgetProviders()
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(emptyList())
+                    awaitCancellation()
                 }
             }
-            assertThat(actual.hasOfflineFiles).isFalse()
+
+            underTest.state.test {
+                // Find the Offline state (may skip Loading if flows emit immediately)
+                val actual = awaitItem().let { state ->
+                    if (state is HomeUiState.Offline) {
+                        state
+                    } else {
+                        // If first item was Loading, await the next one
+                        awaitItem() as HomeUiState.Offline
+                    }
+                }
+                assertThat(actual.hasOfflineFiles).isFalse()
+            }
         }
-    }
 
     @Test
-    fun `test that offline state defaults to false when hasOfflineFilesUseCase throws exception`() = runTest {
-        stubConnectivity(connected = false)
-        hasOfflineFilesUseCase.stub {
-            onBlocking { invoke() }.thenThrow(RuntimeException("Test exception"))
-        }
-        stubWidgetProviders()
-        monitorHomeWidgetConfigurationUseCase.stub {
-            on { invoke() } doReturn flow {
-                emit(emptyList())
-                awaitCancellation()
+    fun `test that offline state defaults to false when hasOfflineFilesUseCase throws exception`() =
+        runTest {
+            stubConnectivity(connected = false)
+            hasOfflineFilesUseCase.stub {
+                onBlocking { invoke() }.thenThrow(RuntimeException("Test exception"))
             }
-        }
-
-        underTest.state.test {
-            // Find the Offline state (may skip Loading if flows emit immediately)
-            val actual = awaitItem().let { state ->
-                if (state is HomeUiState.Offline) {
-                    state
-                } else {
-                    // If first item was Loading, await the next one
-                    awaitItem() as HomeUiState.Offline
+            stubWidgetProviders()
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(emptyList())
+                    awaitCancellation()
                 }
             }
-            assertThat(actual.hasOfflineFiles).isFalse()
+
+            underTest.state.test {
+                // Find the Offline state (may skip Loading if flows emit immediately)
+                val actual = awaitItem().let { state ->
+                    if (state is HomeUiState.Offline) {
+                        state
+                    } else {
+                        // If first item was Loading, await the next one
+                        awaitItem() as HomeUiState.Offline
+                    }
+                }
+                assertThat(actual.hasOfflineFiles).isFalse()
+            }
         }
-    }
 
     private fun stubConnectivity(connected: Boolean = true) {
         monitorConnectivityUseCase.stub {

@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -24,6 +25,7 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     nodeViewItemMapper: NodeViewItemMapper,
+    getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val getIncomingSharesChildrenNodeUseCase: GetIncomingSharesChildrenNodeUseCase,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -31,6 +33,7 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
     nodeViewItemMapper = nodeViewItemMapper,
+    getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.INCOMING_SHARES,

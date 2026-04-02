@@ -16,13 +16,13 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel.Args
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import timber.log.Timber
 
@@ -33,6 +33,7 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     nodeViewItemMapper: NodeViewItemMapper,
+    getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val getAllFavoritesUseCase: GetAllFavoritesUseCase,
     @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
@@ -41,6 +42,7 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
     nodeViewItemMapper = nodeViewItemMapper,
+    getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.FAVOURITES,

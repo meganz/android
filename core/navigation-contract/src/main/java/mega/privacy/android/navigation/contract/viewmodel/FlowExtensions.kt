@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformWhile
 
 /**
  * Converts a Flow to a StateFlow for UI State that remains active while there are active subscribers.
@@ -27,3 +28,15 @@ fun <T> Flow<T>.asUiStateFlow(
     started = SharingStarted.WhileSubscribed(5000),
     initialValue = initialValue
 )
+
+/**
+ * Take while operator that also returns the first value that matches the predicate.
+ *
+ * @param T flow type parameter
+ * @param predicate only one item not matching this predicate will be returned
+ */
+inline fun <T> Flow<T>.takeWhileInclusive(crossinline predicate: suspend (T) -> Boolean): Flow<T> =
+    transformWhile { value ->
+        emit(value)
+        predicate(value)
+    }

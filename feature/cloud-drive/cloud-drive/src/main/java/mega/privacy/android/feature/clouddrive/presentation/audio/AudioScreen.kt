@@ -24,12 +24,12 @@ import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.audio.model.AudioUiState
+import mega.privacy.android.feature.clouddrive.presentation.audio.model.getSelectedItems
 import mega.privacy.android.feature.clouddrive.presentation.audio.view.AudioContent
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
-import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -69,27 +69,16 @@ fun AudioScreen(
     ReportSelectionMode(isInSelectionMode = selectionState.isInSelectionMode)
     val dataState = uiState as? AudioUiState.Data
 
-    val selectedItemsCount by remember {
-        derivedStateOf {
-            val data = uiState as? AudioUiState.Data
-            data?.computeSelectedItemsCount(selectedIds = selectionState.selectedNodeIds) ?: 0
-        }
-    }
     val isAllSelected by remember {
         derivedStateOf {
-            val data = uiState as? AudioUiState.Data
-            data?.let {
-                selectedItemsCount == it.visibleItemsCount && it.visibleItemsCount > 0
-            } ?: false
+            val itemsCount =
+                (uiState as? AudioUiState.Data)?.items?.size ?: 0
+            selectionState.selectedItemsCount == itemsCount && itemsCount > 0
         }
     }
     val selectedNodes by remember {
         derivedStateOf {
-            val ids = selectionState.selectedNodeIds
-            val data = uiState as? AudioUiState.Data
-            data?.items?.mapNotNull { item ->
-                if (item.node.id in ids) item.node else null
-            } ?: emptyList()
+            uiState.getSelectedItems(selectionState.selectedNodeIds)
         }
     }
 
@@ -110,7 +99,7 @@ fun AudioScreen(
         topBar = {
             if (selectionState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
-                    count = selectedItemsCount,
+                    count = selectionState.selectedItemsCount,
                     isAllSelected = isAllSelected,
                     isSelecting = false,
                     onSelectAllClicked = {
@@ -132,20 +121,13 @@ fun AudioScreen(
                         }
                     },
                     actions = buildList {
-                        if (dataState != null && !dataState.isEmpty) {
+                        if (dataState != null && !dataState.items.isEmpty()) {
                             add(
                                 MenuActionWithClick(CommonMenuAction.Search) {
-                                    val searchNavKey = if (dataState.isSearchRevampEnabled) {
-                                        SearchNavKey(
-                                            parentHandle = -1L,
-                                            nodeSourceType = NodeSourceType.AUDIO
-                                        )
-                                    } else {
-                                        LegacySearchNavKey(
-                                            parentHandle = -1L,
-                                            nodeSourceType = NodeSourceType.AUDIO
-                                        )
-                                    }
+                                    val searchNavKey = SearchNavKey(
+                                        parentHandle = -1L,
+                                        nodeSourceType = NodeSourceType.AUDIO
+                                    )
                                     navigationHandler.navigate(searchNavKey)
                                 })
                         }

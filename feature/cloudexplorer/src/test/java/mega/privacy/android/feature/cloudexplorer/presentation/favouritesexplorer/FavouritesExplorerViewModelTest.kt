@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -66,18 +67,23 @@ class FavouritesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = emptyList(),
                 nodeSourceType = NodeSourceType.FAVOURITES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = true,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         } doReturn emptyList()
     }
 
     private fun initViewModel(showFiles: Boolean = false) {
         viewModel = FavouritesExplorerViewModel(
-            monitorNodeUpdatesByIdUseCase,
-            monitorStorageStateUseCase,
-            monitorHiddenNodesEnabledUseCase,
-            monitorShowHiddenItemsUseCase,
-            nodeViewItemMapper,
-            getAllFavoritesUseCase,
+            monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            nodeViewItemMapper = nodeViewItemMapper,
+            getAllFavoritesUseCase = getAllFavoritesUseCase,
+            getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             args = FavouritesExplorerViewModel.Args(showFiles),
         )
     }
@@ -109,6 +115,10 @@ class FavouritesExplorerViewModelTest {
                 nodeViewItemMapper(
                     nodeList = foldersOnly,
                     nodeSourceType = NodeSourceType.FAVOURITES,
+                    highlightedNodeId = null,
+                    isHiddenNodesEnabled = false,
+                    highlightedNames = null,
+                    isContactVerificationOn = false,
                 )
             ) doReturn nodeUiItems
 
@@ -129,6 +139,10 @@ class FavouritesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = NodeSourceType.FAVOURITES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
 
@@ -148,12 +162,20 @@ class FavouritesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = NodeSourceType.FAVOURITES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
         whenever(
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = NodeSourceType.FAVOURITES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = true,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
 
@@ -176,12 +198,20 @@ class FavouritesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = NodeSourceType.FAVOURITES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
         whenever(
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = NodeSourceType.FAVOURITES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
 

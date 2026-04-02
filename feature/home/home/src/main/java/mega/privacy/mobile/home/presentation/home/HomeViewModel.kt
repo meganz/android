@@ -66,7 +66,8 @@ class HomeViewModel @Inject constructor(
                     isHomeCustomizationEnabled = isHomeCustomizationEnabled
                 )
             } else {
-                val hasOfflineFiles = runCatching { hasOfflineFilesUseCase() }.getOrDefault(false)
+                val hasOfflineFiles =
+                    runCatching { hasOfflineFilesUseCase() }.getOrDefault(false)
                 HomeUiState.Offline(hasOfflineFiles = hasOfflineFiles)
             }
         }.asUiStateFlow(

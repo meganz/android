@@ -39,23 +39,23 @@ class NodeViewItemMapper @Inject constructor(
 ) {
 
     /**
-     * Map a list of nodes to NodeUiItems
-     * @param nodeList List of nodes to map
-     * @param nodeSourceType Source type for determining specific logic
-     * @param showPublicLinkCreationTime Whether to show public link creation time, for root directory of links
-     * @param isPublicNodes Whether the nodes are public nodes like folder links
-     * @param highlightedNodeId Optional highlighted node ID
-     * @param highlightedNames Optional list of highlighted names
-     * @return List of mapped NodeUiItem
+     * Invoke
+     *
+     * @param nodeList
+     * @param nodeSourceType
+     * @param highlightedNodeId
+     * @param isHiddenNodesEnabled
+     * @param highlightedNames
+     * @param isContactVerificationOn
+     * @return List of mapped NodeViewItem
      */
     suspend operator fun invoke(
         nodeList: List<TypedNode>,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-        isPublicNodes: Boolean = false,
-        showPublicLinkCreationTime: Boolean = false,
-        highlightedNodeId: NodeId? = null,
-        highlightedNames: List<String>? = null,
-        isContactVerificationOn: Boolean = false,
+        highlightedNodeId: NodeId?,
+        isHiddenNodesEnabled: Boolean,
+        highlightedNames: List<String>?,
+        isContactVerificationOn: Boolean,
     ): List<NodeViewItem<TypedNode>> = withContext(ioDispatcher) {
         val highlightedNamesSet = highlightedNames?.toSet()
 
@@ -71,7 +71,7 @@ class NodeViewItemMapper @Inject constructor(
                     durationInSecondsTextMapper(duration)
                 }
             } else null
-            val isSensitive = nodeSourceType !in setOf(
+            val isSensitive = isHiddenNodesEnabled && nodeSourceType !in setOf(
                 NodeSourceType.INCOMING_SHARES,
                 NodeSourceType.OUTGOING_SHARES,
                 NodeSourceType.LINKS,
@@ -83,7 +83,7 @@ class NodeViewItemMapper @Inject constructor(
                 title = getNodeTitle(node),
                 subtitle = nodeSubtitleMapper(
                     node = node,
-                    showPublicLinkCreationTime = showPublicLinkCreationTime
+                    showPublicLinkCreationTime = false
                 ),
                 formattedDescription = node.description?.replace("\n", " ")
                     ?.let { LocalizedText.Literal(it) },
@@ -91,7 +91,6 @@ class NodeViewItemMapper @Inject constructor(
                 iconRes = node.getIcon(fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(
                     id = node.id,
-                    isPublicNode = isPublicNodes
                 ).takeIf { !isFolder }, // folders will use iconRes
                 accessPermissionIcon = (node as? ShareFolderNode)
                     .getSharesIcon(isContactVerificationOn),
@@ -100,7 +99,7 @@ class NodeViewItemMapper @Inject constructor(
                 showLink = node.exportedData != null,
                 showFavourite = node.isFavourite && node.isIncomingShare.not(),
                 isSensitive = isSensitive,
-                showBlurEffect = shouldShowBlurEffect(isSensitive, node),
+                showBlurEffect = shouldShowBlurEffect(isSensitive, node, isHiddenNodesEnabled),
                 isFolderNode = isFolder,
                 isVideoNode = node is TypedFileNode && node.type is VideoFileTypeInfo,
                 duration = duration,
@@ -121,9 +120,15 @@ class NodeViewItemMapper @Inject constructor(
         }
     }
 
-    private fun shouldShowBlurEffect(isSensitive: Boolean, node: TypedNode): Boolean {
-        return isSensitive && (node as? FileNode)?.type?.let { fileTypeInfo ->
-            fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
-        } == true
+    private fun shouldShowBlurEffect(
+        isSensitive: Boolean,
+        node: TypedNode,
+        isHiddenNodesEnabled: Boolean,
+    ): Boolean {
+        return isSensitive && isMedia(node) && isHiddenNodesEnabled
     }
+
+    private fun isMedia(node: TypedNode): Boolean = (node as? FileNode)?.type?.let { fileTypeInfo ->
+        fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
+    } == true
 }

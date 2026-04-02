@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -35,6 +36,7 @@ abstract class NodeExplorerSharedViewModel(
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val nodeViewItemMapper: NodeViewItemMapper,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val args: Args,
 ) : ViewModel() {
 
@@ -101,11 +103,17 @@ abstract class NodeExplorerSharedViewModel(
         }
     }
 
-    fun setItems(nodes: List<TypedNode>, nodesLoadingState: NodesLoadingState) {
+    protected fun setItems(
+        nodes: List<TypedNode>, nodesLoadingState: NodesLoadingState,
+    ) {
         viewModelScope.launch {
             val nodeUiItems = nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = args.nodeSourceType,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = _nodedExplorerSharedUiState.value.isHiddenNodesEnabled,
+                highlightedNames = null,
+                isContactVerificationOn = contactVerificationEnabled(),
             )
 
             _nodedExplorerSharedUiState.update { state ->
@@ -116,6 +124,9 @@ abstract class NodeExplorerSharedViewModel(
             }
         }
     }
+
+    private suspend fun contactVerificationEnabled() =
+        runCatching { getContactVerificationWarningUseCase() }.getOrDefault(false)
 
     fun onNavigateBackEventConsumed() {
         _nodedExplorerSharedUiState.update { state ->

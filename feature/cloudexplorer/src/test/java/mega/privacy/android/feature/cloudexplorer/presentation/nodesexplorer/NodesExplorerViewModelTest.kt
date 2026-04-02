@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
@@ -96,6 +97,7 @@ class NodesExplorerViewModelTest {
             getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
             getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
             getRootNodeIdUseCase = getRootNodeIdUseCase,
+            getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             args = args
         )
     }
@@ -119,6 +121,10 @@ class NodesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = nodeSourceType,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
 
@@ -139,6 +145,10 @@ class NodesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = nodeSourceType,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
 

@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -64,18 +65,23 @@ class IncomingSharesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         } doReturn emptyList()
     }
 
     private fun initViewModel() {
         viewModel = IncomingSharesExplorerViewModel(
-            monitorNodeUpdatesByIdUseCase,
-            monitorStorageStateUseCase,
-            monitorHiddenNodesEnabledUseCase,
-            monitorShowHiddenItemsUseCase,
-            nodeViewItemMapper,
-            getIncomingSharesChildrenNodeUseCase,
+            monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            nodeViewItemMapper = nodeViewItemMapper,
+            getIncomingSharesChildrenNodeUseCase = getIncomingSharesChildrenNodeUseCase,
+            getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
         )
     }
 
@@ -97,6 +103,10 @@ class IncomingSharesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
 
@@ -117,6 +127,10 @@ class IncomingSharesExplorerViewModelTest {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = true,
+                highlightedNames = null,
+                isContactVerificationOn = false,
             )
         ) doReturn nodeUiItems
 

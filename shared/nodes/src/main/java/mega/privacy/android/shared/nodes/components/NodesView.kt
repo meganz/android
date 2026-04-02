@@ -115,8 +115,15 @@ fun <T : TypedNode> NodesView(
         onLongClicked(items.first { it.node.id == node.id })
     }
 
+    val hiddenNodesAdjustedItems = items.map {
+        it.copy(
+            isSensitive = it.isSensitive && isHiddenNodesEnabled,
+            showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
+        )
+    }
+
     NodesView(
-        items = items,
+        items = hiddenNodesAdjustedItems,
         onMenuClicked = onMenuNodeClicked,
         onItemClicked = onNodeClicked,
         onLongClicked = onNodeLongClicked,
@@ -130,13 +137,10 @@ fun <T : TypedNode> NodesView(
         gridState = gridState,
         highlightText = highlightText,
         spanCount = spanCount,
-        showHiddenNodes = showHiddenNodes,
-        isHiddenNodesEnabled = isHiddenNodesEnabled,
         showLinkIcon = showLinkIcon,
         showChangeViewType = showChangeViewType,
         showSortOrder = showSortOrder,
         showMediaDiscoveryButton = showMediaDiscoveryButton,
-        isContactVerificationOn = isContactVerificationOn,
         inSelectionMode = inSelectionMode,
         onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
         bannerHeader = bannerHeader,
@@ -162,15 +166,16 @@ fun <T : TypedNode> NodesView(
  * @param listState the state of the list
  * @param gridState the state of the grid
  * @param spanCount the span count of the grid
- * @param showHiddenNodes whether to forcefully show hidden nodes
- * @param isHiddenNodesEnabled whether hidden nodes feature is enabled for the user
  * @param showSortOrder whether to show change sort order button
  * @param showLinkIcon whether to show public share link icon
  * @param showChangeViewType whether to show change view type button
  * @param showMediaDiscoveryButton whether to show media discovery button
  * @param onEnterMediaDiscoveryClick callback for enter media discovery click
  * @param listContentPadding the content padding of the list/lazyColumn
- * @param isContactVerificationOn whether contact verification is enabled
+ * @param inSelectionMode whether to show selection mode
+ * @param bannerHeader the header to show at the top of the list
+ * @param nodeSelectionState the state of the selection
+ * @param highlightText the text to highlight in the title and description
  */
 @Composable
 fun <T : TypedNode> NodesView(
@@ -189,27 +194,20 @@ fun <T : TypedNode> NodesView(
     gridState: LazyGridState = rememberLazyGridState(),
     highlightText: String = "",
     spanCount: Int = 2,
-    showHiddenNodes: Boolean = false,
-    isHiddenNodesEnabled: Boolean = false,
     showLinkIcon: Boolean = true,
     showChangeViewType: Boolean = true,
     showSortOrder: Boolean = true,
     showMediaDiscoveryButton: Boolean = false,
-    isContactVerificationOn: Boolean = false,
     inSelectionMode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
     bannerHeader: (@Composable () -> Unit)? = null,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
-    val visibleItems = rememberNodeItems(
-        nodeUIItems = items,
-        showHiddenItems = showHiddenNodes,
-        isHiddenNodesEnabled = isHiddenNodesEnabled,
-    )
-    val highlightedIndex = remember(visibleItems) {
-        visibleItems.indexOfFirst { it.isHighlighted }
-            .takeIf { visibleItems.indices.contains(it) }
+
+    val highlightedIndex = remember(items) {
+        items.indexOfFirst { it.isHighlighted }
+            .takeIf { items.indices.contains(it) }
     }
 
     LaunchedEffect(highlightedIndex) {
@@ -221,8 +219,8 @@ fun <T : TypedNode> NodesView(
         }
     }
 
-    val nodeUiItems = remember(visibleItems, nodeSelectionState.selectedNodeIds) {
-        visibleItems.map {
+    val nodeUiItems = remember(items, nodeSelectionState.selectedNodeIds) {
+        items.map {
             SelectableNodeItem(it, nodeSelectionState.selectedNodeIds.contains(it.id))
         }
     }
@@ -253,8 +251,6 @@ fun <T : TypedNode> NodesView(
             listState = listState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             inSelectionMode = inSelectionMode,
-            isContactVerificationOn = isContactVerificationOn,
-            isHiddenNodesEnabled = isHiddenNodesEnabled,
             bannerHeader = bannerHeader,
         )
     } else {
@@ -283,7 +279,6 @@ fun <T : TypedNode> NodesView(
             gridState = gridState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             inSelectionMode = inSelectionMode,
-            isHiddenNodesEnabled = isHiddenNodesEnabled,
             bannerHeader = bannerHeader,
         )
     }
@@ -295,26 +290,6 @@ fun <T : TypedNode> NodesView(
                 showTakenDownDialog = false
             }
         )
-    }
-}
-
-
-/**
- * Remember function for node items to handle empty span count and to filter out sensitive nodes
- * @param nodeUIItems list of [TypedNodeItem]
- * @param showHiddenItems whether to show hidden items
- * @param isHiddenNodesEnabled whether hidden nodes are enabled
- */
-@Composable
-internal fun <T : TypedNode> rememberNodeItems(
-    nodeUIItems: List<TypedNodeItem<T>>,
-    showHiddenItems: Boolean,
-    isHiddenNodesEnabled: Boolean,
-) = remember(showHiddenItems, nodeUIItems.hashCode()) {
-    return@remember if (showHiddenItems || !isHiddenNodesEnabled) {
-        nodeUIItems
-    } else {
-        nodeUIItems.filterNot { it.isSensitive }
     }
 }
 
