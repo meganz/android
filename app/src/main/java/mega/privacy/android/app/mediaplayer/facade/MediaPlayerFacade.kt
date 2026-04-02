@@ -25,6 +25,8 @@ import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.MediaSource
@@ -54,6 +56,7 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.icon.pack.R
 import mega.privacy.mobile.analytics.event.VideoBufferingExceeded_1_SecondEvent
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -65,6 +68,7 @@ class MediaPlayerFacade @Inject constructor(
     private val crashReporter: CrashReporter,
     private val repeatToggleModeMapper: RepeatToggleModeByExoPlayerMapper,
     private val exoPlayerRepeatModeMapper: ExoPlayerRepeatModeMapper,
+    private val simpleCache: SimpleCache?,
 ) : MediaPlayerGateway {
 
     private lateinit var exoPlayer: ExoPlayer
@@ -92,7 +96,7 @@ class MediaPlayerFacade @Inject constructor(
             dataSpec: androidx.media3.datasource.DataSpec,
             isNetwork: Boolean,
         ) {
-            Timber.d("TransferListener initializing: ${dataSpec.uri}, isNetwork: $isNetwork")
+            Timber.d("[Cache] MISS: file=${dataSpec.uri.lastPathSegment}, position=${dataSpec.position}, length=${dataSpec.length}")
         }
 
         override fun onTransferStart(
@@ -215,10 +219,41 @@ class MediaPlayerFacade @Inject constructor(
         }
     }
 
-    private val dataSourceFactory = DefaultDataSource.Factory(context)
-        .setTransferListener(loggingTransferListener)
+    private val upstreamDataSourceFactory by lazy {
+        DefaultDataSource.Factory(context).setTransferListener(loggingTransferListener)
+    }
 
-    private val mediaSourceFactory = ProgressiveMediaSource.Factory(dataSourceFactory)
+    private val cacheEventListener = object : CacheDataSource.EventListener {
+        override fun onCachedBytesRead(cacheSizeBytes: Long, cachedBytesRead: Long) {
+            Timber.d("[Cache] HIT: read ${cachedBytesRead / 1024} KB from disk (cache total: ${cacheSizeBytes / 1024 / 1024} MB)")
+        }
+
+        override fun onCacheIgnored(reason: Int) {
+            val reasonText = when (reason) {
+                CacheDataSource.CACHE_IGNORED_REASON_ERROR -> "cache read/write error, falling back to upstream"
+                CacheDataSource.CACHE_IGNORED_REASON_UNSET_LENGTH -> "unset length, cache bypassed"
+                else -> "unknown reason ($reason)"
+            }
+            Timber.d("[Cache] IGNORED: $reasonText")
+        }
+    }
+
+    private val dataSourceFactory by lazy {
+        val cache = simpleCache
+        if (cache != null) {
+            CacheDataSource.Factory()
+                .setCache(cache)
+                .setUpstreamDataSourceFactory(upstreamDataSourceFactory)
+                .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+                .setEventListener(cacheEventListener)
+        } else {
+            upstreamDataSourceFactory
+        }
+    }
+
+    private val mediaSourceFactory by lazy {
+        ProgressiveMediaSource.Factory(dataSourceFactory)
+    }
 
     private var bufferingStartTime: Long = 0L
 
