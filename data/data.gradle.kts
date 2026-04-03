@@ -55,6 +55,7 @@ dependencies {
     implementation(androidx.java.core)
     implementation(androidx.exifinterface)
     implementation(androidx.datastore.preferences)
+    implementation(androidx.datastore.preferences.proto)
     implementation(androidx.preferences)
     implementation(androidx.lifecycle.process)
     implementation(androidx.work.ktx)
@@ -66,7 +67,7 @@ dependencies {
     implementation(lib.billing.client.ktx)
 
     implementation(platform(google.firebase.bom))
-    implementation(google.firebase.perf.ktx)
+    implementation(google.firebase.perf)
 
     // Logging
     implementation(lib.bundles.logging)

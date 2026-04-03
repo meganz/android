@@ -21,8 +21,8 @@ import coil3.gif.GifDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
 import coil3.video.VideoFrameDecoder
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.crashlytics.crashlytics
+import com.google.firebase.Firebase
 import dagger.Lazy
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn

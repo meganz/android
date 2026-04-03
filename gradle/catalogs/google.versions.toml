@@ -1,7 +1,7 @@
 [versions]
 accompanist = "0.32.0"
 accompanist-systemui = "0.23.1"
-firebase = "33.1.1"
+firebase = "34.11.0"
 firebase-app-distribution = "16.0.0-beta13"
 flexbox = "3.0.0"
 gson = "2.10.1"
@@ -33,9 +33,9 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-analytics = { module = "com.google.firebase:firebase-analytics"}
 firebase-app-distribution = { module = "com.google.firebase:firebase-appdistribution", version.ref = "firebase-app-distribution" }
 firebase-crashlytics-ndk = { group = "com.google.firebase", name = "firebase-crashlytics-ndk" }
-firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
-firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
-firebase-perf-ktx = { group = "com.google.firebase", name = "firebase-perf-ktx" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+firebase-perf = { group = "com.google.firebase", name = "firebase-perf" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
@@ -65,4 +65,4 @@ guava = { module = "com.google.guava:guava", version.ref = "guava" }
 ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
 
 [bundles]
-firebase-bom = ["firebase-crashlytics-ndk", "firebase-crashlytics-ktx", "firebase-messaging-ktx", "firebase-perf-ktx"]
+firebase-bom = ["firebase-crashlytics-ndk", "firebase-crashlytics", "firebase-messaging", "firebase-perf"]
