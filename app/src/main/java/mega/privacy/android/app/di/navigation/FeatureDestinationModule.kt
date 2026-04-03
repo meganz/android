@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestina
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
+import mega.privacy.android.feature.documentscanner.navigation.ContinuousScanDestination
 import mega.privacy.android.feature.pdfviewer.navigation.PdfViewerFeatureDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -99,6 +100,11 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun providePdfViewerFeatureDestination(): FeatureDestination = PdfViewerFeatureDestination
+
+    @Provides
+    @IntoSet
+    fun provideContinuousScanDestination(): FeatureDestination =
+        ContinuousScanDestination()
 
     @Provides
     @Singleton

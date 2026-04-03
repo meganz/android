@@ -3,8 +3,6 @@ package mega.privacy.android.core.nodecomponents.upload
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +13,8 @@ import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchD
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.usecase.documentscanner.isCustomScannerEnabled
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,6 +26,7 @@ import javax.inject.Inject
 class ScanDocumentViewModel @Inject constructor(
     private val scannerHandler: ScannerHandler,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val navigationEventQueue: NavigationEventQueue,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ScanDocumentUiState())
@@ -39,7 +40,7 @@ class ScanDocumentViewModel @Inject constructor(
     fun prepareDocumentScanner() {
         viewModelScope.launch {
             if (getFeatureFlagValueUseCase.isCustomScannerEnabled()) {
-                _uiState.update { it.copy(navigateToCustomScannerEvent = triggered) }
+                navigationEventQueue.emit(ContinuousScanNavKey)
                 return@launch
             }
             runCatching {
@@ -59,13 +60,6 @@ class ScanDocumentViewModel @Inject constructor(
                 Timber.e(exception, "Failed to prepare document scanner")
             }
         }
-    }
-
-    /**
-     * Resets the navigateToCustomScannerEvent after navigation has been handled
-     */
-    fun onNavigateToCustomScannerConsumed() {
-        _uiState.update { it.copy(navigateToCustomScannerEvent = consumed) }
     }
 
     /**

@@ -3,8 +3,6 @@ package mega.privacy.android.core.nodecomponents.upload
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanner
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
@@ -13,12 +11,15 @@ import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -28,23 +29,25 @@ import org.mockito.kotlin.whenever
 class ScanDocumentViewModelTest {
     private val scannerHandler = mock<ScannerHandler>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val navigationEventQueue = mock<NavigationEventQueue>()
 
     private lateinit var viewModel: ScanDocumentViewModel
 
     @AfterEach
     fun tearDown() {
-        reset(scannerHandler, getFeatureFlagValueUseCase)
+        reset(scannerHandler, getFeatureFlagValueUseCase, navigationEventQueue)
     }
 
     private fun initViewModel() {
         viewModel = ScanDocumentViewModel(
             scannerHandler = scannerHandler,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            navigationEventQueue = navigationEventQueue,
         )
     }
 
     @Test
-    fun `test that prepareDocumentScanner triggers navigate event when feature flag is enabled`() =
+    fun `test that prepareDocumentScanner navigates to custom scanner when feature flag is enabled`() =
         runTest {
             whenever(getFeatureFlagValueUseCase(ApiFeatures.ContinuousDocumentScanner))
                 .thenReturn(true)
@@ -52,11 +55,7 @@ class ScanDocumentViewModelTest {
 
             viewModel.prepareDocumentScanner()
 
-            viewModel.uiState.test {
-                val state = awaitItem()
-                assertThat(state.navigateToCustomScannerEvent).isEqualTo(triggered)
-                assertThat(state.gmsDocumentScanner).isNull()
-            }
+            verify(navigationEventQueue).emit(ContinuousScanNavKey)
         }
 
     @Test
@@ -86,7 +85,6 @@ class ScanDocumentViewModelTest {
                 val state = awaitItem()
                 assertThat(state.gmsDocumentScanner).isEqualTo(gmsDocumentScanner)
                 assertThat(state.documentScanningError).isNull()
-                assertThat(state.navigateToCustomScannerEvent).isEqualTo(consumed)
             }
         }
 
@@ -176,25 +174,6 @@ class ScanDocumentViewModelTest {
                 viewModel.onDocumentScanningErrorConsumed()
                 val updatedState = awaitItem()
                 assertThat(updatedState.documentScanningError).isNull()
-            }
-        }
-
-    @Test
-    fun `test that onNavigateToCustomScannerConsumed resets event to consumed`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.ContinuousDocumentScanner))
-                .thenReturn(true)
-            initViewModel()
-
-            viewModel.prepareDocumentScanner()
-
-            viewModel.uiState.test {
-                val state = awaitItem()
-                assertThat(state.navigateToCustomScannerEvent).isEqualTo(triggered)
-
-                viewModel.onNavigateToCustomScannerConsumed()
-                val updatedState = awaitItem()
-                assertThat(updatedState.navigateToCustomScannerEvent).isEqualTo(consumed)
             }
         }
 
