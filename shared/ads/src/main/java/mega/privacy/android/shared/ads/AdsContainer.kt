@@ -1,6 +1,9 @@
-package mega.privacy.android.app.main.ads
+package mega.privacy.android.shared.ads
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,6 +12,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -19,9 +24,10 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.gms.ads.admanager.AdManagerAdView
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.BuildConfig
-import mega.privacy.android.shared.original.core.ui.controls.ads.AdsCloseIcon
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.mobile.analytics.event.AdsBannerCloseAdsButtonPressedEvent
 import timber.log.Timber
 
@@ -106,18 +112,28 @@ fun AdsContainer(
             })
 
             if (adLoaded && isLoggedInUser) {
-                AdsCloseIcon(modifier = Modifier.align(Alignment.TopEnd), onClick = {
-                    showFreeAdsDialog = true
-                    viewModel.handleAdsClosed()
-                    Analytics.tracker.trackEvent(AdsBannerCloseAdsButtonPressedEvent)
-                })
+                MegaIcon(
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
+                    contentDescription = "Close icon",
+                    tint = IconColor.Primary,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .clickable(onClick = {
+                            showFreeAdsDialog = true
+                            viewModel.handleAdsClosed()
+                            Analytics.tracker.trackEvent(AdsBannerCloseAdsButtonPressedEvent)
+                        })
+                        .padding(4.dp)
+                        .size(16.dp),
+                )
             }
 
-            if (showFreeAdsDialog) {
-                AdsFreeIntroView(onDismiss = {
-                    showFreeAdsDialog = false
-                })
-            }
+            // TODO
+//            if (showFreeAdsDialog) {
+//                AdsFreeIntroView(onDismiss = {
+//                    showFreeAdsDialog = false
+//                })
+//            }
         }
     }
 }

@@ -101,7 +101,6 @@ android {
             extra["enableCrashlytics"] = false
             extra["alwaysUpdateBuildId"] = false
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/Dev\"")
-            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
         }
         release {
             firebaseAppDistribution {
@@ -124,7 +123,6 @@ android {
             // signingConfig = signingConfigs.getByName("debug")
 
             buildConfigField("String", "ENVIRONMENT", "\"\"")
-            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-2135147798858967/9835644604\"")
 
         }
 
@@ -142,7 +140,6 @@ android {
             }
             applicationIdSuffix = ".qa"
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/QA\"")
-            buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
             val cloudDriveDocumentProviderAuthority =
                 "${defaultConfig.applicationId}$applicationIdSuffix.cloud.documents"
             manifestPlaceholders["cloudDriveDocumentProviderAuthority"] =
@@ -212,6 +209,7 @@ configurations.matching { it.name.contains("AndroidTest", ignoreCase = true) }.c
 
 dependencies {
     // Modules
+    implementation(project(":shared:ads"))
     implementation(project(":shared:nodes"))
     implementation(project(":shared:account"))
     implementation(project(":core:formatter"))

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.advertisements
+package mega.privacy.android.shared.ads.advertisements
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,7 +24,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View model of [mega.privacy.android.app.main.ads.NewAdsContainer]
+ * View model of [mega.privacy.android.shared.ads.NewAdsContainer]
  */
 @HiltViewModel
 class AdsViewModel @Inject constructor(

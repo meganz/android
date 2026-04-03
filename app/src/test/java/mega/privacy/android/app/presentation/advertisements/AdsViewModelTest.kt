@@ -14,6 +14,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import mega.privacy.android.domain.usecase.advertisements.MonitorGoogleConsentLoadedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.ads.advertisements.AdsViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

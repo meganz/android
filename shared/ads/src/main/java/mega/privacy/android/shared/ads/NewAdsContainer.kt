@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.ads
+package mega.privacy.android.shared.ads
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.app.presentation.advertisements.AdsViewModel
+import mega.privacy.android.shared.ads.advertisements.AdsViewModel
 
 @Composable
 fun NewAdsContainer(

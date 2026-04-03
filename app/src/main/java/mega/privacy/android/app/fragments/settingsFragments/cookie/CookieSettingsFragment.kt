@@ -22,7 +22,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_POLICIES
 import mega.privacy.android.app.constants.SettingsConstants.KEY_COOKIE_SETTINGS
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
-import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
+import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.settings.cookie.CookieType.ANALYTICS
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase

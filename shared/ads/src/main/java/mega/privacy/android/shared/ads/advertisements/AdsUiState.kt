@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.advertisements
+package mega.privacy.android.shared.ads.advertisements
 
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 

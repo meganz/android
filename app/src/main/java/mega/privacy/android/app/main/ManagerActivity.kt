@@ -131,8 +131,8 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.main.ads.AdsContainer
-import mega.privacy.android.app.main.ads.AdsContainerViewModel
+import mega.privacy.android.shared.ads.AdsContainer
+import mega.privacy.android.shared.ads.AdsContainerViewModel
 import mega.privacy.android.app.main.bottomsheets.HomeFabOptionsBottomSheet
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
@@ -161,7 +161,7 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
-import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
+import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener

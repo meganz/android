@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.advertisements
+package mega.privacy.android.shared.ads.advertisements
 
 import android.app.Activity
 import androidx.activity.ComponentActivity
@@ -18,11 +18,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.advertisements.AdsViewModel.Companion.MINIMUM_AD_REFRESH_INTERVAL
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
+import mega.privacy.android.shared.ads.advertisements.AdsViewModel.Companion.MINIMUM_AD_REFRESH_INTERVAL
 import timber.log.Timber
 import javax.inject.Inject
 

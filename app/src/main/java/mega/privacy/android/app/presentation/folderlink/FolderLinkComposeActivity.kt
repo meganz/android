@@ -37,7 +37,7 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
+import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.ads
+package mega.privacy.android.shared.ads
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
