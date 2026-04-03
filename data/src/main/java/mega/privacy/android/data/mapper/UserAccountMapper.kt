@@ -18,7 +18,6 @@ class UserAccountMapper @Inject constructor() {
      * @param isBusinessAccount
      * @param isMasterBusinessAccount
      * @param accountTypeIdentifier
-     * @param accountTypeString
      */
     operator fun invoke(
         userId: UserId?,
@@ -27,7 +26,6 @@ class UserAccountMapper @Inject constructor() {
         isBusinessAccount: Boolean,
         isMasterBusinessAccount: Boolean,
         accountTypeIdentifier: AccountType?,
-        accountTypeString: String,
     ): UserAccount {
         return UserAccount(
             userId = userId,
@@ -36,7 +34,6 @@ class UserAccountMapper @Inject constructor() {
             isBusinessAccount = isBusinessAccount,
             isMasterBusinessAccount = isMasterBusinessAccount,
             accountTypeIdentifier = accountTypeIdentifier,
-            accountTypeString = accountTypeString,
         )
     }
 }

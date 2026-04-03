@@ -666,7 +666,6 @@ internal class MyAccountViewModelTest {
             isBusinessAccount = false,
             isMasterBusinessAccount = false,
             accountTypeIdentifier = accountType,
-            accountTypeString = "accountTypeString",
         )
 
         whenever(getAccountDetailsUseCase(anyBoolean())).thenReturn(userAccount)

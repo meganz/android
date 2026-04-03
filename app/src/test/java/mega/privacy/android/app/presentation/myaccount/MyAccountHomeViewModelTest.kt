@@ -317,7 +317,6 @@ class MyAccountHomeViewModelTest {
                 isBusinessAccount = true,
                 isMasterBusinessAccount = true,
                 accountTypeIdentifier = AccountType.BUSINESS,
-                accountTypeString = "business"
             )
             initViewModel(accountDetailsValue = expected)
             whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
@@ -342,7 +341,6 @@ class MyAccountHomeViewModelTest {
                 isBusinessAccount = true,
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = AccountType.PRO_FLEXI,
-                accountTypeString = "proflexi"
             )
             initViewModel(accountDetailsValue = expected)
             whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)

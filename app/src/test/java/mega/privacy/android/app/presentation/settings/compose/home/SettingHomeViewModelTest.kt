@@ -76,7 +76,6 @@ class SettingHomeViewModelTest {
                 isBusinessAccount = false,
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,
-                accountTypeString = ""
             )
         }
         initUnderTest()

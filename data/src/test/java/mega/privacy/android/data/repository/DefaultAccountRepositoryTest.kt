@@ -116,7 +116,7 @@ class DefaultAccountRepositoryTest {
     private lateinit var underTest: AccountRepository
 
     private val accountInfoWrapper =
-        mock<AccountInfoWrapper> { on { accountTypeString }.thenReturn("") }
+        mock<AccountInfoWrapper>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
@@ -278,15 +278,12 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test that get account does not throw exception if email is null`() = runTest {
         val expectedUserIdObj = null
-        val expectedAccountTypeString = "Free"
-
         whenever(accountInfoWrapper.accountTypeId).thenReturn(-1)
         whenever(megaChatApiGateway.getMyEmail()).thenReturn(null)
         megaApiGateway.stub {
             onBlocking { isMasterBusinessAccount() }.thenReturn(false)
             onBlocking { getLoggedInUser() }.thenReturn(expectedUserIdObj)
         }
-        whenever(accountInfoWrapper.accountTypeString).thenReturn(expectedAccountTypeString)
 
         assertThat(underTest.getUserAccount()).isNotNull()
     }
@@ -295,8 +292,6 @@ class DefaultAccountRepositoryTest {
     fun `test that user id is included in account info if user is logged in`() = runTest {
         val expectedUserId = 4L
         val expectedUserIdObj = UserId(expectedUserId)
-        val expectedAccountTypeString = "Free"
-
         val user = mock<MegaUser> {
             on { handle }.thenReturn(expectedUserId)
             on { email }.thenReturn(mockEmail)
@@ -305,7 +300,6 @@ class DefaultAccountRepositoryTest {
             onBlocking { isMasterBusinessAccount() }.thenReturn(false)
             onBlocking { getLoggedInUser() }.thenReturn(user)
         }
-        whenever(accountInfoWrapper.accountTypeString).thenReturn(expectedAccountTypeString)
 
         assertThat(underTest.getUserAccount().userId).isEqualTo(expectedUserIdObj)
     }

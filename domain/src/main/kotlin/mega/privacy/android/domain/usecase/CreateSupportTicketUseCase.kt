@@ -16,6 +16,7 @@ class CreateSupportTicketUseCase @Inject constructor(
         description: String,
         logFileName: String?,
         accountDetails: UserAccount?,
+        accountTypeString: String,
     ): SupportTicket {
         val (appVersion, sdkVersion) = environmentRepository.getAppInfo()
         val (device, languageCode) = environmentRepository.getDeviceInfo()
@@ -26,7 +27,7 @@ class CreateSupportTicketUseCase @Inject constructor(
             device = device,
             currentLanguage = languageCode,
             accountEmail = accountDetails?.email ?: "Unknown",
-            accountType = accountDetails?.accountTypeString ?: "Unknown",
+            accountType = accountTypeString,
             description = description,
             logFileName = logFileName,
             deviceSdkVersionInt = environmentRepository.getDeviceSdkVersionInt(),

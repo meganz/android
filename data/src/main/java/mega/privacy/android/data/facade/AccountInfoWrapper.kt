@@ -29,11 +29,6 @@ interface AccountInfoWrapper {
     val accountTypeId: Int
 
     /**
-     * Account type string
-     */
-    val accountTypeString: String
-
-    /**
      * Handle account detail
      * Legacy support, it will remove after refactor done
      *

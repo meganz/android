@@ -79,6 +79,7 @@ class SubmitIssueUseCaseTest {
                 invoke(
                     eq(supportTicket.description),
                     eq(supportTicket.logFileName),
+                    any(),
                     any()
                 )
             }.thenReturn(supportTicket)
@@ -147,9 +148,10 @@ class SubmitIssueUseCaseTest {
         underTest.call(false).test { cancelAndIgnoreRemainingEvents() }
 
         verify(createSupportTicketUseCase).invoke(
-            supportTicket.description,
-            null,
-            getAccountDetailsUseCase(false)
+            eq(supportTicket.description),
+            eq(null),
+            eq(userAccount),
+            any()
         )
     }
 
@@ -163,9 +165,10 @@ class SubmitIssueUseCaseTest {
             underTest.call(true).test { cancelAndIgnoreRemainingEvents() }
 
             verify(createSupportTicketUseCase).invoke(
-                supportTicket.description,
-                compressedLogs.name,
-                getAccountDetailsUseCase(false)
+                eq(supportTicket.description),
+                eq(compressedLogs.name),
+                eq(userAccount),
+                any()
             )
         }
 
@@ -180,10 +183,11 @@ class SubmitIssueUseCaseTest {
     @Test
     fun `test that formatted ticket is submitted`() = runTest {
         underTest(
-            SubmitIssueRequest(
+            request = SubmitIssueRequest(
                 description = supportTicket.description,
-                includeLogs = true
-            )
+                includeLogs = true,
+            ),
+            accountTypeMapper = { supportTicket.accountType },
         ).test { cancelAndIgnoreRemainingEvents() }
 
         verify(supportRepository).logTicket(formattedSupportTicket)
@@ -199,9 +203,10 @@ class SubmitIssueUseCaseTest {
     }
 
     private suspend fun SubmitIssueUseCase.call(includeLogs: Boolean) = invoke(
-        SubmitIssueRequest(
+        request = SubmitIssueRequest(
             description = supportTicket.description,
-            includeLogs = includeLogs
-        )
+            includeLogs = includeLogs,
+        ),
+        accountTypeMapper = { supportTicket.accountType },
     )
 }

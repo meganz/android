@@ -21,10 +21,12 @@ import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.extensions.withCoroutineExceptions
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.GetSupportEmailUseCase
 import mega.privacy.android.domain.usecase.SubmitIssueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.shared.resources.SharedStringResourceProvider
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,6 +49,8 @@ class ReportIssueViewModelTest {
     private lateinit var underTest: ReportIssueViewModel
 
     private val submitIssueUseCase = mock<SubmitIssueUseCase>()
+    private val accountTypeNameMapper = mock<SharedStringResourceProvider<AccountType?>>()
+    private val context = mock<android.content.Context>()
 
     private var savedStateHandle = SavedStateHandle(mapOf())
 
@@ -62,6 +66,8 @@ class ReportIssueViewModelTest {
         monitorConnectivityUseCase.stub {
             on { invoke() } doReturn true.asHotFlow()
         }
+        whenever(accountTypeNameMapper(any())).thenReturn(android.R.string.ok)
+        whenever(context.getString(any())).thenReturn("Free")
     }
 
 
@@ -71,6 +77,8 @@ class ReportIssueViewModelTest {
             savedStateHandle = savedStateHandle,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getSupportEmailUseCase = getSupportEmail,
+            accountTypeNameMapper = accountTypeNameMapper,
+            context = context,
         )
     }
 
@@ -81,6 +89,7 @@ class ReportIssueViewModelTest {
             submitIssueUseCase,
             monitorConnectivityUseCase,
             getSupportEmail,
+            accountTypeNameMapper,
         )
     }
 
@@ -187,7 +196,7 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that a success message is returned if submit report completes without an error`() =
         runTest {
-            whenever(submitIssueUseCase(any())).thenReturn(emptyFlow())
+            whenever(submitIssueUseCase(any(), any())).thenReturn(emptyFlow())
             initViewModel()
             underTest.setDescription(typedDescription)
             scheduler.advanceUntilIdle()
@@ -204,7 +213,7 @@ class ReportIssueViewModelTest {
         withCoroutineExceptions {
             runTest {
                 submitIssueUseCase.stub {
-                    onBlocking { invoke(any()) }.thenAnswer { throw Exception() }
+                    onBlocking { invoke(any(), any()) }.thenAnswer { throw Exception() }
                 }
                 getSupportEmail.stub {
                     onBlocking { invoke() } doReturn supportEmail
@@ -233,12 +242,12 @@ class ReportIssueViewModelTest {
         underTest.submit()
         scheduler.advanceUntilIdle()
 
-        verify(submitIssueUseCase).invoke(argThat { description == typedDescription && includeLogs })
+        verify(submitIssueUseCase).invoke(argThat { description == typedDescription && includeLogs }, any())
     }
 
     @Test
     fun `test that upload progress from 0 to 100 is returned`() = runTest {
-        whenever(submitIssueUseCase(any())).thenReturn(getProgressFlow())
+        whenever(submitIssueUseCase(any(), any())).thenReturn(getProgressFlow())
         initViewModel()
         underTest.setDescription(typedDescription)
         scheduler.advanceUntilIdle()
@@ -253,7 +262,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that no progress is returned after upload is cancelled`() = runTest {
-        whenever(submitIssueUseCase(any())).thenReturn(
+        whenever(submitIssueUseCase(any(), any())).thenReturn(
             getProgressFlow().onEach {
                 if (it.floatValue > 0.5f) underTest.cancelUpload()
             })
@@ -272,7 +281,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that cancelling an upload does not return an error`() = runTest {
-        whenever(submitIssueUseCase(any())).thenReturn(
+        whenever(submitIssueUseCase(any(), any())).thenReturn(
             getProgressFlow()
                 .onEach { if (it.floatValue > 0.1f) underTest.cancelUpload() }
         )
@@ -291,7 +300,7 @@ class ReportIssueViewModelTest {
 
     @Test
     fun `test that cancelling upload clears progress`() = runTest {
-        whenever(submitIssueUseCase(any())).thenReturn(
+        whenever(submitIssueUseCase(any(), any())).thenReturn(
             getProgressFlow()
                 .onEach {
                     if (it.floatValue == 0.01f) underTest.cancelUpload()

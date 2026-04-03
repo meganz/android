@@ -465,7 +465,6 @@ private fun freeUserAccount() = UserAccount(
     isBusinessAccount = false,
     isMasterBusinessAccount = false,
     accountTypeIdentifier = AccountType.FREE,
-    accountTypeString = "Free",
 )
 
 private fun businessSubUserAccount() = UserAccount(
@@ -475,7 +474,6 @@ private fun businessSubUserAccount() = UserAccount(
     isBusinessAccount = true,
     isMasterBusinessAccount = false,
     accountTypeIdentifier = AccountType.BUSINESS,
-    accountTypeString = "Business",
 )
 
 private fun businessMasterUserAccount() = UserAccount(
@@ -485,7 +483,6 @@ private fun businessMasterUserAccount() = UserAccount(
     isBusinessAccount = true,
     isMasterBusinessAccount = true,
     accountTypeIdentifier = AccountType.BUSINESS,
-    accountTypeString = "Business",
 )
 
 private fun proFlexiUserAccount() = UserAccount(
@@ -495,7 +492,6 @@ private fun proFlexiUserAccount() = UserAccount(
     isBusinessAccount = true,
     isMasterBusinessAccount = false,
     accountTypeIdentifier = AccountType.PRO_FLEXI,
-    accountTypeString = "Pro Flexi",
 )
 
 private fun accountLevelDetail(

@@ -196,7 +196,6 @@ internal class DefaultAccountRepository @Inject constructor(
             isBusinessAccount = megaApiGateway.isBusinessAccount,
             isMasterBusinessAccount = megaApiGateway.isMasterBusinessAccount(),
             accountTypeIdentifier = accountTypeMapper(myAccountInfoFacade.accountTypeId),
-            accountTypeString = myAccountInfoFacade.accountTypeString,
         )
     }
 
