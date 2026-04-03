@@ -190,7 +190,7 @@ private fun MediaSearchContent(
     modifier: Modifier = Modifier,
 ) {
     when (state.contentState) {
-        MediaContentState.Loading -> MediaSearchLoading()
+        MediaContentState.Loading -> MediaSearchLoading(modifier)
         MediaContentState.WelcomeEmpty -> {
             MediaSearchEmptyState(
                 modifier = modifier
@@ -518,9 +518,11 @@ private fun PhotoCard(
 }
 
 @Composable
-private fun MediaSearchLoading() {
+private fun MediaSearchLoading(
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(vertical = 16.dp, horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
