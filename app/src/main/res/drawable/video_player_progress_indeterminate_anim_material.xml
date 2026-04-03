@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
- Copyright (C) 2014 The Android Open Source Project
+<!-- Copyright (C) 2016 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,11 +16,9 @@
 
 <!-- This file is copied from Android progress_indeterminate_anim_large_material.xml,
 because we need change the thickness of the progress and it's private. -->
-<objectAnimator xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="3000"
-    android:interpolator="@android:anim/linear_interpolator"
-    android:propertyName="rotation"
-    android:repeatCount="-1"
-    android:valueFrom="0"
-    android:valueTo="720"
-    android:valueType="floatType" />
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_loader_throbber_medium_regular_outline" >
+    <target
+        android:name="root"
+        android:animation="@anim/video_player_progress_indeterminate_rotation_material" />
+</animated-vector>

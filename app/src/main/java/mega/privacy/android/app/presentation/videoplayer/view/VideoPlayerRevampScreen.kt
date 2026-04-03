@@ -63,7 +63,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.VideoPlayerPlayerViewBinding
+import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.PlaybackPositionDialog
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
@@ -163,19 +163,17 @@ internal fun VideoPlayerRevampScreen(
         }
     }
 
-    LaunchedEffect(uiState.showPlaybackDialog, uiState.showSubtitleDialog) {
-        if (uiState.showPlaybackDialog || uiState.showSubtitleDialog) {
+    LaunchedEffect(playbackState, uiState.showPlaybackDialog, uiState.showSubtitleDialog) {
+        if (playbackState <= STATE_BUFFERING
+            || uiState.showPlaybackDialog
+            || uiState.showSubtitleDialog
+        ) {
             autoHideJob?.cancel()
-        } else {
-            if (isControllerViewVisible) {
-                autoHideJob?.cancel()
-                autoHideJob = coroutineScope.launch {
-                    delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                    isControllerViewVisible = false
-                    systemUiController.isSystemBarsVisible = false
-                    playerView?.hideController()
-                }
-            }
+        } else if (isControllerViewVisible) {
+            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+            isControllerViewVisible = false
+            systemUiController.isSystemBarsVisible = false
+            playerView?.hideController()
         }
     }
 
@@ -233,12 +231,12 @@ internal fun VideoPlayerRevampScreen(
         MegaScaffold(
             modifier = Modifier.fillMaxSize(),
             scaffoldState = scaffoldState,
-        ) { paddingValues ->
+        ) { _ ->
             key(orientation) {
                 AndroidViewBinding(
                     modifier = Modifier.fillMaxSize(),
                     factory = { inflater, parent, attachToParent ->
-                        VideoPlayerPlayerViewBinding.inflate(inflater, parent, attachToParent)
+                        VideoPlayerRevampPlayerViewBinding.inflate(inflater, parent, attachToParent)
                             .apply {
                                 playerView = playerComposeView
                                 fun updateResizeMode(isFullscreen: Boolean) {
@@ -393,6 +391,9 @@ internal fun VideoPlayerRevampScreen(
 
                     root.findViewById<ProgressBar>(R.id.loading_video_player_controller_view).isVisible =
                         playbackState <= STATE_BUFFERING
+
+                    root.findViewById<View>(R.id.exo_play_pause).isVisible =
+                        playbackState > STATE_BUFFERING
                 }
 
                 if (isControllerViewVisible && !uiState.isLocked) {
