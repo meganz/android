@@ -142,6 +142,13 @@ class PdfViewerViewModel @Inject constructor(
         _state.update { it.copy(pdfUriData = pdfUriData) }
     }
 
+    /**
+     * Reset pdf URI data after it has been consumed.
+     */
+    fun resetPdfUriData() {
+        _state.update { it.copy(pdfUriData = null) }
+    }
+
     private fun checkIsNodeInBackups() {
         viewModelScope.launch {
             val isNodeInBackups = isNodeInBackupsUseCase(handle)

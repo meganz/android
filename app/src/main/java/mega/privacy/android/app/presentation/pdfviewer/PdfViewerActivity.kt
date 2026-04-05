@@ -423,6 +423,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                 }
 
                 if (pdfUriData != null && lastPageViewed != null) {
+                    viewModel.resetPdfUriData()
                     loadLocalPDF(lastPageViewed.toInt())
                 }
                 if (invalidateMenuEvent != consumed) {

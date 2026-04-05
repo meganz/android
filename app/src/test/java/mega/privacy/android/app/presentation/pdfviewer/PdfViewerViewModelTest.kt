@@ -556,6 +556,24 @@ internal class PdfViewerViewModelTest {
     }
 
     @Test
+    internal fun `test that resetPdfUriData sets pdfUriData to null`() = runTest {
+        val uri = mock<Uri>()
+
+        initTest()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().pdfUriData).isNull()
+
+            underTest.setPdfUriData(uri)
+            assertThat(awaitItem().pdfUriData).isEqualTo(uri)
+
+            underTest.resetPdfUriData()
+            assertThat(awaitItem().pdfUriData).isNull()
+        }
+    }
+
+    @Test
     internal fun `test that broadcastTransferOverQuota invokes correctly`() = runTest {
         underTest.broadcastTransferOverQuota()
         advanceUntilIdle()
