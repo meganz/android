@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.chat.IsMegaApiLoggedInUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -79,11 +80,13 @@ class FetchNodesViewModelTest {
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val globalInitialiser = mock<GlobalInitialiser>()
     private val fetchNodeProvider = mock<FetchNodeProvider>()
-    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
+    private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
+    private val testDispatcher = UnconfinedTestDispatcher()
+    private val applicationScope = CoroutineScope(testDispatcher)
 
     @BeforeAll
     fun initialisation() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(testDispatcher)
     }
 
     @AfterAll
@@ -107,7 +110,8 @@ class FetchNodesViewModelTest {
             isMegaApiLoggedInUseCase,
             getUserDataUseCase,
             globalInitialiser,
-            fetchNodeProvider
+            fetchNodeProvider,
+            monitorFetchNodesFinishUseCase
         )
     }
 
@@ -132,6 +136,7 @@ class FetchNodesViewModelTest {
             getUserDataUseCase = getUserDataUseCase,
             globalInitialiser = globalInitialiser,
             fetchNodeProvider = fetchNodeProvider,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             args = args,
             applicationScope = applicationScope,
         )
@@ -160,6 +165,7 @@ class FetchNodesViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(false)
+        whenever(fetchNodeProvider.isLogInByAccount).thenReturn(false)
         val loginStatusFlow = MutableStateFlow<LoginStatus>(LoginStatus.LoginStarted)
         whenever(fastLoginUseCase.invoke(any(), any(), any())).thenReturn(loginStatusFlow)
         whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
@@ -189,6 +195,7 @@ class FetchNodesViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(true)
+        whenever(fetchNodeProvider.isLogInByAccount).thenReturn(true)
         whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
 
         initViewModel()
@@ -508,6 +515,7 @@ class FetchNodesViewModelTest {
             whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
             whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
             wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+            whenever(fetchNodeProvider.isLogInByAccount).thenReturn(false)
             val loginStatusFlow = MutableStateFlow<LoginStatus>(LoginStatus.LoginStarted)
             whenever(fastLoginUseCase.invoke(any(), any(), any())).thenReturn(loginStatusFlow)
             whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
@@ -546,6 +554,7 @@ class FetchNodesViewModelTest {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+        whenever(fetchNodeProvider.isLogInByAccount).thenReturn(true)
         whenever(fetchNodesUseCase()).thenReturn(emptyFlow())
 
         initViewModel(
@@ -569,6 +578,68 @@ class FetchNodesViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that handlePostLogin is called when root node exists during fast login retry`() =
+        runTest {
+            // Setup mocks - loginMutex locked on first check, root node exists on retry
+            whenever(loginMutex.isLocked).thenReturn(true)
+            whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+            whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+            whenever(isMegaApiLoggedInUseCase()).thenReturn(false)
+            whenever(fetchNodeProvider.isLogInByAccount).thenReturn(false)
+            wheneverBlocking { rootNodeExistsUseCase() }.thenReturn(true)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            verify(rootNodeExistsUseCase).invoke()
+            verify(globalInitialiser).onPostLogin("test-session", true)
+            verify(fastLoginUseCase, never()).invoke(any(), any(), any())
+        }
+
+    @Test
+    fun `test that monitorFetchNodesFinish is called when login mutex stays locked`() =
+        runTest {
+            // Setup mocks - loginMutex always locked, root node never exists
+            whenever(loginMutex.isLocked).thenReturn(true)
+            whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+            whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+            whenever(isMegaApiLoggedInUseCase()).thenReturn(false)
+            whenever(fetchNodeProvider.isLogInByAccount).thenReturn(false)
+            wheneverBlocking { rootNodeExistsUseCase() }.thenReturn(false)
+            whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
+
+            initViewModel()
+            advanceUntilIdle()
+
+            verify(monitorFetchNodesFinishUseCase).invoke()
+            verify(fastLoginUseCase, never()).invoke(any(), any(), any())
+        }
+
+    @Test
+    fun `test that monitorFetchNodesFinish calls handlePostLogin and clearLoginByAccount on emission`() =
+        runTest {
+            // Setup mocks - loginMutex always locked, root node never exists
+            whenever(loginMutex.isLocked).thenReturn(true)
+            whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+            whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+            whenever(isMegaApiLoggedInUseCase()).thenReturn(false)
+            whenever(fetchNodeProvider.isLogInByAccount).thenReturn(false)
+            wheneverBlocking { rootNodeExistsUseCase() }.thenReturn(false)
+            val fetchNodesFinishFlow = MutableSharedFlow<Boolean>()
+            whenever(monitorFetchNodesFinishUseCase()).thenReturn(fetchNodesFinishFlow)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            // Emit fetch nodes finish
+            fetchNodesFinishFlow.emit(true)
+            advanceUntilIdle()
+
+            verify(globalInitialiser).onPostLogin("test-session", true)
+            verify(fetchNodeProvider).clearLoginByAccount()
+        }
 
     @Test
     fun `test that sdk reload refresh event triggers fetch nodes but not fast login`() = runTest {

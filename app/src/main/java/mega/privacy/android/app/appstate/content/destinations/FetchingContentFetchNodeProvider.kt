@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import javax.inject.Inject
 
 internal class FetchNodeProviderImpl @Inject constructor() : FetchNodeProvider {
-    private var isLogInByAccount: Boolean = false
+    override var isLogInByAccount: Boolean = false
 
     override fun setLoginByAccount() {
         this.isLogInByAccount = true

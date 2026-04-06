@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.chat.IsMegaApiLoggedInUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -65,14 +67,13 @@ class FetchNodesViewModel @AssistedInject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val globalInitialiser: GlobalInitialiser,
     private val fetchNodeProvider: FetchNodeProvider,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     @Assisted val args: Args,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FetchNodesUiState(isFromLogin = args.isFromLogin))
     val state: StateFlow<FetchNodesUiState> = _state
-
-    private var pendingAction: String? = null
 
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
 
@@ -109,7 +110,7 @@ class FetchNodesViewModel @AssistedInject constructor(
                 fetchNodes(isRefreshSession = true)
             } else if (isMegaApiLoggedInUseCase()) {
                 Timber.d("User is logged in, fetch nodes")
-                handlePostLogin(isFastLogin = false)
+                handlePostLogin()
                 fetchNodes(isRefreshSession = false)
             } else {
                 // this case mean user logged in and open app again, so we need to fast login
@@ -145,6 +146,12 @@ class FetchNodesViewModel @AssistedInject constructor(
 
     /**
      * Fast login.
+     * Checks whether a login is already in progress.
+     * This may be triggered by other workers calling
+     * [mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase].
+     *
+     * @param session Session.
+     * @param refreshChatUrl Refresh chat url.
      */
     private fun fastLogin(session: String, refreshChatUrl: Boolean) {
         _state.update {
@@ -158,25 +165,36 @@ class FetchNodesViewModel @AssistedInject constructor(
             )
         }
 
-        viewModelScope.launch {
+        applicationScope.launch {
             var retry = 1
             while (loginMutex.isLocked && retry <= 3) {
                 Timber.d("Wait for the isLoggingIn lock to be available")
                 delay(1000L * retry)
                 if (rootNodeExistsUseCase()) {
                     Timber.d("Root node exists")
+                    handlePostLogin()
                     return@launch
                 }
                 retry++
             }
             if (loginMutex.isLocked) {
-                Timber.w("Another login is processing")
-                pendingAction = ACTION_OPEN_APP
-                return@launch
+                Timber.w("Another login is processing, skip fast login")
+                monitorFetchNodesFinish()
+            } else {
+                performFastLogin(session, refreshChatUrl)
             }
-
-            performFastLogin(session, refreshChatUrl)
         }
+    }
+
+    private suspend fun monitorFetchNodesFinish() {
+        monitorFetchNodesFinishUseCase()
+            .catch { Timber.e(it) }
+            .filter { it }
+            .take(1)
+            .collect {
+                handlePostLogin()
+                fetchNodeProvider.clearLoginByAccount()
+            }
     }
 
     private fun performFastLogin(session: String, refreshChatUrl: Boolean) =
@@ -229,7 +247,7 @@ class FetchNodesViewModel @AssistedInject constructor(
                     )
                 }
             }
-            handlePostLogin(true)
+            handlePostLogin()
             getUserData()
             fetchNodes()
         }
@@ -322,8 +340,11 @@ class FetchNodesViewModel @AssistedInject constructor(
         }
     }
 
-    private fun handlePostLogin(isFastLogin: Boolean) {
-        globalInitialiser.onPostLogin(session = args.session, isFastLogin)
+    private fun handlePostLogin() {
+        globalInitialiser.onPostLogin(
+            session = args.session,
+            isFastLogin = !fetchNodeProvider.isLogInByAccount
+        )
     }
 
     private fun stopFetchingNodes() {

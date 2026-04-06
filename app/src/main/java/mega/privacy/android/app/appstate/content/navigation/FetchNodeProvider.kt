@@ -10,6 +10,11 @@ import mega.privacy.android.domain.entity.node.root.RefreshEvent
 interface FetchNodeProvider {
 
     /**
+     * Whether the login is done by account credentials.
+     */
+    val isLogInByAccount: Boolean
+
+    /**
      * Sets whether the login is done by account credentials.
      */
     fun setLoginByAccount()
