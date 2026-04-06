@@ -2649,4 +2649,5 @@
     <string name="pdf_viewer_error_corrupt_or_missing">خطأ. ملف الـ PDF تالف أو غير موجود.</string>
     <string name="pdf_viewer_error_streaming">حدث خطأ أثناء محاولة فتح الملف</string>
     <string name="homepage_empty_hint_audio">[B]لم[/B] [B]يتم العثور على أي[/B] [A]ملفات صوتية[/A]</string>
+    <string name="cloud_explorer_choose_folder_title">اختر مجلد</string>
 </resources>

@@ -2379,4 +2379,7 @@
     <string name="homepage_empty_hint_audio">[B]No[/B] se han [B]encontrado[/B] [A]audios/A]</string>
     <string name="open_link_dialog_hint">Pegar enlace</string>
     <string name="open_link_dialog_title">Abrir enlace</string>
+    <string name="cloud_explorer_choose_folder_title">Elige carpeta</string>
+    <string name="cloud_explorer_select_destination_title">Seleccionar destino</string>
+    <string name="cloud_explorer_use_this_folder_button">Usar esta carpeta</string>
 </resources>

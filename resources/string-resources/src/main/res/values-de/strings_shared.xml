@@ -2037,8 +2037,8 @@
         <item quantity="other">%d Ordner</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">„%1$d Ordner, “</item>
-        <item quantity="other">„%1$d Ordner, “</item>
+        <item quantity="one">“%1$d Ordner, “</item>
+        <item quantity="other">“%1$d Ordner, “</item>
     </plurals>
     <string name="general_first_name">Vorname(n)</string>
     <string name="general_last_name">Familienname</string>
@@ -2317,4 +2317,5 @@
     <string name="homepage_empty_hint_audio">[B]Keine[/B] [A]Audiodateien[/A] [B]gefunden[/B]</string>
     <string name="open_link_dialog_hint">Link einfügen</string>
     <string name="open_link_dialog_title">Link öffnen</string>
+    <string name="cloud_explorer_choose_folder_title">Ordner auswählen</string>
 </resources>

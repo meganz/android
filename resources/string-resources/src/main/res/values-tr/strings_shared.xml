@@ -2333,4 +2333,7 @@
     <string name="homepage_empty_hint_audio">[B]Hiç[/B] [A]ses[/A] [B]bulunamadı[/B]</string>
     <string name="open_link_dialog_title">Bağlantıyı aç</string>
     <string name="open_link_dialog_hint">Bağlantıyı yapıştırın</string>
+    <string name="cloud_explorer_select_destination_title">Hedef seç</string>
+    <string name="cloud_explorer_use_this_folder_button">Bu klasörü kullan</string>
+    <string name="cloud_explorer_choose_folder_title">Klasör seç</string>
 </resources>

@@ -111,7 +111,7 @@
     <!-- All videos tab title of the video section  -->
     <string name="video_section_tab_title_all_videos">모든 동영상</string>
     <!-- Playlists tab title of the video section  -->
-    <string name="video_section_tab_title_playlists">재생 목록</string>
+    <string name="video_section_tab_title_playlists">재생목록</string>
     <!-- Location filter title of the video section  -->
     <string name="video_section_videos_location_filter_title">위치</string>
     <!-- All locations option of the video section location filter  -->
@@ -2231,4 +2231,5 @@
     <string name="pdf_viewer_error_no_network">네트워크 연결이 없습니다. 파일을 열려면 다시 연결하세요.</string>
     <string name="open_link_dialog_title">링크 열기</string>
     <string name="open_link_dialog_hint">링크 붙여넣기</string>
+    <string name="cloud_explorer_choose_folder_title">폴더 선택</string>
 </resources>

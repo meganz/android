@@ -2407,4 +2407,5 @@
     <string name="pdf_viewer_error_corrupt_or_missing">Erreur. Le fichier PDF est corrompu ou n’existe pas.</string>
     <string name="pdf_viewer_error_streaming">Une erreur est survenue lors de l\’ouverture du fichier</string>
     <string name="homepage_empty_hint_audio">[B]Aucun[/B] [A]fichier audio[/A] [B]trouvé[/B]</string>
+    <string name="cloud_explorer_choose_folder_title">Choisir un dossier</string>
 </resources>

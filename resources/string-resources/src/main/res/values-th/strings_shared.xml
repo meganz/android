@@ -2237,4 +2237,5 @@
     <string name="pdf_viewer_error_corrupt_or_missing">เกิดข้อผิดพลาดเนื่องจากไฟล์ PDF เสียหายหรือไม่พบไฟล์นี้</string>
     <string name="pdf_viewer_error_streaming">เกิดข้อผิดพลาดขณะเปิดไฟล์</string>
     <string name="homepage_empty_hint_audio">[B]ไม่พบ[/B] [A]ไฟล์เสียง[/A] [B]ที่นี่[/B]</string>
+    <string name="cloud_explorer_choose_folder_title">เลือกโฟลเดอร์</string>
 </resources>

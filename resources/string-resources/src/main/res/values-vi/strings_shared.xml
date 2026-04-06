@@ -1965,4 +1965,5 @@
     <string name="pdf_viewer_error_no_network">Không có kết nối mạng. Xin kết nối lại rồi mở tệp tin.</string>
     <string name="open_link_dialog_title">Mở đường dẫn liên kết</string>
     <string name="open_link_dialog_hint">Dán đường liên kết</string>
+    <string name="cloud_explorer_choose_folder_title">Chọn thư mục</string>
 </resources>

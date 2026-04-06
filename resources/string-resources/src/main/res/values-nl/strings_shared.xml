@@ -985,7 +985,7 @@
     <!-- USP Carousel page 4 description-->
     <string name="carousel_page_description_slide_4">Chat met vrienden en familie, deel foto\’s of gevoelige informatie, videogesprekken en plan vergaderingen. Veiligheid en privacy gegarandeerd.</string>
     <!-- Create account label-->
-    <string name="general_label_create_account">MEGA-account aanmaken</string>
+    <string name="general_label_create_account">Aanmelden</string>
     <!-- The new feature hidden nodes feature -->
     <string name="hidden_nodes_new_feature">Nieuw kenmerk: Verborgen bestanden en mappen</string>
     <!-- Hidden nodes: hide files and folders feature -->
@@ -2330,4 +2330,5 @@
     <string name="pdf_viewer_error_corrupt_or_missing">Fout. Het PDF bestand is beschadigd of bestaat niet.</string>
     <string name="pdf_viewer_error_streaming">Een fout heeft opgetreden tijdens het openen van het bestand</string>
     <string name="homepage_empty_hint_audio">[B]Geen[/B] [A]audio[/A] [B]gevonden[/B]</string>
+    <string name="cloud_explorer_choose_folder_title">Kies map</string>
 </resources>
