@@ -142,6 +142,7 @@ import timber.log.Timber
 import java.io.File
 import java.net.URI
 import java.util.Collections
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -240,7 +241,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private var mediaPlayback = MutableLiveData<Boolean>()
 
-    private val playlistItems = mutableListOf<PlaylistItem>()
+    private val playlistItems = CopyOnWriteArrayList<PlaylistItem>()
 
     private val itemsSelectedMap = mutableMapOf<Long, PlaylistItem>()
 
@@ -256,8 +257,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private var needStopStreamingServer = false
 
-    private var playSourceChanged: MutableList<MediaItem> = mutableListOf()
-    private var playlistItemsChanged: MutableList<PlaylistItem> = mutableListOf()
+    private var playSourceChanged: MutableList<MediaItem> = CopyOnWriteArrayList()
+    private var playlistItemsChanged: MutableList<PlaylistItem> = CopyOnWriteArrayList()
     private var playingPosition = 0
 
     private var cancelToken: MegaCancelToken? = null
@@ -663,10 +664,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
         runCatching {
             getOfflineNodesByParentIdUseCase(parentId)
         }.onSuccess { list ->
-            playlistItems.clear()
-
             val mediaItems = mutableListOf<MediaItem>()
             var firstPlayIndex = 0
+            val newItems = mutableListOf<PlaylistItem>()
 
             list.filter {
                 it.fileTypeInfo is AudioFileTypeInfo && it.fileTypeInfo?.isSupported == true
@@ -697,9 +697,11 @@ class AudioPlayerServiceViewModel @Inject constructor(
                     size = item.totalSize,
                     duration = (item.fileTypeInfo as? AudioFileTypeInfo)?.duration ?: 0.seconds,
                     fileExtension = item.fileTypeInfo?.extension
-                ).let { playlistItems.add(it) }
+                ).let { newItems.add(it) }
             }
 
+            playlistItems.clear()
+            playlistItems.addAll(newItems)
             updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
         }.onFailure {
             Timber.e(it)
@@ -718,10 +720,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
         typedAudioNodes: List<TypedAudioNode>,
         firstPlayHandle: Long,
     ) {
-        playlistItems.clear()
-
         val mediaItems = ArrayList<MediaItem>()
         var firstPlayIndex = 0
+        val newItems = mutableListOf<PlaylistItem>()
 
         val nodesWithoutThumbnail = ArrayList<Pair<Long, File>>()
 
@@ -773,13 +774,16 @@ class AudioPlayerServiceViewModel @Inject constructor(
                     duration,
                     typedAudioNode.type.extension
                 ).let { playlistItem ->
-                    playlistItems.add(playlistItem)
+                    newItems.add(playlistItem)
                 }
 
                 if (thumbnail != null && !thumbnail.exists()) {
                     nodesWithoutThumbnail.add(Pair(typedAudioNode.id.longValue, thumbnail))
                 }
             }
+
+        playlistItems.clear()
+        playlistItems.addAll(newItems)
 
         if (nodesWithoutThumbnail.isNotEmpty() && isConnectedToInternetUseCase()) {
             cancellableJobs[JOB_KEY_UPDATE_THUMBNAIL]?.cancel()
@@ -856,10 +860,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
         files: List<File>,
         firstPlayHandle: Long,
     ) {
-        playlistItems.clear()
-
         val mediaItems = ArrayList<MediaItem>()
         var firstPlayIndex = 0
+        val newItems = mutableListOf<PlaylistItem>()
 
         files.filter {
             it.isFile && filterByNodeName(it.name)
@@ -881,9 +884,11 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 MimeTypeList.typeForName(file.name).extension
             )
                 .let { playlistItem ->
-                    playlistItems.add(playlistItem)
+                    newItems.add(playlistItem)
                 }
         }
+        playlistItems.clear()
+        playlistItems.addAll(newItems)
         updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
     }
 
