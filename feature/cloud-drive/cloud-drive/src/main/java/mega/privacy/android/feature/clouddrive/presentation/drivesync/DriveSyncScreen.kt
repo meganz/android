@@ -36,7 +36,6 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -49,6 +48,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
@@ -186,9 +186,11 @@ internal fun DriveSyncScreen(
                                             Analytics.tracker.trackEvent(
                                                 CloudDriveSearchBarPressedEvent
                                             )
-                                            SearchNavKey(
-                                                parentHandle = state.currentFolderId.longValue,
-                                                nodeSourceType = state.nodeSourceType
+                                            navigationHandler.navigate(
+                                                SearchNavKey(
+                                                    parentHandle = state.currentFolderId.longValue,
+                                                    nodeSourceType = state.nodeSourceType
+                                                )
                                             )
                                         }
                                     )
