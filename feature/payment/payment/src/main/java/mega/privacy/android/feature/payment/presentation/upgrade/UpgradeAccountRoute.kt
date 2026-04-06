@@ -3,6 +3,7 @@ package mega.privacy.android.feature.payment.presentation.upgrade
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +47,8 @@ fun UpgradeAccountRoute(
     val accountStorageUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
     val megaNavigator = rememberMegaNavigator()
     val activity = LocalActivity.current
+
+    BackHandler(onBack = onBack)
 
     LaunchedOnceEffect(Unit) {
         Analytics.tracker.trackEvent(UpgradeAccountPlanScreenEvent)
