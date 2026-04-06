@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
@@ -53,6 +54,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
@@ -75,6 +77,7 @@ class MyAccountHomeViewModelTest {
     private val connectivityFlow = MutableStateFlow(false)
     private val userUpdatesFlow = MutableStateFlow<UserChanges>(UserChanges.Firstname)
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
+    private val getExtendedAccountDetail: GetExtendedAccountDetail = mock()
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
         onBlocking { invoke() }.thenReturn(accountDetailFlow)
@@ -121,6 +124,7 @@ class MyAccountHomeViewModelTest {
 
         underTest = MyAccountHomeViewModel(
             getAccountDetailsUseCase,
+            getExtendedAccountDetail,
             monitorAccountDetailUseCase,
             monitorMyAvatarFile,
             monitorVerificationStatusUseCase,
@@ -250,7 +254,7 @@ class MyAccountHomeViewModelTest {
                     (expected.levelDetail?.proExpirationTime ?: 0) > 0
                 )
                 assertThat(state.lastSession).isEqualTo(
-                    (expected.sessionDetail?.mostRecentSessionTimeStamp) ?: 0
+                    expected.sessionDetail?.mostRecentSessionTimeStamp
                 )
                 assertThat(state.usedStorage).isEqualTo(
                     expected.storageDetail?.usedStorage ?: 0,
@@ -277,6 +281,19 @@ class MyAccountHomeViewModelTest {
                     expected.levelDetail?.proExpirationTime ?: 0
                 )
             }
+        }
+
+    @Test
+    fun `test that refreshAccountInfo calls getExtendedAccountDetail with sessions enabled`() =
+        runTest {
+            advanceUntilIdle()
+
+            verify(getExtendedAccountDetail).invoke(
+                forceRefresh = true,
+                sessions = true,
+                purchases = false,
+                transactions = false,
+            )
         }
 
     @ParameterizedTest(name = " with usedTransfer as {0} and totalTransfer as {1} and UsedTransferStatus is {2}")

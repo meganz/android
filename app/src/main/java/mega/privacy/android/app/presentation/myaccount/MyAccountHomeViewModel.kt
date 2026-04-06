@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
@@ -55,6 +56,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyAccountHomeViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
+    private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase,
@@ -157,8 +159,7 @@ class MyAccountHomeViewModel @Inject constructor(
                                     && (accountDetail.levelDetail?.subscriptionRenewTime ?: 0) > 0,
                             hasExpireAbleSubscription = accountDetail.levelDetail?.accountType !== AccountType.FREE && (accountDetail.levelDetail?.proExpirationTime
                                 ?: 0) > 0,
-                            lastSession = (accountDetail.sessionDetail?.mostRecentSessionTimeStamp)
-                                ?: 0,
+                            lastSession = accountDetail.sessionDetail?.mostRecentSessionTimeStamp,
                             usedStorage = accountDetail.storageDetail?.usedStorage ?: 0,
                             usedStoragePercentage = accountDetail.storageDetail?.usedPercentage
                                 ?: 0,
@@ -247,6 +248,12 @@ class MyAccountHomeViewModel @Inject constructor(
                         businessProFlexiStatus = businessStatus
                     )
                 }
+                getExtendedAccountDetail(
+                    forceRefresh = true,
+                    sessions = true,
+                    purchases = false,
+                    transactions = false,
+                )
             }.onFailure {
                 Timber.e(it)
             }
