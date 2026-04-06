@@ -9,6 +9,7 @@ import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatur
 import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderImpl
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.appstate.content.navigation.PermissionFeatureDestination
+import mega.privacy.android.app.main.ads.AdsFreeIntroFeatureDestination
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -105,6 +106,11 @@ class FeatureDestinationModule {
     @IntoSet
     fun provideContinuousScanDestination(): FeatureDestination =
         ContinuousScanDestination()
+
+    @Provides
+    @IntoSet
+    fun provideAdsFreeIntroFeatureDestination(): FeatureDestination =
+        AdsFreeIntroFeatureDestination()
 
     @Provides
     @Singleton

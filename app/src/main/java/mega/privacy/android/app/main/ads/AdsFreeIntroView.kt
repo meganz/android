@@ -64,11 +64,15 @@ internal fun AdsFreeIntroView(
 
     // keep using OriginalTheme in new single activity revamp
     OriginalTheme(isDark = state.themeMode.isDarkMode()) {
-        AdsFreeIntroContent(
-            modifier = modifier,
-            onDismiss = onDismiss,
-            uiState = state,
-        )
+        FullScreenDialog(
+            onDismissRequest = onDismiss,
+        ) {
+            AdsFreeIntroContent(
+                modifier = modifier,
+                onDismiss = onDismiss,
+                uiState = state,
+            )
+        }
     }
 }
 
@@ -88,114 +92,135 @@ internal fun AdsFreeIntroContent(
         uiState.cheapestSubscriptionAvailable?.formatStorageSize(usePlaceholder = false)
     val minimalStorageValueAndUnit =
         formattedStorage?.let { "${it.size} ${stringResource(it.unit)}" }.orEmpty()
-    FullScreenDialog(
-        onDismissRequest = onDismiss,
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .systemBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = modifier
-                .verticalScroll(rememberScrollState())
-                .systemBarsPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Image(
+            painter = painterResource(id = R.drawable.ic_add_free),
+            contentDescription = "Add free image",
+            modifier = Modifier
+                .padding(top = 48.dp)
+                .size(200.dp)
+                .testTag(ADS_FREE_IMAGE_TEST_TAG),
+        )
+        MegaText(
+            text = stringResource(sharedR.string.payment_ads_free_intro_title),
+            textColor = TextColor.Primary,
+            style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.W500),
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(top = 24.dp)
+                .testTag(ADS_FREE_TITLE_TEST_TAG),
+        )
+
+        MegaText(
+            text = stringResource(
+                sharedR.string.payment_ads_free_intro_description,
+                formattedPrice?.price.orEmpty()
+            ),
+            textColor = TextColor.Secondary,
+            style = MaterialTheme.typography.subtitle2,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(vertical = 8.dp, horizontal = 16.dp)
+                .testTag(ADS_FREE_DESCRIPTION_TEST_TAG),
+        )
+
+        AdsFreeItem(
+            title = stringResource(sharedR.string.payment_ads_free_intro_generous_storage_label),
+            desc = stringResource(
+                sharedR.string.payment_ads_free_intro_generous_storage_description,
+                minimalStorageValueAndUnit
+            ),
+            icon = R.drawable.ic_cloud_outline,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+        )
+
+        AdsFreeItem(
+            title = stringResource(sharedR.string.payment_ads_free_intro_transfer_sharing_label),
+            desc = stringResource(sharedR.string.payment_ads_free_intro_transfer_sharing_description),
+            icon = R.drawable.ic_circle_chart_outline,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+        )
+
+        AdsFreeItem(
+            title = stringResource(sharedR.string.payment_ads_free_intro_additional_security_label),
+            desc = stringResource(sharedR.string.payment_ads_free_intro_additional_security_description),
+            icon = R.drawable.ic_lock_outline,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+        )
+
+        Spacer(Modifier.weight(1f))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.End,
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_add_free),
-                contentDescription = "Add free image",
+            OutlinedMegaButton(
+                text = stringResource(R.string.general_skip),
+                onClick = {
+                    Analytics.tracker.trackEvent(AdFreeDialogScreenSkipButtonPressedEvent)
+                    onDismiss()
+                },
+                rounded = false,
                 modifier = Modifier
-                    .padding(top = 48.dp)
-                    .size(200.dp)
-                    .testTag(ADS_FREE_IMAGE_TEST_TAG),
+                    .padding(end = 8.dp)
+                    .testTag(SKIP_BUTTON_TEST_TAG),
             )
-            MegaText(
-                text = stringResource(sharedR.string.payment_ads_free_intro_title),
-                textColor = TextColor.Primary,
-                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.W500),
-                textAlign = TextAlign.Center,
+            RaisedDefaultMegaButton(
+                text = stringResource(sharedR.string.payment_ads_free_intro_button_view_pro_plan),
+                onClick = {
+                    Analytics.tracker.trackEvent(
+                        AdFreeDialogScreenViewProPlansButtonPressedEvent
+                    )
+                    context.megaNavigator.openUpgradeAccount(
+                        context = context,
+                        UpgradeAccountSource.ADS_FREE_SCREEN
+                    )
+                    onDismiss()
+                },
                 modifier = Modifier
-                    .padding(top = 24.dp)
-                    .testTag(ADS_FREE_TITLE_TEST_TAG),
+                    .testTag(VIEW_PRO_PLAN_BUTTON_TEST_TAG),
             )
-
-            MegaText(
-                text = stringResource(
-                    sharedR.string.payment_ads_free_intro_description,
-                    formattedPrice?.price.orEmpty()
-                ),
-                textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                    .testTag(ADS_FREE_DESCRIPTION_TEST_TAG),
-            )
-
-            AdsFreeItem(
-                title = stringResource(sharedR.string.payment_ads_free_intro_generous_storage_label),
-                desc = stringResource(
-                    sharedR.string.payment_ads_free_intro_generous_storage_description,
-                    minimalStorageValueAndUnit
-                ),
-                icon = R.drawable.ic_cloud_outline,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-            )
-
-            AdsFreeItem(
-                title = stringResource(sharedR.string.payment_ads_free_intro_transfer_sharing_label),
-                desc = stringResource(sharedR.string.payment_ads_free_intro_transfer_sharing_description),
-                icon = R.drawable.ic_circle_chart_outline,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-            )
-
-            AdsFreeItem(
-                title = stringResource(sharedR.string.payment_ads_free_intro_additional_security_label),
-                desc = stringResource(sharedR.string.payment_ads_free_intro_additional_security_description),
-                icon = R.drawable.ic_lock_outline,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-            )
-
-            Spacer(Modifier.weight(1f))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.End,
-            ) {
-                OutlinedMegaButton(
-                    text = stringResource(R.string.general_skip),
-                    onClick = {
-                        Analytics.tracker.trackEvent(AdFreeDialogScreenSkipButtonPressedEvent)
-                        onDismiss()
-                    },
-                    rounded = false,
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .testTag(SKIP_BUTTON_TEST_TAG),
-                )
-                RaisedDefaultMegaButton(
-                    text = stringResource(sharedR.string.payment_ads_free_intro_button_view_pro_plan),
-                    onClick = {
-                        Analytics.tracker.trackEvent(
-                            AdFreeDialogScreenViewProPlansButtonPressedEvent
-                        )
-                        context.megaNavigator.openUpgradeAccount(
-                            context = context,
-                            UpgradeAccountSource.ADS_FREE_SCREEN
-                        )
-                        onDismiss()
-                    },
-                    modifier = Modifier
-                        .testTag(VIEW_PRO_PLAN_BUTTON_TEST_TAG),
-                )
-            }
         }
+    }
+}
+
+/**
+ * Ads Free Intro Screen for new navigation architecture.
+ * Same as [AdsFreeIntroView] but without the [FullScreenDialog] wrapper.
+ */
+@Composable
+internal fun AdsFreeIntroScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AdsFreeIntroViewModel = hiltViewModel(),
+    onDismiss: () -> Unit,
+) {
+    val state by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(AdFreeDialogScreenEvent)
+    }
+
+    OriginalTheme(isDark = state.themeMode.isDarkMode()) {
+        AdsFreeIntroContent(
+            modifier = modifier,
+            onDismiss = onDismiss,
+            uiState = state,
+        )
     }
 }
 

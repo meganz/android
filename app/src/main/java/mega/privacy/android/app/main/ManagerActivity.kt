@@ -131,7 +131,7 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.shared.ads.AdsContainer
+import mega.privacy.android.app.main.ads.LegacyAdsContainer
 import mega.privacy.android.shared.ads.AdsContainerViewModel
 import mega.privacy.android.app.main.bottomsheets.HomeFabOptionsBottomSheet
 import mega.privacy.android.app.main.controllers.NodeController
@@ -2451,7 +2451,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val request by googleAdsManager.request.collectAsStateWithLifecycle()
             OriginalTheme(isDark = themeMode.isDarkMode()) {
-                AdsContainer(
+                LegacyAdsContainer(
                     modifier = Modifier.fillMaxWidth(),
                     request = request,
                     viewModel = adsContainerViewModel,

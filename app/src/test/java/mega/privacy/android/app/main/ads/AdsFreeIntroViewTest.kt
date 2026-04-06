@@ -1,10 +1,13 @@
 package mega.privacy.android.app.main.ads
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountType
@@ -70,14 +73,17 @@ class AdsFreeIntroViewTest {
         initAdsFreeIntroView()
 
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.payment_ads_free_intro_title))
+            .performScrollTo()
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(
             composeTestRule.activity.getString(
                 sharedR.string.payment_ads_free_intro_description,
                 formattedPrice.price
             )
-        ).assertIsDisplayed()
+        ).performScrollTo()
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.payment_ads_free_intro_generous_storage_label))
+            .performScrollTo()
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(
             composeTestRule.activity.getString(
@@ -85,14 +91,19 @@ class AdsFreeIntroViewTest {
                 minimalStorageValueAndUnit
             )
         )
+            .performScrollTo()
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.payment_ads_free_intro_transfer_sharing_label))
+            .performScrollTo()
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.payment_ads_free_intro_transfer_sharing_description))
+            .performScrollTo()
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.payment_ads_free_intro_additional_security_label))
+            .performScrollTo()
             .assertIsDisplayed()
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.payment_ads_free_intro_additional_security_description))
+            .performScrollTo()
             .assertIsDisplayed()
 
         composeTestRule.onNodeWithTag(ADS_FREE_IMAGE_TEST_TAG)
@@ -102,6 +113,7 @@ class AdsFreeIntroViewTest {
     private fun initAdsFreeIntroView() {
         composeTestRule.setContent {
             AdsFreeIntroContent(
+                modifier = Modifier.fillMaxSize(),
                 uiState = AdsFreeIntroUiState(
                     cheapestSubscriptionAvailable = subscriptionProLite
                 ),

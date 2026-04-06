@@ -33,7 +33,7 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.util.shimmerEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.shared.ads.AdsContainer
+import mega.privacy.android.app.main.ads.LegacyAdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
@@ -145,7 +145,7 @@ internal fun FileLinkView(
                         onSaveToDeviceClicked = onSaveToDeviceClicked
                     )
                 }
-                AdsContainer(
+                LegacyAdsContainer(
                     request = request,
                     isLoggedInUser = viewState.hasDbCredentials,
                     modifier = Modifier.fillMaxWidth(),

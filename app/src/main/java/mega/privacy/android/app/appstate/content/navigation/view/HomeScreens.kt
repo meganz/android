@@ -130,6 +130,7 @@ fun HomeScreens(
             }
             NewAdsContainer(
                 modifier = modifier.fillMaxSize(),
+                onNavigate = outerNavigationHandler::navigate,
             ) { modifier ->
                 MainNavigationScaffold(
                     modifier = modifier

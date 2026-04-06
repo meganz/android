@@ -15,11 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.navigation.destination.AdsFreeIntroNavKey
 import mega.privacy.android.shared.ads.advertisements.AdsViewModel
 
 @Composable
 fun NewAdsContainer(
     modifier: Modifier,
+    onNavigate: (NavKey) -> Unit = {},
     viewModel: AdsViewModel = hiltViewModel(),
     content: @Composable ColumnScope.(Modifier) -> Unit = {},
 ) {
@@ -46,6 +49,7 @@ fun NewAdsContainer(
                 .navigationBarsPadding()
                 .fillMaxWidth(),
             request = uiState.request,
+            onCloseAds = { onNavigate(AdsFreeIntroNavKey) },
         )
     }
 }

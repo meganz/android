@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,10 +39,10 @@ fun AdsContainer(
     modifier: Modifier = Modifier,
     isLoggedInUser: Boolean = true,
     viewModel: AdsContainerViewModel = hiltViewModel(),
+    onCloseAds: () -> Unit = {},
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentLifecycleState by lifecycleOwner.lifecycle.currentStateAsState()
-    var showFreeAdsDialog by rememberSaveable { mutableStateOf(false) }
     var handledState by remember { mutableStateOf(Lifecycle.State.INITIALIZED) }
     var handledRequest by remember { mutableStateOf<AdManagerAdRequest?>(null) }
     var adLoaded by remember { mutableStateOf(false) }
@@ -119,7 +118,7 @@ fun AdsContainer(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .clickable(onClick = {
-                            showFreeAdsDialog = true
+                            onCloseAds()
                             viewModel.handleAdsClosed()
                             Analytics.tracker.trackEvent(AdsBannerCloseAdsButtonPressedEvent)
                         })
@@ -128,12 +127,6 @@ fun AdsContainer(
                 )
             }
 
-            // TODO
-//            if (showFreeAdsDialog) {
-//                AdsFreeIntroView(onDismiss = {
-//                    showFreeAdsDialog = false
-//                })
-//            }
         }
     }
 }

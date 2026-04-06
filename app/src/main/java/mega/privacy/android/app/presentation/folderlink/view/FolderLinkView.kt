@@ -57,7 +57,7 @@ import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.ads.AdsContainer
+import mega.privacy.android.app.main.ads.LegacyAdsContainer
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.filelink.view.ImportDownloadView
@@ -222,7 +222,7 @@ internal fun FolderLinkView(
                             onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                         )
                     }
-                    AdsContainer(
+                    LegacyAdsContainer(
                         request = request,
                         modifier = Modifier.fillMaxWidth(),
                         isLoggedInUser = state.hasDbCredentials,
