@@ -14,7 +14,7 @@ enum class NodeSortOption(
 
     Favourite(
         sharedR.string.action_sort_by_favorite,
-        defaultSortDirection = SortDirection.Descending
+        defaultSortDirection = SortDirection.Ascending
     ),
 
     Label(sharedR.string.action_sort_by_label, defaultSortDirection = SortDirection.Ascending),
