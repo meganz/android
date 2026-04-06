@@ -34,7 +34,7 @@ class NodeSortOptionTest {
         @JvmStatic
         fun provideNodeSortOptionDefaultDirections(): Stream<Arguments> = Stream.of(
             Arguments.of(NodeSortOption.Name, SortDirection.Ascending),
-            Arguments.of(NodeSortOption.Favourite, SortDirection.Descending),
+            Arguments.of(NodeSortOption.Favourite, SortDirection.Ascending),
             Arguments.of(NodeSortOption.Label, SortDirection.Ascending),
             Arguments.of(NodeSortOption.Created, SortDirection.Descending),
             Arguments.of(NodeSortOption.Modified, SortDirection.Descending),
