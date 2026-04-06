@@ -2128,4 +2128,5 @@
     <string name="pdf_viewer_error_no_network">Tidak ada koneksi jaringan. Sambungkan kembali untuk membuka file.</string>
     <string name="open_link_dialog_hint">Tempel tautan</string>
     <string name="open_link_dialog_title">Buka tautan</string>
+    <string name="cloud_explorer_choose_folder_title">Pilih folder</string>
 </resources>

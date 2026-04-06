@@ -2500,4 +2500,5 @@
     </plurals>
     <string name="open_link_dialog_title">Открыть ссылку</string>
     <string name="open_link_dialog_hint">Вставьте ссылку</string>
+    <string name="cloud_explorer_choose_folder_title">Выбрать папку</string>
 </resources>

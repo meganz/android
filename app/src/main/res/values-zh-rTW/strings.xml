@@ -205,7 +205,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">選擇帳戶</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">可離線使用</string>
+    <string name="file_properties_available_offline">可離線存取</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">大小</string>
     <!-- When the file/folder was last modified -->
@@ -293,7 +293,7 @@
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">移除</string>
     <!-- Menu option to delete selected items of the offline state -->
-    <string name="context_delete_offline">從可離線使用中移除</string>
+    <string name="context_delete_offline">從離線存取中移除</string>
     <!-- menu item -->
     <string name="context_share_folder">共享資料夾</string>
     <!-- menu item -->
@@ -443,7 +443,7 @@
     <!-- Settings preference title for cache -->
     <string name="settings_advanced_features_cache">清除快取</string>
     <!-- Settings preference title for offline files -->
-    <string name="settings_advanced_features_offline">清除可離線存取檔案</string>
+    <string name="settings_advanced_features_offline">清除離線存取的檔案</string>
     <!-- Settings preference title for delete account -->
     <string name="settings_delete_account">刪除帳戶</string>
     <!-- Size of files in offline or cache folders -->
@@ -1061,9 +1061,9 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s已被邀請。請檢查您的待處理請求。</string>
     <!-- text_copyright_alert_title -->
-    <string name="copyright_alert_title">致所有使用者之著作權警告</string>
+    <string name="copyright_alert_title">致所有使用者之版權警告</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA尊重他人之著作權，且要求MEGA的雲端服務使用者遵守著作權法。</string>
+    <string name="copyright_alert_first_paragraph">MEGA尊重他人之版權，且要求MEGA的雲端服務使用者遵守版權相關法律。</string>
     <!-- text_copyright_alert_second_paragraph -->
     <string name="copyright_alert_second_paragraph">嚴禁使用MEGA雲端服務侵犯智慧財產權。您不得以上傳、下載、儲存、共享、展示、串流、散佈、寄送電子郵件、連結、傳輸或以任何其他方式提供會侵犯任何個人或單位之智慧財產權或其他相關所有權的檔案、資料或內容。</string>
     <!-- text of the Agree button -->
@@ -1321,7 +1321,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]沒有檔案在您的[/B][A]雲端硬碟[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[A]離線使用[/A]裡[B]沒有檔案[/B]</string>
+    <string name="context_empty_offline">[B]沒有檔案[/B]儲存在[A]離線存取[/A]區</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]沒有[/B][A]聯絡人[/A]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
@@ -1697,9 +1697,9 @@
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">嘗試刪除所有過去的檔案版本時發生錯誤，請於稍後重試。</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
-    <string name="settings_enable_file_versioning_title">檔案版本控制</string>
+    <string name="settings_enable_file_versioning_title">版本控制</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
-    <string name="settings_enable_file_versioning_subtitle">啟用或停用您整個帳戶的檔案版本控制功能。\n停用檔案版本控制並不會讓您的聯絡人無法在共享資料夾建立新版本的檔案。</string>
+    <string name="settings_enable_file_versioning_subtitle">啟用或停用整個帳戶的版本控制。停用版本控制後，您的聯絡人仍可在共享資料夾中建立新版本。</string>
     <!-- Hint shown to guide user on activity add contacts -->
     <string name="type_mail">搜尋聯絡人或輸入電子郵件地址</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
@@ -1881,7 +1881,7 @@
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]您公開共享的資料夾[/A][B]%s[/B]已被下架。</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">爭議撤除</string>
+    <string name="dispute_takendown_file">侵權移除申訴</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
     <string name="error_download_takendown_node">因違反我們的服務條款而無法存取</string>
     <!-- Subtitle of a file takedown reinstated historic notification -->
@@ -2227,7 +2227,7 @@
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">請聯繫您的商業帳戶管理員來解決問題並啟用您的帳戶。</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
-    <string name="logout_warning_offline">當您登出時，可離線使用的檔案將從您的裝置中刪除。</string>
+    <string name="logout_warning_offline">當您登出時，離線存取的檔案將從您的裝置中刪除。</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
     <string name="logout_warning_transfers">當您登出時，正在進行中的傳輸將取消。</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
@@ -3175,7 +3175,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">這是您備份檔案和資料夾存放的地方。您備份的項目是「唯讀」的，以避免它們在您的雲端硬碟中被意外竄改。您可以使用我們桌面應用程式將您電腦中的項目備份到MEGA。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交反對通知的更多資訊。</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交恢復存取申請的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法再存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
     <!-- Title of the Meetings tab for the chat section -->
@@ -3717,9 +3717,9 @@
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]撤除指導政策[/A]，此檔案已被下架。</string>
+    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]侵權下架指南[/A]，此檔案已被下架。</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]撤除指導政策[/A]，此資料夾已被下架。</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]侵權下架指南[/A]，此資料夾已被下架。</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">加入</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -3929,9 +3929,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">無法開啟檔案</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">根據我們的[A]撤除指導政策[/A]，此資料夾已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出異議。</string>
+    <string name="dialog_taken_down_folder_description">根據我們的[A]侵權下架指南[/A]，此資料夾已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出申訴。</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">根據我們的[A]撤除指導政策[/A]，此檔案已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出異議。</string>
+    <string name="dialog_taken_down_file_description">根據我們的[A]侵權下架指南[/A]，此檔案已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出申訴。</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">僅限Pro會員</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->

@@ -2171,9 +2171,9 @@
         <item quantity="other">%d pastas</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d pasta,</item>
-        <item quantity="many">%1$d de pastas,</item>
-        <item quantity="other">%1$d pastas,</item>
+        <item quantity="one">“%1$d pasta, “</item>
+        <item quantity="many">“%1$d de pastas, “</item>
+        <item quantity="other">“%1$d pastas, “</item>
     </plurals>
     <string name="search_landing_title">Procurando alguma coisa?</string>
     <string name="search_landing_subtitle">Pesquisar arquivos e pastas</string>
@@ -2415,4 +2415,7 @@
     <string name="open_link_dialog_hint">Colar link</string>
     <string name="pdf_viewer_error_streaming">Ocorreu um erro ao tentar abrir o arquivo</string>
     <string name="homepage_empty_hint_audio">[B]Nenhum[/B] [A]áudio[/A] [B]foi encontrado[/B]</string>
+    <string name="cloud_explorer_choose_folder_title">Escolher pasta</string>
+    <string name="cloud_explorer_select_destination_title">Selecione o destino</string>
+    <string name="cloud_explorer_use_this_folder_button">Usar esta pasta</string>
 </resources>

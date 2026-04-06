@@ -2245,4 +2245,5 @@
     <string name="homepage_empty_hint_audio">[B]未找到[/B][A]音频文件[/A]</string>
     <string name="open_link_dialog_title">打开链接</string>
     <string name="open_link_dialog_hint">粘贴链接</string>
+    <string name="cloud_explorer_choose_folder_title">选择文件夹</string>
 </resources>

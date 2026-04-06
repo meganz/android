@@ -2403,4 +2403,11 @@
     <string name="pdf_viewer_error_no_network">Fără conexiune la rețea. Vă rugăm să vă reconectați pentru a deschide fișierul.</string>
     <string name="open_link_dialog_title">Deschide un link</string>
     <string name="open_link_dialog_hint">Lipește linkul</string>
+    <string name="cloud_explorer_choose_folder_title">Alege un folder</string>
+    <string name="cloud_explorer_select_destination_title">Selectează destinația</string>
+    <string name="general_error_file_not_found">Acest fișier nu a putut fi găsit</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Eroare. Fișierul PDF este corupt sau nu există.</string>
+    <string name="pdf_viewer_error_streaming">A apărut o eroare în timp ce încercați să deschideți fișierul</string>
+    <string name="homepage_empty_hint_audio">[B]Nu[/B] [A]fișiere audio[/A] [B]au fost găsite[/B]</string>
+    <string name="cloud_explorer_use_this_folder_button">Folosește acest folder</string>
 </resources>

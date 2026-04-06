@@ -2500,4 +2500,5 @@
     <string name="general_error_file_not_found">Nie można odnaleźć tego pliku</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Błąd. Plik PDF jest uszkodzony lub nie istnieje.</string>
     <string name="pdf_viewer_error_streaming">Wystąpił błąd podczas próby otwierania pliku</string>
+    <string name="cloud_explorer_choose_folder_title">Wybierz katalog</string>
 </resources>

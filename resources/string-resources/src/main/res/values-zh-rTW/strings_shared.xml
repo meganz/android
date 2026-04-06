@@ -851,7 +851,7 @@
     <!--General Request Network Failed text-->
     <string name="general_request_failed_message">發生錯誤，請重試</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交反對通知的更多資訊。</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交恢復存取申請的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法再存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
@@ -1257,7 +1257,7 @@
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">永久刪除</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">爭議撤除</string>
+    <string name="dispute_takendown_file">侵權移除申訴</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">編輯</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
@@ -1900,7 +1900,7 @@
     </plurals>
     <string name="albums_multiple_delete_success_message">已刪除%d個相相簿</string>
     <string name="home_screen_no_network_desc">您已離線。\n如果您將檔案設定為離線可用，您仍然可以在沒有連線的情況下存取它們。</string>
-    <string name="home_screen_no_network_desc_with_offline_files">您已離線。\n您仍然可以存取已儲存為離線可用的項目。</string>
+    <string name="home_screen_no_network_desc_with_offline_files">您已離線。\n您仍然可以使用已儲存為離線存取的項目。</string>
     <string name="home_screen_no_network_view_offline_files_button">查看離線檔案</string>
     <string name="timeline_tab_cu_permission_warning_banner_action">更新權限</string>
     <string name="label_file_speed_mega_byte">%1$s&#160;MB/秒</string>
@@ -2023,8 +2023,8 @@
     <string name="empty_file_browser_folder">空白資料夾</string>
     <string name="logout_offline_content_deletion_warning">登出會刪除您的離線內容。</string>
     <string name="offline_screen_title">離線</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">從可離線使用中移除</string>
-    <string name="offline_item_deletion_confirmation_title">要移除離線存取嗎？</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">從離線存取中移除</string>
+    <string name="offline_item_deletion_confirmation_title">要移除離線存取的內容嗎？</string>
     <plurals name="num_of_files_with_parameter">
         <item quantity="other">%d個檔案</item>
     </plurals>
@@ -2070,7 +2070,7 @@
     <string name="transfers_upload_started_snackbar">上傳已開始。詳情請查看通知。</string>
     <string name="search_landing_title">想找什麼？</string>
     <string name="search_landing_subtitle">搜尋檔案和資料夾</string>
-    <string name="offline_screen_empty_state_description">無離線儲存檔案</string>
+    <string name="offline_screen_empty_state_description">無儲存可供離線存取的檔案</string>
     <string name="general_install_label">安裝</string>
     <string name="general_app_update_download_success_message">已下載應用程式更新</string>
     <string name="error_folder_part_of_camera_uploads">此資料夾已包含在相機上傳中。選擇其它資料夾。</string>
@@ -2093,7 +2093,7 @@
     <string name="photos_save_to_cloud_drive_button_text">儲存到雲端硬碟</string>
     <string name="photos_create_album_duplicate_name_error">已存在相同名稱的相簿。請輸入不同的名稱。</string>
     <string name="photos_create_album_proscribed_name_error">不允許使用此相簿名稱。請輸入不同的名稱。</string>
-    <string name="remove_from_offline_success_message">檔案已從可離線使用中移除</string>
+    <string name="remove_from_offline_success_message">檔案已從離線存取中移除</string>
     <string name="create_new_video_playlist_input_title_placeholder">新的播放列表</string>
     <string name="text_editor_show_line_numbers">顯示行數</string>
     <string name="text_editor_hide_line_numbers">隱藏行數</string>
@@ -2109,7 +2109,7 @@
     <string name="album_import_rename_album_dialog_description">您的相簿中已存在名為%1$s的相簿。請為要儲存的相簿輸入新的名稱。</string>
     <string name="album_import_snackbar_success_message">%1$s已儲存到雲端硬碟</string>
     <string name="album_import_snackbar_error_message">%1$s無法儲存到雲端硬碟。稍後再試。如果問題仍然存在，請聯繫與您共享連結的人。</string>
-    <string name="node_menu_action_make_available_offline">離線使用</string>
+    <string name="node_menu_action_make_available_offline">設為離線存取</string>
     <string name="device_center_bottom_sheet_item_remove_connection">移除連線</string>
     <string name="device_center_snackbar_message_connection_removed">連線已移除</string>
     <string name="sync_folder_connection_dialog_title">資料夾已連線到另一個裝置</string>
@@ -2125,7 +2125,7 @@
     <string name="media_discovery_filter_images">圖片</string>
     <string name="media_discovery_filter_videos">影片</string>
     <string name="saf_passcode_lock_enabled_message">若要瀏覽您的MEGA檔案，請在MEGA應用程式中停用密碼。進入設定，然後點選安全性。</string>
-    <string name="saf_no_internet_message">連線到網路即可瀏覽您的MEGA檔案。已儲存為離線使用的檔案可在MEGA應用程式中存取。</string>
+    <string name="saf_no_internet_message">連線到網路即可瀏覽您的MEGA檔案。已儲存為離線存取的檔案可在MEGA應用程式中存取。</string>
     <string name="starter_account">Starter</string>
     <string name="account_upgrade_account_buy_button_title_starter">購買Starter</string>
     <string name="upgrade_account_successful_starter_monthly">感謝您訂閱Starter月付方案</string>
@@ -2245,4 +2245,5 @@
     <string name="open_link_dialog_title">開啟連結</string>
     <string name="open_link_dialog_hint">貼上連結</string>
     <string name="homepage_empty_hint_audio">[B]找不到[/B][A]音訊檔案[/A]</string>
+    <string name="cloud_explorer_choose_folder_title">選擇資料夾</string>
 </resources>

@@ -119,7 +119,7 @@
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Nieuw bij MEGA?</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account">MEGA-account aanmaken</string>
+    <string name="create_account">Aanmelden</string>
     <!-- when the user tries to log in MEGA without typing the email -->
     <string name="error_enter_email">Vul uw email in</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->

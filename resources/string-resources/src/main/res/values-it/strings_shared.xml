@@ -2186,4 +2186,5 @@
         <item quantity="many">%d di oggetti rimossi dal cestino</item>
         <item quantity="other">%d oggetti rimossi dal cestino</item>
     </plurals>
+    <string name="cloud_explorer_choose_folder_title">Scegli cartella</string>
 </resources>
