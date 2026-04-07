@@ -18,6 +18,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onConfirm Called when the user taps Continue
  * @param onDismiss Called when the dialog is dismissed (Cancel or outside tap)
  * @param modifier Modifier for the dialog
+ * @param isAutoShowKeyboard Whether to automatically show the keyboard when the dialog appears
  */
 @Composable
 internal fun PdfViewerPasswordDialog(
@@ -27,6 +28,7 @@ internal fun PdfViewerPasswordDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    isAutoShowKeyboard: Boolean = true,
 ) {
     PasswordInputDialog(
         modifier = modifier.testTag(PDF_VIEWER_PASSWORD_DIALOG_TAG),
@@ -40,6 +42,7 @@ internal fun PdfViewerPasswordDialog(
         inputValue = password,
         onValueChange = onPasswordChange,
         errorText = errorText,
+        isAutoShowKeyboard = isAutoShowKeyboard,
     )
 }
 

@@ -69,9 +69,14 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             onError = viewModel::onLoadError,
             onSubmitPassword = viewModel::submitPassword,
             onDismissPasswordDialog = {
-                viewModel.dismissPasswordDialog()
+                viewModel.clearError()
                 onBack()
             },
+            onDismissErrorDialog = {
+                viewModel.clearError()
+                onBack()
+            },
+            onPasswordInputChanged = viewModel::onPasswordDialogInputChanged,
             onRetry = viewModel::retryLoad,
             onUploadToCloudDrive = onBack,
             onActivateSearch = viewModel::activateSearch,

@@ -1,13 +1,21 @@
 package mega.privacy.android.feature.pdfviewer.presentation
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_ERROR_DIALOG_TAG
+import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_PASSWORD_DIALOG_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,13 +30,14 @@ import org.robolectric.annotation.Config
  * Unit tests for [PdfViewerScreen].
  *
  * Covers BackHandler priority (password → search → back) and top bar title visibility.
+ * and password/error dialogs.
  */
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")
 class PdfViewerScreenTest {
 
     @get:Rule
-    val composeTestRule = createComposeRule()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     // Callback mocks
     private val onBack = mock<() -> Unit>()
@@ -38,6 +47,8 @@ class PdfViewerScreenTest {
     private val onError = mock<(PdfViewerError) -> Unit>()
     private val onSubmitPassword = mock<(String) -> Unit>()
     private val onDismissPasswordDialog = mock<() -> Unit>()
+    private val onDismissErrorDialog = mock<() -> Unit>()
+    private val onPasswordInputChanged = mock<() -> Unit>()
     private val onRetry = mock<() -> Unit>()
     private val onUploadToCloudDrive = mock<() -> Unit>()
     private val onActivateSearch = mock<() -> Unit>()
@@ -56,6 +67,8 @@ class PdfViewerScreenTest {
             onError,
             onSubmitPassword,
             onDismissPasswordDialog,
+            onDismissErrorDialog,
+            onPasswordInputChanged,
             onRetry,
             onUploadToCloudDrive,
             onActivateSearch,
@@ -77,6 +90,8 @@ class PdfViewerScreenTest {
                 onError = onError,
                 onSubmitPassword = onSubmitPassword,
                 onDismissPasswordDialog = onDismissPasswordDialog,
+                onDismissErrorDialog = onDismissErrorDialog,
+                onPasswordInputChanged = onPasswordInputChanged,
                 onRetry = onRetry,
                 onUploadToCloudDrive = onUploadToCloudDrive,
                 onActivateSearch = onActivateSearch,
@@ -96,14 +111,12 @@ class PdfViewerScreenTest {
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         ),
         title: String? = "Test Document.pdf",
-        showPasswordDialog: Boolean = false,
         error: PdfViewerError? = null,
         searchState: PdfViewerSearchState = PdfViewerSearchState(),
     ) = PdfViewerState(
         isLoading = false,
         source = source,
         title = title,
-        showPasswordDialog = showPasswordDialog,
         error = error,
         searchState = searchState,
     )
@@ -135,5 +148,78 @@ class PdfViewerScreenTest {
         setContent(defaultState(searchState = PdfViewerSearchState(isSearchActive = false)))
 
         composeTestRule.onNodeWithText("Test Document.pdf").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that password dialog is displayed when password error`() {
+        setContent(
+            defaultState(
+                error = PdfViewerError.PasswordProtected,
+            )
+        )
+
+        composeTestRule
+            .onNodeWithTag(PDF_VIEWER_PASSWORD_DIALOG_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that password dialog is displayed when invalid password error`() {
+        setContent(
+            defaultState(
+                error = PdfViewerError.InvalidPassword,
+            )
+        )
+        // InvalidPassword path delays 500ms before showing the dialog to avoid keyboard flicker.
+        composeTestRule.mainClock.advanceTimeBy(600)
+
+        composeTestRule
+            .onNodeWithTag(PDF_VIEWER_PASSWORD_DIALOG_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that error dialog is displayed when non-password error`() {
+        setContent(
+            defaultState(
+                error = PdfViewerError.FileNotFound,
+            )
+        )
+
+        composeTestRule
+            .onNodeWithTag(PDF_VIEWER_ERROR_DIALOG_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that onDismissErrorDialog is invoked when ok button is clicked on error dialog`() {
+        setContent(defaultState(error = PdfViewerError.FileNotFound))
+
+        val okLabel = composeTestRule.activity.getString(sharedR.string.general_ok_only)
+        composeTestRule.onNodeWithText(okLabel).performClick()
+
+        verify(onDismissErrorDialog).invoke()
+    }
+
+    @Test
+    fun `test that onDismissPasswordDialog is invoked when cancel button is clicked on password dialog`() {
+        setContent(defaultState(error = PdfViewerError.PasswordProtected))
+
+        val cancelLabel =
+            composeTestRule.activity.getString(sharedR.string.general_dialog_cancel_button)
+        composeTestRule.onNodeWithText(cancelLabel).performClick()
+
+        verify(onDismissPasswordDialog).invoke()
+    }
+
+    @Test
+    fun `test that onPasswordInputChanged is invoked when user types in password field`() {
+        setContent(defaultState(error = PdfViewerError.PasswordProtected))
+
+        composeTestRule
+            .onNode(hasSetTextAction())
+            .performTextInput("a")
+
+        verify(onPasswordInputChanged).invoke()
     }
 }

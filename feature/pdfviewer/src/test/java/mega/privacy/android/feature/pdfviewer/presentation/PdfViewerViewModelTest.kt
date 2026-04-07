@@ -36,7 +36,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PdfViewerViewModelTest {
 
     companion object {
@@ -76,6 +76,7 @@ class PdfViewerViewModelTest {
             setOrUpdateLastPageViewedInPdfUseCase,
             getDataBytesFromUrlUseCase,
             monitorConnectivityUseCase,
+            context,
         )
 
         // Mock ContentResolver so PdfSearchEngine doesn't crash when opening URIs in tests.
@@ -210,30 +211,24 @@ class PdfViewerViewModelTest {
         }
 
     @Test
-    fun `test that dismissPasswordDialog hides dialog and clears error`() = runTest {
-        underTest = initViewModel()
-        underTest.dismissPasswordDialog()
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.showPasswordDialog).isFalse()
-            assertThat(state.error).isNull()
+    fun `test that submitPassword updates currentPassword clears error and sets loading`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                // Consume initial state
+                awaitItem()
+
+                underTest.onLoadError(PdfViewerError.InvalidPassword)
+                assertThat(awaitItem().error).isEqualTo(PdfViewerError.InvalidPassword)
+
+                underTest.submitPassword("test123")
+                val state = awaitItem()
+                assertThat(state.currentPassword).isEqualTo("test123")
+                assertThat(state.error).isNull()
+                assertThat(state.isLoading).isTrue()
+            }
         }
-    }
-
-    @Test
-    fun `test that submitPassword updates currentPassword and hides password dialog`() = runTest {
-        underTest = initViewModel()
-
-        underTest.state.test {
-            // Consume initial state
-            awaitItem()
-
-            underTest.submitPassword("test123")
-            val state = awaitItem()
-            assertThat(state.currentPassword).isEqualTo("test123")
-            assertThat(state.showPasswordDialog).isFalse()
-        }
-    }
 
     @Test
     fun `test that retryLoad sets loading to true and clears error`() = runTest {
@@ -436,12 +431,28 @@ class PdfViewerViewModelTest {
         }
 
     @Test
-    fun `test that onPasswordDialogInputChanged does not change state when error is not InvalidPassword`() =
+    fun `test that onPasswordDialogInputChanged does not change state when error is null`() =
         runTest {
             underTest = initViewModel()
 
             underTest.state.test {
                 awaitItem() // consume initial state (error = null)
+
+                underTest.onPasswordDialogInputChanged()
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that onPasswordDialogInputChanged does not change state when error is PasswordProtected`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                awaitItem() // consume initial state
+
+                underTest.onLoadError(PdfViewerError.PasswordProtected)
+                awaitItem() // consume PasswordProtected error state
 
                 underTest.onPasswordDialogInputChanged()
                 expectNoEvents()

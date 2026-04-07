@@ -8,18 +8,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfSearchResultsBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerContent
+import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerErrorDialog
+import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerPasswordDialog
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerSearchTopBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerTopBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.getPdfUri
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Stateless PDF Viewer screen.
@@ -32,6 +42,8 @@ import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
  * @param onError Callback when an error occurs
  * @param onSubmitPassword Callback to submit password for encrypted PDF
  * @param onDismissPasswordDialog Callback to dismiss the password dialog
+ * @param onDismissErrorDialog Callback when the non-password error dialog is dismissed
+ * @param onPasswordInputChanged Callback when the user edits the password input field
  * @param onRetry Callback to retry loading
  * @param onUploadToCloudDrive Callback to upload file to cloud drive
  * @param onActivateSearch Callback to activate search mode
@@ -52,6 +64,8 @@ internal fun PdfViewerScreen(
     onError: (PdfViewerError) -> Unit,
     onSubmitPassword: (String) -> Unit,
     onDismissPasswordDialog: () -> Unit,
+    onDismissErrorDialog: () -> Unit,
+    onPasswordInputChanged: () -> Unit,
     onRetry: () -> Unit,
     onUploadToCloudDrive: () -> Unit,
     onActivateSearch: () -> Unit,
@@ -62,7 +76,26 @@ internal fun PdfViewerScreen(
     modifier: Modifier = Modifier,
 ) {
     val searchState = uiState.searchState
-    val showPasswordOverlay = uiState.showPasswordDialog || uiState.isPasswordError
+
+    var showPasswordOverlay by rememberSaveable { mutableStateOf(false) }
+    // Enable isAutoShowKeyboard after rotate screen
+    var passwordDialogAutoKeyboard by remember { mutableStateOf(true) }
+
+    LaunchedEffect(uiState.isPasswordError, uiState.error) {
+        if (!uiState.isPasswordError) {
+            showPasswordOverlay = false
+        } else if (uiState.error is PdfViewerError.InvalidPassword) {
+            //  Second time showing the dialog (InvalidPassword)
+            //  Delay re-showing the dialog after a wrong password attempt to avoid keyboard flicker.
+            delay(PASSWORD_DIALOG_DELAY_MS)
+            passwordDialogAutoKeyboard = false
+            showPasswordOverlay = true
+        } else if (!showPasswordOverlay) {
+            // First time showing the dialog (PasswordProtected): enable auto keyboard.
+            passwordDialogAutoKeyboard = true
+            showPasswordOverlay = true
+        }
+    }
 
     BackHandler(searchState.isSearchActive) {
         onDeactivateSearch()
@@ -113,10 +146,17 @@ internal fun PdfViewerScreen(
                         }
 
                         uiState.error != null && !uiState.isPasswordError -> {
-                            // TODO: Handler Error
+                            PdfViewerErrorDialog(
+                                error = uiState.error,
+                                isOnline = uiState.isOnline,
+                                onDismiss = onDismissErrorDialog,
+                            )
                         }
 
-                        uiState.source != null -> {
+                        // Note: when isPasswordError=true, no branch matches intentionally.
+                        // The password dialog is rendered as a full-screen overlay below (outside the scaffold).
+
+                        !uiState.isPasswordError && uiState.source != null -> {
                             PdfViewerContent(
                                 pdfUri = pdfUri,
                                 pdfBytes = bytes,
@@ -157,7 +197,28 @@ internal fun PdfViewerScreen(
         )
 
         if (showPasswordOverlay) {
-            // TODO: Show PdfViewerPasswordDialog (onSubmitPassword / onDismissPasswordDialog). If dialog uses onDismissRequest for back, remove password branch from BackHandler.
+            // Pre-fills with the last attempted password so the user can review and correct it.
+            var localPassword by rememberSaveable { mutableStateOf(uiState.currentPassword ?: "") }
+            val errorText =
+                if (uiState.error is PdfViewerError.InvalidPassword) {
+                    stringResource(sharedR.string.pdf_viewer_dialog_error_incorrect_password)
+                } else {
+                    null
+                }
+
+            PdfViewerPasswordDialog(
+                password = localPassword,
+                errorText = errorText,
+                onPasswordChange = {
+                    localPassword = it
+                    onPasswordInputChanged()
+                },
+                onConfirm = { onSubmitPassword(localPassword) },
+                onDismiss = onDismissPasswordDialog,
+                isAutoShowKeyboard = passwordDialogAutoKeyboard,
+            )
         }
     }
 }
+
+private const val PASSWORD_DIALOG_DELAY_MS = 500L

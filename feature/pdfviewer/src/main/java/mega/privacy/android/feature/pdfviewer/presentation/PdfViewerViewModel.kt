@@ -340,18 +340,11 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         _state.update {
             it.copy(
                 currentPassword = password,
-                showPasswordDialog = false,
                 isLoading = true,
                 error = null,
             )
         }
         reinitSearchEngine()
-    }
-
-    fun dismissPasswordDialog() {
-        _state.update {
-            it.copy(showPasswordDialog = false, error = null)
-        }
     }
 
     fun retryLoad() {

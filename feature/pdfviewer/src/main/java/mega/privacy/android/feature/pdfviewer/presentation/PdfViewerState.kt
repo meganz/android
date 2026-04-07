@@ -67,7 +67,6 @@ data class PdfViewerSearchState(
  * @param currentPage The current page number (1-indexed)
  * @param totalPages The total number of pages in the PDF
  * @param isToolbarVisible Whether the toolbar is currently visible
- * @param showPasswordDialog Whether to show the password dialog
  * @param currentPassword The current password (if entered)
  * @param error The current error state, if any
  * @param isExternalFile Whether this is an external file (from intent)
@@ -88,7 +87,6 @@ internal data class PdfViewerState(
     val currentPage: Int = 1,
     val totalPages: Int = 0,
     val isToolbarVisible: Boolean = true,
-    val showPasswordDialog: Boolean = false,
     val currentPassword: String? = null,
     val error: PdfViewerError? = null,
     val isExternalFile: Boolean = false,
