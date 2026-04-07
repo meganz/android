@@ -1,5 +1,6 @@
 package mega.privacy.android.app.di.mediaplayer
 
+import android.app.ActivityManager
 import android.content.Context
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
@@ -36,7 +37,7 @@ class MediaPlayerModule {
             runCatching {
                 return SimpleCache(
                     File(context.cacheDir, CACHE_DIR_NAME),
-                    LeastRecentlyUsedCacheEvictor(CACHE_MAX_SIZE),
+                    LeastRecentlyUsedCacheEvictor(calculateCacheSize(context)),
                     StandaloneDatabaseProvider(context),
                 )
             }.onFailure { e ->
@@ -45,6 +46,37 @@ class MediaPlayerModule {
             }
         }
         return null
+    }
+
+    private fun calculateCacheSize(context: Context): Long {
+        return try {
+            val activityManager = context.getSystemService(ActivityManager::class.java)
+            val memoryInfo = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memoryInfo)
+            val isLowRamDevice = activityManager.isLowRamDevice
+            val multiplier = if (isLowRamDevice) {
+                LOW_MEMORY_CACHE_SIZE_MULTIPLIER
+            } else {
+                STANDARD_CACHE_SIZE_MULTIPLIER
+            }
+            val cacheSize = (memoryInfo.totalMem * multiplier).toLong()
+                .coerceIn(MIN_CACHE_SIZE, MAX_CACHE_SIZE)
+            Timber.d(
+                "[MediaPlayerCache] totalMem=%d MB, isLowRamDevice=%s, multiplier=%s, cacheSize=%d MB",
+                memoryInfo.totalMem / 1024 / 1024,
+                isLowRamDevice,
+                multiplier,
+                cacheSize / 1024 / 1024,
+            )
+            cacheSize
+        } catch (e: Exception) {
+            Timber.e(
+                e,
+                "[MediaPlayerCache] Failed to calculate cache size, fallback to MIN_CACHE_SIZE=%d MB",
+                MIN_CACHE_SIZE / 1024 / 1024,
+            )
+            MIN_CACHE_SIZE
+        }
     }
 
     /**
@@ -97,7 +129,10 @@ class MediaPlayerModule {
         DefaultStopAudioService(context)
 
     companion object {
-        private const val CACHE_MAX_SIZE = 500 * 1024 * 1024L
+        private const val STANDARD_CACHE_SIZE_MULTIPLIER = 0.06
+        private const val LOW_MEMORY_CACHE_SIZE_MULTIPLIER = 0.03
+        private const val MIN_CACHE_SIZE = 100 * 1024 * 1024L
+        private const val MAX_CACHE_SIZE = 1024 * 1024 * 1024L
         private const val CACHE_DIR_NAME = "media_player_cache"
     }
 }
