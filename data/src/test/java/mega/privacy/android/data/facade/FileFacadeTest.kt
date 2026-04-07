@@ -767,29 +767,6 @@ internal class FileFacadeTest {
         }
     }
 
-    @Test
-    fun `test that getParentSync returns the correct parent uri`() =
-        mockStatic(Uri::class.java).use {
-            val expected = UriPath("parent")
-            val parentUri = mock<Uri> {
-                on { this.toString() } doReturn expected.value
-            }
-            val parentDoc = mock<DocumentFile> {
-                on { this.uri } doReturn parentUri
-            }
-            val doc = mock<DocumentFile> {
-                on { this.parentFile } doReturn parentDoc
-            }
-            val uri = stubGetDocumentFileFromUri(doc)
-            val uriPath = UriPath("content://foo")
-            whenever(Uri.parse(uriPath.value)) doReturn uri
-
-
-            val actual = underTest.getParentSync(uriPath)
-
-            assertThat(actual).isEqualTo(expected)
-        }
-
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that deleteIfItIsAFileSync deletes the document only if it is a file`(

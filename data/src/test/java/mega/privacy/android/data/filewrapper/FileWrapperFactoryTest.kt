@@ -186,18 +186,6 @@ class FileWrapperFactoryTest {
     }
 
     @Test
-    fun `test that parent is returned from the gateway`() =
-        Mockito.mockStatic(Uri::class.java).useNoResult {
-            val (uriPath, _) =
-                commonStub(documentMetadata = DocumentMetadata("parent", true))
-            val (uriPathParent, _) = commonStub("content://folder")
-
-            whenever(fileGateway.getParentSync(uriPath)) doReturn uriPathParent
-            val actual = underTest(uriPath)?.getParentFile()
-            assertThat(actual?.uri).isEqualTo(uriPathParent.value)
-        }
-
-    @Test
     fun `test that path is returned from the gateway`() =
         Mockito.mockStatic(Uri::class.java).useNoResult {
             val (uriPath, _) = commonStub()

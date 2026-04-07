@@ -20,7 +20,6 @@ class FileWrapper(
     private val childFileExistsFunction: (name: String) -> Boolean,
     private val getChildByNameFunction: (name: String) -> String?,
     private val createChildFileFunction: (name: String, asFolder: Boolean) -> FileWrapper?,
-    private val getParentUriFunction: () -> FileWrapper?,
     private val getPathFunction: () -> String?,
     private val deleteFileFunction: () -> Boolean,
     private val deleteFolderIfEmptyFunction: () -> Boolean,
@@ -74,15 +73,6 @@ class FileWrapper(
     fun createChildFile(name: String, asFolder: Boolean): FileWrapper? = runCatching {
         createChildFileFunction(name, asFolder)
     }.onFailure { Timber.e(it) }
-        .getOrNull()
-
-    /**
-     * Get the parent file or folder.
-     * @return the [FileWrapper] of the parent folder or null if the operation failed
-     */
-    @Keep
-    fun getParentFile(): FileWrapper? = runCatching { getParentUriFunction() }
-        .onFailure { Timber.e(it) }
         .getOrNull()
 
     /**

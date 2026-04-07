@@ -1004,11 +1004,6 @@ internal class FileFacade @Inject constructor(
         }
     }
 
-    override fun getParentSync(childUriPath: UriPath): UriPath? {
-        val childDocumentFile = getDocumentFileFromUri(childUriPath.toUri())
-        return childDocumentFile?.parentFile?.uri?.toString()?.let { UriPath(it) }
-    }
-
     override fun deleteIfItIsAFileSync(uriPath: UriPath): Boolean {
         val documentFile = getDocumentFileFromUri(uriPath.toUri())
         return if (documentFile?.isFile == true) {

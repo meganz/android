@@ -37,11 +37,6 @@ internal class FileWrapperFactory(
                     getPathFunction = {
                         fileGateway.getExternalPathByUriSync(uriPath.value)
                     },
-                    getParentUriFunction = {
-                        fileGateway.getParentSync(uriPath)?.let {
-                            invoke(it)
-                        }
-                    },
                     deleteFileFunction = {
                         fileGateway.deleteIfItIsAFileSync(uriPath)
                     },

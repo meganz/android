@@ -570,12 +570,6 @@ interface FileGateway {
     fun createChildFileSync(parentFolder: UriPath, childName: String, asFolder: Boolean): UriPath?
 
     /**
-     * Get the parent of a file or folder
-     * @return the [UriPath] of the parent if it's accessible and permissions are granted, null otherwise
-     */
-    fun getParentSync(childUriPath: UriPath): UriPath?
-
-    /**
      * Deletes a file if it's a regular file
      * @return true if the file was deleted, false otherwise
      */
