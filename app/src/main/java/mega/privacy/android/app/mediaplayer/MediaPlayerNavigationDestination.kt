@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.content.ActivityNotFoundException
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
@@ -9,6 +10,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.shared.resources.R
+import timber.log.Timber
 
 fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
     removeDestination: () -> Unit,
@@ -37,7 +39,15 @@ fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
                 collectionId = key.collectionId,
             )
             if (intent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(intent)
+                try {
+                    context.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    Timber.e(
+                        e,
+                        "Legacy media player: no activity for VIEW intent (data=${intent.data}, type=${intent.type})",
+                    )
+                    snackbarEventQueue.queueMessage(R.string.intent_not_available_file)
+                }
             } else {
                 snackbarEventQueue.queueMessage(R.string.intent_not_available_file)
             }
