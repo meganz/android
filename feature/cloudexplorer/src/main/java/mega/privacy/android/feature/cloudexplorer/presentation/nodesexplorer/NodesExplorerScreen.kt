@@ -43,7 +43,7 @@ fun NodesExplorerScreen(
     nodeExplorerId: NodeId,
     nodeSourceType: NodeSourceType,
     onNavigateBack: () -> Unit,
-    onNavigateToFolder: (NavKey) -> Unit,
+    onNavigate: (NavKey) -> Unit,
 ) {
     ExplorerScreen(
         explorerModeData = explorerModeData,
@@ -51,7 +51,7 @@ fun NodesExplorerScreen(
         nodeExplorerId = nodeExplorerId,
         nodeSourceType = nodeSourceType,
         onNavigateBack = onNavigateBack,
-        onNavigateToFolder = onNavigateToFolder,
+        onNavigate = onNavigate,
     )
 }
 

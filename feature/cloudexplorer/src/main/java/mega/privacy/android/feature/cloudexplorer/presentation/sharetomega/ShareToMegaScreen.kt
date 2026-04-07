@@ -14,7 +14,7 @@ fun ShareToMegaScreen(
     uiState: ShareToMegaUiState,
     onUpload: (NodeId) -> Unit,
     onNavigateBack: () -> Unit,
-    onNavigateToFolder: (NavKey) -> Unit,
+    onNavigate: (NavKey) -> Unit,
 ) {
     if (uiState is ShareToMegaUiState.Loading) {
         //See if we need a loading view
@@ -27,7 +27,7 @@ fun ShareToMegaScreen(
             nodeExplorerId = dataUiState.rootNodeId,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             onNavigateBack = onNavigateBack,
-            onNavigateToFolder = onNavigateToFolder,
+            onNavigate = onNavigate,
             onFolderPicked = onUpload,
         )
     }

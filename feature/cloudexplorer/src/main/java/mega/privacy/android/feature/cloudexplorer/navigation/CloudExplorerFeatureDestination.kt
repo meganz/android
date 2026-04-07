@@ -47,7 +47,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 uiState = uiState,
                 onNavigateBack = { onNavigateBack(key) },
                 onUpload = viewModel::upload,
-                onNavigateToFolder = onNavigate,
+                onNavigate = onNavigate,
             )
         }
     }
@@ -62,7 +62,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 nodeExplorerId = key.nodeId,
                 nodeSourceType = key.nodeSourceType,
                 onNavigateBack = { onNavigateBack(key) },
-                onNavigateToFolder = { onNavigate(it) },
+                onNavigate = { onNavigate(it) },
             )
         }
     }

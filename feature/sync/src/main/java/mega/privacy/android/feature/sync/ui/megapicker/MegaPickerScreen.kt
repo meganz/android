@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.ui.createnewfolder.CreateNewFolderDialog
-import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderMenuAction
+import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -90,10 +90,10 @@ internal fun MegaPickerScreen(
                 onNavigationPressed = {
                     onBackPressedDispatcher?.onBackPressed()
                 },
-                actions = mutableListOf<MenuAction>(CreateNewFolderMenuAction()),
+                actions = mutableListOf<MenuAction>(NewFolderMenuAction),
                 onActionPressed = {
                     when (it) {
-                        is CreateNewFolderMenuAction -> {
+                        is NewFolderMenuAction -> {
                             showCreateNewFolderDialog = true
                         }
                     }

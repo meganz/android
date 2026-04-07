@@ -6,9 +6,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -16,12 +19,16 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
@@ -33,7 +40,9 @@ import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexp
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreenContent
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
+import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
+import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +53,7 @@ fun ExplorerScreen(
     nodeExplorerId: NodeId,
     nodeSourceType: NodeSourceType,
     onNavigateBack: () -> Unit,
-    onNavigateToFolder: (NavKey) -> Unit,
+    onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
     tabIndex: Int = CLOUD_TAB_INDEX,
     onFolderPicked: (NodeId) -> Unit = {},
@@ -52,6 +61,10 @@ fun ExplorerScreen(
     onChatsSelected: (List<Long>) -> Unit = {},
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
+    var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
+    val resources = LocalResources.current
     val nodesExplorerViewModel =
         hiltViewModel<NodesExplorerViewModel, NodesExplorerViewModel.Factory> { factory ->
             factory.create(
@@ -65,7 +78,7 @@ fun ExplorerScreen(
     val nodesExplorerUiStateShared by nodesExplorerViewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
     val incomingSharesExplorerViewModel =
         if (!isInnerNavigation && explorerModeData.isIncomingAvailable)
-        hiltViewModel<IncomingSharesExplorerViewModel>() else null
+            hiltViewModel<IncomingSharesExplorerViewModel>() else null
     val incomingSharesExplorerUiStateShared =
         incomingSharesExplorerViewModel?.nodeExplorerSharedUiState?.collectAsStateWithLifecycle()
     val favouritesExplorerViewModel =
@@ -99,17 +112,28 @@ fun ExplorerScreen(
                         CLOUD_TAB_INDEX -> {
                             if (nodesExplorerUiStateShared.items.isNotEmpty()) {
                                 //Add search
-                                //Add new folder in case explorerMode.isFolderPicker()
                                 //Add select all in case explorerMode.isFolderPicker().not()
+                            }
+                            if (explorerModeData.isFolderPicker) {
+                                add(
+                                    MenuActionWithClick(NewFolderMenuAction) {
+                                        showNewFolderDialog = true
+                                    }
+                                )
                             }
                         }
 
                         INCOMING_TAB_INDEX -> {
-                            //Add search if not empty
+                            if (incomingSharesExplorerUiStateShared?.value?.items?.isNotEmpty() == true) {
+                                //Add search
+                            }
                         }
 
                         FAVOURITES_TAB_INDEX -> {
-                            //Add search if not empty
+                            if (favouritesExplorerUiStateShared?.value?.items?.isNotEmpty() == true) {
+                                //Add search
+                                //Add select all in case explorerMode.isFolderPicker().not()
+                            }
                         }
 
                         CHAT_TAB_INDEX -> {
@@ -164,7 +188,7 @@ fun ExplorerScreen(
                         onNavigateBack = onNavigateBack,
                         consumeNavigateBack = nodesExplorerViewModel::onNavigateBackEventConsumed,
                         onFolderClick = {
-                            onNavigateToFolder(
+                            onNavigate(
                                 NodesExplorerNavKey(
                                     nodeId = it,
                                     nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
@@ -188,7 +212,7 @@ fun ExplorerScreen(
                             onNavigateBack = onNavigateBack,
                             consumeNavigateBack = incomingSharesExplorerViewModel::onNavigateBackEventConsumed,
                             onFolderClick = {
-                                onNavigateToFolder(
+                                onNavigate(
                                     NodesExplorerNavKey(
                                         nodeId = it,
                                         nodeSourceType = incomingSharesExplorerUiStateShared.value.nodeSourceType,
@@ -213,7 +237,7 @@ fun ExplorerScreen(
                             onNavigateBack = onNavigateBack,
                             consumeNavigateBack = favouritesExplorerViewModel::onNavigateBackEventConsumed,
                             onFolderClick = {
-                                onNavigateToFolder(
+                                onNavigate(
                                     NodesExplorerNavKey(
                                         nodeId = it,
                                         nodeSourceType = favouritesExplorerUiStateShared.value.nodeSourceType,
@@ -236,6 +260,33 @@ fun ExplorerScreen(
                 true
             }
         )
+
+        if (showNewFolderDialog) {
+            NewFolderNodeDialog(
+                parentNode = nodesExplorerUiStateShared.currentFolderId,
+                onCreateFolder = { folderId ->
+                    showNewFolderDialog = false
+                    coroutineScope.launch {
+                        folderId?.let {
+                            onNavigate(
+                                NodesExplorerNavKey(
+                                    nodeId = it,
+                                    nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
+                                    explorerMode = explorerModeData.toMode(),
+                                )
+                            )
+                        } ?: snackbarHostState?.showAutoDurationSnackbar(
+                            resources.getString(
+                                sharedR.string.folder_not_created_error_message
+                            )
+                        )
+                    }
+                },
+                onDismiss = {
+                    showNewFolderDialog = false
+                }
+            )
+        }
     }
 }
 

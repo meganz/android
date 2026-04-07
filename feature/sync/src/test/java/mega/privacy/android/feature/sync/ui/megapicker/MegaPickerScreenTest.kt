@@ -359,9 +359,9 @@ internal class MegaPickerScreenTest {
         composeTestRule.waitForIdle()
 
         // Verify that the create new folder menu action is displayed and clickable
-        composeTestRule.onNodeWithTag("menu_action:create_new_folder")
+        composeTestRule.onNodeWithTag("app_bar:create_new_folder")
             .assertIsDisplayed()
-        composeTestRule.onNodeWithTag("menu_action:create_new_folder")
+        composeTestRule.onNodeWithTag("app_bar:create_new_folder")
             .assertIsEnabled()
     }
 
