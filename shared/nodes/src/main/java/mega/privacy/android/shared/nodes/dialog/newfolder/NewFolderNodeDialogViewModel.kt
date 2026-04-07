@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.dialog.newfolderdialog
+package mega.privacy.android.shared.nodes.dialog.newfolder
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,8 +31,8 @@ class NewFolderNodeDialogViewModel @Inject constructor(
     private val snackbarEventQueue: SnackbarEventQueue
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NewFolderDialogState())
-    val uiState: StateFlow<NewFolderDialogState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(NewFolderDialogUiState())
+    val uiState: StateFlow<NewFolderDialogUiState> = _uiState.asStateFlow()
 
     /**
      * Creates a folder after validation.

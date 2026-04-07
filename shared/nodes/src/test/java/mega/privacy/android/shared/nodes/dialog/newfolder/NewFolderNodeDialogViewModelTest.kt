@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.dialog
+package mega.privacy.android.shared.nodes.dialog.newfolder
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -6,8 +6,6 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.INVALID_CHARACTERS
-import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialogViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode

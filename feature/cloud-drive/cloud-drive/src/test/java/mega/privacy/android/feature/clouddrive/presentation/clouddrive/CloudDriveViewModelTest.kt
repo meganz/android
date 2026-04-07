@@ -1239,7 +1239,7 @@ class CloudDriveViewModelTest {
             }
         }
 
-    @org.junit.jupiter.api.Test
+    @Test
     fun `test that node deletion events are monitored even when the flow is not active`() =
         runTest {
             val nodeUpdates = MutableStateFlow(NodeChanges.Name)

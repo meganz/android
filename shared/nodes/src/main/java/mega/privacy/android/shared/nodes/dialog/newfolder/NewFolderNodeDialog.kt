@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.dialog.newfolderdialog
+package mega.privacy.android.shared.nodes.dialog.newfolder
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -17,13 +17,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.dialogs.BasicInputDialog
-import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.DotNameException
 import mega.privacy.android.domain.exception.DoubleDotNameException
 import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -42,7 +42,7 @@ fun NewFolderNodeDialog(
     viewModel: NewFolderNodeDialogViewModel = hiltViewModel(),
     onDismiss: () -> Unit = {},
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val dialogState by viewModel.uiState.collectAsStateWithLifecycle()
     // Saves the input across configuration changes
     var folderName by rememberSaveable(
@@ -69,14 +69,14 @@ fun NewFolderNodeDialog(
         onConsumed = viewModel::clearError
     ) {
         errorMessage = when (it) {
-            is EmptyNodeNameException -> context.getString(sharedR.string.general_invalid_string)
-            is DotNameException -> context.getString(sharedR.string.general_invalid_dot_name_warning)
-            is DoubleDotNameException -> context.getString(sharedR.string.general_invalid_double_dot_name_warning)
-            is InvalidNodeNameException -> context.getString(
+            is EmptyNodeNameException -> resources.getString(sharedR.string.general_invalid_string)
+            is DotNameException -> resources.getString(sharedR.string.general_invalid_dot_name_warning)
+            is DoubleDotNameException -> resources.getString(sharedR.string.general_invalid_double_dot_name_warning)
+            is InvalidNodeNameException -> resources.getString(
                 sharedR.string.general_invalid_characters_defined, INVALID_CHARACTERS
             )
 
-            is NodeNameAlreadyExistsException -> context.getString(NodesR.string.same_item_name_warning)
+            is NodeNameAlreadyExistsException -> resources.getString(NodesR.string.same_item_name_warning)
             else -> null
         }
     }
