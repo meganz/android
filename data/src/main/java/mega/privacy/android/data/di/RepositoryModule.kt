@@ -64,6 +64,7 @@ import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.VideoRepositoryImpl
 import mega.privacy.android.data.repository.VideoSectionRepositoryImpl
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
+import mega.privacy.android.data.repository.ViewedLinksRepositoryImpl
 import mega.privacy.android.data.repository.ZipBrowserRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
@@ -134,6 +135,7 @@ import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.VideoRepository
 import mega.privacy.android.domain.repository.VideoSectionRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
+import mega.privacy.android.domain.repository.ViewedLinksRepository
 import mega.privacy.android.domain.repository.ZipBrowserRepository
 import mega.privacy.android.domain.repository.agesignal.AgeSignalRepository
 import mega.privacy.android.domain.repository.apiserver.ApiServerRepository
@@ -410,4 +412,8 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAgeSignalRepository(implementation: AgeSignalRepositoryImpl): AgeSignalRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindViewedLinksRepository(implementation: ViewedLinksRepositoryImpl): ViewedLinksRepository
 }
