@@ -21,6 +21,9 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
  * @property isAskingForCollisionsResolution true if the app is asking for name collisions resolution, false otherwise.
  * @property nonCollidedFilesUploadedCount number of non-collided files that were uploaded (tracked when upload completes while collision resolution is in progress)
  * @property nodeUpdatedEvent event triggered when nodes have been updated
+ * @property cloudDriveFolderPath navigation stack for the cloud drive explorer (root handle at
+ * index 0, current folder at the end). Used to resolve the parent folder on back press.
+ * @property cloudRootHandle the cloud drive root node handle, or -1 if not yet initialised.
  */
 data class FileExplorerUiState(
     val uploadEvent: StateEventWithContent<TransferTriggerEvent.StartUpload> = consumed(),
@@ -34,6 +37,8 @@ data class FileExplorerUiState(
     val nodeUpdatedEvent: StateEvent = consumed,
     val navigateToCloud: StateEventWithContent<NavigateToCloudEvent> = consumed(),
     val isFeatureFlagEnabled: Boolean? = null,
+    val cloudDriveFolderPath: List<Long> = emptyList(),
+    val cloudRootHandle: Long = -1,
 ) {
 
     data class NavigateToCloudEvent(

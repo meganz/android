@@ -290,10 +290,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             modeCloud = it.mode
             selectFile = it.isSelectFile
             parentHandle = it.parentHandleCloud
-
-            if (parentHandle != INVALID_HANDLE && megaApi.rootNode != null && parentHandle != megaApi.rootNode?.handle) {
-                it.hideTabs(true, CLOUD_FRAGMENT)
-            }
         }
 
         adapter = MegaExplorerAdapter(
@@ -321,7 +317,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         when {
             modeCloud == FileExplorerActivity.SELECT_CAMERA_FOLDER -> setParentHandle(INVALID_HANDLE)
             parentHandle == INVALID_HANDLE -> {
-                val rootHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
+                val rootHandle = fileExplorerViewModel.getCloudRootHandle()
                 var targetPath = rootHandle
                 val latestTargetPathTab = fileExplorerViewModel.latestCopyTargetPathTab
                 val latestMoveTargetPathTab = fileExplorerViewModel.latestMoveTargetPathTab
@@ -379,7 +375,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             FileExplorerActivity.SAVE -> binding.actionText.text = getString(R.string.save_action)
             FileExplorerActivity.SELECT -> {
                 binding.optionsExplorerLayout.isVisible = false
-                activateButton(shouldShowOptionsBar(megaApi.getNodeByHandle(parentHandle)))
+                activateButton(shouldShowOptionsBar(parentHandle))
                 binding.actionText.text = getString(R.string.general_select)
             }
 
@@ -453,6 +449,12 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      */
     private fun initOriginalData() =
         lifecycleScope.launch {
+            val rootHandle = fileExplorerViewModel.getOrInitCloudRootHandle()
+
+            if (parentHandle != INVALID_HANDLE && !fileExplorerViewModel.isAtCloudRoot(parentHandle)) {
+                (requireActivity() as FileExplorerActivity).hideTabs(true, CLOUD_FRAGMENT)
+            }
+
             val chosenNode = withContext(ioDispatcher) {
                 when (fileExplorerActivity.mode) {
                     FileExplorerActivity.COPY -> {
@@ -472,10 +474,18 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             }
             ensureActive()
             if (chosenNode != null && chosenNode.type != MegaNode.TYPE_ROOT) {
+                // Rebuild the path stack so back navigation works correctly when opening at a deep folder.
+                if (fileExplorerViewModel.isCloudRootInitialized()) {
+                    fileExplorerViewModel.rebuildCloudDriveFolderPath(chosenNode.handle)
+                }
                 updateChildNodes(chosenNode)
                 Timber.d("chosenNode is: ${chosenNode.name}")
             } else {
-                megaApi.rootNode?.let { rootNode ->
+                val rootNode = withContext(ioDispatcher) {
+                    megaApi.getNodeByHandle(rootHandle)
+                }
+                if (rootNode != null) {
+                    fileExplorerViewModel.setCloudDriveFolderPath(listOf(rootNode.handle))
                     setParentHandle(rootNode.handle)
                     updateChildNodes(rootNode)
                 }
@@ -507,19 +517,18 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      * Update empty view
      */
     private fun updateEmptyScreen() {
-        megaApi.rootNode?.handle.let { rootHandle ->
-            binding.fileListEmptyImage.setImageResource(
-                if (rootHandle == parentHandle) {
-                    iconPackR.drawable.ic_empty_cloud_glass
-                } else {
-                    iconPackR.drawable.ic_empty_folder_glass
-                }
-            )
-            binding.fileListEmptyTextFirst.text = if (rootHandle == parentHandle) {
-                emptyRootText
+        val atRoot = fileExplorerViewModel.isAtCloudRoot(parentHandle)
+        binding.fileListEmptyImage.setImageResource(
+            if (atRoot) {
+                iconPackR.drawable.ic_empty_cloud_glass
             } else {
-                emptyGeneralText
+                iconPackR.drawable.ic_empty_folder_glass
             }
+        )
+        binding.fileListEmptyTextFirst.text = if (atRoot) {
+            emptyRootText
+        } else {
+            emptyGeneralText
         }
     }
 
@@ -567,6 +576,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         Timber.d("Push to stack $lastFirstVisiblePosition position")
         lastPositionStack.push(lastFirstVisiblePosition)
 
+        fileExplorerViewModel.pushCloudDriveFolder(handle)
         setParentHandle(handle)
         originalData.clear()
         lifecycleScope.launch {
@@ -624,6 +634,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                     if (modeCloud == FileExplorerActivity.SELECT)
                         activateButton(!selectFile)
 
+                    fileExplorerViewModel.pushCloudDriveFolder(node.handle)
                     setParentHandle(node.handle)
                     lifecycleScope.launch {
                         val childNodes =
@@ -668,17 +679,11 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     /**
      * Whether should show option bar
      *
-     * @param parentNode parent node
+     * @param folderHandle handle of the current folder
      * @return true is that shows option bar, otherwise is false
      */
-    private fun shouldShowOptionsBar(parentNode: MegaNode?): Boolean {
-        if (!selectFile) {
-            megaApi.rootNode?.let { rootNode ->
-                return parentNode != null && parentNode.handle != rootNode.handle
-            }
-        }
-        return false
-    }
+    private fun shouldShowOptionsBar(folderHandle: Long) =
+        !selectFile && fileExplorerViewModel.isCloudRootInitialized() && !fileExplorerViewModel.isAtCloudRoot(folderHandle)
 
     /**
      * The behaviour when back button is pressed
@@ -690,31 +695,29 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             Timber.d("onBackPressed")
             if (selectFile && activity.isMultiselect && adapter.multipleSelected)
                 hideMultipleSelect()
-            val parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle))
-                ?: when {
-                    activity.intent.action == ACTION_UPLOAD_SCAN_TO_CLOUD -> {
-                        megaApi.rootNode?.takeIf { parentHandle != it.handle }?.also {
-                            fileExplorerActivity.setCurrentTab(TAB_POSITION_INCOMING)
-                        }
-                    }
-
-                    else -> null
+            var parentFolderHandle = fileExplorerViewModel.popCloudDriveFolderForBack()
+            if (parentFolderHandle == null && activity.intent.action == ACTION_UPLOAD_SCAN_TO_CLOUD) {
+                // If user scan document from incoming folder, keep user in Incoming tab when back to root
+                if (fileExplorerViewModel.isCloudRootInitialized() && !fileExplorerViewModel.isAtCloudRoot(parentHandle)) {
+                    activity.setCurrentTab(TAB_POSITION_INCOMING)
+                    parentFolderHandle = fileExplorerViewModel.getCloudRootHandle()
                 }
+            }
 
-            if (parentNode == null) return 0
+            if (parentFolderHandle == null) return 0
 
             if (modeCloud == FileExplorerActivity.SELECT)
-                activateButton(shouldShowOptionsBar(parentNode))
+                activateButton(shouldShowOptionsBar(parentFolderHandle))
 
-            setParentHandle(parentNode.handle)
-            if (parentNode.type == MegaNode.TYPE_ROOT)
+            setParentHandle(parentFolderHandle)
+            if (fileExplorerViewModel.isAtCloudRoot(parentFolderHandle))
                 activity.hideTabs(false, CLOUD_FRAGMENT)
 
             activity.changeTitle()
 
             if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY) {
                 activity.parentMoveCopy()?.let {
-                    activateButton(modeCloud == FileExplorerActivity.COPY || it.handle != parentNode.handle)
+                    activateButton(modeCloud == FileExplorerActivity.COPY || it.handle != parentFolderHandle)
                 } ?: activateButton(true)
             }
 
@@ -723,6 +726,13 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             binding.fileListEmptyText.isVisible = false
 
             lifecycleScope.launch {
+                val parentNode = withContext(ioDispatcher) {
+                    megaApi.getNodeByHandle(parentFolderHandle)
+                }
+                if (parentNode == null) {
+                    updateNodesByAdapter(emptyList())
+                    return@launch
+                }
                 val childNodes =
                     withContext(ioDispatcher) { megaApi.getChildren(parentNode, order) }
                 updateNodesByAdapter(childNodes)
@@ -850,13 +860,12 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         orderJob = lifecycleScope.launch {
             val children = withContext(ioDispatcher) {
                 runCatching {
-                    megaApi.getChildren(
-                        if (parentHandle == INVALID_HANDLE) {
-                            megaApi.rootNode
-                        } else {
-                            megaApi.getNodeByHandle(parentHandle)
-                        }, order
-                    )
+                    val parentNode = if (parentHandle == INVALID_HANDLE) {
+                        megaApi.getNodeByHandle(fileExplorerViewModel.getCloudRootHandle())
+                    } else {
+                        megaApi.getNodeByHandle(parentHandle)
+                    }
+                    megaApi.getChildren(parentNode, order)
                 }.getOrNull()
             }
 
@@ -885,8 +894,11 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         if (searchString == null || !shouldResetNodes) {
             return
         }
-        if (parentHandle == INVALID_HANDLE)
-            setParentHandle(megaApi.rootNode?.handle ?: INVALID_HANDLE)
+        if (parentHandle == INVALID_HANDLE) {
+            val rootHandle = fileExplorerViewModel.getCloudRootHandle()
+            setParentHandle(rootHandle)
+            fileExplorerViewModel.setCloudDriveFolderPath(listOf(rootHandle))
+        }
         lifecycleScope.launch {
             initNewSearch()
             runCatching {

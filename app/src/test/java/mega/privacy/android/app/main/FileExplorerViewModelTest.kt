@@ -12,9 +12,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
@@ -33,12 +31,14 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
+import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -83,6 +83,8 @@ internal class FileExplorerViewModelTest {
         on { invoke() }.thenReturn(kotlinx.coroutines.flow.emptyFlow())
     }
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getAncestorsIdsUseCase = mock<GetAncestorsIdsUseCase>()
+    private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(testScheduler)
 
@@ -107,6 +109,8 @@ internal class FileExplorerViewModelTest {
             getNodeLocationUseCase = getNodeLocationUseCase,
             activityLifecycleHandler = activityLifecycleHandler,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getAncestorsIdsUseCase = getAncestorsIdsUseCase,
+            getRootNodeIdUseCase = getRootNodeIdUseCase,
         )
     }
 
@@ -126,6 +130,8 @@ internal class FileExplorerViewModelTest {
             activityLifecycleHandler,
             monitorNodeUpdatesUseCase,
             getFeatureFlagValueUseCase,
+            getAncestorsIdsUseCase,
+            getRootNodeIdUseCase,
         )
         // Set default behavior for monitorNodeUpdatesUseCase
         whenever(monitorNodeUpdatesUseCase()).thenReturn(kotlinx.coroutines.flow.emptyFlow())
@@ -665,4 +671,153 @@ internal class FileExplorerViewModelTest {
             assertThat(awaitItem().isFeatureFlagEnabled).isEqualTo(isFeatureFlagEnabled)
         }
     }
+
+    @Test
+    fun `test that popCloudDriveFolderForBack returns null when path is empty`() {
+        initViewModel()
+
+        assertThat(underTest.popCloudDriveFolderForBack()).isNull()
+    }
+
+    @Test
+    fun `test that popCloudDriveFolderForBack returns null when path has only one element`() {
+        initViewModel()
+        underTest.setCloudDriveFolderPath(listOf(100L))
+
+        assertThat(underTest.popCloudDriveFolderForBack()).isNull()
+    }
+
+    @Test
+    fun `test that popCloudDriveFolderForBack returns parent handle after push`() {
+        val root = 1L
+        val child = 2L
+        initViewModel()
+        underTest.setCloudDriveFolderPath(listOf(root))
+        underTest.pushCloudDriveFolder(child)
+
+        assertThat(underTest.popCloudDriveFolderForBack()).isEqualTo(root)
+    }
+
+    @Test
+    fun `test that pushCloudDriveFolder allows multi-level back navigation`() {
+        val root = 1L
+        val folderA = 2L
+        val folderB = 3L
+        initViewModel()
+        underTest.setCloudDriveFolderPath(listOf(root))
+        underTest.pushCloudDriveFolder(folderA)
+        underTest.pushCloudDriveFolder(folderB)
+
+        assertThat(underTest.popCloudDriveFolderForBack()).isEqualTo(folderA)
+        assertThat(underTest.popCloudDriveFolderForBack()).isEqualTo(root)
+        assertThat(underTest.popCloudDriveFolderForBack()).isNull()
+    }
+
+    private suspend fun initCloudRootHandle(root: Long) {
+        whenever(getRootNodeIdUseCase()).thenReturn(NodeId(root))
+        underTest.getOrInitCloudRootHandle()
+    }
+
+    @Test
+    fun `test that getOrInitCloudRootHandle stores the handle`() = runTest(testDispatcher) {
+        val root = 42L
+        initViewModel()
+
+        initCloudRootHandle(root)
+
+        assertThat(underTest.getCloudRootHandle()).isEqualTo(root)
+    }
+
+    @Test
+    fun `test that rebuildCloudDriveFolderPath sets path from use case result`() =
+        runTest(testDispatcher) {
+            val root = 1L
+            val folder = 2L
+            val node = mock<TypedNode>()
+            whenever(getNodeByIdUseCase(NodeId(folder))).thenReturn(node)
+            whenever(getAncestorsIdsUseCase(node)).thenReturn(listOf(NodeId(root)))
+            initViewModel()
+            initCloudRootHandle(root)
+
+            underTest.rebuildCloudDriveFolderPath(folder)
+
+            assertThat(underTest.popCloudDriveFolderForBack()).isEqualTo(root)
+        }
+
+    @Test
+    fun `test that rebuildCloudDriveFolderPath replaces previously pushed entries`() =
+        runTest(testDispatcher) {
+            val root = 1L
+            val folderA = 2L
+            val staleEntry = 99L
+            val node = mock<TypedNode>()
+            whenever(getNodeByIdUseCase(NodeId(folderA))).thenReturn(node)
+            whenever(getAncestorsIdsUseCase(node)).thenReturn(listOf(NodeId(root)))
+            initViewModel()
+            initCloudRootHandle(root)
+            underTest.setCloudDriveFolderPath(listOf(root))
+            underTest.pushCloudDriveFolder(staleEntry)
+
+            underTest.rebuildCloudDriveFolderPath(folderA)
+
+            // After rebuild path is [root, folderA]; staleEntry must be gone
+            assertThat(underTest.popCloudDriveFolderForBack()).isEqualTo(root)
+            assertThat(underTest.popCloudDriveFolderForBack()).isNull()
+        }
+
+    @Test
+    fun `test that isCloudRootInitialized returns false when root handle is not set`() {
+        initViewModel()
+
+        assertThat(underTest.isCloudRootInitialized()).isFalse()
+    }
+
+    @Test
+    fun `test that isCloudRootInitialized returns true after getOrInitCloudRootHandle`() =
+        runTest(testDispatcher) {
+            initViewModel()
+            initCloudRootHandle(1L)
+
+            assertThat(underTest.isCloudRootInitialized()).isTrue()
+        }
+
+    @Test
+    fun `test that isAtCloudRoot returns false when root handle is not set`() {
+        initViewModel()
+
+        assertThat(underTest.isAtCloudRoot(1L)).isFalse()
+    }
+
+    @Test
+    fun `test that isAtCloudRoot returns true when handle matches root`() = runTest(testDispatcher) {
+        val root = 1L
+        initViewModel()
+        initCloudRootHandle(root)
+
+        assertThat(underTest.isAtCloudRoot(root)).isTrue()
+    }
+
+    @Test
+    fun `test that isAtCloudRoot returns false when handle does not match root`() =
+        runTest(testDispatcher) {
+            initViewModel()
+            initCloudRootHandle(1L)
+
+            assertThat(underTest.isAtCloudRoot(2L)).isFalse()
+        }
+
+    @Test
+    fun `test that rebuildCloudDriveFolderPath falls back to root when node is not found`() =
+        runTest(testDispatcher) {
+            val root = 1L
+            val folder = 99L
+            whenever(getNodeByIdUseCase(NodeId(folder))).thenReturn(null)
+            initViewModel()
+            initCloudRootHandle(root)
+
+            underTest.rebuildCloudDriveFolderPath(folder)
+
+            // path = [root], at root so pop returns null
+            assertThat(underTest.popCloudDriveFolderForBack()).isNull()
+        }
 }

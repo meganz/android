@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.presentation.extensions.getState
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -50,6 +52,7 @@ import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
+import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -83,6 +86,8 @@ class FileExplorerViewModel @Inject constructor(
     private val getNodeLocationUseCase: GetNodeLocationUseCase,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -170,6 +175,96 @@ class FileExplorerViewModel @Inject constructor(
                 }
             }.collect { _uiState.update(it) }
         }
+    }
+
+    /**
+     * Returns true if the root handle has been initialised (i.e. is not [INVALID_HANDLE]).
+     */
+    fun isCloudRootInitialized(): Boolean = _uiState.value.cloudRootHandle != INVALID_HANDLE
+
+    /**
+     * Returns true if [handle] is the cloud drive root.
+     * Also returns false when the root has not yet been initialised.
+     */
+    fun isAtCloudRoot(handle: Long): Boolean {
+        val rootHandle = _uiState.value.cloudRootHandle
+        return rootHandle != INVALID_HANDLE && handle == rootHandle
+    }
+
+    /**
+     * Returns the raw cloud drive root handle.
+     * Prefer [isAtCloudRoot] / [isCloudRootInitialized] for comparisons.
+     * Use this only when the handle value itself is required (e.g. SDK calls, setParentHandle).
+     */
+    fun getCloudRootHandle(): Long = _uiState.value.cloudRootHandle
+
+    /**
+     * Returns the cloud drive root handle, fetching it from the repository if not yet cached.
+     * This should be the preferred way to obtain the root handle in suspend contexts, as it
+     * encapsulates SDK access inside the ViewModel and keeps the Fragment free of SDK calls.
+     */
+    suspend fun getOrInitCloudRootHandle(): Long {
+        val cached = _uiState.value.cloudRootHandle
+        if (cached != INVALID_HANDLE) return cached
+        val handle = withContext(ioDispatcher) {
+            getRootNodeIdUseCase()?.longValue ?: INVALID_HANDLE
+        }
+        _uiState.update { it.copy(cloudRootHandle = handle) }
+        return handle
+    }
+
+    /**
+     * Builds the cloud explorer path (root → current folder) and sets it.
+     *
+     * This is intentionally a `suspend` function so that [CloudDriveExplorerFragment] can
+     * `await` path construction before rendering child nodes — ensuring back navigation is
+     * always consistent with what the user sees on screen.
+     *
+     * NOTE: Intentionally a suspend function rather than fire-and-forget via viewModelScope.launch,
+     * so the caller can wait for the path to be ready before updating the UI. Without this,
+     * pressing back before the path is built would navigate to the wrong folder.
+     */
+    suspend fun rebuildCloudDriveFolderPath(folderHandle: Long) {
+        val rootHandle = _uiState.value.cloudRootHandle
+        val path = withContext(ioDispatcher) {
+            val node = getNodeByIdUseCase(NodeId(folderHandle))
+            if (node == null) {
+                Timber.w("rebuildCloudDriveFolderPath: node not found for handle $folderHandle, falling back to root")
+                return@withContext listOf(rootHandle)
+            }
+            val allAncestors = getAncestorsIdsUseCase(node)
+            val rootIndex = allAncestors.indexOfFirst { it.longValue == rootHandle }
+            // Defensive: truncate from parent up to and including the cloud root.
+            val ancestors = if (rootIndex >= 0) allAncestors.subList(0, rootIndex + 1) else allAncestors
+            ancestors.reversed().map { it.longValue } + folderHandle
+        }
+        _uiState.update { it.copy(cloudDriveFolderPath = path) }
+    }
+
+    /**
+     * Sets the cloud drive folder path directly. Used for trivial cases (e.g. root-only path
+     * on search reset) where no ancestor traversal is needed.
+     */
+    fun setCloudDriveFolderPath(handles: List<Long>) {
+        _uiState.update { it.copy(cloudDriveFolderPath = handles) }
+    }
+
+    /**
+     * Records navigation into a child folder (current folder must already be the last path segment).
+     */
+    fun pushCloudDriveFolder(childHandle: Long) {
+        _uiState.update { it.copy(cloudDriveFolderPath = it.cloudDriveFolderPath + childHandle) }
+    }
+
+    /**
+     * Pops the current folder and returns the parent folder handle, or null if already at root.
+     */
+    fun popCloudDriveFolderForBack(): Long? {
+        val path = _uiState.value.cloudDriveFolderPath
+        if (path.size <= 1) return null
+        val newPath = path.dropLast(1)
+        _uiState.update { it.copy(cloudDriveFolderPath = newPath) }
+        return newPath.last()
     }
 
     fun checkFeatureFlag() {
