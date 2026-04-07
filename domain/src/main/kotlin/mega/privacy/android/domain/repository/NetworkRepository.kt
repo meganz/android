@@ -13,7 +13,7 @@ interface NetworkRepository {
      *
      * @return the current connectivity state
      */
-    fun getCurrentConnectivityState(): ConnectivityState
+    suspend fun getCurrentConnectivityState(): ConnectivityState
 
     /**
      * Monitor connectivity changes
@@ -35,14 +35,14 @@ interface NetworkRepository {
      *
      * @return [Boolean]
      */
-    fun isMeteredConnection(): Boolean?
+    suspend fun isMeteredConnection(): Boolean?
 
     /**
      * Is Currently on WIFI
      *
      * @return [Boolean]
      */
-    fun isOnWifi(): Boolean
+    suspend fun isOnWifi(): Boolean
 
     /**
      * Monitor chat signal presence, monitor if any signal is available

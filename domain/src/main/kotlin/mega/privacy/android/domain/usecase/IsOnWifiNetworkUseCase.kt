@@ -10,5 +10,5 @@ class IsOnWifiNetworkUseCase @Inject constructor(
     private val networkRepository: NetworkRepository,
 ) {
 
-    operator fun invoke(): Boolean = networkRepository.isOnWifi()
+    suspend operator fun invoke(): Boolean = networkRepository.isOnWifi()
 }

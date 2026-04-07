@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.os.Build
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.Lifecycle
@@ -38,6 +37,10 @@ import javax.inject.Singleton
 /**
  * Default network repository implementation
  *
+ * Don't migrate deprecated activeNetworkInfo to activeNetwork because it can detect VPN
+ * it's reference to
+ * https://github.com/androidx/androidx/blob/androidx-main/work/work-runtime/src/main/java/androidx/work/impl/constraints/trackers/NetworkStateTracker.kt
+ *
  * @property context
  * @property megaApi
  */
@@ -53,9 +56,15 @@ internal class DefaultNetworkRepository @Inject constructor(
     private val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
 
     @Suppress("DEPRECATION")
-    override fun getCurrentConnectivityState(): ConnectivityState =
+    override suspend fun getCurrentConnectivityState(): ConnectivityState =
+        withContext(ioDispatcher) {
+            getCurrentConnectivityStateInternal()
+        }
+
+    @Suppress("DEPRECATION")
+    private fun getCurrentConnectivityStateInternal(): ConnectivityState =
         if (connectivityManager?.activeNetworkInfo?.isConnected == true) ConnectivityState.Connected(
-            isOnWifi()
+            isOnWifiInternal()
         ) else ConnectivityState.Disconnected
 
     private fun ConnectivityManager?.getActiveNetworkCapabilities(): NetworkCapabilities? =
@@ -75,14 +84,10 @@ internal class DefaultNetworkRepository @Inject constructor(
     // we can create single callback and share state in our application
     @OptIn(FlowPreview::class)
     private val monitorConnectivity = callbackFlow {
-        val networkRequest = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
-
         // emit current network state every time app resumes from background
         val job = ProcessLifecycleOwner.get().lifecycleScope.launch {
             ProcessLifecycleOwner.get().lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                trySend(getCurrentConnectivityState())
+                trySend(getCurrentConnectivityStateInternal())
             }
         }
 
@@ -90,15 +95,13 @@ internal class DefaultNetworkRepository @Inject constructor(
             override fun onLost(network: Network) {
                 super.onLost(network)
                 Timber.d("onLost")
-                // we still check current connectivity state to ensure getting latest value
-                // I have no idea it's device specific issue
-                trySend(getCurrentConnectivityState())
+                trySend(getCurrentConnectivityStateInternal())
             }
 
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 Timber.d("onAvailable")
-                trySend(ConnectivityState.Connected(isOnWifi()))
+                trySend(ConnectivityState.Connected(isOnWifiInternal()))
             }
 
             override fun onCapabilitiesChanged(
@@ -107,13 +110,10 @@ internal class DefaultNetworkRepository @Inject constructor(
             ) {
                 super.onCapabilitiesChanged(network, networkCapabilities)
                 Timber.d("onCapabilitiesChanged")
-                trySend(getCurrentConnectivityState())
+                trySend(getCurrentConnectivityStateInternal())
             }
         }
-        connectivityManager?.apply {
-            registerNetworkCallback(networkRequest, callback)
-            registerDefaultNetworkCallback(callback)
-        }
+        connectivityManager?.registerDefaultNetworkCallback(callback)
 
         awaitClose {
             connectivityManager?.unregisterNetworkCallback(callback)
@@ -125,15 +125,22 @@ internal class DefaultNetworkRepository @Inject constructor(
         .stateIn(
             applicationScope,
             started = SharingStarted.Lazily,
-            initialValue = getCurrentConnectivityState()
+            initialValue = getCurrentConnectivityStateInternal()
         )
 
     override fun isConnectedToInternet() = monitorConnectivity.value.connected
 
-    override fun isMeteredConnection() = connectivityManager?.isActiveNetworkMetered
+    override suspend fun isMeteredConnection() = withContext(ioDispatcher) {
+        connectivityManager?.isActiveNetworkMetered
+    }
 
     @Suppress("DEPRECATION")
-    override fun isOnWifi(): Boolean {
+    override suspend fun isOnWifi(): Boolean = withContext(ioDispatcher) {
+        isOnWifiInternal()
+    }
+
+    @Suppress("DEPRECATION")
+    private fun isOnWifiInternal(): Boolean {
         return connectivityManager?.getActiveNetworkCapabilities()?.let {
             return@let when {
                 it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {

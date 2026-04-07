@@ -23,6 +23,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -301,7 +302,7 @@ internal class MonitorShouldSyncUseCaseTest {
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(batteryInfo))
         whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(wiFiOnly))
         whenever(monitorSyncByChargingUseCase()).thenReturn(flowOf(chargingOnly))
-        whenever(isOnWifiNetworkUseCase()).thenReturn(isOnWiFi)
+        wheneverBlocking { isOnWifiNetworkUseCase() }.thenReturn(isOnWiFi)
         whenever(monitorConnectivityUseCase()).thenReturn(
             connectivityFlow ?: flowOf(true).onCompletion {
                 awaitCancellation()
