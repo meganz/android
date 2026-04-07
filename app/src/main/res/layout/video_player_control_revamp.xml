@@ -33,11 +33,11 @@
             android:id="@+id/loading_video_player_controller_view"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            app:layout_constraintStart_toStartOf="@+id/play_pause_placeholder"
-            app:layout_constraintEnd_toEndOf="@+id/play_pause_placeholder"
-            app:layout_constraintTop_toTopOf="@+id/play_pause_placeholder"
+            android:indeterminateDrawable="@drawable/video_player_progress_indeterminate_anim_material"
             app:layout_constraintBottom_toBottomOf="@+id/play_pause_placeholder"
-            android:indeterminateDrawable="@drawable/video_player_progress_indeterminate_anim_material" />
+            app:layout_constraintEnd_toEndOf="@+id/play_pause_placeholder"
+            app:layout_constraintStart_toStartOf="@+id/play_pause_placeholder"
+            app:layout_constraintTop_toTopOf="@+id/play_pause_placeholder" />
 
         <ImageButton
             android:id="@id/exo_prev"
@@ -64,8 +64,8 @@
             style="@style/AudioPlayerButton"
             android:src="@drawable/media_player_next"
             app:layout_constraintBottom_toBottomOf="@id/play_pause_placeholder"
-            app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
             app:layout_constraintEnd_toStartOf="@+id/exo_ffwd"
+            app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
             app:layout_constraintTop_toTopOf="@id/play_pause_placeholder"
             app:tint="@color/white" />
 
@@ -99,113 +99,18 @@
             android:id="@+id/navigation_bar_bg"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/controls_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
             android:background="@color/grey_alpha_070"
+            android:paddingBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginBottom="30dp">
-
-            <ImageButton
-                android:id="@+id/image_button_lock"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:src="@drawable/ic_lock"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.05"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white"
-                android:visibility="gone"/>
-
-            <ImageButton
-                android:id="@+id/image_screenshot"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:src="@drawable/ic_screenshot"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.275"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white"
-                android:visibility="gone"/>
-
-            <ImageButton
-                android:id="@+id/subtitle"
-                style="@style/VideoPlayerButton"
-                android:src="@drawable/ic_subtitles_disable"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/repeat_toggle"
-                style="@style/VideoPlayerButton"
-                android:src="@drawable/ic_repeat"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.275"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/full_screen"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:src="@drawable/ic_full_screen"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.85"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white"
-                android:visibility="gone"/>
-
-            <TextView
-                android:id="@+id/speed_playback"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:background="?selectableItemBackground"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.06"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="1.75x" />
-
-            <ImageButton
-                android:id="@+id/playlist"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:src="@drawable/ic_player_queue"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.725"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white"
-                tools:visibility="visible" />
-
-            <ImageButton
-                android:id="@+id/more_option"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:src="@drawable/ic_more_horizontal"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.925"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white"/>
+            app:layout_constraintStart_toStartOf="parent">
 
             <TextView
                 android:id="@id/exo_position"
@@ -214,8 +119,8 @@
                 android:layout_marginStart="8dp"
                 android:textColor="@color/white_alpha_038"
                 android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@id/speed_playback"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/repeat_toggle"
                 tools:text="00:30" />
 
             <TextView
@@ -235,26 +140,104 @@
                 android:layout_width="0dp"
                 android:layout_height="26dp"
                 app:buffered_color="@color/grey_300"
-                app:layout_constraintBottom_toTopOf="@id/repeat_toggle"
-                app:layout_constraintStart_toEndOf="@id/exo_position"
+                app:layout_constraintBottom_toTopOf="@id/speed_playback"
                 app:layout_constraintEnd_toStartOf="@id/exo_duration"
-                app:unplayed_color="@color/grey_600"
+                app:layout_constraintStart_toEndOf="@id/exo_position"
                 app:played_color="@color/color_button_brand"
-                app:scrubber_color="@color/color_button_brand"/>
+                app:scrubber_color="@color/color_button_brand"
+                app:unplayed_color="@color/grey_600" />
+
+            <!-- Toolbar: weighted horizontal chain — full width, equal columns (52dp height) -->
+            <TextView
+                android:id="@+id/speed_playback"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="4dp"
+                android:background="?selectableItemBackground"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/repeat_toggle"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="1.75x" />
+
+            <ImageButton
+                android:id="@+id/repeat_toggle"
+                style="@style/VideoPlayerButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_repeat"
+                app:layout_constraintBottom_toBottomOf="@id/speed_playback"
+                app:layout_constraintEnd_toStartOf="@id/device_rotated"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@id/speed_playback"
+                app:layout_constraintTop_toTopOf="@id/speed_playback"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/device_rotated"
+                style="@style/VideoPlayerButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_device_rotate_cw_medium_thin_outline"
+                app:layout_constraintBottom_toBottomOf="@id/speed_playback"
+                app:layout_constraintEnd_toStartOf="@id/full_screen"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@id/repeat_toggle"
+                app:layout_constraintTop_toTopOf="@id/speed_playback"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/full_screen"
+                style="@style/VideoPlayerButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_full_screen"
+                app:layout_constraintBottom_toBottomOf="@id/speed_playback"
+                app:layout_constraintEnd_toStartOf="@id/more_option"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@id/device_rotated"
+                app:layout_constraintTop_toTopOf="@id/speed_playback"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/more_option"
+                style="@style/VideoPlayerButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_more_horizontal"
+                app:layout_constraintBottom_toBottomOf="@id/speed_playback"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@id/full_screen"
+                app:layout_constraintTop_toTopOf="@id/speed_playback"
+                app:tint="@color/white" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/speed_playback_popup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="@id/speed_playback"/>
+                app:layout_constraintBottom_toBottomOf="@id/speed_playback"
+                app:layout_constraintStart_toStartOf="@id/speed_playback" />
 
             <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/video_option_popup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="@id/more_option"
-                app:layout_constraintBottom_toBottomOf="@id/more_option"/>
+                app:layout_constraintBottom_toBottomOf="@id/more_option"
+                app:layout_constraintEnd_toEndOf="@id/more_option" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -263,10 +246,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="80dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone">
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
             android:id="@+id/image_button_unlock"

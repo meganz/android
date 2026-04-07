@@ -119,6 +119,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSlidersHori
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSlidersVertical02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSquareImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineStarImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSubtitles02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSync01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTagSimpleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineTransferArrowsUpDownAltCircleCutoutImageVector
@@ -504,6 +505,9 @@ public object IconPack : IconPackInterface {
                         createMediumThinOutlineSquareImageVector() }
 
                 override val Star: ImageVector by lazy { createMediumThinOutlineStarImageVector() }
+
+                override val Subtitles02: ImageVector by lazy {
+                        createMediumThinOutlineSubtitles02ImageVector() }
 
                 override val Sync01: ImageVector by lazy {
                         createMediumThinOutlineSync01ImageVector() }

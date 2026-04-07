@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.videoplayer.view
 
+import android.Manifest
 import android.app.Activity
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Bitmap
+import android.os.Build
 import android.os.Environment.DIRECTORY_DCIM
 import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.View
@@ -57,6 +59,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -67,7 +70,7 @@ import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.PlaybackPositionDialog
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
@@ -76,6 +79,7 @@ import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
+import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
@@ -83,7 +87,7 @@ import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 
 @androidx.annotation.OptIn(UnstableApi::class)
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalPermissionsApi::class)
 @Composable
 internal fun VideoPlayerRevampScreen(
     bottomSheetNavigator: BottomSheetNavigator,
@@ -99,7 +103,7 @@ internal fun VideoPlayerRevampScreen(
     val configuration = LocalConfiguration.current
     val orientation = configuration.orientation
 
-    var videoPlayerController by remember { mutableStateOf<VideoPlayerController?>(null) }
+    var videoPlayerController by remember { mutableStateOf<VideoPlayerRevampController?>(null) }
 
     val systemUiController = rememberSystemUiController()
     var isControllerViewVisible by rememberSaveable { mutableStateOf(true) }
@@ -123,9 +127,11 @@ internal fun VideoPlayerRevampScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var playbackState by rememberSaveable { mutableIntStateOf(STATE_IDLE) }
-    val playerEventListener = object : Player.Listener {
-        override fun onPlaybackStateChanged(state: Int) {
-            playbackState = state
+    val playerEventListener = remember {
+        object : Player.Listener {
+            override fun onPlaybackStateChanged(state: Int) {
+                playbackState = state
+            }
         }
     }
 
@@ -141,6 +147,41 @@ internal fun VideoPlayerRevampScreen(
     val screenHeight = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
 
     var playerView by remember { mutableStateOf<PlayerView?>(null) }
+
+    var snapshotScreen by rememberSaveable { mutableStateOf(false) }
+    val writeStoragePermission = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
+            snapshotScreen = granted
+        }
+    } else {
+        null
+    }
+    LaunchedEffect(snapshotScreen) {
+        if (snapshotScreen) {
+            val rootPath =
+                getExternalStoragePublicDirectory(DIRECTORY_DCIM).absolutePath
+            playerView?.videoSurfaceView?.let { surfaceView ->
+                viewModel.screenshotWhenVideoPlaying(
+                    rootPath = rootPath,
+                    captureView = surfaceView
+                ) { bitmap ->
+                    Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)
+                    val (width, height) =
+                        if (orientation == ORIENTATION_LANDSCAPE && bitmap.height > bitmap.width) {
+                            (screenHeight * bitmap.width / bitmap.height) to screenHeight
+                        } else {
+                            screenWidth to (screenWidth * bitmap.height / bitmap.width)
+                        }
+
+                    resizedBitmap =
+                        bitmap.scale(width.toInt(), height.toInt(), false)
+                    isScreenshotVisible = true
+                    bitmap.recycle()
+                }
+            }
+            snapshotScreen = false
+        }
+    }
 
     LaunchedEffect(isScreenshotVisible) {
         if (isScreenshotVisible) {
@@ -178,9 +219,7 @@ internal fun VideoPlayerRevampScreen(
     }
 
     LaunchedEffect(uiState.items) {
-        if (uiState.items.isNotEmpty()) {
-            videoPlayerController?.togglePlayQueueEnabled(uiState.items.size)
-        }
+        videoPlayerController?.updatePlayQueueOverflowMenuItems(uiState.items.size)
     }
 
     LaunchedEffect(uiState.isFullscreen) {
@@ -193,10 +232,6 @@ internal fun VideoPlayerRevampScreen(
 
     LaunchedEffect(uiState.currentSpeedPlayback) {
         videoPlayerController?.updateSpeedPlaybackButtonIcon(uiState.currentSpeedPlayback.text)
-    }
-
-    LaunchedEffect(uiState.subtitleSelectedStatus) {
-        videoPlayerController?.updateSubtitleButtonUI(uiState.subtitleSelectedStatus)
     }
 
     LaunchedEffect(uiState.metadata, orientation) {
@@ -247,7 +282,7 @@ internal fun VideoPlayerRevampScreen(
                                     }
                                 }
 
-                                videoPlayerController = VideoPlayerController(
+                                videoPlayerController = VideoPlayerRevampController(
                                     context = context,
                                     uiState = uiState,
                                     container = root,
@@ -310,31 +345,14 @@ internal fun VideoPlayerRevampScreen(
                                         } else {
                                             playerComposeView.hideController()
                                         }
-                                    }
-                                ) {
-                                    val rootPath =
-                                        getExternalStoragePublicDirectory(DIRECTORY_DCIM).absolutePath
-                                    playerComposeView.videoSurfaceView?.let { view ->
-                                        viewModel.screenshotWhenVideoPlaying(
-                                            rootPath = rootPath,
-                                            captureView = view
-                                        ) { bitmap ->
-                                            Analytics.tracker.trackEvent(SnapshotButtonPressedEvent)
-                                            val (width, height) =
-                                                if (orientation == ORIENTATION_LANDSCAPE && bitmap.height > bitmap.width) {
-                                                    (screenHeight * bitmap.width / bitmap.height) to screenHeight
-                                                } else {
-                                                    screenWidth to (screenWidth * bitmap.height / bitmap.width)
-                                                }
-
-                                            resizedBitmap =
-                                                bitmap.scale(width.toInt(), height.toInt(), false)
-                                            isScreenshotVisible = true
-                                            bitmap.recycle()
+                                    },
+                                    onSnapshotSelected = {
+                                        writeStoragePermission?.launchPermissionRequest() ?: run {
+                                            snapshotScreen = true
                                         }
-                                    }
-                                }.also {
-                                    playerComposeView.tag = it
+                                    },
+                                ).also { controller ->
+                                    playerComposeView.tag = controller
                                 }
 
                                 playerComposeView.setControllerVisibilityListener(
@@ -370,13 +388,14 @@ internal fun VideoPlayerRevampScreen(
                             }
                     },
                     onRelease = {
-                        (playerComposeView.tag as? VideoPlayerController)?.release()
+                        (playerComposeView.tag as? VideoPlayerRevampController)?.release()
                         if (uiState.isVideoOptionPopupShown) {
                             viewModel.updateIsVideoOptionPopupShown(false)
                         }
                     }
                 ) {
                     val controllerView = root.findViewById<View>(R.id.controls_view)
+
                     playerComposeView.keepScreenOn =
                         uiState.mediaPlaybackState == MediaPlaybackState.Playing
 
