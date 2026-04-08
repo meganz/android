@@ -363,6 +363,22 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_119_120 = object : Migration(119, 120) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Remove duplicate offline entries keeping the one with the highest id (most recent)
+                db.execSQL(
+                    "DELETE FROM ${MegaDatabaseConstant.TABLE_OFFLINE} WHERE id NOT IN (" +
+                            "SELECT MAX(id) FROM ${MegaDatabaseConstant.TABLE_OFFLINE} GROUP BY handle, path" +
+                            ")"
+                )
+                // Add unique index on (handle, path) to prevent future duplicates
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_OFFLINE}_handle_path " +
+                            "ON ${MegaDatabaseConstant.TABLE_OFFLINE} (handle, path)"
+                )
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
@@ -376,6 +392,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_107_108,
             MIGRATION_110_111,
             MIGRATION_111_112,
+            MIGRATION_119_120,
         )
     }
 }

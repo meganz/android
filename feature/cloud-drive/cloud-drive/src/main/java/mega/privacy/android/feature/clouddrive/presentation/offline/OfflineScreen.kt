@@ -490,7 +490,7 @@ private fun OfflineContent(
 
                 items(
                     items = uiState.offlineNodes,
-                    key = { it.offlineFileInformation.handle }
+                    key = { it.offlineFileInformation.id }
                 ) { node ->
                     NodeListViewItem(
                         title = node.offlineFileInformation.name,
@@ -541,7 +541,7 @@ private fun OfflineContent(
 
                 items(
                     items = uiState.offlineNodes,
-                    key = { it.offlineFileInformation.handle }
+                    key = { it.offlineFileInformation.id }
                 ) { node ->
                     NodeGridViewItem(
                         name = node.offlineFileInformation.name,

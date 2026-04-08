@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.core.transfers.widget.TransfersToolabarWidgetUiState
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -30,6 +29,7 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.feature.transfers.components.widget.TransfersToolbarWidgetStatus
 import mega.privacy.android.shared.nodes.components.GRID_VIEW_TOGGLE_TAG
 import mega.privacy.android.shared.nodes.components.SORT_ORDER_TAG
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.OfflineScreenEvent
 import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
@@ -126,8 +126,8 @@ class OfflineScreenTest {
     @Test
     fun `test that OfflineScreen displays offline nodes when available`() {
         val offlineNodes = listOf(
-            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1"),
-            createOfflineNodeUiItem("test_folder", isFolder = true, handle = "2")
+            createOfflineNodeUiItem(id = 0, name = "test_file.txt", isFolder = false, handle = "1"),
+            createOfflineNodeUiItem(id = 1, name = "test_folder", isFolder = true, handle = "2")
         )
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
@@ -311,8 +311,8 @@ class OfflineScreenTest {
     @Test
     fun `test that OfflineScreen displays grid view when currentViewType is GRID`() {
         val offlineNodes = listOf(
-            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1"),
-            createOfflineNodeUiItem("test_folder", isFolder = true, handle = "2")
+            createOfflineNodeUiItem(id = 0, name = "test_file.txt", isFolder = false, handle = "1"),
+            createOfflineNodeUiItem(id = 1, name = "test_folder", isFolder = true, handle = "2")
         )
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
