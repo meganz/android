@@ -2,7 +2,6 @@ package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.consumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -26,7 +25,7 @@ class ShareToMegaViewModelTest {
     private lateinit var viewModel: ShareToMegaViewModel
 
     private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
-    private val shareUri = mock<UriPath>()
+    private val shareUri = UriPath("content://test/uri")
 
     @BeforeEach
     fun setUp() {
@@ -63,8 +62,6 @@ class ShareToMegaViewModelTest {
             }
             val data = state as ShareToMegaUiState.Data
             assertThat(data.rootNodeId).isEqualTo(expectedRoot)
-            assertThat(data.openFolderEvent).isEqualTo(consumed())
-            assertThat(data.uploadEvent).isEqualTo(consumed())
         }
     }
 

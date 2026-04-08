@@ -52,6 +52,7 @@ fun ExplorerScreen(
     isInnerNavigation: Boolean,
     nodeExplorerId: NodeId,
     nodeSourceType: NodeSourceType,
+    onCloseExplorerScreen: () -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
@@ -60,8 +61,11 @@ fun ExplorerScreen(
     onFilesPicked: (List<NodeId>) -> Unit = {},
     onChatsSelected: (List<Long>) -> Unit = {},
 ) {
+    val shareUris = (explorerModeData as? ExplorerModeData.ShareFilesToMega)?.shareUris
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
+    var isProcessingAction by rememberSaveable { mutableStateOf(false) }
+    val protectedUserTap: (() -> Unit) -> Unit = { action -> if (!isProcessingAction) action() }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
     val resources = LocalResources.current
@@ -98,9 +102,9 @@ fun ExplorerScreen(
         topBar = {
             MegaTopAppBar(
                 navigationType = if (isInnerNavigation) {
-                    AppBarNavigationType.Back { onNavigateBack() }
+                    AppBarNavigationType.Back { protectedUserTap { onNavigateBack() } }
                 } else {
-                    AppBarNavigationType.Close { onNavigateBack() }
+                    AppBarNavigationType.Close { protectedUserTap { onNavigateBack() } }
                 },
                 title = if (isInnerNavigation) {
                     nodesExplorerUiState.folderName.text
@@ -117,7 +121,9 @@ fun ExplorerScreen(
                             if (explorerModeData.isFolderPicker) {
                                 add(
                                     MenuActionWithClick(NewFolderMenuAction) {
-                                        showNewFolderDialog = true
+                                        if (!isProcessingAction) {
+                                            showNewFolderDialog = true
+                                        }
                                     }
                                 )
                             }
@@ -148,24 +154,31 @@ fun ExplorerScreen(
                 modifier = Modifier.testTag(ACTION_BUTTONS_VIEW_TAG),
                 primaryButtonText = stringResource(explorerModeData.actionStringId),
                 onPrimaryButtonClick = {
-                    when {
-                        explorerModeData.isFolderPicker && selectedTabIndex != CHAT_TAB_INDEX -> {
-                            onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
-                        }
+                    protectedUserTap {
+                        isProcessingAction = true
+                        when {
+                            explorerModeData.isFolderPicker && selectedTabIndex != CHAT_TAB_INDEX -> {
+                                onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
+                            }
 
-                        explorerModeData.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX -> {
-                            //Replace with valid chatId list
-                            onChatsSelected(emptyList())
-                        }
+                            explorerModeData.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX -> {
+                                //Replace with valid chatId list
+                                onChatsSelected(emptyList())
+                            }
 
-                        else -> {
-                            //Replace with valid nodeIds list
-                            onFilesPicked(emptyList())
+                            else -> {
+                                //Replace with valid nodeIds list
+                                onFilesPicked(emptyList())
+                            }
                         }
                     }
                 },
+                primaryButtonEnabled = when {
+                    explorerModeData.isFolderPicker -> selectedTabIndex == CLOUD_TAB_INDEX
+                    else -> true
+                },
                 textOnlyButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
-                onTextOnlyButtonClick = onNavigateBack,
+                onTextOnlyButtonClick = { protectedUserTap { onCloseExplorerScreen() } },
             )
         }
     ) { paddingValues ->
@@ -185,16 +198,20 @@ fun ExplorerScreen(
                     NodesExplorerScreenContent(
                         uiState = nodesExplorerUiState,
                         uiStateShared = nodesExplorerUiStateShared,
-                        onNavigateBack = onNavigateBack,
+                        onNavigateBack = { protectedUserTap { onNavigateBack() } },
                         consumeNavigateBack = nodesExplorerViewModel::onNavigateBackEventConsumed,
-                        onFolderClick = {
-                            onNavigate(
-                                NodesExplorerNavKey(
-                                    nodeId = it,
-                                    nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
-                                    explorerMode = explorerModeData.toMode()
+                        onFolderClick = { nodeId ->
+                            protectedUserTap {
+                                onNavigate(
+                                    NodesExplorerNavKey(
+                                        nodeId = nodeId,
+                                        nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
+                                        explorerMode = explorerModeData.toMode(),
+                                        startNavKey = explorerModeData.startNavKey,
+                                        shareUris = shareUris,
+                                    )
                                 )
-                            )
+                            }
                         },
                         onRefreshNodes = nodesExplorerViewModel::refreshNodes,
                         modifier = modifier,
@@ -209,16 +226,20 @@ fun ExplorerScreen(
                     ) { _, modifier ->
                         IncomingSharesExplorerContent(
                             uiStateShared = incomingSharesExplorerUiStateShared.value,
-                            onNavigateBack = onNavigateBack,
+                            onNavigateBack = { protectedUserTap { onNavigateBack() } },
                             consumeNavigateBack = incomingSharesExplorerViewModel::onNavigateBackEventConsumed,
-                            onFolderClick = {
-                                onNavigate(
-                                    NodesExplorerNavKey(
-                                        nodeId = it,
-                                        nodeSourceType = incomingSharesExplorerUiStateShared.value.nodeSourceType,
-                                        explorerMode = explorerModeData.toMode()
+                            onFolderClick = { nodeId ->
+                                protectedUserTap {
+                                    onNavigate(
+                                        NodesExplorerNavKey(
+                                            nodeId = nodeId,
+                                            nodeSourceType = incomingSharesExplorerUiStateShared.value.nodeSourceType,
+                                            explorerMode = explorerModeData.toMode(),
+                                            startNavKey = explorerModeData.startNavKey,
+                                            shareUris = shareUris,
+                                        )
                                     )
-                                )
+                                }
                             },
                             onRefreshNodes = incomingSharesExplorerViewModel::refreshNodes,
                             modifier = modifier
@@ -234,16 +255,20 @@ fun ExplorerScreen(
                     ) { _, modifier ->
                         FavouritesExplorerContent(
                             uiStateShared = favouritesExplorerUiStateShared.value,
-                            onNavigateBack = onNavigateBack,
+                            onNavigateBack = { protectedUserTap { onNavigateBack() } },
                             consumeNavigateBack = favouritesExplorerViewModel::onNavigateBackEventConsumed,
-                            onFolderClick = {
-                                onNavigate(
-                                    NodesExplorerNavKey(
-                                        nodeId = it,
-                                        nodeSourceType = favouritesExplorerUiStateShared.value.nodeSourceType,
-                                        explorerMode = explorerModeData.toMode()
+                            onFolderClick = { nodeId ->
+                                protectedUserTap {
+                                    onNavigate(
+                                        NodesExplorerNavKey(
+                                            nodeId = nodeId,
+                                            nodeSourceType = favouritesExplorerUiStateShared.value.nodeSourceType,
+                                            explorerMode = explorerModeData.toMode(),
+                                            startNavKey = explorerModeData.startNavKey,
+                                            shareUris = shareUris,
+                                        )
                                     )
-                                )
+                                }
                             },
                             onRefreshNodes = favouritesExplorerViewModel::refreshNodes,
                             modifier = modifier
@@ -273,6 +298,8 @@ fun ExplorerScreen(
                                     nodeId = it,
                                     nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
                                     explorerMode = explorerModeData.toMode(),
+                                    startNavKey = explorerModeData.startNavKey,
+                                    shareUris = shareUris,
                                 )
                             )
                         } ?: snackbarHostState?.showAutoDurationSnackbar(

@@ -3,7 +3,11 @@ package mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -15,16 +19,19 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
+import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareFilesToMegaUpload
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
@@ -36,23 +43,57 @@ import mega.privacy.android.shared.nodes.model.SelectableNodeItem
 import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 
 @Composable
 fun NodesExplorerScreen(
     explorerModeData: ExplorerModeData,
     nodeExplorerId: NodeId,
     nodeSourceType: NodeSourceType,
+    onCloseExplorerScreen: () -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
+    onStartUpload: (TransferTriggerEvent) -> Unit = {},
 ) {
+    val uploadUrisEventState = rememberUploadUrisEventState()
+    var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
+    val folderPickedId = NodeId(folderPickedIdLong)
+
     ExplorerScreen(
         explorerModeData = explorerModeData,
         isInnerNavigation = true,
         nodeExplorerId = nodeExplorerId,
         nodeSourceType = nodeSourceType,
+        onCloseExplorerScreen = onCloseExplorerScreen,
+        onFolderPicked = { nodeId ->
+            when (explorerModeData) {
+                is ExplorerModeData.ShareFilesToMega -> {
+                    folderPickedIdLong = nodeId.longValue
+                    uploadUrisEventState.trigger(
+                        explorerModeData.shareUris.map { it.toUri() }
+                    )
+                }
+
+                else -> {}
+            }
+        },
+        onFilesPicked = {},
         onNavigateBack = onNavigateBack,
         onNavigate = onNavigate,
     )
+
+    when (explorerModeData) {
+        is ExplorerModeData.ShareFilesToMega -> {
+            ShareFilesToMegaUpload(
+                parentNodeId = folderPickedId,
+                uploadUrisEventState = uploadUrisEventState,
+                onStartUpload = onStartUpload,
+                onCloseExplorerScreen = onCloseExplorerScreen,
+            )
+        }
+
+        else -> {}
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -5,8 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerViewModel
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.toData
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaScreen
@@ -14,7 +13,6 @@ import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.Share
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.destination.ChatExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
 
@@ -22,19 +20,22 @@ class CloudExplorerFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             shareToMegaDestination(
-                onNavigateBack = { navigationHandler.remove(it) },
-                onNavigate = { navigationHandler.navigate(it) },
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
+                onStartUpload = transferHandler::setTransferEvent
             )
             nodeExplorerDestination(
-                onNavigateBack = { navigationHandler.remove(it) },
-                onNavigate = { navigationHandler.navigate(it) },
+                onCloseExplorerScreen = { navigationHandler.backTo(it, true) },
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
+                onStartUpload = transferHandler::setTransferEvent,
             )
-            chatExplorerDestination()
         }
 
     fun EntryProviderScope<NavKey>.shareToMegaDestination(
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (NavKey) -> Unit,
+        onStartUpload: (TransferTriggerEvent) -> Unit,
     ) {
         entry<ShareToMegaNavKey> { key ->
             val viewModel =
@@ -45,33 +46,30 @@ class CloudExplorerFeatureDestination : FeatureDestination {
 
             ShareToMegaScreen(
                 uiState = uiState,
+                startNavKey = key,
                 onNavigateBack = { onNavigateBack(key) },
-                onUpload = viewModel::upload,
+                onStartUpload = onStartUpload,
                 onNavigate = onNavigate,
             )
         }
     }
 
     fun EntryProviderScope<NavKey>.nodeExplorerDestination(
+        onCloseExplorerScreen: (NavKey) -> Unit,
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (NavKey) -> Unit,
+        onStartUpload: (TransferTriggerEvent) -> Unit,
     ) {
         entry<NodesExplorerNavKey> { key ->
             NodesExplorerScreen(
-                explorerModeData = key.explorerMode.toData(),
+                explorerModeData = key.explorerMode.toData(key),
                 nodeExplorerId = key.nodeId,
                 nodeSourceType = key.nodeSourceType,
+                onCloseExplorerScreen = { onCloseExplorerScreen(key.startNavKey) },
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = { onNavigate(it) },
+                onStartUpload = onStartUpload,
             )
-        }
-    }
-
-    fun EntryProviderScope<NavKey>.chatExplorerDestination() {
-        entry<ChatExplorerNavKey> { key ->
-            val viewModel = hiltViewModel<ChatExplorerViewModel>()
-
-            ChatExplorerScreen()
         }
     }
 }

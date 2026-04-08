@@ -7,15 +7,16 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
 
-@Serializable
-data class ShareToMegaNavKey(val shareUris: List<UriPath>) : NavKey
+interface ExplorerNavKey : NavKey
 
 @Serializable
-data object ChatExplorerNavKey : NavKey
+data class ShareToMegaNavKey(val shareUris: List<UriPath>) : ExplorerNavKey
 
 @Serializable
 data class NodesExplorerNavKey(
     val nodeId: NodeId,
     val nodeSourceType: NodeSourceType,
     val explorerMode: ExplorerMode,
+    val startNavKey: ExplorerNavKey,
+    val shareUris: List<UriPath>?,
 ) : NavKey

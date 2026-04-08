@@ -1,10 +1,12 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega
 
 import androidx.compose.runtime.Stable
-import de.palm.composestateevents.StateEventWithContent
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 
+/**
+ * UI state for share to mega.
+ */
 @Stable
 sealed interface ShareToMegaUiState {
 
@@ -17,10 +19,10 @@ sealed interface ShareToMegaUiState {
      * Data state.
      *
      * @property rootNodeId Root node id.
+     * @property shareUris Uris to share.
      */
     data class Data(
         val rootNodeId: NodeId,
-        val openFolderEvent: StateEventWithContent<NodeId>,
-        val uploadEvent: StateEventWithContent<TransferTriggerEvent>,
+        val shareUris: List<UriPath>,
     ) : ShareToMegaUiState
 }
