@@ -22,6 +22,7 @@ dependencies {
     lintChecks(project(":lint"))
     lintChecks(lib.slack.compose.lints)
 
+    implementation(project(":shared:ads"))
     implementation(project(":shared:nodes"))
     implementation(project(":shared:account"))
     implementation(project(":core:ui-components:node-components"))

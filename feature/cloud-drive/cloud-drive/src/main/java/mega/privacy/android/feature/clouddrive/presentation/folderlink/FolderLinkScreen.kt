@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -29,6 +30,8 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
+import mega.android.core.ui.components.surface.BoxSurface
+import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
@@ -64,6 +67,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.shared.ads.NewAdsContainer
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
@@ -162,31 +166,46 @@ internal fun FolderLinkScreen(
             }
         },
         bottomBar = {
-            if (uiState.isInSelectionMode) {
-                NodeSelectionModeBottomBar(
-                    availableActions = nodeOptionsActionUiState.availableActions,
-                    visibleActions = nodeOptionsActionUiState.visibleActions,
-                    visible = nodeOptionsActionUiState.visibleActions.isNotEmpty(),
-                    multiNodeActionHandler = selectionModeActionHandler,
-                    selectedNodes = uiState.selectedNodes,
-                    isSelecting = false,
-                )
-            } else {
-                uiState.currentFolderNode?.let { folderNode ->
-                    if (isLoaded) {
-                        InlineAnchoredButtonGroup(
-                            modifier = Modifier
-                                .testTag(FOLDER_LINK_BOTTOM_BAR_TAG),
-                            primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
-                            primaryButtonLeadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
-                            onPrimaryButtonClick = {
-                                singleNodeActionHandler(SaveToMegaMenuAction(), folderNode)
-                            },
-                            textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
-                            onTextOnlyButtonClick = {
-                                singleNodeActionHandler(DownloadMenuAction(), folderNode)
-                            }
+            BoxSurface(
+                surfaceColor = if (uiState.isInSelectionMode) {
+                    SurfaceColor.None
+                } else {
+                    SurfaceColor.Surface1
+                }
+            ) {
+                NewAdsContainer(
+                    modifier = Modifier.fillMaxWidth(),
+                    onNavigate = navigationHandler::navigate,
+                ) { modifier ->
+                    if (uiState.isInSelectionMode) {
+                        NodeSelectionModeBottomBar(
+                            modifier = modifier,
+                            availableActions = nodeOptionsActionUiState.availableActions,
+                            visibleActions = nodeOptionsActionUiState.visibleActions,
+                            visible = nodeOptionsActionUiState.visibleActions.isNotEmpty(),
+                            multiNodeActionHandler = selectionModeActionHandler,
+                            selectedNodes = uiState.selectedNodes,
+                            isSelecting = false,
                         )
+                    } else {
+                        uiState.currentFolderNode?.let { folderNode ->
+                            if (isLoaded) {
+                                InlineAnchoredButtonGroup(
+                                    modifier = modifier
+                                        .testTag(FOLDER_LINK_BOTTOM_BAR_TAG),
+                                    primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
+                                    primaryButtonLeadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
+                                    onPrimaryButtonClick = {
+                                        singleNodeActionHandler(SaveToMegaMenuAction(), folderNode)
+                                    },
+                                    textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
+                                    onTextOnlyButtonClick = {
+                                        singleNodeActionHandler(DownloadMenuAction(), folderNode)
+                                    },
+                                    applyInsets = true
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -215,6 +234,7 @@ internal fun FolderLinkScreen(
             }
         )
     }
+
 
     uiState.openedFileNode?.let { fileNode ->
         HandleNodeAction3(
