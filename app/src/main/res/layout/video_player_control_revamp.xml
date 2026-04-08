@@ -106,33 +106,53 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
-            android:background="@color/grey_alpha_070"
-            android:paddingBottom="8dp"
+            android:background="@color/grey_012_transparent"
+            android:paddingVertical="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <TextView
-                android:id="@id/exo_position"
+            <LinearLayout
+                android:id="@+id/layout_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:textColor="@color/white_alpha_038"
-                android:textSize="12sp"
-                app:layout_constraintBottom_toTopOf="@id/speed_playback"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:text="00:30" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@id/exo_duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:textColor="@color/white_alpha_038"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/exo_position"
-                tools:text="04:30" />
+                <TextView
+                    android:id="@id/exo_position"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    tools:text="00:30" />
+
+                <!--
+                    ExoPlayer exposes position and duration as two separate @id TextViews; Media3 does not
+                    insert a slash between them. This view is the literal " / " separator so the row reads
+                    as one "elapsed / total" string (matches design).
+                -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="4dp"
+                    android:text=" / "
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@id/exo_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    tools:text="04:30" />
+            </LinearLayout>
 
             <androidx.media3.ui.DefaultTimeBar
                 android:id="@id/exo_progress"
@@ -141,10 +161,13 @@
                 android:layout_height="26dp"
                 app:buffered_color="@color/grey_300"
                 app:layout_constraintBottom_toTopOf="@id/speed_playback"
-                app:layout_constraintEnd_toStartOf="@id/exo_duration"
-                app:layout_constraintStart_toEndOf="@id/exo_position"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/layout_duration"
                 app:played_color="@color/color_button_brand"
                 app:scrubber_color="@color/color_button_brand"
+                app:scrubber_dragged_size="20dp"
+                app:scrubber_enabled_size="16dp"
                 app:unplayed_color="@color/grey_600" />
 
             <!-- Toolbar: weighted horizontal chain — full width, equal columns (52dp height) -->
