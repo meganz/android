@@ -44,6 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -617,13 +618,18 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that photosInDay contains one entry per distinct calendar day`() = runTest {
-        val now = ZonedDateTime.now()
+        val dateTime = ZonedDateTime.of(
+            2026, 4, 25,
+            10, 30, 0,
+            0,
+            ZoneId.of("Asia/Jakarta")
+        )
         val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
             on { extension } doReturn ".jpg"
         }
         val photo1 = mock<TypedFileNode> {
             on { id } doReturn NodeId(longValue = 1L)
-            on { modificationTime } doReturn now.toEpochSecond()
+            on { modificationTime } doReturn dateTime.toEpochSecond()
             on { type } doReturn mockImageFileTypeInfo
             on { isMarkedSensitive } doReturn false
             on { isSensitiveInherited } doReturn false
@@ -631,7 +637,7 @@ class TimelineTabViewModelTest {
         }
         val photo2 = mock<TypedFileNode> {
             on { id } doReturn NodeId(longValue = 2L)
-            on { modificationTime } doReturn now.plusHours(1).toEpochSecond()
+            on { modificationTime } doReturn dateTime.plusHours(1).toEpochSecond()
             on { type } doReturn mockImageFileTypeInfo
             on { isMarkedSensitive } doReturn false
             on { isSensitiveInherited } doReturn false
@@ -639,7 +645,7 @@ class TimelineTabViewModelTest {
         }
         val photo3 = mock<TypedFileNode> {
             on { id } doReturn NodeId(longValue = 3L)
-            on { modificationTime } doReturn now.minusDays(1).toEpochSecond()
+            on { modificationTime } doReturn dateTime.minusDays(1).toEpochSecond()
             on { type } doReturn mockImageFileTypeInfo
             on { isMarkedSensitive } doReturn false
             on { isSensitiveInherited } doReturn false
@@ -664,13 +670,18 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that photosInDay count reflects the number of photos grouped under each day`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val dateTime = ZonedDateTime.of(
+                2026, 4, 25,
+                10, 30, 0,
+                0,
+                ZoneId.of("Asia/Jakarta")
+            )
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
             val photo1 = mock<TypedFileNode> {
                 on { id } doReturn NodeId(longValue = 1L)
-                on { modificationTime } doReturn now.toEpochSecond()
+                on { modificationTime } doReturn dateTime.toEpochSecond()
                 on { type } doReturn mockImageFileTypeInfo
                 on { isMarkedSensitive } doReturn false
                 on { isSensitiveInherited } doReturn false
@@ -678,7 +689,7 @@ class TimelineTabViewModelTest {
             }
             val photo2 = mock<TypedFileNode> {
                 on { id } doReturn NodeId(longValue = 2L)
-                on { modificationTime } doReturn now.plusHours(1).toEpochSecond()
+                on { modificationTime } doReturn dateTime.plusHours(1).toEpochSecond()
                 on { type } doReturn mockImageFileTypeInfo
                 on { isMarkedSensitive } doReturn false
                 on { isSensitiveInherited } doReturn false
@@ -686,7 +697,7 @@ class TimelineTabViewModelTest {
             }
             val photo3 = mock<TypedFileNode> {
                 on { id } doReturn NodeId(longValue = 3L)
-                on { modificationTime } doReturn now.plusHours(2).toEpochSecond()
+                on { modificationTime } doReturn dateTime.plusHours(2).toEpochSecond()
                 on { type } doReturn mockImageFileTypeInfo
                 on { isMarkedSensitive } doReturn false
                 on { isSensitiveInherited } doReturn false
@@ -711,13 +722,18 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that photosInDay uses the first photo of each day as the card representative`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val dateTime = ZonedDateTime.of(
+                2026, 4, 25,
+                10, 30, 0,
+                0,
+                ZoneId.of("Asia/Jakarta")
+            )
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
             val photo1 = mock<TypedFileNode> {
                 on { id } doReturn NodeId(longValue = 1L)
-                on { modificationTime } doReturn now.toEpochSecond()
+                on { modificationTime } doReturn dateTime.toEpochSecond()
                 on { type } doReturn mockImageFileTypeInfo
                 on { isMarkedSensitive } doReturn false
                 on { isSensitiveInherited } doReturn false
@@ -725,7 +741,7 @@ class TimelineTabViewModelTest {
             }
             val photo2 = mock<TypedFileNode> {
                 on { id } doReturn NodeId(longValue = 2L)
-                on { modificationTime } doReturn now.plusHours(2).toEpochSecond()
+                on { modificationTime } doReturn dateTime.plusHours(2).toEpochSecond()
                 on { type } doReturn mockImageFileTypeInfo
                 on { isMarkedSensitive } doReturn false
                 on { isSensitiveInherited } doReturn false
