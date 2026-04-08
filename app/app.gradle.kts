@@ -327,7 +327,7 @@ dependencies {
 
     // Google GMS
     implementation(lib.billing.client.ktx)
-    implementation(google.services.ads)
+    implementation(google.ads.mobile.sdk)
     implementation(google.services.location)
     implementation(google.services.maps)
     implementation(google.services.mlkit.document.scanner)

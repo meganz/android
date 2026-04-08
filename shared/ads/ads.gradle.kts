@@ -37,6 +37,12 @@ android {
     }
 }
 
+//  Prevent the old play-services-ads from being pulled in transitively by other dependencies
+configurations.configureEach {
+    exclude(group = "com.google.android.gms", module = "play-services-ads")
+    exclude(group = "com.google.android.gms", module = "play-services-ads-lite")
+}
+
 dependencies {
     implementation(project(":core:feature-flags"))
     implementation(project(":core:analytics:analytics-tracker"))
@@ -59,7 +65,7 @@ dependencies {
     implementation(lib.mega.analytics)
 
     implementation(google.gson)
-    implementation(google.services.ads)
+    implementation(google.ads.mobile.sdk)
     implementation(androidx.datastore.preferences)
     implementation(androidx.hilt.navigation)
 

@@ -2,7 +2,8 @@ package mega.privacy.android.shared.ads.advertisements
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.banner.AdSize
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import com.google.android.ump.ConsentInformation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import mega.privacy.android.domain.usecase.advertisements.MonitorGoogleConsentLoadedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.shared.ads.BuildConfig
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -93,7 +95,14 @@ class AdsViewModel @Inject constructor(
         Timber.d("Checking if a new AdRequest is needed")
         if (_uiState.value.request == null || System.currentTimeMillis() - lastFetchTime > MINIMUM_AD_REFRESH_INTERVAL) {
             Timber.d("Creating new AdRequest")
-            _uiState.update { it.copy(request = AdManagerAdRequest.Builder().build()) }
+            _uiState.update {
+                it.copy(
+                    request = BannerAdRequest.Builder(
+                        BuildConfig.AD_UNIT_ID,
+                        AdSize(320, 50)
+                    ).build()
+                )
+            }
             lastFetchTime = System.currentTimeMillis()
         }
     }

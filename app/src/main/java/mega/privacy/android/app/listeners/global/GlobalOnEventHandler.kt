@@ -2,7 +2,8 @@ package mega.privacy.android.app.listeners.global
 
 import android.content.Context
 import android.content.Intent
-import com.google.android.gms.ads.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
+import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -122,7 +123,11 @@ class GlobalOnEventHandler @Inject constructor(
                 if (isAdsFeatureEnabled) {
                     if (!isMobileAdsInitializeCalled.getAndSet(true)) {
                         Timber.d("Initialising MobileAds")
-                        MobileAds.initialize(appContext)
+                        MobileAds.initialize(
+                            appContext,
+                            InitializationConfig.Builder("ca-app-pub-2135147798858967~2157690671")
+                                .build()
+                        )
                     }
                 }
             }.onFailure {

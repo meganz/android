@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.util.shimmerEffect
 import mega.privacy.android.app.R
@@ -81,7 +81,7 @@ internal fun FileLinkView(
     onErrorMessageConsumed: () -> Unit,
     onOverQuotaErrorConsumed: () -> Unit,
     onForeignNodeErrorConsumed: () -> Unit,
-    request: AdManagerAdRequest?,
+    request: BannerAdRequest?,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current

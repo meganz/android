@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.banner.AdSize
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
+import mega.privacy.android.shared.ads.BuildConfig
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.FormError
@@ -52,7 +54,7 @@ class GoogleAdsManager @Inject constructor(
      */
     val isAdsFeatureEnabled = _isAdsFeatureEnabled.asStateFlow()
 
-    private val _request = MutableStateFlow<AdManagerAdRequest?>(null)
+    private val _request = MutableStateFlow<BannerAdRequest?>(null)
 
     /**
      * Flow to provide the AdRequest to be used in the AdManager.
@@ -189,7 +191,12 @@ class GoogleAdsManager @Inject constructor(
         Timber.d("Checking if a new AdRequest is needed")
         if (_request.value == null || System.currentTimeMillis() - lastFetchTime > MINIMUM_AD_REFRESH_INTERVAL) {
             Timber.d("Creating new AdRequest")
-            _request.update { AdManagerAdRequest.Builder().build() }
+            _request.update {
+                BannerAdRequest.Builder(
+                    BuildConfig.AD_UNIT_ID,
+                    AdSize(320, 50)
+                ).build()
+            }
             lastFetchTime = System.currentTimeMillis()
         }
     }

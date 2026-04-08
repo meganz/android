@@ -18,11 +18,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.currentStateAsState
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
-import com.google.android.gms.ads.admanager.AdManagerAdView
+import com.google.android.libraries.ads.mobile.sdk.banner.AdView
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAd
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdEventCallback
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
+import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
@@ -35,7 +36,7 @@ import timber.log.Timber
  */
 @Composable
 fun AdsContainer(
-    request: AdManagerAdRequest?,
+    request: BannerAdRequest?,
     modifier: Modifier = Modifier,
     isLoggedInUser: Boolean = true,
     viewModel: AdsContainerViewModel = hiltViewModel(),
@@ -44,64 +45,44 @@ fun AdsContainer(
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentLifecycleState by lifecycleOwner.lifecycle.currentStateAsState()
     var handledState by remember { mutableStateOf(Lifecycle.State.INITIALIZED) }
-    var handledRequest by remember { mutableStateOf<AdManagerAdRequest?>(null) }
+    var handledRequest by remember { mutableStateOf<BannerAdRequest?>(null) }
     var adLoaded by remember { mutableStateOf(false) }
+
     if (request != null) {
         Box(modifier = modifier) {
             AndroidView(modifier = Modifier.align(Alignment.Center), factory = { context ->
-                AdManagerAdView(context).apply {
-                    adUnitId = BuildConfig.AD_UNIT_ID
-                    setAdSize(AdSize(320, 50))
-                    adListener = object : AdListener() {
-                        override fun onAdClicked() {
-                            Timber.d("Ad clicked")
-                        }
-
-                        override fun onAdClosed() {
-                            Timber.i("Ad closed")
-                        }
-
-                        override fun onAdFailedToLoad(adError: LoadAdError) {
-                            Timber.w("Ad failed to load: ${adError.message} (${adError.code})")
-                            viewModel.setAdsLoaded(false)
-                        }
-
-                        override fun onAdImpression() {
-                            Timber.i("Ad impression")
-                        }
-
-                        override fun onAdLoaded() {
+                AdView(context)
+            }, update = { adView ->
+                // update called many times when recomposition, so we need to check if the request and state are changed
+                if (handledRequest != request) {
+                    adView.loadAd(request, object : AdLoadCallback<BannerAd> {
+                        override fun onAdLoaded(ad: BannerAd) {
                             Timber.i("Ad loaded")
                             viewModel.setAdsLoaded(true)
                             adLoaded = true
+                            ad.adEventCallback = object : BannerAdEventCallback {
+                                override fun onAdClicked() {
+                                    Timber.d("Ad clicked")
+                                }
+
+                                override fun onAdImpression() {
+                                    Timber.i("Ad impression")
+                                }
+                            }
                         }
 
-                        override fun onAdOpened() {
-                            Timber.i("Ad opened")
+                        override fun onAdFailedToLoad(error: LoadAdError) {
+                            Timber.w("Ad failed to load: ${error.message} (${error.code})")
+                            viewModel.setAdsLoaded(false)
                         }
-                    }
-                }
-            }, update = {
-                // update called many times when recomposition, so we need to check if the request and state are changed
-                if (handledRequest != request) {
-                    it.loadAd(request)
+                    })
                     handledRequest = request
                 }
                 if (handledState != currentLifecycleState) {
                     when (currentLifecycleState) {
                         Lifecycle.State.DESTROYED -> {
                             Timber.d("Destroying AdView")
-                            it.destroy()
-                        }
-
-                        Lifecycle.State.RESUMED -> {
-                            Timber.d("Resuming AdView")
-                            it.resume()
-                        }
-
-                        Lifecycle.State.STARTED -> {
-                            Timber.d("Pausing AdView")
-                            it.pause()
+                            adView.destroy()
                         }
 
                         else -> Unit

@@ -44,6 +44,7 @@
 -dontnote **ILicensingService
 -dontnote com.google.android.gms.**
 -dontwarn com.google.android.gms.ads.**
+-dontwarn com.google.android.libraries.ads.mobile.sdk.**
 
 ########################
 # Firebase Crashlytics #
@@ -175,6 +176,8 @@
 -keep public class com.google.ads.** {
     public *;
 }
+
+-keep class com.google.android.libraries.ads.mobile.sdk.** { *; }
 
 # For mediation
 -keepattributes *Annotation*

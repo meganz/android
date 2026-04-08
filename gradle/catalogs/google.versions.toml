@@ -13,7 +13,7 @@ play-age-signals = "0.0.2"
 play-review = "2.0.2"
 play-update = "2.1.0"
 protobuff = "3.22.3"
-services-ads = "24.4.0"
+ads-mobile-sdk = "0.25.0-beta01"
 services-location = "21.3.0"
 services-maps = "18.2.0"
 services-mlkit-document-scanner = "16.0.0"
@@ -51,7 +51,7 @@ play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref =
 play-update = { module = "com.google.android.play:app-update", version.ref = "play-update" }
 play-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "play-update" }
 protobuff = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuff" }
-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "services-ads" }
+ads-mobile-sdk = { module = "com.google.android.libraries.ads.mobile.sdk:ads-mobile-sdk", version.ref = "ads-mobile-sdk" }
 services-location = { module = "com.google.android.gms:play-services-location", version.ref = "services-location" }
 services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "services-maps" }
 services-mlkit-document-scanner = { module = "com.google.android.gms:play-services-mlkit-document-scanner", version.ref = "services-mlkit-document-scanner"}

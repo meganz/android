@@ -7,7 +7,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import mega.privacy.android.shared.ads.AdsContainer
 import mega.privacy.android.shared.ads.AdsContainerViewModel
 
@@ -17,7 +17,7 @@ import mega.privacy.android.shared.ads.AdsContainerViewModel
  */
 @Composable
 fun LegacyAdsContainer(
-    request: AdManagerAdRequest?,
+    request: BannerAdRequest?,
     modifier: Modifier = Modifier,
     isLoggedInUser: Boolean = true,
     viewModel: AdsContainerViewModel = hiltViewModel(),

@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.advertisements
 
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import com.google.android.ump.ConsentInformation
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -82,7 +82,7 @@ class AdsViewModelTest {
             underTest.cancelRefreshAds()
 
             assertThat(underTest.uiState.value.request).isNotNull()
-            assertThat(underTest.uiState.value.request).isInstanceOf(AdManagerAdRequest::class.java)
+            assertThat(underTest.uiState.value.request).isInstanceOf(BannerAdRequest::class.java)
             assertThat(underTest.uiState.value.isAdsFeatureEnabled).isTrue()
             verify(consentInformation).canRequestAds()
         }

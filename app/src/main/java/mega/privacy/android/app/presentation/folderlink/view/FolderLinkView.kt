@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -122,7 +122,7 @@ internal fun FolderLinkView(
     onDisputeTakeDownClicked: (String) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
-    request: AdManagerAdRequest?,
+    request: BannerAdRequest?,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
