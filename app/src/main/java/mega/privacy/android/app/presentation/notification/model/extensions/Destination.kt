@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
-import mega.privacy.android.navigation.destination.ContactsNavKey
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 
@@ -87,7 +87,7 @@ internal fun UserAlert.destination(): NavKey? {
             if (contact.isVisible) {
                 contact.email?.let { ContactInfoNavKey(it) }
             } else if (contact.hasPendingRequest) {
-                ContactsNavKey(ContactsNavKey.NavType.ReceivedRequests)
+                ContactRequestsNavKey(ContactRequestsNavKey.NavType.ReceivedRequests)
             } else null
 
         is ScheduledMeetingAlert -> ChatNavKey(chatId, Constants.ACTION_CHAT_SHOW_MESSAGES)

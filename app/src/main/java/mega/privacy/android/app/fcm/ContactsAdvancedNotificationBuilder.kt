@@ -22,6 +22,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.icon.pack.R
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.navigation.megaNavigator
@@ -329,7 +330,7 @@ class ContactsAdvancedNotificationBuilder(
     }
 
     private suspend fun getIPCPendingIntent(requestCode: Int) =
-        context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ContactsActivity, ContactsNavKey>(
+        context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ContactsActivity, ContactRequestsNavKey>(
             context = context,
             createPendingIntent = {
                 PendingIntent.getActivity(
@@ -339,7 +340,7 @@ class ContactsAdvancedNotificationBuilder(
                     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
                 )
             },
-            singleActivityDestination = { ContactsNavKey(navType = ContactsNavKey.NavType.ReceivedRequests) }
+            singleActivityDestination = { ContactRequestsNavKey(navType = ContactRequestsNavKey.NavType.ReceivedRequests) }
         )
 
     private suspend fun buildSummaryAPC(): Notification {
@@ -378,7 +379,7 @@ class ContactsAdvancedNotificationBuilder(
                     PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
                 )
             },
-            singleActivityDestination = { ContactsNavKey() }
+            singleActivityDestination = { ContactsNavKey }
         )
 
     fun removeAllIncomingContactNotifications() {

@@ -54,7 +54,7 @@ object StorageItem : NavDrawerItem.Account(
 class ContactsItem(
     monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
 ) : NavDrawerItem.Account(
-    destination = ContactsNavKey(ContactsNavKey.NavType.List),
+    destination = ContactsNavKey,
     icon = IconPack.Medium.Thin.Outline.UserSquare,
     title = sharedR.string.general_section_contacts,
     badge = monitorContactRequestsUseCase().map { contactRequestLists ->

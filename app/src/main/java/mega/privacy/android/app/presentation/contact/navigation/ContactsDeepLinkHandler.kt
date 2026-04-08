@@ -11,8 +11,8 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.contact.ContactLinkQueryFromLinkUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.destination.ContactsNavKey
-import mega.privacy.android.navigation.destination.ContactsNavKey.NavType
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey.NavType
 import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import javax.inject.Inject
@@ -29,7 +29,7 @@ class ContactsDeepLinkHandler @Inject constructor(
         uri: Uri,
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? = when (regexPatternType) {
-        PENDING_CONTACTS_LINK -> listOf(ContactsNavKey(NavType.ReceivedRequests))
+        PENDING_CONTACTS_LINK -> listOf(ContactRequestsNavKey(NavType.ReceivedRequests))
 
         else -> null
     }

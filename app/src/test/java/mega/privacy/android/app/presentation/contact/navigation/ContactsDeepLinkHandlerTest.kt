@@ -11,8 +11,8 @@ import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.contact.ContactLinkQueryFromLinkUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.destination.ContactsNavKey
-import mega.privacy.android.navigation.destination.ContactsNavKey.NavType
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey.NavType
 import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -70,7 +70,7 @@ class ContactsDeepLinkHandlerTest {
             .getNavKeysInternal(uri, PENDING_CONTACTS_LINK, isLoggedIn)
 
         if (isLoggedIn) {
-            assertThat(actual).containsExactly(ContactsNavKey(NavType.ReceivedRequests))
+            assertThat(actual).containsExactly(ContactRequestsNavKey(NavType.ReceivedRequests))
             verifyNoInteractions(snackbarEventQueue)
         } else {
             assertThat(actual).isEmpty()

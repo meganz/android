@@ -3,8 +3,8 @@ package mega.privacy.android.app.presentation.extensions.contacts
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.navigation.destination.ContactsNavKey
-import mega.privacy.android.navigation.destination.ContactsNavKey.NavType
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey.NavType
 import mega.privacy.android.shared.resources.R as sharedR
 
 internal fun InviteContactRequest.getMessage(context: Context, email: String) = when (this) {
@@ -46,9 +46,9 @@ internal fun InviteContactRequest.getAction(context: Context) = when (this) {
 internal fun InviteContactRequest.getNavigation() = when (this) {
     InviteContactRequest.Sent,
     InviteContactRequest.AlreadySent,
-        -> ContactsNavKey(NavType.SentRequests)
+        -> ContactRequestsNavKey(NavType.SentRequests)
 
-    InviteContactRequest.AlreadyReceived -> ContactsNavKey(NavType.ReceivedRequests)
+    InviteContactRequest.AlreadyReceived -> ContactRequestsNavKey(NavType.ReceivedRequests)
 
     else -> null
 }

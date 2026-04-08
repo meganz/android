@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.extensions.contacts.getAction
 import mega.privacy.android.app.presentation.extensions.contacts.getMessage
 import mega.privacy.android.app.presentation.extensions.contacts.getNavigation
 import mega.privacy.android.navigation.contract.queue.snackbar.snackbarEventQueue
-import mega.privacy.android.navigation.destination.ContactsNavKey
+import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -23,7 +23,7 @@ internal fun ContactLinkDialog(
     inviteContact: () -> Unit,
     viewContact: () -> Unit,
     onDismiss: () -> Unit,
-    navigateToContactRequests: (ContactsNavKey) -> Unit,
+    navigateToContactRequests: (ContactRequestsNavKey) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current

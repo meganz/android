@@ -36,14 +36,18 @@ data class WebSiteNavKey(
 
 @Serializable
 @Parcelize
-data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey, Parcelable {
+data object ContactsNavKey : NavKey, Parcelable
+
+@Serializable
+@Parcelize
+data class ContactRequestsNavKey(val navType: NavType) : NavKey, Parcelable {
     @Keep
     enum class NavType {
-        List,
         SentRequests,
         ReceivedRequests,
     }
 }
+
 
 /**
  * Navigation key for ChatHostActivity

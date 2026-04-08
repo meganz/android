@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.nav
 import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.contactsRequestLegacyDestination
 import mega.privacy.android.app.presentation.fileexplorer.fileExplorer
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
@@ -63,6 +64,7 @@ class LegacyCoreActivityFeatureGraph(
             settingsCameraUploadsNavigationDestination(navigationHandler::back)
             searchLegacyDestination(navigationHandler::back)
             contactsLegacyDestination(navigationHandler::back)
+            contactsRequestLegacyDestination(navigationHandler::back)
             inviteContactLegacyDestination(navigationHandler::back)
             authenticityCredentialsLegacyDestination(navigationHandler::back)
             chatLegacyDestination(navigationHandler::back)
