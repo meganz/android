@@ -75,6 +75,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.LinksUtil
@@ -411,7 +412,16 @@ class ImagePreviewActivity : BaseActivity() {
 
     private fun renameNode(imageNode: ImageNode) {
         val node = MegaNode.unserialize(imageNode.serializedData)
-        MegaNodeDialogUtil.showRenameNodeDialog(this, node, this, null)
+        val snackbarShower = object : SnackbarShower {
+            override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+                content?.let { viewModel.setResultMessage(it) }
+            }
+
+            override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
+                viewModel.setResultMessage(content)
+            }
+        }
+        MegaNodeDialogUtil.showRenameNodeDialog(this, node, snackbarShower, null)
     }
 
     private fun hideNode(
