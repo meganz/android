@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":core:transfers"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":shared:nodes"))
+    implementation(project(":shared:transfers"))
 
     implementation(platform(androidx.compose.bom))
     implementation(androidx.hilt.navigation)

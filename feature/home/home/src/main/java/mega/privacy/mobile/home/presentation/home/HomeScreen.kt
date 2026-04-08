@@ -40,10 +40,8 @@ import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
-import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
-import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -60,6 +58,8 @@ import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.transfers.components.UploadingFiles
+import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 import mega.privacy.mobile.analytics.event.HomeFabOptionsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.HomeSearchBarPressedEvent
 import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration

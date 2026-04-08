@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.upload
+package mega.privacy.android.shared.transfers.components
 
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
@@ -23,7 +23,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
-import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 import java.io.IOException
 
 @Composable
@@ -67,11 +68,13 @@ fun UploadingFiles(
         uiState.uploadErrorEvent,
         onConsumed = viewModel::onConsumeUploadErrorEvent
     ) { error ->
-        if (error is IOException) {
-            snackbarHostState?.showAutoDurationSnackbar(resource.getString(NodesR.string.error_not_enough_free_space))
-        } else {
-            snackbarHostState?.showAutoDurationSnackbar(resource.getString(NodesR.string.error_temporary_unavaible))
-        }
+        snackbarHostState?.showAutoDurationSnackbar(
+            if (error is IOException) {
+                resource.getString(sharedR.string.general_transfer_error_not_enough_free_space)
+            } else {
+                resource.getString(sharedR.string.general_transfer_error_temporary_unavaible)
+            }
+        )
     }
 
     EventEffect(

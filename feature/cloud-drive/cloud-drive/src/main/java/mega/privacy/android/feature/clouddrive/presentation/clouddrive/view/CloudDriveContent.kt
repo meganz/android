@@ -43,10 +43,8 @@ import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeD
 import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
-import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
-import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -80,6 +78,8 @@ import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.transfers.components.UploadingFiles
+import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 import mega.privacy.mobile.analytics.event.CloudDriveChildNodeMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveEmptyStateAddFilesPressedEvent
 import mega.privacy.mobile.analytics.event.SortButtonPressedEvent

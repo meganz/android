@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.upload
+package mega.privacy.android.shared.transfers.model
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent

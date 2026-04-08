@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":shared:nodes"))
+    implementation(project(":shared:transfers"))
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

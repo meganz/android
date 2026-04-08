@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.upload
+package mega.privacy.android.shared.model
 
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -104,7 +106,7 @@ class UploadFileViewModelTest {
         val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
         val entities = listOf(mock<DocumentEntity>())
         val collisions = emptyList<FileNameCollision>()
-        val rootNode = mock<mega.privacy.android.domain.entity.node.TypedNode>().stub {
+        val rootNode = mock<TypedNode>().stub {
             on { id } doReturn rootNodeId
         }
 

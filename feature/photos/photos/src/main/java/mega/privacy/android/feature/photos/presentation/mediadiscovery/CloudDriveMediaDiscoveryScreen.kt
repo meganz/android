@@ -71,10 +71,8 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
-import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
-import mega.privacy.android.core.nodecomponents.upload.rememberUploadUrisEventState
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -109,6 +107,8 @@ import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.transfers.components.UploadingFiles
+import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime

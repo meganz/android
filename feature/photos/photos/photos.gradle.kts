@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":resources:string-resources"))
     implementation(project(":feature:photos:photos-snowflake-components"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
+    implementation(project(":shared:transfers"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)

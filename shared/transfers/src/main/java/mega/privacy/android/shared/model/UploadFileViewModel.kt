@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.upload
+package mega.privacy.android.shared.transfers.model
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
