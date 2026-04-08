@@ -124,4 +124,9 @@ object MegaDatabaseConstant {
      * Table for text editor scroll state
      */
     const val TABLE_TEXT_EDITOR_SCROLL = "text_editor_scroll"
+
+    /**
+     * Table for recently viewed link
+     */
+    const val TABLE_RECENTLY_VIEWED_LINK = "recently_viewed_link"
 }
