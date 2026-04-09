@@ -19,6 +19,8 @@ import java.io.File
  * @property parentUri The URI of the parent folder of the completed transfer.
  * @property fileUri The URI of the completed transfer file.
  * @property amINodeOwner Indicates if the user is the owner of the node associated with the completed transfer.
+ * @property isNodeInRubbishBin Indicates if the node associated with the completed transfer is in the rubbish bin.
+ * @property node The node associated with the completed transfer, if it still exists.
  * @property isOnline Indicates if the device is currently online.
  * @property openWithEvent Event to handle opening the completed transfer with another app.
  * @property shareLinkEvent Event to handle sharing a link to the completed transfer.
@@ -29,6 +31,8 @@ data class CompletedTransferActionsUiState(
     val parentUri: Uri? = null,
     val fileUri: Uri? = null,
     val amINodeOwner: Boolean = false,
+    val isNodeInRubbishBin: Boolean = false,
+    val node: UnTypedNode? = null,
     val isOnline: Boolean = true,
     val openWithEvent: StateEventWithContent<OpenWithEvent> = consumed(),
     val shareLinkEvent: StateEventWithContent<ShareLinkEvent> = consumed(),
@@ -37,7 +41,8 @@ data class CompletedTransferActionsUiState(
     val canViewInFolder
         get() = completedTransfer != null &&
                 ((completedTransfer.isContentUriDownload && fileUri != null)
-                        || completedTransfer.isContentUriDownload.not())
+                        || (completedTransfer.type.isDownloadType() && !completedTransfer.isContentUriDownload)
+                        || (completedTransfer.type.isDownloadType().not() && node != null))
 
     val canOpenWith
         get() = completedTransfer != null
@@ -45,7 +50,7 @@ data class CompletedTransferActionsUiState(
                 && fileUri != null
 
     val canShareLink
-        get() = completedTransfer != null && amINodeOwner
+        get() = completedTransfer != null && amINodeOwner && !isNodeInRubbishBin
 }
 
 /**

@@ -49,7 +49,7 @@ class CompletedTransferActionsBottomSheetTest {
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private val onOpenWith = mock<(CompletedTransfer) -> Unit>()
-    private val onShareLink = mock<(Long) -> Unit>()
+    private val onShareLink = mock<() -> Unit>()
     private val onClearTransfer = mock<(CompletedTransfer) -> Unit>()
     private val onDismissSheet = mock<() -> Unit>()
     private val onViewInFolder = mock<(CompletedTransfer) -> Unit>()
@@ -126,6 +126,7 @@ class CompletedTransferActionsBottomSheetTest {
             completedUpload, CompletedTransferActionsUiState(
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
+                node = mock<mega.privacy.android.domain.entity.node.FileNode>(),
             )
         )
 
@@ -156,6 +157,7 @@ class CompletedTransferActionsBottomSheetTest {
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
                 isOnline = true,
+                node = mock<mega.privacy.android.domain.entity.node.FileNode>(),
             )
         )
 
@@ -201,7 +203,7 @@ class CompletedTransferActionsBottomSheetTest {
             onNodeWithTag(TEST_TAG_SHARE_LINK_ACTION)
                 .performSemanticsAction(SemanticsActions.OnClick)
 
-            verify(onShareLink).invoke(completedDownload.handle)
+            verify(onShareLink).invoke()
             verifyNoInteractions(onDismissSheet)
         }
     }
@@ -232,6 +234,7 @@ class CompletedTransferActionsBottomSheetTest {
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
                 isOnline = true,
+                node = mock<mega.privacy.android.domain.entity.node.FileNode>(),
             )
         )
 

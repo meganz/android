@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
@@ -66,6 +67,7 @@ class CompletedTransferActionsViewModelTest {
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getOfflineNodeInformationByNodeIdUseCase =
         mock<GetOfflineNodeInformationByNodeIdUseCase>()
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
 
     @TempDir
     lateinit var temporaryFolder: File
@@ -148,6 +150,7 @@ class CompletedTransferActionsViewModelTest {
             fileTypeInfoMapper = fileTypeInfoMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getOfflineNodeInformationByNodeIdUseCase = getOfflineNodeInformationByNodeIdUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
         )
     }
 
@@ -163,6 +166,7 @@ class CompletedTransferActionsViewModelTest {
             fileTypeInfoMapper,
             getFeatureFlagValueUseCase,
             getOfflineNodeInformationByNodeIdUseCase,
+            isNodeInRubbishBinUseCase,
         )
 
         wheneverBlocking { monitorConnectivityUseCase() } doReturn flowOf(true)
@@ -358,7 +362,9 @@ class CompletedTransferActionsViewModelTest {
 
         initializeTest()
 
-        underTest.shareLink(completedDownload.handle)
+        underTest.checkCompletedTransferActions(completedDownload)
+        advanceUntilIdle()
+        underTest.shareLink()
 
         underTest.uiState.test {
             assertThat(awaitItem().shareLinkEvent).isEqualTo(expected)
@@ -373,10 +379,66 @@ class CompletedTransferActionsViewModelTest {
 
         initializeTest()
 
-        underTest.shareLink(completedDownload.handle)
+        underTest.checkCompletedTransferActions(completedDownload)
+        advanceUntilIdle()
+        underTest.shareLink()
 
         underTest.uiState.test {
             assertThat(awaitItem().shareLinkEvent).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun `test that canShareLink is false when node is in rubbish bin`() = runTest {
+        whenever(getNodeAccessPermission(NodeId(completedDownload.handle))) doReturn AccessPermission.OWNER
+        whenever(isNodeInRubbishBinUseCase(NodeId(completedDownload.handle))) doReturn true
+
+        initializeTest()
+
+        underTest.checkCompletedTransferActions(completedDownload)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.amINodeOwner).isTrue()
+            assertThat(state.isNodeInRubbishBin).isTrue()
+            assertThat(state.canShareLink).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canViewInFolder is false for upload when node does not exist`() = runTest {
+        whenever(getNodeByHandleUseCase(completedUpload.handle)) doReturn null
+
+        initializeTest()
+
+        underTest.checkCompletedTransferActions(completedUpload)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.node).isNull()
+            assertThat(state.canViewInFolder).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that canViewInFolder is true for download when node does not exist`() = runTest {
+        val regularDownload = completedDownload.copy(
+            originalPath = "/storage/emulated/0/Download/fileName.txt",
+            path = "/storage/emulated/0/Download/fileName.txt",
+        )
+        whenever(getNodeByHandleUseCase(regularDownload.handle)) doReturn null
+
+        initializeTest()
+
+        underTest.checkCompletedTransferActions(regularDownload)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.node).isNull()
+            assertThat(state.canViewInFolder).isTrue()
         }
     }
 

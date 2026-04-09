@@ -30,6 +30,7 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.sheets.BottomSheetAction
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
@@ -46,7 +47,6 @@ import mega.privacy.android.app.presentation.transfers.view.completed.TEST_TAG_C
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.TimeUtils
-import mega.android.core.ui.components.sheets.BottomSheetAction
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -117,7 +117,7 @@ fun CompletedTransferActionsBottomSheet(
     uiState: CompletedTransferActionsUiState,
     navigationHandler: NavigationHandler?,
     onOpenWith: (CompletedTransfer) -> Unit,
-    onShareLink: (Long) -> Unit,
+    onShareLink: () -> Unit,
     onClearTransfer: (CompletedTransfer) -> Unit,
     onViewInFolder: (CompletedTransfer) -> Unit,
     onConsumeOpenWithEvent: () -> Unit,
@@ -181,7 +181,7 @@ fun CompletedTransferActionsBottomSheet(
                 onClick = {
                     Analytics.tracker.trackEvent(CompletedTransfersItemShareMenuItemEvent)
                     if (uiState.isOnline(coroutineScope, snackbarHostState, context)) {
-                        onShareLink(handle)
+                        onShareLink()
                     }
                 },
             )
