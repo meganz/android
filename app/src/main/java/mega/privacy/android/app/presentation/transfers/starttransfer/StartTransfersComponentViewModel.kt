@@ -469,6 +469,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     startDownloadingAfterCheckSaveDestination(destination)
                 }
             }
+        } else {
+            consumeAskDestination()
         }
     }
 
