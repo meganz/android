@@ -534,6 +534,24 @@ class StartTransfersComponentViewModelTest {
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
         }
 
+    @Test
+    fun `test that askDestinationForDownload is reset when checkSaveDestinationAndStartDownload is invoked with null uri`() =
+        runTest {
+            commonStub()
+            val startDownloadNode = TransferTriggerEvent.StartDownloadNode(
+                nodes = nodes,
+                withStartMessage = false,
+            )
+
+            whenever(shouldAskDownloadDestinationUseCase()).thenReturn(true)
+
+            underTest.startDownloadWithoutConfirmation(startDownloadNode)
+            assertThat(underTest.uiState.value.askDestinationForDownload).isNotNull()
+
+            underTest.checkSaveDestinationAndStartDownload(null)
+
+            assertThat(underTest.uiState.value.askDestinationForDownload).isNull()
+        }
 
     @Test
     fun `test that setStorageDownloadAskAlwaysUseCase is set to true when alwaysAskForDestination is invoked`() =
