@@ -16,14 +16,13 @@ import javax.inject.Singleton
  *
  * @property coroutineScope
  * @property appStartInitialisers
- * @property preLoginInitialisers
  * @property postLoginInitialisers
  */
 @Singleton
 class GlobalInitialiser @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
     private val appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>,
-    private val postLoginInitialisers: Set<@JvmSuppressWildcards PostLoginInitialiser>,
+    private val postLoginInitialisers: dagger.Lazy<Set<@JvmSuppressWildcards PostLoginInitialiser>>,
 ) {
     private var onAppStartJob: Job? = null
     private var onPostLoginJob: Job? = null
@@ -48,7 +47,7 @@ class GlobalInitialiser @Inject constructor(
         Timber.d("Starting post-login initialisation")
         onPostLoginJob?.cancel()
         onPostLoginJob = coroutineScope.launch {
-            postLoginInitialisers.forEach { initialiser ->
+            postLoginInitialisers.get().forEach { initialiser ->
                 launch {
                     try {
                         initialiser(session, isFastLogin)

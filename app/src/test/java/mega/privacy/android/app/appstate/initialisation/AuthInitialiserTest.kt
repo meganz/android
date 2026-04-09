@@ -108,7 +108,7 @@ class AuthInitialiserTest {
         underTest = GlobalInitialiser(
             coroutineScope = testScope,
             appStartInitialisers = appStartInitialisers,
-            postLoginInitialisers = postLoginInitialisers,
+            postLoginInitialisers = { postLoginInitialisers },
         )
 
     }

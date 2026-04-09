@@ -21,8 +21,8 @@ import coil3.gif.GifDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.svg.SvgDecoder
 import coil3.video.VideoFrameDecoder
-import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import dagger.Lazy
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -30,6 +30,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
@@ -220,6 +221,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     private val meetingListener = MeetingListener()
     private val soundsController = CallSoundsController()
+    private var callSoundsJob: Job? = null
 
     private fun handleUncaughtException(throwable: Throwable) {
         Timber.e(throwable, "UNCAUGHT EXCEPTION")
@@ -423,7 +425,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
      * Check the changes of the meeting to play the right sound
      */
     private fun checkCallSounds() {
-        applicationScope.launch {
+        callSoundsJob?.cancel()
+        callSoundsJob = applicationScope.launch {
             monitorCallSoundsUseCase()
                 .collectLatest { next: CallSoundType ->
                     soundsController.playSound(next)
