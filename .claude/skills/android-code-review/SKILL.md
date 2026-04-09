@@ -68,6 +68,8 @@ Using the dimensions and checklists defined below, analyze each changed file for
 
 For large PRs (> 500 lines), prioritize core business logic files.
 
+**String resource check**: Scan the diff for any changes to `*strings*.xml` or `res/values/*.xml` files. Collect every newly added `<string name="...">` entry (diff lines starting with a single `+` but **not** `+++` diff header lines). Lines starting with `-` are removals and must be excluded. Record the string key and the file it appears in — this list will be used in the `🌐 New Strings — Weblate Sync Required` section of the report.
+
 ### Step 3 — Generate Review Report
 Output the report following the Standard Output Format defined below.
 
@@ -502,6 +504,7 @@ fun `test that init does not call loginToFolderUseCase`() { ... }
 - [ ] KDoc present on public API classes, functions, and interfaces
 - [ ] Build files use module name as filename (e.g., `feature/home/home.gradle.kts`)
 - [ ] Convention plugins used for build configuration (`mega.android.library`, `mega.android.hilt`, etc.)
+- [ ] New strings added to XML resource files (e.g., `shared_strings.xml`) have been synced to Weblate
 
 **Common Issues:**
 ```kotlin
@@ -539,6 +542,12 @@ All review reports must strictly follow this format:
 - **Files Changed**: X
 - **Review Date**: YYYY-MM-DD HH:mm
 - **Overall**: [One-sentence overall assessment]
+
+## 🌐 New Strings — Weblate Sync Required
+> ⚠️ New string keys were detected in this PR. Please ensure they are added to Weblate before merging.
+> `string_key_one`, `string_key_two`
+
+[Omit this section entirely if no new strings were detected in the diff.]
 
 ## Issue Overview
 | Severity | Count |

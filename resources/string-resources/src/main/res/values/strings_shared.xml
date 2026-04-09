@@ -2642,10 +2642,6 @@
     <string name="open_link_dialog_title">Open link</string>
     <!-- Hint text for the open link input field -->
     <string name="open_link_dialog_hint">Paste link</string>
-    <!-- Title for the playlist option in video player more options -->
-    <string name="video_player_more_options_playlist_option">Playlist</string>
-    <!-- Title for the lock option in video player more options -->
-    <string name="video_player_more_options_lock_option">Lock video player</string>
     <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
     <string name="cloud_explorer_select_destination_title">Select destination</string>
     <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
@@ -2656,4 +2652,8 @@
     <string name="general_transfer_error_not_enough_free_space">Not enough free space on your device</string>
     <!-- General transfer error shown when a transfer begins, whether upload or download, and the file or node is unavailable for an unknown reason -->
     <string name="general_transfer_error_temporary_unavaible">Resource temporarily not available, please try again later</string>
+    <!-- Title for the playlist option in video player more options -->
+    <string name="video_player_more_options_playlist_option">Playlist</string>
+    <!-- Title for the lock option in video player more options -->
+    <string name="video_player_more_options_lock_option">Lock video player</string>
 </resources>
