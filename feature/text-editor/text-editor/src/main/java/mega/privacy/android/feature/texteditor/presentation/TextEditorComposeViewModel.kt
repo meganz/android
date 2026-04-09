@@ -557,7 +557,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private fun emitShareEffect() {
-        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (args.nodeHandle == INVALID_NODE_HANDLE && args.localPath.isNullOrBlank()) return
         val name = _uiState.value.fileName.ifBlank { args.fileName.orEmpty() }.ifBlank { null }
         if (!args.localPath.isNullOrBlank()) {
             _uiState.update {

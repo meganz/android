@@ -283,6 +283,25 @@ internal class TextEditorComposeViewModelTest {
         )
     }
 
+    @Test
+    fun `test that onMenuAction Share triggers Share with localPath for offline file`() {
+        initUnderTest(
+            nodeHandle = -1L,
+            fileName = "offline.txt",
+            localPath = "/data/offline/offline.txt",
+        )
+        underTest.onMenuAction(TextEditorTopBarAction.Share)
+        val ev = underTest.uiState.value.nodeEffectEvent
+        check(ev is StateEventWithContentTriggered<*>)
+        assertThat(ev.content).isEqualTo(
+            TextEditorNodeEffect.Share(
+                nodeHandle = -1L,
+                localPath = "/data/offline/offline.txt",
+                fileName = "offline.txt",
+            ),
+        )
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `test that isContentDirty returns true when chunk state is edited`() = runTest {
