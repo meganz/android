@@ -21,6 +21,7 @@ import mega.privacy.android.data.repository.DefaultCancelTokenRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
+import mega.privacy.android.data.repository.DefaultContinueWhereLeftOffRepository
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
@@ -97,6 +98,7 @@ import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ClipboardRepository
 import mega.privacy.android.domain.repository.ContactsRepository
+import mega.privacy.android.domain.repository.ContinueWhereLeftOffRepository
 import mega.privacy.android.domain.repository.DocumentSectionRepository
 import mega.privacy.android.domain.repository.DomainNameMigrationRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
@@ -416,4 +418,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindViewedLinksRepository(implementation: ViewedLinksRepositoryImpl): ViewedLinksRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindContinueWhereLeftOffRepository(
+        implementation: DefaultContinueWhereLeftOffRepository,
+    ): ContinueWhereLeftOffRepository
 }

@@ -7,11 +7,11 @@ import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_RECENTLY_USED_TYPE
 
 /**
- * Lookup table for recently used content types (pdf, video, audio, text_editor).
+ * Lookup table for recently used content types (PDF, Video, Audio, TextEditor).
  * Seeded on database migration.
  *
  * @property typeId The unique identifier for the type.
- * @property name The type name (e.g. "pdf", "video", "audio", "text_editor").
+ * @property name The type name matching [RecentlyUsedType] enum names (e.g. "PDF", "Video", "Audio", "TextEditor").
  */
 @Entity(
     tableName = TABLE_RECENTLY_USED_TYPE,

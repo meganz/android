@@ -34,6 +34,9 @@ import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.dao.RecentSearchDao
+import mega.privacy.android.data.database.dao.RecentlyUsedDao
+import mega.privacy.android.data.database.dao.RecentlyUsedTypeDao
+import mega.privacy.android.data.database.dao.TextEditorScrollDao
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import timber.log.Timber
 import java.io.File
@@ -242,4 +245,19 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideRecentSearchDao(database: MegaDatabase): RecentSearchDao =
         database.recentSearchDao()
+
+    @Provides
+    @Singleton
+    internal fun provideRecentlyUsedDao(database: MegaDatabase): RecentlyUsedDao =
+        database.recentlyUsedDao()
+
+    @Provides
+    @Singleton
+    internal fun provideRecentlyUsedTypeDao(database: MegaDatabase): RecentlyUsedTypeDao =
+        database.recentlyUsedTypeDao()
+
+    @Provides
+    @Singleton
+    internal fun provideTextEditorScrollDao(database: MegaDatabase): TextEditorScrollDao =
+        database.textEditorScrollDao()
 }

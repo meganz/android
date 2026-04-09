@@ -9,9 +9,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 internal class AutoMigrationSpec118to119 : AutoMigrationSpec {
     override fun onPostMigrate(db: SupportSQLiteDatabase) {
-        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (1, 'pdf')")
-        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (2, 'video')")
-        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (3, 'audio')")
-        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (4, 'text_editor')")
+        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (1, 'PDF')")
+        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (2, 'Video')")
+        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (3, 'Audio')")
+        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (4, 'TextEditor')")
     }
 }
