@@ -96,7 +96,7 @@ private val BottomBarSlideDistance = 100.dp
 fun TextEditorScreen(
     viewModel: TextEditorComposeViewModel,
     onBack: () -> Unit,
-    onOpenNodeOptions: () -> Unit,
+    onOpenNodeOptions: (() -> Unit)? = null,
     onTransfer: (TransferTriggerEvent) -> Unit = {},
     onShare: (localPath: String?, fileName: String?) -> Unit = { _, _ -> },
 ) {
@@ -394,7 +394,7 @@ private fun CollapsingTopBar(
     lazyListState: LazyListState,
     viewModel: TextEditorComposeViewModel,
     onBack: () -> Unit,
-    onOpenNodeOptions: () -> Unit,
+    onOpenNodeOptions: (() -> Unit)?,
 ) {
     Layout(
         content = {
@@ -693,19 +693,20 @@ private fun TextEditorViewModeTopAppBar(
     title: String,
     onBack: () -> Unit,
     onMenuAction: (TextEditorTopBarAction) -> Unit,
-    onOpenNodeOptions: () -> Unit,
+    onOpenNodeOptions: (() -> Unit)?,
     onTitleClick: () -> Unit,
 ) {
+    val actions = buildList {
+        add(TextEditorTopBarAction.LineNumbers)
+        if (onOpenNodeOptions != null) add(TextEditorTopBarAction.More)
+    }
     MegaTopAppBar(
         title = title,
         navigationType = AppBarNavigationType.Back(onBack),
-        actions = listOf(
-            TextEditorTopBarAction.LineNumbers,
-            TextEditorTopBarAction.More,
-        ),
+        actions = actions,
         onActionPressed = {
             when (it) {
-                is TextEditorTopBarAction.More -> onOpenNodeOptions()
+                is TextEditorTopBarAction.More -> onOpenNodeOptions?.invoke()
                 is TextEditorTopBarAction -> onMenuAction(it)
                 else -> Unit
             }
