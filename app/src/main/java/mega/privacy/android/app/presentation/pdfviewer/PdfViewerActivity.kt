@@ -37,7 +37,6 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
@@ -1739,32 +1738,11 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
 
     override fun loadComplete(nbPages: Int) {
         defaultScrollHandle?.setTotalPages(nbPages)
-        val meta = binding.pdfView.documentMeta
-        Timber.d("Title = ${meta.title}")
-        Timber.d("Author = ${meta.author}")
-        Timber.d("Subject = ${meta.subject}")
-        Timber.d("Keywords = ${meta.keywords}")
-        Timber.d("Creator = ${meta.creator}")
-        Timber.d("Producer = ${meta.producer}")
-        Timber.d("Creation Date = ${meta.creationDate}")
-        Timber.d("Mod. Date = ${meta.modDate}")
-        printBookmarksTree(binding.pdfView.tableOfContents, "-")
-        
         // Hide progress bar when loading is complete
         loading = false
         binding.pdfViewerProgressBar.isVisible = false
-        
-        handler?.postDelayed({ if (isToolbarVisible) setToolbarVisibilityHide(200L) }, 2000)
-    }
 
-    @SuppressLint("DefaultLocale")
-    private fun printBookmarksTree(tree: List<Bookmark>, sep: String) {
-        for (b in tree) {
-            Timber.d("$sep ${b.title}, p ${b.pageIdx}")
-            if (b.hasChildren()) {
-                printBookmarksTree(b.children, "$sep-")
-            }
-        }
+        handler?.postDelayed({ if (isToolbarVisible) setToolbarVisibilityHide(200L) }, 2000)
     }
 
     private fun getFileName(uri: Uri?): String? {
