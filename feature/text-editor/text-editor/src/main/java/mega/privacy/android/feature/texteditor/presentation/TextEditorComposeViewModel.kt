@@ -28,8 +28,10 @@ import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
+import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorComposeUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
@@ -61,6 +63,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getTextContentForTextEditorUseCase: GetTextContentForTextEditorUseCase,
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase,
+    private val getShowLineNumbersPreferenceUseCase: GetShowLineNumbersPreferenceUseCase,
+    private val setShowLineNumbersPreferenceUseCase: SetShowLineNumbersPreferenceUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getNodeAccessUseCase: GetNodeAccessUseCase,
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper,
@@ -101,6 +105,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private var lastSavedContent: String = ""
 
     init {
+        viewModelScope.launch {
+            val saved = runCatching { getShowLineNumbersPreferenceUseCase() }.getOrDefault(false)
+            _uiState.update { it.copy(showLineNumbers = saved) }
+        }
         if (args.mode != TextEditorMode.Create) {
             viewModelScope.launch {
                 _uiState.update { it.copy(isFullyLoaded = false) }
@@ -505,7 +513,12 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     fun onMenuAction(action: TextEditorTopBarAction) {
         when (action) {
             TextEditorTopBarAction.LineNumbers -> {
-                _uiState.update { it.copy(showLineNumbers = !it.showLineNumbers) }
+                val newValue = !_uiState.value.showLineNumbers
+                _uiState.update { it.copy(showLineNumbers = newValue) }
+                viewModelScope.launch {
+                    runCatching { setShowLineNumbersPreferenceUseCase(newValue) }
+                        .onFailure { Timber.e(it, "Failed to persist show line numbers preference") }
+                }
             }
 
             TextEditorTopBarAction.Download -> emitDownloadTransferEvent()

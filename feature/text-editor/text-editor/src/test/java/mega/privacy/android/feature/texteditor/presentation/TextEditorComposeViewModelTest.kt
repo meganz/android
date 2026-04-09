@@ -27,8 +27,10 @@ import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
+import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel.Args
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
@@ -58,6 +60,8 @@ internal class TextEditorComposeViewModelTest {
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val exportNodeUseCase: ExportNodeUseCase = mock()
+    private val getShowLineNumbersPreferenceUseCase: GetShowLineNumbersPreferenceUseCase = mock()
+    private val setShowLineNumbersPreferenceUseCase: SetShowLineNumbersPreferenceUseCase = mock()
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
         TextEditorBottomBarActionsMapper()
 
@@ -73,6 +77,8 @@ internal class TextEditorComposeViewModelTest {
             attachMultipleNodesUseCase,
             get1On1ChatIdUseCase,
             exportNodeUseCase,
+            getShowLineNumbersPreferenceUseCase,
+            setShowLineNumbersPreferenceUseCase,
         )
         runBlocking {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
@@ -109,6 +115,8 @@ internal class TextEditorComposeViewModelTest {
             defaultDispatcher = defaultDispatcher,
             getTextContentForTextEditorUseCase = getTextContentForTextEditorUseCase,
             saveTextContentForTextEditorUseCase = saveTextContentForTextEditorUseCase,
+            getShowLineNumbersPreferenceUseCase = getShowLineNumbersPreferenceUseCase,
+            setShowLineNumbersPreferenceUseCase = setShowLineNumbersPreferenceUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getNodeAccessUseCase = getNodeAccessUseCase,
             textEditorBottomBarActionsMapper = textEditorBottomBarActionsMapper,
@@ -237,16 +245,42 @@ internal class TextEditorComposeViewModelTest {
         assertThat(underTest.uiState.value.transferEvent).isEqualTo(consumed())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that onMenuAction LineNumbers toggles showLineNumbers`() {
+    fun `test that onMenuAction LineNumbers toggles showLineNumbers`() = runTest {
         initUnderTest()
+        advanceUntilIdle()
         assertThat(underTest.uiState.value.showLineNumbers).isFalse()
 
         underTest.onMenuAction(TextEditorTopBarAction.LineNumbers)
+        advanceUntilIdle()
         assertThat(underTest.uiState.value.showLineNumbers).isTrue()
 
         underTest.onMenuAction(TextEditorTopBarAction.LineNumbers)
+        advanceUntilIdle()
         assertThat(underTest.uiState.value.showLineNumbers).isFalse()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that onMenuAction LineNumbers persists preference`() = runTest {
+        initUnderTest()
+        advanceUntilIdle()
+
+        underTest.onMenuAction(TextEditorTopBarAction.LineNumbers)
+        advanceUntilIdle()
+
+        verify(setShowLineNumbersPreferenceUseCase).invoke(true)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that showLineNumbers restores persisted preference on init`() = runTest {
+        whenever(getShowLineNumbersPreferenceUseCase()).thenReturn(true)
+        initUnderTest()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.showLineNumbers).isTrue()
     }
 
     @Test
