@@ -116,10 +116,15 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
         val nodeFileName = node.name.ifEmpty { "file.txt" }
         val destFile = getCacheFileUseCase(TEXT_EDITOR_TEMP_FOLDER, nodeFileName)
             ?: throw IllegalStateException("Cannot get cache file for download")
+        val destDir = destFile.parentFile?.absolutePath
+            ?: throw IllegalStateException("Cannot resolve parent directory for download")
+        if (destFile.exists() && destFile.isDirectory) {
+            destFile.deleteRecursively()
+        }
         var finishError: MegaException? = null
         downloadNodeUseCase(
             node = node,
-            destinationPath = destFile.absolutePath,
+            destinationPath = destDir,
             appData = listOf(TransferAppData.BackgroundTransfer),
             isHighPriority = true,
         ).collect { event ->
