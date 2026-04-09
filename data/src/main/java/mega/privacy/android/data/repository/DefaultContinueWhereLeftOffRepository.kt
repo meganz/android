@@ -48,7 +48,7 @@ internal class DefaultContinueWhereLeftOffRepository @Inject constructor(
         recentlyUsedDao.insertAndPrune(
             entity = RecentlyUsedEntity(
                 nodeHandle = nodeHandle,
-                typeId = recentlyUsedTypeIdMapper.toTypeId(type),
+                typeId = recentlyUsedTypeIdMapper(type),
                 fileName = fileName,
                 lastAccessedTimestamp = System.currentTimeMillis()
             ),

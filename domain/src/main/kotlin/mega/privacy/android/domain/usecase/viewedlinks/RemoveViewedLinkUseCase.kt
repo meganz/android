@@ -14,5 +14,5 @@ class RemoveViewedLinkUseCase @Inject constructor(
     /**
      * @param nodeHandle the handle of the node to remove.
      */
-    suspend operator fun invoke(nodeHandle: Long) = viewedLinksRepository.removeLnk(nodeHandle)
+    suspend operator fun invoke(nodeHandle: Long) = viewedLinksRepository.removeLink(nodeHandle)
 }

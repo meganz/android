@@ -32,7 +32,7 @@ interface ViewedLinksRepository {
      *
      * @param nodeHandle the handle of the node to remove.
      */
-    suspend fun removeLnk(nodeHandle: Long)
+    suspend fun removeLink(nodeHandle: Long)
 
     /**
      * Deletes all viewed link entries (both file and folder links).

@@ -13,5 +13,7 @@ internal class AutoMigrationSpec118to119 : AutoMigrationSpec {
         db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (2, 'Video')")
         db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (3, 'Audio')")
         db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (4, 'TextEditor')")
+        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (5, 'FileLink')")
+        db.execSQL("INSERT OR IGNORE INTO recently_used_type (type_id, name) VALUES (6, 'FolderLink')")
     }
 }

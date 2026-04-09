@@ -13,7 +13,7 @@ internal class ContinueWhereLeftOffItemMapper @Inject constructor(
     operator fun invoke(entity: RecentlyUsedEntity): ContinueWhereLeftOffItem =
         ContinueWhereLeftOffItem(
             nodeHandle = entity.nodeHandle,
-            type = recentlyUsedTypeIdMapper.toRecentlyUsedType(entity.typeId),
+            type = recentlyUsedTypeIdMapper(entity.typeId),
             title = entity.fileName,
             lastAccessedTimestamp = entity.lastAccessedTimestamp,
         )

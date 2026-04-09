@@ -22,6 +22,7 @@ import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.RecentSearchDao
 import mega.privacy.android.data.database.dao.RecentlyUsedDao
 import mega.privacy.android.data.database.dao.RecentlyUsedTypeDao
+import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.TextEditorScrollDao
@@ -42,17 +43,18 @@ import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.database.entity.RecentSearchEntity
 import mega.privacy.android.data.database.entity.RecentlyUsedEntity
 import mega.privacy.android.data.database.entity.RecentlyUsedTypeEntity
-import mega.privacy.android.data.database.entity.TextEditorScrollEntity
+import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
+import mega.privacy.android.data.database.entity.TextEditorScrollEntity
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
 import mega.privacy.android.data.database.spec.AutoMigrationDeleteActiveTransfersSpec
 import mega.privacy.android.data.database.spec.AutoMigrationSpec100to101
 import mega.privacy.android.data.database.spec.AutoMigrationSpec102to103
+import mega.privacy.android.data.database.spec.AutoMigrationSpec118to119
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
 import mega.privacy.android.data.database.spec.AutoMigrationSpec81to82
-import mega.privacy.android.data.database.spec.AutoMigrationSpec118to119
 import mega.privacy.android.data.database.spec.AutoMigrationSpec95to96
 import timber.log.Timber
 
@@ -77,6 +79,7 @@ import timber.log.Timber
         RecentSearchEntity::class,
         RecentlyUsedTypeEntity::class,
         RecentlyUsedEntity::class,
+        RecentlyViewedLinkEntity::class,
         TextEditorScrollEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
@@ -122,6 +125,7 @@ import timber.log.Timber
         AutoMigration(116, 117),
         AutoMigration(117, 118, spec = AutoMigrationDeleteActiveTransfersSpec::class),
         AutoMigration(118, 119, spec = AutoMigrationSpec118to119::class),
+        AutoMigration(119, 120),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -161,6 +165,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun recentlyUsedDao(): RecentlyUsedDao
 
     abstract fun recentlyUsedTypeDao(): RecentlyUsedTypeDao
+
+    abstract fun recentlyViewedLinkDao(): RecentlyViewedLinkDao
 
     abstract fun textEditorScrollDao(): TextEditorScrollDao
 

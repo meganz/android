@@ -10,22 +10,30 @@ internal class RecentlyUsedTypeIdMapper @Inject constructor() {
 
     /**
      * Converts a [RecentlyUsedType] to its database type ID.
+     *
+     * @param type
      */
-    fun toTypeId(type: RecentlyUsedType): Int = when (type) {
+    operator fun invoke(type: RecentlyUsedType): Int = when (type) {
         RecentlyUsedType.PDF -> 1
         RecentlyUsedType.Video -> 2
         RecentlyUsedType.Audio -> 3
         RecentlyUsedType.TextEditor -> 4
+        RecentlyUsedType.FileLink -> 5
+        RecentlyUsedType.FolderLink -> 6
     }
 
     /**
      * Converts a database type ID to a [RecentlyUsedType].
+     *
+     * @param typeId
      */
-    fun toRecentlyUsedType(typeId: Int): RecentlyUsedType = when (typeId) {
+    operator fun invoke(typeId: Int): RecentlyUsedType = when (typeId) {
         1 -> RecentlyUsedType.PDF
         2 -> RecentlyUsedType.Video
         3 -> RecentlyUsedType.Audio
         4 -> RecentlyUsedType.TextEditor
+        5 -> RecentlyUsedType.FileLink
+        6 -> RecentlyUsedType.FolderLink
         else -> error("Unknown type ID: $typeId")
     }
 }

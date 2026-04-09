@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 120,
-    "identityHash": "3a944a95f71ad04f4a58fff29349089e",
+    "identityHash": "58b095e129aaf41bd64c9c09cefe56ab",
     "entities": [
       {
         "tableName": "contacts",
@@ -1072,6 +1072,43 @@
         ]
       },
       {
+        "tableName": "recently_viewed_link",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`node_handle` INTEGER NOT NULL, `link_url` TEXT NOT NULL, PRIMARY KEY(`node_handle`), FOREIGN KEY(`node_handle`) REFERENCES `recently_used`(`node_handle`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "nodeHandle",
+            "columnName": "node_handle",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "linkUrl",
+            "columnName": "link_url",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "node_handle"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "recently_used",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "node_handle"
+            ],
+            "referencedColumns": [
+              "node_handle"
+            ]
+          }
+        ]
+      },
+      {
         "tableName": "text_editor_scroll",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`node_handle` INTEGER NOT NULL, `cursor_position` INTEGER NOT NULL, `scroll_spot` REAL NOT NULL, PRIMARY KEY(`node_handle`), FOREIGN KEY(`node_handle`) REFERENCES `recently_used`(`node_handle`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
@@ -1117,7 +1154,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3a944a95f71ad04f4a58fff29349089e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '58b095e129aaf41bd64c9c09cefe56ab')"
     ]
   }
 }

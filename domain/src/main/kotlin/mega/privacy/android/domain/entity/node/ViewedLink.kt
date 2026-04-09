@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.entity.node
 
-import mega.privacy.android.domain.entity.recentactions.RecentlyUsedType
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 
 /**
  * Domain entity representing a file or folder that was opened via a MEGA deep link.

@@ -34,6 +34,7 @@ import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.dao.RecentSearchDao
+import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.dao.RecentlyUsedDao
 import mega.privacy.android.data.database.dao.RecentlyUsedTypeDao
 import mega.privacy.android.data.database.dao.TextEditorScrollDao
@@ -260,4 +261,9 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideTextEditorScrollDao(database: MegaDatabase): TextEditorScrollDao =
         database.textEditorScrollDao()
+
+    @Provides
+    @Singleton
+    internal fun provideRecentlyViewedLinkDao(database: MegaDatabase): RecentlyViewedLinkDao =
+        database.recentlyViewedLinkDao()
 }
