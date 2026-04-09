@@ -38,8 +38,18 @@ class PasscodeProcessLifecycleOwner private constructor() {
     // ground truth counters
     private var startedCounter = 0
     private var resumedCounter = 0
+    private var skipPasscode = false
 
     var observer: PasscodeProcessLifeCycleObserver? = null
+
+    /**
+     * Skip the next passcode check cycle (stop + start).
+     * Call this before launching an external activity (e.g. file/folder picker).
+     * The flag resets automatically when the activity returns to foreground.
+     */
+    fun skipNextPasscodeCheck() {
+        skipPasscode = true
+    }
 
     inner class ActivityInitializationListener(private val activity: Activity) :
         ReportFragment.ActivityInitializationListener {
@@ -88,6 +98,11 @@ class PasscodeProcessLifecycleOwner private constructor() {
         startedCounter++
         if (startedCounter == 1) {
             Timber.d("Process lifecycle event: STARTED \n ${getStateString(activity)}")
+            if (skipPasscode) {
+                Timber.d("Skipping passcode check: returning from external activity")
+                skipPasscode = false
+                return
+            }
             activity?.let {
                 observer?.onStart(
                     data = PasscodeProcessLifeCycleEventData(
@@ -108,7 +123,7 @@ class PasscodeProcessLifecycleOwner private constructor() {
 
     internal fun activityStopped(activity: Activity?) {
         startedCounter--
-        if (startedCounter == 0) {
+        if (startedCounter == 0 && !skipPasscode) {
             Timber.d("Process lifecycle event: STOPPED \n ${getStateString(activity)}")
             activity?.let {
                 observer?.onStop(

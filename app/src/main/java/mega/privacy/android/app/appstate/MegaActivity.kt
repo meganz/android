@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -79,6 +80,7 @@ import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.passcode.navigation.PasscodeNavKey
 import mega.privacy.android.app.presentation.passcode.navigation.passcodeView
+import mega.privacy.android.app.presentation.security.PasscodeProcessLifecycleOwner
 import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
@@ -242,6 +244,37 @@ class MegaActivity : FragmentActivity() {
                 inAppUpdateHandler.checkForInAppUpdateInstallStatus()
             }
         }
+    }
+
+    @Suppress("DEPRECATION")
+    override fun startActivityForResult(intent: Intent, requestCode: Int, options: Bundle?) {
+        if (isExternalIntent(intent)) {
+            PasscodeProcessLifecycleOwner.get().skipNextPasscodeCheck()
+        }
+        super.startActivityForResult(intent, requestCode, options)
+    }
+
+    // For (Document scanner, Google Play In app update, review, etc.)
+    @Suppress("DEPRECATION")
+    override fun startIntentSenderForResult(
+        intent: IntentSender,
+        requestCode: Int,
+        fillInIntent: Intent?,
+        flagsMask: Int,
+        flagsValues: Int,
+        extraFlags: Int,
+        options: Bundle?,
+    ) {
+        if (intent.creatorPackage == packageName) {
+            PasscodeProcessLifecycleOwner.get().skipNextPasscodeCheck()
+        }
+        super.startIntentSenderForResult(
+            intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options
+        )
+    }
+
+    private fun isExternalIntent(intent: Intent): Boolean {
+        return intent.action in EXTERNAL_ACTIONS
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -492,6 +525,19 @@ class MegaActivity : FragmentActivity() {
     }
 
     companion object {
+        /**
+         * External actions that can be performed by the app
+         */
+        val EXTERNAL_ACTIONS = setOf(
+            Intent.ACTION_OPEN_DOCUMENT,
+            Intent.ACTION_OPEN_DOCUMENT_TREE,
+            Intent.ACTION_GET_CONTENT,
+            Intent.ACTION_CREATE_DOCUMENT,
+            Intent.ACTION_PICK,
+            Intent.ACTION_CHOOSER,
+            Intent.ACTION_SEND,
+            Intent.ACTION_SEND_MULTIPLE,
+        )
 
         /**
          * Get Intent to open this activity with Single top and clear top flags with optionals action and message
