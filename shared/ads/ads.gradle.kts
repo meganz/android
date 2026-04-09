@@ -30,9 +30,20 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+            buildConfigField(
+                "String",
+                "REWARDED_AD_UNIT_ID",
+                "\"ca-app-pub-3940256099942544/5224354917\""
+            )
         }
         release {
             buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-2135147798858967/9835644604\"")
+            // TODO will be updated with real ad unit id
+            buildConfigField(
+                "String",
+                "REWARDED_AD_UNIT_ID",
+                "\"ca-app-pub-3940256099942544/5224354917\""
+            )
         }
     }
 }
@@ -78,6 +89,7 @@ dependencies {
     implementation(androidx.bundles.compose.bom)
     implementation(lib.compose.state.events)
     implementation(lib.kotlin.serialisation)
+    implementation(lib.kotlinx.collections.immutable)
     implementation(google.guava)
     implementation(androidx.material3)
     implementation(androidx.navigation3.runtime)
