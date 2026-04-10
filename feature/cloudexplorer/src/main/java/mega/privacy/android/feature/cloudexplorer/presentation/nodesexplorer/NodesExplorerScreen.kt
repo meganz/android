@@ -20,6 +20,7 @@ import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.data.extensions.toUri
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -27,12 +28,13 @@ import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareFilesToMegaUpload
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
@@ -47,12 +49,14 @@ import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventS
 
 @Composable
 fun NodesExplorerScreen(
-    explorerModeData: ExplorerModeData,
+    explorerMode: ExplorerMode,
+    startNavKey: ExplorerNavKey,
     nodeExplorerId: NodeId,
     nodeSourceType: NodeSourceType,
     onCloseExplorerScreen: () -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
+    shareUris: List<UriPath>? = null,
     onStartUpload: (TransferTriggerEvent) -> Unit = {},
 ) {
     val uploadUrisEventState = rememberUploadUrisEventState()
@@ -60,21 +64,19 @@ fun NodesExplorerScreen(
     val folderPickedId = NodeId(folderPickedIdLong)
 
     ExplorerScreen(
-        explorerModeData = explorerModeData,
+        explorerMode = explorerMode,
+        startNavKey = startNavKey,
         isInnerNavigation = true,
         nodeExplorerId = nodeExplorerId,
         nodeSourceType = nodeSourceType,
+        shareUris = shareUris,
         onCloseExplorerScreen = onCloseExplorerScreen,
         onFolderPicked = { nodeId ->
-            when (explorerModeData) {
-                is ExplorerModeData.ShareFilesToMega -> {
-                    folderPickedIdLong = nodeId.longValue
-                    uploadUrisEventState.trigger(
-                        explorerModeData.shareUris.map { it.toUri() }
-                    )
-                }
-
-                else -> {}
+            if (explorerMode == ExplorerMode.ShareFilesToMega && shareUris != null) {
+                folderPickedIdLong = nodeId.longValue
+                uploadUrisEventState.trigger(
+                    shareUris.map { it.toUri() }
+                )
             }
         },
         onFilesPicked = {},
@@ -82,17 +84,13 @@ fun NodesExplorerScreen(
         onNavigate = onNavigate,
     )
 
-    when (explorerModeData) {
-        is ExplorerModeData.ShareFilesToMega -> {
-            ShareFilesToMegaUpload(
-                parentNodeId = folderPickedId,
-                uploadUrisEventState = uploadUrisEventState,
-                onStartUpload = onStartUpload,
-                onCloseExplorerScreen = onCloseExplorerScreen,
-            )
-        }
-
-        else -> {}
+    if (explorerMode == ExplorerMode.ShareFilesToMega) {
+        ShareFilesToMegaUpload(
+            parentNodeId = folderPickedId,
+            uploadUrisEventState = uploadUrisEventState,
+            onStartUpload = onStartUpload,
+            onCloseExplorerScreen = onCloseExplorerScreen,
+        )
     }
 }
 

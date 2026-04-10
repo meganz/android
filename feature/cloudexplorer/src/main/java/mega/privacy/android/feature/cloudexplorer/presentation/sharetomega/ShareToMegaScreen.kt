@@ -14,12 +14,12 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.data.extensions.toUri
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
@@ -45,13 +45,12 @@ fun ShareToMegaScreen(
         val folderPickedId = NodeId(folderPickedIdLong)
 
         ExplorerScreen(
-            explorerModeData = ExplorerModeData.ShareFilesToMega(
-                startNavKey = startNavKey,
-                shareUris = dataUiState.shareUris,
-            ),
+            explorerMode = ExplorerMode.ShareFilesToMega,
+            startNavKey = startNavKey,
             isInnerNavigation = false,
             nodeExplorerId = dataUiState.rootNodeId,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            shareUris = dataUiState.shareUris,
             onCloseExplorerScreen = onNavigateBack,
             onNavigateBack = onNavigateBack,
             onNavigate = onNavigate,

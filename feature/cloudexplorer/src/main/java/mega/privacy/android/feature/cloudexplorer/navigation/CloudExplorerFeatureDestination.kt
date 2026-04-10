@@ -6,7 +6,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.toData
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaViewModel
@@ -62,9 +61,11 @@ class CloudExplorerFeatureDestination : FeatureDestination {
     ) {
         entry<NodesExplorerNavKey> { key ->
             NodesExplorerScreen(
-                explorerModeData = key.explorerMode.toData(key),
+                explorerMode = key.explorerMode,
+                startNavKey = key.startNavKey,
                 nodeExplorerId = key.nodeId,
                 nodeSourceType = key.nodeSourceType,
+                shareUris = key.shareUris,
                 onCloseExplorerScreen = { onCloseExplorerScreen(key.startNavKey) },
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = { onNavigate(it) },

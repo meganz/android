@@ -29,10 +29,12 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.toMode
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.extensions.actionStringId
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.extensions.titleStringId
 import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerContent
 import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerContent
@@ -41,6 +43,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.Nod
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreenContent
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
 import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
+import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
 import mega.privacy.android.shared.resources.R as sharedR
@@ -48,7 +51,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExplorerScreen(
-    explorerModeData: ExplorerModeData,
+    explorerMode: ExplorerMode,
+    startNavKey: ExplorerNavKey,
     isInnerNavigation: Boolean,
     nodeExplorerId: NodeId,
     nodeSourceType: NodeSourceType,
@@ -56,12 +60,12 @@ fun ExplorerScreen(
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
+    shareUris: List<UriPath>? = null,
     tabIndex: Int = CLOUD_TAB_INDEX,
     onFolderPicked: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
     onChatsSelected: (List<Long>) -> Unit = {},
 ) {
-    val shareUris = (explorerModeData as? ExplorerModeData.ShareFilesToMega)?.shareUris
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
     var isProcessingAction by rememberSaveable { mutableStateOf(false) }
@@ -81,14 +85,14 @@ fun ExplorerScreen(
     val nodesExplorerUiState by nodesExplorerViewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
     val nodesExplorerUiStateShared by nodesExplorerViewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
     val incomingSharesExplorerViewModel =
-        if (!isInnerNavigation && explorerModeData.isIncomingAvailable)
+        if (!isInnerNavigation && explorerMode.isIncomingAvailable)
             hiltViewModel<IncomingSharesExplorerViewModel>() else null
     val incomingSharesExplorerUiStateShared =
         incomingSharesExplorerViewModel?.nodeExplorerSharedUiState?.collectAsStateWithLifecycle()
     val favouritesExplorerViewModel =
         if (!isInnerNavigation) hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
             factory.create(
-                args = FavouritesExplorerViewModel.Args(showFiles = !explorerModeData.isFolderPicker)
+                args = FavouritesExplorerViewModel.Args(showFiles = !explorerMode.isFolderPicker)
             )
         } else null
     val favouritesExplorerUiStateShared =
@@ -109,7 +113,7 @@ fun ExplorerScreen(
                 title = if (isInnerNavigation) {
                     nodesExplorerUiState.folderName.text
                 } else {
-                    stringResource(explorerModeData.titleStringId)
+                    stringResource(explorerMode.titleStringId)
                 },
                 actions = buildList {
                     when (selectedTabIndex) {
@@ -118,7 +122,7 @@ fun ExplorerScreen(
                                 //Add search
                                 //Add select all in case explorerMode.isFolderPicker().not()
                             }
-                            if (explorerModeData.isFolderPicker) {
+                            if (explorerMode.isFolderPicker) {
                                 add(
                                     MenuActionWithClick(NewFolderMenuAction) {
                                         if (!isProcessingAction) {
@@ -152,16 +156,16 @@ fun ExplorerScreen(
         bottomBar = {
             InlineAnchoredButtonGroup(
                 modifier = Modifier.testTag(ACTION_BUTTONS_VIEW_TAG),
-                primaryButtonText = stringResource(explorerModeData.actionStringId),
+                primaryButtonText = stringResource(explorerMode.actionStringId),
                 onPrimaryButtonClick = {
                     protectedUserTap {
                         isProcessingAction = true
                         when {
-                            explorerModeData.isFolderPicker && selectedTabIndex != CHAT_TAB_INDEX -> {
+                            explorerMode.isFolderPicker && selectedTabIndex != CHAT_TAB_INDEX -> {
                                 onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
                             }
 
-                            explorerModeData.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX -> {
+                            explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX -> {
                                 //Replace with valid chatId list
                                 onChatsSelected(emptyList())
                             }
@@ -174,7 +178,7 @@ fun ExplorerScreen(
                     }
                 },
                 primaryButtonEnabled = when {
-                    explorerModeData.isFolderPicker -> selectedTabIndex == CLOUD_TAB_INDEX
+                    explorerMode.isFolderPicker -> selectedTabIndex == CLOUD_TAB_INDEX
                     else -> true
                 },
                 textOnlyButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
@@ -206,8 +210,8 @@ fun ExplorerScreen(
                                     NodesExplorerNavKey(
                                         nodeId = nodeId,
                                         nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
-                                        explorerMode = explorerModeData.toMode(),
-                                        startNavKey = explorerModeData.startNavKey,
+                                        explorerMode = explorerMode,
+                                        startNavKey = startNavKey,
                                         shareUris = shareUris,
                                     )
                                 )
@@ -234,8 +238,8 @@ fun ExplorerScreen(
                                         NodesExplorerNavKey(
                                             nodeId = nodeId,
                                             nodeSourceType = incomingSharesExplorerUiStateShared.value.nodeSourceType,
-                                            explorerMode = explorerModeData.toMode(),
-                                            startNavKey = explorerModeData.startNavKey,
+                                            explorerMode = explorerMode,
+                                            startNavKey = startNavKey,
                                             shareUris = shareUris,
                                         )
                                     )
@@ -263,8 +267,8 @@ fun ExplorerScreen(
                                         NodesExplorerNavKey(
                                             nodeId = nodeId,
                                             nodeSourceType = favouritesExplorerUiStateShared.value.nodeSourceType,
-                                            explorerMode = explorerModeData.toMode(),
-                                            startNavKey = explorerModeData.startNavKey,
+                                            explorerMode = explorerMode,
+                                            startNavKey = startNavKey,
                                             shareUris = shareUris,
                                         )
                                     )
@@ -275,7 +279,7 @@ fun ExplorerScreen(
                         )
                     }
                 }
-                if (explorerModeData.isChatAvailable) {
+                if (explorerMode.isChatAvailable) {
                     //Add chat tab
                 }
             },
@@ -297,8 +301,8 @@ fun ExplorerScreen(
                                 NodesExplorerNavKey(
                                     nodeId = it,
                                     nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
-                                    explorerMode = explorerModeData.toMode(),
-                                    startNavKey = explorerModeData.startNavKey,
+                                    explorerMode = explorerMode,
+                                    startNavKey = startNavKey,
                                     shareUris = shareUris,
                                 )
                             )
