@@ -84,12 +84,18 @@ fun VideosTabRoute(
     LaunchedEffect(uiState) {
         if (uiState is VideosTabUiState.Data) {
             onCurrentVideosSearchQueryRequest()
-            if (videosSelectionUiState.count != (uiState as VideosTabUiState.Data).selectedTypedNodes.size) {
-                updateSelectionModeAvailableActions(
-                    (uiState as VideosTabUiState.Data).selectedTypedNodes,
-                    NodeSourceType.CLOUD_DRIVE
-                )
-            }
+        }
+    }
+
+    LaunchedEffect(uiState, videosSelectionUiState.count) {
+        if (uiState is VideosTabUiState.Data) {
+            updateSelectionModeAvailableActions(
+                if (videosSelectionUiState.count > 0)
+                    (uiState as VideosTabUiState.Data).selectedTypedNodes
+                else
+                    emptyList(),
+                NodeSourceType.CLOUD_DRIVE
+            )
         }
     }
 
