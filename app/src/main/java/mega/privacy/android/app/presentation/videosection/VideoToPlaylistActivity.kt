@@ -61,11 +61,18 @@ class VideoToPlaylistActivity : ComponentActivity() {
                                     viewModel = viewModel,
                                     addedVideoFinished = { titles ->
                                         val message = if (titles.isNotEmpty()) {
-                                            resources.getQuantityString(
-                                                sharedR.plurals.video_section_playlists_add_to_playlists_successfully_message,
-                                                titles.size,
-                                                if (titles.size == 1) titles.first() else titles.size
-                                            )
+                                            if (titles.size == 1) {
+                                                resources.getString(
+                                                    sharedR.string.video_section_add_to_playlist_success,
+                                                    titles.first()
+                                                )
+                                            } else {
+                                                resources.getQuantityString(
+                                                    sharedR.plurals.video_section_add_to_playlists_success,
+                                                    titles.size,
+                                                    titles.size
+                                                )
+                                            }
                                         } else {
                                             resources.getString(sharedR.string.video_section_playlists_add_to_playlists_failed_message)
                                         }

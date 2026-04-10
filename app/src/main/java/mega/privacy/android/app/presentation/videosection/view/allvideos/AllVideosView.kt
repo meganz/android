@@ -64,24 +64,29 @@ internal fun AllVideosView(
     onLongClick: ((item: VideoUIEntity, index: Int) -> Unit) = { _, _ -> },
     highlightText: String = "",
 ) {
-    val context = LocalContext.current
     val resources = LocalResources.current
     val scaffoldState = rememberScaffoldState()
 
     LaunchedEffect(addToPlaylistsTitles) {
         addToPlaylistsTitles?.let { titles ->
             if (titles.isNotEmpty()) {
-                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                    resources.getQuantityString(
-                        sharedR.plurals.video_section_playlists_add_to_playlists_successfully_message,
-                        titles.size,
-                        if (titles.size == 1) titles.first() else titles.size
+                val successMessage = if (titles.size == 1) {
+                    resources.getString(
+                        sharedR.string.video_section_add_to_playlist_success,
+                        titles.first()
                     )
-                )
+                } else {
+                    resources.getQuantityString(
+                        sharedR.plurals.video_section_add_to_playlists_success,
+                        titles.size,
+                        titles.size
+                    )
+                }
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(successMessage)
             } else {
                 val result = scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                    message = context.getString(sharedR.string.video_section_playlists_add_to_playlists_failed_message),
-                    actionLabel = context.getString(R.string.message_option_retry)
+                    message = resources.getString(sharedR.string.video_section_playlists_add_to_playlists_failed_message),
+                    actionLabel = resources.getString(R.string.message_option_retry)
                 )
                 if (result == SnackbarResult.ActionPerformed) {
                     retryActionCallback()
