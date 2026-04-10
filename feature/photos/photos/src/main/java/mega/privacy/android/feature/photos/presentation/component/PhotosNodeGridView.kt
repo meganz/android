@@ -143,7 +143,7 @@ fun PhotosNodeGridView(
                             .padding(horizontal = 16.dp)
                             .testTag(PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG),
                         time = contentType.time,
-                        shouldShowGridSizeSettings = index == 0 && selectedPhotoIds.isEmpty(),
+                        shouldShowGridSizeSettings = index == 0,
                         gridSize = gridSize,
                         onGridSizeChange = onGridSizeChange
                     )
