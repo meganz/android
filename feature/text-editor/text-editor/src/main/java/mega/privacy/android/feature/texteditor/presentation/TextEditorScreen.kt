@@ -13,6 +13,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -88,6 +89,8 @@ private const val REVEAL_ANIMATION_MS = 200
 private const val ENTRANCE_ANIMATION_MS = 300
 private const val FLING_SNAP_ANIMATION_MS = 150
 private val BottomBarSlideDistance = 100.dp
+private val SnackbarBottomBarClearance = 112.dp
+private val SnackbarHorizontalPadding = 16.dp
 
 /**
  * Compose screen for viewing and editing text files.
@@ -254,11 +257,26 @@ fun TextEditorScreen(
         onBack()
     }
 
+    val showBottomBar = uiState.mode != TextEditorMode.Edit
+            && uiState.mode != TextEditorMode.Create
+            && uiState.bottomBarActions.isNotEmpty()
+            && !uiState.isLoading
     MegaScaffold(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0.dp),
         snackbarHost = {
-            MegaSnackbar(snackBarHostState = snackbarHostState)
+            MegaSnackbar(
+                snackBarHostState = snackbarHostState,
+                safeAreaPadding = if (showBottomBar) {
+                    PaddingValues(
+                        bottom = SnackbarBottomBarClearance,
+                        start = SnackbarHorizontalPadding,
+                        end = SnackbarHorizontalPadding,
+                    )
+                } else {
+                    null
+                },
+            )
         },
         topBar = {
             CollapsingTopBar(
@@ -340,10 +358,6 @@ fun TextEditorScreen(
                     LargeInfiniteSpinnerIndicator()
                 }
             }
-            val showBottomBar = uiState.mode != TextEditorMode.Edit
-                    && uiState.mode != TextEditorMode.Create
-                    && uiState.bottomBarActions.isNotEmpty()
-                    && !uiState.isLoading
             LaunchedEffect(showBottomBar) {
                 if (showBottomBar) {
                     bottomBarEntranceOffset.snapTo(bottomBarSlideDistancePx)
