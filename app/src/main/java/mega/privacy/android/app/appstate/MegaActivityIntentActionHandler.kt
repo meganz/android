@@ -2,13 +2,17 @@ package mega.privacy.android.app.appstate
 
 import android.content.Intent
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.entity.ConnectivityState
+import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
@@ -21,6 +25,8 @@ import javax.inject.Inject
 class MegaActivityIntentActionHandler @Inject constructor(
     private val navigationEventQueue: NavigationEventQueue,
     private val navigationResultManager: NavigationResultManager,
+    private val snackbarEventQueue: SnackbarEventQueue,
+    private val getCurrentConnectivityStateUseCase: GetCurrentConnectivityStateUseCase,
 ) {
 
     suspend fun handleAction(
@@ -63,29 +69,43 @@ class MegaActivityIntentActionHandler @Inject constructor(
             Constants.ACTION_SHORTCUT_UPLOAD -> {
                 Timber.d("Shortcut upload action received")
                 Analytics.tracker.trackEvent(ShortcutActionUploadButtonPressedEvent)
-                navigationResultManager.returnResult(
-                    HomeFabOptionsBottomSheetNavKey.KEY,
-                    HomeFabOption.UploadFiles
-                )
+                handleIfConnected {
+                    navigationResultManager.returnResult(
+                        HomeFabOptionsBottomSheetNavKey.KEY,
+                        HomeFabOption.UploadFiles
+                    )
+                }
                 intent.action = null
             }
 
             Constants.ACTION_SHORTCUT_SCAN_DOCUMENT -> {
                 Timber.d("Shortcut scan document action received")
                 Analytics.tracker.trackEvent(ShortcutActionScanDocumentButtonPressedEvent)
-                navigationResultManager.returnResult(
-                    HomeFabOptionsBottomSheetNavKey.KEY,
-                    HomeFabOption.ScanDocument
-                )
+                handleIfConnected {
+                    navigationResultManager.returnResult(
+                        HomeFabOptionsBottomSheetNavKey.KEY,
+                        HomeFabOption.ScanDocument
+                    )
+                }
                 intent.action = null
             }
 
             Constants.ACTION_SHORTCUT_CHAT -> {
                 Timber.d("Shortcut chat action received")
                 Analytics.tracker.trackEvent(ShortcutActionChatButtonPressedEvent)
-                navigationEventQueue.emit(ChatListNavKey())
+                handleIfConnected {
+                    navigationEventQueue.emit(ChatListNavKey())
+                }
                 intent.action = null
             }
+        }
+    }
+
+    private suspend fun handleIfConnected(action: suspend () -> Unit) {
+        if (getCurrentConnectivityStateUseCase().connected) {
+            action()
+        } else {
+            snackbarEventQueue.queueMessage(R.string.error_server_connection_problem)
         }
     }
 }

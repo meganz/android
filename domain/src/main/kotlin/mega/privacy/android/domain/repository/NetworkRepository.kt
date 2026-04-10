@@ -24,7 +24,7 @@ interface NetworkRepository {
 
 
     /**
-     * Check whether device is connected to internet or not
+     * Check whether device is connected to internet or not from cache
      *
      * @return [Boolean]
      */
