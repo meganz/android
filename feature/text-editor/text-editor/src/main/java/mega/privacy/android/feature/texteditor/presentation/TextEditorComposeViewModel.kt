@@ -27,6 +27,11 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
+import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
@@ -71,6 +76,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
+    private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase,
+    private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase,
+    private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -103,6 +111,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     /** Content at last load or last successful save; used for discard. */
     private var lastSavedContent: String = ""
+
+    /** Last known scroll position reported by the UI, used for persistence. */
+    private var lastScrollFraction: Float = 0f
 
     init {
         viewModelScope.launch {
@@ -159,6 +170,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 }
                 rebuildStartLineCache()
                 _uiState.update { it.copy(isFullyLoaded = true) }
+                restoreScrollPosition()
+                saveRecentlyUsed()
             }
             viewModelScope.launch {
                 val (nodeName, actions) = runCatching {
@@ -383,7 +396,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private fun emitCloseEvent() {
-        _uiState.update { it.copy(closeEvent = triggered) }
+        viewModelScope.launch {
+            saveScrollState()
+            _uiState.update { it.copy(closeEvent = triggered) }
+        }
     }
 
     fun consumeCloseEvent() {
@@ -683,4 +699,62 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private fun ceilDiv(a: Int, b: Int): Int = (a + b - 1) / b
+
+    /**
+     * Called by the UI to report the current scroll fraction (0.0–1.0).
+     * Used for persistence when the user leaves the editor.
+     */
+    fun updateScrollFraction(fraction: Float) {
+        lastScrollFraction = fraction
+    }
+
+    private suspend fun saveScrollState() {
+        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        runCatching {
+            saveTextEditorScrollUseCase(
+                TextEditorScroll(
+                    nodeHandle = args.nodeHandle,
+                    cursorPosition = 0, // TODO: persist actual cursor offset when edit mode cursor tracking is added
+                    scrollFraction = lastScrollFraction,
+                )
+            )
+        }.onFailure { Timber.e(it, "Failed to save text editor scroll state") }
+    }
+
+    private fun restoreScrollPosition() {
+        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        viewModelScope.launch {
+            runCatching {
+                getTextEditorScrollUseCase(args.nodeHandle)
+            }.onSuccess { scroll ->
+                if (scroll != null) {
+                    val chunkCount = getChunkCount()
+                    val targetIndex = (scroll.scrollFraction * chunkCount).toInt()
+                        .coerceIn(0, (chunkCount - 1).coerceAtLeast(0))
+                    _uiState.update { it.copy(restoreScrollIndex = targetIndex) }
+                }
+            }.onFailure { Timber.e(it, "Failed to restore text editor scroll state") }
+        }
+    }
+
+    /**
+     * Called by the UI after the scroll restoration has been applied.
+     */
+    fun consumeRestoreScrollIndex() {
+        _uiState.update { it.copy(restoreScrollIndex = null) }
+    }
+
+    private fun saveRecentlyUsed() {
+        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        val fileName = _uiState.value.fileName
+        viewModelScope.launch {
+            runCatching {
+                saveRecentlyUsedItemUseCase(
+                    nodeHandle = args.nodeHandle,
+                    type = RecentlyUsedType.TextEditor,
+                    fileName = fileName,
+                )
+            }.onFailure { Timber.e(it, "Failed to save recently used item") }
+        }
+    }
 }

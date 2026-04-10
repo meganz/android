@@ -44,4 +44,5 @@ data class TextEditorComposeUiState(
     val contentVersion: Int = 0,
     val focusedEditChunk: Int = 0,
     val closeEvent: StateEvent = consumed,
+    val restoreScrollIndex: Int? = null,
 )
