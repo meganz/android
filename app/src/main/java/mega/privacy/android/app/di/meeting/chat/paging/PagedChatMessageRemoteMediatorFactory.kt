@@ -1,7 +1,6 @@
 package mega.privacy.android.app.di.meeting.chat.paging
 
 import dagger.assisted.AssistedFactory
-import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.presentation.meeting.chat.model.paging.PagedChatMessageRemoteMediator
 
 /**
@@ -13,11 +12,9 @@ interface PagedChatMessageRemoteMediatorFactory {
      * Create
      *
      * @param chatId
-     * @param coroutineScope
      * @return PagedChatMessageRemoteMediator
      */
     fun create(
         chatId: Long,
-        coroutineScope: CoroutineScope,
     ): PagedChatMessageRemoteMediator
 }
