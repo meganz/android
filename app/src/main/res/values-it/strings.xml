@@ -177,7 +177,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recenti</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Media caricati</string>
+    <string name="section_secondary_media_uploads">Caricamenti dei media</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -431,7 +431,7 @@
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">I Caricamenti da fotocamera sono stati disattivati. La tua cartella locale non è disponibile.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">I caricamenti dei media sono stati disattivati. La tua cartella locale non è disponibile.</string>
+    <string name="camera_notif_secondary_local_unavailable">I Caricamenti dei media sono stati disattivati. La tua cartella locale non è disponibile.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Apparenza</string>
     <!-- settings of the Features section -->
@@ -509,9 +509,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Come caricare</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Attiva i caricamenti secondari dei media</string>
+    <string name="settings_secondary_upload_on">Attiva i Caricamenti dei media</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Disattiva i caricamenti secondari dei media</string>
+    <string name="settings_secondary_upload_off">Disattiva i Caricamenti dei media</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Scegli cartella</string>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
@@ -800,15 +800,15 @@
     <string name="success_muting_a_chat_for_specific_time">Le notifiche delle chat saranno mutate per %s</string>
     <!-- Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15 -->
     <plurals name="success_muting_chat_until_specific_time">
-        <item quantity="one">Le notifiche delle chat saranno mutate fino alle %1$s</item>
-        <item quantity="many">Le notifiche delle chat saranno mutate fino alle %1$s</item>
-        <item quantity="other">Le notifiche delle chat saranno mutate fino alle %1$s</item>
+        <item quantity="one">Le notifiche delle chat saranno mutate fino alle ore %1$s</item>
+        <item quantity="many">Le notifiche delle chat saranno mutate fino alle ore %1$s</item>
+        <item quantity="other">Le notifiche delle chat saranno mutate fino alle ore %1$s</item>
     </plurals>
     <!-- Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00 -->
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item quantity="one">Le notifiche delle chat saranno mutate fino a %1$s alle %2$s</item>
-        <item quantity="many">Le notifiche delle chat saranno mutate fino a %1$s alle %2$s</item>
-        <item quantity="other">Le notifiche delle chat saranno mutate fino a %1$s alle %2$s</item>
+        <item quantity="one">Le notifiche delle chat saranno mutate fino a %1$s alle ore %2$s</item>
+        <item quantity="many">Le notifiche delle chat saranno mutate fino a %1$s alle ore %2$s</item>
+        <item quantity="other">Le notifiche delle chat saranno mutate fino a %1$s alle ore %2$s</item>
     </plurals>
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
     <string name="notifications_are_already_muted">Le notifiche delle chat sono mutate</string>
@@ -816,9 +816,9 @@
     <string name="success_unmuting_a_chat">Le notifiche delle chat sono attive</string>
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
-        <item quantity="one">Mutata fino alle %1$s</item>
-        <item quantity="many">Mutata fino alle %1$s</item>
-        <item quantity="other">Mutata fino alle %1$s</item>
+        <item quantity="one">Mutata fino alle ore %1$s</item>
+        <item quantity="many">Mutata fino alle ore %1$s</item>
+        <item quantity="other">Mutata fino alle ore %1$s</item>
     </plurals>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_chat_contact_notifications">Notifiche</string>
@@ -1071,7 +1071,7 @@
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
         <item quantity="one">Download terminato di %1$d file su %2$d</item>
-        <item quantity="many">Download terminato di %1$d file su %2$d</item>
+        <item quantity="many">Download terminato di %1$d di file su %2$d</item>
         <item quantity="other">Download terminato di %1$d file su %2$d</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
@@ -1491,7 +1491,7 @@
     <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
     <plurals name="number_of_versions_inside_folder">
         <item quantity="one">%1$d file con versione</item>
-        <item quantity="many">%1$d file con versione</item>
+        <item quantity="many">%1$d di file con versione</item>
         <item quantity="other">%1$d file con versione</item>
     </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
@@ -2031,7 +2031,7 @@
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
     <plurals name="subtitle_notification_added_files">
         <item quantity="one">[A]%1$s [/A][B]ha aggiunto %2$d file.[/B]</item>
-        <item quantity="many">[A]%1$s [/A][B]ha aggiunto %2$d file.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]ha aggiunto %2$d di file.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]ha aggiunto %2$d file.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items -->
@@ -3237,7 +3237,7 @@
     <!-- Title of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_title_end_call_for_all">Terminare la chiamata per tutti i partecipanti?</string>
     <!-- Description of the dialog indicating that it asks you if you want to end the call for all, displayed on the chat room screen. Allows to end call for all participants -->
-    <string name="meetings_chat_screen_dialog_description_end_call_for_all">Questo terminerà la chiamata per tutti i partecipanti</string>
+    <string name="meetings_chat_screen_dialog_description_end_call_for_all">Questo terminerà la chiamata per tutti i partecipanti.</string>
     <!-- Positive button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
     <string name="meetings_chat_screen_dialog_positive_button_end_call_for_all">Si</string>
     <!-- Negative button of the dialog asking if you want to end the call for everyone, displayed on the chat room screen -->
@@ -3357,7 +3357,7 @@
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Permetti a chi non è host di aggiungere partecipanti</string>
     <!-- Title of gif album. -->
-    <string name="photos_album_title_gif">GIFs</string>
+    <string name="photos_album_title_gif">GIF</string>
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
     <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->

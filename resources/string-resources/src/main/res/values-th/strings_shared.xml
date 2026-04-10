@@ -2238,4 +2238,6 @@
     <string name="pdf_viewer_error_streaming">เกิดข้อผิดพลาดขณะเปิดไฟล์</string>
     <string name="homepage_empty_hint_audio">[B]ไม่พบ[/B] [A]ไฟล์เสียง[/A] [B]ที่นี่[/B]</string>
     <string name="cloud_explorer_choose_folder_title">เลือกโฟลเดอร์</string>
+    <string name="general_transfer_error_not_enough_free_space">พื้นที่ว่างไม่เพียงพอบนอุปกรณ์ของคุณ</string>
+    <string name="general_transfer_error_temporary_unavaible">ระบบทรัพยากรไม่สามารถใช้ได้ชั่วคราว กรุณาลองอีกครั้งในภายหลัง</string>
 </resources>

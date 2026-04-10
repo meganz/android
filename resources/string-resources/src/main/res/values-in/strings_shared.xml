@@ -2012,7 +2012,7 @@
         <item quantity="other">%d folder</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">“%1$d folder, “</item>
     </plurals>
     <string name="general_first_name">Nama Depan</string>
     <string name="general_last_name">Nama Belakang</string>
@@ -2110,7 +2110,7 @@
     <string name="text_editor_fast_scroll_line_tooltip">Baris %1$d</string>
     <string name="select_videos_search_empty_view_description">Cari video di drive Cloud anda</string>
     <string name="new_text_file_invalid_extension_error_message">Gunakan ekstensi file yang valid (misalnya .txt)</string>
-    <string name="link_decryption_key_dialog_message">Masukkan kunci untuk membuka tautan ini.\nTidak memilikinya? Hubungi pengirimnya.</string>
+    <string name="link_decryption_key_dialog_message">Masukkan kunci untuk membuka tautan ini.\nTidak memilikinya? Hubungi pemilik tautan.</string>
     <string name="upload_bottom_sheet_action_menu_scan_document">Pindai dokumen</string>
     <string name="upload_bottom_sheet_action_menu_take_picture">Ambil foto</string>
     <string name="upload_bottom_sheet_action_upload_files">Unggah berkas</string>
@@ -2129,4 +2129,43 @@
     <string name="open_link_dialog_hint">Tempel tautan</string>
     <string name="open_link_dialog_title">Buka tautan</string>
     <string name="cloud_explorer_choose_folder_title">Pilih folder</string>
+    <string name="general_transfer_error_not_enough_free_space">Tidak cukup ruang kosong di perangkat anda</string>
+    <string name="general_transfer_error_temporary_unavaible">Sumber sementara tidak tersedia, harap coba kembali nanti</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="other">%d folder,</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="other">Dibagikan dengan %d orang</item>
+    </plurals>
+    <string name="link_password_dialog_message">Masukkan kata sandi untuk membuka tautan ini.\nTidak memilikinya? Hubungi pemilik tautan.</string>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="other">%d barang gagal bergerak</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="other">%d barang berhasil dipindahkan</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="other">%d barang berhasil dipindahkan</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="other">%d barang gagal bergerak</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="other">%d barang dipindahkan ke tempat sampah</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="other">%d barang gagal dipindahkan ke tempat sampah</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="other">%d barang dipindahkan ke tempat sampah, 1 barang gagal</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="other">1 barang dipindahkan ke tempat sampah, %d barang gagal</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="other">%d barang dihapus dari tempat sampah</item>
+    </plurals>
 </resources>

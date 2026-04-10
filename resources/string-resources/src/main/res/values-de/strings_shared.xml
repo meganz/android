@@ -2318,4 +2318,6 @@
     <string name="open_link_dialog_hint">Link einfügen</string>
     <string name="open_link_dialog_title">Link öffnen</string>
     <string name="cloud_explorer_choose_folder_title">Ordner auswählen</string>
+    <string name="general_transfer_error_not_enough_free_space">Nicht genügend Speicherplatz verfügbar</string>
+    <string name="general_transfer_error_temporary_unavaible">Quelldatei momentan nicht verfügbar, bitte versuchen Sie es später noch einmal</string>
 </resources>

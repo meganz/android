@@ -2125,9 +2125,9 @@
         <item quantity="other">%d carpetas</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d carpeta&#160;·&#160;</item>
-        <item quantity="many">%1$d de carpetas&#160;·&#160;</item>
-        <item quantity="other">%1$d carpetas&#160;·&#160;</item>
+        <item quantity="one">%1$d carpeta, “</item>
+        <item quantity="many">%1$d de carpetas, “</item>
+        <item quantity="other">%1$d carpetas, “</item>
     </plurals>
     <string name="home_recents_snackbar_activity_hidden">Tu actividad reciente ha sido ocultada</string>
     <string name="home_recents_button_view_all">Ver todo</string>
@@ -2382,4 +2382,8 @@
     <string name="cloud_explorer_choose_folder_title">Elige carpeta</string>
     <string name="cloud_explorer_select_destination_title">Seleccionar destino</string>
     <string name="cloud_explorer_use_this_folder_button">Usar esta carpeta</string>
+    <string name="general_transfer_error_not_enough_free_space">No hay suficiente espacio libre en tu dispositivo</string>
+    <string name="general_transfer_error_temporary_unavaible">Recurso no disponible temporalmente, por favor inténtalo de nuevo más tarde</string>
+    <string name="video_player_more_options_playlist_option">Lista de reproducción</string>
+    <string name="video_player_more_options_lock_option">Bloquear reproductor de vídeo</string>
 </resources>

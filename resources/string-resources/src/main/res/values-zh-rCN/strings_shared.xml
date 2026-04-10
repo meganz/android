@@ -2002,7 +2002,7 @@
         <item quantity="other">%d个文件夹</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">“%1$d 个文件夹， “</item>
+        <item quantity="other">“%1$d个文件夹， “</item>
     </plurals>
     <string name="albums_multiple_delete_success_message">%d个相册已删除</string>
     <string name="home_screen_no_network_desc">您已离线。\n如果您将文件设为离线可用，您仍然可以在没有网络连接的情况下访问它们。</string>
@@ -2246,4 +2246,10 @@
     <string name="open_link_dialog_title">打开链接</string>
     <string name="open_link_dialog_hint">粘贴链接</string>
     <string name="cloud_explorer_choose_folder_title">选择文件夹</string>
+    <string name="general_transfer_error_not_enough_free_space">您的设备上没有足够的可用空间</string>
+    <string name="general_transfer_error_temporary_unavaible">资源暂不可用，请稍后再试</string>
+    <string name="cloud_explorer_select_destination_title">选择目标位置</string>
+    <string name="cloud_explorer_use_this_folder_button">使用此文件夹</string>
+    <string name="video_player_more_options_playlist_option">播放列表</string>
+    <string name="video_player_more_options_lock_option">锁定视频播放器</string>
 </resources>

@@ -281,7 +281,7 @@
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Conflitto tra cartelle di caricamento</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">La cartella dei Caricamenti da fotocamera e la cartella dei caricamenti multimediali secondari non possono essere correlate tra loro. Scegli una cartella diversa.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">La cartella dei Caricamenti da fotocamera e la cartella dei Caricamenti dei media secondari non possono essere correlate tra loro. Scegli una cartella diversa.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Chiudi</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
@@ -839,7 +839,7 @@
     <!-- Name of the Camera uploads feature -->
     <string name="general_camera_uploads">Caricamenti da fotocamera</string>
     <!-- Name of the Camera uploads feature -->
-    <string name="general_media_uploads">Media caricati</string>
+    <string name="general_media_uploads">Caricamenti dei media</string>
     <!-- Generic settings label text -->
     <string name="general_settings">Impostazioni</string>
     <!-- Ad settings label in the cookie settings page -->
@@ -1775,7 +1775,7 @@
     <!-- Title of favourite album. -->
     <string name="system_album_favourites_title">Preferiti</string>
     <!-- Title of gif album. -->
-    <string name="system_album_gif_title">GIFs</string>
+    <string name="system_album_gif_title">GIF</string>
     <!-- Title of raw album. -->
     <string name="system_album_raw_title">RAW</string>
     <!-- General error message to show when an invalid string is detected -->
@@ -2064,9 +2064,9 @@
         <item quantity="other">%d cartelle</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d cartella&#160;·&#160;</item>
-        <item quantity="many">%1$d di cartelle&#160;·&#160;</item>
-        <item quantity="other">%1$d cartelle&#160;·&#160;</item>
+        <item quantity="one">“%1$d cartella, “</item>
+        <item quantity="many">“%1$d di cartelle, “</item>
+        <item quantity="other">“%1$d cartelle, “</item>
     </plurals>
     <string name="general_first_name">Nome</string>
     <string name="general_last_name">Cognome</string>
@@ -2187,4 +2187,218 @@
         <item quantity="other">%d oggetti rimossi dal cestino</item>
     </plurals>
     <string name="cloud_explorer_choose_folder_title">Scegli cartella</string>
+    <string name="general_transfer_error_not_enough_free_space">Non hai abbastanza spazio libero sul tuo dispositivo</string>
+    <string name="general_transfer_error_temporary_unavaible">Risorsa temporaneamente non disponibile, riprova più tardi</string>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">Impossibile rimuovere %d oggetto dal Cestino</item>
+        <item quantity="many">Impossibile rimuovere %d di oggetti dal Cestino</item>
+        <item quantity="other">Impossibile rimuovere %d oggetti dal Cestino</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d oggetto rimosso dal Cestino</item>
+        <item quantity="many">%d di oggetti rimossi dal Cestino</item>
+        <item quantity="other">%d oggetti rimossi dal Cestino</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">Impossibile rimuovere %d oggetto dal Cestino</item>
+        <item quantity="many">Impossibile rimuovere %d di oggetti dal Cestino</item>
+        <item quantity="other">Impossibile rimuovere %d oggetti dal Cestino</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="one">Impossibile copiare %d oggetto</item>
+        <item quantity="many">Impossibile copiare %d di oggetti</item>
+        <item quantity="other">Impossibile copiare %d oggetti</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="one">%d oggetto copiato con successo</item>
+        <item quantity="many">%d di oggetti copiati con successo</item>
+        <item quantity="other">%d oggetti copiati con successo</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="one">%d oggetto copiato con successo</item>
+        <item quantity="many">%d di oggetti copiati con successo</item>
+        <item quantity="other">%d oggetti copiati con successo</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="one">Impossibile copiare %d oggetto</item>
+        <item quantity="many">Impossibile copiare %d di oggetti</item>
+        <item quantity="other">Impossibile copiare %d oggetti</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="one">Impossibile condividere %d oggetto</item>
+        <item quantity="many">Impossibile condividere %d di oggetti</item>
+        <item quantity="other">Impossibile condividere %d oggetti</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="one">%d cartella condivisa con successo</item>
+        <item quantity="many">%d di cartelle condivise con successo</item>
+        <item quantity="other">%d cartelle condivise con successo</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="one">Impossibile condividere %d cartella</item>
+        <item quantity="many">Impossibile condividere %d di cartelle</item>
+        <item quantity="other">Impossibile condividere %d cartelle</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">Impossibile ripristinare %d oggetto dal Cestino</item>
+        <item quantity="many">Impossibile ripristinare %d di oggetti dal Cestino</item>
+        <item quantity="other">Impossibile ripristinare %d oggetti dal Cestino</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">%d oggetto ripristinato dal Cestino</item>
+        <item quantity="many">%d di oggetti ripristinati dal Cestino</item>
+        <item quantity="other">%d oggetti ripristinati dal Cestino</item>
+    </plurals>
+    <string name="camera_upload_banner_enable_cu_subtitle">Effettua automaticamente il backup delle tue foto e dei tuoi video sul tuo Cloud drive</string>
+    <string name="general_alert_not_logged_in">Devi effettuare l\’accesso per completare questa azione</string>
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA ha accesso limitato alla tua galleria e non può effettuare il backup di tutte le tue foto</string>
+    <string name="timeline_tab_enable_camera_uploads_banner_description">I Caricamenti da fotocamera necessitano di [A]accesso completo[/A] alla tua galleria</string>
+    <string name="timeline_tab_grid_size_menu_title">Grandezza della griglia</string>
+    <string name="timeline_tab_grid_size_compact">Compatta</string>
+    <string name="timeline_tab_grid_size_large">Larga</string>
+    <string name="timeline_tab_filter_apply_filter_button">Applica filtro</string>
+    <string name="general_invite_contact">Invita contatto</string>
+    <string name="contact_found_dialog_title">Contatto trovato</string>
+    <string name="album_content_action_remove_favourites">Rimuovi dai Preferiti</string>
+    <string name="context_empty_cloud_drive_title">Non c\’è ancora niente nel tuo archivio privato</string>
+    <string name="open_link_account_confirmation_error">Hai già effettuato l\’accesso con un account MEGA differente. Prima esci, poi riapri il link di conferma dell\’account.</string>
+    <string name="can_only_join_one_call_error_message">Per unirti a questa chiamata devi prima terminare la tua chiamata corrente</string>
+    <string name="album_content_remove_link_dialog_title">Rimuovere il link?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Rimuovere i link?</string>
+    <string name="album_content_remove_link_dialog_description">Le persone con cui hai condiviso questo link perderanno accesso all\’album</string>
+    <string name="album_content_remove_multiple_links_dialog_description">Le persone con cui hai condiviso questi link perderanno accesso agli album</string>
+    <string name="delete_album_singular_confirmation_dialog_title">Eliminare l\’album?</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">Eliminare gli album?</string>
+    <string name="delete_album_singular_confirmation_dialog_description">I contenuti dell\’album non saranno eliminati</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">I contenuti degli album non saranno eliminati</string>
+    <string name="external_checkout_information_title">Lasciando MEGA</string>
+    <string name="external_checkout_information_description">Stai per aprire un sito web esterno (%1$s). MEGA è responsabile per le transazioni e il supporto dei clienti.</string>
+    <string name="external_checkout_show_next_time">Mostralo la prossima volta</string>
+    <string name="album_photos_selection_limit_dialog_description">Puoi aggiungere solo fino a %d oggetti alla volta a un album.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">Nessun media trovato</string>
+    <string name="albums_multiple_delete_success_message">%d album eliminati</string>
+    <string name="home_screen_no_network_desc">Sei offline.\nSe rendi i file disponibili offline, potrai accedervi anche senza una connessione.</string>
+    <string name="home_screen_no_network_desc_with_offline_files">Sei offline.\nGli oggetti salvati per un uso offline sono ancora disponibili.</string>
+    <string name="home_screen_no_network_view_offline_files_button">Vedi i file offline</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">Aggiorna i permessi</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">Per assicurarci di non perdere alcun tuo ricordo, MEGA ha bisogno di un accesso completo alla tua galleria.</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">La batteria è troppo scarica. Ricarica il dispositivo per avviare i Caricamenti da fotocamera.</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Caricamenti da fotocamera aggiornati</string>
+    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_size_byte">%1$s&#160;B</string>
+    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="search_placeholder_folder">Cerca in %s</string>
+    <string name="search_placeholder_cloud_drive">Cerca nel Cloud drive</string>
+    <string name="search_placeholder_rubbish_bin">Cerca nel Cestino</string>
+    <string name="search_placeholder_incoming_shares">Cerca nelle Condivisioni in arrivo</string>
+    <string name="search_placeholder_outgoing_shares">Cerca nelle Condivisioni in uscita</string>
+    <string name="search_placeholder_links">Cerca nei Link</string>
+    <string name="search_placeholder_favourites">Cerca nei Preferiti</string>
+    <string name="search_placeholder_documents">Cerca nei Documenti</string>
+    <string name="search_placeholder_audios">Cerca negli Audio</string>
+    <string name="search_placeholder_videos">Cerca nei Video</string>
+    <string name="search_placeholder_backups">Cerca nei Backup</string>
+    <string name="general_clear_all">Pulisci tutto</string>
+    <string name="offline_remove_singular_item_success_message">1 oggetto rimosso</string>
+    <string name="offline_remove_multiple_item_success_message">%d oggetti rimossi</string>
+    <string name="section_banners">Banner</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="recovering_info">Caricamento&#8230;</string>
+    <string name="storage_usage_format">%1$s di %2$s utilizzato</string>
+    <string name="general_hi">Ciao</string>
+    <string name="home_recents_snackbar_activity_hidden">La tua attività recente è stata nascosta</string>
+    <string name="home_recents_button_view_all">Vedi tutto</string>
+    <string name="home_recents_options_menu_show_activity">Mostra l\’attività recente</string>
+    <string name="home_recents_empty_text_description">Tutta la tua attività recente di file e cartelle apparirà qui</string>
+    <string name="home_recents_hidden_text_description">Attività recente nascosta</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Questi file non sono più disponibili</string>
+    <string name="shares_screen_links_section_empty">[B]Nessun [/B][A]link pubblico[/A]</string>
+    <string name="general_invalid_dot_name_warning">Il nome “.” non è valido</string>
+    <string name="general_invalid_double_dot_name_warning">Il nome “..” non è valido</string>
+    <string name="transfers_upload_started_snackbar">Caricamento iniziato. Vedi la notifica per dettagli.</string>
+    <string name="search_landing_title">Cerchi qualcosa?</string>
+    <string name="search_landing_subtitle">Cerca file e cartelle</string>
+    <string name="offline_screen_empty_state_description">Nessun file salvato per l\’offline</string>
+    <string name="general_install_label">Installa</string>
+    <string name="general_app_update_download_success_message">Aggiornamento dell\’app scaricato</string>
+    <string name="error_folder_part_of_camera_uploads">Questa cartella è già parte dei Caricamenti da fotocamera. Scegline un\’altra.</string>
+    <string name="error_folder_part_of_media_uploads">Questa cartella è già parte dei Caricamenti dei media. Scegline un\’altra.</string>
+    <string name="error_folder_part_of_sync_or_backup">Questa cartella è già parte di una sincronizzazione o di un backup. Scegline un\’altra.</string>
+    <string name="choose_account_screen_only_price_per_month">A soli %1$s/mese</string>
+    <string name="cu_warning_banner_notification_disabled_warning">Attiva le notifiche in modo da sapere se i caricamenti falliscono o la sincronizzazione si interrompe.</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">Impossibile stabilire una connessione sicura</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA non riesce a connettersi in sicurezza.\n\nSe sei su una rete Wi-Fi pubblica, prova ad accedere prima con il tuo browser.\n\nIl tuo ISP o l\’antivirus potrebbero interferire con la connessione.\n\n[A]Scopri di più[/A]</string>
+    <string name="choose_account_screen_subscriptions_not_available_via_google_play">Gli abbonamenti tramite Google Play non sono disponibili nella tua regione.</string>
+    <string name="home_recents_snackbar_activity_cleared">La tua attività recente è stata eliminata</string>
+    <string name="home_recents_options_menu_clear">Svuota attività recente</string>
+    <string name="home_recents_clear_dialog_message">Vuoi veramente svuotare tutta la tua attività recente? Questa azione non può essere annullata.</string>
+    <string name="choose_account_screen_plan_available_yearly_billing">%1$s è disponibile con fatturazione annuale</string>
+    <string name="choose_account_screen_plan_available_monthly_billing">%1$s è disponibile con fatturazione mensile</string>
+    <string name="album_import_error_access_dialog_description">Il link all\’album è stato rimosso, o l\’album è stato eliminato. Contatta la persona che ha condiviso il link con te.</string>
+    <string name="album_import_rename_album_dialog_description">Un album di nome %1$s già esiste nei tuoi Album. Inserisci un nome diverso per l\’album che stai salvando.</string>
+    <string name="album_import_snackbar_success_message">%1$s salvato nel Cloud drive</string>
+    <string name="album_import_snackbar_error_message">Impossibile salvare %1$s nel Cloud drive. Riprova più tardi. Se il problema persiste, contatta la persona che ha condiviso con te il link.</string>
+    <string name="device_center_bottom_sheet_item_remove_connection">Rimuovi connessione</string>
+    <string name="device_center_snackbar_message_connection_removed">Connessione rimossa</string>
+    <string name="sync_folder_connection_dialog_title">Cartella connessa a un altro dispositivo</string>
+    <string name="sync_folder_connection_dialog_message">Questa cartella è connessa al tuo dispositivo %1$s, probabilmente perché MEGA è stato disinstallato senza fare il logout. Una cartella può essere sincronizzata solo con un dispositivo alla volta. Rimuovi la connessione esistente per sincronizzarla qui.</string>
+    <string name="sync_folder_connection_this_device">Connessa a %1$s</string>
+    <string name="general_dialog_discard_changes_message">Tutte le modifiche non salvate saranno perse</string>
+    <string name="general_changes_saved">Cambiamenti salvati</string>
+    <string name="node_option_save_to_mega">Salva su MEGA</string>
+    <string name="saf_passcode_lock_enabled_message">Per sfogliare i tuoi file MEGA, disabilita il tuo passcode nell\’app di MEGA. Vai nelle Impostazioni, poi tocca Sicurezza.</string>
+    <string name="saf_no_internet_message">Connettiti a internet per sfogliare i tuoi file MEGA. I file salvati per l\’offline sono disponibili nell\’app di MEGA.</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Acquista Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">Ti ringraziamo per il tuo abbonamento mensile Starter</string>
+    <string name="upgrade_account_successful_starter_yearly">Ti ringraziamo per il tuo abbonamento annuale Starter</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Acquista Basic</string>
+    <string name="upgrade_account_successful_basic_monthly">Ti ringraziamo per il tuo abbonamento mensile Basic</string>
+    <string name="upgrade_account_successful_basic_yearly">Ti ringraziamo per il tuo abbonamento annuale Basic</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Acquista Essential</string>
+    <string name="upgrade_account_successful_essential_monthly">Ti ringraziamo per il tuo abbonamento mensile Essential</string>
+    <string name="upgrade_account_successful_essential_yearly">Ti ringraziamo per il tuo abbonamento annuale Essential</string>
+    <string name="search_pdf_placeholder">Cerca documento</string>
+    <string name="pdf_viewer_search_placeholder">Cerca documento</string>
+    <string name="folder_link_subtitle">Link della cartella</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Inserisci la password per aprire questo file</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Password errata</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Rigo %1$d</string>
+    <string name="select_videos_search_empty_view_description">Cerca video nel tuo Cloud drive</string>
+    <string name="new_text_file_invalid_extension_error_message">Utilizza un\’estensione file valida (es.: .txt)</string>
+    <string name="link_decryption_key_dialog_message">Inserisci la chiave per aprire questo link.\nNon ce l\’hai? Contatta il proprietario del link.</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <string name="link_password_dialog_message">Inserisci la password per aprire questo link.\nNon ce l\’hai? Contatta il proprietario del link.</string>
+    <string name="general_error_file_not_found">Impossibile trovare questo file</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Errore. Il file PDF è corrotto o non esiste.</string>
+    <string name="pdf_viewer_error_streaming">Un errore è stato riscontrato durante l\’apertura del file</string>
+    <string name="homepage_empty_hint_audio">[B]Nessun[/B] [A]audio[/A] [B]trovato[/B]</string>
+    <string name="cloud_explorer_select_destination_title">Seleziona destinazione</string>
+    <string name="cloud_explorer_use_this_folder_button">Utilizza questa cartella</string>
+    <string name="video_player_more_options_playlist_option">Playlist</string>
 </resources>
