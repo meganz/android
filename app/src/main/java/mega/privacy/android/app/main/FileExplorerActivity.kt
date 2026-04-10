@@ -378,7 +378,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        showSnackbar(type, binding.fragmentContainerFileExplorer, content, chatId)
+        // Method might be called from other activity, and there's a possibility that the view
+        // might be null
+        if (::binding.isInitialized) {
+            showSnackbar(type, binding.fragmentContainerFileExplorer, content, chatId)
+        }
     }
 
     private fun onProcessAsyncInfo(documents: List<DocumentEntity>?) {
