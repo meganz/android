@@ -17,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -96,6 +97,7 @@ class CompletedTransferActionsBottomSheetTest {
                 completedTransfer = completedDownload,
                 fileUri = "fileUri".toUri(),
                 amINodeOwner = true,
+                node = mock<FileNode>(),
             )
         )
 
@@ -126,7 +128,7 @@ class CompletedTransferActionsBottomSheetTest {
             completedUpload, CompletedTransferActionsUiState(
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
-                node = mock<mega.privacy.android.domain.entity.node.FileNode>(),
+                node = mock<FileNode>(),
             )
         )
 
@@ -157,7 +159,7 @@ class CompletedTransferActionsBottomSheetTest {
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
                 isOnline = true,
-                node = mock<mega.privacy.android.domain.entity.node.FileNode>(),
+                node = mock<FileNode>(),
             )
         )
 
@@ -196,6 +198,7 @@ class CompletedTransferActionsBottomSheetTest {
                 fileUri = "fileUri".toUri(),
                 amINodeOwner = true,
                 isOnline = true,
+                node = mock<FileNode>(),
             )
         )
 
@@ -234,7 +237,7 @@ class CompletedTransferActionsBottomSheetTest {
                 completedTransfer = completedUpload,
                 amINodeOwner = true,
                 isOnline = true,
-                node = mock<mega.privacy.android.domain.entity.node.FileNode>(),
+                node = mock<FileNode>(),
             )
         )
 
@@ -274,6 +277,7 @@ class CompletedTransferActionsBottomSheetTest {
                 fileUri = "fileUri".toUri(),
                 amINodeOwner = true,
                 isOnline = true,
+                node = mock<FileNode>(),
             )
         )
 

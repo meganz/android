@@ -358,6 +358,7 @@ class CompletedTransferActionsViewModelTest {
         }
         val expected = triggered(ShareLinkEvent(untypedNode))
 
+        whenever(isNodeInRubbishBinUseCase(NodeId(completedDownload.handle))) doReturn false
         whenever(getNodeByHandleUseCase(completedDownload.handle)) doReturn untypedNode
 
         initializeTest()
@@ -401,7 +402,7 @@ class CompletedTransferActionsViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.amINodeOwner).isTrue()
-            assertThat(state.isNodeInRubbishBin).isTrue()
+            assertThat(state.node).isNull()
             assertThat(state.canShareLink).isFalse()
         }
     }

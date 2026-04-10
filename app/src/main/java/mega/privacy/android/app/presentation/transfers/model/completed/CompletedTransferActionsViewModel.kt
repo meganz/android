@@ -82,7 +82,6 @@ class CompletedTransferActionsViewModel @Inject constructor(
             }
 
             fetchNode(handle)
-            checkIsInRubbishBin(handle)
             checkShareOption(handle)
 
             if (isContentUriDownload) {
@@ -95,23 +94,15 @@ class CompletedTransferActionsViewModel @Inject constructor(
     private fun fetchNode(transferHandle: Long) {
         viewModelScope.launch {
             runCatching {
-                getNodeByHandleUseCase(transferHandle)
+                if (!isNodeInRubbishBinUseCase(NodeId(transferHandle))) {
+                    getNodeByHandleUseCase(transferHandle)
+                } else {
+                    null
+                }
             }.onSuccess { node ->
                 _uiState.update { it.copy(node = node) }
             }.onFailure {
                 Timber.e("Error fetching node: $it")
-            }
-        }
-    }
-
-    private fun checkIsInRubbishBin(transferHandle: Long) {
-        viewModelScope.launch {
-            runCatching {
-                isNodeInRubbishBinUseCase(NodeId(transferHandle))
-            }.onSuccess { isInRubbish ->
-                _uiState.update { it.copy(isNodeInRubbishBin = isInRubbish) }
-            }.onFailure {
-                Timber.e("Error checking rubbish bin: $it")
             }
         }
     }

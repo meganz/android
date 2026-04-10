@@ -50,7 +50,7 @@ data class CompletedTransferActionsUiState(
                 && fileUri != null
 
     val canShareLink
-        get() = completedTransfer != null && amINodeOwner && !isNodeInRubbishBin
+        get() = completedTransfer != null && amINodeOwner && node != null
 }
 
 /**
