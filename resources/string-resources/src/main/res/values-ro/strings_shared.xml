@@ -2410,4 +2410,6 @@
     <string name="pdf_viewer_error_streaming">A apărut o eroare în timp ce încercați să deschideți fișierul</string>
     <string name="homepage_empty_hint_audio">[B]Nu[/B] [A]fișiere audio[/A] [B]au fost găsite[/B]</string>
     <string name="cloud_explorer_use_this_folder_button">Folosește acest folder</string>
+    <string name="general_transfer_error_not_enough_free_space">Spațiu liber insuficient pe dispozitiv</string>
+    <string name="general_transfer_error_temporary_unavaible">Resursa nu este disponibilă temporar, încercați din nou mai târziu</string>
 </resources>

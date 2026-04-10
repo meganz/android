@@ -2501,4 +2501,9 @@
     <string name="pdf_viewer_error_corrupt_or_missing">Błąd. Plik PDF jest uszkodzony lub nie istnieje.</string>
     <string name="pdf_viewer_error_streaming">Wystąpił błąd podczas próby otwierania pliku</string>
     <string name="cloud_explorer_choose_folder_title">Wybierz katalog</string>
+    <string name="general_transfer_error_not_enough_free_space">Brak wystarczającej pamięci na urządzeniu</string>
+    <string name="general_transfer_error_temporary_unavaible">Źródło chwilowo jest niedostępne, spróbuj ponownie</string>
+    <string name="homepage_empty_hint_audio">[B]Nie[/B] znaleziono plików audio.</string>
+    <string name="cloud_explorer_select_destination_title">Wybierz miejsce docelowe</string>
+    <string name="cloud_explorer_use_this_folder_button">Użyj tego folderu</string>
 </resources>

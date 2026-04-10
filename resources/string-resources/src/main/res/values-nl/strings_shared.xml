@@ -2331,4 +2331,8 @@
     <string name="pdf_viewer_error_streaming">Een fout heeft opgetreden tijdens het openen van het bestand</string>
     <string name="homepage_empty_hint_audio">[B]Geen[/B] [A]audio[/A] [B]gevonden[/B]</string>
     <string name="cloud_explorer_choose_folder_title">Kies map</string>
+    <string name="cloud_explorer_select_destination_title">Selecteer lokatie</string>
+    <string name="cloud_explorer_use_this_folder_button">Gebruik deze map</string>
+    <string name="general_transfer_error_not_enough_free_space">Niet genoeg vrije ruimte op uw apparaat</string>
+    <string name="general_transfer_error_temporary_unavaible">Bron tijdelijk niet beschikbaar, probeer later opnieuw</string>
 </resources>

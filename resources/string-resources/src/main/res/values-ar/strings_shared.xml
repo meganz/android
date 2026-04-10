@@ -2650,4 +2650,6 @@
     <string name="pdf_viewer_error_streaming">حدث خطأ أثناء محاولة فتح الملف</string>
     <string name="homepage_empty_hint_audio">[B]لم[/B] [B]يتم العثور على أي[/B] [A]ملفات صوتية[/A]</string>
     <string name="cloud_explorer_choose_folder_title">اختر مجلد</string>
+    <string name="general_transfer_error_not_enough_free_space">لا توجد مساحة فارغة كافية على جهازك</string>
+    <string name="general_transfer_error_temporary_unavaible">المصادر غير متوفرة مؤقتاً، يرجى المحاولة مرة أخرى في وقت لاحق</string>
 </resources>

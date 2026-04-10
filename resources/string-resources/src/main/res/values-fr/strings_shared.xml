@@ -885,7 +885,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Votre compte MEGA a été désactivé en raison d’allégations répétées de violation des droits d’auteur. Cela signifie que vous ne pouvez ni accéder à votre compte ni à ses données.\nPour de plus amples renseignements sur la manière de déposer un contre-avis, vérifiez votre boîte de réception des courriels.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Votre compte a été résilié en raison du non-respect des Conditions générales d’utilisation de MEGA.\nVous ne pourrez pas accéder à vos données stockées de nouveau ni être autorisé à créer un nouveau compte MEGA.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Votre compte a été résilié en raison du non-respect des Conditions d\’utilisation de MEGA.\nVous ne pourrez pas accéder à vos données stockées de nouveau ni être autorisé à créer un nouveau compte MEGA.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">Votre compte a été désactivé par la personne qui l’administre. Contactez l’administrateur de votre compte Pour entreprise pour obtenir plus de précisions.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
@@ -955,7 +955,7 @@
     <!--Message to be shown when password is considered weak -->
     <string name="sign_up_password_weak_password_error_message">Votre mot de passe est trop facile à deviner. Essayez une combinaison de caractères plus robuste.</string>
     <!--Sign Up page terms and condition content text-->
-    <string name="sign_up_terms_condition_content">J’ai lu et accepte les [A]Conditions générales d’utilisation de MEGA.[/A]</string>
+    <string name="sign_up_terms_condition_content">J’ai lu et accepte les [A]Conditions d\’utilisation de MEGA.[/A]</string>
     <!--Sign Up page password hint and suggestion title-->
     <string name="sign_up_password_hint_title_text">Sont recommandés&#160;:</string>
     <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
@@ -1133,7 +1133,7 @@
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
     <string name="choose_account_screen_subscription_information_description">Les abonnements sont renouvelés automatiquement pour des périodes d\’abonnement successives de même durée et au même prix que la période initiale choisie.\n\nVous pouvez résilier votre abonnement à tout moment, mais au plus tard 24 heures avant la date d\’échéance de votre prochain abonnement. [A]Apprenez à gérer votre abonnement dans vos paramètres[/A].</string>
     <!-- Terms and policies link to navigate user to terms of service page and privacy policy page in the Subscription page-->
-    <string name="choose_account_screen_terms_and_policies_link_text">[A]Conditions générales d\’utilisation[/A] et [B]Politique de confidentialité[/B]</string>
+    <string name="choose_account_screen_terms_and_policies_link_text">[A]Conditions d\’utilisation[/A] et [B]Politique de confidentialité[/B]</string>
     <!-- Get more with Pro plan title in choose account screen-->
     <string name="choose_account_screen_get_more_with_pro_plan_title">Obtenir davantage avec un abonnement Pro</string>
     <!-- Maybe later button text in the choose account screen-->
@@ -2256,7 +2256,7 @@
     <string name="pdf_viewer_search_placeholder">Rechercher dans le document</string>
     <string name="folder_link_subtitle">Lien du dossier</string>
     <string name="pdf_viewer_dialog_title_enter_password">Entrer un mot de passe</string>
-    <string name="folder_link_unavailable_tos_violation">Le lien de dossier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
+    <string name="folder_link_unavailable_tos_violation">Le lien de dossier a été supprimé pour non-respect des Conditions d\’utilisation.</string>
     <string name="link_decryption_key_dialog_title">Entrer la clé de déchiffrement</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Clé de déchiffrement invalide</string>
     <string name="upload_bottom_sheet_action_menu_scan_document">Numériser un document</string>
@@ -2408,4 +2408,6 @@
     <string name="pdf_viewer_error_streaming">Une erreur est survenue lors de l\’ouverture du fichier</string>
     <string name="homepage_empty_hint_audio">[B]Aucun[/B] [A]fichier audio[/A] [B]trouvé[/B]</string>
     <string name="cloud_explorer_choose_folder_title">Choisir un dossier</string>
+    <string name="general_transfer_error_not_enough_free_space">L’espace est insuffisant sur votre appareil</string>
+    <string name="general_transfer_error_temporary_unavaible">La ressource n’est temporairement pas accessible, veuillez réessayer ultérieurement</string>
 </resources>

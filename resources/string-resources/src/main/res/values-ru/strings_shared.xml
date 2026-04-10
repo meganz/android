@@ -2501,4 +2501,6 @@
     <string name="open_link_dialog_title">Открыть ссылку</string>
     <string name="open_link_dialog_hint">Вставьте ссылку</string>
     <string name="cloud_explorer_choose_folder_title">Выбрать папку</string>
+    <string name="general_transfer_error_not_enough_free_space">Недостаточно места на устройстве</string>
+    <string name="general_transfer_error_temporary_unavaible">Ресурс временно недоступен, пожалуйста, повторите попытку позже</string>
 </resources>

@@ -2182,7 +2182,7 @@
     <string name="general_dialog_discard_changes_message">Kaydedilmeyen tüm değişiklikler kaybolacak</string>
     <string name="general_changes_saved">Değişiklikler kaydedildi</string>
     <string name="node_option_save_to_mega">MEGA’ya kaydet</string>
-    <string name="home_screen_audios_chip_title">Sesli</string>
+    <string name="home_screen_audios_chip_title">Ses</string>
     <string name="media_discovery_screen_dropdown_action_zoom_in">Yakınlaştır</string>
     <string name="media_discovery_screen_dropdown_action_zoom_out">Uzaklaştır</string>
     <string name="media_discovery_filter_all_media">Tüm medya</string>
@@ -2336,4 +2336,8 @@
     <string name="cloud_explorer_select_destination_title">Hedef seç</string>
     <string name="cloud_explorer_use_this_folder_button">Bu klasörü kullan</string>
     <string name="cloud_explorer_choose_folder_title">Klasör seç</string>
+    <string name="general_transfer_error_not_enough_free_space">Cihazınızda yeterli boş alan yok</string>
+    <string name="general_transfer_error_temporary_unavaible">Kaynak geçici olarak kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="video_player_more_options_playlist_option">Oynatma listesi</string>
+    <string name="video_player_more_options_lock_option">Video oynatıcıyı kilitle</string>
 </resources>

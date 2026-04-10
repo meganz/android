@@ -2418,4 +2418,6 @@
     <string name="cloud_explorer_choose_folder_title">Escolher pasta</string>
     <string name="cloud_explorer_select_destination_title">Selecione o destino</string>
     <string name="cloud_explorer_use_this_folder_button">Usar esta pasta</string>
+    <string name="general_transfer_error_not_enough_free_space">Não há espaço livre suficiente no seu dispositivo</string>
+    <string name="general_transfer_error_temporary_unavaible">Serviço temporariamente indisponível, por favor tente novamente mais tarde</string>
 </resources>

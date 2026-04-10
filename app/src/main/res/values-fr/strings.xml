@@ -151,7 +151,7 @@
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Je comprends que [B]si je perds mon mot de passe, je pourrais perdre mes données[/B]. En apprendre davantage sur le [A]chiffrement de bout en bout de MEGA[/A].</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">Vous devez accepter nos Conditions générales d’utilisation</string>
+    <string name="create_account_no_terms">Vous devez accepter nos Conditions d\’utilisation</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Vous devez attester que vous comprenez le danger que représente la perte de votre mot de passe</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
@@ -571,7 +571,7 @@
     <!-- Preference screen item action button -->
     <string name="settings_about_privacy_policy">Politique de confidentialité</string>
     <!--  -->
-    <string name="settings_about_terms_of_service">Conditions générales d’utilisation</string>
+    <string name="settings_about_terms_of_service">Conditions d\’utilisation</string>
     <!-- App means “Application” -->
     <string name="settings_about_app_version">Version de l’appli</string>
     <!-- Title of the label where the SDK version is shown -->
@@ -723,7 +723,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">L’adresse courriel ou le mot de passe est erroné. Veuillez réessayer.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Votre compte a été désactivé en raison du non-respect de nos Conditions générales d’utilisation. Veuillez contacter support&#64;mega.io</string>
+    <string name="error_account_suspended">Votre compte a été désactivé en raison du non-respect de nos Conditions d\’utilisation. Veuillez contacter support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Trop de tentatives infructueuses de connexion, veuillez patienter pendant une heure.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -731,11 +731,11 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Le lien de dossier est inaccessible</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Le lien de dossier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
+    <string name="folder_link_unavaible_ToS_violation">Le lien de dossier a été supprimé pour non-respect des Conditions d\’utilisation.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Le lien de fichier est inaccessible</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Le lien de fichier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
+    <string name="file_link_unavaible_ToS_violation">Le lien de fichier a été supprimé pour non-respect des Conditions d\’utilisation.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Cette URL est corrompue ou mal formée. Le lien auquel vous essayez d’accéder n’existe pas.</string>
     <!-- Plural of items which contains a folder. 2 items -->
@@ -745,7 +745,7 @@
         <item quantity="other">%1$d&#160;éléments</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_delete_account">Le compte utilisateur associé a été résilié en raison du non-respect répété de nos Conditions générales d’utilisation.</string>
+    <string name="file_link_unavaible_delete_account">Le compte utilisateur associé a été résilié en raison du non-respect répété de nos Conditions d\’utilisation.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">La clé de déchiffrement fournie pour le lien de dossier est invalide.</string>
     <!-- Item of the navigation title for the chat section -->
@@ -1955,7 +1955,7 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contester le retrait</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Non accessible pour non-respect des Conditions générales d’utilisation</string>
+    <string name="error_download_takendown_node">Non accessible pour non-respect des Conditions d\’utilisation</string>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A] a été rétabli.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -3039,9 +3039,9 @@
     <!-- Title of pop-up error message for taken down file -->
     <string name="error_file_not_available">Le fichier n’est plus accessible</string>
     <!-- Body of pop-up error message for taken down file. -->
-    <string name="error_takendown_file">Le fichier a été supprimé pour non-respect des Conditions générales d’utilisation.</string>
+    <string name="error_takendown_file">Le fichier a été supprimé pour non-respect des Conditions d\’utilisation.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
-    <string name="error_download_takendown_file">Non-respect des Conditions générales d’utilisation</string>
+    <string name="error_download_takendown_file">Non-respect des Conditions d\’utilisation</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_warning_no_picker">Aucune appli n’est installée sur cet appareil pour sélectionner les dossiers.</string>
     <!-- Next audios to be played in the audio playlist -->
@@ -3325,7 +3325,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Votre compte MEGA a été désactivé en raison d’allégations répétées de violation des droits d’auteur. Cela signifie que vous ne pouvez ni accéder à votre compte ni à ses données.\nPour de plus amples renseignements sur la manière de déposer un contre-avis, vérifiez votre boîte de réception des courriels.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">Votre compte a été résilié en raison du non-respect des Conditions générales d’utilisation de MEGA.\nVous ne pourrez pas accéder à vos données stockées de nouveau ni être autorisé à créer un nouveau compte MEGA.</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">Votre compte a été résilié en raison du non-respect des Conditions d\’utilisation de MEGA.\nVous ne pourrez pas accéder à vos données stockées de nouveau ni être autorisé à créer un nouveau compte MEGA.</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Réunions</string>
     <!-- Title of the location option displayed in the chat room toolbar -->

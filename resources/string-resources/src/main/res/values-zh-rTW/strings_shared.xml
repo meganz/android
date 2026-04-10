@@ -2032,7 +2032,7 @@
         <item quantity="other">%d 個資料夾</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">%1$d個資料夾&#160;·&#160;</item>
+        <item quantity="other">“%1$d個資料夾， “</item>
     </plurals>
     <string name="general_first_name">名字</string>
     <string name="general_last_name">姓氏</string>
@@ -2246,4 +2246,8 @@
     <string name="open_link_dialog_hint">貼上連結</string>
     <string name="homepage_empty_hint_audio">[B]找不到[/B][A]音訊檔案[/A]</string>
     <string name="cloud_explorer_choose_folder_title">選擇資料夾</string>
+    <string name="cloud_explorer_use_this_folder_button">使用此資料夾</string>
+    <string name="cloud_explorer_select_destination_title">選擇儲存位置</string>
+    <string name="general_transfer_error_not_enough_free_space">您的裝置可用空間不足</string>
+    <string name="general_transfer_error_temporary_unavaible">資源暫時無法使用，請稍後再試</string>
 </resources>
