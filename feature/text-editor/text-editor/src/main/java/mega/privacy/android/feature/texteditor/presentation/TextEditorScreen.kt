@@ -564,9 +564,10 @@ private fun rememberScrollToHideBarState(
                 available: Offset,
                 source: NestedScrollSource,
             ): Offset {
-                if (consumed.y > 0f && topBarHeightPxState.floatValue > 0f) {
+                val revealDelta = consumed.y + available.y.coerceAtLeast(0f)
+                if (revealDelta > 0f && topBarHeightPxState.floatValue > 0f) {
                     topBarOffsetPxState.floatValue =
-                        (topBarOffsetPxState.floatValue + consumed.y)
+                        (topBarOffsetPxState.floatValue + revealDelta)
                             .coerceIn(-topBarHeightPxState.floatValue, 0f)
                 }
                 return Offset.Zero
