@@ -305,7 +305,10 @@ fun TextEditorScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    Box(modifier = Modifier.fillMaxSize()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         TextEditorLoadingContent()
                     }
                 }
@@ -625,14 +628,9 @@ private fun TextEditorErrorContent(
     }
 }
 
-private val LoadingContentTopPadding = 153.dp
-
 @Composable
 private fun TextEditorLoadingContent() {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = LoadingContentTopPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
