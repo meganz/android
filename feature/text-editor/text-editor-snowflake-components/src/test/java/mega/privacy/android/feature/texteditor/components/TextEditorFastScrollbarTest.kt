@@ -150,4 +150,24 @@ internal class TextEditorFastScrollbarTest {
         )
         assertThat(result).isEqualTo(1f)
     }
+
+    @Test
+    fun `test that shouldShowScrollbar returns false when itemCount is 0`() {
+        assertThat(shouldShowScrollbar(0)).isFalse()
+    }
+
+    @Test
+    fun `test that shouldShowScrollbar returns false when itemCount is 1`() {
+        assertThat(shouldShowScrollbar(1)).isFalse()
+    }
+
+    @Test
+    fun `test that shouldShowScrollbar returns true when itemCount is 2`() {
+        assertThat(shouldShowScrollbar(2)).isTrue()
+    }
+
+    @Test
+    fun `test that shouldShowScrollbar returns true when itemCount is large`() {
+        assertThat(shouldShowScrollbar(100)).isTrue()
+    }
 }

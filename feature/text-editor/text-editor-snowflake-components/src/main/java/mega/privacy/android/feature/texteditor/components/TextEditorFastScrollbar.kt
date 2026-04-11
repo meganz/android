@@ -57,7 +57,7 @@ private val thumbEndPadding = 8.dp
 private val thumbTrackVerticalInset = 4.dp
 
 /** Minimum chunk count (not line count) to show the scrollbar. */
-private const val MINIMUM_ITEMS_FOR_SCROLLBAR = 50
+private const val MINIMUM_ITEMS_FOR_SCROLLBAR = 2
 
 /** Step size for scrolling large lists; avoids hitting platform scroll-offset limit in one jump. */
 private const val SCROLL_STEP_ITEMS = 25_000
@@ -84,7 +84,7 @@ fun TextEditorFastScrollbar(
     modifier: Modifier = Modifier,
     tooltipText: ((currentIndex: Int) -> String)? = null,
 ) {
-    if (itemCount < MINIMUM_ITEMS_FOR_SCROLLBAR) return
+    if (!shouldShowScrollbar(itemCount)) return
 
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
@@ -301,3 +301,9 @@ internal fun calculateScrollProportion(
         (continuousIndex / itemCountFloat).coerceIn(0f, 1f)
     }
 }
+
+/**
+ * Whether the scrollbar should be shown for the given [itemCount] (chunk count, not line count).
+ */
+internal fun shouldShowScrollbar(itemCount: Int): Boolean =
+    itemCount >= MINIMUM_ITEMS_FOR_SCROLLBAR
