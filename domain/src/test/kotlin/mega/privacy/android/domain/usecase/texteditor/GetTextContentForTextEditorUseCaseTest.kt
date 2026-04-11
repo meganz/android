@@ -20,14 +20,17 @@ import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.domain.usecase.streaming.StartStreamingServer
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.io.FileNotFoundException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class GetTextContentForTextEditorUseCaseTest {
@@ -56,6 +59,20 @@ internal class GetTextContentForTextEditorUseCaseTest {
 
     @TempDir
     lateinit var tempDir: File
+
+    @BeforeEach
+    fun resetMocks() {
+        Mockito.reset(
+            getNodeByIdUseCase,
+            getLocalFileForNodeUseCase,
+            getCacheFileUseCase,
+            getDataBytesFromUrlUseCase,
+            startStreamingServer,
+            getStreamingUriStringForNode,
+            downloadNodeUseCase,
+            fileSystemRepository,
+        )
+    }
 
     @Test
     fun `test that getText returns content when localPath is set and file exists`() = runTest {
@@ -97,8 +114,9 @@ internal class GetTextContentForTextEditorUseCaseTest {
     }
 
     @Test
-    fun `test that getText returns failure when localPath does not exist`() = runTest {
+    fun `test that getText falls back to node resolution when localPath does not exist`() = runTest {
         whenever(fileSystemRepository.doesFileExist("/nonexistent/path.txt")).thenReturn(false)
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
 
         val result = runCatching {
             underTest(
@@ -110,14 +128,15 @@ internal class GetTextContentForTextEditorUseCaseTest {
         assertThat(result.isFailure).isTrue()
         val exception = result.exceptionOrNull()
         assertThat(exception).isInstanceOf(IllegalStateException::class.java)
-        assertThat(exception?.message).contains("Local path does not exist")
+        assertThat(exception?.message).contains("Node not found or not a file")
     }
 
     @Test
-    fun `test that getText throws when localPath is a directory`() = runTest {
+    fun `test that getText falls back to node resolution when localPath is a directory`() = runTest {
         val path = "/some/dir"
         whenever(fileSystemRepository.doesFileExist(path)).thenReturn(true)
         whenever(fileSystemRepository.isFolderPath(path)).thenReturn(true)
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
 
         val result = runCatching {
             underTest(nodeHandle = 1L, localPath = path).toList()
@@ -126,7 +145,7 @@ internal class GetTextContentForTextEditorUseCaseTest {
         assertThat(result.isFailure).isTrue()
         val exception = result.exceptionOrNull()
         assertThat(exception).isInstanceOf(IllegalStateException::class.java)
-        assertThat(exception?.message).contains("Path is a directory")
+        assertThat(exception?.message).contains("Node not found or not a file")
     }
 
     @Test
@@ -204,11 +223,14 @@ internal class GetTextContentForTextEditorUseCaseTest {
     fun `test that getText returns content via download when streaming unavailable`() = runTest {
         val nodeHandle = 30L
         val destFile = File(tempDir, "downloaded.txt").apply { writeText("") }
+        val downloadedPath = destFile.absolutePath
         val node = mock<TypedFileNode> {
             on { id } doReturn NodeId(nodeHandle)
             on { name } doReturn "remote.txt"
         }
-        val transfer = mock<Transfer>()
+        val transfer = mock<Transfer> {
+            on { localPath } doReturn downloadedPath
+        }
         whenever(startStreamingServer()).thenReturn(Unit)
         whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
         whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
@@ -217,7 +239,8 @@ internal class GetTextContentForTextEditorUseCaseTest {
         whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
             flowOf(TransferEvent.TransferFinishEvent(transfer, null))
         )
-        whenever(fileSystemRepository.readLinesFromPathInChunks(destFile.absolutePath, 500))
+        whenever(fileSystemRepository.doesFileExist(downloadedPath)).thenReturn(true)
+        whenever(fileSystemRepository.readLinesFromPathInChunks(downloadedPath, 500))
             .thenReturn(flowOf(listOf("downloaded")))
 
         val chunks = underTest(nodeHandle = nodeHandle, localPath = null).toList()
@@ -231,11 +254,14 @@ internal class GetTextContentForTextEditorUseCaseTest {
         runTest {
             val nodeHandle = 35L
             val destFile = File(tempDir, "fallback.txt").apply { writeText("") }
+            val downloadedPath = destFile.absolutePath
             val node = mock<TypedFileNode> {
                 on { id } doReturn NodeId(nodeHandle)
                 on { name } doReturn "remote.txt"
             }
-            val transfer = mock<Transfer>()
+            val transfer = mock<Transfer> {
+                on { localPath } doReturn downloadedPath
+            }
             whenever(startStreamingServer()).thenThrow(RuntimeException("Streaming unavailable"))
             whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
             whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
@@ -243,7 +269,8 @@ internal class GetTextContentForTextEditorUseCaseTest {
             whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
                 flowOf(TransferEvent.TransferFinishEvent(transfer, null))
             )
-            whenever(fileSystemRepository.readLinesFromPathInChunks(destFile.absolutePath, 500))
+            whenever(fileSystemRepository.doesFileExist(downloadedPath)).thenReturn(true)
+            whenever(fileSystemRepository.readLinesFromPathInChunks(downloadedPath, 500))
                 .thenReturn(flowOf(listOf("fallback content")))
 
             val chunks = underTest(nodeHandle = nodeHandle, localPath = null).toList()
@@ -300,5 +327,34 @@ internal class GetTextContentForTextEditorUseCaseTest {
 
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isSameInstanceAs(downloadError)
+    }
+
+    @Test
+    fun `test that getText throws when download succeeds but file does not exist`() = runTest {
+        val nodeHandle = 60L
+        val destFile = File(tempDir, "missing.txt")
+        val downloadedPath = "/some/path/missing.txt"
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(nodeHandle)
+            on { name } doReturn "missing.txt"
+        }
+        val transfer = mock<Transfer> {
+            on { localPath } doReturn downloadedPath
+        }
+        whenever(startStreamingServer()).thenThrow(RuntimeException("unavailable"))
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
+        whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(destFile)
+        whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(
+            flowOf(TransferEvent.TransferFinishEvent(transfer, null))
+        )
+        whenever(fileSystemRepository.doesFileExist(downloadedPath)).thenReturn(false)
+
+        val result = runCatching {
+            underTest(nodeHandle = nodeHandle, localPath = null).toList()
+        }
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isInstanceOf(FileNotFoundException::class.java)
     }
 }

@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.domain.usecase.streaming.StartStreamingServer
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import java.io.FileNotFoundException
 import java.net.URL
 import javax.inject.Inject
 
@@ -71,13 +72,10 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
 
     private suspend fun resolveContentSource(nodeHandle: Long, localPath: String?): ContentSource {
         val contextLocalPath = localPath
-        if (contextLocalPath != null) {
-            if (!fileSystemRepository.doesFileExist(contextLocalPath)) {
-                throw IllegalStateException("Local path does not exist: $contextLocalPath")
-            }
-            if (fileSystemRepository.isFolderPath(contextLocalPath)) {
-                throw IllegalStateException("Path is a directory: $contextLocalPath")
-            }
+        if (contextLocalPath != null &&
+            fileSystemRepository.doesFileExist(contextLocalPath) &&
+            !fileSystemRepository.isFolderPath(contextLocalPath)
+        ) {
             return ContentSource.LocalPath(contextLocalPath)
         }
         val node = getNodeByIdUseCase(NodeId(nodeHandle)) as? TypedFileNode
@@ -119,21 +117,30 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
         val destDir = destFile.parentFile?.absolutePath
             ?: throw IllegalStateException("Cannot resolve parent directory for download")
         if (destFile.exists() && destFile.isDirectory) {
-            destFile.deleteRecursively()
+            fileSystemRepository.deleteFile(destFile)
         }
         var finishError: MegaException? = null
+        var downloadedPath: String? = null
         downloadNodeUseCase(
             node = node,
             destinationPath = destDir,
             appData = listOf(TransferAppData.BackgroundTransfer),
             isHighPriority = true,
         ).collect { event ->
-            if (event is TransferEvent.TransferFinishEvent && event.error != null) {
-                finishError = event.error
+            if (event is TransferEvent.TransferFinishEvent) {
+                if (event.error != null) {
+                    finishError = event.error
+                } else {
+                    downloadedPath = event.transfer.localPath
+                }
             }
         }
         finishError?.let { throw it }
-        return destFile.absolutePath
+        val resolvedPath = downloadedPath ?: destFile.absolutePath
+        if (!fileSystemRepository.doesFileExist(resolvedPath)) {
+            throw FileNotFoundException("Downloaded file not found: $resolvedPath")
+        }
+        return resolvedPath
     }
 
     /** Local file path to read from, or content already read from streaming URL. */
