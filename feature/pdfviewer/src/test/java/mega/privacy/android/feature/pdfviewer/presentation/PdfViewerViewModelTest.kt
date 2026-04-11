@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
@@ -54,6 +56,7 @@ class PdfViewerViewModelTest {
         mock<SetOrUpdateLastPageViewedInPdfUseCase>()
     private val getDataBytesFromUrlUseCase = mock<GetDataBytesFromUrlUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
     private val context = mock<Context>()
 
     private val defaultArgs = PdfViewerViewModel.Args(
@@ -76,6 +79,7 @@ class PdfViewerViewModelTest {
             setOrUpdateLastPageViewedInPdfUseCase,
             getDataBytesFromUrlUseCase,
             monitorConnectivityUseCase,
+            saveRecentlyUsedItemUseCase,
             context,
         )
 
@@ -105,6 +109,7 @@ class PdfViewerViewModelTest {
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             ioDispatcher = testDispatcher,
+            saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
         )
     }
 
@@ -570,4 +575,19 @@ class PdfViewerViewModelTest {
                 assertThat(awaitItem().isOnline).isFalse()
             }
         }
+
+    @Test
+    fun `test that onLoadComplete saves recently used PDF item`() = runTest {
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.onLoadComplete(10)
+        advanceUntilIdle()
+
+        verify(saveRecentlyUsedItemUseCase).invoke(
+            nodeHandle = 12345L,
+            type = RecentlyUsedType.PDF,
+            fileName = "Test Document.pdf",
+        )
+    }
 }

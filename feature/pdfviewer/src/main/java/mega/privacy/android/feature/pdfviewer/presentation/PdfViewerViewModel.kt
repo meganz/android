@@ -32,6 +32,8 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
@@ -58,6 +60,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PdfViewerState())
@@ -302,6 +305,15 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 totalPages = pageCount,
                 error = null,
             )
+        }
+        viewModelScope.launch {
+            runCatching {
+                saveRecentlyUsedItemUseCase(
+                    nodeHandle = args.nodeHandle,
+                    type = RecentlyUsedType.PDF,
+                    fileName = args.title.orEmpty(),
+                )
+            }.onFailure { Timber.e(it, "Failed to save recently used PDF item") }
         }
     }
 
