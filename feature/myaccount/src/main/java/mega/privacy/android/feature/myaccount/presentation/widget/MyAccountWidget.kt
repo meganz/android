@@ -38,6 +38,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.formatter.stripLinkAnnotations
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
@@ -235,12 +236,20 @@ internal fun MyAccountWidget(
                     }
 
                     // Storage usage (formatted)
-                    MegaText(
-                        text = stringResource(
+                    val storageText = if (state.isBusinessAccount) {
+                        stringResource(
+                            R.string.navigation_drawer_used_space_only,
+                            formatFileSize(state.usedStorage, context)
+                        ).stripLinkAnnotations()
+                    } else {
+                        stringResource(
                             R.string.storage_usage_format,
                             formatFileSize(state.usedStorage, context),
                             formatFileSize(state.totalStorage, context)
-                        ),
+                        )
+                    }
+                    MegaText(
+                        text = storageText,
                         textColor = TextColor.Secondary,
                         style = bodySmallStyle,
                         modifier = Modifier
@@ -248,14 +257,16 @@ internal fun MyAccountWidget(
                             .testTag(MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG)
                     )
 
-                    Spacer(modifier = Modifier.height(2.dp))
+                    if (!state.isBusinessAccount) {
+                        Spacer(modifier = Modifier.height(2.dp))
 
-                    // Horizontal progress bar
-                    MyAccountHorizontalProgressBar(
-                        modifier = Modifier.testTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG),
-                        level = state.storageQuotaLevel,
-                        progress = state.usedStoragePercentage.toFloat()
-                    )
+                        // Horizontal progress bar
+                        MyAccountHorizontalProgressBar(
+                            modifier = Modifier.testTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG),
+                            level = state.storageQuotaLevel,
+                            progress = state.usedStoragePercentage.toFloat()
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))

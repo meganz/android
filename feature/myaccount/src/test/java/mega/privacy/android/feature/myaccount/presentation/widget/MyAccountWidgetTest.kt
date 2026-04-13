@@ -9,6 +9,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.formatter.stripLinkAnnotations
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
@@ -247,7 +249,7 @@ class MyAccountWidgetTest {
             totalStorage = 1099511627776L,  // 1 TB
             usedStoragePercentage = 1,
             storageQuotaLevel = QuotaLevel.Success
-        )
+        ).copy(isBusinessAccount = true)
 
         setWidgetContent(testState)
 
@@ -256,6 +258,92 @@ class MyAccountWidgetTest {
 
         // Verify user name is displayed with greeting
         assertGreetingText("Business User")
+    }
+
+    @Test
+    fun `test that storage usage text shows only used storage when account is business`() {
+        val usedStorage = 10737418240L  // 10 GB
+        val testState = createBasicState(
+            name = "Business User",
+            accountTypeNameResource = R.string.business_label,
+            usedStorage = usedStorage,
+            totalStorage = 1099511627776L,  // 1 TB
+            usedStoragePercentage = 1,
+            storageQuotaLevel = QuotaLevel.Success
+        ).copy(isBusinessAccount = true)
+
+        setWidgetContent(testState)
+
+        val formattedUsed = formatFileSize(usedStorage, composeTestRule.activity)
+        val expectedText = composeTestRule.activity.getString(
+            R.string.navigation_drawer_used_space_only,
+            formattedUsed
+        ).stripLinkAnnotations()
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG, useUnmergedTree = true)
+            .assert(hasText(expectedText))
+    }
+
+    @Test
+    fun `test that storage usage text shows used and total storage when account is not business`() {
+        val usedStorage = 10737418240L   // 10 GB
+        val totalStorage = 107374182400L // 100 GB
+        val testState = createBasicState(
+            name = "Pro User",
+            accountTypeNameResource = R.string.pro1_account,
+            usedStorage = usedStorage,
+            totalStorage = totalStorage,
+            usedStoragePercentage = 10,
+            storageQuotaLevel = QuotaLevel.Success
+        )
+
+        setWidgetContent(testState)
+
+        val formattedUsed = formatFileSize(usedStorage, composeTestRule.activity)
+        val formattedTotal = formatFileSize(totalStorage, composeTestRule.activity)
+        val expectedText = composeTestRule.activity.getString(
+            R.string.storage_usage_format,
+            formattedUsed,
+            formattedTotal
+        )
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG, useUnmergedTree = true)
+            .assert(hasText(expectedText))
+    }
+
+    @Test
+    fun `test that progress bar does not exist when account is business`() {
+        val testState = createBasicState(
+            name = "Business User",
+            accountTypeNameResource = R.string.business_label,
+            usedStorage = 10737418240L,
+            totalStorage = 1099511627776L,
+            usedStoragePercentage = 1,
+            storageQuotaLevel = QuotaLevel.Success
+        ).copy(isBusinessAccount = true)
+
+        setWidgetContent(testState)
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that progress bar is displayed when account is not business`() {
+        val testState = createBasicState(
+            name = "Pro User",
+            accountTypeNameResource = R.string.pro1_account,
+            usedStorage = 10737418240L,
+            totalStorage = 107374182400L,
+            usedStoragePercentage = 10,
+            storageQuotaLevel = QuotaLevel.Success
+        )
+
+        setWidgetContent(testState)
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
     }
 
     @Test

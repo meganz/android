@@ -45,6 +45,8 @@ import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlert
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.core.formatter.stripLinkAnnotations
+import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -275,8 +277,14 @@ class MenuViewModel @Inject constructor(
                     val usedRubbish = accountDetail.storageDetail?.usedRubbish ?: 0
                     val accountType = accountDetail.levelDetail?.accountType ?: AccountType.FREE
                     val accountTypeName = accountTypeNameMapper(accountType)
-                    storageSubtitleFlow.value =
+                    storageSubtitleFlow.value = if (accountType.isBusinessAccount) {
+                        getStringFromStringResMapper(
+                            SharedR.string.navigation_drawer_used_space_only,
+                            fileSizeStringMapper(usedStorage)
+                        ).stripLinkAnnotations()
+                    } else {
                         "${fileSizeStringMapper(usedStorage)}/${fileSizeStringMapper(totalStorage)}"
+                    }
                     currentPlanSubtitleFlow.value = getStringFromStringResMapper(accountTypeName)
                     rubbishBinSubtitleFlow.value = fileSizeStringMapper(usedRubbish)
                 }

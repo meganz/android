@@ -57,6 +57,7 @@ import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarCont
 import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -558,6 +559,108 @@ class MenuViewModelTest {
 
 
     @Test
+    fun `test that storageSubtitle shows used storage only when account type is BUSINESS`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetail = createAccountDetail(
+                usedStorage = 10737418240L,
+                totalStorage = Long.MAX_VALUE,
+                usedRubbish = 0L,
+                accountType = AccountType.BUSINESS
+            )
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(accountDetail))
+            }
+
+            val mockUsedStorageString = "10 GB"
+            val mockAccountTypeName = R.string.ok
+
+            fileSizeStringMapper.stub {
+                on { invoke(10737418240L) }.thenReturn(mockUsedStorageString)
+            }
+
+            accountTypeNameMapper.stub {
+                on { invoke(AccountType.BUSINESS) }.thenReturn(mockAccountTypeName)
+            }
+
+            getStringFromStringResMapper.stub {
+                on { invoke(mockAccountTypeName) }.thenReturn("Business")
+                on {
+                    invoke(
+                        SharedR.string.navigation_drawer_used_space_only,
+                        mockUsedStorageString
+                    )
+                }.thenReturn("[A]10 GB[/A] used")
+            }
+
+            val menuItems = mapOf(20 to StorageItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+
+                state.myAccountItems[20]?.subTitle?.test {
+                    assertThat(awaitItem()).isEqualTo("10 GB used")
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that storageSubtitle shows used storage only when account type is PRO_FLEXI`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetail = createAccountDetail(
+                usedStorage = 5368709120L,
+                totalStorage = Long.MAX_VALUE,
+                usedRubbish = 0L,
+                accountType = AccountType.PRO_FLEXI
+            )
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(accountDetail))
+            }
+
+            val mockUsedStorageString = "5 GB"
+            val mockAccountTypeName = R.string.ok
+
+            fileSizeStringMapper.stub {
+                on { invoke(5368709120L) }.thenReturn(mockUsedStorageString)
+            }
+
+            accountTypeNameMapper.stub {
+                on { invoke(AccountType.PRO_FLEXI) }.thenReturn(mockAccountTypeName)
+            }
+
+            getStringFromStringResMapper.stub {
+                on { invoke(mockAccountTypeName) }.thenReturn("Pro Flexi")
+                on {
+                    invoke(
+                        SharedR.string.navigation_drawer_used_space_only,
+                        mockUsedStorageString
+                    )
+                }.thenReturn("[A]5 GB[/A] used")
+            }
+
+            val menuItems = mapOf(20 to StorageItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+
+                state.myAccountItems[20]?.subTitle?.test {
+                    assertThat(awaitItem()).isEqualTo("5 GB used")
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that account details with null level detail default to FREE account type`() =
         runTest {
             stubDefaultDependencies()
@@ -775,6 +878,15 @@ class MenuViewModelTest {
         }
 
         whenever(getRubbishNodeUseCase()).thenReturn(null)
+
+        fileSizeStringMapper.stub {
+            on { invoke(any()) }.thenReturn("")
+        }
+
+        getStringFromStringResMapper.stub {
+            on { invoke(any()) }.thenReturn("")
+            on { invoke(any(), any()) }.thenReturn("")
+        }
     }
 
     private fun initUnderTest(
