@@ -20,17 +20,13 @@ class RewardedAdGateViewModelTest {
         val state = underTest.uiState.value
         assertThat(state.showDialog).isFalse()
         assertThat(state.isLoading).isFalse()
-        assertThat(state.errorMessage).isNull()
     }
 
     @Test
-    fun `test that showDialog sets showDialog true and clears error`() {
-        underTest.setError("some error")
-
+    fun `test that showDialog sets showDialog true`() {
         underTest.showDialog()
 
         assertThat(underTest.uiState.value.showDialog).isTrue()
-        assertThat(underTest.uiState.value.errorMessage).isNull()
     }
 
     @Test
@@ -43,17 +39,13 @@ class RewardedAdGateViewModelTest {
         val state = underTest.uiState.value
         assertThat(state.showDialog).isFalse()
         assertThat(state.isLoading).isFalse()
-        assertThat(state.errorMessage).isNull()
     }
 
     @Test
-    fun `test that setLoading sets isLoading true and clears error`() {
-        underTest.setError("error")
-
+    fun `test that setLoading sets isLoading true`() {
         underTest.setLoading()
 
         assertThat(underTest.uiState.value.isLoading).isTrue()
-        assertThat(underTest.uiState.value.errorMessage).isNull()
     }
 
     @Test
@@ -63,15 +55,5 @@ class RewardedAdGateViewModelTest {
         underTest.setLoadingComplete()
 
         assertThat(underTest.uiState.value.isLoading).isFalse()
-    }
-
-    @Test
-    fun `test that setError sets error message and clears loading`() {
-        underTest.setLoading()
-
-        underTest.setError("Ad failed to load")
-
-        assertThat(underTest.uiState.value.isLoading).isFalse()
-        assertThat(underTest.uiState.value.errorMessage).isEqualTo("Ad failed to load")
     }
 }

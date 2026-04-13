@@ -20,7 +20,7 @@ class RewardedAdGateViewModel @Inject constructor() : ViewModel() {
         field = MutableStateFlow(RewardedAdGateUiState())
 
     fun showDialog() {
-        uiState.update { it.copy(showDialog = true, errorMessage = null) }
+        uiState.update { it.copy(showDialog = true) }
     }
 
     fun dismiss() {
@@ -28,14 +28,10 @@ class RewardedAdGateViewModel @Inject constructor() : ViewModel() {
     }
 
     fun setLoading() {
-        uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        uiState.update { it.copy(isLoading = true) }
     }
 
     fun setLoadingComplete() {
         uiState.update { it.copy(isLoading = false) }
-    }
-
-    fun setError(message: String) {
-        uiState.update { it.copy(isLoading = false, errorMessage = message) }
     }
 }

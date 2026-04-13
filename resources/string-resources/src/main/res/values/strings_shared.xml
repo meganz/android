@@ -2662,4 +2662,24 @@
     <plurals name="video_section_add_to_playlists_success">
         <item quantity="other">Added 1 item to %1$d playlists</item>
     </plurals>
+    <!-- Rewarded ad dialog title prompting user to watch an ad before continuing -->
+    <string name="rewarded_ad_dialog_title">Continue after the ad</string>
+    <!-- Rewarded ad dialog button text to watch the ad -->
+    <string name="rewarded_ad_dialog_watch_ad_button">Watch ad</string>
+    <!-- Rewarded ad dialog subtitle suggesting user can upgrade to Pro for ad-free access -->
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Or upgrade to a Pro plan for instant, ad-free access</string>
+    <!-- Rewarded ad dialog Pro card title -->
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <!-- Rewarded ad dialog Pro perk: unlimited downloads and no ads -->
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Unlimited downloads, skip ads</string>
+    <!-- Rewarded ad dialog Pro perk: up to 20 TB encrypted storage -->
+    <string name="rewarded_ad_dialog_perk_storage">Up to 20 TB encrypted storage</string>
+    <!-- Rewarded ad dialog Pro perk: priority transfer speeds -->
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Priority transfer speeds</string>
+    <!-- Rewarded ad dialog Pro perk: MEGA Pass and VPN included -->
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass and MEGA VPN included</string>
+    <!-- Rewarded ad dialog button text to upgrade to Pro plan -->
+    <string name="rewarded_ad_dialog_upgrade_button">Upgrade to Pro</string>
+    <!-- Toast message shown when a rewarded ad is not available and the user action continues -->
+    <string name="rewarded_ad_unavailable_toast">Ad is unavailable! Continuing&#8230;</string>
 </resources>

@@ -141,6 +141,7 @@ interface IconPackInterface {
                 val Database: ImageVector
                 val Devices: ImageVector
                 val Download: ImageVector
+                val ArrowRight: ImageVector
                 val Edit: ImageVector
                 val EmojiSmile: ImageVector
                 val Eraser: ImageVector

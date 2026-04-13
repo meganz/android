@@ -1,11 +1,17 @@
 package mega.privacy.android.shared.ads.rewarded
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
@@ -14,13 +20,11 @@ import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
 import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd
 import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback
-import kotlinx.collections.immutable.persistentListOf
-import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.dialogs.BasicDialogButton
-import mega.android.core.ui.components.dialogs.VERTICAL
+import kotlinx.coroutines.launch
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.ads.BuildConfig
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -80,6 +84,21 @@ fun rememberRewardedAdGate(
         onNavigate = onNavigate,
     )
 
+    // Dismiss dialog on config change so stale pendingAction is never invoked
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                handler.cancelPendingAction()
+                viewModel.dismiss()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     return handler
 }
 
@@ -90,65 +109,51 @@ private fun RewardedAdGate(
     onNavigate: (NavKey) -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    if (!state.showDialog && !state.isLoading) return
-
-    // TODO strings and design will be confirmed later
     val activity = LocalActivity.current
-    val dialogBody = state.errorMessage
-        ?: "You can watch a short ad to keep going,\nor go Pro for unlimited access with no interruptions."
+    val coroutineScope = rememberCoroutineScope()
 
-    BasicDialog(
-        title = "Unlock more with a quick ad",
-        description = dialogBody,
-        buttons = persistentListOf(
-            BasicDialogButton(
-                text = if (state.isLoading) "Watch ad…" else "Watch ad",
-                onClick = {
-                    if (!state.isLoading && activity != null) {
-                        loadAndShowRewardedAd(
-                            activity = activity,
-                            onLoading = viewModel::setLoading,
-                            onLoadingComplete = viewModel::setLoadingComplete,
-                            onError = viewModel::setError,
-                            onDismiss = viewModel::dismiss,
-                            onRewardEarned = {
-                                viewModel.dismiss()
-                                handler.executeAndReset()
-                            },
-                        )
+    if (state.showDialog) {
+        RewardedAdDialog(
+            isAdLoading = state.isLoading,
+            onDismiss = viewModel::dismiss,
+            onWatchAd = {
+                if (!state.isLoading && activity != null) {
+                    val onComplete = {
+                        viewModel.dismiss()
+                        handler.executeAndReset()
                     }
+                    loadAndShowRewardedAd(
+                        activity = activity,
+                        onLoading = viewModel::setLoading,
+                        onLoadingComplete = viewModel::setLoadingComplete,
+                        onAdUnavailable = {
+                            coroutineScope.launch {
+                                Toast.makeText(
+                                    activity,
+                                    activity.getString(sharedR.string.rewarded_ad_unavailable_toast),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            onComplete()
+                        },
+                        onRewardEarned = onComplete,
+                    )
                 }
-            ),
-            BasicDialogButton(
-                text = "Go Pro",
-                onClick = {
-                    handler.cancelPendingAction()
-                    viewModel.dismiss()
-                    onNavigate(UpgradeAccountNavKey(source = UpgradeAccountSource.ADS_FREE_SCREEN))
-                }
-            ),
-            BasicDialogButton(
-                text = "Not now",
-                onClick = {
-                    handler.cancelPendingAction()
-                    viewModel.dismiss()
-                }
-            )
-        ),
-        onDismissRequest = {
-            handler.cancelPendingAction()
-            viewModel.dismiss()
-        },
-        buttonDirection = VERTICAL
-    )
+            },
+            onUpgradePro = {
+                handler.cancelPendingAction()
+                viewModel.dismiss()
+                onNavigate(UpgradeAccountNavKey(source = UpgradeAccountSource.ADS_FREE_SCREEN))
+            }
+        )
+    }
 }
 
 private fun loadAndShowRewardedAd(
     activity: Activity,
     onLoading: () -> Unit,
     onLoadingComplete: () -> Unit,
-    onError: (String) -> Unit,
-    onDismiss: () -> Unit,
+    onAdUnavailable: () -> Unit,
     onRewardEarned: () -> Unit,
 ) {
     onLoading()
@@ -162,8 +167,8 @@ private fun loadAndShowRewardedAd(
 
             val activityInstance = activityRef.get()
             if (activityInstance == null || activityInstance.isFinishing || activityInstance.isDestroyed) {
-                Timber.w("Activity is no longer valid, discarding loaded ad")
-                onDismiss()
+                Timber.w("Activity is no longer valid, letting user continue")
+                onAdUnavailable()
                 return
             }
 
@@ -174,7 +179,7 @@ private fun loadAndShowRewardedAd(
 
                 override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                     Timber.e("Rewarded ad failed to show: ${fullScreenContentError.message}")
-                    onError(fullScreenContentError.message)
+                    onAdUnavailable()
                 }
 
                 override fun onAdShowedFullScreenContent() {
@@ -198,7 +203,7 @@ private fun loadAndShowRewardedAd(
 
         override fun onAdFailedToLoad(adError: LoadAdError) {
             Timber.e("Rewarded ad failed to load: ${adError.message} (${adError.code})")
-            onError(adError.message)
+            onAdUnavailable()
         }
     })
 }

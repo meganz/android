@@ -6,5 +6,4 @@ package mega.privacy.android.shared.ads.rewarded
 data class RewardedAdGateUiState(
     val showDialog: Boolean = false,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
 )
