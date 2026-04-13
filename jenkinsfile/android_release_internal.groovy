@@ -132,13 +132,9 @@ pipeline {
                     BUILD_STEP = 'Apply Google Map API Key'
 
                     withCredentials([
-                            file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_DEBUG'),
                             file(credentialsId: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE', variable: 'ANDROID_GOOGLE_MAPS_API_FILE_RELEASE')
                     ]) {
                         println("applying production google map api config... ")
-                        sh 'mkdir -p app/src/debug/res/values'
-                        sh 'mkdir -p app/src/release/res/values'
-                        sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_DEBUG} app/src/debug/res/values/google_maps_api.xml"
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_RELEASE} app/src/release/res/values/google_maps_api.xml"
                     }
                 }

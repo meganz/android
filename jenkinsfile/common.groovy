@@ -608,23 +608,6 @@ void downloadDependencyLibForSdk() {
             pwd 
             ls -lh
         """
-
-        println("applying default google map api config... ")
-        withCredentials([
-                file(credentialsId: 'ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG', variable: 'ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG')
-        ]) {
-            String googleMapsApiFolder = "default_google_maps_api_unzipped"
-
-            sh """
-                cd ${WORKSPACE}
-                unzip -o ${ANDROID_DEFAULT_GOOGLE_MAPS_API_FILE_DEBUG} -d ${googleMapsApiFolder}
-                
-                mkdir -p app/src/debug/res/values
-                mkdir -p app/src/release/res/values
-                cp -fv ${googleMapsApiFolder}/debug/res/values/google_maps_api.xml app/src/debug/res/values/google_maps_api.xml
-                cp -fv ${googleMapsApiFolder}/release/res/values/google_maps_api.xml app/src/release/res/values/google_maps_api.xml
-            """
-        }
     }
 }
 

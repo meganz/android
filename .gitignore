@@ -59,11 +59,6 @@ captures
 /.idea/caches/build_file_checksums.ser
 /.idea/caches/gradle_models.ser
 
-## Google API key files
-/app/src/debug/res/values/google_maps_api.xml
-/app/src/release/res/values/google_maps_api.xml
-/app/src/qa/res/values/google_maps_api.xml
-
 ## Transifex script project
 /transifex/
 

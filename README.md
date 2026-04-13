@@ -182,13 +182,7 @@ If you encounter an error (seen in the log file) due to licenses not being accep
 
 ## 7. Build and Run Android App
 
-### 7.1 Download Required Files
-
-Download the required files from: https://mega.nz/#!1tcl3CrL!i23zkmx7ibnYy34HQdsOOFAPOqQuTo1-2iZ5qFlU7-k
-
-Uncompress the archive and place the `debug` and `release` folders in `app/src/`.
-
-### 7.2 Disable Pre-built SDK
+### 7.1 Disable Pre-built SDK
 
 1. Open `buildSrc/src/main/kotlin/mega/privacy/android/build/Util.kt` and change the `shouldUsePrebuiltSdk()` method to:
 
@@ -204,7 +198,7 @@ fun shouldUsePrebuiltSdk(): Boolean = false
 //        System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
 ```
 
-### 7.3 Build Mobile Analytics Library Locally
+### 7.2 Build Mobile Analytics Library Locally
 
 **Note:** You need to occasionally redo this section to ensure the latest analytics library is used.
 
@@ -232,7 +226,7 @@ implementation(files("../analytics-core-release.aar"))
 implementation(files("../analytics-annotations-release.aar"))
 ```
 
-### 7.4 Disable Library Dependencies
+### 7.3 Disable Library Dependencies
 
 1. In the root `build.gradle.kts`, comment out the following code:
 
@@ -261,26 +255,29 @@ resolutionStrategy {
 }
 ```
 
-### 7.5 Use Public Dependencies
+### 7.4 Use Public Dependencies
 
 In `lib.versions.toml`, replace dependencies of **Telephoto** and **uCrop** with their publicly available versions from their official GitHub repositories.
 
-### 7.6 Firebase (GMS build only)
+### 7.5 Firebase (GMS build only)
 
 1. Copy `app/src/gms/google-services.json.example` to `app/src/gms/google-services.json`
 2. Create a Firebase project and add Android apps for `mega.privacy.android.app` and `mega.privacy.android.app.qa`
 3. Replace the placeholder values in `google-services.json` with your project's config
 
-### 7.7 Run the Project
+### 7.6 Run the Project
 
 Open the project with Android Studio, let it build the project, and click **Run**.
 
 ## Notice
 
-To use the **geolocation feature**, you need a **Google Maps API key**:
+To use the **geolocation feature**, you need a **Google Maps API key**.
 
-1. To get one, follow the directions here: https://developers.google.com/maps/documentation/android/signup
+Placeholder `google_maps_api.xml` files with an empty key are already included in the repository. To enable geolocation:
 
-2. Once you have your key, replace the `"google_maps_key"` string in these files:
+1. Get an API key by following the directions here: https://developers.google.com/maps/documentation/android/signup
+
+2. Once you have your key (it starts with "AIza"), replace the empty `"google_maps_key"` string in one of these files:
    - `app/src/debug/res/values/google_maps_api.xml`
+   - `app/src/qa/res/values/google_maps_api.xml`
    - `app/src/release/res/values/google_maps_api.xml`

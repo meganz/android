@@ -234,13 +234,13 @@ pipeline {
             }
         }
 
-        stage('Download Google Map API Key') {
+        stage('Apply Google Map API Key') {
             when {
                 expression { triggerByDeliverQaCmd() || triggerByUploadCoverage() || triggerByPushToDevelop() }
             }
             steps {
                 script {
-                    BUILD_STEP = 'Download Google Map API Key'
+                    BUILD_STEP = 'Apply Google Map API Key'
                 }
 
                 withCredentials([
@@ -248,9 +248,6 @@ pipeline {
                 ]) {
                     script {
                         println("applying production google map api config... ")
-                        sh 'mkdir -p app/src/debug/res/values'
-                        sh 'mkdir -p app/src/release/res/values'
-                        sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/debug/res/values/google_maps_api.xml"
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/release/res/values/google_maps_api.xml"
                     }
                 }

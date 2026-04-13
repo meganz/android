@@ -1,6 +1,6 @@
 <resources>
     <!--
-    Placeholder Google Maps API key for the QA build variant.
+    Placeholder Google Maps API key for the release build variant.
     CI/CD pipelines inject the real key automatically during builds.
 
     For local geolocation testing, replace the empty value below with
