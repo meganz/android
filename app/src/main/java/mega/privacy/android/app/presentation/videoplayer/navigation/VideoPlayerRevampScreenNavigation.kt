@@ -10,8 +10,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.mediaplayer.videoplayer.navigation.SelectSubtitleScreen
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampViewModel
 import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerRevampScreen
 
 @Serializable
@@ -21,7 +20,7 @@ internal fun NavGraphBuilder.videoPlayerRevampScreen(
     navHostController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
-    viewModel: VideoPlayerViewModel,
+    viewModel: VideoPlayerRevampViewModel,
     player: ExoPlayer?,
     handleAutoReplayIfPaused: () -> Unit,
     playQueueButtonClicked: () -> Unit,
@@ -34,7 +33,7 @@ internal fun NavGraphBuilder.videoPlayerRevampScreen(
 
         LaunchedEffect(uiState.navigateToSelectSubtitleScreen) {
             if (uiState.navigateToSelectSubtitleScreen) {
-                navHostController.navigate(SelectSubtitleScreen)
+                navHostController.navigate(VideoPlayerRevampSelectSubtitleScreen)
                 viewModel.updateNavigateToSelectSubtitle(false)
             }
         }

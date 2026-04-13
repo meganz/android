@@ -67,15 +67,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
-import mega.privacy.android.app.mediaplayer.PlaybackPositionDialog
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampController
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
-import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
@@ -92,7 +90,7 @@ import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 internal fun VideoPlayerRevampScreen(
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
-    viewModel: VideoPlayerViewModel,
+    viewModel: VideoPlayerRevampViewModel,
     player: ExoPlayer?,
     playQueueButtonClicked: () -> Unit,
 ) {
@@ -204,11 +202,8 @@ internal fun VideoPlayerRevampScreen(
         }
     }
 
-    LaunchedEffect(playbackState, uiState.showPlaybackDialog, uiState.showSubtitleDialog) {
-        if (playbackState <= STATE_BUFFERING
-            || uiState.showPlaybackDialog
-            || uiState.showSubtitleDialog
-        ) {
+    LaunchedEffect(playbackState, uiState.showSubtitleDialog) {
+        if (playbackState <= STATE_BUFFERING || uiState.showSubtitleDialog) {
             autoHideJob?.cancel()
         } else if (isControllerViewVisible) {
             delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
@@ -458,16 +453,6 @@ internal fun VideoPlayerRevampScreen(
                         )
                     }
                 }
-
-                PlaybackPositionDialog(
-                    type = MediaType.Video,
-                    showPlaybackDialog = uiState.showPlaybackDialog,
-                    currentPlayingItemName = uiState.currentPlayingItemName ?: "",
-                    playbackPosition = uiState.playbackPosition ?: 0,
-                    onPlaybackPositionStatusUpdated = { status, _ ->
-                        viewModel.updatePlaybackPositionStatus(status)
-                    },
-                )
 
                 AddSubtitlesDialog(
                     isShown = uiState.showSubtitleDialog,

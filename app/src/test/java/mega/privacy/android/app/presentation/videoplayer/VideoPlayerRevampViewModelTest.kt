@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapp
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
-import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
@@ -147,7 +146,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCas
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
@@ -231,8 +229,8 @@ import kotlin.time.Duration.Companion.seconds
 )
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class VideoPlayerViewModelTest {
-    private lateinit var underTest: VideoPlayerViewModel
+class VideoPlayerRevampViewModelTest {
+    private lateinit var underTest: VideoPlayerRevampViewModel
 
     private val context = mock<Context>()
     private val mediaPlayerGateway = mock<MediaPlayerGateway>()
@@ -309,7 +307,6 @@ class VideoPlayerViewModelTest {
     private val trackPlaybackPositionUseCase = mock<TrackPlaybackPositionUseCase>()
     private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
-    private val deletePlaybackInformationUseCase = mock<DeletePlaybackInformationUseCase>()
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
     private val testHandle: Long = 123456
@@ -327,7 +324,7 @@ class VideoPlayerViewModelTest {
     private fun initViewModel() {
         fakeMonitorTransferEventsFlow = MutableSharedFlow()
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
-        underTest = VideoPlayerViewModel(
+        underTest = VideoPlayerRevampViewModel(
             context = context,
             mediaPlayerGateway = mediaPlayerGateway,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
@@ -395,7 +392,6 @@ class VideoPlayerViewModelTest {
             trackPlaybackPositionUseCase = trackPlaybackPositionUseCase,
             monitorPlaybackTimesUseCase = monitorPlaybackTimesUseCase,
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
-            deletePlaybackInformationUseCase = deletePlaybackInformationUseCase,
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
         )
@@ -490,7 +486,6 @@ class VideoPlayerViewModelTest {
             trackPlaybackPositionUseCase,
             monitorPlaybackTimesUseCase,
             savePlaybackTimesUseCase,
-            deletePlaybackInformationUseCase,
             getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase,
         )
@@ -1360,78 +1355,6 @@ class VideoPlayerViewModelTest {
         }
 
     @Test
-    fun `test that saveRecentlyUsedItemUseCase is invoked with Video type when saveVideoWatchedTime is called`() =
-        runTest {
-            val expectedId = 1L
-            val instant = Instant.ofEpochMilli(2000L)
-            mockStatic(Instant::class.java).use {
-                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
-                val testMediaItem = MediaItem.Builder()
-                    .setMediaId(expectedId.toString())
-                    .build()
-                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
-                underTest.saveVideoWatchedTime()
-
-                verify(saveRecentlyUsedItemUseCase).invoke(
-                    nodeHandle = expectedId,
-                    type = RecentlyUsedType.Video,
-                    fileName = underTest.uiState.value.metadata?.nodeName.orEmpty(),
-                )
-            }
-        }
-
-    @Test
-    fun `test that saveRecentlyUsedItemUseCase is still invoked when saveVideoRecentlyWatchedUseCase throws`() =
-        runTest {
-            val expectedId = 1L
-            val instant = Instant.ofEpochMilli(2000L)
-            mockStatic(Instant::class.java).use {
-                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
-                val testMediaItem = MediaItem.Builder()
-                    .setMediaId(expectedId.toString())
-                    .build()
-                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
-                whenever(
-                    saveVideoRecentlyWatchedUseCase(any(), any(), any(), any())
-                ).thenThrow(RuntimeException("test error"))
-                underTest.saveVideoWatchedTime()
-                advanceUntilIdle()
-
-                verify(saveRecentlyUsedItemUseCase).invoke(
-                    nodeHandle = expectedId,
-                    type = RecentlyUsedType.Video,
-                    fileName = underTest.uiState.value.metadata?.nodeName.orEmpty(),
-                )
-            }
-        }
-
-    @Test
-    fun `test that saveVideoRecentlyWatchedUseCase is still invoked when saveRecentlyUsedItemUseCase throws`() =
-        runTest {
-            val expectedId = 1L
-            val instant = Instant.ofEpochMilli(2000L)
-            mockStatic(Instant::class.java).use {
-                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
-                val testMediaItem = MediaItem.Builder()
-                    .setMediaId(expectedId.toString())
-                    .build()
-                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
-                whenever(
-                    saveRecentlyUsedItemUseCase(any(), any(), any())
-                ).thenThrow(RuntimeException("test error"))
-                underTest.saveVideoWatchedTime()
-                advanceUntilIdle()
-
-                verify(saveVideoRecentlyWatchedUseCase).invoke(
-                    expectedId,
-                    2,
-                    expectedCollectionId,
-                    expectedCollectionTitle
-                )
-            }
-        }
-
-    @Test
     fun `test that mediaPlaybackState is updated correctly`() = runTest {
         val testPlayingState = MediaPlaybackState.Playing
         val testPausedState = MediaPlaybackState.Paused
@@ -2214,7 +2137,6 @@ class VideoPlayerViewModelTest {
         }
         initViewModel()
         underTest.swapItems(1, 2, testItems, mediaItems)
-        advanceUntilIdle()
         underTest.uiState.test {
             val actual = awaitItem()
             assertThat(actual.items[1].nodeHandle).isEqualTo(2L)
@@ -2493,7 +2415,7 @@ class VideoPlayerViewModelTest {
         }
 
     @Test
-    fun `test that state is updated correctly after checkPlaybackPositionBeforePlayback is invoked`() =
+    fun `test that saved playback position is applied without dialog when initVideoPlayerData is invoked`() =
         runTest {
             val playbackInfo = mock<PlaybackInformation> {
                 on { currentPosition }.thenReturn(100)
@@ -2501,42 +2423,23 @@ class VideoPlayerViewModelTest {
             val map = mapOf(testHandle to playbackInfo)
             whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(map))
             initViewModel()
-            underTest.initVideoPlayerData(null)
+            val intent = mock<Intent>()
+            val uri: Uri = mock()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = uri,
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(getVideoNodesUseCase(any())).thenReturn(emptyList())
+            underTest.initVideoPlayerData(intent)
             advanceUntilIdle()
-            underTest.uiState.test {
-                val actual = awaitItem()
-                assertThat(actual.showPlaybackDialog).isTrue()
-                assertThat(actual.playbackPosition).isEqualTo(100)
-                assertThat(actual.currentPlayingItemName).isEqualTo(testFileName)
-                cancelAndConsumeRemainingEvents()
-            }
+            verify(mediaPlayerGateway).playerSeekToPositionInMs(100)
+            assertThat(underTest.uiState.value.showPlaybackDialog).isFalse()
+            assertThat(underTest.uiState.value.playbackPosition).isNull()
         }
-
-    @ParameterizedTest(name = "when PlaybackPositionStatus is {0}")
-    @MethodSource("providePlaybackPositionStatus")
-    fun `test that state is updated correctly after updatePlaybackStatus is invoked`(
-        status: PlaybackPositionStatus,
-    ) = runTest {
-        whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
-        initViewModel()
-        underTest.updatePlaybackPositionStatus(status, 100)
-        when (status) {
-            PlaybackPositionStatus.Restart -> verify(deletePlaybackInformationUseCase).invoke(any())
-            PlaybackPositionStatus.Resume -> verify(mediaPlayerGateway).playerSeekToPositionInMs(any())
-            else -> Unit
-        }
-        verify(mediaPlayerGateway).setPlayWhenReady(true)
-        underTest.uiState.test {
-            assertThat(awaitItem().showPlaybackDialog).isFalse()
-        }
-    }
-
-    private fun providePlaybackPositionStatus() = listOf(
-        PlaybackPositionStatus.Restart,
-        PlaybackPositionStatus.Resume,
-        PlaybackPositionStatus.DialogShowing,
-        PlaybackPositionStatus.Initial,
-    )
 
     @ParameterizedTest(name = "when state is {0}")
     @ValueSource(ints = [MEDIA_PLAYER_STATE_ENDED, MEDIA_PLAYER_STATE_READY])
