@@ -2320,4 +2320,7 @@
     <string name="cloud_explorer_choose_folder_title">Ordner auswählen</string>
     <string name="general_transfer_error_not_enough_free_space">Nicht genügend Speicherplatz verfügbar</string>
     <string name="general_transfer_error_temporary_unavaible">Quelldatei momentan nicht verfügbar, bitte versuchen Sie es später noch einmal</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Zu Pro wechseln</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
 </resources>

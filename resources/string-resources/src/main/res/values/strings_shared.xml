@@ -2660,6 +2660,7 @@
     <string name="video_section_add_to_playlist_success">Added 1 item to “%1$s”</string>
     <!-- Message shown when a video is successfully added to multiple playlists from the Video section. -->
     <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">Added 1 item to %1$d playlist</item>
         <item quantity="other">Added 1 item to %1$d playlists</item>
     </plurals>
     <!-- Rewarded ad dialog title prompting user to watch an ad before continuing -->
@@ -2682,4 +2683,6 @@
     <string name="rewarded_ad_dialog_upgrade_button">Upgrade to Pro</string>
     <!-- Toast message shown when a rewarded ad is not available and the user action continues -->
     <string name="rewarded_ad_unavailable_toast">Ad is unavailable! Continuing&#8230;</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
 </resources>

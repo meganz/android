@@ -2652,4 +2652,7 @@
     <string name="cloud_explorer_choose_folder_title">اختر مجلد</string>
     <string name="general_transfer_error_not_enough_free_space">لا توجد مساحة فارغة كافية على جهازك</string>
     <string name="general_transfer_error_temporary_unavaible">المصادر غير متوفرة مؤقتاً، يرجى المحاولة مرة أخرى في وقت لاحق</string>
+    <string name="rewarded_ad_dialog_upgrade_button">قم بالترقية إلى برو Pro</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
 </resources>

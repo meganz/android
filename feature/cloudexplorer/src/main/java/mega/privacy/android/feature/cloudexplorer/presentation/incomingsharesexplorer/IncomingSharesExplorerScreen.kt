@@ -3,12 +3,16 @@ package mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesex
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -43,6 +47,10 @@ internal fun IncomingSharesExplorerContent(
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
 ) = with(uiStateShared) {
+    val snackbarHostState = LocalSnackBarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+    val resources = LocalResources.current
+
     EventEffect(
         event = navigateBack,
         onConsumed = consumeNavigateBack,
@@ -58,7 +66,15 @@ internal fun IncomingSharesExplorerContent(
 
     val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
         when {
-            item.isFolderNode -> onFolderClick(item.id)
+            item.isFolderNode -> {
+                if ((item.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() == false) {
+                    coroutineScope.launch {
+                        snackbarHostState?.showSnackbar(resources.getString(sharedR.string.general_read_only_folder_warning))
+                    }
+                } else {
+                    onFolderClick(item.id)
+                }
+            }
         }
     }
     NodeViewWithHeader(
@@ -84,6 +100,7 @@ internal fun IncomingSharesExplorerContent(
                 isHighlighted = it.isHighlighted,
                 onItemClicked = { onItemClicked(it) },
                 enabled = isSelectionModeEnabled || (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() == true,
+                enableClick = true,
             )
         },
         itemGridView = {

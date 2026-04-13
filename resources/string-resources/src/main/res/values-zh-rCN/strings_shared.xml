@@ -2252,4 +2252,7 @@
     <string name="cloud_explorer_use_this_folder_button">使用此文件夹</string>
     <string name="video_player_more_options_playlist_option">播放列表</string>
     <string name="video_player_more_options_lock_option">锁定视频播放器</string>
+    <string name="rewarded_ad_dialog_upgrade_button">升级到Pro会员</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
 </resources>

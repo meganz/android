@@ -2506,4 +2506,7 @@
     <string name="homepage_empty_hint_audio">[B]Nie[/B] znaleziono plików audio.</string>
     <string name="cloud_explorer_select_destination_title">Wybierz miejsce docelowe</string>
     <string name="cloud_explorer_use_this_folder_button">Użyj tego folderu</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Zmień na wersję Pro</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
 </resources>

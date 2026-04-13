@@ -1695,7 +1695,7 @@
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA隱私套件</string>
     <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">年度方案至少可節省16%</string>
+    <string name="account_upgrade_account_label_save_at_least">年繳方案至少可節省16%</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">輸入相簿名稱</string>
     <!-- Title of favourite album. -->
@@ -2250,4 +2250,7 @@
     <string name="cloud_explorer_select_destination_title">選擇儲存位置</string>
     <string name="general_transfer_error_not_enough_free_space">您的裝置可用空間不足</string>
     <string name="general_transfer_error_temporary_unavaible">資源暫時無法使用，請稍後再試</string>
+    <string name="rewarded_ad_dialog_upgrade_button">升級至Pro方案</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
 </resources>

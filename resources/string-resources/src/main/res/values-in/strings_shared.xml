@@ -2168,4 +2168,7 @@
     <plurals name="rubbish_remove_items_snackbar_success">
         <item quantity="other">%d barang dihapus dari tempat sampah</item>
     </plurals>
+    <string name="rewarded_ad_dialog_upgrade_button">Tingkatkan ke Pro</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
 </resources>

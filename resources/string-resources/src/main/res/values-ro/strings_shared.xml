@@ -2338,7 +2338,7 @@
     <plurals name="move_node_snackbar_concat_fail">
         <item quantity="one">%d elementul nu a putut fi mutat</item>
         <item quantity="few">%d elementele nu au putut fi mutate</item>
-        <item quantity="other"></item>
+        <item quantity="other" />
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_fail">
         <item quantity="one">%d elementul nu a putut fi eliminat din coșul de gunoi.</item>
@@ -2412,4 +2412,7 @@
     <string name="cloud_explorer_use_this_folder_button">Folosește acest folder</string>
     <string name="general_transfer_error_not_enough_free_space">Spațiu liber insuficient pe dispozitiv</string>
     <string name="general_transfer_error_temporary_unavaible">Resursa nu este disponibilă temporar, încercați din nou mai târziu</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Upgradează la Pro</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
 </resources>
