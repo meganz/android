@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
@@ -50,25 +51,36 @@ internal class LogFlowTree(
         TimberMegaLogger::class.java.name
     )
 
+    private val channel = Channel<CreateLogEntryRequest>(
+        capacity = 128,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
+    init {
+        scope.launch {
+            for (request in channel) {
+                createLogEntry(request)?.let { _logFlow.emit(it) }
+            }
+        }
+    }
+
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         val trace = if (tag == TimberChatLogger.TAG || tag == TimberMegaLogger.TAG) {
             emptyList()
         } else {
             Throwable().stackTrace.take(10)
         }
-        scope.launch {
-            createLogEntry(
-                CreateLogEntryRequest(
-                    tag = tag,
-                    message = message,
-                    priority = LogPriority.fromInt(priority),
-                    throwable = t,
-                    trace = trace,
-                    loggingClasses = ignoredClasses,
-                    sdkLoggers = sdkLoggers
-                )
-            )?.let { _logFlow.emit(it) }
-        }
+        channel.trySend(
+            CreateLogEntryRequest(
+                tag = tag,
+                message = message,
+                priority = LogPriority.fromInt(priority),
+                throwable = t,
+                trace = trace,
+                loggingClasses = ignoredClasses,
+                sdkLoggers = sdkLoggers
+            )
+        )
     }
 
 }
