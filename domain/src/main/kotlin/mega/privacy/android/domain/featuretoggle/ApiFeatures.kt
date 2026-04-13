@@ -178,6 +178,16 @@ enum class ApiFeatures(
         experimentName = "vprv",
         description = "Open the revamped Video Player instead of the legacy one",
         defaultValue = false
+    ),
+
+    /**
+     * Viewed links feature flag for Home Revamp Phase 2
+     * Enable viewed links section on Home Screen
+     */
+    ViewedLinks(
+        experimentName = "hrvl",
+        description = "Enable viewed links section on Home Screen (Home Revamp Phase 2)",
+        defaultValue = false
     );
 
     companion object : FeatureFlagValueProvider {
