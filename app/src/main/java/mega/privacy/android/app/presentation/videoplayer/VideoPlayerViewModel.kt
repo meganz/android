@@ -115,6 +115,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -198,6 +199,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
@@ -267,6 +269,7 @@ class VideoPlayerViewModel @Inject constructor(
     private val getFileByPathUseCase: GetFileByPathUseCase,
     private val monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     private val saveVideoRecentlyWatchedUseCase: SaveVideoRecentlyWatchedUseCase,
+    private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
     private val setVideoRepeatModeUseCase: SetVideoRepeatModeUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
@@ -1268,14 +1271,28 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun updateRepeatToggleMode(mode: RepeatToggleMode) =
         uiState.update { it.copy(repeatToggleMode = mode) }
 
-    internal fun saveVideoWatchedTime() = viewModelScope.launch {
-        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let {
-            saveVideoRecentlyWatchedUseCase(
-                it,
-                Instant.now().toEpochMilli() / 1000,
-                collectionId ?: 0L,
-                collectionTitle
-            )
+    internal fun saveVideoWatchedTime() {
+        val watchedAt = Instant.now().toEpochMilli() / 1000
+        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let { handle ->
+            viewModelScope.launch {
+                runCatching {
+                    saveVideoRecentlyWatchedUseCase(
+                        handle,
+                        watchedAt,
+                        collectionId ?: 0L,
+                        collectionTitle
+                    )
+                }.onFailure { Timber.e(it, "Failed to save video recently watched") }
+            }
+            viewModelScope.launch {
+                runCatching {
+                    saveRecentlyUsedItemUseCase(
+                        nodeHandle = handle,
+                        type = RecentlyUsedType.Video,
+                        fileName = uiState.value.metadata?.nodeName.orEmpty(),
+                    )
+                }.onFailure { Timber.e(it, "Failed to save recently used video item") }
+            }
         }
     }
 

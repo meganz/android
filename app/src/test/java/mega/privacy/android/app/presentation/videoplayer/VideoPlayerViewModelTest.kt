@@ -179,6 +179,8 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -271,6 +273,7 @@ class VideoPlayerViewModelTest {
     private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
     private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
+    private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
     private val setVideoRepeatModeUseCase = mock<SetVideoRepeatModeUseCase>()
     private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
@@ -363,6 +366,7 @@ class VideoPlayerViewModelTest {
             getFileByPathUseCase = getFileByPathUseCase,
             monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
             saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
+            saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
             setVideoRepeatModeUseCase = setVideoRepeatModeUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
@@ -458,6 +462,7 @@ class VideoPlayerViewModelTest {
             getFileByPathUseCase,
             monitorVideoRepeatModeUseCase,
             saveVideoRecentlyWatchedUseCase,
+            saveRecentlyUsedItemUseCase,
             setVideoRepeatModeUseCase,
             monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase,
@@ -1344,6 +1349,78 @@ class VideoPlayerViewModelTest {
                     .build()
                 whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
                 underTest.saveVideoWatchedTime()
+
+                verify(saveVideoRecentlyWatchedUseCase).invoke(
+                    expectedId,
+                    2,
+                    expectedCollectionId,
+                    expectedCollectionTitle
+                )
+            }
+        }
+
+    @Test
+    fun `test that saveRecentlyUsedItemUseCase is invoked with Video type when saveVideoWatchedTime is called`() =
+        runTest {
+            val expectedId = 1L
+            val instant = Instant.ofEpochMilli(2000L)
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                underTest.saveVideoWatchedTime()
+
+                verify(saveRecentlyUsedItemUseCase).invoke(
+                    nodeHandle = expectedId,
+                    type = RecentlyUsedType.Video,
+                    fileName = underTest.uiState.value.metadata?.nodeName.orEmpty(),
+                )
+            }
+        }
+
+    @Test
+    fun `test that saveRecentlyUsedItemUseCase is still invoked when saveVideoRecentlyWatchedUseCase throws`() =
+        runTest {
+            val expectedId = 1L
+            val instant = Instant.ofEpochMilli(2000L)
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                whenever(
+                    saveVideoRecentlyWatchedUseCase(any(), any(), any(), any())
+                ).thenThrow(RuntimeException("test error"))
+                underTest.saveVideoWatchedTime()
+                advanceUntilIdle()
+
+                verify(saveRecentlyUsedItemUseCase).invoke(
+                    nodeHandle = expectedId,
+                    type = RecentlyUsedType.Video,
+                    fileName = underTest.uiState.value.metadata?.nodeName.orEmpty(),
+                )
+            }
+        }
+
+    @Test
+    fun `test that saveVideoRecentlyWatchedUseCase is still invoked when saveRecentlyUsedItemUseCase throws`() =
+        runTest {
+            val expectedId = 1L
+            val instant = Instant.ofEpochMilli(2000L)
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                whenever(
+                    saveRecentlyUsedItemUseCase(any(), any(), any())
+                ).thenThrow(RuntimeException("test error"))
+                underTest.saveVideoWatchedTime()
+                advanceUntilIdle()
 
                 verify(saveVideoRecentlyWatchedUseCase).invoke(
                     expectedId,

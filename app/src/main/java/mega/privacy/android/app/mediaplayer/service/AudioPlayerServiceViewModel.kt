@@ -124,6 +124,8 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudiosByPa
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioBackgroundPlayEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SaveAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
@@ -194,6 +196,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val getThumbnailUseCase: GetThumbnailUseCase,
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
     private val saveAudioPlaybackInfoUseCase: SaveAudioPlaybackInfoUseCase,
+    private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -1206,7 +1209,21 @@ class AudioPlayerServiceViewModel @Inject constructor(
         mediaItemTransitionState.update { handle }
         cancellableJobs[JOB_KEY_AUDIO_PLAYBACK_INFO]?.cancel()
         cancellableJobs[JOB_KEY_AUDIO_PLAYBACK_INFO] = sharingScope.launch {
-            saveAudioPlaybackInfoUseCase()
+            runCatching {
+                saveAudioPlaybackInfoUseCase()
+            }.onFailure { Timber.e(it, "Failed to save audio playback info") }
+        }
+        val playingItem = playlistItems.firstOrNull { it.nodeHandle == handle }
+        if (playingItem != null) {
+            sharingScope.launch {
+                runCatching {
+                    saveRecentlyUsedItemUseCase(
+                        nodeHandle = handle,
+                        type = RecentlyUsedType.Audio,
+                        fileName = playingItem.nodeName,
+                    )
+                }.onFailure { Timber.e(it, "Failed to save recently used audio item") }
+            }
         }
     }
 
