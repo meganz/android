@@ -20,6 +20,7 @@ import com.google.android.libraries.ads.mobile.sdk.common.FullScreenContentError
 import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd
 import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
@@ -37,17 +38,20 @@ import java.lang.ref.WeakReference
  * @see rememberRewardedAdGate
  */
 class RewardedAdGateHandler(
-    private val showDialog: () -> Unit,
+    private val requestShowDialog: () -> Unit,
 ) {
     private var pendingAction: (() -> Unit)? = null
 
     /**
      * Gate an action behind a rewarded ad dialog.
-     * The action is deferred until the user watches the ad.
+     *
+     * If the user is not eligible to see ads (e.g., feature flag disabled, Pro user),
+     * the action is executed immediately with no dialog. Otherwise the action is deferred
+     * until the user watches the ad.
      */
     fun requestAction(action: () -> Unit) {
         pendingAction = action
-        showDialog()
+        requestShowDialog()
     }
 
     internal fun cancelPendingAction() {
@@ -76,7 +80,15 @@ fun rememberRewardedAdGate(
     onNavigate: (NavKey) -> Unit,
 ): RewardedAdGateHandler {
     val viewModel: RewardedAdGateViewModel = hiltViewModel()
-    val handler = remember(viewModel) { RewardedAdGateHandler(viewModel::showDialog) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val handler = remember(viewModel) { RewardedAdGateHandler(viewModel::requestShowDialog) }
+
+    EventEffect(
+        event = uiState.skipAdEvent,
+        onConsumed = viewModel::onSkipAdEventConsumed,
+    ) {
+        handler.executeAndReset()
+    }
 
     RewardedAdGate(
         viewModel = viewModel,

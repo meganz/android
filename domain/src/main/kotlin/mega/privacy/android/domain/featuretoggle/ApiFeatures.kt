@@ -18,6 +18,16 @@ enum class ApiFeatures(
     override val checkRemote: Boolean = true,
     override val singleCheckPerRun: Boolean = false,
 ) : ApiFeature {
+
+    /**
+     * Enabled rewarded ads in public link screens. AND-21960
+     */
+    RewardedAds(
+        "grads",
+        "Enable rewarded ads in public links screen",
+        false
+    ),
+
     /**
      * Continuous document scanner (AND-22951).
      * When enabled, uses the custom continuous document scanner with real-time
