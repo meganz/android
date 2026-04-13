@@ -105,8 +105,8 @@ internal fun FavouritesExplorerContent(
 @Composable
 private fun EmptyFolder() {
     MegaEmptyView(
-        text = stringResource(sharedR.string.shares_screen_incoming_empty),
-        imagePainter = painterResource(iconPackR.drawable.ic_folder_arrow_up_glass),
+        text = stringResource(sharedR.string.homepage_favourites_empty_hint),
+        imagePainter = painterResource(iconPackR.drawable.ic_hearts_glass),
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
     )
 }
