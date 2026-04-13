@@ -54,7 +54,7 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActiv
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_TITLE_TAG
 import mega.privacy.android.app.presentation.meeting.model.ChatInfoAction
 import mega.privacy.android.app.presentation.meeting.view.ChatInfoView
-import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat
 import mega.privacy.android.app.utils.Constants

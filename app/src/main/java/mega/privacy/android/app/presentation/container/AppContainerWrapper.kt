@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.container
 
-import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.core.passcode.PasscodeCheck
 
 /**
  * App container wrapper - Interface to add compose container functionality to legacy Activities

@@ -247,6 +247,7 @@ dependencies {
     implementation(project(":feature:cloud-drive:cloud-drive"))
     implementation(project(":feature:document-scanner:document-scanner"))
     preBuiltSdkDependency(rootProject.extra)
+    implementation(project(":core:passcode"))
     implementation(project(":core:transfers"))
     implementation(project(":feature:myaccount"))
     implementation(project(":third-party-lib:twemoji"))

@@ -7,9 +7,9 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.presentation.security.PasscodeLifeCycleObserver
-import mega.privacy.android.app.presentation.security.PasscodeLifecycleDispatcher
-import mega.privacy.android.app.presentation.security.PasscodeProcessLifecycleOwner
+import mega.privacy.android.core.passcode.PasscodeLifeCycleObserver
+import mega.privacy.android.core.passcode.PasscodeLifecycleDispatcher
+import mega.privacy.android.core.passcode.PasscodeProcessLifecycleOwner
 
 /**
  * Passcode initializer

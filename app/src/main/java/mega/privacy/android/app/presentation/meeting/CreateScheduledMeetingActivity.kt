@@ -32,7 +32,7 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActiv
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.view.CreateScheduledMeetingView
 import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
-import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode

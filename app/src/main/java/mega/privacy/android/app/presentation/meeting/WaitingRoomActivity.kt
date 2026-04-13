@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.meeting.view.WaitingRoomView
-import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber

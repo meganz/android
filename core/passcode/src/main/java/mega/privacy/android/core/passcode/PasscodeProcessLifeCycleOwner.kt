@@ -1,5 +1,6 @@
 package mega.privacy.android.core.passcode
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -51,6 +52,7 @@ class PasscodeProcessLifecycleOwner private constructor() {
         skipPasscode = true
     }
 
+    @SuppressLint("RestrictedApi")
     inner class ActivityInitializationListener(private val activity: Activity) :
         ReportFragment.ActivityInitializationListener {
         override fun onCreate() {}
@@ -79,7 +81,7 @@ class PasscodeProcessLifecycleOwner private constructor() {
         }
 
         @JvmStatic
-        internal fun init(context: Context) {
+        fun init(context: Context) {
             newInstance.attach(context)
         }
     }
@@ -135,6 +137,7 @@ class PasscodeProcessLifecycleOwner private constructor() {
         }
     }
 
+    @SuppressLint("RestrictedApi")
     @Suppress("DEPRECATION")
     internal fun attach(context: Context) {
         val app = context.applicationContext as Application

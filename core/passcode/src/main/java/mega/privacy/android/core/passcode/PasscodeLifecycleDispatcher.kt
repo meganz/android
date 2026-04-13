@@ -1,6 +1,7 @@
 package mega.privacy.android.core.passcode
 
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Application
 import android.content.Context
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * providers related to an activity as soon it is not safe to run a fragment transaction in this
  * activity.
  */
-internal object PasscodeLifecycleDispatcher {
+object PasscodeLifecycleDispatcher {
     private val initialized = AtomicBoolean(false)
 
     @JvmStatic
@@ -30,6 +31,7 @@ internal object PasscodeLifecycleDispatcher {
 
     @VisibleForTesting
     internal class DispatcherActivityCallback : EmptyCallbacks() {
+        @SuppressLint("RestrictedApi")
         override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
             ReportFragment.injectIfNeededIn(activity)
         }

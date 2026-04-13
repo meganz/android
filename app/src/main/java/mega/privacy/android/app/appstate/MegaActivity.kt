@@ -80,11 +80,11 @@ import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.passcode.navigation.PasscodeNavKey
 import mega.privacy.android.app.presentation.passcode.navigation.passcodeView
-import mega.privacy.android.app.presentation.security.PasscodeProcessLifecycleOwner
 import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.passcode.PasscodeProcessLifecycleOwner
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList

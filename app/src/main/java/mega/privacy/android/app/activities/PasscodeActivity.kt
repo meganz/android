@@ -5,9 +5,9 @@ import android.content.IntentSender
 import android.os.Bundle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.appstate.MegaActivity.Companion.EXTERNAL_ACTIONS
-import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.security.PasscodeProcessLifecycleOwner
+import mega.privacy.android.core.passcode.PasscodeAwareContract.Companion.EXTERNAL_ACTIONS
+import mega.privacy.android.core.passcode.PasscodeCheck
+import mega.privacy.android.core.passcode.PasscodeProcessLifecycleOwner
 import javax.inject.Inject
 
 @AndroidEntryPoint

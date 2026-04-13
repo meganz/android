@@ -2,18 +2,17 @@ package mega.privacy.android.core.passcode
 
 import android.content.Context
 import android.content.Intent
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -21,13 +20,19 @@ class PasscodeAwareContractTest {
 
     private val context = mock<Context>()
     private val delegate = mock<ActivityResultContract<String, String>>()
-    private val passcodeOwner = PasscodeProcessLifecycleOwner.get()
 
     private lateinit var underTest: PasscodeAwareContract<String, String>
 
     @BeforeEach
     fun setup() {
         underTest = PasscodeAwareContract(delegate)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        reset(
+            delegate
+        )
     }
 
     @ParameterizedTest
@@ -76,7 +81,7 @@ class PasscodeAwareContractTest {
     @Test
     fun `test that parseResult delegates to wrapped contract`() {
         val expectedResult = "result"
-        whenever(delegate.parseResult(any(), any())).thenReturn(expectedResult)
+        whenever(delegate.parseResult(any(), anyOrNull())).thenReturn(expectedResult)
 
         val result = underTest.parseResult(0, null)
 
