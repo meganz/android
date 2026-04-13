@@ -2137,10 +2137,42 @@ class VideoPlayerViewModelTest {
         }
         initViewModel()
         underTest.swapItems(1, 2, testItems, mediaItems)
+        advanceUntilIdle()
         underTest.uiState.test {
             val actual = awaitItem()
             assertThat(actual.items[1].nodeHandle).isEqualTo(2L)
             assertThat(actual.items[2].nodeHandle).isEqualTo(1L)
+        }
+    }
+
+    @Test
+    fun `test that swapItems reinitialises mediaItemsDuringChanged when size mismatch occurs`() = runTest {
+        val initialItems = (0..2).map {
+            initVideoPlayerItem(it.toLong(), it.toString())
+        }
+        val initialMediaItems = (0..2).map {
+            MediaItem.Builder().setMediaId(it.toString()).build()
+        }
+        initViewModel()
+        // First swap: populates mediaItemsDuringChanged with 3 entries
+        underTest.swapItems(0, 1, initialItems, initialMediaItems)
+        advanceUntilIdle()
+
+        // Simulate playlist growing to 4 items — triggers size-mismatch re-init
+        val expandedItems = (0..3).map {
+            initVideoPlayerItem(it.toLong(), it.toString())
+        }
+        val expandedMediaItems = (0..3).map {
+            MediaItem.Builder().setMediaId(it.toString()).build()
+        }
+        underTest.swapItems(1, 2, expandedItems, expandedMediaItems)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.items[1].nodeHandle).isEqualTo(2L)
+            assertThat(actual.items[2].nodeHandle).isEqualTo(1L)
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -2155,9 +2187,10 @@ class VideoPlayerViewModelTest {
             }
             initViewModel()
             underTest.swapItems(1, 2, testItems, mediaItems)
-            underTest.updateItemsAfterReorder()
-            verify(mediaPlayerGateway).buildPlaySources(any())
             advanceUntilIdle()
+            underTest.updateItemsAfterReorder()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).buildPlaySources(any())
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.mediaPlaySources?.mediaItems?.get(1)?.mediaId).isEqualTo("2")

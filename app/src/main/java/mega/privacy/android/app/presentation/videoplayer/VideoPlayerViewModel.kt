@@ -1855,37 +1855,49 @@ class VideoPlayerViewModel @Inject constructor(
         mediaItems: List<MediaItem>? = uiState.value.mediaPlaySources?.mediaItems,
     ) {
         if (list.isEmpty() || mediaItems.isNullOrEmpty() || list.size != mediaItems.size) return
-        val indicesOfItems = list.indices
-        val newItems = list.toMutableList()
-        if (mediaItemsDuringChanged.isEmpty()) {
-            mediaItemsDuringChanged.addAll(mediaItems)
-        }
 
-        viewModelScope.launch(ioDispatcher) {
-            mutex.withLock {
-                if (from in indicesOfItems && to in indicesOfItems) {
-                    Collections.swap(newItems, from, to)
-                    Collections.swap(mediaItemsDuringChanged, from, to)
-                }
-                withContext(mainDispatcher) {
-                    uiState.update { it.copy(items = newItems) }
+        viewModelScope.launch {
+            val newItems = withContext(ioDispatcher) {
+                mutex.withLock {
+                    if (mediaItemsDuringChanged.isEmpty()) {
+                        mediaItemsDuringChanged.addAll(mediaItems)
+                    } else if (mediaItemsDuringChanged.size != list.size) {
+                        mediaItemsDuringChanged.clear()
+                        mediaItemsDuringChanged.addAll(mediaItems)
+                    }
+
+                    val items = list.toMutableList()
+                    val indicesOfItems = list.indices
+                    if (from in indicesOfItems && to in indicesOfItems &&
+                        from in mediaItemsDuringChanged.indices && to in mediaItemsDuringChanged.indices
+                    ) {
+                        Collections.swap(items, from, to)
+                        Collections.swap(mediaItemsDuringChanged, from, to)
+                    }
+                    items
                 }
             }
+            uiState.update { it.copy(items = newItems) }
         }
     }
 
     internal fun updateItemsAfterReorder() {
-        if (mediaItemsDuringChanged.isNotEmpty()) {
+        viewModelScope.launch {
+            val reorderedMediaItems = mutex.withLock {
+                if (mediaItemsDuringChanged.isEmpty()) return@withLock null
+                val items = mediaItemsDuringChanged.toList()
+                mediaItemsDuringChanged.clear()
+                items
+            } ?: return@launch
+
             val index = uiState.value.currentPlayingIndex ?: 0
             val mediaPlaySources = MediaPlaySources(
-                mediaItems = mediaItemsDuringChanged.toList(),
+                mediaItems = reorderedMediaItems,
                 newIndexForCurrentItem = index,
                 nameToDisplay = null
             )
-
             uiState.update { it.copy(mediaPlaySources = mediaPlaySources) }
             mediaPlayerGateway.buildPlaySources(mediaPlaySources)
-            mediaItemsDuringChanged.clear()
         }
     }
 
