@@ -9,5 +9,7 @@ import de.palm.composestateevents.consumed
 data class RewardedAdGateUiState(
     val showDialog: Boolean = false,
     val isLoading: Boolean = false,
+    val isCheckingEligibility: Boolean = true,
+    val isEligible: Boolean = false,
     val skipAdEvent: StateEvent = consumed,
 )

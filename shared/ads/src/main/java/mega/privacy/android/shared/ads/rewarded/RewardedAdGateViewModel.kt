@@ -28,12 +28,11 @@ class RewardedAdGateViewModel @Inject constructor(
     val uiState: StateFlow<RewardedAdGateUiState>
         field = MutableStateFlow(RewardedAdGateUiState())
 
-    /**
-     * Check whether the ad dialog should be shown. If the user is eligible (currently based
-     * on the [ApiFeatures.RewardedAds] feature flag), show the dialog. Otherwise trigger
-     * [RewardedAdGateUiState.skipAdEvent] so the caller can skip the ad and continue.
-     */
-    fun requestShowDialog() {
+    init {
+        checkEligibility()
+    }
+
+    private fun checkEligibility() {
         viewModelScope.launch {
             val isEligible = runCatching {
                 getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)
@@ -41,11 +40,27 @@ class RewardedAdGateViewModel @Inject constructor(
                 Timber.e(it, "Failed to read RewardedAds feature flag")
             }.getOrDefault(false)
 
-            if (isEligible) {
-                uiState.update { it.copy(showDialog = true) }
-            } else {
-                uiState.update { it.copy(skipAdEvent = triggered) }
+            uiState.update {
+                it.copy(
+                    isCheckingEligibility = false,
+                    isEligible = isEligible,
+                )
             }
+        }
+    }
+
+    /**
+     * Check whether the ad dialog should be shown. If the eligibility check is still in
+     * progress or the user is not eligible (currently based on the [ApiFeatures.RewardedAds]
+     * feature flag), trigger [RewardedAdGateUiState.skipAdEvent] so the caller can skip the
+     * ad and continue without being blocked while flags load. Otherwise show the dialog.
+     */
+    fun requestShowDialog() {
+        val state = uiState.value
+        if (!state.isCheckingEligibility && state.isEligible) {
+            uiState.update { it.copy(showDialog = true) }
+        } else {
+            uiState.update { it.copy(skipAdEvent = triggered) }
         }
     }
 
@@ -54,7 +69,13 @@ class RewardedAdGateViewModel @Inject constructor(
     }
 
     fun dismiss() {
-        uiState.update { RewardedAdGateUiState() }
+        uiState.update {
+            it.copy(
+                showDialog = false,
+                isLoading = false,
+                skipAdEvent = consumed,
+            )
+        }
     }
 
     fun setLoading() {
