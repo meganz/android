@@ -37,7 +37,6 @@ import mega.privacy.android.app.appstate.content.navigation.StorageStatusViewMod
 import mega.privacy.android.app.appstate.content.navigation.TopLevelBackStackNavigationHandler
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
-import mega.privacy.android.shared.ads.NewAdsContainer
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.domain.entity.StorageState
@@ -51,6 +50,7 @@ import mega.privacy.android.navigation.contract.state.SelectionModeController
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.shared.ads.NewAdsContainer
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.mobile.home.presentation.home.Home
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
@@ -86,7 +86,6 @@ fun HomeScreens(
                 handledStorageState = storageUiState.storageState
             }
         }
-        handledStorageState == storageUiState.storageState
     }
 
     val snackbarHostState = LocalSnackBarHostState.current

@@ -78,6 +78,7 @@ fun StorageStatusDialogViewM3(
     viewModel: StorageStatusViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    if (uiState.isLoading) return
     val coroutineScope = rememberCoroutineScope()
     val dialogState = StorageStatusDialogState(
         storageState = storageState,

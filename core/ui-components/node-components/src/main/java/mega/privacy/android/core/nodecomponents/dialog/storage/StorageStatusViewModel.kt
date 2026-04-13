@@ -3,16 +3,18 @@ package mega.privacy.android.core.nodecomponents.dialog.storage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -20,50 +22,44 @@ import javax.inject.Inject
 class StorageStatusViewModel @Inject constructor(
     private val getPricing: GetPricing,
     private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
-    private val getAccountTypeUseCase: GetAccountTypeUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
+    monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(StorageStatusUiState())
 
-    /**
-     * State
-     */
-    val state = _state.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            runCatching {
-                isAchievementsEnabledUseCase()
-            }.onSuccess { isEnabled ->
-                _state.update { it.copy(isAchievementsEnabled = isEnabled) }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-        viewModelScope.launch {
-            runCatching {
-                getPricing(false).products
-            }.onSuccess { products ->
-                _state.update {
-                    it.copy(
-                        product = products
-                            .filter { product -> product.months == 1 }
-                            .maxBy { product -> product.storage }
-                    )
-                }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-        viewModelScope.launch {
-            runCatching {
-                getAccountTypeUseCase()
-            }.onSuccess { accountType ->
-                _state.update { it.copy(accountType = accountType) }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
+    val state: StateFlow<StorageStatusUiState> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            monitorAccountDetailUseCase()
+                .map { it.levelDetail?.accountType ?: AccountType.FREE }
+                .catch {
+                    Timber.e(it, "Error monitoring account detail")
+                    emit(AccountType.FREE)
+                },
+            flow { emit(isAchievementsEnabledUseCase()) }
+                .catch {
+                    Timber.e(it, "Error getting achievements enabled")
+                    emit(false)
+                },
+            flow {
+                emit(
+                    getPricing(false).products
+                        .filter { it.months == 1 }
+                        .maxByOrNull { it.storage }
+                )
+            }.catch {
+                Timber.e(it, "Error getting pricing")
+                emit(null)
+            },
+        ) { accountType, isAchievementsEnabled, product ->
+            StorageStatusUiState(
+                accountType = accountType,
+                isAchievementsEnabled = isAchievementsEnabled,
+                product = product,
+                isLoading = false,
+            )
+        }.asUiStateFlow(
+            scope = viewModelScope,
+            initialValue = StorageStatusUiState(isLoading = true),
+        )
     }
 
     /**
@@ -79,9 +75,11 @@ class StorageStatusViewModel @Inject constructor(
  * @property product
  * @property accountType
  * @property isAchievementsEnabled
+ * @property isLoading
  */
 data class StorageStatusUiState(
     val product: Product? = null,
     val accountType: AccountType = AccountType.FREE,
     val isAchievementsEnabled: Boolean = false,
+    val isLoading: Boolean = true,
 )
