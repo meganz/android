@@ -126,6 +126,19 @@ object MegaDatabaseConstant {
     const val TABLE_TEXT_EDITOR_SCROLL = "text_editor_scroll"
 
     /**
+     * SQL statements to seed the recently_used_type lookup table.
+     * Used by both the fresh-install callback and the 118→119 migration.
+     */
+    val SEED_RECENTLY_USED_TYPE_SQL = listOf(
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (1, 'PDF')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (2, 'Video')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (3, 'Audio')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (4, 'TextEditor')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (5, 'FileLink')",
+        "INSERT OR IGNORE INTO $TABLE_RECENTLY_USED_TYPE (type_id, name) VALUES (6, 'FolderLink')",
+    )
+
+    /**
      * Table for recently viewed link
      */
     const val TABLE_RECENTLY_VIEWED_LINK = "recently_viewed_link"

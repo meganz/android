@@ -191,6 +191,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             startVersions = (1..66).toList()
                 .toIntArray() // allow destructive migration for version 1 to 66
         ).addMigrations(*MIGRATIONS)
+            .addCallback(SeedRecentlyUsedTypeCallback)
             .openHelperFactory(
                 MegaOpenHelperFactor(
                     factory,
@@ -199,6 +200,20 @@ internal abstract class MegaDatabase : RoomDatabase() {
             )
             .fallbackToDestructiveMigrationOnDowngrade(true)
             .build()
+
+        /**
+         * Seeds the recently_used_type lookup table on fresh install.
+         * AutoMigrationSpec118to119 only runs on upgrade; this callback
+         * ensures the seed data exists when the DB is created from scratch.
+         */
+        private object SeedRecentlyUsedTypeCallback : RoomDatabase.Callback() {
+            override fun onCreate(connection: SupportSQLiteDatabase) {
+                super.onCreate(connection)
+                MegaDatabaseConstant.SEED_RECENTLY_USED_TYPE_SQL.forEach {
+                    connection.execSQL(it)
+                }
+            }
+        }
 
         private val MIGRATION_67_68 = object : Migration(67, 68) {
             override fun migrate(database: SupportSQLiteDatabase) {
