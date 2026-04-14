@@ -252,14 +252,19 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
             Timber.d("The parent handle is: %s", parentHandle);
         }
 
+        MegaNode rootNode = megaApi.getRootNode();
+        if (rootNode == null) {
+            return v;
+        }
+
         if (parentHandle == -1) {
-            parentHandle = megaApi.getRootNode().getHandle();
+            parentHandle = rootNode.getHandle();
         }
 
         MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
         if (chosenNode == null) {
-            parentHandle = megaApi.getRootNode().getHandle();
-            nodes = megaApi.getChildren(megaApi.getRootNode());
+            parentHandle = rootNode.getHandle();
+            nodes = megaApi.getChildren(rootNode);
             changeActionBarTitle(context.getString(R.string.file_provider_title));
         } else {
             nodes = megaApi.getChildren(chosenNode);
@@ -442,7 +447,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
                 listView.setVisibility(View.GONE);
                 emptyImageView.setVisibility(View.VISIBLE);
                 emptyTextViewFirst.setVisibility(View.VISIBLE);
-                if (megaApi.getRootNode().getHandle() == parentHandle) {
+                if (megaApi.getRootNode() != null && megaApi.getRootNode().getHandle() == parentHandle) {
                     emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_cloud_glass);
                     String textToShow = String.format(context.getString(R.string.context_empty_cloud_drive));
                     try {
