@@ -83,7 +83,7 @@ class HandleDownloadTransferEventsUseCaseTest {
             underTest(finishEvent, finishEvent)
 
             verify(scanMediaFileUseCase).invoke(
-                arrayOf(localPath, localPath), arrayOf("")
+                arrayOf(localPath, localPath), Array(2) { "" }
             )
         }
 

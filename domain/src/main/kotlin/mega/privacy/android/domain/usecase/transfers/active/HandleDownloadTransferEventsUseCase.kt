@@ -64,7 +64,10 @@ class HandleDownloadTransferEventsUseCase @Inject constructor(
         }.takeIf { it.isNotEmpty() }
             ?.let { paths ->
                 runCatching {
-                    scanMediaFileUseCase(paths.toTypedArray(), arrayOf(""))
+                    scanMediaFileUseCase(
+                        paths.toTypedArray(),
+                        Array(paths.size) { "" },
+                    )
                 }
             }
     }
