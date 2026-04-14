@@ -6,16 +6,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.passcode.view.PasscodeLoadingView
-import mega.privacy.android.app.presentation.passcode.view.PasscodeView
-import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
+import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
+import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
+import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.view.PasscodeLoadingView
+import mega.privacy.android.core.passcode.presentation.view.PasscodeView
 import timber.log.Timber
 
 @Composable
 internal fun PasscodeContainer(
     passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
-    passcodeUI: @Composable () -> Unit = { PasscodeView(cryptObjectFactory = passcodeCryptObjectFactory) },
+    passcodeUI: @Composable () -> Unit = {
+        PasscodeView(
+            cryptObjectFactory = passcodeCryptObjectFactory,
+            logoutConfirmationDialog = { onDismissed ->
+                LogoutConfirmationDialog(onDismissed = onDismissed)
+            },
+        )
+    },
     viewModel: PasscodeCheckViewModel = hiltViewModel(),
     canLock: () -> Boolean = { true },
     loading: @Composable (() -> Unit) = { PasscodeLoadingView() },

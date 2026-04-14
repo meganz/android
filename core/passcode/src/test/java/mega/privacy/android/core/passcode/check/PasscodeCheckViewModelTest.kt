@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.security.check
+package mega.privacy.android.core.passcode.check
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -7,17 +7,16 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
-import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
+import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.test.extension.asHotFlow
+import mega.privacy.android.core.test.extension.withCoroutineExceptions
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
-import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.app.extensions.withCoroutineExceptions
 
 class PasscodeCheckViewModelTest {
     private lateinit var underTest: PasscodeCheckViewModel

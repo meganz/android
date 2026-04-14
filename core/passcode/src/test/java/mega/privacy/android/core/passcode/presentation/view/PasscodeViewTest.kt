@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.passcode.view
+package mega.privacy.android.core.passcode.presentation.view
 
 import android.content.Context
 import androidx.activity.ComponentActivity
@@ -17,16 +17,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.app.presentation.passcode.view.FAILED_ATTEMPTS_TAG
-import mega.privacy.android.app.presentation.passcode.view.FORGOT_PASSCODE_BUTTON_TAG
-import mega.privacy.android.app.presentation.passcode.view.LOGOUT_BUTTON_TAG
-import mega.privacy.android.app.presentation.passcode.view.PASSCODE_FIELD_TAG
-import mega.privacy.android.app.presentation.passcode.view.PASSWORD_FIELD_TAG
-import mega.privacy.android.app.presentation.passcode.view.PasscodeView
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent

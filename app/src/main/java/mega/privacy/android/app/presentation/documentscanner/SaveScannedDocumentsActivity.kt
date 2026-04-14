@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_SOLO_IMAGE_URI
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.INITIAL_FILENAME_FORMAT
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.passcode.view
+package mega.privacy.android.core.passcode.presentation.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,7 +21,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
 
 @Composable
-internal fun PasscodeLoadingView() {
+fun PasscodeLoadingView() {
     Column(
         modifier = Modifier
             .fillMaxSize()

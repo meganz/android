@@ -7,7 +7,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.settings.passcode.mapper.BiometricAuthErrorMapper
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import javax.inject.Inject

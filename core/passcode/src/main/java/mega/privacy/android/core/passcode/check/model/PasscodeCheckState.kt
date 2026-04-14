@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.security.check.model
+package mega.privacy.android.core.passcode.check.model
 
 /**
  * Passcode check state

@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase

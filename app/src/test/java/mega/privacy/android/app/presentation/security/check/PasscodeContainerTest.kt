@@ -7,8 +7,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
+import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
+import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

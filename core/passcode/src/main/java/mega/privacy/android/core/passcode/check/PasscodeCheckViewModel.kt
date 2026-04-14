@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.security.check
+package mega.privacy.android.core.passcode.check
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
+import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-internal class PasscodeCheckViewModel @Inject constructor(
+class PasscodeCheckViewModel @Inject constructor(
     private val monitorPasscodeLockStateUseCase: MonitorPasscodeLockStateUseCase,
 ) : ViewModel() {
 

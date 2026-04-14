@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.passcode.view
+package mega.privacy.android.core.passcode.presentation.view
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,23 +43,24 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.surface.BoxSurface
+import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
-import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.core.passcode.R
+import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasscodeField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
-import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
@@ -70,12 +71,17 @@ import timber.log.Timber
 /**
  * Passcode dialog
  *
+ * @param cryptObjectFactory
  * @param passcodeUnlockViewModel
+ * @param logoutConfirmationDialog
+ * @param biometricAuthIsAvailable
+ * @param showBiometricAuth
  */
 @Composable
-internal fun PasscodeView(
+fun PasscodeView(
     cryptObjectFactory: PasscodeCryptObjectFactory,
     passcodeUnlockViewModel: PasscodeUnlockViewModel = hiltViewModel(),
+    logoutConfirmationDialog: @Composable (onDismissed: () -> Unit) -> Unit = {},
     biometricAuthIsAvailable: (Context) -> Boolean = ::areBiometricsEnabled,
     showBiometricAuth: (
         onSuccess: () -> Unit,
@@ -157,6 +163,7 @@ internal fun PasscodeView(
                         failedAttemptCount = currentState.failedAttempts,
                         showLogoutWarning = currentState.logoutWarning,
                         passcodeType = currentState.passcodeType,
+                        logoutConfirmationDialog = logoutConfirmationDialog,
                     )
                 }
             }
@@ -174,6 +181,7 @@ private fun PasscodeContent(
     failedAttemptCount: Int,
     showLogoutWarning: Boolean,
     passcodeType: PasscodeUIType,
+    logoutConfirmationDialog: @Composable (onDismissed: () -> Unit) -> Unit,
     modifier: Modifier = Modifier,
     usePasswordField: Boolean = false,
 ) {
@@ -204,7 +212,7 @@ private fun PasscodeContent(
                 )
             },
             textAlign = TextAlign.Center,
-            style = AppTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge,
             textColor = TextColor.Primary,
         )
 
@@ -247,7 +255,7 @@ private fun PasscodeContent(
                 ),
                 text = stringResource(id = R.string.pin_lock_alert),
                 textAlign = TextAlign.Center,
-                style = AppTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge,
                 textColor = TextColor.Primary,
             )
         }
@@ -274,12 +282,11 @@ private fun PasscodeContent(
         }
     }
     if (logoutDialog) {
-        Surface(
+        BoxSurface(
             modifier = Modifier.fillMaxSize(),
+            surfaceColor = SurfaceColor.PageBackground
         ) {}
-        LogoutConfirmationDialog(
-            onDismissed = { logoutDialog = false }
-        )
+        logoutConfirmationDialog { logoutDialog = false }
     }
 }
 
@@ -354,6 +361,7 @@ private fun PasscodeDialogPreview(
             showLogoutWarning = previewParameters.showWarning,
             usePasswordField = previewParameters.usePassword,
             passcodeType = previewParameters.passcodeType,
+            logoutConfirmationDialog = {},
         )
     }
 }

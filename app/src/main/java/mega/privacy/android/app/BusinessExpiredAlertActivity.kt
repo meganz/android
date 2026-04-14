@@ -13,7 +13,7 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.presentation.business.BusinessExpiredAlertScreen
 import mega.privacy.android.app.presentation.business.BusinessExpiredAlertViewModel
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode

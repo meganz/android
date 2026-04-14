@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.passcode.model
+package mega.privacy.android.core.passcode.presentation.model
 
 import mega.privacy.android.domain.entity.ThemeMode
 

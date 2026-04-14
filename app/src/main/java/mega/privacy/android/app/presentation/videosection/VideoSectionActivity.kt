@@ -51,7 +51,7 @@ import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog

@@ -1,13 +1,13 @@
-package mega.privacy.android.app.presentation.passcode.mapper
+package mega.privacy.android.core.passcode.presentation.mapper
 
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
 import mega.privacy.android.domain.entity.passcode.PasscodeType
 import javax.inject.Inject
 
 /**
  * Passcode type mapper
  */
-internal class PasscodeTypeMapper @Inject constructor() {
+class PasscodeTypeMapper @Inject constructor() {
     /**
      * Invoke
      *

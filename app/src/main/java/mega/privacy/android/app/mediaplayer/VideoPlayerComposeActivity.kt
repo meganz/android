@@ -62,7 +62,7 @@ import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer

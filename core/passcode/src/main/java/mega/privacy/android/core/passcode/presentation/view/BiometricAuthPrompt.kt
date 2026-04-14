@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.passcode.view
+package mega.privacy.android.core.passcode.presentation.view
 
 import android.content.Context
 import androidx.biometric.BiometricPrompt

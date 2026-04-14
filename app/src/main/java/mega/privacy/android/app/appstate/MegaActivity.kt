@@ -71,17 +71,18 @@ import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.loginEntryProvider
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.passcode.navigation.PasscodeNavKey
-import mega.privacy.android.app.presentation.passcode.navigation.passcodeView
-import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewModel
-import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
+import mega.privacy.android.core.passcode.presentation.navigation.passcodeView
+import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
+import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.passcode.PasscodeProcessLifecycleOwner
@@ -448,7 +449,12 @@ class MegaActivity : FragmentActivity() {
                                                 onFinish = ::finish
                                             )
 
-                                            passcodeView(passcodeCryptObjectFactory)
+                                            passcodeView(
+                                                cryptObjectFactory = passcodeCryptObjectFactory,
+                                                logoutConfirmationDialog = { onDismissed ->
+                                                    LogoutConfirmationDialog(onDismissed = onDismissed)
+                                                },
+                                            )
                                         },
                                         transitionSpec = { fadeTransition },
                                         popTransitionSpec = { fadeTransition },

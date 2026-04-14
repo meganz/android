@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.passcode
+package mega.privacy.android.core.passcode.presentation
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.app.extensions.withCoroutineExceptions
-import mega.privacy.android.app.presentation.passcode.mapper.PasscodeTypeMapper
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.core.test.extension.asHotFlow
+import mega.privacy.android.core.test.extension.withCoroutineExceptions
+import mega.privacy.android.core.passcode.presentation.mapper.PasscodeTypeMapper
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.passcode.PasscodeType

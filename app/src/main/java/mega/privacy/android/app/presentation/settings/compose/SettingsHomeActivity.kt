@@ -16,7 +16,7 @@ import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.compose.home.SettingsHomeDestinationWrapper
 import mega.privacy.android.domain.entity.ThemeMode

@@ -42,7 +42,7 @@ import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
-import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
+import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC

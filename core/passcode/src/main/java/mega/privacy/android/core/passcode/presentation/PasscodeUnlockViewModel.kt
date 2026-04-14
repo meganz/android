@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.passcode
+package mega.privacy.android.core.passcode.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.passcode.mapper.PasscodeTypeMapper
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.core.passcode.presentation.mapper.PasscodeTypeMapper
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -27,7 +27,7 @@ import javax.inject.Inject
  * @property unlockPasscodeUseCase
  */
 @HiltViewModel
-internal class PasscodeUnlockViewModel @Inject constructor(
+class PasscodeUnlockViewModel @Inject constructor(
     private val monitorPasscodeAttemptsUseCase: MonitorPasscodeAttemptsUseCase,
     private val unlockPasscodeUseCase: UnlockPasscodeUseCase,
     private val monitorPasscodeTypeUseCase: MonitorPasscodeTypeUseCase,

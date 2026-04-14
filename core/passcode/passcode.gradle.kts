@@ -2,6 +2,7 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
+    alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-android")
 }
 
@@ -16,16 +17,30 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":domain"))
+    implementation(project(":shared:original-core-ui"))
+    implementation(project(":core:analytics:analytics-tracker"))
     implementation(lib.logging.timber)
+    implementation(lib.mega.analytics)
+    implementation(lib.mega.core.ui)
     implementation(androidx.appcompat)
+    implementation(androidx.biometric)
+    implementation(androidx.hilt.navigation)
     implementation(androidx.lifecycle.runtime)
+    implementation(androidx.lifecycle.runtime.compose)
+    implementation(androidx.navigation3.runtime)
     implementation(androidx.compose.activity)
     implementation(androidx.bundles.compose.bom)
     implementation(platform(androidx.compose.bom))
+    implementation(androidx.material3)
 
     testImplementation(project(":core-test"))
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
+    testImplementation(testlib.bundles.ui.test)
+    testImplementation(testlib.compose.junit)
+    testImplementation(testlib.compose.manifest)
+    testImplementation(google.hilt.android.test)
     testRuntimeOnly(testlib.junit.jupiter.engine)
 }

@@ -24,7 +24,7 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
 import mega.privacy.android.app.utils.Constants

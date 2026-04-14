@@ -26,7 +26,7 @@ import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContain
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContentView
 import mega.privacy.android.app.presentation.psa.PsaViewModel
 import mega.privacy.android.core.passcode.PasscodeCheck

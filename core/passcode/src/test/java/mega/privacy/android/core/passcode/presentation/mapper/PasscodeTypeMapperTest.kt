@@ -1,8 +1,7 @@
-package mega.privacy.android.app.presentation.passcode.mapper
+package mega.privacy.android.core.passcode.presentation.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.passcode.mapper.PasscodeTypeMapper
-import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
+import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
 import mega.privacy.android.domain.entity.passcode.PasscodeType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DynamicTest

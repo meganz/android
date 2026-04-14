@@ -37,7 +37,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGr
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
-import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
