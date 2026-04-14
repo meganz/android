@@ -44,12 +44,11 @@ internal fun ContinueWhereLeftOffCarousel(
     items: List<ContinueWhereLeftOffItem>,
     onItemClick: (ContinueWhereLeftOffItem) -> Unit,
     modifier: Modifier = Modifier,
-    onSeeAllClick: () -> Unit = {},
 ) {
     if (items.isEmpty()) return
 
     Column(modifier = modifier) {
-        ContinueWhereLeftOffHeader(onSeeAllClick = onSeeAllClick)
+        ContinueWhereLeftOffHeader()
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 16.dp),
@@ -67,7 +66,6 @@ internal fun ContinueWhereLeftOffCarousel(
 
 @Composable
 private fun ContinueWhereLeftOffHeader(
-    onSeeAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -86,8 +84,7 @@ private fun ContinueWhereLeftOffHeader(
             modifier = Modifier
                 .size(24.dp)
                 .wrapContentSize(unbounded = true, align = Alignment.Center)
-                .size(48.dp)
-                .clickable { onSeeAllClick() },
+                .size(48.dp),
             contentAlignment = Alignment.Center,
         ) {
             MegaIcon(

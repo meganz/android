@@ -8,6 +8,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,6 +29,7 @@ class ContinueWhereLeftOffViewModelTest {
 
     private val monitorContinueWhereLeftOffItemsUseCase =
         mock<MonitorContinueWhereLeftOffItemsUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val fakeFlow = MutableSharedFlow<List<ContinueWhereLeftOffItem>>()
 
     private lateinit var underTest: ContinueWhereLeftOffViewModel
@@ -35,6 +39,7 @@ class ContinueWhereLeftOffViewModelTest {
         whenever(monitorContinueWhereLeftOffItemsUseCase(10)).thenReturn(fakeFlow)
         underTest = ContinueWhereLeftOffViewModel(
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
         )
     }
 
@@ -63,5 +68,26 @@ class ContinueWhereLeftOffViewModelTest {
             assertThat(awaitItem()).isEqualTo(items)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that resolveNode returns TypedFileNode for valid handle`() = runTest {
+        val nodeHandle = 123L
+        val expectedNode = mock<TypedFileNode>()
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(expectedNode)
+
+        val result = underTest.resolveNode(nodeHandle)
+
+        assertThat(result).isEqualTo(expectedNode)
+    }
+
+    @Test
+    fun `test that resolveNode returns null when use case throws`() = runTest {
+        val nodeHandle = 456L
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenThrow(RuntimeException("Not found"))
+
+        val result = underTest.resolveNode(nodeHandle)
+
+        assertThat(result).isNull()
     }
 }
