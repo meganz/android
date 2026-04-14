@@ -8,6 +8,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.backup.BackupRemovalStatus
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -31,6 +32,7 @@ import mega.privacy.android.feature.sync.domain.entity.megapicker.MegaPickerNode
 import mega.privacy.android.feature.sync.domain.usecase.megapicker.MonitorMegaPickerFolderNodesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import org.junit.jupiter.api.AfterEach
@@ -68,6 +70,7 @@ internal class MegaPickerViewModelTest {
         mock()
     private val removeDeviceFolderConnectionUseCase: RemoveDeviceFolderConnectionUseCase = mock()
     private val monitorMegaPickerFolderNodesUseCase: MonitorMegaPickerFolderNodesUseCase = mock()
+    private val folderConflictMessageFormatter: FolderConflictMessageFormatter = mock()
 
     private val typedNodeUiModels: List<TypedNodeUiModel> = emptyList()
 
@@ -86,7 +89,8 @@ internal class MegaPickerViewModelTest {
             nodeExistsInCurrentLocationUseCase,
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
             removeDeviceFolderConnectionUseCase,
-            monitorMegaPickerFolderNodesUseCase
+            monitorMegaPickerFolderNodesUseCase,
+            folderConflictMessageFormatter,
         )
     }
 
@@ -389,8 +393,8 @@ internal class MegaPickerViewModelTest {
                 )
             )
 
-            val event = underTest.state.value.snackbarMessageId
-            assertThat(event).isEqualTo(errorStringRes)
+            val event = underTest.state.value.snackbarMessage
+            assertThat(event).isEqualTo(LocalizedText.StringRes(errorStringRes))
         }
 
     @Test
@@ -402,7 +406,7 @@ internal class MegaPickerViewModelTest {
         )
 
         underTest.state.test {
-            assertThat(awaitItem().snackbarMessageId).isEqualTo(null)
+            assertThat(awaitItem().snackbarMessage).isEqualTo(null)
         }
     }
 
@@ -913,8 +917,8 @@ internal class MegaPickerViewModelTest {
                 )
             )
 
-            val event = underTest.state.value.snackbarMessageId
-            assertThat(event).isEqualTo(99999)
+            val event = underTest.state.value.snackbarMessage
+            assertThat(event).isEqualTo(LocalizedText.StringRes(99999))
         }
 
     @Test
@@ -1139,8 +1143,8 @@ internal class MegaPickerViewModelTest {
             )
         )
 
-        val event = underTest.state.value.snackbarMessageId
-        assertThat(event).isEqualTo(sharedR.string.error_folder_part_of_camera_uploads)
+        val event = underTest.state.value.snackbarMessage
+        assertThat(event).isEqualTo(LocalizedText.Literal("cu-conflict-some folder"))
         verifyNoInteractions(tryNodeSyncUseCase)
     }
 
@@ -1172,8 +1176,8 @@ internal class MegaPickerViewModelTest {
             )
         )
 
-        val event = underTest.state.value.snackbarMessageId
-        assertThat(event).isEqualTo(sharedR.string.error_folder_part_of_media_uploads)
+        val event = underTest.state.value.snackbarMessage
+        assertThat(event).isEqualTo(LocalizedText.Literal("mu-conflict-some folder"))
         verifyNoInteractions(tryNodeSyncUseCase)
     }
 
@@ -1205,8 +1209,8 @@ internal class MegaPickerViewModelTest {
             )
         )
 
-        val event = underTest.state.value.snackbarMessageId
-        assertThat(event).isEqualTo(sharedR.string.error_folder_part_of_sync_or_backup)
+        val event = underTest.state.value.snackbarMessage
+        assertThat(event).isEqualTo(LocalizedText.Literal("sync-conflict-some folder"))
         verifyNoInteractions(tryNodeSyncUseCase)
     }
 
@@ -1238,8 +1242,8 @@ internal class MegaPickerViewModelTest {
             )
         )
 
-        val event = underTest.state.value.snackbarMessageId
-        assertThat(event).isEqualTo(sharedR.string.error_folder_part_of_camera_uploads)
+        val event = underTest.state.value.snackbarMessage
+        assertThat(event).isEqualTo(LocalizedText.Literal("cu-conflict-some folder"))
         verifyNoInteractions(tryNodeSyncUseCase)
     }
 
@@ -1276,7 +1280,7 @@ internal class MegaPickerViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.navigateNextEvent).isEqualTo(triggered)
-                assertThat(state.snackbarMessageId).isNull()
+                assertThat(state.snackbarMessage).isNull()
             }
         }
 
@@ -1312,7 +1316,7 @@ internal class MegaPickerViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.navigateNextEvent).isEqualTo(triggered)
-            assertThat(state.snackbarMessageId).isNull()
+            assertThat(state.snackbarMessage).isNull()
         }
     }
 
@@ -1340,7 +1344,7 @@ internal class MegaPickerViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.navigateNextEvent).isEqualTo(triggered)
-            assertThat(state.snackbarMessageId).isNull()
+            assertThat(state.snackbarMessage).isNull()
         }
         // Verify that isFolderUsedBySyncOrBackupAcrossDevicesUseCase was NOT called
         verifyNoInteractions(isFolderUsedBySyncOrBackupAcrossDevicesUseCase)
@@ -1637,8 +1641,8 @@ internal class MegaPickerViewModelTest {
                 val state = awaitItem()
                 assertThat(state.showRemoveConnectionDialog).isFalse()
                 assertThat(state.selectedDisabledFolder).isNull()
-                assertThat(state.snackbarMessageId)
-                    .isEqualTo(sharedR.string.device_center_snackbar_message_connection_removed)
+                assertThat(state.snackbarMessage)
+                    .isEqualTo(LocalizedText.StringRes(sharedR.string.device_center_snackbar_message_connection_removed))
             }
             verify(removeDeviceFolderConnectionUseCase).invoke(123L)
         }
@@ -1700,7 +1704,7 @@ internal class MegaPickerViewModelTest {
             val state = awaitItem()
             assertThat(state.showRemoveConnectionDialog).isFalse()
             assertThat(state.selectedDisabledFolder).isNull()
-            assertThat(state.snackbarMessageId).isEqualTo(sharedR.string.general_text_error)
+            assertThat(state.snackbarMessage).isEqualTo(LocalizedText.StringRes(sharedR.string.general_text_error))
         }
     }
 
@@ -1740,6 +1744,28 @@ internal class MegaPickerViewModelTest {
         folderNodesStub: ((Node, NodeId?, Boolean, String?) -> kotlinx.coroutines.flow.Flow<MegaPickerFolderResult>)? = null,
     ) {
         wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) }.thenReturn(false)
+        whenever(
+            folderConflictMessageFormatter.formatFromFolderUsage(any(), any(), any())
+        ).thenAnswer { invocation ->
+            val folderName = invocation.getArgument<String>(0)
+            when (val result = invocation.getArgument<FolderUsageResult>(2)) {
+                FolderUsageResult.NotUsed -> null
+                is FolderUsageResult.UsedByCameraUpload,
+                is FolderUsageResult.UsedByCameraUploadParent,
+                is FolderUsageResult.UsedByCameraUploadChild,
+                    -> "cu-conflict-$folderName"
+
+                is FolderUsageResult.UsedByMediaUpload,
+                is FolderUsageResult.UsedByMediaUploadParent,
+                is FolderUsageResult.UsedByMediaUploadChild,
+                    -> "mu-conflict-$folderName"
+
+                is FolderUsageResult.UsedBySyncOrBackup,
+                is FolderUsageResult.UsedBySyncOrBackupParent,
+                is FolderUsageResult.UsedBySyncOrBackupChild,
+                    -> "sync-conflict-$folderName"
+            }
+        }
         if (folderNodesStub != null) {
             whenever(
                 monitorMegaPickerFolderNodesUseCase(
@@ -1790,6 +1816,7 @@ internal class MegaPickerViewModelTest {
             removeDeviceFolderConnectionUseCase = removeDeviceFolderConnectionUseCase,
             monitorMegaPickerFolderNodesUseCase = monitorMegaPickerFolderNodesUseCase,
             nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+            folderConflictMessageFormatter = folderConflictMessageFormatter,
         )
     }
 }

@@ -130,4 +130,24 @@ object CameraUploadsWorkerStatusConstant {
      * Folder conflict with Sync or Backup key (covers both local and cross-device conflicts)
      */
     const val FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP = "folder_conflict_with_sync_or_backup"
+
+    /**
+     * Conflict device name key
+     */
+    const val CONFLICT_DEVICE_NAME = "conflict_device_name"
+
+    /**
+     * Conflict backup name key
+     */
+    const val CONFLICT_BACKUP_NAME = "conflict_backup_name"
+
+    /**
+     * Conflict folder display name key
+     */
+    const val CONFLICT_FOLDER_NAME = "conflict_folder_name"
+
+    /**
+     * Conflict is local folder key
+     */
+    const val CONFLICT_IS_LOCAL = "conflict_is_local"
 }

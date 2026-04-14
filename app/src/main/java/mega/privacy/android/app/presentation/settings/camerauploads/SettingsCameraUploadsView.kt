@@ -215,9 +215,9 @@ internal fun SettingsCameraUploadsView(
     EventEffect(
         event = uiState.snackbarMessage,
         onConsumed = { onSnackbarMessageConsumed() },
-        action = { messageResId ->
+        action = { message ->
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                message = context.resources.getString(messageResId),
+                message = message.get(context),
             )
         },
     )

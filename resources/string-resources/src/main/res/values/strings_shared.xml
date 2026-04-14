@@ -2685,4 +2685,18 @@
     <string name="rewarded_ad_unavailable_toast">Ad is unavailable! Continuing&#8230;</string>
     <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
     <string name="general_read_only_folder_warning">This folder is read-only</string>
+    <!-- Unified folder conflict message. %1$s folder display name, %2$s sync_label_cloud_folder or sync_label_device_folder, %3$s feature (e.g. sync_label_camera_uploads, sync_label_media_uploads, sync_label_a_sync_or_backup), %4$s device name or sync_label_this_device -->
+    <string name="sync_error_folder_conflict">“%1$s” %2$s is already part of %3$s on %4$s. Choose another.</string>
+    <!-- Label for cloud folder in sync conflict messages -->
+    <string name="sync_label_cloud_folder">cloud folder</string>
+    <!-- Label for device folder in sync conflict messages -->
+    <string name="sync_label_device_folder">device folder</string>
+    <!-- Label for a sync or backup in sync conflict messages -->
+    <string name="sync_label_a_sync_or_backup">a sync or backup</string>
+    <!-- Label when the conflicting feature is on this device or the device name is unknown -->
+    <string name="sync_label_this_device">this device</string>
+    <!-- Label for a sync or backup in sync conflict messages -->
+    <string name="sync_label_camera_uploads">Camera Uploads</string>
+    <!-- Label for a sync or backup in sync conflict messages -->
+    <string name="sync_label_media_uploads">Media Uploads</string>
 </resources>

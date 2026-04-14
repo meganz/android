@@ -19,6 +19,7 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
     private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getDeviceIdAndNameMapUseCase: GetDeviceIdAndNameMapUseCase,
 ) {
     private val cachedBackups = TimeCache(CACHE_DURATION) {
         getBackupInfoUseCase()
@@ -55,6 +56,10 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
         } else {
             cachedBackups.refresh()
         }
+
+        val deviceNameMap = runCatching {
+            getDeviceIdAndNameMapUseCase()
+        }.getOrNull() ?: emptyMap()
 
         val currentDeviceId = if (shouldExcludeCurrentDevice) {
             getDeviceIdUseCase()
@@ -100,17 +105,30 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
                 else -> {
                     // If not related to Camera/Media Uploads, check all backup entries
                     val relationship = determineNodeRelationshipUseCase(nodeId, backup.rootHandle)
+                    val resolvedDeviceName = backup.deviceId?.let { deviceNameMap[it] }
                     when (relationship) {
                         NodeRelationship.ExactMatch -> {
-                            return FolderUsageResult.UsedBySyncOrBackup(backup.deviceId)
+                            return FolderUsageResult.UsedBySyncOrBackup(
+                                deviceId = backup.deviceId,
+                                deviceName = resolvedDeviceName,
+                                backupName = backup.name,
+                            )
                         }
 
                         NodeRelationship.TargetIsAncestor -> {
-                            return FolderUsageResult.UsedBySyncOrBackupChild(backup.deviceId)
+                            return FolderUsageResult.UsedBySyncOrBackupChild(
+                                deviceId = backup.deviceId,
+                                deviceName = resolvedDeviceName,
+                                backupName = backup.name,
+                            )
                         }
 
                         NodeRelationship.TargetIsDescendant -> {
-                            return FolderUsageResult.UsedBySyncOrBackupParent(backup.deviceId)
+                            return FolderUsageResult.UsedBySyncOrBackupParent(
+                                deviceId = backup.deviceId,
+                                deviceName = resolvedDeviceName,
+                                backupName = backup.name,
+                            )
                         }
 
                         else -> { /* continue checking other backups */

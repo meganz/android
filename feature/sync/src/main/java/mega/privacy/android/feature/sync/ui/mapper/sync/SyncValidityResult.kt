@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
  */
 sealed interface SyncValidityResult {
     data class ShowSnackbar(val messageResId: Int) : SyncValidityResult
+    data class ShowSnackbarMessage(val message: String) : SyncValidityResult
     data class ValidFolderSelected(val localFolderUri: UriPath, val folderName: String) :
         SyncValidityResult
 

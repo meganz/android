@@ -2,8 +2,10 @@ package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.notification.SyncNotificationGateway
+import mega.privacy.android.feature.sync.data.mapper.notification.CrossDeviceConflictNotificationMessageMapper
 import mega.privacy.android.feature.sync.data.mapper.notification.GenericErrorToNotificationMessageMapper
 import mega.privacy.android.feature.sync.data.mapper.notification.StalledIssuesToNotificationMessageMapper
 import mega.privacy.android.feature.sync.data.mapper.notification.SyncShownNotificationEntityToSyncNotificationMessageMapper
@@ -19,6 +21,7 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
     private val stalledIssuesToNotificationMessageMapper: StalledIssuesToNotificationMessageMapper,
     private val genericErrorToNotificationMessageMapper: GenericErrorToNotificationMessageMapper,
     private val syncShownNotificationEntityToSyncNotificationMessageMapper: SyncShownNotificationEntityToSyncNotificationMessageMapper,
+    private val crossDeviceConflictNotificationMessageMapper: CrossDeviceConflictNotificationMessageMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SyncNotificationRepository {
 
@@ -79,15 +82,23 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
         return genericErrorToNotificationMessageMapper(type)
     }
 
-    override suspend fun getCrossDeviceConflictNotification(conflictingSyncs: List<FolderPair>): SyncNotificationMessage =
-        genericErrorToNotificationMessageMapper(
-            syncNotificationType = SyncNotificationType.CROSS_DEVICE_CONFLICT,
-            issuePath = conflictingSyncs.first().pairName
-        )
+    override suspend fun getCrossDeviceConflictNotification(
+        conflictingSyncs: List<FolderPair>,
+        folderUsageResult: FolderUsageResult,
+    ): SyncNotificationMessage {
+        val first = conflictingSyncs.first()
+        return crossDeviceConflictNotificationMessageMapper(first, folderUsageResult)
+    }
 
-    override suspend fun setPendingCrossDeviceConflictNotification(conflictingSyncs: List<FolderPair>) {
-        val notification = getCrossDeviceConflictNotification(conflictingSyncs)
-        setDisplayedNotification(notification, notificationId = null)
+    override suspend fun setPendingCrossDeviceConflictNotification(
+        conflictingSyncs: List<FolderPair>,
+        folderUsageResult: FolderUsageResult,
+    ) {
+        if (conflictingSyncs.isNotEmpty()) {
+            val notification =
+                getCrossDeviceConflictNotification(conflictingSyncs, folderUsageResult)
+            setDisplayedNotification(notification, notificationId = null)
+        }
     }
 
     override suspend fun getPendingCrossDeviceConflictNotification(): SyncNotificationMessage? {

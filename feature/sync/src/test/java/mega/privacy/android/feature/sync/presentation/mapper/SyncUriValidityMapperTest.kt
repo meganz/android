@@ -17,6 +17,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
 import mega.privacy.android.shared.resources.R as sharedR
@@ -28,6 +29,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito.reset
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
@@ -44,11 +46,16 @@ class SyncUriValidityMapperTest {
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val folderConflictMessageFormatter: FolderConflictMessageFormatter = mock()
 
     private lateinit var underTest: SyncUriValidityMapper
 
     @BeforeEach
     fun setUp() {
+        whenever(folderConflictMessageFormatter.formatDeviceFolderCameraUploadsConflict(any()))
+            .thenReturn("camera-uploads-conflict")
+        whenever(folderConflictMessageFormatter.formatDeviceFolderMediaUploadsConflict(any()))
+            .thenReturn("media-uploads-conflict")
         underTest = SyncUriValidityMapper(
             getFolderPairsUseCase = getFolderPairsUseCase,
             getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase,
@@ -58,6 +65,7 @@ class SyncUriValidityMapperTest {
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            folderConflictMessageFormatter = folderConflictMessageFormatter,
         )
     }
 
@@ -71,7 +79,8 @@ class SyncUriValidityMapperTest {
             getPrimaryFolderPathUseCase,
             isCameraUploadsEnabledUseCase,
             isMediaUploadsEnabledUseCase,
-            getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase,
+            folderConflictMessageFormatter,
         )
     }
 

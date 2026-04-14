@@ -69,6 +69,7 @@ dependencies {
 
     testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(testlib.bundles.ui.test)
+    testImplementation(testlib.test.core.ktx)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testImplementation(google.hilt.android.test)

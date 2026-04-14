@@ -19,13 +19,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -50,7 +51,7 @@ internal fun MegaPickerScreen(
     disabledFolderClicked: (TypedNodeUiModel) -> Unit,
     currentFolderSelected: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
-    snackbarMessageId: Int?,
+    snackbarMessage: LocalizedText?,
     snackbarMessageShown: () -> Unit,
     isLoading: Boolean,
     isSelectEnabled: Boolean,
@@ -59,8 +60,6 @@ internal fun MegaPickerScreen(
     isSingleActivity: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val localResources = LocalResources.current
 
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -132,10 +131,11 @@ internal fun MegaPickerScreen(
         }
     }
 
-    LaunchedEffect(snackbarMessageId) {
-        if (snackbarMessageId != null) {
+    val context = LocalContext.current
+    LaunchedEffect(snackbarMessage) {
+        if (snackbarMessage != null) {
             snackbarHostState.showAutoDurationSnackbar(
-                message = localResources.getString(snackbarMessageId),
+                message = snackbarMessage.get(context),
             )
             snackbarMessageShown()
         }
@@ -228,7 +228,7 @@ private fun SyncNewFolderScreenPreview(
             disabledFolderClicked = {},
             currentFolderSelected = {},
             fileTypeIconMapper = FileTypeIconMapper(),
-            snackbarMessageId = null,
+            snackbarMessage = null,
             snackbarMessageShown = {},
             isLoading = false,
             isSelectEnabled = isSelectEnabled,

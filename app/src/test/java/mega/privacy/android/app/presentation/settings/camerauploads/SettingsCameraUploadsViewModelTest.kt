@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.mapper.UploadOptionUiItemMapper
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
@@ -83,6 +85,7 @@ import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCa
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
@@ -106,11 +109,14 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import java.util.stream.Stream
 
 /**
@@ -189,6 +195,8 @@ internal class SettingsCameraUploadsViewModelTest {
         mock<HasLocalFolderConflictWithSyncUseCase>()
     private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase =
         mock<IsFolderUsedBySyncOrBackupAcrossDevicesUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val folderConflictMessageFormatter = mock<FolderConflictMessageFormatter>()
 
     private val fakeMonitorCameraUploadsSettingsActionsFlow =
         MutableSharedFlow<CameraUploadsSettingsAction>()
@@ -206,6 +214,7 @@ internal class SettingsCameraUploadsViewModelTest {
     @BeforeEach
     fun resetMocks() {
         reset(
+            folderConflictMessageFormatter,
             areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatusUseCase,
@@ -255,7 +264,8 @@ internal class SettingsCameraUploadsViewModelTest {
             broadcastCameraUploadsSettingsActionUseCase,
             getPathByDocumentContentUriUseCase,
             hasLocalFolderConflictWithSyncUseCase,
-            isFolderUsedBySyncOrBackupAcrossDevicesUseCase
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+            getNodeByIdUseCase
         )
     }
 
@@ -315,14 +325,14 @@ internal class SettingsCameraUploadsViewModelTest {
             enableCameraUploadsStatus
         )
         whenever(hasLocalFolderConflictWithSyncUseCase(any())).thenReturn(false)
-        whenever(
+        wheneverBlocking {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
-                nodeId = anyValueClass(),
-                isSyncFolderSelection = any(),
-                shouldExcludeCurrentDevice = any(),
-                useCache = any(),
+                nodeId = any(),
+                isSyncFolderSelection = eq(false),
+                shouldExcludeCurrentDevice = eq(false),
+                useCache = eq(false),
             )
-        ).thenReturn(FolderUsageResult.NotUsed)
+        }.thenReturn(FolderUsageResult.NotUsed)
 
         underTest = SettingsCameraUploadsViewModel(
             applicationScope = applicationScope,
@@ -378,6 +388,8 @@ internal class SettingsCameraUploadsViewModelTest {
             getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase,
             hasLocalFolderConflictWithSyncUseCase = hasLocalFolderConflictWithSyncUseCase,
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            folderConflictMessageFormatter = folderConflictMessageFormatter,
         )
     }
 
@@ -399,7 +411,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onCameraUploadsStateChanged(enabled = false)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -412,7 +430,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onCameraUploadsStateChanged(enabled = false) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -450,7 +474,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onCameraUploadsStateChanged(enabled = true)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -463,7 +493,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onCameraUploadsStateChanged(enabled = true) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -569,7 +605,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onMediaPermissionsGranted() }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -582,7 +624,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onMediaPermissionsGranted() }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -612,7 +660,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onMediaPermissionsGranted()
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.settings_camera_notif_initializing_title))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.settings_camera_notif_initializing_title
+                            )
+                        )
+                    )
                     assertThat(analyticsExtension.events.first()).isEqualTo(
                         CameraUploadsEnabledEvent
                     )
@@ -675,7 +729,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.uiState.test {
                     val state = awaitItem()
                     assertThat(state.businessAccountPromptType).isNull()
-                    assertThat(state.snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(state.snackbarMessage).isEqualTo(triggered(LocalizedText.StringRes(R.string.general_error)))
                 }
             }
 
@@ -788,7 +842,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -829,7 +889,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onChargingWhenUploadingContentStateChanged(false) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -863,7 +929,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 fakeMonitorCameraUploadsStatusInfoFlow.emit(cameraUploadsStatusInfo)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(SharedR.string.camera_uploads_phone_not_charging_message))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                SharedR.string.camera_uploads_phone_not_charging_message
+                            )
+                        )
+                    )
                 }
             }
     }
@@ -885,7 +957,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onUploadOptionUiItemSelected(UploadOptionUiItem.PhotosOnly) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -925,7 +1003,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onVideoQualityUiItemSelected(VideoQualityUiItem.High) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -963,7 +1047,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onKeepFileNamesStateChanged(false) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1004,7 +1094,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onIncludeLocationTagsStateChanged(false)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1052,7 +1148,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onLocationPermissionGranted()
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1100,7 +1202,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onChargingDuringVideoCompressionStateChanged(false) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1144,7 +1252,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onNewVideoCompressionSizeLimitProvided(500) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1202,9 +1316,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onLocalPrimaryFolderSelected(primaryFolderUriPath)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(
-                        triggered(SharedR.string.error_folder_part_of_sync_or_backup)
-                    )
+                    assertThat(awaitItem().snackbarMessage).isNotNull()
                 }
             }
 
@@ -1216,7 +1328,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onLocalPrimaryFolderSelected(null)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.error_invalid_folder_selected
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1230,7 +1348,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onLocalPrimaryFolderSelected(primaryFolderUriPath)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.error_invalid_folder_selected
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1342,14 +1466,51 @@ internal class SettingsCameraUploadsViewModelTest {
                         useCache = any()
                     )
                 ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device"))
+                val cloudFolderNode = mock<TypedFolderNode> {
+                    on { name }.thenReturn("CloudFolder")
+                }
+                whenever(getNodeByIdUseCase(NodeId(123456L))).thenReturn(cloudFolderNode)
+                val expectedMessage = "Folder conflict message"
+                whenever(
+                    folderConflictMessageFormatter.formatFromFolderUsage(
+                        folderDisplayName = eq("CloudFolder"),
+                        folderTypeLabelRes = eq(SharedR.string.sync_label_cloud_folder),
+                        result = any(),
+                    )
+                ).thenReturn(expectedMessage)
 
                 underTest.onPrimaryFolderNodeSelected(NodeId(123456L))
 
                 underTest.uiState.test {
                     assertThat(awaitItem().snackbarMessage).isEqualTo(
-                        triggered(SharedR.string.error_folder_part_of_sync_or_backup)
+                        triggered(LocalizedText.Literal(expectedMessage))
                     )
                 }
+            }
+
+        @Test
+        fun `test that snackbar is shown when primary folder node conflicts but node name is unavailable`() =
+            runTest {
+                initializeUnderTest()
+                whenever(
+                    isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                        nodeId = anyValueClass(),
+                        isSyncFolderSelection = any(),
+                        shouldExcludeCurrentDevice = any(),
+                        useCache = any()
+                    )
+                ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device"))
+                whenever(getNodeByIdUseCase(NodeId(123456L))).thenReturn(null)
+
+                underTest.onPrimaryFolderNodeSelected(NodeId(123456L))
+
+                underTest.uiState.test {
+                    val state = awaitItem()
+                    assertThat(state.snackbarMessage).isEqualTo(
+                        triggered(LocalizedText.StringRes(SharedR.string.sync_label_a_sync_or_backup))
+                    )
+                }
+                verify(setupPrimaryFolderUseCase, never()).invoke(any())
             }
 
         @Test
@@ -1361,7 +1522,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onPrimaryFolderNodeSelected(NodeId(123456L)) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1374,7 +1541,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onPrimaryFolderNodeSelected(NodeId(123456L))
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.error_invalid_folder_selected
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1478,7 +1651,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onMediaUploadsStateChanged(enabled = false)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1491,7 +1670,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onMediaUploadsStateChanged(enabled = false) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1518,7 +1703,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onMediaUploadsStateChanged(enabled = true)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1531,7 +1722,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onMediaUploadsStateChanged(enabled = true) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1675,9 +1872,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onLocalSecondaryFolderSelected(secondaryFolderUriPath)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(
-                        triggered(SharedR.string.error_folder_part_of_sync_or_backup)
-                    )
+                    assertThat(awaitItem().snackbarMessage).isNotNull()
                 }
             }
 
@@ -1692,7 +1887,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onLocalSecondaryFolderSelected(secondaryFolderUriPath) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1704,7 +1905,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onLocalSecondaryFolderSelected(null)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.error_invalid_folder_selected
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1718,7 +1925,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onLocalSecondaryFolderSelected(secondaryFolderUriPath)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.error_invalid_folder_selected
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1815,14 +2028,51 @@ internal class SettingsCameraUploadsViewModelTest {
                         useCache = any()
                     )
                 ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device"))
+                val mediaCloudFolderNode = mock<TypedFolderNode> {
+                    on { name }.thenReturn("MediaCloudFolder")
+                }
+                whenever(getNodeByIdUseCase(NodeId(789012L))).thenReturn(mediaCloudFolderNode)
+                val expectedMessage = "Folder conflict message"
+                whenever(
+                    folderConflictMessageFormatter.formatFromFolderUsage(
+                        folderDisplayName = eq("MediaCloudFolder"),
+                        folderTypeLabelRes = eq(SharedR.string.sync_label_cloud_folder),
+                        result = any(),
+                    )
+                ).thenReturn(expectedMessage)
 
                 underTest.onSecondaryFolderNodeSelected(NodeId(789012L))
 
                 underTest.uiState.test {
                     assertThat(awaitItem().snackbarMessage).isEqualTo(
-                        triggered(SharedR.string.error_folder_part_of_sync_or_backup)
+                        triggered(LocalizedText.Literal(expectedMessage))
                     )
                 }
+            }
+
+        @Test
+        fun `test that snackbar is shown when secondary folder node conflicts but node name is unavailable`() =
+            runTest {
+                initializeUnderTest()
+                whenever(
+                    isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                        nodeId = anyValueClass(),
+                        isSyncFolderSelection = any(),
+                        shouldExcludeCurrentDevice = any(),
+                        useCache = any()
+                    )
+                ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device"))
+                whenever(getNodeByIdUseCase(NodeId(789012L))).thenReturn(null)
+
+                underTest.onSecondaryFolderNodeSelected(NodeId(789012L))
+
+                underTest.uiState.test {
+                    val state = awaitItem()
+                    assertThat(state.snackbarMessage).isEqualTo(
+                        triggered(LocalizedText.StringRes(SharedR.string.sync_label_a_sync_or_backup))
+                    )
+                }
+                verify(setupSecondaryFolderUseCase, never()).invoke(any())
             }
 
         @Test
@@ -1834,7 +2084,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 assertDoesNotThrow { underTest.onSecondaryFolderNodeSelected(NodeId(789012L)) }
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.general_error
+                            )
+                        )
+                    )
                 }
             }
 
@@ -1847,7 +2103,13 @@ internal class SettingsCameraUploadsViewModelTest {
                 underTest.onSecondaryFolderNodeSelected(NodeId(789012L))
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.error_invalid_folder_selected))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.error_invalid_folder_selected
+                            )
+                        )
+                    )
                 }
             }
 

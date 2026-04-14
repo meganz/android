@@ -29,6 +29,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
+    private val getDeviceIdAndNameMapUseCase: GetDeviceIdAndNameMapUseCase = mock()
 
     private lateinit var underTest: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 
@@ -38,7 +39,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             getBackupInfoUseCase,
             determineNodeRelationshipUseCase,
             getDeviceIdUseCase,
-            getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase,
+            getDeviceIdAndNameMapUseCase,
         )
     }
 
@@ -48,7 +50,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             getBackupInfoUseCase,
             determineNodeRelationshipUseCase,
             getDeviceIdUseCase,
-            getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase,
+            getDeviceIdAndNameMapUseCase,
         )
     }
 

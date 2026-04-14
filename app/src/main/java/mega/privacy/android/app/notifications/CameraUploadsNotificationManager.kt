@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
@@ -36,6 +37,7 @@ import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -49,6 +51,7 @@ class CameraUploadsNotificationManager @Inject constructor(
     private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val megaNavigator: MegaNavigator,
+    private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
 ) {
 
     companion object {
@@ -134,8 +137,13 @@ class CameraUploadsNotificationManager @Inject constructor(
 
             CameraUploadsStatusInfo.NoWifiConnection -> showNoWifiConnectionNotification()
             CameraUploadsStatusInfo.NoNetworkConnection -> showNoNetworkConnectionNotification()
-            CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup ->
-                showFolderConflictWithSyncOrBackupNotification()
+            is CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup ->
+                showFolderConflictWithSyncOrBackupNotification(
+                    deviceName = cameraUploadsStatusInfo.deviceName,
+                    backupName = cameraUploadsStatusInfo.backupName,
+                    folderName = cameraUploadsStatusInfo.folderName,
+                    isLocalFolder = cameraUploadsStatusInfo.isLocalFolder,
+                )
         }
     }
 
@@ -459,11 +467,32 @@ class CameraUploadsNotificationManager @Inject constructor(
 
     /**
      * Display a notification when Camera/Media Uploads folder conflicts with Sync/Backup folder
+     * @param deviceName The name of the device where the conflicting sync/backup is located
+     * @param backupName The name of the conflicting sync/backup
+     * @param folderName The display name of the conflicting folder
+     * @param isLocalFolder Whether the conflicting folder is a local/device folder
      */
-    private suspend fun showFolderConflictWithSyncOrBackupNotification() {
+    private suspend fun showFolderConflictWithSyncOrBackupNotification(
+        deviceName: String?,
+        backupName: String?,
+        folderName: String?,
+        isLocalFolder: Boolean,
+    ) {
+        val folderTypeLabelRes = if (isLocalFolder) sharedR.string.sync_label_device_folder
+        else sharedR.string.sync_label_cloud_folder
+        val content = folderConflictMessageFormatter.format(
+            folderDisplayName = folderName ?: run {
+                Timber.d("Skip folder conflict notification: folder name missing")
+                return
+            },
+            folderTypeLabelRes = folderTypeLabelRes,
+            featureLabel = backupName
+                ?: context.getString(sharedR.string.sync_label_a_sync_or_backup),
+            deviceName = deviceName,
+        )
         val notification = createNotification(
             title = context.getString(R.string.section_photo_sync),
-            content = context.getString(sharedR.string.error_folder_part_of_sync_or_backup),
+            content = content,
             intent = getCUSettingsPendingIntent(),
         )
         notificationManager.notify(

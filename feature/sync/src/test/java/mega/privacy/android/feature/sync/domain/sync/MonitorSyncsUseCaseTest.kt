@@ -493,7 +493,8 @@ internal class MonitorSyncsUseCaseTest {
         underTest().test {
             awaitItem()
             verify(syncNotificationRepository).setPendingCrossDeviceConflictNotification(
-                listOf(conflictingSync)
+                listOf(conflictingSync),
+                FolderUsageResult.UsedBySyncOrBackup("other-device-id"),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -526,7 +527,8 @@ internal class MonitorSyncsUseCaseTest {
                     verify(setUserPausedSyncUseCase).invoke(sync.id, paused = true)
                 }
                 verify(syncNotificationRepository).setPendingCrossDeviceConflictNotification(
-                    validFolderPairs
+                    validFolderPairs,
+                    FolderUsageResult.UsedByCameraUpload,
                 )
                 cancelAndIgnoreRemainingEvents()
             }

@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
@@ -19,19 +20,17 @@ import javax.inject.Inject
 class SyncRemoteFolderValidityMapper @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+    private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
 ) {
 
     /**
-     * Validates remote folder selection for Sync/Backup against Camera/Media Uploads.
-     *
-     * Checks if the selected remote folder or any of its ancestors/descendants are already
-     * selected for Camera/Media Uploads.
-     *
      * @param nodeId The selected remote folder node ID
-     * @return [SyncValidityResult] indicating validation outcome
+     * @param remoteFolderDisplayName Display name of the selected remote folder (for conflict copy)
      */
-    suspend operator fun invoke(nodeId: NodeId): SyncValidityResult {
-        // Check if DCIMSelectionAsSyncBackup feature flag is enabled
+    suspend operator fun invoke(
+        nodeId: NodeId,
+        remoteFolderDisplayName: String,
+    ): SyncValidityResult {
         val isFeatureEnabled = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
         }.getOrElse {
@@ -40,16 +39,12 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
         }
 
         if (!isFeatureEnabled) {
-            // Feature flag is disabled, skip Camera/Media Uploads validation
             return SyncValidityResult.ValidFolderSelected(
                 localFolderUri = UriPath(""),
                 folderName = ""
             )
         }
 
-        // Use the domain use case to check folder usage
-        // We only check Camera/Media Uploads (not Sync/Backup) for remote folder selection
-        // and exclude current device since we're checking cross-device conflicts
         return runCatching {
             val result = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = nodeId,
@@ -58,7 +53,7 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
                 useCache = false,
             )
 
-            mapFolderUsageResultToSyncValidityResult(result)
+            mapFolderUsageResultToSyncValidityResult(result, remoteFolderDisplayName)
         }.getOrElse { exception ->
             Timber.e(exception, "Error validating remote folder")
             SyncValidityResult.ValidFolderSelected(
@@ -68,47 +63,52 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
         }
     }
 
-    /**
-     * Maps [FolderUsageResult] to the appropriate [SyncValidityResult].
-     * Only Camera/Media Uploads conflicts are relevant for remote folder selection.
-     */
     private fun mapFolderUsageResultToSyncValidityResult(
         result: FolderUsageResult,
+        remoteFolderDisplayName: String,
     ): SyncValidityResult = when (result) {
-        // Camera Uploads conflicts
         is FolderUsageResult.UsedByCameraUpload,
         is FolderUsageResult.UsedByCameraUploadChild,
         is FolderUsageResult.UsedByCameraUploadParent,
             -> {
             Timber.d("Remote folder conflicts with Camera Uploads folder")
-            SyncValidityResult.ShowSnackbar(
-                messageResId = sharedR.string.error_folder_part_of_camera_uploads
+            SyncValidityResult.ShowSnackbarMessage(
+                folderConflictMessageFormatter.formatFromFolderUsage(
+                    folderDisplayName = remoteFolderDisplayName,
+                    folderTypeLabelRes = sharedR.string.sync_label_cloud_folder,
+                    result = result,
+                ).orEmpty()
             )
         }
 
-        // Media Uploads conflicts
         is FolderUsageResult.UsedByMediaUpload,
         is FolderUsageResult.UsedByMediaUploadChild,
         is FolderUsageResult.UsedByMediaUploadParent,
             -> {
             Timber.d("Remote folder conflicts with Media Uploads folder")
-            SyncValidityResult.ShowSnackbar(
-                messageResId = sharedR.string.error_folder_part_of_media_uploads
+            SyncValidityResult.ShowSnackbarMessage(
+                folderConflictMessageFormatter.formatFromFolderUsage(
+                    folderDisplayName = remoteFolderDisplayName,
+                    folderTypeLabelRes = sharedR.string.sync_label_cloud_folder,
+                    result = result,
+                ).orEmpty()
             )
         }
 
-        // Sync/Backup conflicts on other devices
         is FolderUsageResult.UsedBySyncOrBackup,
         is FolderUsageResult.UsedBySyncOrBackupParent,
         is FolderUsageResult.UsedBySyncOrBackupChild,
             -> {
             Timber.d("Remote folder conflicts with Sync/Backup folder on another device")
-            SyncValidityResult.ShowSnackbar(
-                messageResId = sharedR.string.error_folder_part_of_sync_or_backup
+            SyncValidityResult.ShowSnackbarMessage(
+                folderConflictMessageFormatter.formatFromFolderUsage(
+                    folderDisplayName = remoteFolderDisplayName,
+                    folderTypeLabelRes = sharedR.string.sync_label_cloud_folder,
+                    result = result,
+                ).orEmpty()
             )
         }
 
-        // No conflicts
         FolderUsageResult.NotUsed -> {
             SyncValidityResult.ValidFolderSelected(
                 localFolderUri = UriPath(""),

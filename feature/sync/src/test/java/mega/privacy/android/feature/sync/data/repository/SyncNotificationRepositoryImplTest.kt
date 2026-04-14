@@ -5,10 +5,12 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.data.gateway.notification.SyncNotificationGateway
+import mega.privacy.android.feature.sync.data.mapper.notification.CrossDeviceConflictNotificationMessageMapper
 import mega.privacy.android.feature.sync.data.mapper.notification.GenericErrorToNotificationMessageMapper
 import mega.privacy.android.feature.sync.data.mapper.notification.StalledIssuesToNotificationMessageMapper
 import mega.privacy.android.feature.sync.data.mapper.notification.SyncShownNotificationEntityToSyncNotificationMessageMapper
@@ -26,9 +28,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
@@ -43,13 +47,16 @@ internal class SyncNotificationRepositoryImplTest {
     private val scheduler = TestCoroutineScheduler()
     private val dbEntityToDomainMapper: SyncShownNotificationEntityToSyncNotificationMessageMapper =
         mock()
+    private val crossDeviceConflictNotificationMessageMapper: CrossDeviceConflictNotificationMessageMapper =
+        mock()
     private val unconfinedTestDispatcher = UnconfinedTestDispatcher(scheduler)
 
     private val underTest = SyncNotificationRepositoryImpl(
         syncNotificationGateway = syncNotificationGateway,
         stalledIssuesToNotificationMessageMapper = stalledIssuesToNotificationMessageMapper,
         genericErrorToNotificationMessageMapper = genericErrorToNotificationMessageMapper,
-        dbEntityToDomainMapper,
+        syncShownNotificationEntityToSyncNotificationMessageMapper = dbEntityToDomainMapper,
+        crossDeviceConflictNotificationMessageMapper = crossDeviceConflictNotificationMessageMapper,
         ioDispatcher = unconfinedTestDispatcher
     )
 
@@ -59,6 +66,7 @@ internal class SyncNotificationRepositoryImplTest {
             syncNotificationGateway,
             stalledIssuesToNotificationMessageMapper,
             genericErrorToNotificationMessageMapper,
+            crossDeviceConflictNotificationMessageMapper,
         )
     }
 
@@ -88,7 +96,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_text
                     SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_low_battery_text
-                    SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.error_folder_part_of_sync_or_backup
+                    SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.general_sync_notification_generic_error_text
                 },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = 0)
@@ -128,7 +136,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_text
                     SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_low_battery_text
-                    SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.error_folder_part_of_sync_or_backup
+                    SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.general_sync_notification_generic_error_text
                 },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = null)
@@ -292,4 +300,47 @@ internal class SyncNotificationRepositoryImplTest {
 
         assertThat(result).isEqualTo(notificationMessage)
     }
+
+    @Test
+    fun `test that setPendingCrossDeviceConflictNotification stores notification when conflicting syncs is not empty`() =
+        runTest {
+            val folderPair = FolderPair(
+                id = 1,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "someName",
+                localFolderPath = "somePath",
+                remoteFolder = RemoteFolder(id = NodeId(1L), name = "someName"),
+                syncStatus = SyncStatus.SYNCED,
+                syncError = null,
+            )
+            val folderUsageResult = FolderUsageResult.UsedBySyncOrBackup("other-device")
+            val notificationMessage: SyncNotificationMessage = mock()
+            whenever(
+                crossDeviceConflictNotificationMessageMapper(folderPair, folderUsageResult)
+            ).thenReturn(notificationMessage)
+            val notificationEntity =
+                SyncShownNotificationEntity(notificationType = SyncNotificationType.CROSS_DEVICE_CONFLICT.name)
+            whenever(dbEntityToDomainMapper(eq(notificationMessage), eq(null))).thenReturn(
+                notificationEntity
+            )
+
+            underTest.setPendingCrossDeviceConflictNotification(
+                listOf(folderPair),
+                folderUsageResult,
+            )
+
+            verify(syncNotificationGateway).setNotificationShown(notificationEntity)
+        }
+
+    @Test
+    fun `test that setPendingCrossDeviceConflictNotification does nothing when conflicting syncs is empty`() =
+        runTest {
+            underTest.setPendingCrossDeviceConflictNotification(
+                emptyList(),
+                FolderUsageResult.UsedBySyncOrBackup("other-device"),
+            )
+
+            verifyNoInteractions(crossDeviceConflictNotificationMessageMapper)
+            verifyNoInteractions(syncNotificationGateway)
+        }
 }

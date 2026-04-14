@@ -190,15 +190,13 @@ private fun SyncNewFolderScreenScaffold(
                     isStorageOverQuota = state.isStorageOverQuota
                 )
 
-                val resources = LocalResources.current
+                val context = LocalContext.current
                 EventEffect(
                     event = state.showSnackbar,
                     onConsumed = { onShowSnackbarConsumed() },
-                ) { stringId ->
-                    stringId?.let {
-                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                            resources.getString(stringId)
-                        )
+                ) { message ->
+                    message?.let {
+                        scaffoldState.snackbarHostState.showAutoDurationSnackbar(it.get(context))
                     }
                 }
             }

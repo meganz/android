@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.repository.BackupRepository.Companion.BACKUPS_FOLDER_DEFAULT_NAME
@@ -134,7 +135,23 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                     when (val validityResult = syncUriValidityMapper(documentFile.uri.toString())) {
                         is SyncValidityResult.ShowSnackbar -> {
                             _state.update { state ->
-                                state.copy(showSnackbar = triggered(validityResult.messageResId))
+                                state.copy(
+                                    showSnackbar = triggered(
+                                        LocalizedText.StringRes(validityResult.messageResId)
+                                    )
+                                )
+                            }
+                        }
+
+                        is SyncValidityResult.ShowSnackbarMessage -> {
+                            _state.update { state ->
+                                state.copy(
+                                    showSnackbar = triggered(
+                                        LocalizedText.Literal(
+                                            validityResult.message
+                                        )
+                                    )
+                                )
                             }
                         }
 
@@ -172,14 +189,31 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                         if (state.value.syncType != SyncType.TYPE_BACKUP) {
                             state.value.selectedMegaFolder?.let { remoteFolder ->
                                 val validationResult = syncRemoteFolderValidityMapper(
-                                    nodeId = remoteFolder.id
+                                    nodeId = remoteFolder.id,
+                                    remoteFolderDisplayName = remoteFolder.name,
                                 )
 
                                 when (validationResult) {
                                     is SyncValidityResult.ShowSnackbar -> {
                                         _state.update { state ->
                                             state.copy(
-                                                showSnackbar = triggered(validationResult.messageResId),
+                                                showSnackbar = triggered(
+                                                    LocalizedText.StringRes(validationResult.messageResId)
+                                                ),
+                                                isLoading = false
+                                            )
+                                        }
+                                        return@launch
+                                    }
+
+                                    is SyncValidityResult.ShowSnackbarMessage -> {
+                                        _state.update { state ->
+                                            state.copy(
+                                                showSnackbar = triggered(
+                                                    LocalizedText.Literal(
+                                                        validationResult.message
+                                                    )
+                                                ),
                                                 isLoading = false
                                             )
                                         }
@@ -241,14 +275,31 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                                     else -> {
                                         state.value.selectedMegaFolder?.let { remoteFolder ->
                                             val validationResult = syncRemoteFolderValidityMapper(
-                                                nodeId = remoteFolder.id
+                                                nodeId = remoteFolder.id,
+                                                remoteFolderDisplayName = remoteFolder.name,
                                             )
                                             when (validationResult) {
                                                 is SyncValidityResult.ShowSnackbar -> {
                                                     _state.update { state ->
                                                         state.copy(
                                                             showSnackbar = triggered(
-                                                                validationResult.messageResId
+                                                                LocalizedText.StringRes(
+                                                                    validationResult.messageResId
+                                                                )
+                                                            ),
+                                                            isLoading = false
+                                                        )
+                                                    }
+                                                    return@launch
+                                                }
+
+                                                is SyncValidityResult.ShowSnackbarMessage -> {
+                                                    _state.update { state ->
+                                                        state.copy(
+                                                            showSnackbar = triggered(
+                                                                LocalizedText.Literal(
+                                                                    validationResult.message
+                                                                )
                                                             ),
                                                             isLoading = false
                                                         )

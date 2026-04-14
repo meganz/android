@@ -42,18 +42,36 @@ sealed interface FolderUsageResult {
     /**
      * Folder is exactly matched with a Sync or Backup folder
      * @param deviceId The device ID of the sync/backup, null if unknown
+     * @param deviceName The device name of the sync/backup, null if unknown
+     * @param backupName The backup name of the sync/backup, null if unknown
      */
-    data class UsedBySyncOrBackup(val deviceId: String?) : FolderUsageResult
+    data class UsedBySyncOrBackup(
+        val deviceId: String?,
+        val deviceName: String? = null,
+        val backupName: String? = null,
+    ) : FolderUsageResult
 
     /**
      * Folder is a parent of a Sync or Backup folder (contains a synced/backed up folder)
      * @param deviceId The device ID of the sync/backup, null if unknown
+     * @param deviceName The device name of the sync/backup, null if unknown
+     * @param backupName The backup name of the sync/backup, null if unknown
      */
-    data class UsedBySyncOrBackupParent(val deviceId: String?) : FolderUsageResult
+    data class UsedBySyncOrBackupParent(
+        val deviceId: String?,
+        val deviceName: String? = null,
+        val backupName: String? = null,
+    ) : FolderUsageResult
 
     /**
      * Folder is a child of a Sync or Backup folder (inside a synced/backed up folder)
      * @param deviceId The device ID of the sync/backup, null if unknown
+     * @param deviceName The device name of the sync/backup, null if unknown
+     * @param backupName The backup name of the sync/backup, null if unknown
      */
-    data class UsedBySyncOrBackupChild(val deviceId: String?) : FolderUsageResult
+    data class UsedBySyncOrBackupChild(
+        val deviceId: String?,
+        val deviceName: String? = null,
+        val backupName: String? = null,
+    ) : FolderUsageResult
 }

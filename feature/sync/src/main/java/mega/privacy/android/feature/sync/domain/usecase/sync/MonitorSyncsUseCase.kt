@@ -48,16 +48,16 @@ internal class MonitorSyncsUseCaseImpl @Inject constructor(
                 }
                 .conflate()
                 .collect { (validSyncs, invalidSyncs) ->
-                    // Check for cross-device folder conflicts
-                    val conflictingSyncs = validSyncs.filter {
+                    val conflictingSyncsWithUsage = validSyncs.mapNotNull {
                         val result = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                             nodeId = it.remoteFolder.id,
                             isSyncFolderSelection = true,
                             shouldExcludeCurrentDevice = true,
                             useCache = true,
                         )
-                        result != FolderUsageResult.NotUsed
+                        if (result != FolderUsageResult.NotUsed) it to result else null
                     }
+                    val conflictingSyncs = conflictingSyncsWithUsage.map { it.first }
 
                     // Pause conflicting syncs and mark as user-paused to prevent auto-resume
                     conflictingSyncs.forEach {
@@ -66,9 +66,10 @@ internal class MonitorSyncsUseCaseImpl @Inject constructor(
                     }
 
                     // Store notification for conflicting syncs
-                    if (conflictingSyncs.isNotEmpty()) {
+                    if (conflictingSyncsWithUsage.isNotEmpty()) {
                         syncNotificationRepository.setPendingCrossDeviceConflictNotification(
-                            conflictingSyncs
+                            conflictingSyncs,
+                            conflictingSyncsWithUsage.first().second,
                         )
                     }
 

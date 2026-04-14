@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -33,6 +34,7 @@ import mega.privacy.android.feature.sync.domain.entity.megapicker.MegaPickerNode
 import mega.privacy.android.feature.sync.domain.usecase.megapicker.MonitorMegaPickerFolderNodesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
@@ -53,6 +55,7 @@ internal class MegaPickerViewModel @AssistedInject constructor(
     private val removeDeviceFolderConnectionUseCase: RemoveDeviceFolderConnectionUseCase,
     private val monitorMegaPickerFolderNodesUseCase: MonitorMegaPickerFolderNodesUseCase,
     private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
+    private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -110,10 +113,11 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                             } ?: FolderUsageResult.NotUsed
                         }.getOrNull() ?: FolderUsageResult.NotUsed
 
-                        val errorMessage = getFolderUsageMessage(folderUsageResult)
+                        val folderName = state.value.currentFolder?.name.orEmpty()
+                        val errorMessage = getFolderUsageMessage(folderName, folderUsageResult)
 
                         if (errorMessage != null) {
-                            _state.update { it.copy(snackbarMessageId = errorMessage) }
+                            _state.update { it.copy(snackbarMessage = errorMessage) }
                             return@launch
                         }
                     }
@@ -144,12 +148,13 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                         folderSelected()
                     }.onFailure {
                         val error = (it as MegaSyncException).syncError
-                        val errorMessage = deviceFolderUINodeErrorMessageMapper(error)
+                        val messageRes = deviceFolderUINodeErrorMessageMapper(error)
                             ?: deviceFolderUINodeErrorMessageMapper(SyncError.UNKNOWN_ERROR)
+                            ?: sharedR.string.general_text_error
 
                         _state.update { state ->
                             state.copy(
-                                snackbarMessageId = errorMessage
+                                snackbarMessage = LocalizedText.StringRes(messageRes)
                             )
                         }
                     }
@@ -186,7 +191,7 @@ internal class MegaPickerViewModel @AssistedInject constructor(
 
             MegaPickerAction.SnackbarShown -> {
                 _state.update {
-                    it.copy(snackbarMessageId = null)
+                    it.copy(snackbarMessage = null)
                 }
             }
 
@@ -228,26 +233,14 @@ internal class MegaPickerViewModel @AssistedInject constructor(
         }
     }
 
-    private fun getFolderUsageMessage(folderUsageResult: FolderUsageResult): Int? {
-        val errorMessage = when (folderUsageResult) {
-            FolderUsageResult.NotUsed -> null
-            FolderUsageResult.UsedByCameraUpload,
-            FolderUsageResult.UsedByCameraUploadParent,
-            FolderUsageResult.UsedByCameraUploadChild,
-                -> sharedR.string.error_folder_part_of_camera_uploads
-
-            FolderUsageResult.UsedByMediaUpload,
-            FolderUsageResult.UsedByMediaUploadParent,
-            FolderUsageResult.UsedByMediaUploadChild,
-                -> sharedR.string.error_folder_part_of_media_uploads
-
-            is FolderUsageResult.UsedBySyncOrBackup,
-            is FolderUsageResult.UsedBySyncOrBackupParent,
-            is FolderUsageResult.UsedBySyncOrBackupChild,
-                -> sharedR.string.error_folder_part_of_sync_or_backup
-        }
-        return errorMessage
-    }
+    private fun getFolderUsageMessage(
+        folderDisplayName: String,
+        folderUsageResult: FolderUsageResult,
+    ): LocalizedText? = folderConflictMessageFormatter.formatFromFolderUsage(
+        folderDisplayName = folderDisplayName,
+        folderTypeLabelRes = sharedR.string.sync_label_cloud_folder,
+        result = folderUsageResult,
+    )?.let { LocalizedText.Literal(it) }
 
     private fun folderSelected() {
         Timber.d("Folder selected: ${state.value.currentFolder?.name}, id: ${state.value.currentFolder?.id}")
@@ -296,7 +289,7 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                     it.copy(
                         showRemoveConnectionDialog = false,
                         selectedDisabledFolder = null,
-                        snackbarMessageId = sharedR.string.device_center_snackbar_message_connection_removed
+                        snackbarMessage = LocalizedText.StringRes(sharedR.string.device_center_snackbar_message_connection_removed)
                     )
                 }
                 state.value.currentFolder?.let(::fetchFolders)
@@ -306,7 +299,7 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                     state.copy(
                         showRemoveConnectionDialog = false,
                         selectedDisabledFolder = null,
-                        snackbarMessageId = sharedR.string.general_text_error
+                        snackbarMessage = LocalizedText.StringRes(sharedR.string.general_text_error)
                     )
                 }
             }

@@ -9,6 +9,10 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHECK_FILE_UPLOAD
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_ERROR
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_PROGRESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_BACKUP_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_DEVICE_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_FOLDER_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_IS_LOCAL
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_FILE_INDEX
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
@@ -218,10 +222,21 @@ class CameraUploadsStatusInfoMapperTest {
             CameraUploadsStatusInfo.NoNetworkConnection
         ),
         Arguments.of(
-            workDataOf(STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP),
+            workDataOf(
+                STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP,
+                CONFLICT_DEVICE_NAME to "TestDevice",
+                CONFLICT_BACKUP_NAME to "TestBackup",
+                CONFLICT_FOLDER_NAME to "TestFolder",
+                CONFLICT_IS_LOCAL to false,
+            ),
             WorkInfo.State.RUNNING,
             WorkInfo.STOP_REASON_NOT_STOPPED,
-            CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup
+            CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup(
+                deviceName = "TestDevice",
+                backupName = "TestBackup",
+                folderName = "TestFolder",
+                isLocalFolder = false,
+            )
         ),
         Arguments.of(
             workDataOf(),

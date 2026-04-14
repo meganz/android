@@ -51,7 +51,7 @@ internal fun MegaPickerRoute(
             selectCurrentFolder(viewModel, syncPermissionsManager)
         },
         fileTypeIconMapper = fileTypeIconMapper,
-        snackbarMessageId = state.value.snackbarMessageId,
+        snackbarMessage = state.value.snackbarMessage,
         snackbarMessageShown = {
             viewModel.handleAction(MegaPickerAction.SnackbarShown)
         },

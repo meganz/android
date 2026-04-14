@@ -89,7 +89,9 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             ).thenReturn(conflictResult)
 
             underTest().test {
-                assertThat(awaitItem()).isEqualTo(conflictResult)
+                val emission = awaitItem()
+                assertThat(emission?.folderUsageResult).isEqualTo(conflictResult)
+                assertThat(emission?.cameraUploadFolderType).isEqualTo(CameraUploadFolderType.Primary)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -177,7 +179,9 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             ).thenReturn(conflictResult)
 
             underTest().test {
-                assertThat(awaitItem()).isEqualTo(conflictResult)
+                val emission = awaitItem()
+                assertThat(emission?.folderUsageResult).isEqualTo(conflictResult)
+                assertThat(emission?.cameraUploadFolderType).isEqualTo(CameraUploadFolderType.Secondary)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -265,7 +269,9 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             ).thenReturn(conflictResult)
 
             underTest().test {
-                assertThat(awaitItem()).isEqualTo(conflictResult)
+                val emission = awaitItem()
+                assertThat(emission?.folderUsageResult).isEqualTo(conflictResult)
+                assertThat(emission?.cameraUploadFolderType).isEqualTo(CameraUploadFolderType.Primary)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -291,7 +297,9 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             ).thenReturn(conflictResult)
 
             underTest().test {
-                assertThat(awaitItem()).isEqualTo(conflictResult)
+                val emission = awaitItem()
+                assertThat(emission?.folderUsageResult).isEqualTo(conflictResult)
+                assertThat(emission?.cameraUploadFolderType).isEqualTo(CameraUploadFolderType.Primary)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -365,7 +373,9 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             ).thenReturn(conflictResult)
 
             underTest().test {
-                assertThat(awaitItem()).isEqualTo(conflictResult)
+                val emission = awaitItem()
+                assertThat(emission?.folderUsageResult).isEqualTo(conflictResult)
+                assertThat(emission?.cameraUploadFolderType).isEqualTo(CameraUploadFolderType.Primary)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -391,7 +401,9 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             ).thenReturn(conflictResult)
 
             underTest().test {
-                assertThat(awaitItem()).isEqualTo(conflictResult)
+                val emission = awaitItem()
+                assertThat(emission?.folderUsageResult).isEqualTo(conflictResult)
+                assertThat(emission?.cameraUploadFolderType).isEqualTo(CameraUploadFolderType.Primary)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -417,7 +429,9 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             ).thenReturn(conflictResult)
 
             underTest().test {
-                assertThat(awaitItem()).isEqualTo(conflictResult)
+                val emission = awaitItem()
+                assertThat(emission?.folderUsageResult).isEqualTo(conflictResult)
+                assertThat(emission?.cameraUploadFolderType).isEqualTo(CameraUploadFolderType.Primary)
                 cancelAndIgnoreRemainingEvents()
             }
         }

@@ -54,7 +54,10 @@ class SyncNotificationMapper @Inject constructor(
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_notify)
             .setContentTitle(context.getString(syncNotificationMessage.title))
-            .setContentText(context.getString(syncNotificationMessage.text))
+            .setContentText(
+                syncNotificationMessage.formattedText
+                    ?: context.getString(syncNotificationMessage.text)
+            )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

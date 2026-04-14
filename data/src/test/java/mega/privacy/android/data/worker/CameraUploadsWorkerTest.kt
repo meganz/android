@@ -38,6 +38,10 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CHEC
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_ERROR
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.COMPRESSION_SUCCESS
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_BACKUP_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_DEVICE_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_FOLDER_NAME
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CONFLICT_IS_LOCAL
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_FILE_INDEX
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
@@ -66,6 +70,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedRea
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
+import mega.privacy.android.domain.entity.camerauploads.FolderConflictResult
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.Node
@@ -125,6 +130,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
@@ -249,6 +255,7 @@ internal class CameraUploadsWorkerTest {
     private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase =
         mock()
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock()
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
 
     private val foregroundInfo = ForegroundInfo(1, mock())
     private val primaryNodeHandle = 1111L
@@ -347,6 +354,7 @@ internal class CameraUploadsWorkerTest {
                 hasLocalFolderConflictWithSyncUseCase = hasLocalFolderConflictWithSyncUseCase,
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
                 getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
+                getNodeByHandleUseCase = getNodeByHandleUseCase,
             )
         )
     }
@@ -1833,7 +1841,13 @@ internal class CameraUploadsWorkerTest {
                 )
             )
             verify(underTest).setProgress(
-                workDataOf(STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP)
+                workDataOf(
+                    STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP,
+                    CONFLICT_DEVICE_NAME to "",
+                    CONFLICT_BACKUP_NAME to "",
+                    CONFLICT_FOLDER_NAME to "primaryPath",
+                    CONFLICT_IS_LOCAL to true,
+                )
             )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         }
@@ -1854,7 +1868,13 @@ internal class CameraUploadsWorkerTest {
                 )
             )
             verify(underTest).setProgress(
-                workDataOf(STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP)
+                workDataOf(
+                    STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP,
+                    CONFLICT_DEVICE_NAME to "",
+                    CONFLICT_BACKUP_NAME to "",
+                    CONFLICT_FOLDER_NAME to "",
+                    CONFLICT_IS_LOCAL to false,
+                )
             )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         }
@@ -1864,7 +1884,12 @@ internal class CameraUploadsWorkerTest {
         runTest {
             setupDefaultCheckConditionMocks()
             whenever(monitorCrossDeviceFolderConflictsUseCase()).thenReturn(
-                flowOf(FolderUsageResult.UsedBySyncOrBackup(null))
+                flowOf(
+                    FolderConflictResult(
+                        folderUsageResult = FolderUsageResult.UsedBySyncOrBackup(null),
+                        cameraUploadFolderType = CameraUploadFolderType.Primary,
+                    )
+                )
             )
 
             val result = underTest.doWork()
@@ -1876,7 +1901,13 @@ internal class CameraUploadsWorkerTest {
                 )
             )
             verify(underTest).setProgress(
-                workDataOf(STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP)
+                workDataOf(
+                    STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP,
+                    CONFLICT_DEVICE_NAME to "",
+                    CONFLICT_BACKUP_NAME to "",
+                    CONFLICT_FOLDER_NAME to "",
+                    CONFLICT_IS_LOCAL to false,
+                )
             )
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
         }

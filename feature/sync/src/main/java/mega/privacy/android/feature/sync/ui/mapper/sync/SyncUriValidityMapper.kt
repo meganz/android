@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCa
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
@@ -29,6 +30,7 @@ class SyncUriValidityMapper @Inject constructor(
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
 ) {
 
     suspend operator fun invoke(documentUri: String): SyncValidityResult {
@@ -125,13 +127,18 @@ class SyncUriValidityMapper @Inject constructor(
                 localDCIMFolderPath.isNotEmpty() &&
                 determinePathRelationship(localDCIMFolderPath, path) != PathRelationship.NO_MATCH
 
+        val folderDisplayName = extractFolderName(path)
         return if (isCameraMatch) {
-            SyncValidityResult.ShowSnackbar(
-                messageResId = sharedR.string.error_folder_part_of_camera_uploads
+            SyncValidityResult.ShowSnackbarMessage(
+                folderConflictMessageFormatter.formatDeviceFolderCameraUploadsConflict(
+                    folderDisplayName
+                )
             )
         } else if (isMediaMatch) {
-            SyncValidityResult.ShowSnackbar(
-                messageResId = sharedR.string.error_folder_part_of_media_uploads
+            SyncValidityResult.ShowSnackbarMessage(
+                folderConflictMessageFormatter.formatDeviceFolderMediaUploadsConflict(
+                    folderDisplayName
+                )
             )
         } else if (isLegacyDCIMMatch) {
             SyncValidityResult.ShowSnackbar(

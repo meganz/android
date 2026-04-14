@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
@@ -141,7 +142,9 @@ internal class SyncNewFolderViewModelTest {
         with(underTest) {
             state.test {
                 val result = (awaitItem().showSnackbar as StateEventWithContentTriggered).content
-                assertThat(result).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
+                assertThat(result).isEqualTo(
+                    LocalizedText.StringRes(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
+                )
             }
         }
     }
@@ -170,7 +173,7 @@ internal class SyncNewFolderViewModelTest {
         with(underTest) {
             state.test {
                 val result = (awaitItem().showSnackbar as StateEventWithContentTriggered).content
-                assertThat(result).isEqualTo(snackbarMessage)
+                assertThat(result).isEqualTo(LocalizedText.StringRes(snackbarMessage))
             }
         }
     }
@@ -214,7 +217,12 @@ internal class SyncNewFolderViewModelTest {
             whenever(myBackupsFolderExistsUseCase()).thenReturn(true)
             // Mock remote folder validation for non-BACKUP sync types
             if (syncType == SyncType.TYPE_TWOWAY) {
-                whenever(syncRemoteFolderValidityMapper(nodeId = remoteFolder.id)).thenReturn(
+                whenever(
+                    syncRemoteFolderValidityMapper(
+                        nodeId = remoteFolder.id,
+                        remoteFolderDisplayName = remoteFolder.name,
+                    )
+                ).thenReturn(
                     SyncValidityResult.ValidFolderSelected(
                         localFolderUri = UriPath(""),
                         folderName = "folder"
@@ -473,7 +481,12 @@ internal class SyncNewFolderViewModelTest {
                 emit(remoteFolder)
                 awaitCancellation()
             })
-            whenever(syncRemoteFolderValidityMapper(nodeId = remoteFolder.id)).thenReturn(
+            whenever(
+                syncRemoteFolderValidityMapper(
+                    nodeId = remoteFolder.id,
+                    remoteFolderDisplayName = remoteFolder.name,
+                )
+            ).thenReturn(
                 SyncValidityResult.ShowSnackbar(sharedR.string.sync_local_device_folder_currently_synced_message)
             )
 
@@ -485,7 +498,7 @@ internal class SyncNewFolderViewModelTest {
                 val result = awaitItem()
                 assertThat(result.isLoading).isFalse()
                 assertThat((result.showSnackbar as StateEventWithContentTriggered).content)
-                    .isEqualTo(sharedR.string.sync_local_device_folder_currently_synced_message)
+                    .isEqualTo(LocalizedText.StringRes(sharedR.string.sync_local_device_folder_currently_synced_message))
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -498,7 +511,12 @@ internal class SyncNewFolderViewModelTest {
                 emit(remoteFolder)
                 awaitCancellation()
             })
-            whenever(syncRemoteFolderValidityMapper(nodeId = remoteFolder.id)).thenReturn(
+            whenever(
+                syncRemoteFolderValidityMapper(
+                    nodeId = remoteFolder.id,
+                    remoteFolderDisplayName = remoteFolder.name,
+                )
+            ).thenReturn(
                 SyncValidityResult.Invalid
             )
 
@@ -538,7 +556,8 @@ internal class SyncNewFolderViewModelTest {
             underTest.handleAction(SyncNewFolderAction.NextClicked)
 
             verify(syncRemoteFolderValidityMapper, never()).invoke(
-                any()
+                any(),
+                any(),
             )
             assertThat(underTest.state.value.openSyncListScreen).isEqualTo(triggered)
         }
@@ -562,7 +581,7 @@ internal class SyncNewFolderViewModelTest {
             setMyBackupsFolderUseCase = setMyBackupsFolderUseCase,
             syncUriValidityMapper = syncUriValidityMapper,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            syncRemoteFolderValidityMapper = syncRemoteFolderValidityMapper
+            syncRemoteFolderValidityMapper = syncRemoteFolderValidityMapper,
         )
     }
 

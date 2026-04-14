@@ -4,6 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.FolderConflictResult
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -23,7 +24,7 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
         val POLL_INTERVAL = 10.minutes
     }
 
-    operator fun invoke(): Flow<FolderUsageResult?> = flow {
+    operator fun invoke(): Flow<FolderConflictResult?> = flow {
         if (!isFeatureEnabled()) {
             emit(null)
             return@flow
@@ -44,13 +45,16 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
      * Checks both primary and secondary folders for conflicts.
      * Returns the first conflict found, or null if everything is valid.
      */
-    private suspend fun findConflict(): FolderUsageResult? = runCatching {
+    private suspend fun findConflict(): FolderConflictResult? = runCatching {
         // 1. Check Primary Folder
         val primaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
         val primaryResult = checkFolderUsage(primaryHandle)
 
         if (isConflictForPrimary(primaryResult)) {
-            return@runCatching primaryResult
+            return@runCatching FolderConflictResult(
+                folderUsageResult = primaryResult,
+                cameraUploadFolderType = CameraUploadFolderType.Primary,
+            )
         }
 
         // 2. Check Secondary Folder (if enabled)
@@ -59,7 +63,10 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
             val secondaryResult = checkFolderUsage(secondaryHandle)
 
             if (isConflictForSecondary(secondaryResult)) {
-                return@runCatching secondaryResult
+                return@runCatching FolderConflictResult(
+                    folderUsageResult = secondaryResult,
+                    cameraUploadFolderType = CameraUploadFolderType.Secondary,
+                )
             }
         }
 
