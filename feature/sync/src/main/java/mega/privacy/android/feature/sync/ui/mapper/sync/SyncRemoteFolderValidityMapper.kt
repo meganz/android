@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sync.ui.mapper.sync
 
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -8,6 +9,7 @@ import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcro
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.SyncRemoteFolderConflictEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -72,6 +74,7 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
         is FolderUsageResult.UsedByCameraUploadParent,
             -> {
             Timber.d("Remote folder conflicts with Camera Uploads folder")
+            Analytics.tracker.trackEvent(SyncRemoteFolderConflictEvent)
             SyncValidityResult.ShowSnackbarMessage(
                 folderConflictMessageFormatter.formatFromFolderUsage(
                     folderDisplayName = remoteFolderDisplayName,
@@ -86,6 +89,7 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
         is FolderUsageResult.UsedByMediaUploadParent,
             -> {
             Timber.d("Remote folder conflicts with Media Uploads folder")
+            Analytics.tracker.trackEvent(SyncRemoteFolderConflictEvent)
             SyncValidityResult.ShowSnackbarMessage(
                 folderConflictMessageFormatter.formatFromFolderUsage(
                     folderDisplayName = remoteFolderDisplayName,
@@ -100,6 +104,7 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
         is FolderUsageResult.UsedBySyncOrBackupChild,
             -> {
             Timber.d("Remote folder conflicts with Sync/Backup folder on another device")
+            Analytics.tracker.trackEvent(SyncRemoteFolderConflictEvent)
             SyncValidityResult.ShowSnackbarMessage(
                 folderConflictMessageFormatter.formatFromFolderUsage(
                     folderDisplayName = remoteFolderDisplayName,

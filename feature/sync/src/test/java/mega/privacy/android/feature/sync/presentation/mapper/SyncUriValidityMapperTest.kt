@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.presentation.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -11,6 +12,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathU
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetFileStorageTypeNameUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -47,6 +49,7 @@ class SyncUriValidityMapperTest {
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val folderConflictMessageFormatter: FolderConflictMessageFormatter = mock()
+    private val getFileStorageTypeNameUseCase: GetFileStorageTypeNameUseCase = mock()
 
     private lateinit var underTest: SyncUriValidityMapper
 
@@ -66,6 +69,7 @@ class SyncUriValidityMapperTest {
             isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             folderConflictMessageFormatter = folderConflictMessageFormatter,
+            getFileStorageTypeNameUseCase = getFileStorageTypeNameUseCase,
         )
     }
 
@@ -81,6 +85,7 @@ class SyncUriValidityMapperTest {
             isMediaUploadsEnabledUseCase,
             getFeatureFlagValueUseCase,
             folderConflictMessageFormatter,
+            getFileStorageTypeNameUseCase,
         )
     }
 
@@ -109,6 +114,8 @@ class SyncUriValidityMapperTest {
         whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(isDCIMSelectionEnabled)
+        whenever(getFileStorageTypeNameUseCase(any()))
+            .thenReturn(FileStorageType.Internal("Test Device"))
 
         // Override path mappings for specific URIs (useful for folder pair paths)
         folderPathOverrides.forEach { (uri, path) ->

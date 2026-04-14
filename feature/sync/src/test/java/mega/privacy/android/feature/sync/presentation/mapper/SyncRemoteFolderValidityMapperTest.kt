@@ -3,6 +3,8 @@ package mega.privacy.android.feature.sync.presentation.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -39,6 +41,7 @@ class SyncRemoteFolderValidityMapperTest {
 
     @BeforeEach
     fun setUp() {
+        Analytics.initialise(mock<AnalyticsTracker>())
         underTest = SyncRemoteFolderValidityMapper(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
@@ -48,6 +51,7 @@ class SyncRemoteFolderValidityMapperTest {
 
     @AfterEach
     fun resetAndTearDown() {
+        Analytics.initialise(null)
         reset(
             getFeatureFlagValueUseCase,
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase,

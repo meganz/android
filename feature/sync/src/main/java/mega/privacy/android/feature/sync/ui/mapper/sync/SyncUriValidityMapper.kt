@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.ui.mapper.sync
 
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -8,12 +10,16 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathU
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.file.GetFileStorageTypeNameUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.SyncDcimFolderSelectedEvent
+import mega.privacy.mobile.analytics.event.SyncExternalStorageFolderSelectedEvent
+import mega.privacy.mobile.analytics.event.SyncLocalFolderConflictEvent
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -31,6 +37,7 @@ class SyncUriValidityMapper @Inject constructor(
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
+    private val getFileStorageTypeNameUseCase: GetFileStorageTypeNameUseCase,
 ) {
 
     suspend operator fun invoke(documentUri: String): SyncValidityResult {
@@ -91,6 +98,7 @@ class SyncUriValidityMapper @Inject constructor(
                 if (folderName.isEmpty()) {
                     return SyncValidityResult.Invalid
                 }
+                trackFolderSelectionEvents(path, localDCIMFolderPath)
                 return SyncValidityResult.ValidFolderSelected(
                     localFolderUri = UriPath(documentUri),
                     folderName = folderName
@@ -103,6 +111,19 @@ class SyncUriValidityMapper @Inject constructor(
         return SyncValidityResult.Invalid
     }
 
+    private suspend fun trackFolderSelectionEvents(path: String, localDCIMFolderPath: String) {
+        if (localDCIMFolderPath.isNotEmpty() &&
+            determinePathRelationship(localDCIMFolderPath, path) != PathRelationship.NO_MATCH
+        ) {
+            Analytics.tracker.trackEvent(SyncDcimFolderSelectedEvent)
+        }
+        val storageType = runCatching {
+            getFileStorageTypeNameUseCase(UriPath(path))
+        }.getOrNull()
+        if (storageType is FileStorageType.SdCard) {
+            Analytics.tracker.trackEvent(SyncExternalStorageFolderSelectedEvent)
+        }
+    }
 
     private suspend fun checkIfPathIsAlreadyUsedByCameraUploads(
         path: String,
@@ -129,12 +150,14 @@ class SyncUriValidityMapper @Inject constructor(
 
         val folderDisplayName = extractFolderName(path)
         return if (isCameraMatch) {
+            Analytics.tracker.trackEvent(SyncLocalFolderConflictEvent)
             SyncValidityResult.ShowSnackbarMessage(
                 folderConflictMessageFormatter.formatDeviceFolderCameraUploadsConflict(
                     folderDisplayName
                 )
             )
         } else if (isMediaMatch) {
+            Analytics.tracker.trackEvent(SyncLocalFolderConflictEvent)
             SyncValidityResult.ShowSnackbarMessage(
                 folderConflictMessageFormatter.formatDeviceFolderMediaUploadsConflict(
                     folderDisplayName

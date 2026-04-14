@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.backup.BackupRemovalStatus
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -36,6 +38,7 @@ import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageForma
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -78,6 +81,7 @@ internal class MegaPickerViewModelTest {
 
     @AfterEach
     fun resetAndTearDown() {
+        Analytics.initialise(null)
         reset(
             setSelectedMegaFolderUseCase,
             getRootNodeUseCase,
@@ -92,6 +96,11 @@ internal class MegaPickerViewModelTest {
             monitorMegaPickerFolderNodesUseCase,
             folderConflictMessageFormatter,
         )
+    }
+
+    @BeforeEach
+    fun setUp() {
+        Analytics.initialise(mock<AnalyticsTracker>())
     }
 
     @Test

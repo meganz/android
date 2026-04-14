@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -38,6 +39,7 @@ import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageForma
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import mega.privacy.android.shared.sync.featuretoggles.SyncFeatures
+import mega.privacy.mobile.analytics.event.SyncMegaPickerFolderDisabledEvent
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = MegaPickerViewModel.MegaPickerViewModelFactory::class)
@@ -197,6 +199,7 @@ internal class MegaPickerViewModel @AssistedInject constructor(
 
             is MegaPickerAction.DisabledFolderClicked -> {
                 // Only show remove-connection dialog when folder has a removable backup (other device)
+                Analytics.tracker.trackEvent(SyncMegaPickerFolderDisabledEvent)
                 if (action.node.backupId != null) {
                     _state.update {
                         it.copy(

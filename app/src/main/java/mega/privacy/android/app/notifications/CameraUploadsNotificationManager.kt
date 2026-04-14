@@ -11,6 +11,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.ForegroundInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
@@ -37,6 +38,7 @@ import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.CameraUploadsFolderConflictDetectedEvent
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -495,6 +497,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             content = content,
             intent = getCUSettingsPendingIntent(),
         )
+        Analytics.tracker.trackEvent(CameraUploadsFolderConflictDetectedEvent)
         notificationManager.notify(
             FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP_NOTIFICATION_ID,
             notification
