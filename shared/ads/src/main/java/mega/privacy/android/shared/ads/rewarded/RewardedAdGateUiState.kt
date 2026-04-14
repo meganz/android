@@ -11,5 +11,6 @@ data class RewardedAdGateUiState(
     val isLoading: Boolean = false,
     val isCheckingEligibility: Boolean = true,
     val isEligible: Boolean = false,
+    val currentAttemptCount: Int = 0,
     val skipAdEvent: StateEvent = consumed,
 )

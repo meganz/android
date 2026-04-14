@@ -138,6 +138,10 @@ private fun RewardedAdGate(
                         activity = activity,
                         onLoading = viewModel::setLoading,
                         onLoadingComplete = viewModel::setLoadingComplete,
+                        onRewardEarned = {
+                            viewModel.resetAttemptCount()
+                            onComplete()
+                        },
                         onAdUnavailable = {
                             coroutineScope.launch {
                                 Toast.makeText(
@@ -148,7 +152,6 @@ private fun RewardedAdGate(
                             }
                             onComplete()
                         },
-                        onRewardEarned = onComplete,
                     )
                 }
             },
