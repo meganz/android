@@ -24,7 +24,6 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.hasParam
 import mega.privacy.android.data.extensions.isTypeWithParam
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -56,8 +55,9 @@ import mega.privacy.android.domain.entity.preference.StartScreenDestinationPrefe
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.repository.SettingsRepository
-import nz.mega.sdk.MegaAccountDetails
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_ENOENT
@@ -103,7 +103,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
-    private val myAccountInfoFacade: AccountInfoWrapper,
+    private val getAccountTypeUseCase: GetAccountTypeUseCase,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val appVersionMapper: AppVersionMapper,
@@ -625,7 +625,7 @@ internal class DefaultSettingsRepository @Inject constructor(
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
                     when (error.errorCode) {
-                        API_ENOENT -> if (myAccountInfoFacade.accountTypeId == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+                        API_ENOENT -> if (getAccountTypeUseCase() == AccountType.FREE) {
                             continuation.resumeWith(Result.success(DAYS_USER_FREE))
                         } else {
                             continuation.resumeWith(Result.success(DAYS_USER_PRO))

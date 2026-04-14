@@ -29,9 +29,6 @@ class AccountInfoFacade @Inject constructor(
 ) : AccountInfoWrapper {
     override val storageCapacityUsedAsFormattedString: String
         get() = myAccountInfo.usedFormatted
-    override val accountTypeId: Int
-        get() = myAccountInfo.accountType
-
     override suspend fun handleAccountDetail(request: MegaRequest) {
         val storage = request.numDetails and MyAccountInfo.HAS_STORAGE_DETAILS != 0
         if (storage && megaApiGateway.getRootNode() != null) {

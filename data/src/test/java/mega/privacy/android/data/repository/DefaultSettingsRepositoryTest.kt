@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -26,8 +25,9 @@ import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.exception.MegaException
-import nz.mega.sdk.MegaAccountDetails
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -74,7 +74,7 @@ internal class DefaultSettingsRepositoryTest {
     private val startScreenMapper: StartScreenMapper = mock()
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
-    private val myAccountInfoFacade: AccountInfoWrapper = mock()
+    private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val appVersionMapper = mock<AppVersionMapper>()
 
@@ -94,7 +94,7 @@ internal class DefaultSettingsRepositoryTest {
             startScreenMapper = startScreenMapper,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
             fileVersionsOptionCache = fileVersionsOptionCache,
-            myAccountInfoFacade = myAccountInfoFacade,
+            getAccountTypeUseCase = getAccountTypeUseCase,
             megaLocalRoomGateway = megaLocalRoomGateway,
             appVersionMapper = appVersionMapper
         )
@@ -395,7 +395,7 @@ internal class DefaultSettingsRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_ENOENT)
             }
 
-            whenever(myAccountInfoFacade.accountTypeId).thenReturn(MegaAccountDetails.ACCOUNT_TYPE_FREE)
+            whenever(getAccountTypeUseCase()).thenReturn(AccountType.FREE)
             whenever(megaApiGateway.getRubbishBinAutopurgePeriod(any())).thenAnswer {
                 (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                     api,
@@ -418,7 +418,7 @@ internal class DefaultSettingsRepositoryTest {
                 on { errorCode }.thenReturn(MegaError.API_ENOENT)
             }
 
-            whenever(myAccountInfoFacade.accountTypeId).thenReturn(MegaAccountDetails.ACCOUNT_TYPE_PROI)
+            whenever(getAccountTypeUseCase()).thenReturn(AccountType.PRO_I)
             whenever(megaApiGateway.getRubbishBinAutopurgePeriod(any())).thenAnswer {
                 (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                     api,

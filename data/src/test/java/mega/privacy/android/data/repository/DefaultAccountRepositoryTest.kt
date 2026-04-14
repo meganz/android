@@ -27,7 +27,6 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
-import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -122,7 +121,6 @@ class DefaultAccountRepositoryTest {
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val userAccountMapper = UserAccountMapper()
-    private val accountTypeMapper = mock<AccountTypeMapper>()
     private val currencyMapper = ::Currency
     private val subscriptionOptionListMapper = mock<SubscriptionOptionListMapper>()
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
@@ -198,7 +196,6 @@ class DefaultAccountRepositoryTest {
             megaChatApiGateway,
             megaApiFolderGateway,
             localStorageGateway,
-            accountTypeMapper,
             subscriptionOptionListMapper,
             megaAchievementMapper,
             achievementsOverviewMapper,
@@ -243,7 +240,6 @@ class DefaultAccountRepositoryTest {
             userUpdateMapper = userUpdateMapper,
             localStorageGateway = localStorageGateway,
             userAccountMapper = userAccountMapper,
-            accountTypeMapper = accountTypeMapper,
             currencyMapper = currencyMapper,
             subscriptionOptionListMapper = subscriptionOptionListMapper,
             megaAchievementMapper = megaAchievementMapper,
@@ -278,7 +274,6 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test that get account does not throw exception if email is null`() = runTest {
         val expectedUserIdObj = null
-        whenever(accountInfoWrapper.accountTypeId).thenReturn(-1)
         whenever(megaChatApiGateway.getMyEmail()).thenReturn(null)
         megaApiGateway.stub {
             onBlocking { isMasterBusinessAccount() }.thenReturn(false)

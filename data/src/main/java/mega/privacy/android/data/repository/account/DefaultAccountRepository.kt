@@ -45,7 +45,6 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
-import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
@@ -123,7 +122,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property userUpdateMapper             [UserUpdateMapper]
  * @property localStorageGateway          [MegaLocalStorageGateway]
  * @property userAccountMapper            [UserAccountMapper]
- * @property accountTypeMapper            [AccountTypeMapper]
  * @property currencyMapper               [CurrencyMapper]
  * @property subscriptionOptionListMapper [SubscriptionOptionListMapper]
  * @property megaAchievementMapper        [MegaAchievementMapper]
@@ -156,7 +154,6 @@ internal class DefaultAccountRepository @Inject constructor(
     private val userUpdateMapper: UserUpdateMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
     private val userAccountMapper: UserAccountMapper,
-    private val accountTypeMapper: AccountTypeMapper,
     private val currencyMapper: CurrencyMapper,
     private val subscriptionOptionListMapper: SubscriptionOptionListMapper,
     private val megaAchievementMapper: MegaAchievementMapper,
@@ -195,7 +192,7 @@ internal class DefaultAccountRepository @Inject constructor(
             fullName = megaChatApiGateway.getMyFullname(),
             isBusinessAccount = megaApiGateway.isBusinessAccount,
             isMasterBusinessAccount = megaApiGateway.isMasterBusinessAccount(),
-            accountTypeIdentifier = accountTypeMapper(myAccountInfoFacade.accountTypeId),
+            accountTypeIdentifier = accountDetail.value.levelDetail?.accountType,
         )
     }
 
@@ -917,7 +914,7 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun broadcastRefreshSession() = appEventGateway.broadcastRefreshSession()
 
     override fun getAccountType(): AccountType =
-        accountTypeMapper(myAccountInfoFacade.accountTypeId)
+        accountDetail.value.levelDetail?.accountType ?: AccountType.UNKNOWN
 
     override suspend fun retryPendingConnections() = withContext(ioDispatcher) {
         Timber.d("Retrying pending connections...")

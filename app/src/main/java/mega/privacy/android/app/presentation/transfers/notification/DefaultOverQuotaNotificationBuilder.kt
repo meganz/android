@@ -8,7 +8,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.data.facade.AccountInfoFacade
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginNavKey
@@ -30,7 +31,6 @@ import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaAccountDetails
 import javax.inject.Inject
 
 /**
@@ -40,7 +40,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
-    private val accountInfoFacade: AccountInfoFacade,
+    private val getAccountTypeUseCase: GetAccountTypeUseCase,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
     private val megaNavigator: MegaNavigator,
 ) : OverQuotaNotificationBuilder {
@@ -55,7 +55,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         val isLoggedIn = isUserLoggedInUseCase()
         var isFreeAccount = false
         val actionPendingIntent = if (isLoggedIn) {
-            isFreeAccount = accountInfoFacade.accountTypeId == MegaAccountDetails.ACCOUNT_TYPE_FREE
+            isFreeAccount = getAccountTypeUseCase() == AccountType.FREE
             megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, UpgradeAccountNavKey>(
                 context = context,
                 createPendingIntent = { intent ->
