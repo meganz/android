@@ -353,6 +353,7 @@ internal abstract class RepositoryModule {
     abstract fun bindSearchRepository(implementation: SearchRepositoryImpl): SearchRepository
 
     @Binds
+    @Singleton
     abstract fun bindBackupRepository(implementation: BackupRepositoryImpl): BackupRepository
 
     @Binds

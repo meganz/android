@@ -51,9 +51,14 @@ internal class BackupRepositoryImpl @Inject constructor(
     private val backupInfoTypeIntMapper: BackupInfoTypeIntMapper,
     private val backupStateIntMapper: BackupStateIntMapper,
 ) : BackupRepository {
+    private var cachedDeviceId: String? = null
+
     override suspend fun getDeviceId(): String? = withContext(ioDispatcher) {
         if (megaApiGateway.isMegaApiLoggedIn() == 0) return@withContext null
+        cachedDeviceId?.let { return@withContext it }
         megaApiGateway.getDeviceId()
+            ?.takeIf { it.isNotEmpty() }
+            ?.also { cachedDeviceId = it }
     }
 
     override suspend fun getDeviceIdAndNameMap() = withContext(ioDispatcher) {

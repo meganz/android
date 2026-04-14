@@ -61,8 +61,13 @@ internal class BackupRepositoryImplTest {
     private val deviceId = "12345-6789"
     private val deviceName = "New Device Name"
 
-    @BeforeAll
+    @BeforeEach
     fun setUp() {
+        reset(
+            backupInfoListMapper,
+            backupMapper,
+            megaApiGateway,
+        )
         underTest = BackupRepositoryImpl(
             backupDeviceNamesMapper = backupDeviceNamesMapper,
             backupInfoListMapper = backupInfoListMapper,
@@ -73,15 +78,6 @@ internal class BackupRepositoryImplTest {
             megaLocalRoomGateway = megaLocalRoomGateway,
             backupInfoTypeIntMapper = backupInfoTypeIntMapper,
             backupStateIntMapper = backupStateIntMapper,
-        )
-    }
-
-    @BeforeEach
-    fun resetMocks() {
-        reset(
-            backupInfoListMapper,
-            backupMapper,
-            megaApiGateway,
         )
     }
 
@@ -131,19 +127,35 @@ internal class BackupRepositoryImplTest {
             ).isEqualTo(backup)
         }
 
+    @Test
+    fun `test that get device id returns the device id from gateway`() = runTest {
+        whenever(megaApiGateway.isMegaApiLoggedIn()).thenReturn(1)
+        whenever(megaApiGateway.getDeviceId()).thenReturn("12345-6789")
+        assertThat(underTest.getDeviceId()).isEqualTo("12345-6789")
+    }
+
     @ParameterizedTest(name = "deviceId: \"{0}\"")
     @NullAndEmptySource
-    @ValueSource(strings = ["12345-6789"])
-    fun `test that get device id returns the current device id`(deviceId: String?) = runTest {
-        whenever(megaApiGateway.isMegaApiLoggedIn()).thenReturn(1)
-        whenever(megaApiGateway.getDeviceId()).thenReturn(deviceId)
-        assertThat(underTest.getDeviceId()).isEqualTo(deviceId)
-    }
+    fun `test that get device id returns null when gateway returns null or empty`(deviceId: String?) =
+        runTest {
+            whenever(megaApiGateway.isMegaApiLoggedIn()).thenReturn(1)
+            whenever(megaApiGateway.getDeviceId()).thenReturn(deviceId)
+            assertThat(underTest.getDeviceId()).isNull()
+        }
 
     @Test
     fun `test that get device id returns null when not logged in`() = runTest {
         whenever(megaApiGateway.isMegaApiLoggedIn()).thenReturn(0)
         assertThat(underTest.getDeviceId()).isNull()
+    }
+
+    @Test
+    fun `test that get device id returns cached value on subsequent calls`() = runTest {
+        whenever(megaApiGateway.isMegaApiLoggedIn()).thenReturn(1)
+        whenever(megaApiGateway.getDeviceId()).thenReturn("12345-6789")
+        underTest.getDeviceId()
+        whenever(megaApiGateway.getDeviceId()).thenReturn("different-id")
+        assertThat(underTest.getDeviceId()).isEqualTo("12345-6789")
     }
 
     @Test
