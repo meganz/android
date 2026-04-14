@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.entity.RecentlyUsedEntity
 import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
-import mega.privacy.android.data.mapper.continuewhereleftoff.RecentlyUsedTypeIdMapper
+import mega.privacy.android.data.mapper.viewedlinks.ViewedLinkRawItemMapper
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ViewedLinksRepository
@@ -20,29 +20,19 @@ import javax.inject.Inject
  * and the recently_viewed_link child table.
  *
  * @property recentlyViewedLinkDao
- * @property recentlyUsedTypeIdMapper
+ * @property viewedLinkRawItemMapper
  * @property ioDispatcher
  */
 internal class ViewedLinksRepositoryImpl @Inject constructor(
     private val recentlyViewedLinkDao: RecentlyViewedLinkDao,
-    private val recentlyUsedTypeIdMapper: RecentlyUsedTypeIdMapper,
+    private val viewedLinkRawItemMapper: ViewedLinkRawItemMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewedLinksRepository {
 
     override fun monitorLinks(): Flow<List<ViewedLink>> =
         recentlyViewedLinkDao
             .monitorViewedLinks()
-            .map { items ->
-                items.map { raw ->
-                    ViewedLink(
-                        nodeHandle = raw.nodeHandle,
-                        name = raw.fileName,
-                        linkUrl = raw.linkUrl,
-                        type = recentlyUsedTypeIdMapper(raw.typeId),
-                        accessedTimestamp = raw.lastAccessedTimestamp,
-                    )
-                }
-            }
+            .map(viewedLinkRawItemMapper::invoke)
             .flowOn(ioDispatcher)
 
     override suspend fun saveLink(viewedLink: ViewedLink) = withContext(ioDispatcher) {
