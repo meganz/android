@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.texteditor.presentation
 
+import androidx.compose.ui.text.TextRange
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
@@ -746,6 +747,68 @@ internal class TextEditorComposeViewModelTest {
 
         val newState = underTest.getOrCreateChunkState(0)
         assertThat(newState.text.toString()).startsWith("EDITED")
+    }
+
+    @Test
+    fun `test that disposeChunkState preserves cursor position on recreation`() = runTest {
+        val allLines = (1..100).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { selection = TextRange(5) }
+        underTest.disposeChunkState(0)
+
+        val newState = underTest.getOrCreateChunkState(0)
+        assertThat(newState.selection.start).isEqualTo(5)
+        assertThat(newState.selection.end).isEqualTo(5)
+    }
+
+    @Test
+    fun `test that disposeChunkState sets restoreFocusChunkIndex for focused chunk`() = runTest {
+        val allLines = (1..100).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        underTest.getOrCreateChunkState(0)
+        underTest.disposeChunkState(0)
+
+        assertThat(underTest.uiState.value.restoreFocusChunkIndex).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that disposeChunkState does not set restoreFocusChunkIndex for non-focused chunk`() = runTest {
+        val allLines = (1..500).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        underTest.setFocusedEditChunk(0)
+        underTest.getOrCreateChunkState(1)
+        underTest.disposeChunkState(1)
+
+        assertThat(underTest.uiState.value.restoreFocusChunkIndex).isNull()
+    }
+
+    @Test
+    fun `test that consumeRestoreFocusChunkIndex clears the value`() = runTest {
+        val allLines = (1..100).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        underTest.getOrCreateChunkState(0)
+        underTest.disposeChunkState(0)
+        assertThat(underTest.uiState.value.restoreFocusChunkIndex).isEqualTo(0)
+
+        underTest.consumeRestoreFocusChunkIndex()
+        assertThat(underTest.uiState.value.restoreFocusChunkIndex).isNull()
     }
 
     @Test

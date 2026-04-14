@@ -339,6 +339,8 @@ fun TextEditorScreen(
                             showLineNumbers = uiState.showLineNumbers,
                             readOnly = !isEditable,
                             requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
+                            restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
+                            onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
                         )
                         TextEditorFastScrollbar(
                             state = lazyListState,

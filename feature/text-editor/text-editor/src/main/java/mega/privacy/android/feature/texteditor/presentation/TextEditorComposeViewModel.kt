@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.texteditor.presentation
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -102,6 +103,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     /** Original text per chunk at the moment its TextFieldState was created. */
     private val chunkOriginals = mutableMapOf<Int, String>()
+
+    /** Saved cursor/selection per chunk, captured on dispose and restored on recreation (e.g. rotation). */
+    private val chunkSelections = mutableMapOf<Int, TextRange>()
 
     /** Set to true when a disposed chunk had edits. */
     private var hasDisposedEdits: Boolean = false
@@ -261,7 +265,16 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         return chunkStates.getOrPut(chunkIndex) {
             val text = chunkTexts.getOrElse(chunkIndex) { "" }
             chunkOriginals[chunkIndex] = text
-            TextFieldState(text)
+            val savedSelection = chunkSelections.remove(chunkIndex)
+            val initialSelection = if (savedSelection != null) {
+                TextRange(
+                    savedSelection.start.coerceIn(0, text.length),
+                    savedSelection.end.coerceIn(0, text.length),
+                )
+            } else {
+                TextRange(text.length)
+            }
+            TextFieldState(text, initialSelection = initialSelection)
         }
     }
 
@@ -271,6 +284,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      */
     fun disposeChunkState(chunkIndex: Int) {
         val state = chunkStates.remove(chunkIndex) ?: return
+        chunkSelections[chunkIndex] = state.selection
+        if (chunkIndex == _uiState.value.focusedEditChunk) {
+            _uiState.update { it.copy(restoreFocusChunkIndex = chunkIndex) }
+        }
         val currentText = state.text.toString()
         val original = chunkOriginals.remove(chunkIndex)
         if (currentText != original && chunkIndex < chunkTexts.size) {
@@ -323,6 +340,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         buildChunksFromLines()
         chunkStates.clear()
         chunkOriginals.clear()
+        chunkSelections.clear()
         hasDisposedEdits = false
         rebuildStartLineCache()
         val initialChunk = if (chunkTexts.isNotEmpty())
@@ -676,6 +694,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private fun clearEditState() {
         chunkStates.clear()
         chunkOriginals.clear()
+        chunkSelections.clear()
         chunkTexts.clear()
         hasDisposedEdits = false
     }
@@ -742,6 +761,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      */
     fun consumeRestoreScrollIndex() {
         _uiState.update { it.copy(restoreScrollIndex = null) }
+    }
+
+    /**
+     * Called by the UI after focus has been restored to the chunk.
+     */
+    fun consumeRestoreFocusChunkIndex() {
+        _uiState.update { it.copy(restoreFocusChunkIndex = null) }
     }
 
     private fun saveRecentlyUsed() {

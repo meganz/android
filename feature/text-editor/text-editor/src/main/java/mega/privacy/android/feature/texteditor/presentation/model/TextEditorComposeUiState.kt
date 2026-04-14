@@ -45,4 +45,5 @@ data class TextEditorComposeUiState(
     val focusedEditChunk: Int = 0,
     val closeEvent: StateEvent = consumed,
     val restoreScrollIndex: Int? = null,
+    val restoreFocusChunkIndex: Int? = null,
 )

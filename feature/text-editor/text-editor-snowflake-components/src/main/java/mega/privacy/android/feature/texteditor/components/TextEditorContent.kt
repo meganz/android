@@ -86,6 +86,9 @@ fun TextEditorContent(
     readOnly: Boolean,
     /** When true (e.g. Create mode), first chunk requests focus and shows the IME once content is shown. */
     requestInitialFocusOnFirstChunk: Boolean = false,
+    /** When non-null, restores focus to this chunk index and shows the keyboard (e.g. after rotation). */
+    restoreFocusChunkIndex: Int? = null,
+    onRestoreFocusConsumed: () -> Unit = {},
 ) {
     val textColor = DSTokens.colors.text.primary
     val textStyle = remember(textColor) { editorTextStyle(textColor) }
@@ -130,6 +133,8 @@ fun TextEditorContent(
                     showLineNumbers = showLineNumbers,
                     textStyle = textStyle,
                     requestInitialFocusOnFirstChunk = requestInitialFocusOnFirstChunk,
+                    restoreFocusChunkIndex = restoreFocusChunkIndex,
+                    onRestoreFocusConsumed = onRestoreFocusConsumed,
                 )
             }
         }
@@ -187,17 +192,28 @@ private fun EditModeLazyColumn(
     showLineNumbers: Boolean,
     textStyle: TextStyle,
     requestInitialFocusOnFirstChunk: Boolean,
+    restoreFocusChunkIndex: Int? = null,
+    onRestoreFocusConsumed: () -> Unit = {},
 ) {
-    val firstChunkFocusRequester = remember { FocusRequester() }
+    val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(requestInitialFocusOnFirstChunk) {
         if (!requestInitialFocusOnFirstChunk) return@LaunchedEffect
         lazyListState.scrollToItem(0)
         snapshotFlow { lazyListState.layoutInfo.totalItemsCount }
             .first { it > 0 }
-        runCatching { firstChunkFocusRequester.requestFocus() }
+        runCatching { focusRequester.requestFocus() }
             .onFailure { Timber.w(it, "Initial focus request failed") }
         keyboardController?.show()
+    }
+    LaunchedEffect(restoreFocusChunkIndex) {
+        val targetChunk = restoreFocusChunkIndex ?: return@LaunchedEffect
+        snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo }
+            .first { items -> items.any { it.index == targetChunk } }
+        runCatching { focusRequester.requestFocus() }
+            .onFailure { Timber.w(it, "Restore focus request failed") }
+        keyboardController?.show()
+        onRestoreFocusConsumed()
     }
     LazyColumn(
         state = lazyListState,
@@ -227,8 +243,11 @@ private fun EditModeLazyColumn(
                 maxLineNumber = totalLineCount,
                 showLineNumbers = showLineNumbers,
                 textStyle = textStyle,
-                focusRequester = if (idx == 0 && requestInitialFocusOnFirstChunk) {
-                    firstChunkFocusRequester
+                focusRequester = if (
+                    (idx == 0 && requestInitialFocusOnFirstChunk) ||
+                    idx == restoreFocusChunkIndex
+                ) {
+                    focusRequester
                 } else {
                     null
                 },
