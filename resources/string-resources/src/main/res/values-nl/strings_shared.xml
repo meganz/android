@@ -2350,6 +2350,14 @@
     <string name="rewarded_ad_dialog_perk_unlimited_downloads">Ongelimiteerde downloads, reclame skippen</string>
     <string name="rewarded_ad_dialog_perk_storage">Tot op 20 TB gecodeerde opslag</string>
     <string name="rewarded_ad_dialog_perk_transfer_speed">Prioriteitsoverdrachtssnelheden</string>
-    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
-    <string name="general_read_only_folder_warning">This folder is read-only</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass en MEGA VPN inbegrepen</string>
+    <string name="rewarded_ad_unavailable_toast">Reclame is onbeschikbaar! Doorgaan&#8230;</string>
+    <string name="general_read_only_folder_warning">Deze map is alleen-lezen</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s is al onderdeel van %3$s op %4$s. Kies er een andere.</string>
+    <string name="sync_label_cloud_folder">cloud-map</string>
+    <string name="sync_label_device_folder">apparaatmap</string>
+    <string name="sync_label_a_sync_or_backup">een synchronisatie of back-up</string>
+    <string name="sync_label_this_device">dit apparaat</string>
+    <string name="sync_label_camera_uploads">Camera-upload</string>
+    <string name="sync_label_media_uploads">Media-upload</string>
 </resources>

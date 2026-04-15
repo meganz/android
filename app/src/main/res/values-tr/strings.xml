@@ -3138,7 +3138,7 @@
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">Gönder</string>
     <!-- Error message when submit issue failed-->
-    <string name="settings_help_report_issue_error">Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin. Sorunu hala gönderemiyorsanız yardım için %s ile iletişime geçin.</string>
+    <string name="settings_help_report_issue_error">Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin. Sorunu hâlâ gönderemiyorsanız yardım için %s ile iletişime geçin.</string>
     <!-- Success message when submit issue succeeded-->
     <string name="settings_help_report_issue_success">Raporunuzu aldık. Sorunu inceleyip size geri döneceğiz.</string>
     <!-- Message shown during log file upload-->

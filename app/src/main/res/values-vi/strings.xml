@@ -4566,4 +4566,6 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Đăng tải camêra đang được bật</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Vị trí này không còn tồn tại.</string>
+    <string name="invalid_input">Không phải một mục hợp lệ</string>
+    <string name="invalid_link">Liên kết không hợp lệ. Vui lòng thử lại hoặc yêu cầu một liên kết mới.</string>
 </resources>
