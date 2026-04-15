@@ -31,11 +31,13 @@ class SignalPresenceViewModelTest {
         mock<RetryConnectionsAndSignalPresenceUseCase>()
     private val monitorChatSignalPresenceUseCase =
         mock<MonitorChatSignalPresenceUseCase>()
-    private val monitorChatSignalPresenceFlow = MutableSharedFlow<Unit>()
+    private var monitorChatSignalPresenceFlow = MutableSharedFlow<Unit>()
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        // New instance per test so previous ViewModel's subscription cannot receive emissions from this test.
+        monitorChatSignalPresenceFlow = MutableSharedFlow()
         whenever(monitorChatSignalPresenceUseCase()).thenReturn(monitorChatSignalPresenceFlow)
         underTest = SignalPresenceViewModel(
             retryConnectionsAndSignalPresenceUseCase = retryConnectionsAndSignalPresenceUseCase,
@@ -51,52 +53,82 @@ class SignalPresenceViewModelTest {
 
     @Test
     fun `test that signal is sent when signal presence is called the first time`() = runTest {
-        underTest.signalPresence()
+        underTest.retryConnections(signalPresence = true)
         advanceUntilIdle()
-        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+        verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
     }
 
     @Test
     fun `test that subsequent calls are debounced by 500ms`() = runTest {
-        underTest.signalPresence()
+        underTest.retryConnections(signalPresence = true)
         advanceUntilIdle()
-        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
-        underTest.signalPresence()
-        underTest.signalPresence()
-        underTest.signalPresence()
+        verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
+        underTest.retryConnections(signalPresence = true)
+        underTest.retryConnections(signalPresence = true)
+        underTest.retryConnections(signalPresence = true)
         advanceTimeBy(501L)
-        verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke()
+        verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke(true)
     }
 
     @Test
     fun `test that signal is sent when monitorChatSignalPresence emits and delaySignalPresence is true`() =
         runTest {
-            whenever(retryConnectionsAndSignalPresenceUseCase()) doReturn true
-            underTest.signalPresence()
+            whenever(retryConnectionsAndSignalPresenceUseCase(true)) doReturn true
+            underTest.retryConnections(signalPresence = true)
             advanceUntilIdle()
-            verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
 
             // Emit from monitorChatSignalPresenceUseCase
             monitorChatSignalPresenceFlow.emit(Unit)
             advanceUntilIdle()
 
             // Should be called again because delaySignalPresence was true
-            verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke()
+            verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke(true)
         }
 
     @Test
     fun `test that signal is not sent when monitorChatSignalPresence emits and delaySignalPresence is false`() =
         runTest {
-            whenever(retryConnectionsAndSignalPresenceUseCase()) doReturn false
-            underTest.signalPresence()
+            whenever(retryConnectionsAndSignalPresenceUseCase(true)) doReturn false
+            underTest.retryConnections(signalPresence = true)
             advanceUntilIdle()
-            verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
 
             // Emit from monitorChatSignalPresenceUseCase
             monitorChatSignalPresenceFlow.emit(Unit)
             advanceUntilIdle()
 
             // Should not be called again because delaySignalPresence was false
-            verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke()
+            verify(retryConnectionsAndSignalPresenceUseCase, times(1)).invoke(true)
+        }
+
+    @Test
+    fun `test that signalPresence calls use case with signalPresence true`() =
+        runTest {
+            underTest.signalPresence()
+            advanceUntilIdle()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(true)
+        }
+
+    @Test
+    fun `test that retryConnections calls use case with needSignalPresence false`() =
+        runTest {
+            underTest.retryConnections(signalPresence = false)
+            advanceUntilIdle()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(false)
+        }
+
+    @Test
+    fun `test that signalPresence passes needSignalPresence false to use case when monitorChatSignalPresence emits`() =
+        runTest {
+            whenever(retryConnectionsAndSignalPresenceUseCase(false)) doReturn true
+            underTest.retryConnections(signalPresence = false)
+            advanceUntilIdle()
+            verify(retryConnectionsAndSignalPresenceUseCase).invoke(false)
+
+            monitorChatSignalPresenceFlow.emit(Unit)
+            advanceUntilIdle()
+
+            verify(retryConnectionsAndSignalPresenceUseCase, times(2)).invoke(false)
         }
 }

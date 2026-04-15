@@ -25,6 +25,7 @@ class SignalPresenceViewModel @Inject constructor(
     private val updatePresenceFlow: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     private var presenceJob: Job? = null
     private var delaySignalPresence = false
+    private var needSignalPresence = true
 
     init {
         viewModelScope.launch {
@@ -54,15 +55,27 @@ class SignalPresenceViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Retries pending connections and optionally signals presence, then keeps repeating on each
+     * [monitorChatSignalPresenceUseCase] tick while presenceConfig is available and not pending.
+     * Stops automatically when presenceConfig is unavailable or pending.
+     */
     private suspend fun sendPresenceSignal() {
-        try {
-            delaySignalPresence = retryConnectionsAndSignalPresenceUseCase()
-        } catch (e: Exception) {
-            Timber.e(e, "Error signaling presence")
+        runCatching {
+            retryConnectionsAndSignalPresenceUseCase(needSignalPresence)
+        }.onSuccess { presenceConfigAvailable ->
+            delaySignalPresence = presenceConfigAvailable
+        }.onFailure {
+            Timber.e(it, "Error signaling presence")
         }
     }
 
     fun signalPresence() {
+        retryConnections(signalPresence = true)
+    }
+
+    fun retryConnections(signalPresence: Boolean) {
+        this.needSignalPresence = signalPresence
         if (presenceJob == null) {
             trackPresence()
         } else {

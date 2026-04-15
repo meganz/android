@@ -45,6 +45,7 @@ import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
@@ -91,7 +92,6 @@ import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -171,13 +171,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     @Inject
     lateinit var crashReporter: CrashReporter
 
-    /**
-     * Monitor Chat Signal Presence Use Case
-     * Check if chat has signal presence
-     */
-    @Inject
-    lateinit var monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase
-
     @Inject
     lateinit var getDomainNameUseCase: GetDomainNameUseCase
 
@@ -192,11 +185,11 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     private val billingViewModel by viewModels<BillingViewModel>()
     private val viewModel by viewModels<BaseViewModel>()
+    private val signalPresenceViewModel by viewModels<SignalPresenceViewModel>()
 
     @JvmField
     protected var app: MegaApplication = MegaApplication.getInstance()
     private var sslErrorDialog: AlertDialog? = null
-    private var delaySignalPresence = false
     private var upgradeAlert: AlertDialog? = null
     private var purchaseType: PurchaseType? = null
     private var activeSubscriptionSku: String? = null
@@ -260,14 +253,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     showExpiredBusinessAlert()
                     viewModel.onShowExpiredBusinessAlertConsumed()
                 }
-            }
-        }
-
-        collectFlow(monitorChatSignalPresenceUseCase(), Lifecycle.State.CREATED) {
-            Timber.d("BROADCAST TO SEND SIGNAL PRESENCE")
-            if (delaySignalPresence) {
-                delaySignalPresence = false
-                retryConnectionsAndSignalPresence()
             }
         }
 
@@ -415,23 +400,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      */
     protected fun retryConnectionsAndSignalPresence() {
         Timber.d("retryConnectionsAndSignalPresence")
-        try {
-            megaApi.retryPendingConnections()
-            megaChatApi.retryPendingConnections(false)
-
-            if (megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
-                delaySignalPresence = false
-
-                if (this !is MeetingActivity) {
-                    Timber.d("Send signal presence")
-                    megaChatApi.signalPresenceActivity()
-                }
-            } else {
-                delaySignalPresence = true
-            }
-        } catch (e: Exception) {
-            Timber.w(e, "Exception")
-        }
+        // Retry connections and signal presence via SignalPresenceViewModel
+        // MeetingActivity: retry connections without signaling presence
+        signalPresenceViewModel.retryConnections(signalPresence = this !is MeetingActivity)
     }
 
     private fun handleGoBack() {
