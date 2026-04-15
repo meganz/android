@@ -192,8 +192,14 @@ class LoginViewModel @AssistedInject constructor(
     private val accountBlockedTypeStringMapper: AccountBlockedTypeStringMapper,
     @Assisted val isInSingleActivity: Boolean,
 ) : ViewModel() {
+    private val is2FARequited = savedStateHandle[IS_2FA_REQUIRED] ?: false
 
-    private val _state = MutableStateFlow(LoginState())
+    private val _state = MutableStateFlow(
+        LoginState(
+            is2FARequired = is2FARequited,
+            is2FAEnabled = is2FARequited,
+        )
+    )
     val state: StateFlow<LoginState> = _state
 
     /**
@@ -309,17 +315,22 @@ class LoginViewModel @AssistedInject constructor(
                     { state: LoginState ->
                         resumeTransfersForNotLoggedInInstance(session)
                         if (state.intentState == null) {
-
+                            val is2FARequired = savedStateHandle[IS_2FA_REQUIRED] ?: false
+                            val savedEmail = savedStateHandle.get<String>(PENDING_2FA_EMAIL)
+                            val savedPassword = savedStateHandle.get<String>(PENDING_2FA_PASSWORD)
                             state.copy(
                                 intentState = LoginIntentState.ReadyForInitialSetup,
-                                accountSession = state.accountSession?.copy(session = session)
-                                    ?: AccountSession(session = session),
-                                is2FAEnabled = false,
+                                accountSession = state.accountSession?.copy(
+                                    session = session,
+                                    email = savedEmail
+                                ) ?: AccountSession(session = session, email = savedEmail),
+                                password = savedPassword,
+                                is2FAEnabled = is2FARequired,
                                 isAccountConfirmed = false,
                                 pressedBackWhileLogin = false,
                                 isFirstTime = session == null,
-                                isAlreadyLoggedIn = session != null,
-                                isLoginRequired = session == null,
+                                isAlreadyLoggedIn = !is2FARequired && session != null,
+                                isLoginRequired = !is2FARequired && session == null,
                             )
                         } else {
                             state.copy(
@@ -482,6 +493,9 @@ class LoginViewModel @AssistedInject constructor(
      * Stops logging in.
      */
     fun stopLogin(isPerformLocalLogOut: Boolean = true) {
+        savedStateHandle[IS_2FA_REQUIRED] = false
+        savedStateHandle.remove<String>(PENDING_2FA_EMAIL)
+        savedStateHandle.remove<String>(PENDING_2FA_PASSWORD)
         _state.update {
             it.copy(
                 accountSession = null,
@@ -736,6 +750,9 @@ class LoginViewModel @AssistedInject constructor(
                     if (exception !is LoginException) return@onFailure
 
                     if (exception is LoginMultiFactorAuthRequired) {
+                        savedStateHandle[IS_2FA_REQUIRED] = true
+                        savedStateHandle[PENDING_2FA_EMAIL] = state.value.accountSession?.email
+                        savedStateHandle[PENDING_2FA_PASSWORD] = state.value.password
                         _state.update {
                             it.copy(
                                 isLoginInProgress = false,
@@ -1418,6 +1435,9 @@ class LoginViewModel @AssistedInject constructor(
          * Intent action for opening app.
          */
         private const val ACTION_OPEN_APP = "OPEN_APP"
+        private const val IS_2FA_REQUIRED = "is_2fa_required"
+        private const val PENDING_2FA_EMAIL = "pending_2fa_email"
+        private const val PENDING_2FA_PASSWORD = "pending_2fa_password"
     }
 
     data class HandledLinks(val link: String, val timeStamp: Long)

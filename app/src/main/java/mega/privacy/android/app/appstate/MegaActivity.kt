@@ -304,6 +304,7 @@ class MegaActivity : FragmentActivity() {
             val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
             val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()
             val rootNodeState by globalStateViewModel.rootNodeExistsFlow.collectAsStateWithLifecycle()
+            val loginState by loginViewModel.state.collectAsStateWithLifecycle()
             val snackbarHostState = remember { SnackbarHostState() }
 
             LaunchedEffect(globalState, navGraphState) {
@@ -348,7 +349,9 @@ class MegaActivity : FragmentActivity() {
                             PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
                         } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
                     if (authStatus == PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn) {
-                        loginViewModel.stopLogin(isPerformLocalLogOut = false)
+                        if (!loginState.is2FARequired) {
+                            loginViewModel.stopLogin(isPerformLocalLogOut = false)
+                        }
                     }
                     navigationHandler.onNetworkChange(globalState.isConnected)
                     navigationHandler.onLoginChange(authStatus)
