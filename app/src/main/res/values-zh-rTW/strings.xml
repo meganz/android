@@ -3307,7 +3307,7 @@
         <item quantity="other">已從「%2$s」移除%1$d個項目</item>
     </plurals>
     <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">一次性會議</string>
+    <string name="meetings_list_one_off_meeting_label">單次會議</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">繼續觀看</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
@@ -4159,7 +4159,7 @@
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">此會議和其所有事件都將歸入過去的會議，所有與會者都將收到通知。</string>
     <!-- Meeting list tooltip description for start meeting fab button -->
-    <string name="meeting_list_tooltip_fab_description">您現在可以安排一次性和週期性會議。</string>
+    <string name="meeting_list_tooltip_fab_description">您現在可以安排單次和週期性會議。</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
     <string name="meeting_list_tooltip_sched_description">您現在可以在會議室中點選[A]開始會議[/A]，在預定時間之前開始會議。</string>
     <!-- Meeting list tooltip title for recurring meeting item -->

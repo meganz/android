@@ -1867,7 +1867,7 @@
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">días</string>
     <!-- Title of the option to generate a public chat link -->
-    <string name="get_chat_link_option">Obtén enlace de chat</string>
+    <string name="get_chat_link_option">Obtener enlace de chat</string>
     <!-- Title of the option to make a public chat private -->
     <string name="make_chat_private_option">Activar Rotación de la clave de cifrado</string>
     <!-- Title of the view to inform that a chat is private -->
@@ -1879,9 +1879,9 @@
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">El chat no se puede convertir en privado porque el número de participantes excede el límite para chats privados.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_created_chat_link">[A]%1$s[/A][B] ha creado un enlace del chat.[/B]</string>
+    <string name="message_created_chat_link">[A]%1$s[/A][B] ha creado un enlace de chat.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_deleted_chat_link">[A]%1$s[/A][B] ha eliminado un enlace del chat.[/B]</string>
+    <string name="message_deleted_chat_link">[A]%1$s[/A][B] ha eliminado un enlace de chat.[/B]</string>
     <!-- Title of the option to delete a chat link -->
     <string name="action_delete_link">Desactivar enlace de chat</string>
     <!-- Title of the alert when a chat link is invalid -->
@@ -1897,7 +1897,7 @@
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">Espectadores</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
-    <string name="error_chat_link_init_error">No se ha podido empezar el chat al cargar el enlace del chat.</string>
+    <string name="error_chat_link_init_error">No se ha podido iniciar el chat al cargar el enlace de chat.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] ha activado la rotación de la clave de cifrado.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2055,7 +2055,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s y %2$d más</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">Para generar un enlace del chat, tienes que añadir una descripción primero:</string>
+    <string name="message_error_set_title_get_link">Para generar un enlace de chat, tienes que añadir una descripción primero:</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Llamada iniciada</string>
     <!-- Title of the dialog to inform about a SSL error -->
@@ -2207,7 +2207,7 @@
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Al eliminar el enlace ya no tendrás acceso a esta conversación.</string>
     <!-- Question of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_question_text">¿Quieres crear un nuevo chat de grupo y obtener un enlace del chat?</string>
+    <string name="context_create_chat_link_question_text">¿Quieres crear un nuevo chat de grupo y obtener un enlace de chat?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">La rotación de la clave de cifrado es un poco más segura, pero no te permite crear un enlace de chat y los nuevos participantes no verán los mensajes anteriores.</string>
     <!-- Label that indicates the steps of a wizard -->
@@ -2243,7 +2243,7 @@
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Introducir el nombre del grupo</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
-    <string name="alert_enter_group_name">Para crear un enlace del chat, debes ponerle nombre al grupo.</string>
+    <string name="alert_enter_group_name">Para crear un enlace de chat, debes ponerle nombre al grupo.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">Invita a contactos y chatea de forma segura con el chat cifrado de MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
@@ -2251,7 +2251,7 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Link de chat no disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Enlace del chat eliminado</string>
+    <string name="chat_link_deleted">Enlace de chat eliminado</string>
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">Versión restaurada</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->

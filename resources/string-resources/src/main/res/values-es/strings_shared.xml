@@ -573,7 +573,7 @@
     <!-- Title of the share meeting link bottom panel -->
     <string name="meetings_share_link_bottom_sheet_title">Reunión confirmada: invita a otras personas a unirse</string>
     <!-- Button text of the send meeting link to chat -->
-    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Enviar enlace del chat</string>
+    <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Enviar enlace de chat</string>
     <!-- Button text of the share meeting link -->
     <string name="meetings_share_link_bottom_sheet_button_share_link">Obtener enlace</string>
     <!-- Title for the inline warning banner when storage is almost full -->
