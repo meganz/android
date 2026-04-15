@@ -14,9 +14,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @param isFullyLoaded True when gradual loading has finished and all content is in memory.
  * @param errorMessage Optional error message when an operation fails; shown in error UI when set, cleared when error is consumed.
  * @param showDiscardDialog True when the discard-changes confirmation dialog should be shown (Edit/Create, unsaved changes).
- * @param saveSuccessEvent One-shot event fired when Edit-mode save completes successfully; the UI shows a snackbar on consumption.
  * @param exitAfterCreateDiscardEvent One-shot event when Create mode user confirms discard; UI should pop without save.
- * @param exitAfterCreateSaveEvent One-shot event when Create mode save completes successfully; UI should pop back.
  * @param isRestoringContent True while content is being reverted/updated in background (e.g. discard); show loading overlay.
  * @param nodeEffectEvent One-shot effect for manage link, share, or send to chat; consumed by the app host.
  * @param shareErrorEvent One-shot event fired when the share public-link could not be resolved; the UI shows a snackbar.
@@ -31,8 +29,6 @@ data class TextEditorComposeUiState(
     val showLineNumbers: Boolean = false,
     val showDiscardDialog: Boolean = false,
     val exitAfterCreateDiscardEvent: StateEvent = consumed,
-    val exitAfterCreateSaveEvent: StateEvent = consumed,
-    val saveSuccessEvent: StateEvent = consumed,
     val isRestoringContent: Boolean = false,
     val bottomBarActions: List<TextEditorBottomBarAction> = emptyList(),
     val nodeEffectEvent: StateEventWithContent<TextEditorNodeEffect> = consumed(),

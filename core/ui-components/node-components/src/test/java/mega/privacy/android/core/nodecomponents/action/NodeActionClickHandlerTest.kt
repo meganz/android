@@ -932,27 +932,33 @@ class NodeActionClickHandlerTest {
     // EditAction Tests
     @Test
     fun `test EditAction canHandle returns true for EditMenuAction`() {
-        val action = EditActionClickHandler(mockMegaNavigator)
+        val action = EditActionClickHandler()
         val menuAction = mock<EditMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
     }
 
     @Test
-    fun `test that EditAction handle calls openTextEditor with CloudNode Edit mode`() {
-        val action = EditActionClickHandler(mockMegaNavigator)
+    fun `test that EditAction handle returns result with correct key and node handle`() {
+        val action = EditActionClickHandler()
         val menuAction = mock<EditMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openTextEditor(
-            any(),
-            argThat { params ->
-                params is OpenTextEditorParams.CloudNode &&
-                        params.mode == TextEditorMode.Edit &&
-                        params.nodeSourceType == NodeSourceTypeInt.FILE_BROWSER_ADAPTER
-            },
+        verify(mockNavigationHandler).returnResult(
+            EditActionClickHandler.RESULT_KEY,
+            mockFileNode.id.longValue,
         )
+    }
+
+    @Test
+    fun `test that EditAction handle dismisses bottom sheet`() {
+        val action = EditActionClickHandler()
+        val menuAction = mock<EditMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockViewModel).dismiss()
     }
 
     // DisputeTakeDownAction Tests
@@ -1514,7 +1520,7 @@ class NodeActionClickHandlerTest {
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(InfoActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
-        assertThat(EditActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
+        assertThat(EditActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(DisputeTakeDownActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
         assertThat(
             VerifyActionClickHandler(mockGetNodeShareDataUseCase, mockMegaNavigator).canHandle(

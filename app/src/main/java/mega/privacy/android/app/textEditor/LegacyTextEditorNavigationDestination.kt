@@ -25,6 +25,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.core.nodecomponents.action.clickhandler.EditActionClickHandler
 import mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkDialogNavKey
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
@@ -334,6 +335,19 @@ private fun TextEditorComposeContent(
         hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
             factory.create(args)
         }
+
+    if (showNodeOptions) {
+        LaunchedEffect(Unit) {
+            navigationHandler.monitorResult<Long>(EditActionClickHandler.RESULT_KEY)
+                .collect { editNodeHandle ->
+                    if (editNodeHandle != null && editNodeHandle == navKey.nodeHandle) {
+                        navigationHandler.clearResult(EditActionClickHandler.RESULT_KEY)
+                        viewModel.setEditMode()
+                    }
+                }
+        }
+    }
+
     TextEditorScreen(
         viewModel = viewModel,
         onBack = removeDestination,

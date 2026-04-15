@@ -42,6 +42,8 @@ import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBott
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorComposeUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /** Number of lines per chunk in both view and edit modes.
@@ -80,6 +82,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase,
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -450,10 +453,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         _uiState.update { it.copy(exitAfterCreateDiscardEvent = consumed) }
     }
 
-    fun consumeExitAfterCreateSaveEvent() {
-        _uiState.update { it.copy(exitAfterCreateSaveEvent = consumed) }
-    }
-
     /** User dismissed the discard dialog. */
     fun dismissDiscardDialog() {
         _uiState.update { it.copy(showDiscardDialog = false) }
@@ -498,12 +497,14 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                                             fromHomePage = saveResult.fromHome,
                                         )
                                     ),
-                                    saveSuccessEvent = if (wasCreateMode) consumed else triggered,
-                                    exitAfterCreateSaveEvent = if (wasCreateMode) triggered else consumed,
                                 )
                             }
                             clearEditState()
                             rebuildStartLineCache()
+                            if (!wasCreateMode) {
+                                snackbarEventQueue.queueMessage(sharedR.string.general_changes_saved)
+                            }
+                            emitCloseEvent()
                         }
                     }
                 },
@@ -538,10 +539,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     fun consumeSendToChatErrorEvent() {
         _uiState.update { it.copy(sendToChatErrorEvent = consumed) }
-    }
-
-    fun consumeSaveSuccessEvent() {
-        _uiState.update { it.copy(saveSuccessEvent = consumed) }
     }
 
     fun onMenuAction(action: TextEditorTopBarAction) {

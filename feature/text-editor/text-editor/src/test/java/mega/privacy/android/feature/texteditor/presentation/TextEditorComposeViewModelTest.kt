@@ -41,6 +41,8 @@ import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeVie
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeEffect
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -72,6 +74,7 @@ internal class TextEditorComposeViewModelTest {
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase = mock()
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase = mock()
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase = mock()
+    private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
         TextEditorBottomBarActionsMapper()
 
@@ -92,6 +95,7 @@ internal class TextEditorComposeViewModelTest {
             saveTextEditorScrollUseCase,
             getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase,
+            snackbarEventQueue,
         )
         runBlocking {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
@@ -139,6 +143,7 @@ internal class TextEditorComposeViewModelTest {
             saveTextEditorScrollUseCase = saveTextEditorScrollUseCase,
             getTextEditorScrollUseCase = getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
+            snackbarEventQueue = snackbarEventQueue,
         )
     }
 
@@ -459,7 +464,7 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
-    fun `test that saveFile in Create mode emits exitAfterCreateSaveEvent and not saveSuccessEvent`() =
+    fun `test that saveFile in Create mode emits closeEvent and does not queue snackbar`() =
         runTest {
             whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
                 .thenReturn(
@@ -477,12 +482,12 @@ internal class TextEditorComposeViewModelTest {
             advanceUntilIdle()
 
             val state = underTest.uiState.value
-            assertThat(state.exitAfterCreateSaveEvent).isEqualTo(triggered)
-            assertThat(state.saveSuccessEvent).isEqualTo(consumed)
+            assertThat(state.closeEvent).isEqualTo(triggered)
+            verify(snackbarEventQueue, never()).queueMessage(sharedR.string.general_changes_saved)
         }
 
     @Test
-    fun `test that saveFile in Edit mode emits saveSuccessEvent and not exitAfterCreateSaveEvent`() =
+    fun `test that saveFile in Edit mode emits closeEvent and queues snackbar`() =
         runTest {
             val lines = listOf("hello")
             doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
@@ -503,8 +508,8 @@ internal class TextEditorComposeViewModelTest {
             advanceUntilIdle()
 
             val state = underTest.uiState.value
-            assertThat(state.saveSuccessEvent).isEqualTo(triggered)
-            assertThat(state.exitAfterCreateSaveEvent).isEqualTo(consumed)
+            assertThat(state.closeEvent).isEqualTo(triggered)
+            verify(snackbarEventQueue).queueMessage(sharedR.string.general_changes_saved)
         }
 
     @Test
@@ -949,7 +954,7 @@ internal class TextEditorComposeViewModelTest {
         }
 
     @Test
-    fun `test that saveFile sets saveSuccessEvent to triggered and mode to View on success`() =
+    fun `test that saveFile sets closeEvent to triggered and mode to View on success`() =
         runTest {
             doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
                 .invoke(any(), anyOrNull(), any())
@@ -969,12 +974,12 @@ internal class TextEditorComposeViewModelTest {
             advanceUntilIdle()
 
             val state = underTest.uiState.value
-            assertThat(state.saveSuccessEvent).isEqualTo(triggered)
+            assertThat(state.closeEvent).isEqualTo(triggered)
             assertThat(state.mode).isEqualTo(TextEditorMode.View)
         }
 
     @Test
-    fun `test that consumeSaveSuccessEvent resets the event`() =
+    fun `test that saveFile in Edit mode queues global snackbar message`() =
         runTest {
             doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
                 .invoke(any(), anyOrNull(), any())
@@ -992,10 +997,10 @@ internal class TextEditorComposeViewModelTest {
 
             underTest.saveFile()
             advanceUntilIdle()
-            assertThat(underTest.uiState.value.saveSuccessEvent).isEqualTo(triggered)
 
-            underTest.consumeSaveSuccessEvent()
-            assertThat(underTest.uiState.value.saveSuccessEvent).isEqualTo(consumed)
+            verify(snackbarEventQueue).queueMessage(
+                sharedR.string.general_changes_saved
+            )
         }
 
     @Test

@@ -212,26 +212,11 @@ fun TextEditorScreen(
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val changesSavedMessage = stringResource(sharedR.string.general_changes_saved)
     val genericErrorMessage = stringResource(sharedR.string.general_request_failed_message)
     val lineTooltipTemplate = stringResource(sharedR.string.text_editor_fast_scroll_line_tooltip)
     EventEffect(
-        event = uiState.saveSuccessEvent,
-        onConsumed = viewModel::consumeSaveSuccessEvent,
-    ) {
-        snackbarHostState.showSnackbar(changesSavedMessage)
-    }
-
-    EventEffect(
         event = uiState.exitAfterCreateDiscardEvent,
         onConsumed = viewModel::consumeExitAfterCreateDiscardEvent,
-    ) {
-        onBack()
-    }
-
-    EventEffect(
-        event = uiState.exitAfterCreateSaveEvent,
-        onConsumed = viewModel::consumeExitAfterCreateSaveEvent,
     ) {
         onBack()
     }
