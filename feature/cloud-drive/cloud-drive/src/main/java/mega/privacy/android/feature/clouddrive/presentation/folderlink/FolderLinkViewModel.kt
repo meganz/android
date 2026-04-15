@@ -8,6 +8,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,8 +27,10 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
@@ -61,6 +64,8 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val monitorViewTypeUseCase: MonitorViewType,
     private val setViewTypeUseCase: SetViewType,
+    private val stopAudioService: StopAudioService,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -186,7 +191,11 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     }
 
     private suspend fun checkCredentials() {
-        val hasCredentials = hasCredentialsUseCase()
+        val hasCredentials = runCatching {
+            hasCredentialsUseCase()
+        }.onFailure {
+            Timber.e(it)
+        }.getOrDefault(false)
         _uiState.update {
             it.copy(hasCredentials = hasCredentials)
         }
@@ -387,6 +396,14 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             parts.size > 3 -> parts[3] // Old format: #F!handle!key!subhandle
             parts.size == 2 -> parts[1] // New format: /folder/handle#key!subhandle
             else -> null
+        }
+    }
+
+    public override fun onCleared() {
+        super.onCleared()
+        // Stop audio service for non-logged user
+        if (!_uiState.value.hasCredentials) {
+            applicationScope.launch { stopAudioService() }
         }
     }
 

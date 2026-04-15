@@ -3,9 +3,11 @@ package mega.privacy.android.feature.clouddrive.presentation.folderlink
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
@@ -22,8 +24,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
+import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
@@ -47,6 +50,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -65,9 +69,11 @@ internal class FolderLinkViewModelTest {
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
-    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = NodeSortConfigurationUiMapper()
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper =
+        NodeSortConfigurationUiMapper()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val setViewTypeUseCase: SetViewType = mock()
+    private val stopAudioService: StopAudioService = mock()
 
     private lateinit var underTest: FolderLinkViewModel
 
@@ -87,6 +93,8 @@ internal class FolderLinkViewModelTest {
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             monitorViewTypeUseCase = monitorViewTypeUseCase,
             setViewTypeUseCase = setViewTypeUseCase,
+            stopAudioService = stopAudioService,
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
             args = args,
         )
     }
@@ -105,6 +113,7 @@ internal class FolderLinkViewModelTest {
             setCloudSortOrderUseCase,
             monitorViewTypeUseCase,
             setViewTypeUseCase,
+            stopAudioService,
         )
         whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
@@ -148,7 +157,9 @@ internal class FolderLinkViewModelTest {
         val url = "https://mega.nz/folder/abc"
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
         stubNodeUiItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
@@ -175,7 +186,9 @@ internal class FolderLinkViewModelTest {
         val url = "https://mega.nz/folder/abc"
         whenever(hasCredentialsUseCase()).thenReturn(true)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
         stubNodeUiItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
@@ -192,7 +205,9 @@ internal class FolderLinkViewModelTest {
         val url = "https://mega.nz/folder/abc"
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
         stubNodeUiItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
@@ -269,7 +284,9 @@ internal class FolderLinkViewModelTest {
             val url = "https://mega.nz/folder/abc"
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenThrow(FetchFolderNodesException.Expired())
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenThrow(
+                FetchFolderNodesException.Expired()
+            )
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -299,7 +316,9 @@ internal class FolderLinkViewModelTest {
             val url = "https://mega.nz/folder/abc#key!$subHandle"
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(eq(subHandle), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(eq(subHandle), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -314,7 +333,9 @@ internal class FolderLinkViewModelTest {
             val url = "https://mega.nz/#F!handle!key!$subHandle"
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(eq(subHandle), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(eq(subHandle), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -327,7 +348,9 @@ internal class FolderLinkViewModelTest {
         val url = "https://mega.nz/folder/abc#key"
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
         stubNodeUiItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
@@ -357,7 +380,9 @@ internal class FolderLinkViewModelTest {
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.API_INCOMPLETE)
             whenever(loginToFolderUseCase("$url#key")).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -378,7 +403,9 @@ internal class FolderLinkViewModelTest {
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.API_INCOMPLETE)
             whenever(loginToFolderUseCase("$url!key")).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -395,7 +422,9 @@ internal class FolderLinkViewModelTest {
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.API_INCOMPLETE)
         whenever(loginToFolderUseCase("$url#key")).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
         stubNodeUiItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
@@ -414,7 +443,9 @@ internal class FolderLinkViewModelTest {
         val childUiItems = listOf<NodeUiItem<TypedNode>>(mock())
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
         whenever(
             nodeUiItemMapper(
                 any(),
@@ -450,9 +481,13 @@ internal class FolderLinkViewModelTest {
             val folder = mockFolderNode(id = 42L)
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
-            whenever(getFolderLinkChildrenNodesUseCase(eq(42L), anyOrNull())).thenThrow(RuntimeException())
+            whenever(getFolderLinkChildrenNodesUseCase(eq(42L), anyOrNull())).thenThrow(
+                RuntimeException()
+            )
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -483,7 +518,9 @@ internal class FolderLinkViewModelTest {
         val url = "https://mega.nz/folder/abc"
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult()) // parentNode = null
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        ) // parentNode = null
         stubNodeUiItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
@@ -503,7 +540,9 @@ internal class FolderLinkViewModelTest {
         val parentFolder = mockFolderNode(id = 1L, name = "Root")
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult(rootNode = parentFolder))
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult(rootNode = parentFolder)
+        )
         stubNodeUiItemMapper()
         whenever(getFolderLinkChildrenNodesUseCase(eq(10L), anyOrNull())).thenReturn(emptyList())
         whenever(getFolderParentNodeUseCase(NodeId(10L))).thenReturn(parentFolder)
@@ -531,9 +570,16 @@ internal class FolderLinkViewModelTest {
             val subFolder = mockFolderNode(id = 10L)
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
-            whenever(getFolderLinkChildrenNodesUseCase(eq(10L), anyOrNull())).thenReturn(emptyList())
+            whenever(
+                getFolderLinkChildrenNodesUseCase(
+                    eq(10L),
+                    anyOrNull()
+                )
+            ).thenReturn(emptyList())
             whenever(getFolderParentNodeUseCase(NodeId(10L))).thenThrow(FetchFolderNodesException.GenericError())
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
@@ -556,11 +602,20 @@ internal class FolderLinkViewModelTest {
             val parentFolder = mockFolderNode(id = 1L)
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
-            whenever(getFolderLinkChildrenNodesUseCase(eq(10L), anyOrNull())).thenReturn(emptyList())
+            whenever(
+                getFolderLinkChildrenNodesUseCase(
+                    eq(10L),
+                    anyOrNull()
+                )
+            ).thenReturn(emptyList())
             whenever(getFolderParentNodeUseCase(NodeId(10L))).thenReturn(parentFolder)
-            whenever(getFolderLinkChildrenNodesUseCase(eq(1L), anyOrNull())).thenThrow(RuntimeException())
+            whenever(getFolderLinkChildrenNodesUseCase(eq(1L), anyOrNull())).thenThrow(
+                RuntimeException()
+            )
             initViewModel(FolderLinkViewModel.Args(uriString = url))
             advanceUntilIdle()
 
@@ -630,7 +685,9 @@ internal class FolderLinkViewModelTest {
         val folder = mockFolderNode(id = 42L)
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
         stubNodeUiItemMapper()
         whenever(getFolderLinkChildrenNodesUseCase(eq(42L), anyOrNull())).thenReturn(emptyList())
         initViewModel(FolderLinkViewModel.Args(uriString = url))
@@ -666,7 +723,9 @@ internal class FolderLinkViewModelTest {
         whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_SIZE_ASC))
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
         stubNodeUiItemMapper()
         initViewModel(FolderLinkViewModel.Args(uriString = url))
         advanceUntilIdle()
@@ -954,7 +1013,10 @@ internal class FolderLinkViewModelTest {
             sortOrderFlow.value = SortOrder.ORDER_DEFAULT_DESC
             advanceUntilIdle()
 
-            verify(getFolderLinkChildrenNodesUseCase).invoke(eq(5L), eq(SortOrder.ORDER_DEFAULT_DESC))
+            verify(getFolderLinkChildrenNodesUseCase).invoke(
+                eq(5L),
+                eq(SortOrder.ORDER_DEFAULT_DESC)
+            )
         }
 
     @Test
@@ -963,7 +1025,9 @@ internal class FolderLinkViewModelTest {
             val url = "https://mega.nz/folder/abc"
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
             whenever(containsMediaItemUseCase(any())).thenReturn(true)
             initViewModel(FolderLinkViewModel.Args(uriString = url))
@@ -980,7 +1044,9 @@ internal class FolderLinkViewModelTest {
             val url = "https://mega.nz/folder/abc"
             whenever(hasCredentialsUseCase()).thenReturn(false)
             whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(FetchFolderNodesResult())
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
             stubNodeUiItemMapper()
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
             initViewModel(FolderLinkViewModel.Args(uriString = url))
@@ -989,5 +1055,30 @@ internal class FolderLinkViewModelTest {
             underTest.uiState.test {
                 assertThat(awaitItem().hasMediaItems).isFalse()
             }
+        }
+
+    @Test
+    fun `test that onCleared stops audio service when the user has no credentials`() = runTest {
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        initViewModel(FolderLinkViewModel.Args(uriString = null))
+        advanceUntilIdle()
+
+        underTest.onCleared()
+        advanceUntilIdle()
+
+        verify(stopAudioService).invoke()
+    }
+
+    @Test
+    fun `test that onCleared does not stop audio service when the user has credentials`() =
+        runTest {
+            whenever(hasCredentialsUseCase()).thenReturn(true)
+            initViewModel(FolderLinkViewModel.Args(uriString = null))
+            advanceUntilIdle()
+
+            underTest.onCleared()
+            advanceUntilIdle()
+
+            verify(stopAudioService, times(0)).invoke()
         }
 }
