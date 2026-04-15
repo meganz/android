@@ -2167,9 +2167,9 @@
         <item quantity="other">%d dossiers</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“«&#160;%1$d dossier,  »“</item>
-        <item quantity="many">“«&#160;%1$d dossiers,  »“</item>
-        <item quantity="other">“«&#160;%1$d dossiers,  »“</item>
+        <item quantity="one">%1$d dossier&#160;·&#160;</item>
+        <item quantity="many">%1$d dossiers&#160;·&#160;</item>
+        <item quantity="other">%1$d dossiers&#160;·&#160;</item>
     </plurals>
     <string name="general_first_name">Prénom</string>
     <string name="general_last_name">Nom</string>

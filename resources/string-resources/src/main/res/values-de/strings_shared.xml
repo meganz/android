@@ -2037,8 +2037,8 @@
         <item quantity="other">%d Ordner</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d Ordner, “</item>
-        <item quantity="other">“%1$d Ordner, “</item>
+        <item quantity="one">%1$d Ordner&#160;·&#160;</item>
+        <item quantity="other">%1$d Ordner&#160;·&#160;</item>
     </plurals>
     <string name="general_first_name">Vorname(n)</string>
     <string name="general_last_name">Familienname</string>

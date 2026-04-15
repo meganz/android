@@ -2056,7 +2056,7 @@
         <item quantity="other">%d個のフォルダ</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">“「%1$d個のフォルダ」、 “</item>
+        <item quantity="other">%1$d個のフォルダ&#160;・&#160;</item>
     </plurals>
     <string name="general_install_label">インストール</string>
     <string name="general_app_update_download_success_message">アプリのアップデートをダウンロードしました</string>

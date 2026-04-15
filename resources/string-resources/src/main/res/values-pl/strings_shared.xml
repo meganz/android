@@ -2236,10 +2236,10 @@
         <item quantity="other">%d katalogów</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d folder, “</item>
-        <item quantity="few">“%1$d foldery, “</item>
-        <item quantity="many">“%1$d foldery, “</item>
-        <item quantity="other">“%1$d foldery, “</item>
+        <item quantity="one">%1$d katalog&#160;·&#160;</item>
+        <item quantity="few">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="many">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="other">%1$d katalogów&#160;·&#160;</item>
     </plurals>
     <string name="general_install_label">Zainstaluj</string>
     <string name="general_app_update_download_success_message">Pobrano aktualizację aplikacji</string>

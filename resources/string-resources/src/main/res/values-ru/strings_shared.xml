@@ -2232,10 +2232,10 @@
         <item quantity="other">%d папок</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d папка, “</item>
-        <item quantity="few">“%1$d папки, “</item>
-        <item quantity="many">“%1$d папок, “</item>
-        <item quantity="other">“%1$d папок, “</item>
+        <item quantity="one">%1$d папка&#160;·&#160;</item>
+        <item quantity="few">%1$d папки&#160;·&#160;</item>
+        <item quantity="many">%1$d папок&#160;·&#160;</item>
+        <item quantity="other">%1$d папок&#160;·&#160;</item>
     </plurals>
     <string name="general_first_name">Имя</string>
     <string name="general_last_name">Фамилия</string>

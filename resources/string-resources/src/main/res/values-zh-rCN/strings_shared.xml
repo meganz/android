@@ -2002,7 +2002,7 @@
         <item quantity="other">%d个文件夹</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">“%1$d个文件夹， “</item>
+        <item quantity="other">%1$d个文件夹&#160;·&#160;</item>
     </plurals>
     <string name="albums_multiple_delete_success_message">%d个相册已删除</string>
     <string name="home_screen_no_network_desc">您已离线。\n如果您将文件设为离线可用，您仍然可以在没有网络连接的情况下访问它们。</string>

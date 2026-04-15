@@ -2032,7 +2032,7 @@
         <item quantity="other">%d 個資料夾</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">%1$d個資料夾，</item>
+        <item quantity="other">%1$d個資料夾&#160;·&#160;</item>
     </plurals>
     <string name="general_first_name">名字</string>
     <string name="general_last_name">姓氏</string>

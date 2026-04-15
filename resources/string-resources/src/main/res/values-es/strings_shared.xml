@@ -2125,9 +2125,9 @@
         <item quantity="other">%d carpetas</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d carpeta, “</item>
-        <item quantity="many">“%1$d de carpetas, “</item>
-        <item quantity="other">“%1$d carpetas, “</item>
+        <item quantity="one">%1$d carpeta&#160;·&#160;</item>
+        <item quantity="many">%1$d de carpetas&#160;·&#160;</item>
+        <item quantity="other">%1$d carpetas&#160;·&#160;</item>
     </plurals>
     <string name="home_recents_snackbar_activity_hidden">Tu actividad reciente ha sido ocultada</string>
     <string name="home_recents_button_view_all">Ver todo</string>

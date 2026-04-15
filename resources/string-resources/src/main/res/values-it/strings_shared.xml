@@ -2064,9 +2064,9 @@
         <item quantity="other">%d cartelle</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d cartella, “</item>
-        <item quantity="many">“%1$d di cartelle, “</item>
-        <item quantity="other">“%1$d cartelle, “</item>
+        <item quantity="one">%1$d cartella&#160;·&#160;</item>
+        <item quantity="many">%1$d di cartelle&#160;·&#160;</item>
+        <item quantity="other">%1$d cartelle&#160;·&#160;</item>
     </plurals>
     <string name="general_first_name">Nome</string>
     <string name="general_last_name">Cognome</string>

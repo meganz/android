@@ -2118,8 +2118,8 @@
         <item quantity="other">%d klasör</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d klasör, “</item>
-        <item quantity="other">“%1$d klasör, “</item>
+        <item quantity="one">%1$d klasör&#160;·&#160;</item>
+        <item quantity="other">%1$d klasör&#160;·&#160;</item>
     </plurals>
     <string name="general_install_label">Yükle</string>
     <string name="general_app_update_download_success_message">Uygulama güncellemesi indirildi</string>

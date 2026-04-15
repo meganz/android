@@ -2171,9 +2171,9 @@
         <item quantity="other">%d pastas</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d pasta, “</item>
-        <item quantity="many">“%1$d de pastas, “</item>
-        <item quantity="other">“%1$d pastas, “</item>
+        <item quantity="one">%1$d pasta&#160;·&#160;</item>
+        <item quantity="many">%1$d de pastas&#160;·&#160;</item>
+        <item quantity="other">%1$d pastas&#160;·&#160;</item>
     </plurals>
     <string name="search_landing_title">Procurando alguma coisa?</string>
     <string name="search_landing_subtitle">Pesquisar arquivos e pastas</string>
