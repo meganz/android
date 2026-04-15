@@ -2340,4 +2340,28 @@
     <string name="general_transfer_error_temporary_unavaible">Kaynak geçici olarak kullanılamıyor. Lütfen daha sonra tekrar deneyin.</string>
     <string name="video_player_more_options_playlist_option">Oynatma listesi</string>
     <string name="video_player_more_options_lock_option">Video oynatıcıyı kilitle</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Pro’ya yükseltin</string>
+    <string name="video_section_add_to_playlist_success">“%1$s” listesine 1 öğe eklendi</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">“%1$d” oynatma listesine 1 öğe eklendi</item>
+        <item quantity="other">“%1$d” oynatma listesine 1 öğe eklendi</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Reklamdan sonra devam edin</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Reklamı izle</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Veya reklamsız, anında erişim için bir Pro plana yükseltin</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Sınırsız indirme, reklam görmeyin</string>
+    <string name="rewarded_ad_dialog_perk_storage">20 TB’a kadar şifrelenmiş depolama</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Öncelikli aktarım hızları</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass ve MEGA VPN dahil</string>
+    <string name="rewarded_ad_unavailable_toast">Reklam mevcut değil! Devam ediliyor&#8230;</string>
+    <string name="general_read_only_folder_warning">Bu klasör salt okunur</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s, %4$s üzerindeki %3$s özelliğinin zaten bir parçası. Başka bir tane seçin.</string>
+    <string name="sync_label_cloud_folder">bulut klasörü</string>
+    <string name="sync_label_device_folder">cihaz klasörü</string>
+    <string name="sync_label_a_sync_or_backup">bir senkronize veya yedekleme</string>
+    <string name="sync_label_this_device">bu cihaz</string>
+    <string name="sync_label_camera_uploads">Kamera Yüklemeleri</string>
+    <string name="sync_label_media_uploads">Medya Yüklemeleri</string>
+    <string name="home_widget_continue_where_left_off">Kaldığınız yerden devam edin</string>
 </resources>

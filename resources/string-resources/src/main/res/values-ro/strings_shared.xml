@@ -2412,4 +2412,30 @@
     <string name="cloud_explorer_use_this_folder_button">Folosește acest folder</string>
     <string name="general_transfer_error_not_enough_free_space">Spațiu liber insuficient pe dispozitiv</string>
     <string name="general_transfer_error_temporary_unavaible">Resursa nu este disponibilă temporar, încercați din nou mai târziu</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Upgradează la Pro</string>
+    <string name="video_player_more_options_playlist_option">Listă de redare</string>
+    <string name="video_player_more_options_lock_option">Blochează player-ul video</string>
+    <string name="video_section_add_to_playlist_success">Am adăugat 1 element în “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">Am adăugat 1 element în lista de redare %1$d</item>
+        <item quantity="few">Am adăugat 1 element în listele de redare %1$d</item>
+        <item quantity="other">Am adăugat 1 element în listele de redare %1$d</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Continuă după reclama</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Urmărește reclama</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Sau treci la un plan Pro pentru acces instant, fără reclame.</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Descărcări nelimitate, sari peste reclame.</string>
+    <string name="rewarded_ad_dialog_perk_storage">Până la 20 TB stocare criptată</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Viteze de transfer prioritare</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass și MEGA VPN incluse</string>
+    <string name="rewarded_ad_unavailable_toast">Reclama nu este disponibilă! Continuăm&#8230;</string>
+    <string name="general_read_only_folder_warning">Acest folder este doar pentru citire.</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s este deja parte din %3$s pe %4$s. Alegeți altul.</string>
+    <string name="sync_label_cloud_folder">Folder în cloud</string>
+    <string name="sync_label_device_folder">Folder de pe dispozitiv</string>
+    <string name="sync_label_a_sync_or_backup">sincronizare sau backup</string>
+    <string name="sync_label_this_device">acest dispozitiv</string>
+    <string name="sync_label_camera_uploads">Încărcări din Cameră</string>
+    <string name="sync_label_media_uploads">Încărcări media</string>
 </resources>

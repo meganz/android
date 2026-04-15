@@ -2056,7 +2056,7 @@
         <item quantity="other">%d個のフォルダ</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">「%1$d個のフォルダ」、</item>
+        <item quantity="other">“「%1$d個のフォルダ」、 “</item>
     </plurals>
     <string name="general_install_label">インストール</string>
     <string name="general_app_update_download_success_message">アプリのアップデートをダウンロードしました</string>
@@ -2253,4 +2253,27 @@
     <string name="general_transfer_error_temporary_unavaible">リソースが一時的に利用できません。後でもう一度やり直してください</string>
     <string name="video_player_more_options_playlist_option">プレイリスト</string>
     <string name="video_player_more_options_lock_option">動画プレーヤーをロック</string>
+    <string name="video_section_add_to_playlist_success">「%1$s」に1項目を追加しました</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="other">%1$d個のプレイリストに1項目を追加しました</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_upgrade_button">Proにアップグレード</string>
+    <string name="rewarded_ad_dialog_title">広告を視聴して続行</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">広告を見る</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">またはProプランにアップグレードして、広告なしですぐに利用</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">ダウンロード無制限、広告なし</string>
+    <string name="rewarded_ad_dialog_perk_storage">最大20TBの暗号化ストレージ</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">優先転送速度</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA PassとMEGA VPN付き</string>
+    <string name="rewarded_ad_unavailable_toast">広告が利用できません。続行します&#8230;</string>
+    <string name="general_read_only_folder_warning">このフォルダは読み取り専用です</string>
+    <string name="sync_error_folder_conflict">「%1$s」%2$sはすでに%4$s上の%3$sの一部です。別のものを選択してください。</string>
+    <string name="sync_label_cloud_folder">クラウド上のフォルダ</string>
+    <string name="sync_label_device_folder">デバイスフォルダ</string>
+    <string name="sync_label_a_sync_or_backup">同期またはバックアップ</string>
+    <string name="sync_label_this_device">この端末</string>
+    <string name="sync_label_camera_uploads">カメラアップロード</string>
+    <string name="sync_label_media_uploads">メディアアップロード</string>
+    <string name="home_widget_continue_where_left_off">続きから再開する</string>
 </resources>

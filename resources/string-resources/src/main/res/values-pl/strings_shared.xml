@@ -2503,7 +2503,35 @@
     <string name="cloud_explorer_choose_folder_title">Wybierz katalog</string>
     <string name="general_transfer_error_not_enough_free_space">Brak wystarczającej pamięci na urządzeniu</string>
     <string name="general_transfer_error_temporary_unavaible">Źródło chwilowo jest niedostępne, spróbuj ponownie</string>
-    <string name="homepage_empty_hint_audio">[B]Nie[/B] znaleziono plików audio.</string>
+    <string name="homepage_empty_hint_audio">[B]Nie[/B] [B]znaleziono[/B] plików [A]audio[/A]</string>
     <string name="cloud_explorer_select_destination_title">Wybierz miejsce docelowe</string>
     <string name="cloud_explorer_use_this_folder_button">Użyj tego folderu</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Zmień na wersję Pro</string>
+    <string name="video_player_more_options_playlist_option">Playlista</string>
+    <string name="video_player_more_options_lock_option">Zablokuj odtwarzacz wideo</string>
+    <string name="video_section_add_to_playlist_success">Dodano 1 pozycję do “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">Dodano 1 element do listy odtwarzania %1$d</item>
+        <item quantity="few">Dodano 1 element do list odtwarzania %1$d</item>
+        <item quantity="many">Dodano 1 element do list odtwarzania %1$d</item>
+        <item quantity="other">Dodano 1 element do list odtwarzania %1$d</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Kontynuuj po reklamie</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Obejrzyj reklamę</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Lub przejdź na plan Pro, aby uzyskać natychmiastowy dostęp bez reklam</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Pobieranie bez ograniczeń, pomiń reklamy</string>
+    <string name="rewarded_ad_dialog_perk_storage">Do 20 TB zaszyfrowanej przestrzeni na dane</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Priorytetowe prędkości transferu</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">Zawiera MEGA Pass i MEGA VPN</string>
+    <string name="rewarded_ad_unavailable_toast">Reklama jest niedostępna! Kontynuacja&#8230;</string>
+    <string name="general_read_only_folder_warning">Ten folder jest tylko do odczytu</string>
+    <string name="sync_error_folder_conflict">„%1$s” %2$s jest już częścią %3$s w dniu %4$s. Wybierz inny.</string>
+    <string name="sync_label_cloud_folder">folder w chmurze</string>
+    <string name="sync_label_device_folder">folder urządzenia</string>
+    <string name="sync_label_a_sync_or_backup">synchronizacja lub kopia zapasowa</string>
+    <string name="sync_label_this_device">to urządzenie</string>
+    <string name="sync_label_camera_uploads">Przesyłanie z aparatu</string>
+    <string name="sync_label_media_uploads">Przesyłanie multimediów</string>
+    <string name="home_widget_continue_where_left_off">Kontynuuj tam, gdzie skończyłeś</string>
 </resources>

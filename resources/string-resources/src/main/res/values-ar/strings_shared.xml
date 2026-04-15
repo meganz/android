@@ -2652,4 +2652,35 @@
     <string name="cloud_explorer_choose_folder_title">اختر مجلد</string>
     <string name="general_transfer_error_not_enough_free_space">لا توجد مساحة فارغة كافية على جهازك</string>
     <string name="general_transfer_error_temporary_unavaible">المصادر غير متوفرة مؤقتاً، يرجى المحاولة مرة أخرى في وقت لاحق</string>
+    <string name="rewarded_ad_dialog_upgrade_button">قم بالترقية إلى برو Pro</string>
+    <string name="video_player_more_options_playlist_option">قائمة التشغيل</string>
+    <string name="video_player_more_options_lock_option">قفل مشغّل الفيديو</string>
+    <string name="video_section_add_to_playlist_success">تمت إضافة عنصر واحد إلى “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="zero">تمت إضافة عنصر واحد إلى قوائم تشغيل %1$d</item>
+        <item quantity="one">تمت إضافة عنصر واحد إلى قائمة التشغيل %1$d</item>
+        <item quantity="two">تمت إضافة عنصر واحد إلى قوائم تشغيل %1$d</item>
+        <item quantity="few">تمت إضافة عنصر واحد إلى قوائم تشغيل %1$d</item>
+        <item quantity="many"></item>
+        <item quantity="other">تمت إضافة عنصر واحد إلى قوائم تشغيل %1$d</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">استمر بعد الإعلان</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">شاهد الإعلان</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">أو الترقية إلى خطة Pro للوصول الفوري بدون إعلانات</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">تنزيلات غير محدودة وتخطي الإعلانات</string>
+    <string name="rewarded_ad_dialog_perk_storage">سعة تخزين مشفرة تصل إلى 20 تيرابايت</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">سرعات نقل ذات أولوية</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">يشمل MEGA Pass و MEGA VPN</string>
+    <string name="rewarded_ad_unavailable_toast">الإعلان غير متاح! جارٍ المتابعة&#8230;</string>
+    <string name="general_read_only_folder_warning">هذا المجلد للقراءة فقط</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s موجود بالفعل كجزء من %3$s على %4$s. اختر آخر.</string>
+    <string name="sync_label_cloud_folder">مجلد سحابي</string>
+    <string name="sync_label_device_folder">مجلد الجهاز</string>
+    <string name="sync_label_a_sync_or_backup">مزامنة أو نسخة احتياطية</string>
+    <string name="sync_label_this_device">هذا الجهاز</string>
+    <string name="sync_label_camera_uploads">تحميلات الكاميرا</string>
+    <string name="sync_label_media_uploads">تحميلات الوسائط</string>
+    <string name="cloud_explorer_select_destination_title">اختر الوجهة</string>
+    <string name="cloud_explorer_use_this_folder_button">استخدم هذا المجلد</string>
 </resources>

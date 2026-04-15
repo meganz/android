@@ -1695,7 +1695,7 @@
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA隱私套件</string>
     <!-- Message about savings on yearly plan in case it has discount -->
-    <string name="account_upgrade_account_label_save_at_least">年度方案至少可節省16%</string>
+    <string name="account_upgrade_account_label_save_at_least">年繳方案至少可節省16%</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">輸入相簿名稱</string>
     <!-- Title of favourite album. -->
@@ -2032,7 +2032,7 @@
         <item quantity="other">%d 個資料夾</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">“%1$d個資料夾， “</item>
+        <item quantity="other">%1$d個資料夾，</item>
     </plurals>
     <string name="general_first_name">名字</string>
     <string name="general_last_name">姓氏</string>
@@ -2250,4 +2250,27 @@
     <string name="cloud_explorer_select_destination_title">選擇儲存位置</string>
     <string name="general_transfer_error_not_enough_free_space">您的裝置可用空間不足</string>
     <string name="general_transfer_error_temporary_unavaible">資源暫時無法使用，請稍後再試</string>
+    <string name="rewarded_ad_dialog_upgrade_button">升級至Pro方案</string>
+    <string name="video_player_more_options_playlist_option">播放列表</string>
+    <string name="video_player_more_options_lock_option">鎖定影片播放器</string>
+    <string name="video_section_add_to_playlist_success">已將1個項目新增到「%1$s」</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="other">已將1個項目新增到%1$d播放列表</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">廣告結束後繼續觀看</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">觀看廣告</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">或升級至Pro方案，立即享受無廣告的使用體驗</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">無限次下載，無廣告</string>
+    <string name="rewarded_ad_dialog_perk_storage">高達20 TB的加密儲存空間</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">享有優先傳輸頻寬</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">包含MEGA Pass及MEGA VPN</string>
+    <string name="rewarded_ad_unavailable_toast">目前無法提供廣告，內容繼續播放&#8230;</string>
+    <string name="general_read_only_folder_warning">此資料夾僅限讀取</string>
+    <string name="sync_label_cloud_folder">雲端資料夾</string>
+    <string name="sync_label_device_folder">裝置資料夾</string>
+    <string name="sync_label_a_sync_or_backup">同步或備份</string>
+    <string name="sync_label_this_device">此裝置</string>
+    <string name="sync_label_camera_uploads">相機上傳</string>
+    <string name="sync_label_media_uploads">媒體上傳</string>
 </resources>

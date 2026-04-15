@@ -2553,7 +2553,7 @@
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
     <string name="user_is_not_contact">%s님이 당신의 연락처 목록에 없습니다</string>
     <!-- Option of color theme, light mode. -->
-    <string name="theme_light">가벼움</string>
+    <string name="theme_light">밝음</string>
     <!-- Option of color theme, dark mode. -->
     <string name="theme_dark">어두움</string>
     <!-- Option of color theme, follow the system setting. -->

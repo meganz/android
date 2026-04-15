@@ -2420,4 +2420,31 @@
     <string name="cloud_explorer_use_this_folder_button">Usar esta pasta</string>
     <string name="general_transfer_error_not_enough_free_space">Não há espaço livre suficiente no seu dispositivo</string>
     <string name="general_transfer_error_temporary_unavaible">Serviço temporariamente indisponível, por favor tente novamente mais tarde</string>
+    <string name="video_player_more_options_playlist_option">Lista de reprodução</string>
+    <string name="video_player_more_options_lock_option">Bloquear o reprodutor de vídeo</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Fazer upgrade a Pro</string>
+    <string name="video_section_add_to_playlist_success">1 item foi adicionado a “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">1 item foi adicionado à %1$d lista de reprodução</item>
+        <item quantity="many">1 item foi adicionado a %1$d de listas de reprodução</item>
+        <item quantity="other">1 item foi adicionado a %1$d listas de reprodução</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Continue depois do anúncio</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Ver anúncio</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Ou faça o upgrade a um plano Pro para obter acesso imediato e sem anúncios</string>
+    <string name="rewarded_ad_dialog_pro_card_title">Planos Pro do MEGA</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Downloads ilimitados, sem anúncios</string>
+    <string name="rewarded_ad_dialog_perk_storage">Até 20 TB de armazenamento criptografado</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass e MEGA VPN incluídos</string>
+    <string name="rewarded_ad_unavailable_toast">O anúncio não está disponível. Continuando&#8230;</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Velocidades de transferência prioritárias</string>
+    <string name="general_read_only_folder_warning">Esta pasta é somente leitura</string>
+    <string name="sync_error_folder_conflict">A %2$s “%1$s” já está incluída em %3$s em %4$s. Escolha outra pasta.</string>
+    <string name="sync_label_cloud_folder">pasta na nuvem</string>
+    <string name="sync_label_device_folder">pasta no dispositivo</string>
+    <string name="sync_label_a_sync_or_backup">uma sincronização ou um backup</string>
+    <string name="sync_label_this_device">este dispositivo</string>
+    <string name="sync_label_camera_uploads">Uploads da câmera</string>
+    <string name="sync_label_media_uploads">Uploads de mídia</string>
+    <string name="home_widget_continue_where_left_off">Continue de onde você parou</string>
 </resources>

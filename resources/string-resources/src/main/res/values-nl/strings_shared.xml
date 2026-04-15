@@ -2335,4 +2335,29 @@
     <string name="cloud_explorer_use_this_folder_button">Gebruik deze map</string>
     <string name="general_transfer_error_not_enough_free_space">Niet genoeg vrije ruimte op uw apparaat</string>
     <string name="general_transfer_error_temporary_unavaible">Bron tijdelijk niet beschikbaar, probeer later opnieuw</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Upgraden naar Pro</string>
+    <string name="video_player_more_options_playlist_option">Afspeellijst</string>
+    <string name="video_player_more_options_lock_option">Videospeler vergrendelen</string>
+    <string name="video_section_add_to_playlist_success">1 item toegevoegd tot “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">1 item toegevoegd tot %1$d afspeellijst</item>
+        <item quantity="other">1 item toegevoegd tot %1$d afspeellijsten</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Doorgaan na de reclame</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Advertentie bekijken</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Of upgrade naar een Pro abonnement voor onmiddelijke, reclame vrije toegang</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Ongelimiteerde downloads, reclame skippen</string>
+    <string name="rewarded_ad_dialog_perk_storage">Tot op 20 TB gecodeerde opslag</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Prioriteitsoverdrachtssnelheden</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass en MEGA VPN inbegrepen</string>
+    <string name="rewarded_ad_unavailable_toast">Reclame is onbeschikbaar! Doorgaan&#8230;</string>
+    <string name="general_read_only_folder_warning">Deze map is alleen-lezen</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s is al onderdeel van %3$s op %4$s. Kies er een andere.</string>
+    <string name="sync_label_cloud_folder">cloud-map</string>
+    <string name="sync_label_device_folder">apparaatmap</string>
+    <string name="sync_label_a_sync_or_backup">een synchronisatie of back-up</string>
+    <string name="sync_label_this_device">dit apparaat</string>
+    <string name="sync_label_camera_uploads">Camera-upload</string>
+    <string name="sync_label_media_uploads">Media-upload</string>
 </resources>

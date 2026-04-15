@@ -2503,4 +2503,34 @@
     <string name="cloud_explorer_choose_folder_title">Выбрать папку</string>
     <string name="general_transfer_error_not_enough_free_space">Недостаточно места на устройстве</string>
     <string name="general_transfer_error_temporary_unavaible">Ресурс временно недоступен, пожалуйста, повторите попытку позже</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Улучшение до Pro</string>
+    <string name="video_player_more_options_playlist_option">Плейлист</string>
+    <string name="video_player_more_options_lock_option">Заблокировать видеоплеер</string>
+    <string name="video_section_add_to_playlist_success">Добавлен 1 элемент в “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">Добавлен 1 элемент в %1$d плейлист</item>
+        <item quantity="few">Добавлен 1 элемент в %1$d плейлиста</item>
+        <item quantity="many">Добавлен 1 элемент в %1$d плейлистов</item>
+        <item quantity="other">Добавлен 1 элемент в %1$d плейлистов</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Продолжить после рекламы</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Посмотреть рекламу</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Или перейдите на план Pro для мгновенного доступа без рекламы</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Неограниченные скачивания, пропуск рекламы</string>
+    <string name="rewarded_ad_dialog_perk_storage">До 20 ТБ зашифрованного хранилища</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Приоритетные скорости передачи данных</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass и MEGA VPN включены</string>
+    <string name="rewarded_ad_unavailable_toast">Реклама недоступна! Продолжаем&#8230;</string>
+    <string name="general_read_only_folder_warning">Эта папка доступна только для чтения</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s уже является частью %3$s на %4$s. Выберите другое.</string>
+    <string name="sync_label_cloud_folder">облачная папка</string>
+    <string name="sync_label_device_folder">папка устройства</string>
+    <string name="sync_label_a_sync_or_backup">синхронизация или резервное копирование</string>
+    <string name="sync_label_this_device">это устройство</string>
+    <string name="sync_label_camera_uploads">Загрузки из камеры</string>
+    <string name="sync_label_media_uploads">Загрузки медиафайлов</string>
+    <string name="cloud_explorer_select_destination_title">Выберите место назначения</string>
+    <string name="cloud_explorer_use_this_folder_button">Использовать эту папку</string>
+    <string name="home_widget_continue_where_left_off">Продолжите, где остановились</string>
 </resources>

@@ -2652,4 +2652,57 @@
     <string name="cloud_explorer_choose_folder_title">Choose folder</string>
     <!-- Button for the cloud explorer screen, in folder picker mode, to confirm the usage of the chosen folder -->
     <string name="cloud_explorer_use_this_folder_button">Use this folder</string>
+    <!-- General transfer error shown when there is not enough local space on the device and it is required for the action -->
+    <string name="general_transfer_error_not_enough_free_space">Not enough free space on your device</string>
+    <!-- General transfer error shown when a transfer begins, whether upload or download, and the file or node is unavailable for an unknown reason -->
+    <string name="general_transfer_error_temporary_unavaible">Resource temporarily not available, please try again later</string>
+    <!-- Title for the playlist option in video player more options -->
+    <string name="video_player_more_options_playlist_option">Playlist</string>
+    <!-- Title for the lock option in video player more options -->
+    <string name="video_player_more_options_lock_option">Lock video player</string>
+    <!-- Message shown when a video is successfully added to a single playlist from the Video section. -->
+    <string name="video_section_add_to_playlist_success">Added 1 item to “%1$s”</string>
+    <!-- Message shown when a video is successfully added to multiple playlists from the Video section. -->
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">Added 1 item to %1$d playlist</item>
+        <item quantity="other">Added 1 item to %1$d playlists</item>
+    </plurals>
+    <!-- Rewarded ad dialog title prompting user to watch an ad before continuing -->
+    <string name="rewarded_ad_dialog_title">Continue after the ad</string>
+    <!-- Rewarded ad dialog button text to watch the ad -->
+    <string name="rewarded_ad_dialog_watch_ad_button">Watch ad</string>
+    <!-- Rewarded ad dialog subtitle suggesting user can upgrade to Pro for ad-free access -->
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Or upgrade to a Pro plan for instant, ad-free access</string>
+    <!-- Rewarded ad dialog Pro card title -->
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <!-- Rewarded ad dialog Pro perk: unlimited downloads and no ads -->
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Unlimited downloads, skip ads</string>
+    <!-- Rewarded ad dialog Pro perk: up to 20 TB encrypted storage -->
+    <string name="rewarded_ad_dialog_perk_storage">Up to 20 TB encrypted storage</string>
+    <!-- Rewarded ad dialog Pro perk: priority transfer speeds -->
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Priority transfer speeds</string>
+    <!-- Rewarded ad dialog Pro perk: MEGA Pass and VPN included -->
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass and MEGA VPN included</string>
+    <!-- Rewarded ad dialog button text to upgrade to Pro plan -->
+    <string name="rewarded_ad_dialog_upgrade_button">Upgrade to Pro</string>
+    <!-- Toast message shown when a rewarded ad is not available and the user action continues -->
+    <string name="rewarded_ad_unavailable_toast">Ad is unavailable! Continuing&#8230;</string>
+    <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
+    <string name="general_read_only_folder_warning">This folder is read-only</string>
+    <!-- Unified folder conflict message. %1$s folder display name, %2$s sync_label_cloud_folder or sync_label_device_folder, %3$s feature (e.g. sync_label_camera_uploads, sync_label_media_uploads, sync_label_a_sync_or_backup), %4$s device name or sync_label_this_device -->
+    <string name="sync_error_folder_conflict">“%1$s” %2$s is already part of %3$s on %4$s. Choose another.</string>
+    <!-- Label for cloud folder in sync conflict messages -->
+    <string name="sync_label_cloud_folder">cloud folder</string>
+    <!-- Label for device folder in sync conflict messages -->
+    <string name="sync_label_device_folder">device folder</string>
+    <!-- Label for a sync or backup in sync conflict messages -->
+    <string name="sync_label_a_sync_or_backup">a sync or backup</string>
+    <!-- Label when the conflicting feature is on this device or the device name is unknown -->
+    <string name="sync_label_this_device">this device</string>
+    <!-- Label for a sync or backup in sync conflict messages -->
+    <string name="sync_label_camera_uploads">Camera Uploads</string>
+    <!-- Label for a sync or backup in sync conflict messages -->
+    <string name="sync_label_media_uploads">Media Uploads</string>
+    <!-- Home widget section header for continue where you left off -->
+    <string name="home_widget_continue_where_left_off">Continue where you left off</string>
 </resources>

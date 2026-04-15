@@ -2320,4 +2320,32 @@
     <string name="cloud_explorer_choose_folder_title">Ordner auswählen</string>
     <string name="general_transfer_error_not_enough_free_space">Nicht genügend Speicherplatz verfügbar</string>
     <string name="general_transfer_error_temporary_unavaible">Quelldatei momentan nicht verfügbar, bitte versuchen Sie es später noch einmal</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Zu Pro wechseln</string>
+    <string name="cloud_explorer_select_destination_title">Ziel wählen</string>
+    <string name="cloud_explorer_use_this_folder_button">Diesen Ordner verwenden</string>
+    <string name="video_player_more_options_playlist_option">Playlist</string>
+    <string name="video_player_more_options_lock_option">Videoplayer sperren</string>
+    <string name="video_section_add_to_playlist_success">1 Element zu „%1$s“ hinzugefügt</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">1 Element zu %1$d Playlist hinzugefügt</item>
+        <item quantity="other">1 Element zu %1$d Playlists hinzugefügt</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Weiter nach der Werbung</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Werbung ansehen</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Oder auf ein Pro-Paket upgraden, um sofortigen werbefreien Zugriff zu erhalten</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Unbegrenzt downloaden, Werbung überspringen</string>
+    <string name="rewarded_ad_dialog_perk_storage">Bis zu 20&#160;TB verschlüsselter Speicher</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Priorisierte Übertragungsgeschwindigkeit</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA&#160;Pass und MEGA&#160;VPN inklusive</string>
+    <string name="rewarded_ad_unavailable_toast">Werbung ist nicht verfügbar! Fortfahren&#8230;</string>
+    <string name="general_read_only_folder_warning">Dieser Ordner ist schreibgeschützt</string>
+    <string name="sync_error_folder_conflict">„%1$s“ %2$s ist bereits in %3$s auf %4$s enthalten. Treffen Sie eine andere Auswahl.</string>
+    <string name="sync_label_this_device">diesem Gerät</string>
+    <string name="sync_label_device_folder">Geräteordner</string>
+    <string name="sync_label_cloud_folder">Cloud-Ordner</string>
+    <string name="sync_label_a_sync_or_backup">einer Synchronisierung oder einem Backup</string>
+    <string name="sync_label_camera_uploads">Kamera-Uploads</string>
+    <string name="sync_label_media_uploads">Medien-Uploads</string>
+    <string name="home_widget_continue_where_left_off">Kürzliche Aktivitäten fortsetzen</string>
 </resources>

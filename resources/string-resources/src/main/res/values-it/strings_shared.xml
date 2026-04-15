@@ -2401,4 +2401,30 @@
     <string name="cloud_explorer_select_destination_title">Seleziona destinazione</string>
     <string name="cloud_explorer_use_this_folder_button">Utilizza questa cartella</string>
     <string name="video_player_more_options_playlist_option">Playlist</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Aggiorna a Pro</string>
+    <string name="video_player_more_options_lock_option">Blocca il lettore video</string>
+    <string name="video_section_add_to_playlist_success">Aggiunto 1 elemento a “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">Aggiunto 1 elemento alla playlist %1$d</item>
+        <item quantity="many"></item>
+        <item quantity="other">Aggiunto 1 elemento alle playlist %1$d</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Continua dopo la pubblicità</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Guarda la pubblicità</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Oppure passa a un piano Pro per un accesso immediato senza annunci</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Download illimitati, Salta la pubblicità</string>
+    <string name="rewarded_ad_dialog_perk_storage">Fino a 20 TB di spazio di archiviazione crittografato</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Velocità di trasferimento prioritario</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass e MEGA VPN inclusi</string>
+    <string name="rewarded_ad_unavailable_toast">La pubblicità non è disponibile! Proseguo&#8230;</string>
+    <string name="general_read_only_folder_warning">Questa cartella è di sola lettura</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s è già parte di %3$s su %4$s. Scegli un altro.</string>
+    <string name="sync_label_cloud_folder">Cartella cloud</string>
+    <string name="sync_label_device_folder">Cartella del dispositivo</string>
+    <string name="sync_label_a_sync_or_backup">una sincronizzazione o backup</string>
+    <string name="sync_label_this_device">questo dispositivo</string>
+    <string name="sync_label_camera_uploads">Caricamenti dalla fotocamera</string>
+    <string name="sync_label_media_uploads">Caricamenti multimediali</string>
+    <string name="home_recents_bucket_subtitle_added_to">Aggiunto a %s</string>
 </resources>

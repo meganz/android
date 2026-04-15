@@ -2125,9 +2125,9 @@
         <item quantity="other">%d carpetas</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d carpeta, “</item>
-        <item quantity="many">%1$d de carpetas, “</item>
-        <item quantity="other">%1$d carpetas, “</item>
+        <item quantity="one">“%1$d carpeta, “</item>
+        <item quantity="many">“%1$d de carpetas, “</item>
+        <item quantity="other">“%1$d carpetas, “</item>
     </plurals>
     <string name="home_recents_snackbar_activity_hidden">Tu actividad reciente ha sido ocultada</string>
     <string name="home_recents_button_view_all">Ver todo</string>
@@ -2386,4 +2386,29 @@
     <string name="general_transfer_error_temporary_unavaible">Recurso no disponible temporalmente, por favor inténtalo de nuevo más tarde</string>
     <string name="video_player_more_options_playlist_option">Lista de reproducción</string>
     <string name="video_player_more_options_lock_option">Bloquear reproductor de vídeo</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Ampliar cuenta a Pro</string>
+    <string name="sync_label_this_device">este dispositivo</string>
+    <string name="sync_label_device_folder">La carpeta del dispositivo</string>
+    <string name="sync_label_cloud_folder">La carpeta en la nube</string>
+    <string name="sync_label_a_sync_or_backup">una sincronización o un backup</string>
+    <string name="video_section_add_to_playlist_success">Se ha añadido 1 elemento a “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">Se ha añadido 1 elemento a %1$d lista de reproducción</item>
+        <item quantity="many">Se ha añadido 1 elemento a %1$d de listas de reproducción</item>
+        <item quantity="other">Se ha añadido 1 elemento a %1$d listas de reproducción</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Continúa después del anuncio</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Ver anuncio</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">O amplía a un plan Pro para obtener acceso inmediato y sin anuncios</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Descargas sin anuncios</string>
+    <string name="rewarded_ad_dialog_perk_storage">Hasta 20 TB de almacenamiento cifrado</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Transferencia rápidas</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass y MEGA VPN incluidos</string>
+    <string name="rewarded_ad_unavailable_toast">El anuncio no está disponible. Continuando&#8230;</string>
+    <string name="general_read_only_folder_warning">Esta carpeta es de solo lectura</string>
+    <string name="sync_error_folder_conflict">La %2$s \“%1$s\“ ya forma parte de %3$s en %4$s. Elige otra carpeta.</string>
+    <string name="sync_label_camera_uploads">las subidas de la cámara</string>
+    <string name="sync_label_media_uploads">las subidas multimedia</string>
+    <string name="home_widget_continue_where_left_off">Continúa desde donde lo dejaste</string>
 </resources>

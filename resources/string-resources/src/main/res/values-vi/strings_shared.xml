@@ -1968,4 +1968,281 @@
     <string name="cloud_explorer_choose_folder_title">Chọn thư mục</string>
     <string name="general_transfer_error_not_enough_free_space">Không đủ chỗ trống trong điện thoại</string>
     <string name="general_transfer_error_temporary_unavaible">Nguồn dữ liệu hiện không khả dụng, xin thử lại sau</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Nâng cấp lên Pro</string>
+    <string name="shares_screen_links_section_empty">[B]Không [/B][A]liên kết công khai[/A]</string>
+    <string name="password_dialog_hint">Nhập mật khẩu liên kết</string>
+    <string name="video_player_more_options_playlist_option">Danh sách phát</string>
+    <string name="video_player_more_options_lock_option">Khóa trình phát video</string>
+    <string name="search_placeholder_cloud_drive">Tìm trong ổ đĩa đám mây</string>
+    <string name="search_placeholder_videos">Tìm kiếm trong Video</string>
+    <string name="home_recents_empty_text_description">Tất cả hoạt động về tệp và thư mục gần đây của bạn sẽ hiển thị ở đây.</string>
+    <string name="storage_usage_format">%1$s của %2$s đã được sử dụng</string>
+    <string name="general_hi">Xin chào</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">Xóa các album?</string>
+    <string name="video_section_add_to_playlist_success">Đã thêm 1 mục vào “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="other">Đã thêm 1 mục vào %1$d danh sách phát</item>
+    </plurals>
+    <string name="preview_not_available_undecrypted_files">Xem trước không khả dụng cho các tệp chưa được giải mã.</string>
+    <string name="external_checkout_button_text">Mua trên trang web của chúng tôi (Tiết kiệm lên tới %1$.0f%%)</string>
+    <string name="context_empty_folder_title">Thư mục này trống</string>
+    <string name="general_invalid_link">Liên kết không hợp lệ. Vui lòng thử lại hoặc yêu cầu một liên kết mới</string>
+    <string name="rewarded_ad_dialog_title">Tiếp tục sau quảng cáo</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Xem quảng cáo</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Hoặc nâng cấp lên gói Pro để truy cập ngay lập tức và không có quảng cáo.</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Tải xuống không giới hạn, bỏ qua quảng cáo</string>
+    <string name="rewarded_ad_dialog_perk_storage">Dung lượng lưu trữ được mã hóa lên tới 20 TB</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Tốc độ truyền tải ưu tiên</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass và MEGA VPN được bao gồm</string>
+    <string name="rewarded_ad_unavailable_toast">Quảng cáo hiện không khả dụng! Tiếp tục&#8230;</string>
+    <string name="general_read_only_folder_warning">Thư mục này chỉ đọc được</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s đã là một phần của %3$s trên %4$s. Chọn cái khác.</string>
+    <string name="sync_label_cloud_folder">Thư mục đám mây</string>
+    <string name="sync_label_device_folder">Thư mục thiết bị</string>
+    <string name="sync_label_a_sync_or_backup">một đồng bộ hoặc sao lưu</string>
+    <string name="sync_label_this_device">thiết bị này</string>
+    <string name="sync_label_camera_uploads">Tải lên từ máy ảnh</string>
+    <string name="sync_label_media_uploads">Tải lên phương tiện truyền thông</string>
+    <string name="general_error_file_not_found">Không thể tìm thấy tệp này</string>
+    <string name="pdf_viewer_error_corrupt_or_missing">Lỗi. Tệp PDF bị hỏng hoặc không tồn tại.</string>
+    <string name="pdf_viewer_error_streaming">Đã xảy ra lỗi khi cố mở tệp</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="recovering_info">Đang tải&#8230;</string>
+    <string name="offline_remove_singular_item_success_message">1 mục đã được xóa</string>
+    <string name="homepage_empty_hint_audio">[B]Không[/B] [A]âm thanh[/A] [B]được tìm thấy[/B]</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="search_landing_title">Bạn đang tìm kiếm gì?</string>
+    <string name="search_landing_subtitle">Tìm kiếm tệp và thư mục</string>
+    <string name="external_checkout_information_title">Rời khỏi MEGA</string>
+    <string name="album_content_remove_link_dialog_description">Những người bạn đã chia sẻ liên kết này sẽ mất quyền truy cập vào album</string>
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="other">Còn lại %1$d ngày</item>
+    </plurals>
+    <string name="hidden_nodes_description_control_visibility_tag">Chỉ bạn mới có thể hiển thị các tệp ẩn, bằng cách hiển thị tạm thời các mục ẩn từ [A]cài đặt[/A].</string>
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">Để đảm bảo chúng tôi không bỏ lỡ mọi ký ức của bạn, MEGA cần quyền truy cập đầy đủ vào thư viện ảnh của bạn. [A]Chạm để thay đổi quyền.[/A]</string>
+    <string name="album_content_remove_multiple_links_dialog_description">Những người bạn đã chia sẻ các liên kết này sẽ mất quyền truy cập vào các album</string>
+    <string name="delete_album_singular_confirmation_dialog_title">Xóa album?</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="general_alert_not_logged_in">Bạn phải đăng nhập để thực hiện thao tác này</string>
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA có quyền truy cập hạn chế vào thư viện ảnh của bạn và không thể sao lưu mọi ảnh của bạn</string>
+    <string name="timeline_tab_enable_camera_uploads_banner_description">Tải lên bằng camera yêu cầu [A]toàn quyền truy cập[/A] vào thư viện ảnh của bạn</string>
+    <string name="timeline_tab_grid_size_compact">Gọn</string>
+    <string name="timeline_tab_grid_size_large">Lớn</string>
+    <string name="delete_album_singular_confirmation_dialog_description">Nội dung của album sẽ không bị xóa.</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">Nội dung của các album sẽ không bị xóa.</string>
+    <string name="timeline_tab_filter_apply_filter_button">Áp dụng bộ lọc</string>
+    <string name="general_invite_contact">Mời liên hệ</string>
+    <string name="contact_found_dialog_title">Đã tìm thấy liên hệ</string>
+    <string name="album_content_action_remove_favourites">Xóa khỏi Yêu thích</string>
+    <string name="context_empty_cloud_drive_title">Hiện chưa có gì trong kho riêng tư của bạn</string>
+    <string name="context_empty_cloud_drive_description">Giữ an toàn với mã hóa zero-knowledge</string>
+    <string name="open_link_account_confirmation_error">Bạn đang đăng nhập bằng một tài khoản MEGA khác. Đăng xuất trước, sau đó mở lại liên kết xác nhận tài khoản</string>
+    <string name="can_only_join_one_call_error_message">Để tham gia cuộc gọi này, bạn phải kết thúc cuộc gọi hiện tại</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="external_checkout_information_description">Bạn sắp mở một trang web bên ngoài (%1$s). MEGA chịu trách nhiệm cho giao dịch và hỗ trợ khách hàng.</string>
+    <string name="external_checkout_show_next_time">Hiển thị điều này lần sau.</string>
+    <string name="album_photos_selection_limit_dialog_description">Bạn chỉ có thể thêm tối đa %d mục cùng lúc vào một album.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">Không tìm thấy phương tiện.</string>
+    <string name="albums_multiple_delete_success_message">Các album %d đã bị xóa.</string>
+    <string name="home_screen_no_network_view_offline_files_button">Xem tệp ngoại tuyến.</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">Cập nhật quyền truy cập.</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">Để đảm bảo chúng tôi không bỏ lỡ mọi ký ức của bạn, MEGA cần quyền truy cập đầy đủ vào thư viện ảnh của bạn.</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Dung lượng pin quá thấp. Hãy sạc thiết bị để bắt đầu tải lên từ camera.</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Tải lên từ camera đã được cập nhật.</string>
+    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_size_byte">%1$s&#160;B</string>
+    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="search_placeholder_folder">Tìm trong %s</string>
+    <string name="search_placeholder_rubbish_bin">Tìm trong thùng rác</string>
+    <string name="search_placeholder_incoming_shares">Tìm trong các chia sẻ đến</string>
+    <string name="search_placeholder_outgoing_shares">Tìm trong các chia sẻ đã gửi</string>
+    <string name="search_placeholder_links">Tìm kiếm trong Liên kết</string>
+    <string name="search_placeholder_favourites">Tìm kiếm trong Yêu thích</string>
+    <string name="search_placeholder_documents">Tìm kiếm trong Tài liệu</string>
+    <string name="search_placeholder_audios">Tìm kiếm trong Âm thanh</string>
+    <string name="search_placeholder_backups">Tìm kiếm trong Sao lưu</string>
+    <string name="general_clear_all">Xóa tất cả</string>
+    <string name="offline_remove_multiple_item_success_message">%d mục đã được xóa</string>
+    <string name="section_banners">Biểu ngữ</string>
+    <string name="home_recents_snackbar_activity_hidden">Hoạt động gần đây của bạn đã bị ẩn</string>
+    <string name="home_recents_button_view_all">Xem tất cả</string>
+    <string name="home_recents_options_menu_show_activity">Hiển thị hoạt động gần đây</string>
+    <string name="home_recents_hidden_text_description">Hoạt động gần đây đã bị ẩn.</string>
+    <string name="home_recents_bucket_subtitle_added_to">Đã thêm vào %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Các tệp này hiện không còn có sẵn.</string>
+    <string name="general_invalid_dot_name_warning">Tên “.” không hợp lệ</string>
+    <string name="general_invalid_double_dot_name_warning">Tên “..” không hợp lệ</string>
+    <string name="transfers_upload_started_snackbar">Đã bắt đầu tải lên. Xem thông báo để biết chi tiết.</string>
+    <string name="offline_screen_empty_state_description">Không có tệp nào được lưu cho chế độ Ngoại tuyến.</string>
+    <string name="general_install_label">Cài đặt</string>
+    <string name="general_app_update_download_success_message">Bản cập nhật ứng dụng đã tải xuống.</string>
+    <string name="error_folder_part_of_camera_uploads">Thư mục này đã là một phần của Camera Uploads. Hãy chọn thư mục khác.</string>
+    <string name="error_folder_part_of_media_uploads">Thư mục này đã là một phần của Media Uploads. Hãy chọn thư mục khác.</string>
+    <string name="error_folder_part_of_sync_or_backup">Thư mục này đã là một phần của đồng bộ hoặc sao lưu. Hãy chọn thư mục khác.</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nTrong tháng đầu tiên</string>
+    <string name="choose_account_screen_only_price_per_month">Chỉ %1$s/tháng</string>
+    <string name="cu_warning_banner_notification_disabled_warning">Bật thông báo để biết liệu tải lên có gặp sự cố hoặc ngừng đồng bộ hay không.</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">Kết nối bảo mật thất bại</string>
+    <string name="timeline_tab_grid_size_menu_title">Kích thước lưới</string>
+    <string name="album_content_remove_link_dialog_title">Xóa liên kết?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Xóa các liên kết?</string>
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Nhận %1$s dung lượng lưu trữ miễn phí khi bắt đầu thử MEGA&#160;Pass miễn phí, có hiệu lực vĩnh viễn</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">Tự động sao lưu ảnh và video của bạn lên ổ đĩa đám mây</string>
+    <string name="home_screen_no_network_desc">Bạn đang ngoại tuyến.\nNếu bạn cho phép làm việc ngoại tuyến với các tệp, bạn vẫn có thể truy cập chúng mà không có kết nối.</string>
+    <string name="home_screen_no_network_desc_with_offline_files">Bạn đang ngoại tuyến.\nCác mục bạn đã lưu để dùng khi ngoại tuyến vẫn có sẵn.</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">Các liên kết này sẽ không còn công khai nữa.</item>
+    </plurals>
+    <string name="payment_ads_free_intro_title">Muốn dùng MEGA mà không có quảng cáo?</string>
+    <string name="payment_ads_free_intro_description">Nâng cấp lên gói Pro với dung lượng lưu trữ lớn và nhiều tính năng khác. Các gói Pro của chúng tôi bắt đầu từ chỉ %1$s mỗi tháng.</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">Hủy chia sẻ các thư mục %1$d này?</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="other">Đang thử lại quá trình truyền, xem tab Hoạt động để theo dõi tiến độ</item>
+    </plurals>
+    <plurals name="label_first_time_in_months_full">
+        <item quantity="other">[B]%1$s[/B]\nTrong %2$d tháng đầu tiên</item>
+    </plurals>
+    <string name="camera_update_low_battery_banner_description">Việc tải lên đã bị tạm dừng do pin yếu. Hãy sạc thiết bị để tiếp tục.</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">Tải lên từ camera bị tạm dừng, kết nối với Wi-Fi hoặc cho phép dữ liệu di động</string>
+    <plurals name="label_first_time_in_years_full">
+        <item quantity="other">[B]%1$s[/B]\nTrong %2$d năm đầu tiên</item>
+    </plurals>
+    <string name="cloud_explorer_select_destination_title">Chọn đích</string>
+    <string name="cloud_explorer_use_this_folder_button">Sử dụng thư mục này</string>
+    <string name="folder_link_subtitle">Liên kết thư mục</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Mật khẩu không đúng</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Nhập mật khẩu để mở tệp này</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Dòng %1$d</string>
+    <string name="select_videos_search_empty_view_description">Tìm video trong Cloud Drive của bạn</string>
+    <string name="new_text_file_invalid_extension_error_message">Sử dụng phần mở rộng tệp hợp lệ (ví dụ .txt)</string>
+    <string name="file_info_subtitle_format">%1$s · %2$s</string>
+    <string name="label_file_size_petabytes">%s&#160;PB</string>
+    <string name="label_file_size_exabytes">%s&#160;EB</string>
+    <plurals name="num_of_folders_num_of_files">
+        <item quantity="other">%d thư mục,</item>
+    </plurals>
+    <plurals name="general_num_shared_with_count">
+        <item quantity="other">Chia sẻ với %d người</item>
+    </plurals>
+    <string name="saf_no_internet_message">Kết nối với Internet để duyệt các tệp MEGA của bạn. Các tệp đã lưu ngoại tuyến có sẵn trong ứng dụng MEGA.</string>
+    <string name="link_decryption_key_dialog_message">Nhập khóa để mở liên kết này.\nBạn chưa có khóa? Liên hệ với chủ liên kết.</string>
+    <string name="starter_account">Gói Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Mua Gói Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">Cảm ơn bạn đã đăng ký gói Starter trả phí hàng tháng</string>
+    <string name="upgrade_account_successful_starter_yearly">Cảm ơn bạn đã đăng ký gói Starter trả phí hàng năm</string>
+    <string name="basic_account">Gói Cơ bản</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Mua Gói Cơ bản</string>
+    <string name="upgrade_account_successful_basic_monthly">Cảm ơn bạn đã đăng ký gói Cơ bản trả phí hàng tháng</string>
+    <string name="upgrade_account_successful_basic_yearly">Cảm ơn bạn đã đăng ký gói Cơ bản trả phí hàng năm</string>
+    <string name="essential_account">Gói Thiết yếu</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Mua Gói Thiết yếu</string>
+    <string name="upgrade_account_successful_essential_monthly">Cảm ơn bạn đã đăng ký gói Thiết yếu trả phí hàng tháng</string>
+    <string name="upgrade_account_successful_essential_yearly">Cảm ơn bạn đã đăng ký gói Thiết yếu trả phí hàng năm</string>
+    <string name="search_pdf_placeholder">Tìm tài liệu</string>
+    <string name="pdf_viewer_search_placeholder">Tìm tài liệu</string>
+    <string name="link_password_dialog_message">Nhập mật khẩu để mở liên kết này.\nBạn chưa có mật khẩu? Liên hệ với chủ liên kết.</string>
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="other">%d các mục không thể di chuyển</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="other">%d các mục không thể di chuyển</item>
+    </plurals>
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="other">%d các mục đã di chuyển thành công</item>
+    </plurals>
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="other">%d các mục đã di chuyển thành công</item>
+    </plurals>
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="other">%d các mục đã được di chuyển vào thùng rác</item>
+    </plurals>
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="other">%d các mục không thể di chuyển vào thùng rác</item>
+    </plurals>
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="other">%d các mục đã được di chuyển vào thùng rác, 1 mục không thể di chuyển</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="other">%d các mục đã bị xóa khỏi thùng rác</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="other">%d các mục không thể xóa khỏi thùng rác</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="other">%d các mục đã bị xóa khỏi thùng rác</item>
+    </plurals>
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="other">%d các mục không thể xóa khỏi thùng rác</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="other">%d mục sao chép thất bại</item>
+    </plurals>
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="other">%d mục sao chép thành công</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="other">%d mục sao chép thành công</item>
+    </plurals>
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="other">%d mục sao chép thất bại</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="other">%d thư mục chia sẻ thất bại</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="other">%d thư mục được chia sẻ thành công</item>
+    </plurals>
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="other">%d thư mục chia sẻ thất bại</item>
+    </plurals>
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="other">%d mục phục hồi từ thùng rác thất bại</item>
+    </plurals>
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="other">%d mục đã phục hồi từ thùng rác</item>
+    </plurals>
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="other">1 mục đã được di chuyển vào thùng rác, %d mục không thể di move</item>
+    </plurals>
+    <string name="general_dialog_discard_changes_message">Mọi chỉnh sửa chưa lưu sẽ bị mất</string>
+    <string name="general_changes_saved">Các thay đổi đã được lưu</string>
+    <string name="home_recents_clear_dialog_message">Bạn có chắc chắn muốn xóa toàn bộ hoạt động gần đây không? Việc này sẽ không thể hoàn tác.</string>
+    <string name="node_option_save_to_mega">Lưu vào MEGA</string>
+    <string name="device_center_bottom_sheet_item_remove_connection">Xóa kết nối</string>
+    <string name="device_center_snackbar_message_connection_removed">Kết nối đã bị xóa</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA không thể kết nối một cách an toàn.\n\nNếu bạn đang dùng Wi-Fi công cộng, hãy thử đăng nhập qua trình duyệt của bạn trước.\n\nNhà cung cấp dịch vụ Internet hoặc phần mềm bảo mật của bạn cũng có thể can thiệp vào kết nối.\n\n[A]Tìm hiểu thêm[/A]</string>
+    <string name="sync_folder_connection_dialog_title">Thư mục đã được kết nối với một thiết bị khác</string>
+    <string name="sync_folder_connection_dialog_message">Thư mục này được liên kết với thiết bị %1$s của bạn, có thể là do MEGA bị gỡ cài đặt mà không đăng xuất. Một thư mục chỉ có thể đồng bộ với một thiết bị tại một thời điểm. Xóa kết nối hiện có để đồng bộ nó ở đây.</string>
+    <string name="sync_folder_connection_this_device">Đã kết nối với %1$s</string>
+    <string name="choose_account_screen_subscriptions_not_available_via_google_play">Các gói đăng ký hiện không có sẵn thông qua Google Play ở khu vực của bạn.</string>
+    <string name="home_recents_snackbar_activity_cleared">Hoạt động gần đây của bạn đã bị xóa</string>
+    <string name="home_recents_options_menu_clear">Xóa hoạt động gần đây</string>
+    <string name="choose_account_screen_plan_available_yearly_billing">%1$s có sẵn với thanh toán hàng năm</string>
+    <string name="choose_account_screen_plan_available_monthly_billing">%1$s có sẵn với thanh toán hàng tháng</string>
+    <string name="album_import_error_access_dialog_description">Liên kết tới album đã bị gỡ bỏ, hoặc album đã bị xóa. Liên hệ với người đã chia sẻ liên kết cho bạn.</string>
+    <string name="album_import_rename_album_dialog_description">Một album có tên %1$s đã tồn tại trong danh sách album của bạn. Nhập tên mới cho album bạn đang lưu.</string>
+    <string name="album_import_snackbar_success_message">%1$s đã được lưu vào ổ đám mây</string>
+    <string name="album_import_snackbar_error_message">%1$s không thể được lưu vào ổ đám mây. Hãy thử lại sau. Nếu sự cố tiếp tục, liên hệ với người đã chia sẻ liên kết cho bạn.</string>
+    <string name="saf_passcode_lock_enabled_message">Để duyệt các tập tin MEGA của bạn, vô hiệu hóa mã mở khóa trong ứng dụng MEGA. Vào Cài đặt, sau đó chạm Bảo mật.</string>
 </resources>

@@ -2410,4 +2410,33 @@
     <string name="cloud_explorer_choose_folder_title">Choisir un dossier</string>
     <string name="general_transfer_error_not_enough_free_space">L’espace est insuffisant sur votre appareil</string>
     <string name="general_transfer_error_temporary_unavaible">La ressource n’est temporairement pas accessible, veuillez réessayer ultérieurement</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Souscrire un abonnement Pro</string>
+    <string name="video_player_more_options_playlist_option">Playlist</string>
+    <string name="video_player_more_options_lock_option">Verrouiller le lecteur vidéo</string>
+    <string name="video_section_add_to_playlist_success">1 élément ajouté à «&#160;%1$s&#160;»</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="one">1 élément ajouté à %1$d playlist</item>
+        <item quantity="many">1 élément ajouté à %1$d playlists</item>
+        <item quantity="other">1 élément ajouté à %1$d playlists</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">Continuez après la publicité</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Regarder la publicité</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">Ou passez à un abonnement Pro pour un accès instantané sans publicités</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">Téléchargements illimités, sans publicités</string>
+    <string name="rewarded_ad_dialog_perk_storage">Jusqu’à 20 To de stockage chiffré</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">Vitesses de transfert prioritaires</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass et MEGA VPN inclus</string>
+    <string name="rewarded_ad_unavailable_toast">La publicité est indisponible ! Poursuite en cours&#8230;</string>
+    <string name="general_read_only_folder_warning">Ce dossier est en lecture seule</string>
+    <string name="sync_error_folder_conflict">Le %2$s «&#160;%1$s&#160;» fait déjà partie %3$s sur %4$s. Choisissez-en un autre.</string>
+    <string name="sync_label_cloud_folder">dossier cloud</string>
+    <string name="sync_label_device_folder">dossier de l\’appareil</string>
+    <string name="sync_label_a_sync_or_backup">d\’une synchronisation ou d\’une sauvegarde</string>
+    <string name="sync_label_this_device">cet appareil</string>
+    <string name="sync_label_camera_uploads">Téléversements de l\’appareil photo</string>
+    <string name="sync_label_media_uploads">Téléversements de médias</string>
+    <string name="cloud_explorer_select_destination_title">Choisir la destination</string>
+    <string name="cloud_explorer_use_this_folder_button">Utiliser ce dossier</string>
+    <string name="home_widget_continue_where_left_off">Reprenez où vous étiez</string>
 </resources>

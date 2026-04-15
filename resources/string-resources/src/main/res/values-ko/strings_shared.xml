@@ -2240,4 +2240,28 @@
     <string name="homepage_empty_hint_audio">[B]발견된[/B] [A]오디오[/A] [B]없음[/B]</string>
     <string name="cloud_explorer_select_destination_title">목적지 선택</string>
     <string name="cloud_explorer_use_this_folder_button">이 폴더 이용</string>
+    <string name="video_player_more_options_playlist_option">재생목록</string>
+    <string name="video_player_more_options_lock_option">동영상 재생기 잠금</string>
+    <string name="video_section_add_to_playlist_success">“%1$s”에 항목 1개 추가됨</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="other">%1$d 재생목록에 항목 1개 추가됨</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_upgrade_button">Pro로 업그레이드</string>
+    <string name="rewarded_ad_dialog_title">광고 이후 계속 됩니다</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">광고 보기</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">또는 즉시, 광고 없는 접근을 하려면 Pro 요금제로 업그레이드 하세요</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">무제한 다운로드, 광고 건너뛰기</string>
+    <string name="rewarded_ad_dialog_perk_storage">암호화 저장소 최대 20TB</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">전송 속도 우선순위</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass와 MEGA VPN 포함</string>
+    <string name="rewarded_ad_unavailable_toast">사용 가능한 광고가 없습니다! 계속 합니다&#8230;</string>
+    <string name="general_read_only_folder_warning">이 폴더는 읽기 전용입니다</string>
+    <string name="sync_error_folder_conflict">““%1$s” %2$s은 이미 %4$s에서 %3$s의 일부입니다. 다른 것을 선택하세요.”</string>
+    <string name="sync_label_cloud_folder">클라우드 폴더</string>
+    <string name="sync_label_device_folder">기기 폴더</string>
+    <string name="sync_label_a_sync_or_backup">동기화 또는 백업</string>
+    <string name="sync_label_this_device">이 기기</string>
+    <string name="sync_label_camera_uploads">카메라 업로드</string>
+    <string name="sync_label_media_uploads">미디어 업로드</string>
 </resources>

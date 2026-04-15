@@ -2252,4 +2252,26 @@
     <string name="cloud_explorer_use_this_folder_button">使用此文件夹</string>
     <string name="video_player_more_options_playlist_option">播放列表</string>
     <string name="video_player_more_options_lock_option">锁定视频播放器</string>
+    <string name="rewarded_ad_dialog_upgrade_button">升级到Pro会员</string>
+    <string name="video_section_add_to_playlist_success">已添加1个项目到“%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="other">已添加1个项目到 %1$d播放列表</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">观看广告后继续</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">观看广告</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">或升级至Pro方案后即可立即享受无广告体验</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_perk_storage">最高至20TB的加密储存空间</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">包含MEGA Pass及MEGA VPN</string>
+    <string name="general_read_only_folder_warning">此文件夹仅限读取</string>
+    <string name="sync_label_cloud_folder">云端文件夹</string>
+    <string name="sync_label_device_folder">设备文件夹</string>
+    <string name="sync_label_a_sync_or_backup">同步或备份</string>
+    <string name="sync_label_this_device">此设备</string>
+    <string name="sync_label_camera_uploads">相机上传</string>
+    <string name="sync_label_media_uploads">媒体上传</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">无限下载，跳过广告</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">优先传输速度</string>
+    <string name="rewarded_ad_unavailable_toast">无法提供广告！继续&#8230;</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s 已包含在 %4$s的%3$s 内。请选择其他选项。</string>
 </resources>

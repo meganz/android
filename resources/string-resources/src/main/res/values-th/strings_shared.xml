@@ -2240,4 +2240,30 @@
     <string name="cloud_explorer_choose_folder_title">เลือกโฟลเดอร์</string>
     <string name="general_transfer_error_not_enough_free_space">พื้นที่ว่างไม่เพียงพอบนอุปกรณ์ของคุณ</string>
     <string name="general_transfer_error_temporary_unavaible">ระบบทรัพยากรไม่สามารถใช้ได้ชั่วคราว กรุณาลองอีกครั้งในภายหลัง</string>
+    <string name="rewarded_ad_dialog_upgrade_button">อัปเกรดเป็น Pro</string>
+    <string name="video_player_more_options_playlist_option">เพลย์ลิสต์</string>
+    <string name="video_player_more_options_lock_option">ล็อคเครื่องเล่นวิดีโอ</string>
+    <string name="video_section_add_to_playlist_success">เพิ่ม 1 รายการไปยัง “%1$s”</string>
+    <plurals name="video_section_add_to_playlists_success">
+        <item quantity="other">เพิ่ม 1 รายการไปยัง %1$d เพลย์ลิสต์</item>
+    </plurals>
+    <string name="rewarded_ad_dialog_title">ดำเนินการต่อหลังจากโฆษณา</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">ดูโฆษณา</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">หรืออัปเกรดเป็นแผน Pro เพื่อการเข้าถึงแบบทันทีโดยไม่มีโฆษณา</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA โปร</string>
+    <string name="rewarded_ad_dialog_perk_unlimited_downloads">ดาวน์โหลดไม่จำกัด และข้ามโฆษณา</string>
+    <string name="rewarded_ad_dialog_perk_storage">พื้นที่จัดเก็บที่เข้ารหัสได้สูงสุด 20 TB</string>
+    <string name="rewarded_ad_dialog_perk_transfer_speed">ความเร็วในการถ่ายโอนลำดับความสำคัญ</string>
+    <string name="rewarded_ad_dialog_perk_pass_vpn">รวม MEGA Pass และ MEGA VPN</string>
+    <string name="rewarded_ad_unavailable_toast">โฆษณาไม่พร้อมใช้งาน! กำลังดำเนินการต่อ&#8230;</string>
+    <string name="general_read_only_folder_warning">โฟลเดอร์นี้อ่านอย่างเดียว</string>
+    <string name="sync_error_folder_conflict">“%1$s” %2$s เป็นส่วนหนึ่งของ %3$s อยู่แล้วบน %4$s กรุณาเลือกอย่างอื่น</string>
+    <string name="sync_label_cloud_folder">โฟลเดอร์คลาวด์</string>
+    <string name="sync_label_device_folder">โฟลเดอร์อุปกรณ์</string>
+    <string name="sync_label_a_sync_or_backup">การซิงค์หรือการสำรองข้อมูล</string>
+    <string name="sync_label_this_device">อุปกรณ์นี้</string>
+    <string name="sync_label_camera_uploads">การอัปโหลดจากกล้อง</string>
+    <string name="sync_label_media_uploads">การอัปโหลดสื่อ</string>
+    <string name="cloud_explorer_select_destination_title">เลือกปลายทาง</string>
+    <string name="cloud_explorer_use_this_folder_button">ใช้โฟลเดอร์นี้</string>
 </resources>
