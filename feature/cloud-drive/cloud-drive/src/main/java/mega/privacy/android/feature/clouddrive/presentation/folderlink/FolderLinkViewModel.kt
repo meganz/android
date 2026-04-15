@@ -176,7 +176,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                 order = _uiState.value.selectedSortOrder,
             )
             val hasMediaItems = containsMediaItemUseCase(children)
-            val items = nodeUiItemMapper(children)
+            val items = nodeUiItemMapper(nodeList = children, isPublicNodes = true)
             _uiState.update {
                 it.copy(
                     contentState = FolderLinkContentState.Loaded,
@@ -278,7 +278,10 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             runCatching {
                 val result =
                     fetchFolderNodesUseCase(folderSubHandle, _uiState.value.selectedSortOrder)
-                val nodeUiItems = nodeUiItemMapper(result.childrenNodes)
+                val nodeUiItems = nodeUiItemMapper(
+                    nodeList = result.childrenNodes,
+                    isPublicNodes = true
+                )
                 val hasMediaItems = containsMediaItemUseCase(result.childrenNodes)
                 _uiState.update {
                     it.copy(
