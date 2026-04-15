@@ -7,23 +7,23 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 import androidx.compose.material.navigation.BottomSheetNavigator
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
+import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerViewModel
 
 @Serializable
-internal object VideoPlayerNavigationGraph
+internal object LegacyVideoPlayerNavigationGraph
 
-internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
+internal fun NavGraphBuilder.legacyVideoPlayerComposeNavigationGraph(
     navHostController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
-    viewModel: VideoPlayerViewModel,
+    viewModel: LegacyVideoPlayerViewModel,
     player: ExoPlayer?,
     handleAutoReplayIfPaused: () -> Unit,
 ) {
-    navigation<VideoPlayerNavigationGraph>(
-        startDestination = VideoPlayerScreen,
+    navigation<LegacyVideoPlayerNavigationGraph>(
+        startDestination = LegacyVideoPlayerScreen,
     ) {
-        videoPlayerScreen(
+        legacyVideoPlayerScreen(
             navHostController = navHostController,
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
@@ -31,17 +31,17 @@ internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
             player = player,
             handleAutoReplayIfPaused = handleAutoReplayIfPaused,
         ) {
-            navHostController.navigate(VideoQueueScreen)
+            navHostController.navigate(LegacyVideoQueueScreen)
         }
 
-        videoQueueScreen(
+        legacyVideoQueueScreen(
             navHostController = navHostController,
-            videoPlayerViewModel = viewModel
+            legacyVideoPlayerViewModel = viewModel
         )
 
-        selectSubtitleScreen(
+        legacySelectSubtitleScreen(
             navHostController = navHostController,
-            videoPlayerViewModel = viewModel
+            legacyVideoPlayerViewModel = viewModel
         )
     }
 }

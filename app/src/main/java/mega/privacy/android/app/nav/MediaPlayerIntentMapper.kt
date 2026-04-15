@@ -3,8 +3,8 @@ package mega.privacy.android.app.nav
 import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -121,8 +121,8 @@ class MediaPlayerIntentMapper @Inject constructor(
 
     private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo, useRevamp: Boolean) = when {
         fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-            if (useRevamp) Intent(context, VideoPlayerRevampActivity::class.java)
-            else Intent(context, VideoPlayerComposeActivity::class.java)
+            if (useRevamp) Intent(context, VideoPlayerActivity::class.java)
+            else Intent(context, LegacyVideoPlayerActivity::class.java)
 
         fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
             Intent(context, AudioPlayerActivity::class.java)

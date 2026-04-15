@@ -231,8 +231,8 @@ import kotlin.time.Duration.Companion.seconds
 )
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class VideoPlayerViewModelTest {
-    private lateinit var underTest: VideoPlayerViewModel
+class LegacyVideoPlayerViewModelTest {
+    private lateinit var underTest: LegacyVideoPlayerViewModel
 
     private val context = mock<Context>()
     private val mediaPlayerGateway = mock<MediaPlayerGateway>()
@@ -327,7 +327,7 @@ class VideoPlayerViewModelTest {
     private fun initViewModel() {
         fakeMonitorTransferEventsFlow = MutableSharedFlow()
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
-        underTest = VideoPlayerViewModel(
+        underTest = LegacyVideoPlayerViewModel(
             context = context,
             mediaPlayerGateway = mediaPlayerGateway,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),

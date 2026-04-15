@@ -1,11 +1,12 @@
 package mega.privacy.android.app.presentation.videoplayer
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.content.pm.ActivityInfo
-import android.content.res.Configuration
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Matrix
+import android.os.Build
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -30,14 +32,18 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.SpeedSelectedPopup
-import mega.privacy.android.app.mediaplayer.VideoOptionRevampPopup
-import mega.privacy.android.app.mediaplayer.model.RevampVideoOptionItem
+import mega.privacy.android.app.mediaplayer.VideoOptionPopup
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.VideoOptionItem
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
+import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.mobile.analytics.event.SpeedOption0_5XPressedEvent
 import mega.privacy.mobile.analytics.event.SpeedOption1_5XPressedEvent
@@ -48,8 +54,10 @@ import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1XEvent
 import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1_25XEvent
 import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1_75XEvent
 import timber.log.Timber
+import javax.inject.Singleton
 
-class VideoPlayerRevampController(
+@Singleton
+class LegacyVideoPlayerController(
     private val context: Context,
     private val uiState: VideoPlayerUiState,
     container: ViewGroup,
@@ -64,20 +72,23 @@ class VideoPlayerRevampController(
     private val lockStateChanged: (lock: Boolean) -> Unit,
     private val playQueueButtonClicked: () -> Unit,
     private val playerViewClicked: () -> Unit,
-    private val onSnapshotSelected: () -> Unit,
+    private val captureScreenShot: () -> Unit,
 ) {
+    private val playQueueButton = container.findViewById<ImageButton>(R.id.playlist)
     private val trackName = container.findViewById<TextView>(R.id.track_name)
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
     private val playerComposeView = container.findViewById<PlayerView>(R.id.player_compose_view)
     private val moreOptionButton = container.findViewById<ImageButton>(R.id.more_option)
     private val videoOptionPopup = container.findViewById<ComposeView>(R.id.video_option_popup)
+    private val screenshotButton = container.findViewById<ImageButton>(R.id.image_screenshot)
     private val fullscreenButton = container.findViewById<ImageButton>(R.id.full_screen)
+    private val lockButton = container.findViewById<ImageButton>(R.id.image_button_lock)
     private val controllerView = container.findViewById<View>(R.id.layout_player)
     private val unlockView = container.findViewById<View>(R.id.layout_unlock)
     private val unlockButton = container.findViewById<ImageButton>(R.id.image_button_unlock)
     private val speedPlaybackButton = container.findViewById<TextView>(R.id.speed_playback)
     private val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
-    private val deviceRotateButton = container.findViewById<ImageButton>(R.id.device_rotated)
+    private val subtitleButton = container.findViewById<ImageButton>(R.id.subtitle)
 
     private var scaleGestureDetector: ScaleGestureDetector? = null
     private var gestureDetector: GestureDetector? = null
@@ -87,22 +98,35 @@ class VideoPlayerRevampController(
     private var translationY = 0f
 
     private var isSpeedPopupShown = mutableStateOf(uiState.isSpeedPopupShown)
-    private var isVideoOptionPopupShown = mutableStateOf(uiState.isVideoOptionPopupShown)
+    private var isVideoOptionPopupShown = mutableStateOf(false)
     private var currentSpeedPlayback = mutableStateOf(uiState.currentSpeedPlayback)
     private var isFullscreen = mutableStateOf(uiState.isFullscreen)
     private var playbackState = uiState.mediaPlaybackState
-    private var isLocked = mutableStateOf(uiState.isLocked)
-    private var playQueueInOverflowMenu = mutableStateOf(uiState.items.size > SINGLE_PLAYLIST_SIZE)
 
     init {
         setupRepeatToggleButton(uiState.repeatToggleMode)
         setupMoreOptionButton()
-        updatePlayQueueOverflowMenuItems(uiState.items.size)
+        setupVideoPlayQueueButton(uiState.items.size)
+        screenshotButton.setOnClickListener {
+            screenshotButtonClicked()
+        }
         setupFullscreen(uiState.isFullscreen)
         setupLockButton()
         setupSpeedPlaybackButton()
         setupGestures()
-        setupDeviceRotateButton()
+        setupSubtitleButton()
+    }
+
+    /**
+     * Setup video play queue button.
+     *
+     * @param size the video play queue size
+     */
+    private fun setupVideoPlayQueueButton(size: Int) {
+        togglePlayQueueEnabled(size)
+        playQueueButton.setOnClickListener {
+            playQueueButtonClicked()
+        }
     }
 
     /**
@@ -138,10 +162,16 @@ class VideoPlayerRevampController(
     }
 
     /**
-     * Updates whether [RevampVideoOptionItem.Playlist] appears in the overflow menu (same rule as legacy toolbar playlist).
+     * Toggle the playlist button.
+     *
+     * @param itemSize the item size
      */
-    internal fun updatePlayQueueOverflowMenuItems(itemSize: Int) {
-        playQueueInOverflowMenu.value = itemSize > SINGLE_PLAYLIST_SIZE
+    internal fun togglePlayQueueEnabled(itemSize: Int) {
+        playQueueButton.visibility =
+            if (itemSize > SINGLE_PLAYLIST_SIZE)
+                View.VISIBLE
+            else
+                View.INVISIBLE
     }
 
     private fun setupMoreOptionButton() {
@@ -163,32 +193,34 @@ class VideoPlayerRevampController(
 
     private fun initVideoOptionPopup(composeView: ComposeView) {
         composeView.setupComposeView(context) {
-            val videoOptions = remember(playQueueInOverflowMenu.value, isShowSubtitleIcon) {
-                buildList {
-                    add(RevampVideoOptionItem.Snapshot)
-                    if (isShowSubtitleIcon) {
-                        add(RevampVideoOptionItem.Subtitle)
+            val videoOptions = remember(isFullscreen.value) {
+                listOf(
+                    VideoOptionItem.VIDEO_OPTION_SNAPSHOT,
+                    VideoOptionItem.VIDEO_OPTION_LOCK,
+                    if (isFullscreen.value) {
+                        VideoOptionItem.VIDEO_OPTION_ORIGINAL
+                    } else {
+                        VideoOptionItem.VIDEO_OPTION_ZOOM_TO_FILL
                     }
-                    if (playQueueInOverflowMenu.value) {
-                        add(RevampVideoOptionItem.Playlist)
-                    }
-                    add(RevampVideoOptionItem.Lock)
-                }
+                )
             }
+            val orientation = LocalConfiguration.current.orientation
 
-            VideoOptionRevampPopup(
+            VideoOptionPopup(
                 items = videoOptions,
-                isShown = isVideoOptionPopupShown.value,
+                isShown = isVideoOptionPopupShown.value && orientation == ORIENTATION_PORTRAIT,
                 onDismissRequest = {
                     updateIsVideoOptionPopupShown(false)
                     isVideoOptionPopupShown.value = false
                 }
-            ) { option ->
-                when (option) {
-                    RevampVideoOptionItem.Snapshot -> onSnapshotSelected()
-                    RevampVideoOptionItem.Subtitle -> showSubtitleDialog()
-                    RevampVideoOptionItem.Playlist -> playQueueButtonClicked()
-                    RevampVideoOptionItem.Lock -> updateLockState(true)
+            ) { videOption ->
+                when (videOption) {
+                    VideoOptionItem.VIDEO_OPTION_SNAPSHOT -> screenshotButtonClicked()
+                    VideoOptionItem.VIDEO_OPTION_LOCK -> updateLockState(true)
+                    else -> {
+                        isFullscreen.value = !isFullscreen.value
+                        fullscreenClickedCallback(isFullscreen.value)
+                    }
                 }
                 updateIsVideoOptionPopupShown(false)
                 isVideoOptionPopupShown.value = false
@@ -208,6 +240,27 @@ class VideoPlayerRevampController(
         }
     }
 
+    private fun screenshotButtonClicked() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && !hasPermissions(
+                context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) {
+            val activity = context as? Activity
+            if (activity == null) {
+                Timber.e("Context is not an activity")
+                return
+            }
+            requestPermission(
+                activity,
+                REQUEST_WRITE_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        } else {
+            captureScreenShot()
+        }
+    }
+
     internal fun setupFullscreen(isFullScreen: Boolean) {
         updateFullscreenButtonIcon(isFullScreen)
         fullscreenButton.setOnClickListener {
@@ -216,8 +269,7 @@ class VideoPlayerRevampController(
         }
     }
 
-    internal fun updateFullscreenButtonIcon(isFullScreen: Boolean) {
-        isFullscreen.value = isFullScreen
+    internal fun updateFullscreenButtonIcon(isFullScreen: Boolean) =
         fullscreenButton.setImageResource(
             if (isFullScreen) {
                 R.drawable.ic_original
@@ -225,34 +277,18 @@ class VideoPlayerRevampController(
                 R.drawable.ic_full_screen
             }
         )
-    }
-
-    private fun setupDeviceRotateButton() {
-        deviceRotateButton.setOnClickListener {
-            val activity = context as? Activity
-            if (activity == null) {
-                Timber.e("Context is not an activity")
-                return@setOnClickListener
-            }
-            val isPortrait =
-                context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-            activity.requestedOrientation = if (isPortrait) {
-                ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            } else {
-                ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            }
-        }
-    }
 
     private fun setupLockButton() {
         updateLockState(uiState.isLocked)
+        lockButton.setOnClickListener {
+            updateLockState(true)
+        }
         unlockButton.setOnClickListener {
             updateLockState(false)
         }
     }
 
     private fun updateLockState(isLock: Boolean) {
-        isLocked.value = isLock
         controllerView.isVisible = !isLock
         unlockView.isVisible = isLock
         lockStateChanged(isLock)
@@ -260,7 +296,6 @@ class VideoPlayerRevampController(
     }
 
     internal fun updateLockView(isLock: Boolean) {
-        isLocked.value = isLock
         controllerView.isVisible = !isLock
         unlockView.isVisible = isLock
     }
@@ -320,7 +355,7 @@ class VideoPlayerRevampController(
             context,
             object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 override fun onScale(detector: ScaleGestureDetector): Boolean {
-                    if (!isLocked.value) {
+                    if (!uiState.isLocked) {
                         zoomLevel = (zoomLevel * detector.scaleFactor).coerceIn(1.0f, maxZoom)
                         updateTransformations()
                     }
@@ -336,7 +371,7 @@ class VideoPlayerRevampController(
                     distanceX: Float,
                     distanceY: Float,
                 ): Boolean {
-                    if (zoomLevel > 1 && !isLocked.value) {
+                    if (zoomLevel > 1 && !uiState.isLocked) {
                         translationX -= distanceX
                         translationY -= distanceY
                         enforceBoundaries()
@@ -384,13 +419,33 @@ class VideoPlayerRevampController(
         }
     }
 
+    private fun setupSubtitleButton() {
+        subtitleButton.isVisible = isShowSubtitleIcon
+        updateSubtitleButtonUI(uiState.subtitleSelectedStatus)
+        subtitleButton.setOnClickListener {
+            showSubtitleDialog()
+        }
+    }
+
+    internal fun updateSubtitleButtonUI(status: SubtitleSelectedStatus) =
+        subtitleButton.setImageResource(
+            if (status == SubtitleSelectedStatus.Off) {
+                R.drawable.ic_subtitles_disable
+            } else {
+                R.drawable.ic_subtitles_enable
+            }
+        )
+
     internal fun release() {
+        screenshotButton?.setOnClickListener(null)
         repeatToggleButton?.setOnClickListener(null)
         moreOptionButton?.setOnClickListener(null)
         fullscreenButton?.setOnClickListener(null)
+        lockButton?.setOnClickListener(null)
         unlockButton?.setOnClickListener(null)
+        playQueueButton?.setOnClickListener(null)
+        subtitleButton?.setOnClickListener(null)
         speedPlaybackButton?.setOnClickListener(null)
-        deviceRotateButton?.setOnClickListener(null)
 
         playerComposeView?.setOnTouchListener(null)
 

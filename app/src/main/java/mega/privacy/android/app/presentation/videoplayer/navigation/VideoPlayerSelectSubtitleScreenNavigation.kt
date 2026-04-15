@@ -1,51 +1,51 @@
-package mega.privacy.android.app.mediaplayer.videoplayer.navigation
+package mega.privacy.android.app.presentation.videoplayer.navigation
 
 import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.serialization.Serializable
 import mega.privacy.android.analytics.Analytics
+import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.mediaplayer.SelectSubtitleComposeView
 import mega.privacy.android.app.mediaplayer.SelectSubtitleFileViewModel
-import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.sharedViewModel
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.mobile.analytics.event.AddSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.CancelSelectSubtitlePressedEvent
 
+/**
+ * Select subtitle NavKey for the revamped video player.
+ */
 @Serializable
-internal object SelectSubtitleScreen
+internal data object VideoPlayerSelectSubtitleScreenNavKey : NavKey
 
-internal fun NavGraphBuilder.selectSubtitleScreen(
-    navHostController: NavHostController,
-    videoPlayerViewModel: VideoPlayerViewModel,
+internal fun EntryProviderScope<NavKey>.videoPlayerSelectSubtitleScreen(
+    viewModel: VideoPlayerViewModelV2,
+    onBack: () -> Unit,
 ) {
-    composable<SelectSubtitleScreen> { backStackEntry ->
-        val selectSubtitleViewModel =
-            backStackEntry.sharedViewModel<SelectSubtitleFileViewModel>(navHostController)
+    entry<VideoPlayerSelectSubtitleScreenNavKey> {
         val systemUiController = rememberSystemUiController()
+        val selectSubtitleViewModel = hiltViewModel<SelectSubtitleFileViewModel>()
 
         LaunchedEffect(Unit) {
             systemUiController.isSystemBarsVisible = true
         }
 
         SelectSubtitleComposeView(
-            viewModel = selectSubtitleViewModel,
             onAddSubtitle = { info ->
                 Analytics.tracker.trackEvent(AddSubtitlePressedEvent)
-                videoPlayerViewModel.updateSubtitleSelectedStatus(
+                viewModel.updateSubtitleSelectedStatus(
                     SubtitleSelectedStatus.AddSubtitleItem,
                     info
                 )
                 selectSubtitleViewModel.clearSelectedItem()
-                navHostController.popBackStack()
+                onBack()
             },
             onBackPressed = {
                 Analytics.tracker.trackEvent(CancelSelectSubtitlePressedEvent)
-                navHostController.popBackStack()
-                videoPlayerViewModel.updateShowSubtitleDialog(false)
+                onBack()
+                viewModel.updateShowSubtitleDialog(false)
             }
         )
     }

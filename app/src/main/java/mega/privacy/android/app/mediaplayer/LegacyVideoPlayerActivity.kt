@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videoplayer
+package mega.privacy.android.app.mediaplayer
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -52,13 +52,12 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.mediaplayer.MediaSessionHelper
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerRevampNavigationGraph
-import mega.privacy.android.app.presentation.videoplayer.navigation.videoPlayerRevampNavigationGraph
+import mega.privacy.android.app.mediaplayer.videoplayer.navigation.LegacyVideoPlayerNavigationGraph
+import mega.privacy.android.app.mediaplayer.videoplayer.navigation.legacyVideoPlayerComposeNavigationGraph
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -70,6 +69,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
+import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
@@ -133,10 +133,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * The activity for the revamped video player
+ * The activity for the video player
  */
 @AndroidEntryPoint
-class VideoPlayerRevampActivity : PasscodeActivity() {
+class LegacyVideoPlayerActivity : PasscodeActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
@@ -150,7 +150,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
     @Inject
     lateinit var mediaPlayerGateway: MediaPlayerGateway
 
-    private val videoPlayerRevampViewModel: VideoPlayerRevampViewModel by viewModels()
+    private val legacyVideoPlayerViewModel: LegacyVideoPlayerViewModel by viewModels()
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
 
     private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -170,7 +170,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
         AudioManager.OnAudioFocusChangeListener { focusChange ->
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                    videoPlayerRevampViewModel.pausePlaybackNonUserInitiated()
+                    legacyVideoPlayerViewModel.pausePlaybackNonUserInitiated()
                 }
 
                 AudioManager.AUDIOFOCUS_GAIN -> {
@@ -179,7 +179,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
                     // AUDIOFOCUS_GAIN after the user left the player, incorrectly restarting video.
                     // Do not resume when the user explicitly paused — wait for their play action.
                     if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) &&
-                        videoPlayerRevampViewModel.shouldResumeOnAudioFocusGain()
+                        legacyVideoPlayerViewModel.shouldResumeOnAudioFocusGain()
                     ) {
                         mediaPlayerGateway.setPlayWhenReady(true)
                     }
@@ -191,14 +191,14 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
                 ?: return@registerForActivityResult
-            videoPlayerRevampViewModel.importChatNode(newParentHandle = NodeId(toHandle))
+            legacyVideoPlayerViewModel.importChatNode(newParentHandle = NodeId(toHandle))
         }
 
     private val nameCollisionActivityContract = registerForActivityResult(
         NameCollisionActivityContract()
     ) { result ->
         result?.let {
-            videoPlayerRevampViewModel.updateSnackBarMessage(it)
+            legacyVideoPlayerViewModel.updateSnackBarMessage(it)
         }
     }
 
@@ -207,7 +207,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
             val moveHandles = result.data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
             val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
             if (moveHandles != null && moveHandles.isNotEmpty() && toHandle != null)
-                videoPlayerRevampViewModel.moveNode(
+                legacyVideoPlayerViewModel.moveNode(
                     nodeHandle = moveHandles[0],
                     newParentHandle = toHandle,
                 )
@@ -218,7 +218,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
             val copyHandles = result.data?.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES)
             val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
             if (copyHandles != null && copyHandles.isNotEmpty() && toHandle != null) {
-                videoPlayerRevampViewModel.copyNode(
+                legacyVideoPlayerViewModel.copyNode(
                     nodeHandle = copyHandles[0],
                     newParentHandle = toHandle,
                 )
@@ -240,13 +240,13 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
     private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
         if (result.resultCode != RESULT_OK) return
 
-        videoPlayerRevampViewModel.hideOrUnhideNode(
-            nodeId = NodeId(videoPlayerRevampViewModel.uiState.value.currentPlayingHandle),
+        legacyVideoPlayerViewModel.hideOrUnhideNode(
+            nodeId = NodeId(legacyVideoPlayerViewModel.uiState.value.currentPlayingHandle),
             hide = true,
         )
 
         val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
-        videoPlayerRevampViewModel.updateSnackBarMessage(message)
+        legacyVideoPlayerViewModel.updateSnackBarMessage(message)
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -260,20 +260,20 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
         enableEdgeToEdge()
         setupImmersiveMode()
         val player = createPlayer()
-        videoPlayerRevampViewModel.initRepeatToggleMode()
+        legacyVideoPlayerViewModel.initRepeatToggleMode()
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             var passcodeEnabled by remember { mutableStateOf(true) }
             val bottomSheetNavigator = rememberBottomSheetNavigator()
             val navHostController = rememberNavController(bottomSheetNavigator)
-            val uiState by videoPlayerRevampViewModel.uiState.collectAsStateWithLifecycle()
+            val uiState by legacyVideoPlayerViewModel.uiState.collectAsStateWithLifecycle()
             val scaffoldState = rememberScaffoldState()
 
             var showBlockedDialog by rememberSaveable { mutableStateOf(false) }
 
             EventEffect(
                 event = uiState.blockedError,
-                onConsumed = { videoPlayerRevampViewModel.onBlockedErrorConsumed() }) {
+                onConsumed = { legacyVideoPlayerViewModel.onBlockedErrorConsumed() }) {
                 showBlockedDialog = true
             }
 
@@ -294,21 +294,21 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
             ) {
                 NavHost(
                     navController = navHostController,
-                    startDestination = VideoPlayerRevampNavigationGraph
+                    startDestination = LegacyVideoPlayerNavigationGraph
                 ) {
-                    videoPlayerRevampNavigationGraph(
+                    legacyVideoPlayerComposeNavigationGraph(
                         navHostController = navHostController,
                         bottomSheetNavigator = bottomSheetNavigator,
                         scaffoldState = scaffoldState,
-                        viewModel = videoPlayerRevampViewModel,
-                        handleAutoReplayIfPaused = videoPlayerRevampViewModel::handleAutoReplayIfPaused,
+                        viewModel = legacyVideoPlayerViewModel,
+                        handleAutoReplayIfPaused = legacyVideoPlayerViewModel::handleAutoReplayIfPaused,
                         player = player
                     )
                 }
 
                 StartTransferComponent(
                     event = uiState.downloadEvent,
-                    onConsumeEvent = videoPlayerRevampViewModel::resetDownloadNode,
+                    onConsumeEvent = legacyVideoPlayerViewModel::resetDownloadNode,
                     snackBarHostState = scaffoldState.snackbarHostState,
                 )
 
@@ -336,7 +336,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
                 }
             }
         }
-        videoPlayerRevampViewModel.initVideoPlayerData(intent)
+        legacyVideoPlayerViewModel.initVideoPlayerData(intent)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
         setupObserver()
         initMediaSession()
@@ -359,7 +359,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
     private fun createPlayer(): ExoPlayer {
         val nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit =
             { title, artist, album ->
-                with(videoPlayerRevampViewModel) {
+                with(legacyVideoPlayerViewModel) {
                     val playingItemTitle = uiState.value.currentPlayingItemName ?: ""
                     updateMetadata(Metadata(title, artist, album, playingItemTitle))
                 }
@@ -370,19 +370,19 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
             nameChangeCallback = nameChangeCallback,
             mediaPlayerCallback = object : MediaPlayerCallback {
                 override fun onMediaItemTransitionCallback(handle: String?, isUpdateName: Boolean) {
-                    videoPlayerRevampViewModel.onMediaItemTransition(handle, isUpdateName)
+                    legacyVideoPlayerViewModel.onMediaItemTransition(handle, isUpdateName)
                 }
 
                 override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
                 }
 
                 override fun onRepeatModeChangedCallback(repeatToggleMode: RepeatToggleMode) =
-                    videoPlayerRevampViewModel.updateRepeatToggleMode(repeatToggleMode)
+                    legacyVideoPlayerViewModel.updateRepeatToggleMode(repeatToggleMode)
 
                 override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean, reason: Int) {
                     val isPausedByUser =
                         reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST && !playWhenReady
-                    videoPlayerRevampViewModel.onPlayWhenReadyChanged(
+                    legacyVideoPlayerViewModel.onPlayWhenReadyChanged(
                         state = if (playWhenReady) {
                             MediaPlaybackState.Playing
                         } else {
@@ -393,14 +393,14 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
                 }
 
                 override fun onPlaybackStateChangedCallback(state: Int) {
-                    videoPlayerRevampViewModel.onPlaybackStateChanged(state)
+                    legacyVideoPlayerViewModel.onPlaybackStateChanged(state)
                 }
 
-                override fun onPlayerErrorCallback() = videoPlayerRevampViewModel.onPlayerError()
+                override fun onPlayerErrorCallback() = legacyVideoPlayerViewModel.onPlayerError()
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
                     if (videoWidth == 0 || videoHeight == 0) return
-                    videoPlayerRevampViewModel.updateCurrentPlayingVideoSize(
+                    legacyVideoPlayerViewModel.updateCurrentPlayingVideoSize(
                         VideoSize(videoWidth, videoHeight)
                     )
                 }
@@ -411,31 +411,31 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
     private fun setupObserver() {
         mediaPlayerGateway.monitorMediaNotAllowPlayState().onEach { notAllow ->
             if (notAllow) {
-                videoPlayerRevampViewModel.updateSnackBarMessage(getString(R.string.not_allow_play_alert))
+                legacyVideoPlayerViewModel.updateSnackBarMessage(getString(R.string.not_allow_play_alert))
             }
         }.launchIn(lifecycleScope)
 
-        videoPlayerRevampViewModel.getCollision().observe(this) { collision ->
+        legacyVideoPlayerViewModel.getCollision().observe(this) { collision ->
             nameCollisionActivityContract.launch(arrayListOf(collision))
         }
 
-        videoPlayerRevampViewModel.onSnackbarMessage().observe(this) { message ->
-            videoPlayerRevampViewModel.updateSnackBarMessage(getString(message))
+        legacyVideoPlayerViewModel.onSnackbarMessage().observe(this) { message ->
+            legacyVideoPlayerViewModel.updateSnackBarMessage(getString(message))
         }
 
-        videoPlayerRevampViewModel.onExceptionThrown().observe(this, ::manageException)
+        legacyVideoPlayerViewModel.onExceptionThrown().observe(this, ::manageException)
 
-        videoPlayerRevampViewModel.onStartChatFileOfflineDownload().observe(this) {
-            videoPlayerRevampViewModel.startDownloadForOffline(it)
+        legacyVideoPlayerViewModel.onStartChatFileOfflineDownload().observe(this) {
+            legacyVideoPlayerViewModel.startDownloadForOffline(it)
         }
 
         collectFlow(
-            videoPlayerRevampViewModel.uiState.map { it.clickedMenuAction }.distinctUntilChanged()
+            legacyVideoPlayerViewModel.uiState.map { it.clickedMenuAction }.distinctUntilChanged()
         ) {
             handleMenuActions(it)
         }
 
-        collectFlow(videoPlayerRevampViewModel.uiState.map { it.menuOptionClickedContent }
+        collectFlow(legacyVideoPlayerViewModel.uiState.map { it.menuOptionClickedContent }
             .distinctUntilChanged()) {
             it?.let { content ->
                 when (content) {
@@ -452,14 +452,14 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
                         if (!showTakenDownNodeActionNotAvailableDialog(content.node, this)) {
                             LinksUtil.showGetLinkActivity(
                                 this,
-                                videoPlayerRevampViewModel.uiState.value.currentPlayingHandle
+                                legacyVideoPlayerViewModel.uiState.value.currentPlayingHandle
                             )
                         }
 
                     is MenuOptionClickedContent.RemoveLink ->
                         if (!showTakenDownNodeActionNotAvailableDialog(content.node, this)) {
                             AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
-                                videoPlayerRevampViewModel.removeLink()
+                                legacyVideoPlayerViewModel.removeLink()
                             }
                         }
 
@@ -471,18 +471,16 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
                             actionNodeCallback = object : ActionNodeCallback {
                                 override fun finishRenameActionWithSuccess(newName: String) {
                                     val newMetadata =
-                                        videoPlayerRevampViewModel.uiState.value.metadata.copy(
-                                            nodeName = newName
-                                        )
-                                    videoPlayerRevampViewModel.updateMetadata(newMetadata)
+                                        legacyVideoPlayerViewModel.uiState.value.metadata.copy(nodeName = newName)
+                                    legacyVideoPlayerViewModel.updateMetadata(newMetadata)
                                 }
                             })
                 }
-                videoPlayerRevampViewModel.clearMenuOptionClickedContent()
+                legacyVideoPlayerViewModel.clearMenuOptionClickedContent()
             }
         }
 
-        collectFlow(videoPlayerRevampViewModel.uiState.map { it.isClosedAfterHidingNode }
+        collectFlow(legacyVideoPlayerViewModel.uiState.map { it.isClosedAfterHidingNode }
             .distinctUntilChanged()) { isClosed ->
             if (isClosed) {
                 finish()
@@ -498,7 +496,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
     private fun manageException(throwable: Throwable) {
         if (!manageCopyMoveException(throwable) && throwable is MegaException) {
             throwable.message?.let { errorMessage ->
-                videoPlayerRevampViewModel.updateSnackBarMessage(errorMessage)
+                legacyVideoPlayerViewModel.updateSnackBarMessage(errorMessage)
             }
         }
     }
@@ -506,7 +504,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
     private fun handleMenuActions(action: VideoPlayerMenuAction?) {
         if (action == null) return
         val launchSource = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
-        val playingHandle = videoPlayerRevampViewModel.uiState.value.currentPlayingHandle
+        val playingHandle = legacyVideoPlayerViewModel.uiState.value.currentPlayingHandle
         when (action) {
             VideoPlayerFileInfoAction -> handleFileInfoAction(launchSource, playingHandle)
             VideoPlayerChatImportAction -> handleChatImportAction()
@@ -524,7 +522,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
                 else
                     handleMoveToRubbishAction(playingHandle)
         }
-        videoPlayerRevampViewModel.updateClickedMenuAction(null)
+        legacyVideoPlayerViewModel.updateClickedMenuAction(null)
     }
 
     private fun handleFileInfoAction(launchSource: Int, playingHandle: Long) {
@@ -533,20 +531,20 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
             val fileInfoIntent = when (launchSource) {
                 OFFLINE_ADAPTER ->
                     Intent(
-                        this@VideoPlayerRevampActivity,
+                        this@LegacyVideoPlayerActivity,
                         OfflineFileInfoActivity::class.java
                     ).apply {
                         putExtra(HANDLE, playingHandle.toString())
                     }
 
                 else -> {
-                    val nodeName = videoPlayerRevampViewModel.uiState.value.currentPlayingItemName
-                    Intent(this@VideoPlayerRevampActivity, FileInfoActivity::class.java).apply {
+                    val nodeName = legacyVideoPlayerViewModel.uiState.value.currentPlayingItemName
+                    Intent(this@LegacyVideoPlayerActivity, FileInfoActivity::class.java).apply {
                         putExtra(HANDLE, playingHandle)
                         putExtra(NAME, nodeName)
                     }.apply {
                         val fromIncoming = launchSource in listOf(SEARCH_ADAPTER, RECENTS_ADAPTER)
-                                && videoPlayerRevampViewModel.isNodeComesFromIncoming()
+                                && legacyVideoPlayerViewModel.isNodeComesFromIncoming()
                         when {
                             launchSource == INCOMING_SHARES_ADAPTER || fromIncoming -> {
                                 putExtra(INTENT_EXTRA_KEY_FROM, FROM_INCOMING_SHARES)
@@ -581,7 +579,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
         if (getStorageState() == StorageState.PayWall) {
             AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
         } else {
-            videoPlayerRevampViewModel.saveChatNodeToOffline()
+            legacyVideoPlayerViewModel.saveChatNodeToOffline()
         }
     }
 
@@ -592,7 +590,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
         var isBusinessAccountExpired: Boolean
 
 
-        with(videoPlayerRevampViewModel.uiState.value) {
+        with(legacyVideoPlayerViewModel.uiState.value) {
             isPaid = this.accountType?.isPaid == true
             isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
             isBusinessAccountExpired = this.isBusinessAccountExpired
@@ -606,16 +604,16 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
             hiddenNodesOnboardingLauncher.launch(intent)
             overridePendingTransition(0, 0)
         } else if (isHiddenNodesOnboarded) {
-            videoPlayerRevampViewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = true)
+            legacyVideoPlayerViewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = true)
             val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
-            videoPlayerRevampViewModel.updateSnackBarMessage(message)
+            legacyVideoPlayerViewModel.updateSnackBarMessage(message)
         } else {
             showHiddenNodesOnboarding()
         }
     }
 
     private fun showHiddenNodesOnboarding() {
-        videoPlayerRevampViewModel.setHiddenNodesOnboarded()
+        legacyVideoPlayerViewModel.setHiddenNodesOnboarded()
 
         val intent = HiddenNodesOnboardingActivity.createScreen(
             context = this,
@@ -626,10 +624,10 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
     }
 
     private fun handleUnhideAction(playingHandle: Long) {
-        videoPlayerRevampViewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = false)
+        legacyVideoPlayerViewModel.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = false)
         val message =
             resources.getQuantityString(sharedR.plurals.unhidden_nodes_result_message, 1, 1)
-        videoPlayerRevampViewModel.updateSnackBarMessage(message)
+        legacyVideoPlayerViewModel.updateSnackBarMessage(message)
     }
 
     private fun handleMoveAction(playingHandle: Long) {
@@ -655,13 +653,13 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
     }
 
     private fun handleRemoveAction() {
-        MaterialAlertDialogBuilder(this@VideoPlayerRevampActivity)
+        MaterialAlertDialogBuilder(this@LegacyVideoPlayerActivity)
             .setMessage(getString(R.string.confirmation_delete_one_attachment))
             .setPositiveButton(
                 getString(R.string.context_remove)
             ) { _, _ ->
                 lifecycleScope.launch {
-                    runCatching { videoPlayerRevampViewModel.deleteMessageFromChat() }
+                    runCatching { legacyVideoPlayerViewModel.deleteMessageFromChat() }
                         .onSuccess { finish() }
                         .onFailure { Timber.e(it) }
                 }
@@ -691,7 +689,7 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
         if (result.resultCode != RESULT_OK) return
         val message = result.data?.getStringExtra("message") ?: return
 
-        videoPlayerRevampViewModel.updateSnackBarMessage(message)
+        legacyVideoPlayerViewModel.updateSnackBarMessage(message)
     }
 
     private fun initMediaSession() {
@@ -714,12 +712,12 @@ class VideoPlayerRevampActivity : PasscodeActivity() {
 
     override fun onStop() {
         super.onStop()
-        videoPlayerRevampViewModel.pauseForBackground()
+        legacyVideoPlayerViewModel.pauseForBackground()
     }
 
     override fun onStart() {
         super.onStart()
-        videoPlayerRevampViewModel.handleAutoReplayIfPaused()
+        legacyVideoPlayerViewModel.handleAutoReplayIfPaused()
     }
 
     override fun onDestroy() {

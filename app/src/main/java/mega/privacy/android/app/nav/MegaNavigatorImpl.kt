@@ -26,8 +26,8 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampActivity
+import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
@@ -76,10 +76,8 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HAN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
-import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
-import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
@@ -94,7 +92,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
@@ -431,8 +428,8 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo, useRevamp: Boolean = false) = when {
         fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-            if (useRevamp) Intent(context, VideoPlayerRevampActivity::class.java)
-            else Intent(context, VideoPlayerComposeActivity::class.java)
+            if (useRevamp) Intent(context, VideoPlayerActivity::class.java)
+            else Intent(context, LegacyVideoPlayerActivity::class.java)
 
         fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
             Intent(context, AudioPlayerActivity::class.java)

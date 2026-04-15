@@ -58,7 +58,6 @@ import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapp
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
-import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
@@ -167,7 +166,6 @@ import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCas
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
@@ -230,7 +228,7 @@ import kotlin.time.Duration.Companion.seconds
  * ViewModel for video player.
  */
 @HiltViewModel
-class VideoPlayerViewModel @Inject constructor(
+class VideoPlayerViewModelV2 @Inject constructor(
     @ApplicationContext private val context: Context,
     @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -297,7 +295,6 @@ class VideoPlayerViewModel @Inject constructor(
     private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimesUseCase,
     private val savePlaybackTimesUseCase: SavePlaybackTimesUseCase,
-    private val deletePlaybackInformationUseCase: DeletePlaybackInformationUseCase,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     savedStateHandle: SavedStateHandle,
@@ -359,9 +356,8 @@ class VideoPlayerViewModel @Inject constructor(
     private val mediaItemsDuringChanged = mutableListOf<MediaItem>()
     private var searchJob: Job? = null
     private val mutex = Mutex()
-    private var playbackPositionJob: Job? = null
-    private var hasCheckedPlaybackPosition = false
-    private var playbackPositionStatus = PlaybackPositionStatus.Initial
+    protected var playbackPositionJob: Job? = null
+    protected var hasCheckedPlaybackPosition = false
     private var currentIntent: Intent? = null
 
     private var isPausedByUser = false
@@ -614,11 +610,14 @@ class VideoPlayerViewModel @Inject constructor(
                 buildPlaySources(mediaPlaySources)
                 setPlayWhenReady(
                     mediaPlaySources.isRestartPlaying &&
-                            !uiState.value.showPlaybackDialog &&
                             !uiState.value.showSubtitleDialog
                 )
                 playerPrepare()
             }
+            // Apply the seek during BUFFERING so it is queued by ExoPlayer and executed on
+            // STATE_READY. The subsequent STATE_READY callback in onPlaybackStateChanged will
+            // find playbackPosition = null (already cleared here) and be a no-op.
+            applyPendingSavedPlaybackPositionSeek()
             mediaPlaySources.nameToDisplay?.let { name ->
                 uiState.update { it.copy(metadata = Metadata(null, null, null, nodeName = name)) }
             }
@@ -1159,10 +1158,17 @@ class VideoPlayerViewModel @Inject constructor(
             // Pause the video before check playback position
             mediaPlayerGateway.setPlayWhenReady(false)
             checkPlaybackPositionBeforePlayback(handle) {
+                // Apply the seek here, inside the callback, where the position is guaranteed
+                // to already be stored in state. This avoids the race condition where ExoPlayer
+                // could reach STATE_READY before the position coroutine completes, which would
+                // cause applyPendingSavedPlaybackPositionSeek() in onPlaybackStateChanged to be
+                // a no-op and silently discard the saved position (especially for local/offline files).
+                applyPendingSavedPlaybackPositionSeek()
                 mediaPlayerGateway.setPlayWhenReady(true)
             }
         } else {
-            checkPlaybackPositionStatus()
+            applyPendingSavedPlaybackPositionSeek()
+            ensurePlayingAfterPlaybackPositionHandling()
         }
 
         // Reset hasCheckedPlaybackPosition to re-check playback position on video transition
@@ -1205,28 +1211,14 @@ class VideoPlayerViewModel @Inject constructor(
         uiState.update { it.copy(menuActions = actions) }
     }
 
-    private fun checkPlaybackPositionStatus(
-        playbackPosition: Long? = uiState.value.playbackPosition,
-    ) {
-        when (playbackPositionStatus) {
-            PlaybackPositionStatus.Restart -> viewModelScope.launch {
-                deletePlaybackInformationUseCase(
-                    if (uiState.value.currentPlayingHandle == INVALID_HANDLE) {
-                        firstPlayingHandle
-                    } else {
-                        uiState.value.currentPlayingHandle
-                    }
-                )
-            }
+    private fun applyPendingSavedPlaybackPositionSeek() {
+        val position = uiState.value.playbackPosition ?: return
+        if (position <= 0L) return
+        mediaPlayerGateway.playerSeekToPositionInMs(position)
+        uiState.update { it.copy(playbackPosition = null) }
+    }
 
-            PlaybackPositionStatus.Resume -> playbackPosition?.let {
-                mediaPlayerGateway.playerSeekToPositionInMs(it)
-            }
-
-            else -> Unit
-        }
-        playbackPositionStatus = PlaybackPositionStatus.Initial
-
+    private fun ensurePlayingAfterPlaybackPositionHandling() {
         if (!mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser) {
             mediaPlayerGateway.setPlayWhenReady(true)
         }
@@ -1240,11 +1232,10 @@ class VideoPlayerViewModel @Inject constructor(
                 updatePlaybackState(MediaPlaybackState.Paused)
 
             state == MEDIA_PLAYER_STATE_READY -> {
+                applyPendingSavedPlaybackPositionSeek()
                 if (playbackState == MediaPlaybackState.Paused
                     && !mediaPlayerGateway.getPlayWhenReady()
                     && !uiState.value.isAutoReplay
-                    && playbackPositionStatus == PlaybackPositionStatus.Initial
-                    && !uiState.value.showPlaybackDialog
                     && !uiState.value.showSubtitleDialog
                     && !isPausedByUser
                 ) {
@@ -1289,7 +1280,7 @@ class VideoPlayerViewModel @Inject constructor(
                     saveRecentlyUsedItemUseCase(
                         nodeHandle = handle,
                         type = RecentlyUsedType.Video,
-                        fileName = uiState.value.metadata?.nodeName.orEmpty(),
+                        fileName = uiState.value.metadata.nodeName.orEmpty(),
                     )
                 }.onFailure { Timber.e(it, "Failed to save recently used video item") }
             }
@@ -1347,7 +1338,6 @@ class VideoPlayerViewModel @Inject constructor(
         val shouldAutoReplay = uiState.value.mediaPlaybackState == MediaPlaybackState.Paused &&
                 uiState.value.isAutoReplay &&
                 !uiState.value.showSubtitleDialog &&
-                !uiState.value.showPlaybackDialog &&
                 !isPausedByUser
 
         if (shouldAutoReplay) {
@@ -2086,31 +2076,15 @@ class VideoPlayerViewModel @Inject constructor(
                 monitorPlaybackTimesUseCase().firstOrNull()?.get(handle)?.currentPosition
 
             if (playbackPosition != null && playbackPosition > 0) {
-                playbackPositionStatus = PlaybackPositionStatus.DialogShowing
                 uiState.update {
                     it.copy(
-                        showPlaybackDialog = true,
                         playbackPosition = playbackPosition,
                         currentPlayingItemName = currentItemName
                     )
                 }
-            } else {
-                noPlaybackPosition()
             }
+            noPlaybackPosition()
         }
-    }
-
-    internal fun updatePlaybackPositionStatus(
-        value: PlaybackPositionStatus,
-        playbackPosition: Long? = uiState.value.playbackPosition,
-    ) {
-        playbackPositionStatus = value
-        if (hasCheckedPlaybackPosition) {
-            initVideoPlaybackSources()
-        } else {
-            checkPlaybackPositionStatus(playbackPosition)
-        }
-        uiState.update { it.copy(showPlaybackDialog = false) }
     }
 
     internal suspend fun getMatchedSubtitleFileInfo(): SubtitleFileInfo? =

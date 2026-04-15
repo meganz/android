@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.navigation.BottomSheetNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -69,14 +68,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampController
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampViewModel
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
@@ -87,10 +85,9 @@ import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalPermissionsApi::class)
 @Composable
-internal fun VideoPlayerRevampScreen(
-    bottomSheetNavigator: BottomSheetNavigator,
+internal fun VideoPlayerScreen(
     scaffoldState: ScaffoldState,
-    viewModel: VideoPlayerRevampViewModel,
+    viewModel: VideoPlayerViewModelV2,
     player: ExoPlayer?,
     playQueueButtonClicked: () -> Unit,
 ) {
@@ -101,7 +98,7 @@ internal fun VideoPlayerRevampScreen(
     val configuration = LocalConfiguration.current
     val orientation = configuration.orientation
 
-    var videoPlayerController by remember { mutableStateOf<VideoPlayerRevampController?>(null) }
+    var videoPlayerController by remember { mutableStateOf<VideoPlayerController?>(null) }
 
     val systemUiController = rememberSystemUiController()
     var isControllerViewVisible by rememberSaveable { mutableStateOf(true) }
@@ -250,244 +247,239 @@ internal fun VideoPlayerRevampScreen(
         }
     }
 
-    MegaBottomSheetLayout(
+    MegaScaffold(
         modifier = Modifier
             .fillMaxSize()
             .semantics {
                 testTagsAsResourceId = true
             },
-        bottomSheetNavigator = bottomSheetNavigator,
-    ) {
-        MegaScaffold(
-            modifier = Modifier.fillMaxSize(),
-            scaffoldState = scaffoldState,
-        ) { _ ->
-            key(orientation) {
-                AndroidViewBinding(
-                    modifier = Modifier.fillMaxSize(),
-                    factory = { inflater, parent, attachToParent ->
-                        VideoPlayerRevampPlayerViewBinding.inflate(inflater, parent, attachToParent)
-                            .apply {
-                                playerView = playerComposeView
-                                fun updateResizeMode(isFullscreen: Boolean) {
-                                    playerComposeView.resizeMode = if (isFullscreen) {
-                                        RESIZE_MODE_ZOOM
-                                    } else {
-                                        RESIZE_MODE_FIT
-                                    }
-                                }
-
-                                videoPlayerController = VideoPlayerRevampController(
-                                    context = context,
-                                    uiState = uiState,
-                                    container = root,
-                                    isShowSubtitleIcon = viewModel.isShowSubtitleIcon(),
-                                    updateRepeatToggleMode = {
-                                        val repeatToggleMode =
-                                            uiState.repeatToggleMode.let { repeatToggleMode ->
-                                                if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
-                                                    Analytics.tracker.trackEvent(
-                                                        LoopButtonPressedEvent
-                                                    )
-                                                    RepeatToggleMode.REPEAT_ONE
-
-                                                } else {
-                                                    RepeatToggleMode.REPEAT_NONE
-                                                }
-                                            }
-                                        viewModel.setRepeatToggleModeForPlayer(repeatToggleMode)
-                                    },
-                                    updateIsVideoOptionPopupShown = { value ->
-                                        viewModel.updateIsVideoOptionPopupShown(value)
-                                    },
-                                    updateIsSpeedPopupShown = { value ->
-                                        viewModel.updateIsSpeedPopupShown(value)
-                                    },
-                                    speedPlaybackItemSelected = { item ->
-                                        viewModel.updateCurrentSpeedPlaybackItem(item)
-                                    },
-                                    updateLockStatus = { isLock ->
-                                        viewModel.updateLockStatus(isLock)
-                                    },
-                                    showSubtitleDialog = {
-                                        viewModel.updateShowSubtitleDialog(true)
-                                    },
-                                    fullscreenClickedCallback = { isFullscreen ->
-                                        viewModel.updateFullscreen(isFullscreen)
-                                        updateResizeMode(isFullscreen)
-                                    },
-                                    lockStateChanged = {
-                                        autoHideJob?.cancel()
-                                        autoHideJob = coroutineScope.launch {
-                                            systemUiController.isSystemBarsVisible = true
-                                            playerComposeView.showController()
-                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                            systemUiController.isSystemBarsVisible = false
-                                            playerComposeView.hideController()
-                                        }
-                                    },
-                                    playQueueButtonClicked = {
-                                        autoHideJob?.cancel()
-                                        playQueueButtonClicked()
-                                    },
-                                    playerViewClicked = {
-                                        val visible = !isControllerViewVisible
-                                        autoHideJob?.cancel()
-                                        isControllerViewVisible = visible
-                                        systemUiController.isSystemBarsVisible = visible
-                                        if (visible) {
-                                            playerComposeView.showController()
-                                        } else {
-                                            playerComposeView.hideController()
-                                        }
-                                    },
-                                    onSnapshotSelected = {
-                                        writeStoragePermission?.launchPermissionRequest() ?: run {
-                                            snapshotScreen = true
-                                        }
-                                    },
-                                ).also { controller ->
-                                    playerComposeView.tag = controller
-                                }
-
-                                playerComposeView.setControllerVisibilityListener(
-                                    PlayerView.ControllerVisibilityListener { visibility ->
-                                        if (visibility == View.VISIBLE && !isControllerViewVisible) {
-                                            autoHideJob?.cancel()
-                                            autoHideJob = coroutineScope.launch {
-                                                delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                                playerComposeView.hideController()
-                                            }
-                                        }
-                                    }
-                                )
-
-                                playerComposeView.player = player
-                                playerComposeView.controllerShowTimeoutMs = 0
-                                updateResizeMode(uiState.isFullscreen)
-
-                                autoHideJob?.cancel()
-                                if (isControllerViewVisible) {
-                                    systemUiController.isSystemBarsVisible = true
-                                    playerComposeView.showController()
-                                }
-
-                                playerComposeView.controllerAutoShow = false
-
-                                autoHideJob = coroutineScope.launch {
-                                    delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                    isControllerViewVisible = false
-                                    systemUiController.isSystemBarsVisible = false
-                                    playerComposeView.hideController()
+        scaffoldState = scaffoldState,
+    ) { _ ->
+        key(orientation) {
+            AndroidViewBinding(
+                modifier = Modifier.fillMaxSize(),
+                factory = { inflater, parent, attachToParent ->
+                    VideoPlayerRevampPlayerViewBinding.inflate(inflater, parent, attachToParent)
+                        .apply {
+                            playerView = playerComposeView
+                            fun updateResizeMode(isFullscreen: Boolean) {
+                                playerComposeView.resizeMode = if (isFullscreen) {
+                                    RESIZE_MODE_ZOOM
+                                } else {
+                                    RESIZE_MODE_FIT
                                 }
                             }
-                    },
-                    onRelease = {
-                        (playerComposeView.tag as? VideoPlayerRevampController)?.release()
-                        if (uiState.isVideoOptionPopupShown) {
-                            viewModel.updateIsVideoOptionPopupShown(false)
-                        }
-                    }
-                ) {
-                    val controllerView = root.findViewById<View>(R.id.controls_view)
 
-                    playerComposeView.keepScreenOn =
-                        uiState.mediaPlaybackState == MediaPlaybackState.Playing
+                            videoPlayerController = VideoPlayerController(
+                                context = context,
+                                uiState = uiState,
+                                container = root,
+                                isShowSubtitleIcon = viewModel.isShowSubtitleIcon(),
+                                updateRepeatToggleMode = {
+                                    val repeatToggleMode =
+                                        uiState.repeatToggleMode.let { repeatToggleMode ->
+                                            if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
+                                                Analytics.tracker.trackEvent(
+                                                    LoopButtonPressedEvent
+                                                )
+                                                RepeatToggleMode.REPEAT_ONE
 
-                    updateControllerViewPadding(
-                        controllerView = controllerView,
-                        orientation = orientation,
-                        padding = navigationBarHeightPx,
-                        navigationBarPosition = navigationBarPosition
-                    )
-                    root.findViewById<View>(R.id.navigation_bar_bg).isVisible =
-                        orientation != ORIENTATION_PORTRAIT
-
-                    root.findViewById<ProgressBar>(R.id.loading_video_player_controller_view).isVisible =
-                        playbackState <= STATE_BUFFERING
-
-                    root.findViewById<View>(R.id.exo_play_pause).isVisible =
-                        playbackState > STATE_BUFFERING
-                }
-
-                if (isControllerViewVisible && !uiState.isLocked) {
-                    val horizontalPadding = when {
-                        orientation == ORIENTATION_LANDSCAPE && navigationBarPosition == NavigationBarPosition.Left ->
-                            PaddingValues(start = navigationBarHeight)
-
-                        orientation == ORIENTATION_LANDSCAPE && navigationBarPosition == NavigationBarPosition.Right ->
-                            PaddingValues(end = navigationBarHeight)
-
-                        else -> PaddingValues(0.dp)
-                    }
-                    VideoPlayerTopBar(
-                        modifier = Modifier.padding(horizontalPadding),
-                        title = if (orientation == ORIENTATION_PORTRAIT) {
-                            ""
-                        } else {
-                            uiState.metadata.title ?: uiState.metadata.nodeName
-                        },
-                        menuActions = uiState.menuActions,
-                        onBackPressed = { backDispatcher?.onBackPressed() },
-                        onMenuActionClicked = viewModel::updateClickedMenuAction,
-                    )
-                }
-
-                resizedBitmap?.let {
-                    if (isScreenshotVisible) {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = "Screenshot Animation",
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .graphicsLayer(
-                                    scaleX = scale.value,
-                                    scaleY = scale.value,
-                                    transformOrigin =
-                                        if (orientation == ORIENTATION_LANDSCAPE)
-                                            TransformOrigin(0.9f, 0.9f)
-                                        else {
-                                            TransformOrigin(0.9f, 0.8f)
+                                            } else {
+                                                RepeatToggleMode.REPEAT_NONE
+                                            }
                                         }
-                                )
-                        )
+                                    viewModel.setRepeatToggleModeForPlayer(repeatToggleMode)
+                                },
+                                updateIsVideoOptionPopupShown = { value ->
+                                    viewModel.updateIsVideoOptionPopupShown(value)
+                                },
+                                updateIsSpeedPopupShown = { value ->
+                                    viewModel.updateIsSpeedPopupShown(value)
+                                },
+                                speedPlaybackItemSelected = { item ->
+                                    viewModel.updateCurrentSpeedPlaybackItem(item)
+                                },
+                                updateLockStatus = { isLock ->
+                                    viewModel.updateLockStatus(isLock)
+                                },
+                                showSubtitleDialog = {
+                                    viewModel.updateShowSubtitleDialog(true)
+                                },
+                                fullscreenClickedCallback = { isFullscreen ->
+                                    viewModel.updateFullscreen(isFullscreen)
+                                    updateResizeMode(isFullscreen)
+                                },
+                                lockStateChanged = {
+                                    autoHideJob?.cancel()
+                                    autoHideJob = coroutineScope.launch {
+                                        systemUiController.isSystemBarsVisible = true
+                                        playerComposeView.showController()
+                                        delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                        systemUiController.isSystemBarsVisible = false
+                                        playerComposeView.hideController()
+                                    }
+                                },
+                                playQueueButtonClicked = {
+                                    autoHideJob?.cancel()
+                                    playQueueButtonClicked()
+                                },
+                                playerViewClicked = {
+                                    val visible = !isControllerViewVisible
+                                    autoHideJob?.cancel()
+                                    isControllerViewVisible = visible
+                                    systemUiController.isSystemBarsVisible = visible
+                                    if (visible) {
+                                        playerComposeView.showController()
+                                    } else {
+                                        playerComposeView.hideController()
+                                    }
+                                },
+                                onSnapshotSelected = {
+                                    writeStoragePermission?.launchPermissionRequest() ?: run {
+                                        snapshotScreen = true
+                                    }
+                                },
+                            ).also { controller ->
+                                playerComposeView.tag = controller
+                            }
+
+                            playerComposeView.setControllerVisibilityListener(
+                                PlayerView.ControllerVisibilityListener { visibility ->
+                                    if (visibility == View.VISIBLE && !isControllerViewVisible) {
+                                        autoHideJob?.cancel()
+                                        autoHideJob = coroutineScope.launch {
+                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                            playerComposeView.hideController()
+                                        }
+                                    }
+                                }
+                            )
+
+                            playerComposeView.player = player
+                            playerComposeView.controllerShowTimeoutMs = 0
+                            updateResizeMode(uiState.isFullscreen)
+
+                            autoHideJob?.cancel()
+                            if (isControllerViewVisible) {
+                                systemUiController.isSystemBarsVisible = true
+                                playerComposeView.showController()
+                            }
+
+                            playerComposeView.controllerAutoShow = false
+
+                            autoHideJob = coroutineScope.launch {
+                                delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                isControllerViewVisible = false
+                                systemUiController.isSystemBarsVisible = false
+                                playerComposeView.hideController()
+                            }
+                        }
+                },
+                onRelease = {
+                    (playerComposeView.tag as? VideoPlayerController)?.release()
+                    if (uiState.isVideoOptionPopupShown) {
+                        viewModel.updateIsVideoOptionPopupShown(false)
                     }
                 }
+            ) {
+                val controllerView = root.findViewById<View>(R.id.controls_view)
 
-                AddSubtitlesDialog(
-                    isShown = uiState.showSubtitleDialog,
-                    selectOptionState = uiState.subtitleSelectedStatus.id,
-                    matchedSubtitleFileUpdate = {
-                        viewModel.getMatchedSubtitleFileInfo()
-                    },
-                    subtitleFileName = uiState.addedSubtitleInfo?.name,
-                    onOffClicked = {
-                        viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
-                    },
-                    onAddedSubtitleClicked = {
-                        viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
-                    },
-                    onAutoMatch = { info ->
-                        if (info.url == null) {
-                            viewModel.updateSnackBarMessage(
-                                resource.getString(R.string.media_player_video_message_adding_subtitle_failed)
-                            )
-                            return@AddSubtitlesDialog
-                        }
-                        Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
-                        viewModel.updateSubtitleSelectedStatus(
-                            SubtitleSelectedStatus.SelectMatchedItem,
-                            info
-                        )
-                    },
-                    onDismissRequest = {
-                        viewModel.updateShowSubtitleDialog(false)
-                    },
-                    onToSelectSubtitle = {
-                        Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
-                        viewModel.navigateToSelectSubtitle()
-                    })
+                playerComposeView.keepScreenOn =
+                    uiState.mediaPlaybackState == MediaPlaybackState.Playing
+
+                updateControllerViewPadding(
+                    controllerView = controllerView,
+                    orientation = orientation,
+                    padding = navigationBarHeightPx,
+                    navigationBarPosition = navigationBarPosition
+                )
+                root.findViewById<View>(R.id.navigation_bar_bg).isVisible =
+                    orientation != ORIENTATION_PORTRAIT
+
+                root.findViewById<ProgressBar>(R.id.loading_video_player_controller_view).isVisible =
+                    playbackState <= STATE_BUFFERING
+
+                root.findViewById<View>(R.id.exo_play_pause).isVisible =
+                    playbackState > STATE_BUFFERING
             }
+
+            if (isControllerViewVisible && !uiState.isLocked) {
+                val horizontalPadding = when {
+                    orientation == ORIENTATION_LANDSCAPE && navigationBarPosition == NavigationBarPosition.Left ->
+                        PaddingValues(start = navigationBarHeight)
+
+                    orientation == ORIENTATION_LANDSCAPE && navigationBarPosition == NavigationBarPosition.Right ->
+                        PaddingValues(end = navigationBarHeight)
+
+                    else -> PaddingValues(0.dp)
+                }
+                VideoPlayerTopBar(
+                    modifier = Modifier.padding(horizontalPadding),
+                    title = if (orientation == ORIENTATION_PORTRAIT) {
+                        ""
+                    } else {
+                        uiState.metadata.title ?: uiState.metadata.nodeName
+                    },
+                    menuActions = uiState.menuActions,
+                    onBackPressed = { backDispatcher?.onBackPressed() },
+                    onMenuActionClicked = viewModel::updateClickedMenuAction,
+                )
+            }
+
+            resizedBitmap?.let {
+                if (isScreenshotVisible) {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = "Screenshot Animation",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer(
+                                scaleX = scale.value,
+                                scaleY = scale.value,
+                                transformOrigin =
+                                    if (orientation == ORIENTATION_LANDSCAPE)
+                                        TransformOrigin(0.9f, 0.9f)
+                                    else {
+                                        TransformOrigin(0.9f, 0.8f)
+                                    }
+                            )
+                    )
+                }
+            }
+
+            AddSubtitlesDialog(
+                isShown = uiState.showSubtitleDialog,
+                selectOptionState = uiState.subtitleSelectedStatus.id,
+                matchedSubtitleFileUpdate = {
+                    viewModel.getMatchedSubtitleFileInfo()
+                },
+                subtitleFileName = uiState.addedSubtitleInfo?.name,
+                onOffClicked = {
+                    viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+                },
+                onAddedSubtitleClicked = {
+                    viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
+                },
+                onAutoMatch = { info ->
+                    if (info.url == null) {
+                        viewModel.updateSnackBarMessage(
+                            resource.getString(R.string.media_player_video_message_adding_subtitle_failed)
+                        )
+                        return@AddSubtitlesDialog
+                    }
+                    Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
+                    viewModel.updateSubtitleSelectedStatus(
+                        SubtitleSelectedStatus.SelectMatchedItem,
+                        info
+                    )
+                },
+                onDismissRequest = {
+                    viewModel.updateShowSubtitleDialog(false)
+                },
+                onToSelectSubtitle = {
+                    Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
+                    viewModel.navigateToSelectSubtitle()
+                })
         }
     }
 }

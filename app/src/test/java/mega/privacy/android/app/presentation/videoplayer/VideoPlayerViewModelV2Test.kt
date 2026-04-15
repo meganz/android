@@ -177,7 +177,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -229,8 +228,8 @@ import kotlin.time.Duration.Companion.seconds
 )
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class VideoPlayerRevampViewModelTest {
-    private lateinit var underTest: VideoPlayerRevampViewModel
+class VideoPlayerViewModelV2Test {
+    private lateinit var underTest: VideoPlayerViewModelV2
 
     private val context = mock<Context>()
     private val mediaPlayerGateway = mock<MediaPlayerGateway>()
@@ -324,7 +323,7 @@ class VideoPlayerRevampViewModelTest {
     private fun initViewModel() {
         fakeMonitorTransferEventsFlow = MutableSharedFlow()
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
-        underTest = VideoPlayerRevampViewModel(
+        underTest = VideoPlayerViewModelV2(
             context = context,
             mediaPlayerGateway = mediaPlayerGateway,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),

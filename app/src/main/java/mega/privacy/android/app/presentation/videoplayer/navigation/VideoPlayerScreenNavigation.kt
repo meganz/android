@@ -1,31 +1,28 @@
 package mega.privacy.android.app.presentation.videoplayer.navigation
 
 import androidx.compose.material.ScaffoldState
-import androidx.compose.material.navigation.BottomSheetNavigator
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampViewModel
-import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerRevampScreen
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
+import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerScreen
 
 @Serializable
-internal object VideoPlayerRevampScreenDestination
+internal data object VideoPlayerScreenNavKey : NavKey
 
-internal fun NavGraphBuilder.videoPlayerRevampScreen(
-    navHostController: NavHostController,
-    bottomSheetNavigator: BottomSheetNavigator,
+internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
     scaffoldState: ScaffoldState,
-    viewModel: VideoPlayerRevampViewModel,
+    viewModel: VideoPlayerViewModelV2,
     player: ExoPlayer?,
     handleAutoReplayIfPaused: () -> Unit,
     playQueueButtonClicked: () -> Unit,
+    onNavigateToSelectSubtitle: () -> Unit,
 ) {
-    composable<VideoPlayerRevampScreenDestination> {
+    entry<VideoPlayerScreenNavKey> {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         LaunchedEffect(Unit) {
             handleAutoReplayIfPaused()
@@ -33,13 +30,12 @@ internal fun NavGraphBuilder.videoPlayerRevampScreen(
 
         LaunchedEffect(uiState.navigateToSelectSubtitleScreen) {
             if (uiState.navigateToSelectSubtitleScreen) {
-                navHostController.navigate(VideoPlayerRevampSelectSubtitleScreen)
+                onNavigateToSelectSubtitle()
                 viewModel.updateNavigateToSelectSubtitle(false)
             }
         }
 
-        VideoPlayerRevampScreen(
-            bottomSheetNavigator = bottomSheetNavigator,
+        VideoPlayerScreen(
             scaffoldState = scaffoldState,
             viewModel = viewModel,
             player = player,

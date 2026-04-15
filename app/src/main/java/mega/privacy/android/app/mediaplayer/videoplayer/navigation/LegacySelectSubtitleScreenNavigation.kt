@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.videoplayer.navigation
+package mega.privacy.android.app.mediaplayer.videoplayer.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavGraphBuilder
@@ -10,23 +10,19 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.mediaplayer.SelectSubtitleComposeView
 import mega.privacy.android.app.mediaplayer.SelectSubtitleFileViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.sharedViewModel
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampViewModel
+import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.mobile.analytics.event.AddSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.CancelSelectSubtitlePressedEvent
 
-/**
- * Select subtitle route for the revamped video player only. Legacy graph uses
- * [mega.privacy.android.app.mediaplayer.videoplayer.navigation.SelectSubtitleScreen].
- */
 @Serializable
-internal object VideoPlayerRevampSelectSubtitleScreen
+internal object LegacySelectSubtitleScreen
 
-internal fun NavGraphBuilder.videoPlayerRevampSelectSubtitleScreen(
+internal fun NavGraphBuilder.legacySelectSubtitleScreen(
     navHostController: NavHostController,
-    viewModel: VideoPlayerRevampViewModel,
+    legacyVideoPlayerViewModel: LegacyVideoPlayerViewModel,
 ) {
-    composable<VideoPlayerRevampSelectSubtitleScreen> { backStackEntry ->
+    composable<LegacySelectSubtitleScreen> { backStackEntry ->
         val selectSubtitleViewModel =
             backStackEntry.sharedViewModel<SelectSubtitleFileViewModel>(navHostController)
         val systemUiController = rememberSystemUiController()
@@ -39,7 +35,7 @@ internal fun NavGraphBuilder.videoPlayerRevampSelectSubtitleScreen(
             viewModel = selectSubtitleViewModel,
             onAddSubtitle = { info ->
                 Analytics.tracker.trackEvent(AddSubtitlePressedEvent)
-                viewModel.updateSubtitleSelectedStatus(
+                legacyVideoPlayerViewModel.updateSubtitleSelectedStatus(
                     SubtitleSelectedStatus.AddSubtitleItem,
                     info
                 )
@@ -49,7 +45,7 @@ internal fun NavGraphBuilder.videoPlayerRevampSelectSubtitleScreen(
             onBackPressed = {
                 Analytics.tracker.trackEvent(CancelSelectSubtitlePressedEvent)
                 navHostController.popBackStack()
-                viewModel.updateShowSubtitleDialog(false)
+                legacyVideoPlayerViewModel.updateShowSubtitleDialog(false)
             }
         )
     }

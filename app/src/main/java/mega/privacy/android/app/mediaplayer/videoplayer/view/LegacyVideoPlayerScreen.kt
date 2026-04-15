@@ -66,8 +66,8 @@ import mega.privacy.android.app.databinding.VideoPlayerPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.PlaybackPositionDialog
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
+import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerController
+import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.view.AddSubtitlesDialog
@@ -86,10 +86,10 @@ import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-internal fun VideoPlayerScreen(
+internal fun LegacyVideoPlayerScreen(
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
-    viewModel: VideoPlayerViewModel,
+    viewModel: LegacyVideoPlayerViewModel,
     player: ExoPlayer?,
     playQueueButtonClicked: () -> Unit,
 ) {
@@ -99,7 +99,7 @@ internal fun VideoPlayerScreen(
     val configuration = LocalConfiguration.current
     val orientation = configuration.orientation
 
-    var videoPlayerController by remember { mutableStateOf<VideoPlayerController?>(null) }
+    var legacyVideoPlayerController by remember { mutableStateOf<LegacyVideoPlayerController?>(null) }
 
     val systemUiController = rememberSystemUiController()
     var isControllerViewVisible by rememberSaveable { mutableStateOf(true) }
@@ -181,36 +181,36 @@ internal fun VideoPlayerScreen(
 
     LaunchedEffect(uiState.items) {
         if (uiState.items.isNotEmpty()) {
-            videoPlayerController?.togglePlayQueueEnabled(uiState.items.size)
+            legacyVideoPlayerController?.togglePlayQueueEnabled(uiState.items.size)
         }
     }
 
     LaunchedEffect(uiState.isFullscreen) {
-        videoPlayerController?.updateFullscreenButtonIcon(uiState.isFullscreen)
+        legacyVideoPlayerController?.updateFullscreenButtonIcon(uiState.isFullscreen)
     }
 
     LaunchedEffect(uiState.isLocked) {
-        videoPlayerController?.updateLockView(uiState.isLocked)
+        legacyVideoPlayerController?.updateLockView(uiState.isLocked)
     }
 
     LaunchedEffect(uiState.currentSpeedPlayback) {
-        videoPlayerController?.updateSpeedPlaybackButtonIcon(uiState.currentSpeedPlayback.text)
+        legacyVideoPlayerController?.updateSpeedPlaybackButtonIcon(uiState.currentSpeedPlayback.text)
     }
 
     LaunchedEffect(uiState.subtitleSelectedStatus) {
-        videoPlayerController?.updateSubtitleButtonUI(uiState.subtitleSelectedStatus)
+        legacyVideoPlayerController?.updateSubtitleButtonUI(uiState.subtitleSelectedStatus)
     }
 
     LaunchedEffect(uiState.metadata, orientation) {
-        videoPlayerController?.displayMetadata(uiState.metadata)
+        legacyVideoPlayerController?.displayMetadata(uiState.metadata)
     }
 
     LaunchedEffect(uiState.repeatToggleMode) {
-        videoPlayerController?.updateRepeatToggleButtonUI(context, uiState.repeatToggleMode)
+        legacyVideoPlayerController?.updateRepeatToggleButtonUI(context, uiState.repeatToggleMode)
     }
 
     LaunchedEffect(uiState.mediaPlaybackState) {
-        videoPlayerController?.updatePlaybackState(uiState.mediaPlaybackState)
+        legacyVideoPlayerController?.updatePlaybackState(uiState.mediaPlaybackState)
     }
 
     DisposableEffect(Unit) {
@@ -249,7 +249,7 @@ internal fun VideoPlayerScreen(
                                     }
                                 }
 
-                                videoPlayerController = VideoPlayerController(
+                                legacyVideoPlayerController = LegacyVideoPlayerController(
                                     context = context,
                                     uiState = uiState,
                                     container = root,
@@ -372,7 +372,7 @@ internal fun VideoPlayerScreen(
                             }
                     },
                     onRelease = {
-                        (playerComposeView.tag as? VideoPlayerController)?.release()
+                        (playerComposeView.tag as? LegacyVideoPlayerController)?.release()
                         if (uiState.isVideoOptionPopupShown) {
                             viewModel.updateIsVideoOptionPopupShown(false)
                         }

@@ -422,12 +422,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".mediaplayer.VideoPlayerComposeActivity"
+            android:name=".mediaplayer.LegacyVideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
             android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".presentation.videoplayer.VideoPlayerRevampActivity"
+            android:name=".presentation.videoplayer.VideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
             android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
             android:windowSoftInputMode="adjustNothing" />

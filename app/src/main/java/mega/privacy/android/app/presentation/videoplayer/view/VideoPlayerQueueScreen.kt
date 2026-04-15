@@ -15,20 +15,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueMenuAction
 import mega.privacy.android.app.mediaplayer.queue.view.VideoQueueTopBar
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerRevampViewModel
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 
 @Composable
-internal fun VideoPlayerRevampQueueScreen(
-    navHostController: NavHostController,
-    viewModel: VideoPlayerRevampViewModel,
+internal fun VideoPlayerQueueScreen(
+    viewModel: VideoPlayerViewModelV2,
+    onBack: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val lazyListState = rememberLazyListState()
@@ -131,7 +130,7 @@ internal fun VideoPlayerRevampQueueScreen(
                                 viewModel.closeSearch()
                             }
                             viewModel.seekToByHandle(item.nodeHandle)
-                            navHostController.popBackStack()
+                            onBack()
                         }
                     }
                 },

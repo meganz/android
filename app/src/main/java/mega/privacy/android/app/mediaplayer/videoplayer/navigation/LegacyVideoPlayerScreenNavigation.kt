@@ -10,22 +10,22 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.compose.material.navigation.BottomSheetNavigator
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.mediaplayer.videoplayer.view.VideoPlayerScreen
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
+import mega.privacy.android.app.mediaplayer.videoplayer.view.LegacyVideoPlayerScreen
+import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerViewModel
 
 @Serializable
-internal object VideoPlayerScreen
+internal object LegacyVideoPlayerScreen
 
-internal fun NavGraphBuilder.videoPlayerScreen(
+internal fun NavGraphBuilder.legacyVideoPlayerScreen(
     navHostController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,
     scaffoldState: ScaffoldState,
-    viewModel: VideoPlayerViewModel,
+    viewModel: LegacyVideoPlayerViewModel,
     player: ExoPlayer?,
     handleAutoReplayIfPaused: () -> Unit,
     playQueueButtonClicked: () -> Unit,
 ) {
-    composable<VideoPlayerScreen> {
+    composable<LegacyVideoPlayerScreen> {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         LaunchedEffect(Unit) {
             handleAutoReplayIfPaused()
@@ -33,12 +33,12 @@ internal fun NavGraphBuilder.videoPlayerScreen(
 
         LaunchedEffect(uiState.navigateToSelectSubtitleScreen) {
             if (uiState.navigateToSelectSubtitleScreen) {
-                navHostController.navigate(SelectSubtitleScreen)
+                navHostController.navigate(LegacySelectSubtitleScreen)
                 viewModel.updateNavigateToSelectSubtitle(false)
             }
         }
 
-        VideoPlayerScreen(
+        LegacyVideoPlayerScreen(
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
             viewModel = viewModel,

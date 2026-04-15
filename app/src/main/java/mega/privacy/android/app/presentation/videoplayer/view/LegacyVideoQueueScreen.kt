@@ -21,14 +21,14 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.queue.model.VideoQueueMenuAction
 import mega.privacy.android.app.mediaplayer.queue.view.VideoQueueTopBar
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
+import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerViewModel
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 
 @Composable
-internal fun VideoQueueScreen(
+internal fun LegacyVideoQueueScreen(
     navHostController: NavHostController,
-    viewModel: VideoPlayerViewModel,
+    viewModel: LegacyVideoPlayerViewModel,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val lazyListState = rememberLazyListState()
