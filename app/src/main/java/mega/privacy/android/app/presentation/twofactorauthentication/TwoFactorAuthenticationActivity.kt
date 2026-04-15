@@ -8,9 +8,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,14 +22,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
+import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationView
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -75,6 +77,11 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     @Composable
     private fun TwoFactorAuthenticationScreen(isDarkMode: Boolean) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        LaunchedEffect(uiState.authenticationState) {
+            if (uiState.authenticationState == AuthenticationState.Passed) {
+                setResult(RESULT_OK)
+            }
+        }
         TwoFactorAuthenticationView(
             uiState = uiState,
             isDarkMode = isDarkMode,
@@ -89,10 +96,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
             on2FAPinReset = viewModel::on2FAPinReset,
             onExportRkClicked = { chooseRecoverySaveLocation() },
-            onDismissClicked = {
-                update2FASetting()
-                finish()
-            },
+            onDismissClicked = ::finish,
             onCopySeedLongClicked = { copySeed(uiState.seed.orEmpty()) },
             onIsRkExportSuccessfullyConsumed = viewModel::onIsRkExportSuccessfullyEventConsumed,
             onIsWritePermissionDeniedConsumed = viewModel::onWritePermissionDeniedEventConsumed,
@@ -114,8 +118,8 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
@@ -200,10 +204,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun update2FASetting() {
-        setResult(RESULT_OK)
     }
 
     private fun openPlayStore() {
