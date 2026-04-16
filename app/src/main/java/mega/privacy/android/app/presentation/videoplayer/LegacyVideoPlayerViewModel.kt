@@ -1652,8 +1652,8 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         uiState.update { it.copy(isVideoOptionPopupShown = value) }
     }
 
-    internal fun updateIsSpeedPopupShown(value: Boolean) {
-        uiState.update { it.copy(isSpeedPopupShown = value) }
+    internal fun updateIsSpeedOptionsShown(value: Boolean) {
+        uiState.update { it.copy(isSpeedOptionsShown = value) }
     }
 
     internal fun updateCurrentSpeedPlaybackItem(item: SpeedPlaybackItem) {

@@ -272,8 +272,8 @@ internal fun LegacyVideoPlayerScreen(
                                     updateIsVideoOptionPopupShown = { value ->
                                         viewModel.updateIsVideoOptionPopupShown(value)
                                     },
-                                    updateIsSpeedPopupShown = { value ->
-                                        viewModel.updateIsSpeedPopupShown(value)
+                                    updateIsSpeedOptionsShown = { value ->
+                                        viewModel.updateIsSpeedOptionsShown(value)
                                     },
                                     speedPlaybackItemSelected = { item ->
                                         viewModel.updateCurrentSpeedPlaybackItem(item)

@@ -15,10 +15,18 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +40,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -68,10 +78,17 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.list.FlexibleLineListItem
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
+import mega.privacy.android.app.presentation.videoplayer.model.VideoSpeedPlaybackMenuAction
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -81,9 +98,14 @@ import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
 import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SpeedSelectedDialogEvent
 
 @androidx.annotation.OptIn(UnstableApi::class)
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalPermissionsApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class,
+    ExperimentalPermissionsApi::class,
+    ExperimentalMaterial3Api::class,
+)
 @Composable
 internal fun VideoPlayerScreen(
     scaffoldState: ScaffoldState,
@@ -99,6 +121,7 @@ internal fun VideoPlayerScreen(
     val orientation = configuration.orientation
 
     var videoPlayerController by remember { mutableStateOf<VideoPlayerController?>(null) }
+    var isSpeedOptionsShown by rememberSaveable { mutableStateOf(false) }
 
     val systemUiController = rememberSystemUiController()
     var isControllerViewVisible by rememberSaveable { mutableStateOf(true) }
@@ -293,11 +316,8 @@ internal fun VideoPlayerScreen(
                                 updateIsVideoOptionPopupShown = { value ->
                                     viewModel.updateIsVideoOptionPopupShown(value)
                                 },
-                                updateIsSpeedPopupShown = { value ->
-                                    viewModel.updateIsSpeedPopupShown(value)
-                                },
-                                speedPlaybackItemSelected = { item ->
-                                    viewModel.updateCurrentSpeedPlaybackItem(item)
+                                updateIsSpeedOptionsShown = { value ->
+                                    isSpeedOptionsShown = value
                                 },
                                 updateLockStatus = { isLock ->
                                     viewModel.updateLockStatus(isLock)
@@ -444,6 +464,52 @@ internal fun VideoPlayerScreen(
                                     }
                             )
                     )
+                }
+            }
+
+            if (isSpeedOptionsShown) {
+                LaunchedEffect(Unit) {
+                    Analytics.tracker.trackEvent(SpeedSelectedDialogEvent)
+                }
+                val speedSheetState =
+                    rememberModalBottomSheetState(skipPartiallyExpanded = false)
+                MegaModalBottomSheet(
+                    bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+                    sheetState = speedSheetState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding(),
+                    onDismissRequest = { isSpeedOptionsShown = false },
+                ) {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        VideoSpeedPlaybackMenuAction.entries.forEach { action ->
+                            val isSelected = action.playbackItem == uiState.currentSpeedPlayback
+                            FlexibleLineListItem(
+                                modifier = Modifier.testTag(action.testTag),
+                                title = action.getDescription(),
+                                trailingElement = {
+                                    if (isSelected) {
+                                        MegaIcon(
+                                            modifier = Modifier.size(24.dp),
+                                            painter = rememberVectorPainter(
+                                                IconPack.Small.Thin.Outline.Check
+                                            ),
+                                            contentDescription = null,
+                                            tint = IconColor.Secondary,
+                                        )
+                                    }
+                                },
+                                onClickListener = {
+                                    Analytics.tracker.trackEvent(action.speedOptionPressedEvent)
+                                    viewModel.updateCurrentSpeedPlaybackItem(action.playbackItem)
+                                    coroutineScope.launch {
+                                        speedSheetState.hide()
+                                        isSpeedOptionsShown = false
+                                    }
+                                },
+                            )
+                        }
+                    }
                 }
             }
 

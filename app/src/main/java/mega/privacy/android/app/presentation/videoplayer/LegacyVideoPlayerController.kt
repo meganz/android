@@ -64,7 +64,7 @@ class LegacyVideoPlayerController(
     private val isShowSubtitleIcon: Boolean,
     private val updateRepeatToggleMode: () -> Unit,
     private val updateIsVideoOptionPopupShown: (Boolean) -> Unit,
-    private val updateIsSpeedPopupShown: (Boolean) -> Unit,
+    private val updateIsSpeedOptionsShown: (Boolean) -> Unit,
     private val speedPlaybackItemSelected: (SpeedPlaybackItem) -> Unit,
     private val updateLockStatus: (Boolean) -> Unit,
     private val showSubtitleDialog: () -> Unit,
@@ -97,7 +97,7 @@ class LegacyVideoPlayerController(
     private var translationX = 0f
     private var translationY = 0f
 
-    private var isSpeedPopupShown = mutableStateOf(uiState.isSpeedPopupShown)
+    private var isSpeedOptionsShown = mutableStateOf(uiState.isSpeedOptionsShown)
     private var isVideoOptionPopupShown = mutableStateOf(false)
     private var currentSpeedPlayback = mutableStateOf(uiState.currentSpeedPlayback)
     private var isFullscreen = mutableStateOf(uiState.isFullscreen)
@@ -308,8 +308,8 @@ class LegacyVideoPlayerController(
         initSpeedPlaybackPopup(speedPlaybackPopup)
         speedPlaybackButton.text = uiState.currentSpeedPlayback.text
         speedPlaybackButton.setOnClickListener {
-            updateIsSpeedPopupShown(true)
-            isSpeedPopupShown.value = true
+            updateIsSpeedOptionsShown(true)
+            isSpeedOptionsShown.value = true
         }
     }
 
@@ -317,11 +317,11 @@ class LegacyVideoPlayerController(
         composeView.setupComposeView(context) {
             SpeedSelectedPopup(
                 items = VideoSpeedPlaybackItem.entries,
-                isShown = isSpeedPopupShown.value,
+                isShown = isSpeedOptionsShown.value,
                 currentPlaybackSpeed = currentSpeedPlayback.value,
                 onDismissRequest = {
-                    updateIsSpeedPopupShown(false)
-                    isSpeedPopupShown.value = false
+                    updateIsSpeedOptionsShown(false)
+                    isSpeedOptionsShown.value = false
                 }
             ) { speedPlaybackItem ->
                 when (speedPlaybackItem) {
@@ -338,9 +338,9 @@ class LegacyVideoPlayerController(
                     Analytics.tracker.trackEvent(eventIdentifier)
                 }
                 speedPlaybackItemSelected(speedPlaybackItem)
-                updateIsSpeedPopupShown(false)
+                updateIsSpeedOptionsShown(false)
                 currentSpeedPlayback.value = speedPlaybackItem
-                isSpeedPopupShown.value = false
+                isSpeedOptionsShown.value = false
             }
         }
     }
@@ -455,7 +455,7 @@ class LegacyVideoPlayerController(
         scaleGestureDetector = null
         gestureDetector = null
 
-        isSpeedPopupShown.value = false
+        isSpeedOptionsShown.value = false
         isVideoOptionPopupShown.value = false
     }
 }

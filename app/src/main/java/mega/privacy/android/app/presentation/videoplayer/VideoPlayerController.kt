@@ -27,26 +27,14 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.SpeedSelectedPopup
 import mega.privacy.android.app.mediaplayer.VideoOptionRevampPopup
 import mega.privacy.android.app.mediaplayer.model.RevampVideoOptionItem
-import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
-import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
-import mega.privacy.mobile.analytics.event.SpeedOption0_5XPressedEvent
-import mega.privacy.mobile.analytics.event.SpeedOption1_5XPressedEvent
-import mega.privacy.mobile.analytics.event.SpeedOption2XPressedEvent
-import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_0_25XEvent
-import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_0_75XEvent
-import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1XEvent
-import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1_25XEvent
-import mega.privacy.mobile.analytics.event.VideoSpeedOptionPressed_1_75XEvent
 import timber.log.Timber
 
 class VideoPlayerController(
@@ -56,8 +44,7 @@ class VideoPlayerController(
     private val isShowSubtitleIcon: Boolean,
     private val updateRepeatToggleMode: () -> Unit,
     private val updateIsVideoOptionPopupShown: (Boolean) -> Unit,
-    private val updateIsSpeedPopupShown: (Boolean) -> Unit,
-    private val speedPlaybackItemSelected: (SpeedPlaybackItem) -> Unit,
+    private val updateIsSpeedOptionsShown: (Boolean) -> Unit,
     private val updateLockStatus: (Boolean) -> Unit,
     private val showSubtitleDialog: () -> Unit,
     private val fullscreenClickedCallback: (Boolean) -> Unit,
@@ -76,7 +63,6 @@ class VideoPlayerController(
     private val unlockView = container.findViewById<View>(R.id.layout_unlock)
     private val unlockButton = container.findViewById<ImageButton>(R.id.image_button_unlock)
     private val speedPlaybackButton = container.findViewById<TextView>(R.id.speed_playback)
-    private val speedPlaybackPopup = container.findViewById<ComposeView>(R.id.speed_playback_popup)
     private val deviceRotateButton = container.findViewById<ImageButton>(R.id.device_rotated)
 
     private var scaleGestureDetector: ScaleGestureDetector? = null
@@ -86,9 +72,7 @@ class VideoPlayerController(
     private var translationX = 0f
     private var translationY = 0f
 
-    private var isSpeedPopupShown = mutableStateOf(uiState.isSpeedPopupShown)
     private var isVideoOptionPopupShown = mutableStateOf(uiState.isVideoOptionPopupShown)
-    private var currentSpeedPlayback = mutableStateOf(uiState.currentSpeedPlayback)
     private var isFullscreen = mutableStateOf(uiState.isFullscreen)
     private var playbackState = uiState.mediaPlaybackState
     private var isLocked = mutableStateOf(uiState.isLocked)
@@ -270,43 +254,9 @@ class VideoPlayerController(
     }
 
     private fun setupSpeedPlaybackButton() {
-        initSpeedPlaybackPopup(speedPlaybackPopup)
         speedPlaybackButton.text = uiState.currentSpeedPlayback.text
         speedPlaybackButton.setOnClickListener {
-            updateIsSpeedPopupShown(true)
-            isSpeedPopupShown.value = true
-        }
-    }
-
-    private fun initSpeedPlaybackPopup(composeView: ComposeView) {
-        composeView.setupComposeView(context) {
-            SpeedSelectedPopup(
-                items = VideoSpeedPlaybackItem.entries,
-                isShown = isSpeedPopupShown.value,
-                currentPlaybackSpeed = currentSpeedPlayback.value,
-                onDismissRequest = {
-                    updateIsSpeedPopupShown(false)
-                    isSpeedPopupShown.value = false
-                }
-            ) { speedPlaybackItem ->
-                when (speedPlaybackItem) {
-                    VideoSpeedPlaybackItem.PlaybackSpeed_0_25X -> VideoSpeedOptionPressed_0_25XEvent
-                    VideoSpeedPlaybackItem.PlaybackSpeed_0_5X -> SpeedOption0_5XPressedEvent
-                    VideoSpeedPlaybackItem.PlaybackSpeed_0_75X -> VideoSpeedOptionPressed_0_75XEvent
-                    VideoSpeedPlaybackItem.PlaybackSpeed_1X -> VideoSpeedOptionPressed_1XEvent
-                    VideoSpeedPlaybackItem.PlaybackSpeed_1_25X -> VideoSpeedOptionPressed_1_25XEvent
-                    VideoSpeedPlaybackItem.PlaybackSpeed_1_5X -> SpeedOption1_5XPressedEvent
-                    VideoSpeedPlaybackItem.PlaybackSpeed_1_75X -> VideoSpeedOptionPressed_1_75XEvent
-                    VideoSpeedPlaybackItem.PlaybackSpeed_2X -> SpeedOption2XPressedEvent
-                    else -> null
-                }?.let { eventIdentifier ->
-                    Analytics.tracker.trackEvent(eventIdentifier)
-                }
-                speedPlaybackItemSelected(speedPlaybackItem)
-                updateIsSpeedPopupShown(false)
-                currentSpeedPlayback.value = speedPlaybackItem
-                isSpeedPopupShown.value = false
-            }
+            updateIsSpeedOptionsShown(true)
         }
     }
 
@@ -395,12 +345,10 @@ class VideoPlayerController(
         playerComposeView?.setOnTouchListener(null)
 
         videoOptionPopup.disposeComposition()
-        speedPlaybackPopup.disposeComposition()
 
         scaleGestureDetector = null
         gestureDetector = null
 
-        isSpeedPopupShown.value = false
         isVideoOptionPopupShown.value = false
     }
 }

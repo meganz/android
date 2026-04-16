@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.videoplayer
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.TextureView
+import android.view.View
 import androidx.lifecycle.SavedStateHandle
 import androidx.media3.common.MediaItem
 import app.cash.turbine.test
@@ -135,6 +137,7 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
@@ -177,7 +180,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -205,9 +207,9 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.clearInvocations
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
-import org.mockito.kotlin.never
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -1634,16 +1636,39 @@ class VideoPlayerViewModelV2Test {
         }
     }
 
-    @ParameterizedTest(name = "when value is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that isSpeedPopupShown is updated correctly`(value: Boolean) = runTest {
-        initViewModel()
-        underTest.updateIsSpeedPopupShown(value)
-        testScheduler.advanceUntilIdle()
-        underTest.uiState.test {
-            assertThat(awaitItem().isSpeedPopupShown).isEqualTo(value)
+    @Test
+    fun `test that screenshotWhenVideoPlaying does not invoke successCallback when captureView is not a TextureView`() =
+        runTest {
+            var callbackInvoked = false
+            val mockView = mock<View>()
+
+            underTest.screenshotWhenVideoPlaying(
+                rootPath = "test/path",
+                captureView = mockView,
+                successCallback = { callbackInvoked = true },
+            )
+            advanceUntilIdle()
+
+            assertThat(callbackInvoked).isFalse()
         }
-    }
+
+    @Test
+    fun `test that screenshotWhenVideoPlaying does not invoke successCallback when TextureView is not available`() =
+        runTest {
+            var callbackInvoked = false
+            val mockTextureView = mock<TextureView> {
+                on { isAvailable } doReturn false
+            }
+
+            underTest.screenshotWhenVideoPlaying(
+                rootPath = "test/path",
+                captureView = mockTextureView,
+                successCallback = { callbackInvoked = true },
+            )
+            advanceUntilIdle()
+
+            assertThat(callbackInvoked).isFalse()
+        }
 
     @ParameterizedTest(name = "when item is {0}")
     @MethodSource("provideSpeedPlaybackItem")

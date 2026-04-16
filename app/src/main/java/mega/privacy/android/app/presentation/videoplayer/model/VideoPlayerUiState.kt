@@ -45,7 +45,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property query search query
  * @property searchedItems searched video player items
  * @property isLocked whether the video player is locked
- * @property isSpeedPopupShown speed playback popup whether is shown, true is shown, otherwise is false
+ * @property isSpeedOptionsShown whether the playback speed options bottom sheet is shown
  * @property currentSpeedPlayback current SpeedPlaybackItem
  * @property showPlaybackDialog whether the playback dialog is shown
  * @property playbackPosition the playback position
@@ -56,6 +56,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property addedSubtitleInfo the added subtitle info
  * @property navigateToSelectSubtitleScreen whether to navigate to select subtitle screen
  * @property blockedError the blocked error event
+ * @property isClosedAfterHidingNode whether to close the video player after hiding node.
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -87,7 +88,7 @@ data class VideoPlayerUiState(
     val query: String? = null,
     val searchedItems: List<VideoPlayerItem> = emptyList(),
     val isLocked: Boolean = false,
-    val isSpeedPopupShown: Boolean = false,
+    val isSpeedOptionsShown: Boolean = false,
     val currentSpeedPlayback: SpeedPlaybackItem = VideoSpeedPlaybackItem.PlaybackSpeed_1X,
     val showPlaybackDialog: Boolean = false,
     val playbackPosition: Long? = null,

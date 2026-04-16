@@ -1714,12 +1714,12 @@ class LegacyVideoPlayerViewModelTest {
 
     @ParameterizedTest(name = "when value is {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that isSpeedPopupShown is updated correctly`(value: Boolean) = runTest {
+    fun `test that isSpeedOptionsShown is updated correctly`(value: Boolean) = runTest {
         initViewModel()
-        underTest.updateIsSpeedPopupShown(value)
+        underTest.updateIsSpeedOptionsShown(value)
         testScheduler.advanceUntilIdle()
         underTest.uiState.test {
-            assertThat(awaitItem().isSpeedPopupShown).isEqualTo(value)
+            assertThat(awaitItem().isSpeedOptionsShown).isEqualTo(value)
         }
     }
 

@@ -356,8 +356,8 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private val mediaItemsDuringChanged = mutableListOf<MediaItem>()
     private var searchJob: Job? = null
     private val mutex = Mutex()
-    protected var playbackPositionJob: Job? = null
-    protected var hasCheckedPlaybackPosition = false
+    private var playbackPositionJob: Job? = null
+    private var hasCheckedPlaybackPosition = false
     private var currentIntent: Intent? = null
 
     private var isPausedByUser = false
@@ -406,9 +406,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
                 }
                 .catch { Timber.e(it) }
                 .collect { event ->
-                    val error = (event as TransferEvent.TransferTemporaryErrorEvent).error
-
-                    when (error) {
+                    when (val error = (event as TransferEvent.TransferTemporaryErrorEvent).error) {
                         is QuotaExceededMegaException -> {
                             if (!event.transfer.isForeignOverQuota && error.value != 0L) {
                                 viewModelScope.launch { broadcastTransferOverQuotaUseCase(true) }
@@ -883,24 +881,24 @@ class VideoPlayerViewModelV2 @Inject constructor(
             FROM_ALBUM_SHARING,
             FAVOURITES_ADAPTER,
                 -> {
-                when {
-                    launchSource == LINKS_ADAPTER && parentHandle == INVALID_HANDLE ->
+                when (launchSource) {
+                    LINKS_ADAPTER if parentHandle == INVALID_HANDLE ->
                         context.getString(sharedR.string.shares_screen_links_shares_tab_title) to getVideoNodesFromPublicLinksUseCase(
                             order
                         )
 
-                    launchSource == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE ->
+                    INCOMING_SHARES_ADAPTER if parentHandle == INVALID_HANDLE ->
                         context.getString(sharedR.string.shares_screen_incoming_shares_tab_title) to getVideoNodesFromInSharesUseCase(
                             order
                         )
 
-                    launchSource == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE ->
+                    OUTGOING_SHARES_ADAPTER if parentHandle == INVALID_HANDLE ->
                         context.getString(sharedR.string.shares_screen_outgoing_shares_tab_title) to getVideoNodesFromOutSharesUseCase(
                             lastHandle = INVALID_HANDLE,
                             order = order
                         )
 
-                    launchSource == CONTACT_FILE_ADAPTER && parentHandle == INVALID_HANDLE -> {
+                    CONTACT_FILE_ADAPTER if parentHandle == INVALID_HANDLE -> {
                         intent.getStringExtra(Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL)
                             ?.let { email ->
                                 val videoNodes = getVideoNodesByEmailUseCase(email).orEmpty()
@@ -1226,12 +1224,11 @@ class VideoPlayerViewModelV2 @Inject constructor(
 
     internal fun onPlaybackStateChanged(state: Int) {
         val playbackState = uiState.value.mediaPlaybackState
-        when {
-            state == MEDIA_PLAYER_STATE_ENDED &&
-                    playbackState == MediaPlaybackState.Playing ->
+        when (state) {
+            MEDIA_PLAYER_STATE_ENDED if playbackState == MediaPlaybackState.Playing ->
                 updatePlaybackState(MediaPlaybackState.Paused)
 
-            state == MEDIA_PLAYER_STATE_READY -> {
+            MEDIA_PLAYER_STATE_READY -> {
                 applyPendingSavedPlaybackPositionSeek()
                 if (playbackState == MediaPlaybackState.Paused
                     && !mediaPlayerGateway.getPlayWhenReady()
@@ -1280,7 +1277,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
                     saveRecentlyUsedItemUseCase(
                         nodeHandle = handle,
                         type = RecentlyUsedType.Video,
-                        fileName = uiState.value.metadata.nodeName.orEmpty(),
+                        fileName = uiState.value.metadata.nodeName,
                     )
                 }.onFailure { Timber.e(it, "Failed to save recently used video item") }
             }
@@ -1305,7 +1302,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
      * Pauses playback for a non-user reason (e.g. system / app policy). Clears
      * [allowUpdatePausedByUser] around the gateway pause so ExoPlayer does not treat this stop as a
      * user request, keeping [shouldResumeOnAudioFocusGain] accurate for code that resumes after
-     * transient interruptions. If the player was already not playing, only UI state is set to paused.
+     * transient interruptions. If the player was already not playing, only UI state is set to pause.
      */
     internal fun pausePlaybackNonUserInitiated() {
         if (mediaPlayerGateway.getPlayWhenReady()) {
@@ -1642,10 +1639,6 @@ class VideoPlayerViewModelV2 @Inject constructor(
         uiState.update { it.copy(isVideoOptionPopupShown = value) }
     }
 
-    internal fun updateIsSpeedPopupShown(value: Boolean) {
-        uiState.update { it.copy(isSpeedPopupShown = value) }
-    }
-
     internal fun updateCurrentSpeedPlaybackItem(item: SpeedPlaybackItem) {
         mediaPlayerGateway.updatePlaybackSpeed(item)
         uiState.update { it.copy(currentSpeedPlayback = item) }
@@ -1655,17 +1648,17 @@ class VideoPlayerViewModelV2 @Inject constructor(
         runCatching { mediaPlayerGateway.mediaPlayerIsPlaying() }.getOrDefault(false)
 
     /**
-     * Capture the screenshot when video playing
+     * Capture the screenshot when video playing.
      *
      * @param captureView the view that will be captured
-     * @param successCallback the callback after the screenshot is saved successfully
-     *
+     * @param successCallback invoked on the main dispatcher after the screenshot is saved
+     * successfully. Safe to perform UI work (Compose state, View updates, etc.) directly.
      */
     @SuppressLint("SimpleDateFormat")
     internal fun screenshotWhenVideoPlaying(
         rootPath: String,
         captureView: View,
-        successCallback: (bitmap: Bitmap) -> Unit,
+        successCallback: suspend (bitmap: Bitmap) -> Unit,
     ) {
         val textureView = captureView as? TextureView
         if (textureView == null || !textureView.isAvailable) {
@@ -1706,7 +1699,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private suspend fun saveBitmapByMediaStore(
         rootPath: String,
         bitmap: Bitmap,
-        successCallback: (bitmap: Bitmap) -> Unit,
+        successCallback: suspend (bitmap: Bitmap) -> Unit,
     ) = withContext(ioDispatcher) {
         val contentValues = organiseContentValues(rootPath)
         insertAndCompressBitmap(contentValues, bitmap, successCallback)
@@ -1737,10 +1730,10 @@ class VideoPlayerViewModelV2 @Inject constructor(
         }
     }
 
-    private fun insertAndCompressBitmap(
+    private suspend fun insertAndCompressBitmap(
         contentValues: ContentValues,
         bitmap: Bitmap,
-        successCallback: (bitmap: Bitmap) -> Unit,
+        successCallback: suspend (bitmap: Bitmap) -> Unit,
     ) {
         val contentResolver = context.contentResolver
         contentResolver?.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
@@ -1752,6 +1745,8 @@ class VideoPlayerViewModelV2 @Inject constructor(
                             QUALITY_SCREENSHOT,
                             outputStream
                         )
+                    } ?: return@let
+                    withContext(mainDispatcher) {
                         successCallback(bitmap)
                     }
                 } catch (e: Exception) {
@@ -2251,5 +2246,4 @@ class VideoPlayerViewModelV2 @Inject constructor(
         private const val SCREENSHOT_NAME_SUFFIX = ".jpg"
     }
 }
-
 
