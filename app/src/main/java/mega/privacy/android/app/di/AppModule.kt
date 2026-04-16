@@ -17,6 +17,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.LegacyDatabaseMigrationImpl
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.NativeLibraryLoader
 import mega.privacy.android.app.activities.UpgradeAccountDeepLinkHandler
 import mega.privacy.android.app.activities.navigation.WebViewDeepLinkHandler
 import mega.privacy.android.app.appstate.global.event.CombinedEventQueueImpl
@@ -80,6 +81,7 @@ internal class AppModule {
         @ApplicationContext context: Context,
         fileGateway: FileGateway,
     ): MegaApiAndroid {
+        NativeLibraryLoader.awaitLoaded()
         FileWrapper.initializeFactory(fileGateway)
         val packageInfo: PackageInfo
         var path: String? = null
@@ -111,6 +113,7 @@ internal class AppModule {
     @Provides
     @Suppress("DEPRECATION")
     fun provideMegaApiFolder(@ApplicationContext context: Context): MegaApiAndroid {
+        NativeLibraryLoader.awaitLoaded()
         val packageInfo: PackageInfo
         var path: String? = null
         try {

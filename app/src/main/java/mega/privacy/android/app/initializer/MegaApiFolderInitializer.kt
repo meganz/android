@@ -66,7 +66,11 @@ class MegaApiFolderInitializer : Initializer<Unit> {
      *
      */
     override fun dependencies(): List<Class<out Initializer<*>>> =
-        listOf(LoggerInitializer::class.java, SetupMegaApiInitializer::class.java)
+        listOf(
+            LoggerInitializer::class.java,
+            SetupMegaApiInitializer::class.java,
+            NativeLibraryInitializer::class.java
+        )
 
     private fun isLoggedIn(megaApi: MegaApiAndroid): Boolean = megaApi.isLoggedIn != 0
 }

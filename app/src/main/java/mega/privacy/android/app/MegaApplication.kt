@@ -114,11 +114,19 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     SingletonImageLoader.Factory, Configuration.Provider {
     @MegaApi
     @Inject
-    lateinit var megaApi: MegaApiAndroid
+    lateinit var _megaApi: Lazy<MegaApiAndroid>
+
+    val megaApi: MegaApiAndroid
+        @JvmName("getMegaApi")
+        get() = _megaApi.get()
 
     @MegaApiFolder
     @Inject
-    lateinit var megaApiFolder: MegaApiAndroid
+    lateinit var _megaApiFolder: Lazy<MegaApiAndroid>
+
+    val megaApiFolder: MegaApiAndroid
+        @JvmName("getMegaApiFolder")
+        get() = _megaApiFolder.get()
 
     @Inject
     @get:JvmName("megaChatApi")
