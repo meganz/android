@@ -56,12 +56,10 @@ fun EntryProviderScope<NavKey>.searchScreen(
             )
 
             HandleNodeOptionsActionResult(
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                onNavigate = navigationHandler::navigate,
-                onTransfer = onTransfer,
-                nodeResultFlow = navigationHandler::monitorResult,
-                clearResultFlow = navigationHandler::clearResult,
-            )
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onTransfer = onTransfer,
+        )
         }
     }
 }

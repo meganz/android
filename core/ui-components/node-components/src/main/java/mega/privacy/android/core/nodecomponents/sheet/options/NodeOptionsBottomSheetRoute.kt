@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 
 import android.content.Context
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,36 +38,26 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
+import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
-import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
 import mega.privacy.android.shared.nodes.components.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
-import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.shared.nodes.model.text
-import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.isSharedSource
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.megaActivityResultContract
 import timber.log.Timber
 
 /**
@@ -90,116 +79,35 @@ internal fun NodeOptionsBottomSheetRoute(
     nodeId: Long,
     nodeSourceType: NodeSourceType,
     partiallyExpand: Boolean,
-    onTransfer: (TransferTriggerEvent) -> Unit,
-    onNavigate: (NavKey) -> Unit = {},
-    onRename: (NodeId) -> Unit = {},
-    onCollisionResult: (NodeNameCollisionsResult) -> Unit = {},
-    onAddVideoToPlaylistResult: (AddVideoToPlaylistResult) -> Unit = {},
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
-        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
-            creationCallback = { it.create(nodeSourceType) }
-        ),
-    actionHandler: SingleNodeActionHandler = rememberSingleNodeActionHandler(
-        navigationHandler = navigationHandler,
-        viewModel = nodeOptionsActionViewModel
-    ),
+    onActionClicked: (MenuAction, TypedNode) -> Unit,
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
-    shareFolderDialogResult: ShareFolderDialogResult? = null,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val nodeOptionActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val megaActivityResultContract = remember { context.megaActivityResultContract }
-    val shareFolderLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.shareFolderActivityResultContract
-    ) { result ->
-        result?.let { (contactIds, nodeHandles) ->
-            nodeOptionsActionViewModel.contactSelectedForShareFolder(contactIds, nodeHandles)
-        }
-    }
-    val nodeHandlesToJsonMapper = remember { NodeHandlesToJsonMapper() }
 
     LaunchedEffect(Unit) {
         keyboardController?.hide()
         viewModel.getBottomSheetOptions(nodeId, nodeSourceType)
     }
 
-    LaunchedEffect(shareFolderDialogResult) {
-        shareFolderDialogResult?.let {
-            val handles = it.nodes.map { node -> node.id.longValue }.toLongArray()
-            shareFolderLauncher.launch(handles)
-        }
-    }
-
     BackHandler {
         onDismiss()
     }
 
-    // Event handlers
     EventEffect(
-        event = nodeOptionActionState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = onTransfer
-    )
-
-    EventEffect(
-        event = nodeOptionActionState.shareFolderDialogEvent,
-        onConsumed = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
-        action = { handles ->
-            onNavigate(ShareFolderDialogNavKey(nodeHandlesToJsonMapper(handles)))
-        }
-    )
-
-    EventEffect(
-        event = nodeOptionActionState.shareFolderEvent,
-        onConsumed = nodeOptionsActionViewModel::resetShareFolderEvent,
-        action = { handles -> shareFolderLauncher.launch(handles.toLongArray()) }
-    )
-
-    EventEffect(
-        event = nodeOptionActionState.contactsData,
-        onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
-        action = { (contactData, isFromBackups, nodeHandles) ->
-            onNavigate(
-                ShareFolderAccessDialogNavKey(
-                    nodes = nodeHandles,
-                    contacts = contactData.joinToString(separator = ","),
-                    isFromBackups = isFromBackups
-                )
-            )
+        event = uiState.error,
+        onConsumed = viewModel::onConsumeErrorState,
+        action = {
+            Timber.e(it)
+            onDismiss()
         },
     )
 
-    EventEffect(
-        event = nodeOptionActionState.navigationEvent,
-        onConsumed = nodeOptionsActionViewModel::resetNavigationEvent,
-        action = onNavigate
-    )
-
-    EventEffect(
-        event = nodeOptionActionState.dismissEvent,
-        onConsumed = nodeOptionsActionViewModel::resetDismiss,
-        action = onDismiss
-    )
-
-    EventEffect(
-        event = nodeOptionActionState.renameNodeRequestEvent,
-        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
-        action = onRename
-    )
-
-    EventEffect(
-        event = nodeOptionActionState.nodeNameCollisionsResult,
-        onConsumed = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
-        action = onCollisionResult
-    )
-
-    EventEffect(
-        event = nodeOptionActionState.addVideoToPlaylistResultEvent,
-        onConsumed = nodeOptionsActionViewModel::resetAddVideoToPlaylistResultEvent,
-        action = onAddVideoToPlaylistResult
-    )
+    val actionHandler = remember(onActionClicked) {
+        SingleNodeActionHandler { action, node ->
+            onActionClicked(action, node)
+        }
+    }
 
     NodeOptionsBottomSheetContent(
         uiState = uiState,

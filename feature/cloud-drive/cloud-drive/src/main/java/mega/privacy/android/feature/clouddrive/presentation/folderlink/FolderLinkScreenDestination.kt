@@ -45,12 +45,10 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                 onTransfer = transferHandler::setTransferEvent,
             )
             HandleNodeOptionsActionResult(
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                onNavigate = navigationHandler::navigate,
-                onTransfer = transferHandler::setTransferEvent,
-                nodeResultFlow = navigationHandler::monitorResult,
-                clearResultFlow = navigationHandler::clearResult,
-            )
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onTransfer = transferHandler::setTransferEvent,
+        )
         }
     }
 }

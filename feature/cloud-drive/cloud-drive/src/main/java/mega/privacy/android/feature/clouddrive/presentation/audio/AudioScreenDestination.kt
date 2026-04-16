@@ -34,10 +34,8 @@ fun EntryProviderScope<NavKey>.audioScreen(
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
     }
 }

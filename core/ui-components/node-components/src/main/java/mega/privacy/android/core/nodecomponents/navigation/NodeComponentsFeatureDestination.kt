@@ -31,7 +31,6 @@ class NodeComponentsFeatureDestination : FeatureDestination {
             )
             nodeOptionsBottomSheet(
                 navigationHandler = navigationHandler,
-                shareFolderDialogResult = navigationHandler::monitorResult,
                 returnResult = navigationHandler::returnResult
             )
             changeLabelBottomSheetNavigation(navigationHandler::back)

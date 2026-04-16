@@ -9,8 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import java.io.File
-import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -20,18 +18,19 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.clickhandler.EditActionClickHandler
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
+import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
-import mega.privacy.android.core.nodecomponents.action.clickhandler.EditActionClickHandler
-import mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkDialogNavKey
-import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
-import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -44,24 +43,19 @@ import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import nz.mega.sdk.MegaApiJava
+import java.io.File
 
 /**
  * Returns true when the node options bottom sheet result indicates the editor should close
  * (e.g. user navigated away or triggered a transfer where the current node may no longer be valid).
- * Preview / Open-with downloads ([TransferTriggerEvent.StartDownloadForPreview]) do not close the editor.
+ * Preview / Open-with downloads do not close the editor.
  */
 internal fun shouldCloseTextEditorOnNodeOptionsResult(
     result: NodeOptionsBottomSheetResult?,
-): Boolean = when (result) {
-    is NodeOptionsBottomSheetResult.Transfer ->
-        result.event !is TransferTriggerEvent.StartDownloadForPreview
-
-    is NodeOptionsBottomSheetResult.Navigation ->
-        result.navKey !is ChangeLabelBottomSheet &&
-                result.navKey !is ChangeLabelBottomSheetMultiple &&
-                result.navKey !is RemoveNodeLinkDialogNavKey
-
-    else -> false
+): Boolean = when (result?.action) {
+    is LabelMenuAction, is RemoveLinkMenuAction, is OpenWithMenuAction -> false
+    null -> false
+    else -> true
 }
 
 /** True when adapter is rubbish bin, offline, folder link, zip, file link, chat, or versions (hides Get Link and Edit). */
@@ -213,7 +207,7 @@ private fun buildTextEditorViewModelArgs(
  * when enabled shows [TextEditorScreen]; when disabled starts [TextEditorActivity] and pops.
  * Tapping More opens the Node Options Bottom Sheet (cloud node only). When the user deletes or
  * moves the node (Navigation or most Transfer results), the editor is closed; preview/Open-with
- * downloads ([TransferTriggerEvent.StartDownloadForPreview]) stay on the editor and forward the transfer.
+ * downloads stay on the editor and forward the transfer.
  */
 fun EntryProviderScope<NavKey>.legacyTextEditorScreen(
     navigationHandler: NavigationHandler,
@@ -244,23 +238,22 @@ private fun TextEditorEntry(
     val legacyIntent = buildTextEditorIntent(context, navKey)
 
     if (navKey.chatId == null && navKey.localPath == null) {
-        LaunchedEffect(Unit) {
-            navigationHandler.monitorResult<NodeOptionsBottomSheetResult>(NodeOptionsBottomSheetNavKey.RESULT)
-                .distinctUntilChanged()
-                .collect { result ->
-                    if (result is NodeOptionsBottomSheetResult.Transfer &&
-                        result.event is TransferTriggerEvent.StartDownloadForPreview
-                    ) {
-                        transferHandler.setTransferEvent(result.event)
-                        navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
-                        return@collect
-                    }
-                    if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
-                        navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
-                        removeDestination()
-                    }
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = {
+                    it.create(viewTypeToNodeSourceTypeMapper(navKey.nodeSourceType))
                 }
-        }
+            )
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onTransfer = transferHandler::setTransferEvent,
+            onActionExecuted = { result ->
+                if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
+                    removeDestination()
+                }
+            },
+        )
     }
 
     FeatureFlagGate(

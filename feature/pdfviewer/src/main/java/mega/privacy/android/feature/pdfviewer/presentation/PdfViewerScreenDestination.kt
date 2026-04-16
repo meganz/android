@@ -54,10 +54,8 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
 
         PdfViewerScreen(

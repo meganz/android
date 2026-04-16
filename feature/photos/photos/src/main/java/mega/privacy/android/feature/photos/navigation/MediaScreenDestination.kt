@@ -97,10 +97,8 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
 
         LaunchedEffect(photoSelectionResult) {
@@ -186,10 +184,8 @@ fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
             )
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
 
         VideoPlaylistDetailRoute(
@@ -217,10 +213,8 @@ fun EntryProviderScope<NavKey>.mediaSearchScreen(
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
 
         MediaSearchScreenM3(
@@ -539,10 +533,8 @@ fun EntryProviderScope<NavKey>.videoRecentlyWatchedScreen(
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
         VideoRecentlyWatchedRoute(
             onBack = navigationHandler::back,
@@ -584,10 +576,8 @@ fun EntryProviderScope<NavKey>.cloudDriveMediaDiscoveryScreen(
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
 
         CloudDriveMediaDiscoveryRoute(

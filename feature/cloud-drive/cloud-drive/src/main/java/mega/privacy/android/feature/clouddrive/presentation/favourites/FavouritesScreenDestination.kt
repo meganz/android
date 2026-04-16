@@ -30,10 +30,8 @@ fun EntryProviderScope<NavKey>.favouritesScreen(
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
     }
 }

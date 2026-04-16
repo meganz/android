@@ -422,6 +422,12 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }
     }
 
+    fun triggerShareFolderFromDialogResult(nodeHandles: List<Long>) {
+        uiState.update { state ->
+            state.copy(shareFolderEvent = triggered(nodeHandles))
+        }
+    }
+
     fun resetShareFolderEvent() {
         uiState.update {
             it.copy(shareFolderEvent = consumed())

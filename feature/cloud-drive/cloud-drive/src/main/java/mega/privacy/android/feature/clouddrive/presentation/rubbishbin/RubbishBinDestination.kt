@@ -27,10 +27,8 @@ fun EntryProviderScope<NavKey>.rubbishBin(
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            onNavigate = navigationHandler::navigate,
+            navigationHandler = navigationHandler,
             onTransfer = transferHandler::setTransferEvent,
-            nodeResultFlow = navigationHandler::monitorResult,
-            clearResultFlow = navigationHandler::clearResult,
         )
 
         RubbishBinScreen(
