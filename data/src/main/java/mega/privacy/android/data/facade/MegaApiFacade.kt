@@ -515,6 +515,18 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun retryPendingConnections() = megaApi.retryPendingConnections()
 
+    override fun setMaxConnections(
+        direction: Int,
+        connections: Int,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.setMaxConnections(direction, connections, listener)
+
+    override fun getMaxUploadConnections(listener: MegaRequestListenerInterface) =
+        megaApi.getMaxUploadConnections(listener)
+
+    override fun getMaxDownloadConnections(listener: MegaRequestListenerInterface) =
+        megaApi.getMaxDownloadConnections(listener)
+
     override suspend fun getTransfers(type: Int): List<MegaTransfer> =
         megaApi.getTransfers(type) ?: emptyList()
 

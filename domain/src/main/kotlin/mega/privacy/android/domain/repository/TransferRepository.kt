@@ -32,6 +32,12 @@ interface TransferRepository {
 
     companion object {
         const val MAX_COMPLETED_TRANSFERS = 100
+
+        /**
+         * The valid range for the maximum number of transfer connections
+         * (both downloads and uploads).
+         */
+        val MAX_TRANSFER_CONNECTIONS_RANGE = 1..8
     }
 
     /**
@@ -646,4 +652,32 @@ interface TransferRepository {
      * Clears cache related to completed transfers
      */
     fun clearCompletedTransfersCache()
+
+    /**
+     * Get the maximum number of download connections.
+     *
+     * @return the maximum number of download connections.
+     */
+    suspend fun getMaxDownloadConnections(): Int
+
+    /**
+     * Get the maximum number of upload connections.
+     *
+     * @return the maximum number of upload connections.
+     */
+    suspend fun getMaxUploadConnections(): Int
+
+    /**
+     * Set the maximum number of download connections.
+     *
+     * @param connections the maximum number of download connections.
+     */
+    suspend fun setMaxDownloadConnections(connections: Int)
+
+    /**
+     * Set the maximum number of upload connections.
+     *
+     * @param connections the maximum number of upload connections.
+     */
+    suspend fun setMaxUploadConnections(connections: Int)
 }

@@ -750,6 +750,33 @@ interface MegaApiGateway {
     fun retryPendingConnections()
 
     /**
+     * Set the maximum number of connections for a given transfer direction.
+     *
+     * @param direction MegaTransfer.TYPE_DOWNLOAD or MegaTransfer.TYPE_UPLOAD
+     * @param connections Maximum number of connections
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setMaxConnections(
+        direction: Int,
+        connections: Int,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Get the maximum number of connections per upload transfer.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getMaxUploadConnections(listener: MegaRequestListenerInterface)
+
+    /**
+     * Get the maximum number of connections per download transfer.
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getMaxDownloadConnections(listener: MegaRequestListenerInterface)
+
+    /**
      * Gets all transfers of a specific type (downloads or uploads).
      * If the parameter isn't MegaTransfer::TYPE_DOWNLOAD or MegaTransfer::TYPE_UPLOAD
      * this function returns an empty list.

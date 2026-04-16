@@ -61,7 +61,6 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransferData
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -1967,6 +1966,115 @@ class DefaultTransfersRepositoryTest {
                     underTest.clearTransferErrorStatus()
                     assertThat(awaitItem()).isFalse()
                 }
+            }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class MaxTransferConnectionsTests {
+
+        @Test
+        fun `test that getMaxDownloadConnections returns the value when MegaApi returns API_OK`() =
+            runTest {
+                val expected = 4
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest> {
+                    on { number }.thenReturn(expected.toLong())
+                }
+                whenever(megaApiGateway.getMaxDownloadConnections(any())).thenAnswer {
+                    ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        megaRequest,
+                        megaError,
+                    )
+                }
+
+                assertThat(underTest.getMaxDownloadConnections()).isEqualTo(expected)
+            }
+
+        @Test
+        fun `test that getMaxUploadConnections returns the value when MegaApi returns API_OK`() =
+            runTest {
+                val expected = 6
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest> {
+                    on { number }.thenReturn(expected.toLong())
+                }
+                whenever(megaApiGateway.getMaxUploadConnections(any())).thenAnswer {
+                    ((it.arguments[0]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        megaRequest,
+                        megaError,
+                    )
+                }
+
+                assertThat(underTest.getMaxUploadConnections()).isEqualTo(expected)
+            }
+
+        @Test
+        fun `test that setMaxDownloadConnections calls setMaxConnections with TYPE_DOWNLOAD`() =
+            runTest {
+                val connections = 4
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest>()
+                whenever(
+                    megaApiGateway.setMaxConnections(
+                        eq(MegaTransfer.TYPE_DOWNLOAD),
+                        eq(connections),
+                        any(),
+                    )
+                ).thenAnswer {
+                    ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        megaRequest,
+                        megaError,
+                    )
+                }
+
+                underTest.setMaxDownloadConnections(connections)
+
+                verify(megaApiGateway).setMaxConnections(
+                    eq(MegaTransfer.TYPE_DOWNLOAD),
+                    eq(connections),
+                    any(),
+                )
+            }
+
+        @Test
+        fun `test that setMaxUploadConnections calls setMaxConnections with TYPE_UPLOAD`() =
+            runTest {
+                val connections = 6
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest>()
+                whenever(
+                    megaApiGateway.setMaxConnections(
+                        eq(MegaTransfer.TYPE_UPLOAD),
+                        eq(connections),
+                        any(),
+                    )
+                ).thenAnswer {
+                    ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        mock(),
+                        megaRequest,
+                        megaError,
+                    )
+                }
+
+                underTest.setMaxUploadConnections(connections)
+
+                verify(megaApiGateway).setMaxConnections(
+                    eq(MegaTransfer.TYPE_UPLOAD),
+                    eq(connections),
+                    any(),
+                )
             }
     }
 }

@@ -6,6 +6,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaTransfer
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
@@ -93,5 +96,32 @@ internal class MegaApiFacadeTest {
 
             assertThat(result).isTrue()
         }
+
+    @Test
+    fun `test that setMaxConnections delegates to megaApi`() {
+        val listener = mock<MegaRequestListenerInterface>()
+
+        underTest.setMaxConnections(MegaTransfer.TYPE_DOWNLOAD, 4, listener)
+
+        verify(megaApi).setMaxConnections(MegaTransfer.TYPE_DOWNLOAD, 4, listener)
+    }
+
+    @Test
+    fun `test that getMaxUploadConnections delegates to megaApi`() {
+        val listener = mock<MegaRequestListenerInterface>()
+
+        underTest.getMaxUploadConnections(listener)
+
+        verify(megaApi).getMaxUploadConnections(listener)
+    }
+
+    @Test
+    fun `test that getMaxDownloadConnections delegates to megaApi`() {
+        val listener = mock<MegaRequestListenerInterface>()
+
+        underTest.getMaxDownloadConnections(listener)
+
+        verify(megaApi).getMaxDownloadConnections(listener)
+    }
 }
 

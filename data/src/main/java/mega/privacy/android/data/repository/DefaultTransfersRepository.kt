@@ -897,4 +897,41 @@ internal class DefaultTransfersRepository @Inject constructor(
         parentNodeCache.clear()
         transferPathCache.clear()
     }
+
+    override suspend fun getMaxDownloadConnections(): Int =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("getMaxDownloadConnections") { it.number.toInt() }
+                megaApiGateway.getMaxDownloadConnections(listener)
+            }
+        }
+
+    override suspend fun getMaxUploadConnections(): Int =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("getMaxUploadConnections") { it.number.toInt() }
+                megaApiGateway.getMaxUploadConnections(listener)
+            }
+        }
+
+    override suspend fun setMaxDownloadConnections(connections: Int) =
+        setMaxConnections(MegaTransfer.TYPE_DOWNLOAD, connections)
+
+    override suspend fun setMaxUploadConnections(connections: Int) =
+        setMaxConnections(MegaTransfer.TYPE_UPLOAD, connections)
+
+    private suspend fun setMaxConnections(direction: Int, connections: Int) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("setMaxConnections direction: $direction") { }
+                megaApiGateway.setMaxConnections(
+                    direction,
+                    connections,
+                    listener,
+                )
+            }
+        }
 }
