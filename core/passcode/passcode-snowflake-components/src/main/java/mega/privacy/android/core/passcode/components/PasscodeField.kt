@@ -1,6 +1,5 @@
-package mega.privacy.android.shared.original.core.ui.controls.textfields
+package mega.privacy.android.core.passcode.components
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,10 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-
-
 internal const val PASSCODE_FIELD_TAG = "passcode_field:text_field"
 
 /**
@@ -126,13 +121,5 @@ private fun PasscodeCell(
                 color = if (isFocussed) DSTokens.colors.border.strongSelected else LocalTextStyle.current.color,
             )
         }
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun PasscodeFieldPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        PasscodeField(onComplete = {})
     }
 }

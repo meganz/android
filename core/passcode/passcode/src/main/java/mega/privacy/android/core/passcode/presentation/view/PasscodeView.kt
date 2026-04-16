@@ -53,13 +53,13 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.passcode.R
+import mega.privacy.android.core.passcode.components.PasscodeField
 import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
 import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.textfields.PasscodeField
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent

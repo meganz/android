@@ -58,7 +58,8 @@ class ArchitecturePlugin : Plugin<Project> {
 
     private val moduleExceptions = listOf(
         ":core:ui-components:node-components", //this module will be deleted because it's not following the architecture itself
-        ":feature:photos:photos-snowflake-components" //this library should be refactored or moved to shared folder, as it's used by multiple modules
+        ":feature:photos:photos-snowflake-components", //this library should be refactored or moved to shared folder, as it's used by multiple modules
+        ":core:passcode:passcode", //core module with its own snowflake-components
     )
 
     sealed interface ArchitectureLayer {

@@ -1,4 +1,4 @@
-package mega.privacy.android.shared.original.core.ui.controls.textfields
+package mega.privacy.android.core.passcode.components
 
 import android.text.InputType
 import android.view.inputmethod.EditorInfo

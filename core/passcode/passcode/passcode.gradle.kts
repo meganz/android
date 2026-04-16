@@ -18,6 +18,7 @@ dependencies {
 
     implementation(project(":domain"))
     implementation(project(":shared:original-core-ui"))
+    implementation(project(":core:passcode:passcode-snowflake-components"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(lib.logging.timber)
     implementation(lib.mega.analytics)
