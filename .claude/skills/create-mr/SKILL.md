@@ -60,6 +60,30 @@ git checkout -b "<branch-name>"
 - If the command fails because the branch already exists, run `git checkout "<branch-name>"` instead and inform the user.
 - Continue to Step 1 using this new branch as the current branch.
 
+### Step 0.5 — Handle worktree (if running inside a git worktree)
+
+Detect whether the current working directory is inside a git worktree by running:
+```bash
+git rev-parse --is-inside-work-tree && git worktree list --porcelain
+```
+
+If the output of `git worktree list` shows that the current directory is a linked worktree (i.e. it is not the main worktree):
+
+1. Determine the branch name to use:
+   - If `--branch` was passed, use that name (already resolved in Step 0).
+   - Otherwise, use the current worktree branch name stripped of any worktree-specific prefix/suffix, or ask the user for a branch name.
+2. From the **main worktree** directory, create the normal branch pointing at the same commit:
+   ```bash
+   git branch "<branch-name>" "<current-worktree-HEAD-commit>"
+   ```
+3. Switch the worktree to track that new normal branch:
+   ```bash
+   git checkout "<branch-name>"
+   ```
+4. Continue to Step 1 using this normal branch. All subsequent steps (push, MR creation) will use this branch.
+
+This ensures worktree-internal branches (which are temporary) are never used as MR source branches.
+
 ### Step 1 — Ensure commits are GPG-signed
 
 #### Sub-step A — Commit any uncommitted changes (signed)

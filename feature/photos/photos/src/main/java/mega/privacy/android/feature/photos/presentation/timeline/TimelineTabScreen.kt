@@ -73,7 +73,7 @@ import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGrid
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
-import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
@@ -259,7 +259,7 @@ internal fun TimelineTabScreen(
         }
 
         uiState.isLoading -> {
-            PhotosSkeletonView(
+            MediaSkeletonView(
                 modifier = Modifier.testTag(TIMELINE_TAB_SCREEN_LOADING_SKELETON_VIEW_TAG)
             )
         }

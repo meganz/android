@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.videos
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +41,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeLabelCircle
-import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.TagsRow
@@ -166,10 +165,8 @@ internal fun VideosTabScreen(
         )
 
         when (uiState) {
-            is VideosTabUiState.Loading -> NodesViewSkeleton(
+            is VideosTabUiState.Loading -> MediaSkeletonView(
                 modifier = Modifier.testTag(VIDEO_TAB_LOADING_VIEW_TEST_TAG),
-                isListView = true,
-                contentPadding = PaddingValues()
             )
 
             is VideosTabUiState.Data -> {

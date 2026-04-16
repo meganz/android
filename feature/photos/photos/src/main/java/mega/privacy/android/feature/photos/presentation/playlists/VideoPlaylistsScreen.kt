@@ -41,7 +41,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQ
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
-import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -135,10 +135,8 @@ internal fun VideoPlaylistsTabScreen(
     }
 
     when (uiState) {
-        is VideoPlaylistsTabUiState.Loading -> NodesViewSkeleton(
+        is VideoPlaylistsTabUiState.Loading -> MediaSkeletonView(
             modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_LOADING_VIEW_TEST_TAG),
-            isListView = true,
-            contentPadding = PaddingValues()
         )
 
         is VideoPlaylistsTabUiState.Data -> {

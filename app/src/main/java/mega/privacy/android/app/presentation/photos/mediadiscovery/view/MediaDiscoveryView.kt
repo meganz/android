@@ -79,7 +79,7 @@ import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
-import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -237,7 +237,7 @@ fun MediaDiscoveryView(
                 }
             }
         } else {
-            PhotosSkeletonView()
+            MediaSkeletonView()
         }
     }
 

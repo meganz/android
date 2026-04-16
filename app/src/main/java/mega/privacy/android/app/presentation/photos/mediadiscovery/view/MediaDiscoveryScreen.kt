@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -53,7 +54,7 @@ import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
-import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -205,7 +206,9 @@ fun MediaDiscoveryScreen(
                     EmptyView(uiState.currentMediaType)
                 }
             } else {
-                PhotosSkeletonView()
+                MediaSkeletonView(
+                    Modifier.testTag(MEDIA_DISCOVERY_SKELETON_VIEW_TEST_TAG)
+                )
             }
             StartTransferComponent(
                 event = uiState.downloadEvent,
@@ -216,6 +219,10 @@ fun MediaDiscoveryScreen(
     )
 }
 
+/**
+ * Skeleton View Test Tag
+ */
+const val MEDIA_DISCOVERY_SKELETON_VIEW_TEST_TAG = "media_discovery:skeleton_view"
 
 @Composable
 private fun MDHeader(

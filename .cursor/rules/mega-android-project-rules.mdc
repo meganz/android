@@ -290,6 +290,7 @@ alwaysApply: true
 - **Feature Branches**: Use feature branches for development
 - **Code Review**: Require code reviews for all changes
 - **CI/CD**: Use Jenkins for continuous integration and deployment
+- **Worktree MRs**: When creating a merge request from a worktree, first create a normal branch from the worktree changes before pushing. Worktree branches are temporary and should not be used as MR source branches.
 
 ### Local Development
 - **Gradle Wrapper**: Use Gradle wrapper for consistent builds

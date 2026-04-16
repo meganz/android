@@ -33,7 +33,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 
 @Composable
-fun PhotosSkeletonView(modifier: Modifier = Modifier) {
+fun MediaSkeletonView(modifier: Modifier = Modifier) {
     val columns =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
             3
@@ -42,7 +42,8 @@ fun PhotosSkeletonView(modifier: Modifier = Modifier) {
         }
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize(),
         userScrollEnabled = false,
     ) {
         items(
@@ -81,6 +82,7 @@ fun PhotosSkeletonView(modifier: Modifier = Modifier) {
         }
     }
 }
+
 
 @Composable
 fun AlbumListSkeletonView(modifier: Modifier = Modifier) {
@@ -266,6 +268,7 @@ private fun AlbumSmall2BigSkeletonView(
     }
 }
 
+
 private fun Modifier.shimmerEffectSemiRounded(): Modifier {
     return this.shimmerEffect(
         shape = RoundedCornerShape(4.dp)
@@ -280,9 +283,9 @@ private fun Modifier.shimmerEffectSquare(): Modifier {
 
 @CombinedThemePreviews
 @Composable
-private fun PhotosSkeletonViewPreview() {
+private fun MediaSkeletonViewPreview() {
     AndroidThemeForPreviews {
-        PhotosSkeletonView()
+        MediaSkeletonView()
     }
 }
 
