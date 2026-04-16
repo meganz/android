@@ -2032,7 +2032,7 @@
         <item quantity="other">%d 個資料夾</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">%1$d個資料夾，</item>
+        <item quantity="other">%1$d個資料夾&#160;·&#160;</item>
     </plurals>
     <string name="general_first_name">名字</string>
     <string name="general_last_name">姓氏</string>
@@ -2273,4 +2273,5 @@
     <string name="sync_label_this_device">此裝置</string>
     <string name="sync_label_camera_uploads">相機上傳</string>
     <string name="sync_label_media_uploads">媒體上傳</string>
+    <string name="general_skip">跳過</string>
 </resources>

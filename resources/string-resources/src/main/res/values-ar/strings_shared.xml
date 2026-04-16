@@ -2683,4 +2683,6 @@
     <string name="sync_label_media_uploads">تحميلات الوسائط</string>
     <string name="cloud_explorer_select_destination_title">اختر الوجهة</string>
     <string name="cloud_explorer_use_this_folder_button">استخدم هذا المجلد</string>
+    <string name="home_widget_continue_where_left_off">استمر من حيث توقفت</string>
+    <string name="general_skip">تخطى</string>
 </resources>

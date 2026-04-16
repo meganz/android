@@ -2167,9 +2167,9 @@
         <item quantity="other">%d dossiers</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“«&#160;%1$d dossier,  »“</item>
-        <item quantity="many">“«&#160;%1$d dossiers,  »“</item>
-        <item quantity="other">“«&#160;%1$d dossiers,  »“</item>
+        <item quantity="one">%1$d&#160;dossier&#160;·&#160;</item>
+        <item quantity="many">%1$d de dossiers&#160;·&#160;</item>
+        <item quantity="other">%1$d&#160;dossiers&#160;·&#160;</item>
     </plurals>
     <string name="general_first_name">Prénom</string>
     <string name="general_last_name">Nom</string>
@@ -2439,4 +2439,5 @@
     <string name="cloud_explorer_select_destination_title">Choisir la destination</string>
     <string name="cloud_explorer_use_this_folder_button">Utiliser ce dossier</string>
     <string name="home_widget_continue_where_left_off">Reprenez où vous étiez</string>
+    <string name="general_skip">Ignorer</string>
 </resources>

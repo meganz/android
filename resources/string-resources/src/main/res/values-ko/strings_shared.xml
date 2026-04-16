@@ -2022,7 +2022,7 @@
         <item quantity="other">폴더 %d개</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">“폴더 %1$d개, “</item>
+        <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
     </plurals>
     <string name="recovering_info">불러오는 중&#8230;</string>
     <string name="storage_usage_format">%2$s 중 %1$s 이용함</string>
@@ -2264,4 +2264,5 @@
     <string name="sync_label_this_device">이 기기</string>
     <string name="sync_label_camera_uploads">카메라 업로드</string>
     <string name="sync_label_media_uploads">미디어 업로드</string>
+    <string name="general_skip">건너뛰기</string>
 </resources>
