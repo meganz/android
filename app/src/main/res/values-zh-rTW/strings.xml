@@ -3717,9 +3717,9 @@
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]侵權下架指南[/A]，此檔案已被下架。</string>
+    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]侵權下架指引政策[/A]，此檔案已被下架。</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]侵權下架指南[/A]，此資料夾已被下架。</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]侵權下架指引政策[/A]，此資料夾已被下架。</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">加入</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -3929,9 +3929,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">無法開啟檔案</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">根據我們的[A]侵權下架指南[/A]，此資料夾已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出申訴。</string>
+    <string name="dialog_taken_down_folder_description">根據我們的[A]侵權下架指引政策[/A]，此資料夾已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出申訴。</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">根據我們的[A]侵權下架指南[/A]，此檔案已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出申訴。</string>
+    <string name="dialog_taken_down_file_description">根據我們的[A]侵權下架指引政策[/A]，此檔案已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出申訴。</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">僅限Pro會員</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->

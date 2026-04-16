@@ -2266,4 +2266,5 @@
     <string name="sync_label_media_uploads">การอัปโหลดสื่อ</string>
     <string name="cloud_explorer_select_destination_title">เลือกปลายทาง</string>
     <string name="cloud_explorer_use_this_folder_button">ใช้โฟลเดอร์นี้</string>
+    <string name="general_skip">ข้าม</string>
 </resources>

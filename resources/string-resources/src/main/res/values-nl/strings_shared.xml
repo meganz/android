@@ -2112,8 +2112,8 @@
         <item quantity="other">%d mappen</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">“%1$d map, “</item>
-        <item quantity="other">“%1$d mappen, “</item>
+        <item quantity="one">%1$d map&#160;·&#160;</item>
+        <item quantity="other">%1$d mappen&#160;·&#160;</item>
     </plurals>
     <string name="search_landing_title">Op zoek naar iets?</string>
     <string name="search_landing_subtitle">Zoek bestanden en mappen</string>
@@ -2360,4 +2360,5 @@
     <string name="sync_label_this_device">dit apparaat</string>
     <string name="sync_label_camera_uploads">Camera-upload</string>
     <string name="sync_label_media_uploads">Media-upload</string>
+    <string name="general_skip">Overslaan</string>
 </resources>

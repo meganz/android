@@ -2438,4 +2438,5 @@
     <string name="sync_label_this_device">acest dispozitiv</string>
     <string name="sync_label_camera_uploads">Încărcări din Cameră</string>
     <string name="sync_label_media_uploads">Încărcări media</string>
+    <string name="general_skip">Omite</string>
 </resources>

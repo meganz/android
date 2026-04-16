@@ -2245,4 +2245,5 @@
     <string name="album_import_snackbar_success_message">%1$s đã được lưu vào ổ đám mây</string>
     <string name="album_import_snackbar_error_message">%1$s không thể được lưu vào ổ đám mây. Hãy thử lại sau. Nếu sự cố tiếp tục, liên hệ với người đã chia sẻ liên kết cho bạn.</string>
     <string name="saf_passcode_lock_enabled_message">Để duyệt các tập tin MEGA của bạn, vô hiệu hóa mã mở khóa trong ứng dụng MEGA. Vào Cài đặt, sau đó chạm Bảo mật.</string>
+    <string name="general_skip">Bỏ qua</string>
 </resources>
