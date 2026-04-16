@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.transfers.presentation.settings.view
 
+import android.content.res.Resources
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -34,15 +36,7 @@ fun TransfersSettingsView(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val enabled = uiState is TransfersSettingsUiState.Data
-    val isLoading = uiState is TransfersSettingsUiState.Loading
-    val selectedDownloadConnections =
-        (uiState as? TransfersSettingsUiState.Data)?.maxDownloadConnections ?: 0
-    val selectedUploadConnections =
-        (uiState as? TransfersSettingsUiState.Data)?.maxUploadConnections ?: 0
-    val transferConnections =
-        (uiState as? TransfersSettingsUiState.Data)?.maxTransferConnectionsRange?.toList()
-            ?: emptyList()
+    val resources = LocalResources.current
 
     MegaScaffold(
         modifier = modifier
@@ -56,61 +50,115 @@ fun TransfersSettingsView(
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            GenericListItem(
-                enableClick = false,
-                contentPadding = PaddingValues(
-                    horizontal = 16.dp,
-                    vertical = 12.dp
-                ),
-                title = {
-                    MegaText(
-                        text = "Transfer connections",
-                        textColor = TextColor.Primary,
-                        style = AppTheme.typography.bodyLarge,
-                    )
+        val modifier = Modifier.padding(paddingValues)
+        when (uiState) {
+            is TransfersSettingsUiState.Data -> TransfersSettingsViewContent(
+                modifier = modifier,
+                transferConnections = uiState.maxTransferConnectionsRange.toList(),
+                selectedDownloadConnections = uiState.maxDownloadConnections,
+                selectedUploadConnections = uiState.maxUploadConnections,
+                downloadValueToString = { value ->
+                    value.transferConnectionsValueToString(resources, DEFAULT_DOWNLOAD_CONNECTIONS)
                 },
-                subtitle = {
-                    MegaText(
-                        text = "Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.",
-                        textColor = TextColor.Secondary,
-                        style = AppTheme.typography.bodyMedium,
-                    )
+                uploadValueToString = { value ->
+                    value.transferConnectionsValueToString(resources, DEFAULT_UPLOAD_CONNECTIONS)
                 },
+                onSetMaxDownloadConnections = onSetMaxDownloadConnections,
+                onSetMaxUploadConnections = onSetMaxUploadConnections,
+                enabled = true
             )
-            StrongDivider(modifier = Modifier.fillMaxWidth())
-            SettingsOptionsItem(
-                key = DOWNLOAD_CONNECTIONS_VIEW_TAG,
-                title = "Download connections",
-                values = transferConnections,
-                valueToString = { value ->
-                    if (isLoading) "" else value.toText(DEFAULT_DOWNLOAD_CONNECTIONS)
-                },
-                selectedValue = selectedDownloadConnections,
-                enabled = enabled,
-            ) { _, value -> onSetMaxDownloadConnections(value) }
-            StrongDivider(modifier = Modifier.fillMaxWidth())
-            SettingsOptionsItem(
-                key = UPLOAD_CONNECTIONS_VIEW_TAG,
-                title = "Upload connections",
-                values = transferConnections,
-                valueToString = { value ->
-                    if (isLoading) "" else value.toText(DEFAULT_UPLOAD_CONNECTIONS)
-                },
-                selectedValue = selectedUploadConnections,
-                enabled = enabled,
-            ) { _, value -> onSetMaxUploadConnections(value) }
-            StrongDivider(modifier = Modifier.fillMaxWidth())
+
+            TransfersSettingsUiState.Loading ->
+                TransfersSettingsViewContent(
+                    modifier = modifier,
+                    transferConnections = emptyList(),
+                    selectedDownloadConnections = 0,
+                    selectedUploadConnections = 0,
+                    downloadValueToString = { "" },
+                    uploadValueToString = { "" },
+                    onSetMaxDownloadConnections = onSetMaxDownloadConnections,
+                    onSetMaxUploadConnections = onSetMaxUploadConnections,
+                    enabled = false
+                )
         }
     }
 }
 
-internal fun Int.toText(default: Int): String = when (this) {
-    1 -> "$this (Best for slow networks)"
-    default -> "$this (Default)"
-    8 -> "$this (Higher battery and data usage)"
-    else -> this.toString()
+@Composable
+private fun TransfersSettingsViewContent(
+    transferConnections: List<Int>,
+    selectedDownloadConnections: Int,
+    selectedUploadConnections: Int,
+    downloadValueToString: (Int) -> String,
+    uploadValueToString: (Int) -> String,
+    modifier: Modifier,
+    onSetMaxDownloadConnections: (Int) -> Unit,
+    onSetMaxUploadConnections: (Int) -> Unit,
+    enabled: Boolean,
+) {
+    Column(modifier = modifier) {
+        GenericListItem(
+            enableClick = false,
+            contentPadding = PaddingValues(
+                horizontal = 16.dp,
+                vertical = 12.dp
+            ),
+            title = {
+                MegaText(
+                    text = stringResource(sharedR.string.settings_transfer_connections_title),
+                    textColor = TextColor.Primary,
+                    style = AppTheme.typography.bodyLarge,
+                )
+            },
+            subtitle = {
+                MegaText(
+                    text = stringResource(sharedR.string.settings_transfer_connections_text),
+                    textColor = TextColor.Secondary,
+                    style = AppTheme.typography.bodyMedium,
+                )
+            },
+        )
+        StrongDivider(modifier = Modifier.fillMaxWidth())
+        SettingsOptionsItem(
+            key = DOWNLOAD_CONNECTIONS_VIEW_TAG,
+            title = stringResource(sharedR.string.settings_transfer_download_connections),
+            values = transferConnections,
+            valueToString = downloadValueToString,
+            selectedValue = selectedDownloadConnections,
+            enabled = enabled,
+        ) { _, value -> onSetMaxDownloadConnections(value) }
+        StrongDivider(modifier = Modifier.fillMaxWidth())
+        SettingsOptionsItem(
+            key = UPLOAD_CONNECTIONS_VIEW_TAG,
+            title = stringResource(sharedR.string.settings_transfer_upload_connections),
+            values = transferConnections,
+            valueToString = uploadValueToString,
+            selectedValue = selectedUploadConnections,
+            enabled = enabled,
+        ) { _, value -> onSetMaxUploadConnections(value) }
+        StrongDivider(modifier = Modifier.fillMaxWidth())
+    }
 }
+
+internal fun Int.transferConnectionsValueToString(resources: Resources, default: Int): String =
+    when (this) {
+        BEST_FOR_SLOW_NETWORKS -> resources.getString(
+            sharedR.string.settings_transfer_connections_slow_networs,
+            BEST_FOR_SLOW_NETWORKS
+        )
+
+        default -> resources.getString(
+            sharedR.string.settings_transfer_connections_default,
+            default
+        )
+
+        DEFAULT_UPLOAD_AND_DATA_USAGE -> resources.getString(
+            sharedR.string.settings_transfer_connections_higher_usage,
+            DEFAULT_UPLOAD_AND_DATA_USAGE
+        )
+
+        else -> this.toString()
+    }
 
 
 @Composable
@@ -147,5 +195,7 @@ internal const val TRANSFERS_SETTINGS_VIEW_TAG = "transfers_settings_view"
 internal const val DOWNLOAD_CONNECTIONS_VIEW_TAG =
     "$TRANSFERS_SETTINGS_VIEW_TAG:download_connections"
 internal const val UPLOAD_CONNECTIONS_VIEW_TAG = "$TRANSFERS_SETTINGS_VIEW_TAG:upload_connections"
+internal const val BEST_FOR_SLOW_NETWORKS = 1
 internal const val DEFAULT_DOWNLOAD_CONNECTIONS = 4
 internal const val DEFAULT_UPLOAD_CONNECTIONS = 3
+internal const val DEFAULT_UPLOAD_AND_DATA_USAGE = 8

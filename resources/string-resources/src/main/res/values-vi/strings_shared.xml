@@ -2246,4 +2246,18 @@
     <string name="album_import_snackbar_error_message">%1$s không thể được lưu vào ổ đám mây. Hãy thử lại sau. Nếu sự cố tiếp tục, liên hệ với người đã chia sẻ liên kết cho bạn.</string>
     <string name="saf_passcode_lock_enabled_message">Để duyệt các tập tin MEGA của bạn, vô hiệu hóa mã mở khóa trong ứng dụng MEGA. Vào Cài đặt, sau đó chạm Bảo mật.</string>
     <string name="general_skip">Bỏ qua</string>
+    <!-- Title for the Transfer connections setting -->
+    <string name="settings_transfer_connections_title">Transfer connections</string>
+    <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
+    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
+    <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
+    <string name="settings_transfer_download_connections">Download connections</string>
+    <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
+    <string name="settings_transfer_upload_connections">Upload connections</string>
+    <!-- Possible value for transfer connections settings. This is the recommended value for slow networks -->
+    <string name="settings_transfer_connections_slow_networs">%1$d (Best for slow networks)</string>
+    <!-- Possible value for transfer connections settings. This is the default value -->
+    <string name="settings_transfer_connections_default">%1$d (Default)</string>
+    <!-- Possible value for transfer connections settings. This value should be faster, but will increase the battery and data usage. -->
+    <string name="settings_transfer_connections_higher_usage">%1$d (Higher battery and data usage)</string>
 </resources>

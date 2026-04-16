@@ -2267,4 +2267,18 @@
     <string name="cloud_explorer_select_destination_title">เลือกปลายทาง</string>
     <string name="cloud_explorer_use_this_folder_button">ใช้โฟลเดอร์นี้</string>
     <string name="general_skip">ข้าม</string>
+    <!-- Title for the Transfer connections setting -->
+    <string name="settings_transfer_connections_title">Transfer connections</string>
+    <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
+    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
+    <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
+    <string name="settings_transfer_download_connections">Download connections</string>
+    <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
+    <string name="settings_transfer_upload_connections">Upload connections</string>
+    <!-- Possible value for transfer connections settings. This is the recommended value for slow networks -->
+    <string name="settings_transfer_connections_slow_networs">%1$d (Best for slow networks)</string>
+    <!-- Possible value for transfer connections settings. This is the default value -->
+    <string name="settings_transfer_connections_default">%1$d (Default)</string>
+    <!-- Possible value for transfer connections settings. This value should be faster, but will increase the battery and data usage. -->
+    <string name="settings_transfer_connections_higher_usage">%1$d (Higher battery and data usage)</string>
 </resources>

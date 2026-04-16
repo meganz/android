@@ -2164,9 +2164,9 @@
         <item quantity="other">%d de foldere</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;&#160;</item>
-        <item quantity="few">%1$d foldere&#160;&#160;</item>
-        <item quantity="other">%1$d de foldere&#160;&#160;</item>
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="few">%1$d foldere&#160;·&#160;</item>
+        <item quantity="other">%1$d de foldere&#160;·&#160;</item>
     </plurals>
     <string name="offline_screen_empty_state_description">Niciun fișier salvat pentru offline</string>
     <string name="general_install_label">Instalează</string>
@@ -2338,7 +2338,7 @@
     <plurals name="move_node_snackbar_concat_fail">
         <item quantity="one">%d elementul nu a putut fi mutat</item>
         <item quantity="few">%d elementele nu au putut fi mutate</item>
-        <item quantity="other"></item>
+        <item quantity="other" />
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_fail">
         <item quantity="one">%d elementul nu a putut fi eliminat din coșul de gunoi.</item>
@@ -2439,4 +2439,18 @@
     <string name="sync_label_camera_uploads">Încărcări din Cameră</string>
     <string name="sync_label_media_uploads">Încărcări media</string>
     <string name="general_skip">Omite</string>
+    <!-- Title for the Transfer connections setting -->
+    <string name="settings_transfer_connections_title">Transfer connections</string>
+    <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
+    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
+    <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
+    <string name="settings_transfer_download_connections">Download connections</string>
+    <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
+    <string name="settings_transfer_upload_connections">Upload connections</string>
+    <!-- Possible value for transfer connections settings. This is the recommended value for slow networks -->
+    <string name="settings_transfer_connections_slow_networs">%1$d (Best for slow networks)</string>
+    <!-- Possible value for transfer connections settings. This is the default value -->
+    <string name="settings_transfer_connections_default">%1$d (Default)</string>
+    <!-- Possible value for transfer connections settings. This value should be faster, but will increase the battery and data usage. -->
+    <string name="settings_transfer_connections_higher_usage">%1$d (Higher battery and data usage)</string>
 </resources>

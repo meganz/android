@@ -2406,7 +2406,7 @@
     <string name="video_section_add_to_playlist_success">Aggiunto 1 elemento a “%1$s”</string>
     <plurals name="video_section_add_to_playlists_success">
         <item quantity="one">Aggiunto 1 elemento alla playlist %1$d</item>
-        <item quantity="many"></item>
+        <item quantity="many" />
         <item quantity="other">Aggiunto 1 elemento alle playlist %1$d</item>
     </plurals>
     <string name="rewarded_ad_dialog_title">Continua dopo la pubblicità</string>
@@ -2428,4 +2428,18 @@
     <string name="sync_label_media_uploads">Caricamenti multimediali</string>
     <string name="home_recents_bucket_subtitle_added_to">Aggiunto a %s</string>
     <string name="general_skip">Salta</string>
+    <!-- Title for the Transfer connections setting -->
+    <string name="settings_transfer_connections_title">Transfer connections</string>
+    <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
+    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
+    <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
+    <string name="settings_transfer_download_connections">Download connections</string>
+    <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
+    <string name="settings_transfer_upload_connections">Upload connections</string>
+    <!-- Possible value for transfer connections settings. This is the recommended value for slow networks -->
+    <string name="settings_transfer_connections_slow_networs">%1$d (Best for slow networks)</string>
+    <!-- Possible value for transfer connections settings. This is the default value -->
+    <string name="settings_transfer_connections_default">%1$d (Default)</string>
+    <!-- Possible value for transfer connections settings. This value should be faster, but will increase the battery and data usage. -->
+    <string name="settings_transfer_connections_higher_usage">%1$d (Higher battery and data usage)</string>
 </resources>
