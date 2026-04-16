@@ -29,6 +29,8 @@ ARCHIVE_FOLDER = "archive"
 
 CODE_REVIEW_CMD = "code_review"
 CODE_REVIEW_OUTPUT_FILE = "code_review_report.md"
+CODE_REVIEW_SUMMARY_FILE = "code_review_summary.md"
+CODE_REVIEW_ERROR_REPORT_FILE = "code_review_error_report.txt"
 
 /**
  * common.groovy file with common methods
@@ -342,12 +344,30 @@ pipeline {
                         util.useGitLab() {
                             withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
                                 try {
-                                    sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}'"
-                                    common.sendFileToMRComment(CODE_REVIEW_OUTPUT_FILE)
+                                    sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --model 'claude-opus-4-6' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
+                                    def summary = "Code Review Report"
+                                    if (fileExists(CODE_REVIEW_SUMMARY_FILE)) {
+                                        summary = readFile(CODE_REVIEW_SUMMARY_FILE).trim()
+                                    }
+                                    common.sendFileToMRComment(CODE_REVIEW_OUTPUT_FILE, summary)
                                 } catch (Exception e) {
+                                    String errorMessage = e.message ?: 'Unknown error'
+                                    try {
+                                        if (fileExists(CODE_REVIEW_ERROR_REPORT_FILE)) {
+                                            errorMessage = readFile(CODE_REVIEW_ERROR_REPORT_FILE).trim()
+                                        }
+                                    } catch (ignored) {
+                                    }
+
+                                    common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                                    String mrNumber = common.getMrNumber()
+                                    String folder = "android-build/MR-${mrNumber}"
+                                    String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
+
                                     String failMsg = ":x: **Code Review Failed** (Build: ${env.BUILD_NUMBER})<br/>" +
-                                            "Error: ${e.message ?: 'Unknown error'}<br/>" +
-                                            "Please check the [build log](${env.BUILD_URL}) for details."
+                                            "Error: ${errorMessage}<br/>" +
+                                            "Please check the [build log](${jenkinsLog}) for details."
+
                                     common.sendToMR(failMsg)
                                 }
                             }
@@ -357,7 +377,7 @@ pipeline {
             }
             post {
                 always {
-                    archiveArtifacts artifacts: CODE_REVIEW_OUTPUT_FILE, allowEmptyArchive: true
+                    archiveArtifacts artifacts: "${CODE_REVIEW_OUTPUT_FILE},${CODE_REVIEW_SUMMARY_FILE},${CODE_REVIEW_ERROR_REPORT_FILE}", allowEmptyArchive: true
                 }
                 cleanup {
                     cleanWs(cleanWhenFailure: true)
@@ -672,12 +692,22 @@ String getLastCommitMessage() {
  * @return true if code review should run, false otherwise.
  */
 def shouldRunCodeReview() {
-    boolean isNewMr = env.GITLAB_OA_ACTION == "open"
-    boolean isTriggeredByCommand = env.GITLAB_OBJECT_KIND == "note" &&
-            env.GITLAB_COMMENT_TRIGGER != null &&
-            env.GITLAB_COMMENT_TRIGGER.trim() == CODE_REVIEW_CMD
-    return isNewMr || isTriggeredByCommand
+    // 1. Determine if this is a "Newly Created MR"
+    // Condition: It is an MR context (CHANGE_ID exists) and it's the very first build for this MR job.
+    // This is the most reliable method because the first build of a Multibranch Pipeline MR job
+    // always corresponds to the MR creation event.
+    boolean isNewMr = (env.CHANGE_ID != null) && (env.BUILD_NUMBER == "1")
+
+    // 2. Determine if triggered by a "Specific MR Comment"
+    // Note: When triggered by a comment, GITLAB_OBJECT_KIND usually changes to "note".
+    boolean isCommentTrigger = isCodeReviewOnly()
+
+    // 3. Fallback logic: Use GITLAB_OA_ACTION for auxiliary validation if it exists
+    boolean isExplicitOpen = (env.GITLAB_OA_ACTION == "open")
+
+    return isNewMr || isCommentTrigger || isExplicitOpen
 }
+
 
 /**
  * Returns true when the build was triggered solely by the "code_review" comment,

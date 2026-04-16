@@ -127,8 +127,9 @@ void sendToMR(String message) {
  * such as code review reports.
  *
  * @param filePath absolute or workspace-relative path to the markdown file to send
+ * @param summary the summary of the MR comment
  */
-void sendFileToMRComment(String filePath) {
+void sendFileToMRComment(String filePath, String summary) {
     println("####### Entering common.sendLargeTextToMR() #######")
 
     def mrNumber = getMrNumber()
@@ -137,10 +138,12 @@ void sendFileToMRComment(String filePath) {
             def jsonPayloadFile = "${WORKSPACE}/.mr_comment_payload_${System.currentTimeMillis()}.json"
             env.MR_COMMENT_SOURCE_FILE = filePath
             env.MR_COMMENT_PAYLOAD_FILE = jsonPayloadFile
+            env.COMMENT_SUMMARY = summary
             env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
             sh '''
                 jq -n --rawfile body ${MR_COMMENT_SOURCE_FILE} \
-                    '{"body": ("<details><summary>Code Review Report</summary>" + $body + "</details>")}' \
+                    --arg summary "${COMMENT_SUMMARY}" \
+                    '{"body": ("<details><summary>Code Review Report\n\n" + $summary + "\n\n</summary>" + $body + "</details>")}' \
                     > ${MR_COMMENT_PAYLOAD_FILE}
                 curl --request POST \
                      --header "PRIVATE-TOKEN:$TOKEN" \
