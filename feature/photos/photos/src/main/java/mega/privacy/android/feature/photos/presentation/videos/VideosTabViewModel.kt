@@ -200,7 +200,7 @@ class VideosTabViewModel @Inject constructor(
 
             val content = FileNodeContent.AudioOrVideo(uri = uri)
 
-            val isSearchMode = queryFlow.value.isNullOrEmpty()
+            val isSearchMode = !queryFlow.value.isNullOrEmpty()
 
             val navKey = LegacyMediaPlayerNavKey(
                 nodeHandle = item.id.longValue,
@@ -243,6 +243,7 @@ class VideosTabViewModel @Inject constructor(
         val updatedSelectedIds = selectedVideoIdsFlow.value.toMutableList()
         if (item.id.longValue in updatedSelectedIds) {
             updatedSelectedIds -= item.id.longValue
+            areAllSelected = false
         } else {
             updatedSelectedIds += item.id.longValue
         }
@@ -258,6 +259,7 @@ class VideosTabViewModel @Inject constructor(
     }
 
     internal fun clearSelection() {
+        areAllSelected = false
         selectedVideoIdsFlow.update { emptyList() }
     }
 }
