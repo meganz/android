@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -43,11 +44,13 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
@@ -60,6 +63,7 @@ import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
@@ -81,6 +85,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUs
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.payment.model.AccountTypeInt
@@ -137,6 +142,8 @@ class FolderLinkViewModel @Inject constructor(
     val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase,
     private val queryAdsUseCase: QueryAdsUseCase,
+    private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     /**
@@ -469,6 +476,12 @@ class FolderLinkViewModel @Inject constructor(
                     folderSubHandle?.let {
                         handleMediaFolderNavigation()
                     }
+
+                    state.value.url?.let { url ->
+                        result.rootNode?.let { rootNode ->
+                            saveViewedFolderLink(url, rootNode)
+                        }
+                    }
                 }
                 .onFailure { throwable ->
                     _state.update {
@@ -478,6 +491,29 @@ class FolderLinkViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    private fun saveViewedFolderLink(link: String, rootNode: TypedFolderNode) {
+        viewModelScope.launch {
+            val isEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
+            }.getOrDefault(false)
+            if (!isEnabled) return@launch
+
+            runCatching {
+                saveViewedLinkUseCase(
+                    ViewedLink(
+                        nodeHandle = rootNode.id.longValue,
+                        name = rootNode.name,
+                        linkUrl = link,
+                        type = RecentlyUsedType.FolderLink,
+                        accessedTimestamp = null
+                    )
+                )
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

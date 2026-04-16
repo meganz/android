@@ -10,6 +10,8 @@ import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.entity.RecentlyUsedEntity
 import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
 import mega.privacy.android.data.database.entity.ViewedLinkRawItem
+import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.mapper.continuewhereleftoff.RecentlyUsedTypeIdMapper
 import mega.privacy.android.data.mapper.viewedlinks.ViewedLinkRawItemMapper
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.ViewedLink
@@ -31,6 +33,8 @@ internal class ViewedLinksRepositoryImplTest {
 
     private val recentlyViewedLinkDao: RecentlyViewedLinkDao = mock()
     private val viewedLinkRawItemMapper: ViewedLinkRawItemMapper = mock()
+    private val recentlyUsedTypeIdMapper = RecentlyUsedTypeIdMapper()
+    private val deviceGateway: DeviceGateway = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
@@ -38,6 +42,8 @@ internal class ViewedLinksRepositoryImplTest {
         underTest = ViewedLinksRepositoryImpl(
             recentlyViewedLinkDao = recentlyViewedLinkDao,
             viewedLinkRawItemMapper = viewedLinkRawItemMapper,
+            recentlyUsedTypeIdMapper = recentlyUsedTypeIdMapper,
+            deviceGateway = deviceGateway,
             ioDispatcher = testDispatcher,
         )
     }
@@ -46,7 +52,8 @@ internal class ViewedLinksRepositoryImplTest {
     fun resetMocks() {
         reset(
             recentlyViewedLinkDao,
-            viewedLinkRawItemMapper
+            viewedLinkRawItemMapper,
+            deviceGateway
         )
     }
 
@@ -144,7 +151,7 @@ internal class ViewedLinksRepositoryImplTest {
             verify(recentlyViewedLinkDao).saveViewedLink(
                 recentlyUsedEntity = RecentlyUsedEntity(
                     nodeHandle = 123L,
-                    typeId = RecentlyUsedType.FileLink.ordinal,
+                    typeId = 5,
                     fileName = "document.pdf",
                     lastAccessedTimestamp = 5000L,
                 ),
@@ -171,7 +178,7 @@ internal class ViewedLinksRepositoryImplTest {
             verify(recentlyViewedLinkDao).saveViewedLink(
                 recentlyUsedEntity = RecentlyUsedEntity(
                     nodeHandle = 456L,
-                    typeId = RecentlyUsedType.FolderLink.ordinal,
+                    typeId = 6,
                     fileName = "shared-folder",
                     lastAccessedTimestamp = 9000L,
                 ),

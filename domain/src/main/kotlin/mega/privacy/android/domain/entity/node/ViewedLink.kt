@@ -20,5 +20,5 @@ data class ViewedLink(
     val name: String,
     val linkUrl: String,
     val type: RecentlyUsedType,
-    val accessedTimestamp: Long,
+    val accessedTimestamp: Long? = null,
 )

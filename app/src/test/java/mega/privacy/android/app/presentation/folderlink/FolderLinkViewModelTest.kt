@@ -31,6 +31,8 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -42,6 +44,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
@@ -55,6 +58,7 @@ import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicLinkInformationUseCase
@@ -76,6 +80,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.navigation.MegaNavigator
@@ -88,6 +93,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
+import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -145,6 +151,8 @@ class FolderLinkViewModelTest {
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase = mock()
     private val queryAdsUseCase: QueryAdsUseCase = mock()
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
+    private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @BeforeEach
     fun setup() {
@@ -190,7 +198,9 @@ class FolderLinkViewModelTest {
             isUserLoggedInUseCase,
             stopAudioService,
             getPublicLinkInformationUseCase,
-            queryAdsUseCase
+            queryAdsUseCase,
+            saveViewedLinkUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -234,7 +244,9 @@ class FolderLinkViewModelTest {
             monitorMiscLoadedUseCase = mock(),
             getPublicLinkInformationUseCase = getPublicLinkInformationUseCase,
             queryAdsUseCase = queryAdsUseCase,
-            getCookieSettingsUseCase = getCookieSettingsUseCase
+            getCookieSettingsUseCase = getCookieSettingsUseCase,
+            saveViewedLinkUseCase = saveViewedLinkUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -318,6 +330,93 @@ class FolderLinkViewModelTest {
             assertThat(newValue.errorState).isEqualTo(LinkErrorState.Unavailable)
         }
     }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is called after successful fetchNodes when feature is enabled`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val rootNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(999L))
+                on { name }.thenReturn("shared-folder")
+            }
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(emptyList())
+                on { this.rootNode }.thenReturn(rootNode)
+            }
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                fetchFolderNodeResult
+            )
+            val folderInfo = mock<FolderInfo> {
+                on { id }.thenReturn(NodeId(999L))
+            }
+            whenever(getPublicLinkInformationUseCase(folderLink)).thenReturn(folderInfo)
+            whenever(queryAdsUseCase(folderInfo.id.longValue)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+            underTest.folderLogin(folderLink)
+
+            verify(saveViewedLinkUseCase).invoke(
+                ViewedLink(
+                    nodeHandle = 999L,
+                    name = "shared-folder",
+                    linkUrl = folderLink,
+                    type = RecentlyUsedType.FolderLink,
+                    accessedTimestamp = null
+                )
+            )
+        }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is not called when feature is disabled`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val rootNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(999L))
+                on { name }.thenReturn("shared-folder")
+            }
+            val fetchFolderNodeResult = mock<FetchFolderNodesResult> {
+                on { this.childrenNodes }.thenReturn(emptyList())
+                on { this.rootNode }.thenReturn(rootNode)
+            }
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                fetchFolderNodeResult
+            )
+            val folderInfo = mock<FolderInfo> {
+                on { id }.thenReturn(NodeId(999L))
+            }
+            whenever(getPublicLinkInformationUseCase(folderLink)).thenReturn(folderInfo)
+            whenever(queryAdsUseCase(folderInfo.id.longValue)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+            underTest.folderLogin(folderLink)
+
+            verify(saveViewedLinkUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is not called when fetchNodes fails`() =
+        runTest {
+            val base64Handle = "1234"
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.LinkRemoved()
+            )
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(saveViewedLinkUseCase, never()).invoke(any())
+        }
 
     @Test
     fun `test that on login into folder and on result API_INCOMPLETE values are updated correctly`() =
@@ -862,7 +961,7 @@ class FolderLinkViewModelTest {
     fun `test that stopAudioService is not invoked when the user is logged in`() = runTest {
         whenever(isUserLoggedInUseCase()).thenReturn(true)
         underTest.stopAudioPlayerServiceWithoutLogin()
-        verify(stopAudioService, times(0)).invoke()
+        verify(stopAudioService, never()).invoke()
     }
 
     @ParameterizedTest

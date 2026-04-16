@@ -24,19 +24,23 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -48,6 +52,8 @@ import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameC
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.nodes.extension.getIcon
@@ -79,6 +85,8 @@ class FileLinkViewModel @Inject constructor(
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
     private val queryAdsUseCase: QueryAdsUseCase,
+    private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileLinkState())
@@ -130,54 +138,80 @@ class FileLinkViewModel @Inject constructor(
     /**
      * Get node from public link
      */
-    fun getPublicNode(link: String, decryptionIntroduced: Boolean = false) = viewModelScope.launch {
-        runCatching { getPublicNodeUseCase(link) }
-            .onSuccess { node ->
-                Timber.d("getPublicNode result: ${node.name}")
-                val iconResource = node.getIcon(
-                    originShares = false,
-                    fileTypeIconMapper = fileTypeIconMapper
-                )
-                _state.update {
-                    it.copyWithTypedNode(node, iconResource)
+    fun getPublicNode(link: String, decryptionIntroduced: Boolean = false) {
+        viewModelScope.launch {
+            runCatching { getPublicNodeUseCase(link) }
+                .onSuccess { node ->
+                    Timber.d("getPublicNode result: ${node.name}")
+                    val iconResource = node.getIcon(
+                        originShares = false,
+                        fileTypeIconMapper = fileTypeIconMapper
+                    )
+                    _state.update {
+                        it.copyWithTypedNode(node, iconResource)
+                    }
+                    queryAds(node.id.longValue)
+                    saveViewedNode(link, node)
+                    resetJobInProgressState()
                 }
-                queryAds(node.id.longValue)
-                resetJobInProgressState()
-            }
-            .onFailure { exception ->
-                Timber.d("getPublicNode result: $exception")
-                resetJobInProgressState()
-                when (exception) {
-                    is PublicNodeException.InvalidDecryptionKey -> {
-                        if (decryptionIntroduced) {
-                            Timber.w("Incorrect key, ask again!")
+                .onFailure { exception ->
+                    Timber.d("getPublicNode result: $exception")
+                    resetJobInProgressState()
+                    when (exception) {
+                        is PublicNodeException.InvalidDecryptionKey -> {
+                            if (decryptionIntroduced) {
+                                Timber.w("Incorrect key, ask again!")
+                                _state.update { it.copy(askForDecryptionKeyDialogEvent = triggered) }
+                            } else {
+                                _state.update {
+                                    it.copy(errorState = LinkErrorState.Unavailable)
+                                }
+                            }
+                        }
+
+                        is PublicNodeException.DecryptionKeyRequired -> {
                             _state.update { it.copy(askForDecryptionKeyDialogEvent = triggered) }
-                        } else {
+                        }
+
+                        else -> {
                             _state.update {
-                                it.copy(errorState = LinkErrorState.Unavailable)
+                                it.copy(
+                                    errorState = if (exception is PublicNodeException.Expired) {
+                                        LinkErrorState.Expired
+                                    } else if (exception is PublicNodeException) {
+                                        LinkErrorState.Unavailable
+                                    } else {
+                                        LinkErrorState.NoError
+                                    }
+                                )
                             }
                         }
                     }
-
-                    is PublicNodeException.DecryptionKeyRequired -> {
-                        _state.update { it.copy(askForDecryptionKeyDialogEvent = triggered) }
-                    }
-
-                    else -> {
-                        _state.update {
-                            it.copy(
-                                errorState = if (exception is PublicNodeException.Expired) {
-                                    LinkErrorState.Expired
-                                } else if (exception is PublicNodeException) {
-                                    LinkErrorState.Unavailable
-                                } else {
-                                    LinkErrorState.NoError
-                                }
-                            )
-                        }
-                    }
                 }
+        }
+    }
+
+    private fun saveViewedNode(link: String, node: TypedFileNode) {
+        viewModelScope.launch {
+            val isEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
+            }.getOrDefault(false)
+            if (!isEnabled) return@launch
+
+            runCatching {
+                saveViewedLinkUseCase(
+                    ViewedLink(
+                        nodeHandle = node.id.longValue,
+                        name = node.name,
+                        linkUrl = link,
+                        type = RecentlyUsedType.FileLink,
+                        accessedTimestamp = null
+                    )
+                )
+            }.onFailure {
+                Timber.e(it)
             }
+        }
     }
 
     private fun queryAds(handle: Long) {

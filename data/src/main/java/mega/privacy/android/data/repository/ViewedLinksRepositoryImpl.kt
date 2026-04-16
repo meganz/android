@@ -8,6 +8,8 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.entity.RecentlyUsedEntity
 import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
+import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.mapper.continuewhereleftoff.RecentlyUsedTypeIdMapper
 import mega.privacy.android.data.mapper.viewedlinks.ViewedLinkRawItemMapper
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -21,11 +23,15 @@ import javax.inject.Inject
  *
  * @property recentlyViewedLinkDao
  * @property viewedLinkRawItemMapper
+ * @property recentlyUsedTypeIdMapper
+ * @property deviceGateway
  * @property ioDispatcher
  */
 internal class ViewedLinksRepositoryImpl @Inject constructor(
     private val recentlyViewedLinkDao: RecentlyViewedLinkDao,
     private val viewedLinkRawItemMapper: ViewedLinkRawItemMapper,
+    private val recentlyUsedTypeIdMapper: RecentlyUsedTypeIdMapper,
+    private val deviceGateway: DeviceGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewedLinksRepository {
 
@@ -38,9 +44,10 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
     override suspend fun saveLink(viewedLink: ViewedLink) = withContext(ioDispatcher) {
         val recentlyUsedEntity = RecentlyUsedEntity(
             nodeHandle = viewedLink.nodeHandle,
-            typeId = viewedLink.type.ordinal,
+            typeId = recentlyUsedTypeIdMapper(viewedLink.type),
             fileName = viewedLink.name,
-            lastAccessedTimestamp = viewedLink.accessedTimestamp,
+            lastAccessedTimestamp = viewedLink.accessedTimestamp
+                ?: deviceGateway.getCurrentTimeInMillis(),
         )
         val recentlyViewedLinkEntity = RecentlyViewedLinkEntity(
             nodeHandle = viewedLink.nodeHandle,

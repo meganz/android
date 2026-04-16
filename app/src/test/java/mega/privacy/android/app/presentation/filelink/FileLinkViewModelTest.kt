@@ -13,16 +13,20 @@ import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.exception.PublicNodeException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
@@ -33,6 +37,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
@@ -42,10 +47,12 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
+import org.mockito.Mockito.never
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -69,6 +76,8 @@ class FileLinkViewModelTest {
     private val nodeContentUriIntentMapper = mock<NodeContentUriIntentMapper>()
     private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
     private val queryAdsUseCase = mock<QueryAdsUseCase>()
+    private val saveViewedLinkUseCase = mock<SaveViewedLinkUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val url = "https://mega.co.nz/abc"
     private val filePreviewPath = "data/cache/xyz.jpg"
@@ -93,7 +102,9 @@ class FileLinkViewModelTest {
             megaNavigator,
             nodeContentUriIntentMapper,
             getNodePreviewFileUseCase,
-            queryAdsUseCase
+            queryAdsUseCase,
+            saveViewedLinkUseCase,
+            getFeatureFlagValueUseCase
         )
         initViewModel()
     }
@@ -115,7 +126,9 @@ class FileLinkViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             monitorMiscLoadedUseCase = mock(),
-            queryAdsUseCase = queryAdsUseCase
+            queryAdsUseCase = queryAdsUseCase,
+            saveViewedLinkUseCase = saveViewedLinkUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -238,6 +251,46 @@ class FileLinkViewModelTest {
             val result = expectMostRecentItem()
             assertThat(result.errorState).isEqualTo(LinkErrorState.Unavailable)
         }
+    }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is called after successful getPublicNode when feature is enabled`() =
+        runTest {
+            val publicNode = mockFileNode()
+            whenever(getPublicNodeUseCase(url)).thenReturn(publicNode)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+
+            underTest.getPublicNode(url)
+
+            verify(saveViewedLinkUseCase).invoke(
+                ViewedLink(
+                    nodeHandle = 1234567890L,
+                    name = title,
+                    linkUrl = url,
+                    type = RecentlyUsedType.FileLink,
+                    accessedTimestamp = null
+                )
+            )
+        }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is not called when feature is disabled`() = runTest {
+        val publicNode = mockFileNode()
+        whenever(getPublicNodeUseCase(url)).thenReturn(publicNode)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+
+        underTest.getPublicNode(url)
+
+        verify(saveViewedLinkUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is not called when getPublicNode fails`() = runTest {
+        whenever(getPublicNodeUseCase(any())).thenThrow(PublicNodeException.GenericError())
+
+        underTest.getPublicNode(url)
+
+        verify(saveViewedLinkUseCase, never()).invoke(any())
     }
 
     @Test
