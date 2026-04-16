@@ -444,6 +444,62 @@ class VideosTabViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that areAllSelected resets to false after clearSelection`() =
+        runTest {
+            val video1 = createVideoUiEntity(handle = 1L)
+            val video2 = createVideoUiEntity(handle = 2L)
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createTypedVideoNode(video1) to video1,
+                    createTypedVideoNode(video2) to video2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.selectAllVideos()
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isTrue()
+                underTest.clearSelection()
+                assertThat(awaitItem().areAllSelected).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that areAllSelected resets to false when item is deselected`() =
+        runTest {
+            val video1 = createVideoUiEntity(handle = 1L)
+            val video2 = createVideoUiEntity(handle = 2L)
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createTypedVideoNode(video1) to video1,
+                    createTypedVideoNode(video2) to video2
+                )
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.selectAllVideos()
+                    awaitItem()
+                }
+
+            underTest.selectionUiState.test {
+                assertThat(awaitItem().areAllSelected).isTrue()
+                underTest.onItemLongClicked(video1)
+                assertThat(awaitItem().areAllSelected).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     @ParameterizedTest(name = "when the showHiddenItems is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that uiState is updated correctly`(
