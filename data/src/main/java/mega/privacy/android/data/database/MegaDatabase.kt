@@ -397,6 +397,16 @@ internal abstract class MegaDatabase : RoomDatabase() {
                     "CREATE UNIQUE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_OFFLINE}_handle_path " +
                             "ON ${MegaDatabaseConstant.TABLE_OFFLINE} (handle, path)"
                 )
+
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}` (" +
+                            "`node_handle` INTEGER NOT NULL, " +
+                            "`link_url` TEXT NOT NULL, " +
+                            "PRIMARY KEY(`node_handle`), " +
+                            "FOREIGN KEY(`node_handle`) REFERENCES `${MegaDatabaseConstant.TABLE_RECENTLY_USED}`(`node_handle`) " +
+                            "ON UPDATE NO ACTION ON DELETE CASCADE" +
+                            ")"
+                )
             }
         }
 
