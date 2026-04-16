@@ -232,6 +232,7 @@ dependencies {
     implementation(project(":feature:cloudexplorer"))
     implementation(project(":resources:string-resources"))
     implementation(project(":feature:chat"))
+    implementation(project(":feature:transfers:transfers"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":feature:payment:payment-snowflake-components"))
     implementation(project(":feature:payment:payment"))
