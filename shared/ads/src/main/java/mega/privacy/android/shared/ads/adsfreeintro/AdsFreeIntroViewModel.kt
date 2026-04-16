@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.ads
+package mega.privacy.android.shared.ads.adsfreeintro
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,16 +8,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.formatter.mapper.FormattedPriceMapper
+import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
-import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-internal class AdsFreeIntroViewModel @Inject constructor(
+class AdsFreeIntroViewModel @Inject constructor(
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
-    private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
+    private val formattedPriceMapper: FormattedPriceMapper,
+    private val formattedSizeMapper: FormattedSizeMapper,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AdsFreeIntroUiState())
@@ -30,11 +32,19 @@ internal class AdsFreeIntroViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             runCatching {
-                getRecommendedSubscriptionUseCase()?.let {
-                    localisedSubscriptionMapper(it, it)
+                getRecommendedSubscriptionUseCase()
+            }.onSuccess { subscription ->
+                subscription?.let {
+                    _state.update { state ->
+                        state.copy(
+                            formattedPrice = formattedPriceMapper(subscription.amount),
+                            storageSize = formattedSizeMapper(
+                                subscription.storage,
+                                usePlaceholder = false,
+                            ),
+                        )
+                    }
                 }
-            }.onSuccess { cheapestSubscription ->
-                _state.update { it.copy(cheapestSubscriptionAvailable = cheapestSubscription) }
             }.onFailure {
                 Timber.e(it)
             }

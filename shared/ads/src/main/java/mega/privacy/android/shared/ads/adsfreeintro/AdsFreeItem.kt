@@ -1,26 +1,24 @@
-package mega.privacy.android.shared.original.core.ui.controls.ads
+package mega.privacy.android.shared.ads.adsfreeintro
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.R
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2medium
+import mega.privacy.android.shared.ads.R
 
 /**
  * Item to show the benefits of the Ads Free.
@@ -37,9 +35,9 @@ fun AdsFreeItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Icon(
+        MegaIcon(
             painter = painterResource(id = icon),
-            tint = DSTokens.colors.icon.secondary,
+            tint = IconColor.Secondary,
             contentDescription = "Ads Free Icon"
         )
 
@@ -50,14 +48,14 @@ fun AdsFreeItem(
                 modifier = Modifier.testTag(ADS_FREE_ITEM_TITLE_TEST_TAG),
                 text = title,
                 textColor = TextColor.Primary,
-                style = MaterialTheme.typography.subtitle2medium,
+                style = AppTheme.typography.titleSmall,
             )
 
             MegaText(
                 modifier = Modifier.testTag(ADS_FREE_ITEM_DESC_TEST_TAG),
                 text = desc,
                 textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.subtitle2,
+                style = AppTheme.typography.bodySmall,
             )
         }
     }
@@ -66,11 +64,11 @@ fun AdsFreeItem(
 @CombinedThemePreviews
 @Composable
 private fun AdsFreeItemPreview() {
-    OriginalTheme(isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         AdsFreeItem(
             title = "Enjoy an ad-free experience",
             desc = "Upgrade to a Pro plan for lots of storage and more. Our Pro plans start at just €4.99 a month.",
-            icon = R.drawable.ic_camera_rotate,
+            icon = R.drawable.ic_cloud_outline,
         )
     }
 }

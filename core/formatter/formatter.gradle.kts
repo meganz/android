@@ -9,6 +9,7 @@ android {
 
 dependencies {
     implementation(project(":resources:string-resources"))
+    implementation(project(":domain"))
     //test
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

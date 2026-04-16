@@ -10,6 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import mega.privacy.android.shared.ads.AdsContainer
 import mega.privacy.android.shared.ads.AdsContainerViewModel
+import mega.privacy.android.shared.ads.adsfreeintro.AdsFreeIntroView
 
 /**
  * Legacy ads container that shows AdsFreeIntroView dialog when close button is tapped.
