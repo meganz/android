@@ -1649,7 +1649,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     internal fun updateIsVideoOptionPopupShown(value: Boolean) {
-        uiState.update { it.copy(isVideoOptionPopupShown = value) }
+        uiState.update { it.copy(isMoreOptionShown = value) }
     }
 
     internal fun updateIsSpeedOptionsShown(value: Boolean) {

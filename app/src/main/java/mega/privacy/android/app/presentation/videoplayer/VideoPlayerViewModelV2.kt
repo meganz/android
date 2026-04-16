@@ -114,10 +114,10 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
@@ -155,6 +155,7 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
@@ -197,7 +198,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
-import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
@@ -1635,8 +1635,8 @@ class VideoPlayerViewModelV2 @Inject constructor(
         }
     }
 
-    internal fun updateIsVideoOptionPopupShown(value: Boolean) {
-        uiState.update { it.copy(isVideoOptionPopupShown = value) }
+    internal fun updateIsMoreOptionShown(value: Boolean) {
+        uiState.update { it.copy(isMoreOptionShown = value) }
     }
 
     internal fun updateCurrentSpeedPlaybackItem(item: SpeedPlaybackItem) {
@@ -1651,8 +1651,9 @@ class VideoPlayerViewModelV2 @Inject constructor(
      * Capture the screenshot when video playing.
      *
      * @param captureView the view that will be captured
-     * @param successCallback invoked on the main dispatcher after the screenshot is saved
-     * successfully. Safe to perform UI work (Compose state, View updates, etc.) directly.
+     * @param successCallback invoked on [ioDispatcher] after the screenshot is saved successfully.
+     * Do not perform UI work here (Compose state, View updates, Snackbar, etc.); use
+     * `withContext(Dispatchers.Main.immediate)` (or equivalent) inside the callback when needed.
      */
     @SuppressLint("SimpleDateFormat")
     internal fun screenshotWhenVideoPlaying(
@@ -1746,9 +1747,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
                             outputStream
                         )
                     } ?: return@let
-                    withContext(mainDispatcher) {
-                        successCallback(bitmap)
-                    }
+                    successCallback(bitmap)
                 } catch (e: Exception) {
                     Timber.e("Bitmap is saved error: ${e.message}")
                 }
@@ -1857,7 +1856,6 @@ class VideoPlayerViewModelV2 @Inject constructor(
         mediaItems: List<MediaItem>? = uiState.value.mediaPlaySources?.mediaItems,
     ) {
         if (list.isEmpty() || mediaItems.isNullOrEmpty() || list.size != mediaItems.size) return
-
         viewModelScope.launch {
             val newItems = withContext(ioDispatcher) {
                 mutex.withLock {

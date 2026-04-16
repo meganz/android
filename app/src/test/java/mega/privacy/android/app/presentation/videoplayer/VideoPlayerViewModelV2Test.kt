@@ -1627,12 +1627,12 @@ class VideoPlayerViewModelV2Test {
 
     @ParameterizedTest(name = "when value is {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that isVideoOptionPopupShown is updated correctly`(value: Boolean) = runTest {
+    fun `test that isMoreOptionShown is updated correctly`(value: Boolean) = runTest {
         initViewModel()
-        underTest.updateIsVideoOptionPopupShown(value)
+        underTest.updateIsMoreOptionShown(value)
         testScheduler.advanceUntilIdle()
         underTest.uiState.test {
-            assertThat(awaitItem().isVideoOptionPopupShown).isEqualTo(value)
+            assertThat(awaitItem().isMoreOptionShown).isEqualTo(value)
         }
     }
 
@@ -2211,10 +2211,9 @@ class VideoPlayerViewModelV2Test {
             }
             initViewModel()
             underTest.swapItems(1, 2, testItems, mediaItems)
-            advanceUntilIdle()
             underTest.updateItemsAfterReorder()
-            advanceUntilIdle()
             verify(mediaPlayerGateway).buildPlaySources(any())
+            advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.mediaPlaySources?.mediaItems?.get(1)?.mediaId).isEqualTo("2")

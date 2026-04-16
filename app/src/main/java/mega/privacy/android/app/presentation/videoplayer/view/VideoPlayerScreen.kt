@@ -40,16 +40,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Density
@@ -70,27 +70,32 @@ import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
-import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
-import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
+import kotlinx.coroutines.withContext
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
+import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
+import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
+import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMoreOption
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSpeedPlaybackMenuAction
-import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
+import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -144,6 +149,22 @@ internal fun VideoPlayerScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val isShowSubtitleIcon = viewModel.isShowSubtitleIcon()
+    val isShowPlaylistOption = uiState.items.size > SINGLE_PLAYLIST_SIZE
+    val moreOptionActions = remember(isShowSubtitleIcon, isShowPlaylistOption) {
+        buildList {
+            add(VideoPlayerMoreOption.Snapshot)
+            if (isShowSubtitleIcon) {
+                add(VideoPlayerMoreOption.Subtitle)
+            }
+            if (isShowPlaylistOption) {
+                add(VideoPlayerMoreOption.Playlist)
+            }
+            add(VideoPlayerMoreOption.Lock)
+        }
+    }
+
     var playbackState by rememberSaveable { mutableIntStateOf(STATE_IDLE) }
     val playerEventListener = remember {
         object : Player.Listener {
@@ -152,6 +173,8 @@ internal fun VideoPlayerScreen(
             }
         }
     }
+
+    val moreOptionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     val coroutineScope = rememberCoroutineScope()
     var autoHideJob by remember { mutableStateOf<Job?>(null) }
@@ -190,11 +213,13 @@ internal fun VideoPlayerScreen(
                         } else {
                             screenWidth to (screenWidth * bitmap.height / bitmap.width)
                         }
-
-                    resizedBitmap =
+                    val scaledBitmap =
                         bitmap.scale(width.toInt(), height.toInt(), false)
-                    isScreenshotVisible = true
                     bitmap.recycle()
+                    withContext(Dispatchers.Main.immediate) {
+                        resizedBitmap = scaledBitmap
+                        isScreenshotVisible = true
+                    }
                 }
             }
             snapshotScreen = false
@@ -222,8 +247,11 @@ internal fun VideoPlayerScreen(
         }
     }
 
-    LaunchedEffect(playbackState, uiState.showSubtitleDialog) {
-        if (playbackState <= STATE_BUFFERING || uiState.showSubtitleDialog) {
+    LaunchedEffect(playbackState, uiState.showSubtitleDialog, uiState.isMoreOptionShown) {
+        if (playbackState <= STATE_BUFFERING ||
+            uiState.showSubtitleDialog ||
+            uiState.isMoreOptionShown
+        ) {
             autoHideJob?.cancel()
         } else if (isControllerViewVisible) {
             delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
@@ -297,7 +325,6 @@ internal fun VideoPlayerScreen(
                                 context = context,
                                 uiState = uiState,
                                 container = root,
-                                isShowSubtitleIcon = viewModel.isShowSubtitleIcon(),
                                 updateRepeatToggleMode = {
                                     val repeatToggleMode =
                                         uiState.repeatToggleMode.let { repeatToggleMode ->
@@ -314,16 +341,13 @@ internal fun VideoPlayerScreen(
                                     viewModel.setRepeatToggleModeForPlayer(repeatToggleMode)
                                 },
                                 updateIsVideoOptionPopupShown = { value ->
-                                    viewModel.updateIsVideoOptionPopupShown(value)
+                                    viewModel.updateIsMoreOptionShown(value)
                                 },
                                 updateIsSpeedOptionsShown = { value ->
                                     isSpeedOptionsShown = value
                                 },
                                 updateLockStatus = { isLock ->
                                     viewModel.updateLockStatus(isLock)
-                                },
-                                showSubtitleDialog = {
-                                    viewModel.updateShowSubtitleDialog(true)
                                 },
                                 fullscreenClickedCallback = { isFullscreen ->
                                     viewModel.updateFullscreen(isFullscreen)
@@ -338,10 +362,6 @@ internal fun VideoPlayerScreen(
                                         systemUiController.isSystemBarsVisible = false
                                         playerComposeView.hideController()
                                     }
-                                },
-                                playQueueButtonClicked = {
-                                    autoHideJob?.cancel()
-                                    playQueueButtonClicked()
                                 },
                                 playerViewClicked = {
                                     val visible = !isControllerViewVisible
@@ -397,8 +417,8 @@ internal fun VideoPlayerScreen(
                 },
                 onRelease = {
                     (playerComposeView.tag as? VideoPlayerController)?.release()
-                    if (uiState.isVideoOptionPopupShown) {
-                        viewModel.updateIsVideoOptionPopupShown(false)
+                    if (uiState.isMoreOptionShown) {
+                        viewModel.updateIsMoreOptionShown(false)
                     }
                 }
             ) {
@@ -424,11 +444,11 @@ internal fun VideoPlayerScreen(
             }
 
             if (isControllerViewVisible && !uiState.isLocked) {
-                val horizontalPadding = when {
-                    orientation == ORIENTATION_LANDSCAPE && navigationBarPosition == NavigationBarPosition.Left ->
+                val horizontalPadding = when (orientation) {
+                    ORIENTATION_LANDSCAPE if navigationBarPosition == NavigationBarPosition.Left ->
                         PaddingValues(start = navigationBarHeight)
 
-                    orientation == ORIENTATION_LANDSCAPE && navigationBarPosition == NavigationBarPosition.Right ->
+                    ORIENTATION_LANDSCAPE if navigationBarPosition == NavigationBarPosition.Right ->
                         PaddingValues(end = navigationBarHeight)
 
                     else -> PaddingValues(0.dp)
@@ -546,6 +566,53 @@ internal fun VideoPlayerScreen(
                     Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
                     viewModel.navigateToSelectSubtitle()
                 })
+
+            if (uiState.isMoreOptionShown) {
+                MegaModalBottomSheet(
+                    modifier = Modifier.fillMaxWidth(),
+                    sheetState = moreOptionsSheetState,
+                    bottomSheetBackground = MegaModalBottomSheetBackground.PageBackground,
+                    onDismissRequest = {
+                        // Called after a swipe/outside-tap gesture — the sheet is already
+                        // animating away, so just sync the ViewModel state.
+                        viewModel.updateIsMoreOptionShown(false)
+                    },
+                    content = {
+                        moreOptionActions.forEach { action ->
+                            NodeActionListTile(
+                                modifier = Modifier.testTag(action.testTag),
+                                menuAction = action,
+                                onActionClicked = {
+                                    // Animate the sheet away first, then perform the action
+                                    // so the hide animation is not skipped.
+                                    coroutineScope.launch {
+                                        moreOptionsSheetState.hide()
+                                    }.invokeOnCompletion { cause ->
+                                        if (cause == null && !moreOptionsSheetState.isVisible) {
+                                            when (action) {
+                                                VideoPlayerMoreOption.Snapshot ->
+                                                    videoPlayerController?.onSnapshotOptionSelected()
+
+                                                VideoPlayerMoreOption.Subtitle ->
+                                                    viewModel.updateShowSubtitleDialog(true)
+
+                                                VideoPlayerMoreOption.Playlist -> {
+                                                    autoHideJob?.cancel()
+                                                    playQueueButtonClicked()
+                                                }
+
+                                                VideoPlayerMoreOption.Lock ->
+                                                    videoPlayerController?.onLockOptionSelected()
+                                            }
+                                            viewModel.updateIsMoreOptionShown(false)
+                                        }
+                                    }
+                                },
+                            )
+                        }
+                    },
+                )
+            }
         }
     }
 }

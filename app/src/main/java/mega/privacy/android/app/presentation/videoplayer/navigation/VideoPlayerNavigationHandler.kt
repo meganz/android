@@ -22,12 +22,16 @@ class VideoPlayerNavigationHandler(
 
     override fun back() {
         Timber.d("VideoPlayerNavigationHandler::back")
-        backStack.removeLastOrNull()
+        if (backStack.size > 1) {
+            backStack.removeLastOrNull()
+        }
     }
 
     override fun remove(navKey: NavKey) {
         Timber.d("VideoPlayerNavigationHandler::remove $navKey")
-        backStack.remove(navKey)
+        if (backStack.size > 1) {
+            backStack.remove(navKey)
+        }
     }
 
     override fun navigate(destination: NavKey, navOptions: NavOptions?) {
@@ -44,7 +48,8 @@ class VideoPlayerNavigationHandler(
         val index = backStack.indexOfLast { it == destination }
         if (index == -1) return
         val removeCount = backStack.size - index - if (inclusive) 0 else 1
-        repeat(removeCount) { backStack.removeLastOrNull() }
+        val maxRemovable = backStack.size - 1
+        repeat(minOf(removeCount, maxRemovable)) { backStack.removeLastOrNull() }
     }
 
     override fun navigateAndClearBackStack(destination: NavKey) {
@@ -63,7 +68,9 @@ class VideoPlayerNavigationHandler(
 
     override fun <T> returnResult(key: String, value: T) {
         navigationResultManager.returnResult(key, value)
-        backStack.removeLastOrNull()
+        if (backStack.size > 1) {
+            backStack.removeLastOrNull()
+        }
     }
 
     override fun clearResult(key: String) {

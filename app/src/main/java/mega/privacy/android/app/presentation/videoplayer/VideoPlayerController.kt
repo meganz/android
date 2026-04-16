@@ -18,7 +18,6 @@ import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
@@ -28,8 +27,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.VideoOptionRevampPopup
-import mega.privacy.android.app.mediaplayer.model.RevampVideoOptionItem
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
@@ -41,15 +38,12 @@ class VideoPlayerController(
     private val context: Context,
     private val uiState: VideoPlayerUiState,
     container: ViewGroup,
-    private val isShowSubtitleIcon: Boolean,
     private val updateRepeatToggleMode: () -> Unit,
     private val updateIsVideoOptionPopupShown: (Boolean) -> Unit,
     private val updateIsSpeedOptionsShown: (Boolean) -> Unit,
     private val updateLockStatus: (Boolean) -> Unit,
-    private val showSubtitleDialog: () -> Unit,
     private val fullscreenClickedCallback: (Boolean) -> Unit,
     private val lockStateChanged: (lock: Boolean) -> Unit,
-    private val playQueueButtonClicked: () -> Unit,
     private val playerViewClicked: () -> Unit,
     private val onSnapshotSelected: () -> Unit,
 ) {
@@ -57,7 +51,6 @@ class VideoPlayerController(
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
     private val playerComposeView = container.findViewById<PlayerView>(R.id.player_compose_view)
     private val moreOptionButton = container.findViewById<ImageButton>(R.id.more_option)
-    private val videoOptionPopup = container.findViewById<ComposeView>(R.id.video_option_popup)
     private val fullscreenButton = container.findViewById<ImageButton>(R.id.full_screen)
     private val controllerView = container.findViewById<View>(R.id.layout_player)
     private val unlockView = container.findViewById<View>(R.id.layout_unlock)
@@ -72,7 +65,6 @@ class VideoPlayerController(
     private var translationX = 0f
     private var translationY = 0f
 
-    private var isVideoOptionPopupShown = mutableStateOf(uiState.isVideoOptionPopupShown)
     private var isFullscreen = mutableStateOf(uiState.isFullscreen)
     private var playbackState = uiState.mediaPlaybackState
     private var isLocked = mutableStateOf(uiState.isLocked)
@@ -90,7 +82,7 @@ class VideoPlayerController(
     }
 
     /**
-     * Setup the repeat toggle button
+     * Set up the repeat toggle button
      *
      * @param defaultRepeatToggleMode the default RepeatToggleMode
      */
@@ -122,17 +114,15 @@ class VideoPlayerController(
     }
 
     /**
-     * Updates whether [RevampVideoOptionItem.Playlist] appears in the overflow menu (same rule as legacy toolbar playlist).
+     * Updates whether VideoPlayerMoreOption.Playlist appears in the overflow menu (same rule as legacy toolbar playlist).
      */
     internal fun updatePlayQueueOverflowMenuItems(itemSize: Int) {
         playQueueInOverflowMenu.value = itemSize > SINGLE_PLAYLIST_SIZE
     }
 
     private fun setupMoreOptionButton() {
-        initVideoOptionPopup(videoOptionPopup)
         moreOptionButton.setOnClickListener {
             updateIsVideoOptionPopupShown(true)
-            isVideoOptionPopupShown.value = true
         }
     }
 
@@ -145,39 +135,12 @@ class VideoPlayerController(
         trackName.text = metadata.title ?: metadata.nodeName
     }
 
-    private fun initVideoOptionPopup(composeView: ComposeView) {
-        composeView.setupComposeView(context) {
-            val videoOptions = remember(playQueueInOverflowMenu.value, isShowSubtitleIcon) {
-                buildList {
-                    add(RevampVideoOptionItem.Snapshot)
-                    if (isShowSubtitleIcon) {
-                        add(RevampVideoOptionItem.Subtitle)
-                    }
-                    if (playQueueInOverflowMenu.value) {
-                        add(RevampVideoOptionItem.Playlist)
-                    }
-                    add(RevampVideoOptionItem.Lock)
-                }
-            }
+    internal fun onSnapshotOptionSelected() {
+        onSnapshotSelected()
+    }
 
-            VideoOptionRevampPopup(
-                items = videoOptions,
-                isShown = isVideoOptionPopupShown.value,
-                onDismissRequest = {
-                    updateIsVideoOptionPopupShown(false)
-                    isVideoOptionPopupShown.value = false
-                }
-            ) { option ->
-                when (option) {
-                    RevampVideoOptionItem.Snapshot -> onSnapshotSelected()
-                    RevampVideoOptionItem.Subtitle -> showSubtitleDialog()
-                    RevampVideoOptionItem.Playlist -> playQueueButtonClicked()
-                    RevampVideoOptionItem.Lock -> updateLockState(true)
-                }
-                updateIsVideoOptionPopupShown(false)
-                isVideoOptionPopupShown.value = false
-            }
-        }
+    internal fun onLockOptionSelected() {
+        updateLockState(true)
     }
 
     private fun ComposeView.setupComposeView(context: Context, content: @Composable () -> Unit) {
@@ -343,12 +306,7 @@ class VideoPlayerController(
         deviceRotateButton?.setOnClickListener(null)
 
         playerComposeView?.setOnTouchListener(null)
-
-        videoOptionPopup.disposeComposition()
-
         scaleGestureDetector = null
         gestureDetector = null
-
-        isVideoOptionPopupShown.value = false
     }
 }

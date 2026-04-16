@@ -372,8 +372,9 @@ internal fun LegacyVideoPlayerScreen(
                             }
                     },
                     onRelease = {
+
                         (playerComposeView.tag as? LegacyVideoPlayerController)?.release()
-                        if (uiState.isVideoOptionPopupShown) {
+                        if (uiState.isMoreOptionShown) {
                             viewModel.updateIsVideoOptionPopupShown(false)
                         }
                     }
