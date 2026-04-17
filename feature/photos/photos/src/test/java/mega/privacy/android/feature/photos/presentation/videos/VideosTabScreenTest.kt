@@ -1,11 +1,13 @@
 package mega.privacy.android.feature.photos.presentation.videos
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -43,6 +45,7 @@ class VideosTabScreenTest {
         onLongClick: (item: VideoUiEntity) -> Unit = {},
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
+        contentPadding: PaddingValues = PaddingValues(),
         navigationHandler: NavigationHandler = mock(),
     ) {
         composeTestRule.setContent {
@@ -53,6 +56,7 @@ class VideosTabScreenTest {
                 onClick = onClick,
                 onLongClick = onLongClick,
                 onSortNodes = onSortNodes,
+                contentPadding = contentPadding,
                 navigationHandler = navigationHandler,
             )
         }
@@ -107,6 +111,20 @@ class VideosTabScreenTest {
             VIDEO_TAB_LOADING_VIEW_TEST_TAG,
             VIDEO_TAB_EMPTY_VIEW_TEST_TAG
         ).assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that all videos view is displayed when contentPadding is set`() {
+        val video = createVideoUiEntity(1L)
+        setComposeContent(
+            uiState = VideosTabUiState.Data(
+                allVideoEntities = listOf(video)
+            ),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp),
+        )
+
+        VIDEO_TAB_ALL_VIDEOS_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        VIDEO_TAB_VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG.assertIsDisplayedWithTag()
     }
 
     @Test

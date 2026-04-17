@@ -732,7 +732,8 @@ private fun MediaScreen.MediaContent(
             videosSelectionUiState = videosSelectionUiState,
             navigationHandler = navigationHandler,
             onCurrentVideosSearchQueryRequest = onCurrentVideosSearchQueryRequest,
-            updateSelectionModeAvailableActions = updateSelectionModeAvailableActions
+            updateSelectionModeAvailableActions = updateSelectionModeAvailableActions,
+            contentPadding = timelineContentPadding.excludeTopPadding(),
         )
 
         MediaScreen.Playlists -> VideoPlaylistsTabRoute(
@@ -740,6 +741,7 @@ private fun MediaScreen.MediaContent(
             dismissVideoPlaylistRemovedDialog = dismissVideoPlaylistRemovedDialog,
             modifier = modifier,
             navigate = navigationHandler::navigate,
+            contentPadding = timelineContentPadding.excludeTopPadding(),
         )
     }
 }
