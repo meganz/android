@@ -105,15 +105,29 @@ class AudioQueueViewModel @Inject constructor(
             _uiState.value.items
         }
         val index = items.indexOfFirst { playingHandle == it.id.longValue }
-        val newItems = items.updateMediaQueueItemType(index).updateOriginalData()
+        val updatedItems = items.updateMediaQueueItemType(index).let { typeUpdated ->
+            if (_uiState.value.isSelectMode) typeUpdated.clearNonNextSelectedItems() else typeUpdated
+        }
+        val newItems = updatedItems.updateOriginalData()
         val itemsToShow =
             if (_uiState.value.isSearchMode) newItems.filterItemBySearchQuery() else newItems
         val playingIndex =
             itemsToShow.indexOfFirst { it.type == MediaQueueItemType.Playing }
+        val selectedHandles = newItems.filter { it.isSelected }.map { it.id.longValue }
         _uiState.update {
-            it.copy(items = itemsToShow, indexOfCurrentPlayingItem = playingIndex)
+            it.copy(
+                items = itemsToShow,
+                indexOfCurrentPlayingItem = playingIndex,
+                selectedItemHandles = if (it.isSelectMode) selectedHandles else it.selectedItemHandles
+            )
         }
     }
+
+    private fun List<MediaQueueItemUiEntity>.clearNonNextSelectedItems() =
+        map { item ->
+            if (item.isSelected && item.type != MediaQueueItemType.Next) item.copy(isSelected = false)
+            else item
+        }
 
     private fun List<MediaQueueItemUiEntity>.updateMediaQueueItemType(playingIndex: Int) =
         if (playingIndex in indices) {
