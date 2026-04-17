@@ -336,3 +336,11 @@ alwaysApply: true
 - Configure your IDE to use 4 spaces instead of tabs  
 - Set continuation indent to 4 spaces  
 - Enable "Use tab character" = false in IDE settings
+
+## Android Knowledge Base
+
+When you need to look up Android documentation, best practices, or API guidance, use the Android CLI Knowledge Base:
+- **Search**: `android docs search '<query>'`
+- **Fetch**: `android docs fetch <kb-url>` (using the `kb://` URLs returned by search)
+
+If the `android` CLI is not installed (i.e., `which android` returns nothing), prompt the user to install it from https://developer.android.com/tools/agents before proceeding.
