@@ -26,12 +26,15 @@ import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.mobile.analytics.event.VideoPlayerRotateToLandscapePressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlayerRotateToPortraitPressedEvent
 import timber.log.Timber
 
 class VideoPlayerController(
@@ -184,8 +187,10 @@ class VideoPlayerController(
             val isPortrait =
                 context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
             activity.requestedOrientation = if (isPortrait) {
+                Analytics.tracker.trackEvent(VideoPlayerRotateToLandscapePressedEvent)
                 ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
             } else {
+                Analytics.tracker.trackEvent(VideoPlayerRotateToPortraitPressedEvent)
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
         }
