@@ -3,6 +3,7 @@ package mega.privacy.android.data.preferences.security
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaAttributes
@@ -25,6 +26,7 @@ internal class PasscodeDatastoreMigrationTest {
         underTest = PasscodeDatastoreMigration(
             databaseHandler = { databaseHandler },
             passcodeDataStoreFactory = mock { on { invoke(anyOrNull()) }.thenReturn(passcodeDataStore) },
+            databaseDispatcher = UnconfinedTestDispatcher(),
         )
     }
 

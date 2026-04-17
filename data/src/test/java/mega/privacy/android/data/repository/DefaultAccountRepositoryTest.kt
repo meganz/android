@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
@@ -47,8 +46,8 @@ import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.SubscriptionOption
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
@@ -125,7 +124,6 @@ class DefaultAccountRepositoryTest {
     private val subscriptionOptionListMapper = mock<SubscriptionOptionListMapper>()
     private val megaAchievementMapper = mock<MegaAchievementMapper>()
     private val achievementsOverviewMapper = mock<AchievementsOverviewMapper>()
-    private val dbHandler = mock<DatabaseHandler>()
     private val accountSessionMapper = mock<AccountSessionMapper>()
     private val chatPreferencesGateway = mock<ChatPreferencesGateway>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
@@ -199,7 +197,6 @@ class DefaultAccountRepositoryTest {
             subscriptionOptionListMapper,
             megaAchievementMapper,
             achievementsOverviewMapper,
-            dbHandler,
             myAccountCredentialsMapper,
             accountSessionMapper,
             chatPreferencesGateway,
@@ -244,7 +241,6 @@ class DefaultAccountRepositoryTest {
             subscriptionOptionListMapper = subscriptionOptionListMapper,
             megaAchievementMapper = megaAchievementMapper,
             achievementsOverviewMapper = achievementsOverviewMapper,
-            dbHandler = { dbHandler },
             myAccountCredentialsMapper = myAccountCredentialsMapper,
             accountDetailMapper = accountDetailMapper,
             accountSessionMapper = accountSessionMapper,
@@ -730,13 +726,13 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test resetAccountDetailsTimeStamp invoke correct method`() = runTest {
         underTest.resetAccountDetailsTimeStamp()
-        verify(dbHandler).resetAccountDetailsTimeStamp()
+        verify(localStorageGateway).resetAccountDetailsTimeStamp()
     }
 
     @Test
     fun `test resetExtendedAccountDetailsTimestamp invoke correct method`() = runTest {
         underTest.resetExtendedAccountDetailsTimestamp()
-        verify(dbHandler).resetExtendedAccountDetailsTimestamp()
+        verify(localStorageGateway).resetExtendedAccountDetailsTimestamp()
     }
 
     @Test

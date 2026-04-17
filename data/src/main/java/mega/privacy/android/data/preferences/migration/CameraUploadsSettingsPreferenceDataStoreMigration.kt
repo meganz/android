@@ -3,10 +3,13 @@ package mega.privacy.android.data.preferences.migration
 import androidx.datastore.core.DataMigration
 import androidx.datastore.preferences.core.Preferences
 import dagger.Lazy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.qualifier.DatabaseDispatcher
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import javax.inject.Inject
 
@@ -16,6 +19,7 @@ import javax.inject.Inject
 internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constructor(
     private val databaseHandler: Lazy<DatabaseHandler>,
     private val cameraUploadsSettingsPreferenceDataStoreFactory: CameraUploadsSettingsPreferenceDataStoreFactory,
+    @DatabaseDispatcher private val databaseDispatcher: CoroutineDispatcher,
 ) : DataMigration<Preferences> {
     override suspend fun cleanUp() {
         // No-op
@@ -27,7 +31,9 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
     override suspend fun migrate(currentData: Preferences): Preferences {
         val newPreferences = currentData.toMutablePreferences()
         val store = cameraUploadsSettingsPreferenceDataStoreFactory(newPreferences)
-        val oldPreferences = databaseHandler.get().preferences
+        val oldPreferences = withContext(databaseDispatcher) {
+            databaseHandler.get().preferences
+        }
         if (oldPreferences == null) {
             setDefaults(store)
         } else {

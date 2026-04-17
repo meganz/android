@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
-import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.decodeBase64
 import mega.privacy.android.data.extensions.encodeBase64
 import mega.privacy.android.data.extensions.failWithError
@@ -37,6 +35,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.qualifier.FileVersionsOption
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
@@ -55,7 +54,6 @@ import mega.privacy.android.domain.entity.preference.StartScreenDestinationPrefe
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import nz.mega.sdk.MegaApiJava
@@ -76,7 +74,6 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default settings repository implementation
  *
- * @property databaseHandler [DatabaseHandler]
  * @property context [Context]
  * @property megaApiGateway [MegaApiGateway]
  * @property megaLocalStorageGateway [MegaLocalStorageGateway]
@@ -91,7 +88,6 @@ import kotlin.coroutines.suspendCoroutine
  */
 @ExperimentalContracts
 internal class DefaultSettingsRepository @Inject constructor(
-    private val databaseHandler: Lazy<DatabaseHandler>,
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,

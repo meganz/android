@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
-import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +27,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.extensions.getRequestListener
@@ -89,6 +87,7 @@ import mega.privacy.android.domain.exception.chat.ResourceDoesNotExistChatExcept
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
@@ -98,7 +97,6 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_ENOENT
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -132,7 +130,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property appEventGateway
  * @property pendingMessageListMapper
  * @property megaLocalRoomGateway
- * @property databaseHandler
  * @property chatStorageGateway
  * @property typedMessageEntityMapper
  * @property richPreviewEntityMapper
@@ -163,7 +160,6 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val pendingMessageListMapper: PendingMessageListMapper,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-    private val databaseHandler: Lazy<DatabaseHandler>,
     private val chatStorageGateway: ChatStorageGateway,
     private val typedMessageEntityMapper: TypedMessageEntityMapper,
     private val richPreviewEntityMapper: RichPreviewEntityMapper,
@@ -946,8 +942,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getParticipantFirstName(handle: Long, contemplateEmail: Boolean): String? =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getContactByHandle(handle)?.shortName?.takeIf { it.isNotBlank() }
-                ?: databaseHandler.get()
-                    .findNonContactByHandle(handle.toString())?.shortName?.takeIf { it.isNotBlank() }
+                ?: localStorageGateway.getNonContactByHandle(handle)?.shortName?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }
                 ?: megaChatApiGateway.getUserLastnameFromCache(handle)?.takeIf { it.isNotBlank() }
@@ -958,8 +953,7 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun getParticipantFullName(handle: Long): String? = withContext(ioDispatcher) {
         megaLocalRoomGateway.getContactByHandle(handle)?.fullName?.takeIf { it.isNotBlank() }
-            ?: databaseHandler.get()
-                .findNonContactByHandle(handle.toString())?.fullName?.takeIf { it.isNotBlank() }
+            ?: localStorageGateway.getNonContactByHandle(handle)?.fullName?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserAliasFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFullNameFromCache(handle)?.takeIf { it.isNotBlank() }
             ?: megaChatApiGateway.getUserFirstnameFromCache(handle)?.takeIf { it.isNotBlank() }

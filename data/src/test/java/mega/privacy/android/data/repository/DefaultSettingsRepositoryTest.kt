@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -23,9 +22,9 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import nz.mega.sdk.MegaApiJava
@@ -59,9 +58,6 @@ import kotlin.contracts.ExperimentalContracts
 internal class DefaultSettingsRepositoryTest {
     private lateinit var underTest: DefaultSettingsRepository
 
-    private val databaseHandler: DatabaseHandler = mock {
-        on { preferences }.thenReturn(mock())
-    }
     private val context: Context = mock()
     private val megaApiGateway: MegaApiGateway = mock()
     private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
@@ -81,7 +77,6 @@ internal class DefaultSettingsRepositoryTest {
     @BeforeAll
     fun setUp() {
         underTest = DefaultSettingsRepository(
-            databaseHandler = { databaseHandler },
             context = context,
             megaApiGateway = megaApiGateway,
             megaLocalStorageGateway = megaLocalStorageGateway,
@@ -103,7 +98,6 @@ internal class DefaultSettingsRepositoryTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            databaseHandler,
             context,
             megaApiGateway,
             megaLocalStorageGateway,

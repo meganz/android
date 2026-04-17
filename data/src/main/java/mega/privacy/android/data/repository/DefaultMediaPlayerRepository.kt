@@ -2,14 +2,12 @@ package mega.privacy.android.data.repository
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -49,7 +47,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private val megaApi: MegaApiGateway,
     private val megaApiFolder: MegaApiFolderGateway,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
-    private val dbHandler: Lazy<DatabaseHandler>,
     private val fileNodeMapper: FileNodeMapper,
     private val typedAudioNodeMapper: TypedAudioNodeMapper,
     private val typedVideoNodeMapper: TypedVideoNodeMapper,
@@ -534,8 +531,8 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    private fun getMegaUserNameDB(user: MegaUser): String? =
-        dbHandler.get().findContactByHandle(user.handle)?.let { megaContactDB ->
+    private suspend fun getMegaUserNameDB(user: MegaUser): String? =
+        megaLocalRoomGateway.getContactByHandle(user.handle)?.let { megaContactDB ->
             when {
                 megaContactDB.nickname.isNullOrEmpty().not() -> {
                     megaContactDB.nickname

@@ -18,7 +18,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.yield
 import mega.privacy.android.data.R
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -143,7 +142,6 @@ class ChatRepositoryImplTest {
     private val appEventGateway = mock<AppEventGateway>()
     private val chatHistoryLoadStatusMapper = mock<ChatHistoryLoadStatusMapper>()
     private val chatPreviewMapper = mock<ChatPreviewMapper>()
-    private val databaseHandler = mock<DatabaseHandler>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val context = mock<Context>()
     private val chatStorageGateway = mock<ChatStorageGateway>()
@@ -197,7 +195,6 @@ class ChatRepositoryImplTest {
             chatInitStateMapper = chatInitStateMapper,
             pendingMessageListMapper = mock(),
             chatPreviewMapper = chatPreviewMapper,
-            databaseHandler = { databaseHandler },
             megaLocalRoomGateway = megaLocalRoomGateway,
             chatStorageGateway = chatStorageGateway,
             typedMessageEntityMapper = mock(),
@@ -220,7 +217,6 @@ class ChatRepositoryImplTest {
     @AfterEach
     fun cleanUp() {
         reset(
-            databaseHandler,
             megaChatApiGateway,
             megaLocalRoomGateway,
             chatMessageMapper,
@@ -632,8 +628,8 @@ class ChatRepositoryImplTest {
                 "lastName",
                 "email",
             )
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(
                 nonContact
             )
             assertThat(underTest.getParticipantFirstName(handle, false))
@@ -644,8 +640,8 @@ class ChatRepositoryImplTest {
     fun `test that first name returns correctly when calling from alias sdk cache`() =
         runTest {
             val handle = 123L
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserAliasFromCache(handle)).thenReturn("alias")
             assertThat(underTest.getParticipantFirstName(handle, false)).isEqualTo("alias")
         }
@@ -654,8 +650,8 @@ class ChatRepositoryImplTest {
     fun `test that first name returns correctly when calling from first name sdk cache`() =
         runTest {
             val handle = 123L
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserAliasFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserFirstnameFromCache(handle)).thenReturn("firstName")
             assertThat(underTest.getParticipantFirstName(handle, false)).isEqualTo("firstName")
@@ -665,8 +661,8 @@ class ChatRepositoryImplTest {
     fun `test that first name returns correctly when calling from last name sdk cache`() =
         runTest {
             val handle = 123L
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserAliasFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserFirstnameFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserLastnameFromCache(handle)).thenReturn("lastName")
@@ -677,8 +673,8 @@ class ChatRepositoryImplTest {
     fun `test that first name returns correctly when calling without contemplating email`() =
         runTest {
             val handle = 123L
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserAliasFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserFirstnameFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserLastnameFromCache(handle)).thenReturn(null)
@@ -689,8 +685,8 @@ class ChatRepositoryImplTest {
     fun `test that first name returns correctly when calling from last email sdk cache`() =
         runTest {
             val handle = 123L
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserAliasFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserFirstnameFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserLastnameFromCache(handle)).thenReturn(null)
@@ -702,8 +698,8 @@ class ChatRepositoryImplTest {
     fun `test that first name returns correctly when calling from last email sdk cache and it is null`() =
         runTest {
             val handle = 123L
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserAliasFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserFirstnameFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserLastnameFromCache(handle)).thenReturn(null)
@@ -736,8 +732,8 @@ class ChatRepositoryImplTest {
                 "lastName",
                 "email",
             )
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(
                 nonContact
             )
             assertThat(underTest.getParticipantFullName(handle)).isEqualTo(nonContact.fullName)
@@ -747,8 +743,8 @@ class ChatRepositoryImplTest {
     fun `test that full name returns correctly when calling from full name sdk cache`() =
         runTest {
             val handle = 123L
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserFullNameFromCache(handle)).thenReturn("fullName")
             assertThat(underTest.getParticipantFullName(handle)).isEqualTo("fullName")
         }
@@ -757,8 +753,8 @@ class ChatRepositoryImplTest {
     fun `test that full name returns correctly when calling from email sdk cache`() =
         runTest {
             val handle = 123L
-            whenever(databaseHandler.findContactByHandle(handle)).thenReturn(null)
-            whenever(databaseHandler.findNonContactByHandle(handle.toString())).thenReturn(null)
+            whenever(megaLocalRoomGateway.getContactByHandle(handle)).thenReturn(null)
+            whenever(localStorageGateway.getNonContactByHandle(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserFullNameFromCache(handle)).thenReturn(null)
             whenever(megaChatApiGateway.getUserEmailFromCache(handle)).thenReturn("email")
             assertThat(underTest.getParticipantFullName(handle)).isEqualTo("email")

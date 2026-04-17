@@ -162,6 +162,16 @@ interface MegaLocalStorageGateway {
     suspend fun getAttributes(): MegaAttributes?
 
     /**
+     * Reset account details time stamp
+     */
+    suspend fun resetAccountDetailsTimeStamp()
+
+    /**
+     * Reset extended account details time stamp
+     */
+    suspend fun resetExtendedAccountDetailsTimestamp()
+
+    /**
      * Get chat files folder handle
      */
     suspend fun getChatFilesFolderHandle(): Long?
@@ -254,5 +264,12 @@ interface MegaLocalStorageGateway {
     /**
      * Should show copyright
      */
-    fun shouldShowCopyright(): Boolean
+    suspend fun shouldShowCopyright(): Boolean
+
+    /**
+     * Get chat video quality
+     *
+     * @return chat video quality as [Int]
+     */
+    suspend fun getChatVideoQuality(): Int
 }

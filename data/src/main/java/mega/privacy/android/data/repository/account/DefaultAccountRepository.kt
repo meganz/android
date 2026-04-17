@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getRequestListener
@@ -119,7 +118,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway               [MegaApiGateway]
  * @property megaChatApiGateway           [MegaChatApiGateway]
  * @property megaApiFolderGateway         [MegaApiFolderGateway]
- * @property dbHandler                    [DatabaseHandler]
  * @property ioDispatcher                 [CoroutineDispatcher]
  * @property userUpdateMapper             [UserUpdateMapper]
  * @property localStorageGateway          [MegaLocalStorageGateway]
@@ -151,7 +149,6 @@ internal class DefaultAccountRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
-    private val dbHandler: Lazy<DatabaseHandler>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val userUpdateMapper: UserUpdateMapper,
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -382,12 +379,12 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun getAccountDetailsTimeStampInSeconds(): String? =
         withContext(ioDispatcher) {
-            dbHandler.get().attributes?.accountDetailsTimeStamp
+            localStorageGateway.getAttributes()?.accountDetailsTimeStamp
         }
 
     override suspend fun getExtendedAccountDetailsTimeStampInSeconds(): String? =
         withContext(ioDispatcher) {
-            dbHandler.get().attributes?.extendedAccountDetailsTimeStamp
+            localStorageGateway.getAttributes()?.extendedAccountDetailsTimeStamp
         }
 
     override suspend fun getSpecificAccountDetail(
@@ -437,11 +434,11 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun resetAccountDetailsTimeStamp() = withContext(ioDispatcher) {
-        dbHandler.get().resetAccountDetailsTimeStamp()
+        localStorageGateway.resetAccountDetailsTimeStamp()
     }
 
     override suspend fun resetExtendedAccountDetailsTimestamp() = withContext(ioDispatcher) {
-        dbHandler.get().resetExtendedAccountDetailsTimestamp()
+        localStorageGateway.resetExtendedAccountDetailsTimestamp()
     }
 
     override suspend fun createContactLink(renew: Boolean): String = withContext(ioDispatcher) {

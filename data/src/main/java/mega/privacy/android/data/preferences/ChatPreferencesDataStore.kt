@@ -9,14 +9,13 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.domain.entity.ChatImageQuality
@@ -41,7 +40,7 @@ internal class ChatPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityMapper: VideoQualityMapper,
-    private val dbH: Lazy<DatabaseHandler>,
+    private val localStorageGateway: MegaLocalStorageGateway,
 ) : ChatPreferencesGateway {
     private val chatImageQualityPreferenceKey = stringPreferencesKey("CHAT_IMAGE_QUALITY")
     private val lastContactPermissionRequestedTimePreferenceKey =
@@ -62,7 +61,7 @@ internal class ChatPreferencesDataStore @Inject constructor(
             }
 
     override suspend fun getChatVideoQualityPreference(): VideoQuality =
-        videoQualityMapper(dbH.get().chatVideoQuality) ?: VideoQuality.ORIGINAL
+        videoQualityMapper(localStorageGateway.getChatVideoQuality()) ?: VideoQuality.ORIGINAL
 
 
     override suspend fun setChatImageQualityPreference(quality: ChatImageQuality) {

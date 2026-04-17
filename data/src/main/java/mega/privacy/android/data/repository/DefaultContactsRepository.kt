@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.FileConstant
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.findItemByHandle
 import mega.privacy.android.data.extensions.getDecodedAliases
@@ -33,6 +32,7 @@ import mega.privacy.android.data.extensions.replaceIfExists
 import mega.privacy.android.data.extensions.sortList
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
@@ -118,8 +118,8 @@ internal class DefaultContactsRepository @Inject constructor(
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
     private val contactWrapper: ContactWrapper,
     private val contactRequestActionMapper: ContactRequestActionMapper,
-    private val databaseHandler: Lazy<DatabaseHandler>,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val localStorageGateway: MegaLocalStorageGateway,
     @ApplicationContext private val context: Context,
     private val userChatStatusMapper: UserChatStatusMapper,
     private val userMapper: UserMapper,
@@ -728,7 +728,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun clearContactDatabase() = withContext(ioDispatcher) {
         Timber.d("clear Database")
-        databaseHandler.get().clearContacts()
+        localStorageGateway.clearContacts()
     }
 
     override suspend fun createOrUpdateContact(
@@ -895,11 +895,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
                     when (error.errorCode) {
                         MegaError.API_OK -> {
-                            databaseHandler.get().apply {
-                                setLastPublicHandle(request.nodeHandle)
-                                setLastPublicHandleTimeStamp()
-                                lastPublicHandleType = MegaApiJava.AFFILIATE_TYPE_CONTACT
-                            }
                             continuation.resumeWith(
                                 Result.success(
                                     ContactLinkQueryResult(
@@ -928,6 +923,11 @@ internal class DefaultContactsRepository @Inject constructor(
                 },
             )
             megaApiGateway.contactLinkQuery(userHandle, listener)
+        }
+        if (!result.email.isNullOrBlank()) {
+            localStorageGateway.setLastPublicHandle(result.contactLinkHandle)
+            localStorageGateway.setLastPublicHandleTimeStamp()
+            localStorageGateway.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CONTACT)
         }
         val isContact = !result.email.isNullOrBlank() && megaApiGateway.getContacts()
             .any { contact -> result.email == contact.email && contact.visibility == MegaUser.VISIBILITY_VISIBLE }

@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -60,7 +59,6 @@ class DefaultMediaPlayerRepositoryTest {
 
     private val megaApi = mock<MegaApiGateway>()
     private val megaApiFolder = mock<MegaApiFolderGateway>()
-    private val dbHandler = mock<DatabaseHandler>()
     private val fileGateway = mock<FileGateway>()
     private val sortOrderIntMapper = mock<SortOrderIntMapper>()
     private val appPreferencesGateway = mock<AppPreferencesGateway>()
@@ -84,7 +82,6 @@ class DefaultMediaPlayerRepositoryTest {
             megaApi = megaApi,
             megaApiFolder = megaApiFolder,
             megaLocalRoomGateway = megaLocalRoomGateway,
-            dbHandler = { dbHandler },
             fileNodeMapper = fileNodeMapper,
             typedAudioNodeMapper = typedAudioNodeMapper,
             typedVideoNodeMapper = typedVideoNodeMapper,
@@ -105,7 +102,6 @@ class DefaultMediaPlayerRepositoryTest {
         reset(
             megaApi,
             megaApiFolder,
-            dbHandler,
             fileGateway,
             sortOrderIntMapper,
             appPreferencesGateway,

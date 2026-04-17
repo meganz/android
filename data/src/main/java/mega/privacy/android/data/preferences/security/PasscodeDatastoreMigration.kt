@@ -3,13 +3,17 @@ package mega.privacy.android.data.preferences.security
 import androidx.datastore.core.DataMigration
 import androidx.datastore.preferences.core.Preferences
 import dagger.Lazy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.domain.qualifier.DatabaseDispatcher
 import javax.inject.Inject
 
 internal class PasscodeDatastoreMigration @Inject constructor(
     private val databaseHandler: Lazy<DatabaseHandler>,
     private val passcodeDataStoreFactory: PasscodeDataStoreFactory,
+    @DatabaseDispatcher private val databaseDispatcher: CoroutineDispatcher,
 ) : DataMigration<Preferences> {
 
     override suspend fun cleanUp() {
@@ -24,7 +28,9 @@ internal class PasscodeDatastoreMigration @Inject constructor(
         val newPreferences = currentData.toMutablePreferences()
         val store = passcodeDataStoreFactory(newPreferences)
 
-        val oldPreferences = databaseHandler.get().preferences
+        val oldPreferences = withContext(databaseDispatcher) {
+            databaseHandler.get().preferences
+        }
         if (oldPreferences == null) {
             setDefaults(store)
         } else {
@@ -51,9 +57,12 @@ internal class PasscodeDatastoreMigration @Inject constructor(
         store: PasscodeDataStore,
         oldPreferences: MegaPreferences,
     ) {
+        val attempts = withContext(databaseDispatcher) {
+            databaseHandler.get().attributes?.attempts ?: 0
+        }
         store.setValues(
             enabled = oldPreferences.passcodeLockEnabled.toBoolean(),
-            attempts = databaseHandler.get().attributes?.attempts ?: 0,
+            attempts = attempts,
             passcode = oldPreferences.passcodeLockCode,
             state = oldPreferences.passcodeLockEnabled.toBoolean(),
             timeOutMilliseconds = oldPreferences.passcodeLockRequireTime?.toLongOrNull(),

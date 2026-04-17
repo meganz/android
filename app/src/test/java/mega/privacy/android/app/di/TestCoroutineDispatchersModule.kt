@@ -10,6 +10,7 @@ import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
+import mega.privacy.android.domain.qualifier.DatabaseDispatcher
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -49,4 +50,9 @@ object TestCoroutinesDispatchersModule {
     @MainImmediateDispatcher
     @Provides
     fun providesMainImmediateDispatcher(): CoroutineDispatcher = Dispatchers.Main.immediate
+
+    @DatabaseDispatcher
+    @Provides
+    fun providesDatabaseDispatcher(): CoroutineDispatcher =
+        AsyncTask.THREAD_POOL_EXECUTOR.asCoroutineDispatcher()
 }

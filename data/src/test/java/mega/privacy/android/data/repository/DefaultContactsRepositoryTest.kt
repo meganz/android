@@ -13,9 +13,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
@@ -102,8 +102,8 @@ class DefaultContactsRepositoryTest {
         ChatConnectionStateMapper(chatConnectionStatusMapper = ChatConnectionStatusMapper())
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
     private val contactWrapper: ContactWrapper = mock()
-    private val databaseHandler: DatabaseHandler = mock()
     private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
+    private val localStorageGateway: MegaLocalStorageGateway = mock()
     private val context: Context = mock()
     private val contactGateway: ContactGateway = mock()
 
@@ -161,10 +161,10 @@ class DefaultContactsRepositoryTest {
             credentialsPreferencesGateway = { credentialsPreferencesGateway },
             contactRequestActionMapper = contactRequestActionMapper,
             contactWrapper = contactWrapper,
-            databaseHandler = { databaseHandler },
             chatConnectionStateMapper = chatConnectionStateMapper,
             context = context,
             megaLocalRoomGateway = megaLocalRoomGateway,
+            localStorageGateway = localStorageGateway,
             userChatStatusMapper = userChatStatusMapper,
             userMapper = userMapper,
             sharingScope = CoroutineScope(UnconfinedTestDispatcher()),
@@ -285,7 +285,7 @@ class DefaultContactsRepositoryTest {
 
             val result = underTest.getUserFirstName(userHandle, false)
             verifyNoInteractions(contactWrapper)
-            verifyNoInteractions(databaseHandler)
+            verifyNoInteractions(localStorageGateway)
 
             assertThat(result).isEqualTo(testName)
         }
@@ -877,7 +877,7 @@ class DefaultContactsRepositoryTest {
     fun `test that clear contact database when call clearContactDatabase`() =
         runTest {
             underTest.clearContactDatabase()
-            verify(databaseHandler).clearContacts()
+            verify(localStorageGateway).clearContacts()
         }
 
     @Test

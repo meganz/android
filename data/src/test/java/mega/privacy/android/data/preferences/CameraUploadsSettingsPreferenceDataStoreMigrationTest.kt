@@ -2,6 +2,7 @@ package mega.privacy.android.data.preferences
 
 import androidx.datastore.preferences.core.Preferences
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaPreferences
@@ -35,6 +36,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
                     dataStore
                 )
             },
+            databaseDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
