@@ -13,8 +13,14 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.feature.transfers.presentation.settings.model.TransfersSettingsUiState
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.DownloadConnectionsChangedEvent
+import mega.privacy.mobile.analytics.event.DownloadConnectionsDialogEvent
+import mega.privacy.mobile.analytics.event.TransfersSettingsScreenEvent
+import mega.privacy.mobile.analytics.event.UploadConnectionsChangedEvent
+import mega.privacy.mobile.analytics.event.UploadConnectionsDialogEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,6 +32,9 @@ import org.robolectric.annotation.Config
 @Config(sdk = [34])
 @RunWith(AndroidJUnit4::class)
 class TransfersSettingsViewTest {
+
+    @get:Rule
+    val analyticsTestRule = AnalyticsTestRule()
 
     @get:Rule
     var composeRule = createAndroidComposeRule<ComponentActivity>()
@@ -292,6 +301,78 @@ class TransfersSettingsViewTest {
                 default = DEFAULT_DOWNLOAD_CONNECTIONS
             )
         ).isEqualTo("5")
+    }
+
+    @Test
+    fun `test that TransfersSettingsScreenEvent is tracked when screen is displayed`() {
+        initComposeRuleContent(uiState = DATA_STATE)
+        composeRule.waitForIdle()
+
+        assertThat(analyticsTestRule.events).contains(TransfersSettingsScreenEvent)
+    }
+
+    @Test
+    fun `test that DownloadConnectionsDialogEvent is tracked when download connections item is clicked`() {
+        initComposeRuleContent(uiState = DATA_STATE)
+
+        composeRule.onNodeWithTag(downloadItemTag).performClick()
+        composeRule.waitForIdle()
+
+        assertThat(analyticsTestRule.events).contains(DownloadConnectionsDialogEvent)
+    }
+
+    @Test
+    fun `test that UploadConnectionsDialogEvent is tracked when upload connections item is clicked`() {
+        initComposeRuleContent(uiState = DATA_STATE)
+
+        composeRule.onNodeWithTag(uploadItemTag).performClick()
+        composeRule.waitForIdle()
+
+        assertThat(analyticsTestRule.events).contains(UploadConnectionsDialogEvent)
+    }
+
+    @Test
+    fun `test that DownloadConnectionsChangedEvent is tracked when a value is selected in the download bottom sheet`() {
+        initComposeRuleContent(uiState = DATA_STATE)
+
+        val slowNetworksText = getString(
+            sharedR.string.settings_transfer_connections_slow_networs,
+            BEST_FOR_SLOW_NETWORKS
+        )
+        composeRule.onNodeWithTag(downloadItemTag).performClick()
+        composeRule.waitForIdle()
+        composeRule
+            .onNode(hasText(slowNetworksText) and hasClickAction())
+            .performSemanticsAction(SemanticsActions.OnClick)
+        composeRule.waitForIdle()
+
+        val event = analyticsTestRule.events
+            .filterIsInstance<DownloadConnectionsChangedEvent>()
+        assertThat(event).hasSize(1)
+        assertThat(event.first().info["previousValue"]).isEqualTo(DEFAULT_DOWNLOAD_CONNECTIONS)
+        assertThat(event.first().info["newValue"]).isEqualTo(BEST_FOR_SLOW_NETWORKS)
+    }
+
+    @Test
+    fun `test that UploadConnectionsChangedEvent is tracked when a value is selected in the upload bottom sheet`() {
+        initComposeRuleContent(uiState = DATA_STATE)
+
+        val slowNetworksText = getString(
+            sharedR.string.settings_transfer_connections_slow_networs,
+            BEST_FOR_SLOW_NETWORKS
+        )
+        composeRule.onNodeWithTag(uploadItemTag).performClick()
+        composeRule.waitForIdle()
+        composeRule
+            .onNode(hasText(slowNetworksText) and hasClickAction())
+            .performSemanticsAction(SemanticsActions.OnClick)
+        composeRule.waitForIdle()
+
+        val event = analyticsTestRule.events
+            .filterIsInstance<UploadConnectionsChangedEvent>()
+        assertThat(event).hasSize(1)
+        assertThat(event.first().info["previousValue"]).isEqualTo(DEFAULT_UPLOAD_CONNECTIONS)
+        assertThat(event.first().info["newValue"]).isEqualTo(BEST_FOR_SLOW_NETWORKS)
     }
 
     companion object {

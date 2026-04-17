@@ -21,6 +21,7 @@ dependencies {
 
     lintChecks(project(":lint"))
 
+    implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
     implementation(project(":navigation"))
@@ -45,6 +46,7 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
 
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
 

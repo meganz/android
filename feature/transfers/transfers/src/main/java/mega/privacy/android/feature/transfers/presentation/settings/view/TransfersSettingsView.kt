@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
@@ -18,15 +22,23 @@ import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.divider.StrongDivider
 import mega.android.core.ui.components.list.GenericListItem
-import mega.android.core.ui.components.settings.SettingsOptionsItem
+import mega.android.core.ui.components.settings.SettingsNavigationItem
+import mega.android.core.ui.components.settings.SettingsOptionsModal
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.transfers.presentation.settings.model.TransfersSettingsUiState
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.DownloadConnectionsChangedEvent
+import mega.privacy.mobile.analytics.event.DownloadConnectionsDialogEvent
+import mega.privacy.mobile.analytics.event.TransfersSettingsScreenEvent
+import mega.privacy.mobile.analytics.event.UploadConnectionsChangedEvent
+import mega.privacy.mobile.analytics.event.UploadConnectionsDialogEvent
 
 @Composable
 fun TransfersSettingsView(
@@ -37,6 +49,10 @@ fun TransfersSettingsView(
     modifier: Modifier = Modifier,
 ) {
     val resources = LocalResources.current
+
+    LaunchedOnceEffect(Unit) {
+        Analytics.tracker.trackEvent(TransfersSettingsScreenEvent)
+    }
 
     MegaScaffold(
         modifier = modifier
@@ -96,6 +112,9 @@ private fun TransfersSettingsViewContent(
     onSetMaxUploadConnections: (Int) -> Unit,
     enabled: Boolean,
 ) {
+    var showDownloadDialog by remember { mutableStateOf(false) }
+    var showUploadDialog by remember { mutableStateOf(false) }
+
     Column(modifier = modifier) {
         GenericListItem(
             enableClick = false,
@@ -119,24 +138,80 @@ private fun TransfersSettingsViewContent(
             },
         )
         StrongDivider(modifier = Modifier.fillMaxWidth())
-        SettingsOptionsItem(
+        SettingsNavigationItem(
             key = DOWNLOAD_CONNECTIONS_VIEW_TAG,
             title = stringResource(sharedR.string.settings_transfer_download_connections),
-            values = transferConnections,
-            valueToString = downloadValueToString,
-            selectedValue = selectedDownloadConnections,
             enabled = enabled,
-        ) { _, value -> onSetMaxDownloadConnections(value) }
+            subtitle = downloadValueToString(selectedDownloadConnections),
+        ) {
+            Analytics.tracker.trackEvent(DownloadConnectionsDialogEvent)
+            showDownloadDialog = true
+        }
         StrongDivider(modifier = Modifier.fillMaxWidth())
-        SettingsOptionsItem(
+        SettingsNavigationItem(
             key = UPLOAD_CONNECTIONS_VIEW_TAG,
             title = stringResource(sharedR.string.settings_transfer_upload_connections),
-            values = transferConnections,
-            valueToString = uploadValueToString,
-            selectedValue = selectedUploadConnections,
             enabled = enabled,
-        ) { _, value -> onSetMaxUploadConnections(value) }
+            subtitle = uploadValueToString(selectedUploadConnections),
+        ) {
+            Analytics.tracker.trackEvent(UploadConnectionsDialogEvent)
+            showUploadDialog = true
+        }
         StrongDivider(modifier = Modifier.fillMaxWidth())
+    }
+
+    if (showDownloadDialog) {
+        SettingsOptionsModal(
+            key = DOWNLOAD_CONNECTIONS_VIEW_TAG,
+            content = {
+                addHeader(
+                    title = stringResource(sharedR.string.settings_transfer_download_connections)
+                )
+                transferConnections.forEach { value ->
+                    addItem(
+                        isSelected = value == selectedDownloadConnections,
+                        value = value,
+                        valueToString = downloadValueToString,
+                    )
+                }
+            },
+            onDismiss = { showDownloadDialog = false },
+        ) { value ->
+            Analytics.tracker.trackEvent(
+                DownloadConnectionsChangedEvent(
+                    previousValue = selectedDownloadConnections,
+                    newValue = value,
+                )
+            )
+            onSetMaxDownloadConnections(value)
+        }
+    }
+
+    if (showUploadDialog) {
+        SettingsOptionsModal(
+            key = UPLOAD_CONNECTIONS_VIEW_TAG,
+            content = {
+                addHeader(
+                    title = stringResource(sharedR.string.settings_transfer_upload_connections)
+                )
+                transferConnections.forEach { value ->
+                    addItem(
+                        isSelected = value == selectedUploadConnections,
+                        value = value,
+                        valueToString = uploadValueToString,
+                    )
+                }
+            },
+            onDismiss = { showUploadDialog = false },
+        ) { value ->
+            Analytics.tracker.trackEvent(
+                UploadConnectionsChangedEvent(
+                    previousValue = selectedUploadConnections,
+                    newValue = value,
+                )
+            )
+            onSetMaxUploadConnections(value)
+        }
     }
 }
 
