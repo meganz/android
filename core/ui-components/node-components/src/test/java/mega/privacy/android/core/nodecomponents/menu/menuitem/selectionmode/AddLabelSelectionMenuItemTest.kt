@@ -57,28 +57,45 @@ class AddLabelSelectionMenuItemTest {
     }
 
     @Test
-    fun `test shouldDisplay ignores other parameters and only checks noNodeTakenDown`() = runTest {
+    fun `test shouldDisplay returns false when hasNodeAccessPermission is false`() = runTest {
         val addLabelMenuItem = AddLabelSelectionMenuItem(mock<LabelMenuAction>())
 
-        val result1 = addLabelMenuItem.shouldDisplay(
+        val result = addLabelMenuItem.shouldDisplay(
             hasNodeAccessPermission = false,
             selectedNodes = listOf(mockFileNode),
-            canBeMovedToTarget = false,
-            noNodeInBackups = false,
+            canBeMovedToTarget = true,
+            noNodeInBackups = true,
             noNodeTakenDown = true,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
-        val result2 = addLabelMenuItem.shouldDisplay(
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mockFileNode),
-            canBeMovedToTarget = true,
-            noNodeInBackups = true,
-            noNodeTakenDown = false,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
-        )
-
-        assertThat(result1).isTrue()
-        assertThat(result2).isFalse()
+        assertThat(result).isFalse()
     }
+
+    @Test
+    fun `test shouldDisplay ignores other parameters and only checks noNodeTakenDown and hasNodeAccessPermission`() =
+        runTest {
+            val addLabelMenuItem = AddLabelSelectionMenuItem(mock<LabelMenuAction>())
+
+            val result1 = addLabelMenuItem.shouldDisplay(
+                hasNodeAccessPermission = true,
+                selectedNodes = listOf(mockFileNode),
+                canBeMovedToTarget = false,
+                noNodeInBackups = false,
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+
+            val result2 = addLabelMenuItem.shouldDisplay(
+                hasNodeAccessPermission = true,
+                selectedNodes = listOf(mockFileNode),
+                canBeMovedToTarget = true,
+                noNodeInBackups = true,
+                noNodeTakenDown = false,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            )
+
+            assertThat(result1).isTrue()
+            assertThat(result2).isFalse()
+        }
 }

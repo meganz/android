@@ -148,6 +148,9 @@ abstract class NodeSelectionModeModule {
             shareSelectionMenuItem: ShareSelectionMenuItem,
             addToSelectionMenuItem: AddToSelectionMenuItem,
             addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
+            addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -162,7 +165,10 @@ abstract class NodeSelectionModeModule {
             disputeTakeDownSelectionMenuItem,
             shareSelectionMenuItem,
             addToSelectionMenuItem,
-            addToAlbumSelectionMenuItem
+            addToAlbumSelectionMenuItem,
+            addLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem,
         )
 
 
@@ -180,6 +186,9 @@ abstract class NodeSelectionModeModule {
             renameSelectionMenuItem: RenameSelectionMenuItem,
             copySelectionModeMenuAction: CopySelectionMenuItem,
             rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
+            addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -189,7 +198,10 @@ abstract class NodeSelectionModeModule {
             getLinkSelectionMenuItem,
             removeLinkSelectionMenuItem,
             sendToChatSelectionMenuItem,
-            shareSelectionMenuItem
+            shareSelectionMenuItem,
+            addLabelSelectionMenuItem,
+            addToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem,
         )
 
 

@@ -23,7 +23,7 @@ class AddToFavouritesSelectionMenuItem @Inject constructor(
         nodeSourceType: NodeSourceType,
     ): Boolean {
         if (!noNodeTakenDown || selectedNodes.isEmpty()) return false
-        return selectedNodes.any { !it.isFavourite }
+        return selectedNodes.any { !it.isFavourite } && hasNodeAccessPermission
     }
 
     override val showAsActionOrder: Int?
