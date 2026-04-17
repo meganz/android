@@ -7,7 +7,6 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.CryptoObject
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,10 +44,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.button.MegaOutlinedButton
+import mega.android.core.ui.components.button.TextOnlyButton
+import mega.android.core.ui.components.inputfields.PasswordTextInputField
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.preview.CombinedThemePreviews
-import mega.android.core.ui.theme.AndroidTheme
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
@@ -58,9 +60,6 @@ import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
 import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
-import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
@@ -221,7 +220,7 @@ private fun PasscodeContent(
             ShowPasswordField(onPasswordEntered)
         } else {
             if (passcodeType is PasscodeUIType.Alphanumeric) {
-                ShowPasswordField(onPasscodeEntered, "")
+                ShowPasswordField(onPasscodeEntered)
             } else if (passcodeType is PasscodeUIType.Pin) {
                 PasscodeField(
                     onComplete = onPasscodeEntered,
@@ -261,22 +260,21 @@ private fun PasscodeContent(
         }
         if (failedAttemptCount > 0 && !usePassword) {
             Spacer(modifier = Modifier.height(20.dp))
-            OutlinedMegaButton(
+            MegaOutlinedButton(
                 onClick = {
                     Analytics.tracker.trackEvent(PasscodeLogoutButtonPressedEvent)
                     logoutDialog = true
                 },
-                textId = R.string.action_logout,
+                text = stringResource(R.string.action_logout),
                 modifier = Modifier.testTag(LOGOUT_BUTTON_TAG),
-                rounded = false,
             )
             Spacer(modifier = Modifier.height(20.dp))
-            TextMegaButton(
+            TextOnlyButton(
                 onClick = {
                     Analytics.tracker.trackEvent(ForgotPasscodeButtonPressedEvent)
                     usePassword = true
                 },
-                textId = R.string.settings_passcode_forgot_passcode_button,
+                text = stringResource(R.string.settings_passcode_forgot_passcode_button),
                 modifier = Modifier.testTag(FORGOT_PASSCODE_BUTTON_TAG),
             )
         }
@@ -291,18 +289,18 @@ private fun PasscodeContent(
 }
 
 @Composable
-private fun ShowPasswordField(onPasswordEntered: (String) -> Unit, hintText: String? = null) {
+private fun ShowPasswordField(onPasswordEntered: (String) -> Unit) {
     var password by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(key1 = Unit) {
         focusRequester.requestFocus()
     }
-    PasswordTextField(
+    PasswordTextInputField(
         modifier = Modifier
             .fillMaxWidth(0.5f)
             .testTag(PASSWORD_FIELD_TAG)
             .focusRequester(focusRequester),
-        onTextChange = { password = it },
+        onValueChanged = { password = it },
         text = password,
         imeAction = ImeAction.Done,
         keyboardActions = KeyboardActions(
@@ -310,7 +308,7 @@ private fun ShowPasswordField(onPasswordEntered: (String) -> Unit, hintText: Str
                 onPasswordEntered(password)
             }
         ),
-        hint = hintText
+        label = null,
     )
 }
 
@@ -352,7 +350,7 @@ internal const val FORGOT_PASSCODE_BUTTON_TAG = "passcode_dialog:button:forgot_p
 private fun PasscodeDialogPreview(
     @PreviewParameter(PasscodeDialogParameterProvider::class) previewParameters: PreviewParameters,
 ) {
-    AndroidTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         PasscodeContent(
             modifier = Modifier,
             onPasscodeEntered = {},

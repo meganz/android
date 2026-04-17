@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.privacy.android.core.passcode.rememberPasscodeAwareLauncher
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaActivityResultContract
@@ -72,14 +73,14 @@ fun rememberUploadHandler(
         }
 
     val openMultipleDocumentLauncher =
-        rememberLauncherForActivityResult(megaResultContract.openMultipleDocumentsPersistable) {
+        rememberPasscodeAwareLauncher(megaResultContract.openMultipleDocumentsPersistable) {
             if (it.isNotEmpty()) {
                 onFilesSelected(it)
             }
         }
 
     val uploadFolderLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        rememberPasscodeAwareLauncher(ActivityResultContracts.StartActivityForResult()) {
             val intent = it.data
             val uri = intent?.data
             if (it.resultCode == Activity.RESULT_OK && uri != null) {

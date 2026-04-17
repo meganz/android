@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import mega.privacy.android.core.passcode.rememberPasscodeAwareLauncher
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -57,7 +58,7 @@ fun ChatAttachFileBottomSheet(
         }
 
     val localLauncher =
-        rememberLauncherForActivityResult(
+        rememberPasscodeAwareLauncher(
             contract = ActivityResultContracts.StartActivityForResult()
         ) { result ->
             if (result.resultCode == Activity.RESULT_OK) {

@@ -30,6 +30,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
+import mega.privacy.android.core.passcode.PasscodeProcessLifecycleOwner
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.inappupdate.ResetInAppUpdateStatisticsUseCase
 import mega.privacy.android.domain.usecase.inappupdate.ShouldPromptUserForUpdateUseCase
@@ -207,6 +208,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
         IntentSenderForResultStarter { intent, _, fillInIntent, flagsMask, flagsValues, _, _ ->
             val request = IntentSenderRequest.Builder(intent).setFillInIntent(fillInIntent)
                 .setFlags(flagsValues, flagsMask).build()
+            PasscodeProcessLifecycleOwner.get().skipNextPasscodeCheck()
             updateFlowResultLauncher?.launch(request)
         }
 

@@ -23,6 +23,7 @@ class CustomLintRegistry : IssueRegistry() {
             ScaffoldDetector.ISSUE,
             ManagerActivityIntentDetector.ISSUE,
             ComposableFunctionVisibilityDetector.ISSUE,
+            ExternalLauncherPasscodeDetector.ISSUE,
         )
 
     override val api: Int = CURRENT_API

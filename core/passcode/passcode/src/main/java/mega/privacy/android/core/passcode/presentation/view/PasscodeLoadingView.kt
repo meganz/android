@@ -1,7 +1,6 @@
 package mega.privacy.android.core.passcode.presentation.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,9 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.utils.shimmerEffect
+import mega.android.core.ui.modifiers.shimmerEffect
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 
 @Composable
 fun PasscodeLoadingView() {
@@ -52,7 +51,7 @@ fun PasscodeLoadingView() {
 @CombinedThemePreviews
 @Composable
 private fun PasscodeLoadingViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         PasscodeLoadingView()
     }
 }

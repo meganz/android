@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.upload
 
 import android.app.Activity
 import androidx.activity.compose.LocalActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
+import mega.privacy.android.core.passcode.rememberPasscodeAwareLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -42,7 +42,7 @@ fun ScanDocumentHandler(
     val activity = LocalActivity.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val scanDocumentLauncher = rememberLauncherForActivityResult(
+    val scanDocumentLauncher = rememberPasscodeAwareLauncher(
         contract = ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
