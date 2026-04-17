@@ -11,6 +11,7 @@ import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.SnackbarDuration
 import mega.privacy.android.core.nodecomponents.action.HandleNodeOptionsActionEvent
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
@@ -36,6 +37,10 @@ import mega.privacy.android.shared.resources.R as sharedResR
 fun HandleNodeOptionsActionResult(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
     navigationHandler: NavigationHandler,
+    nodeActionHandler: SingleNodeActionHandler = rememberSingleNodeActionHandler(
+        viewModel = nodeOptionsActionViewModel,
+        navigationHandler = navigationHandler,
+    ),
     onTransfer: (TransferTriggerEvent) -> Unit,
     onDeferredAction: ((() -> Unit) -> Unit)? = null,
     onNavResultConsumed: ((NodeOptionsBottomSheetResult) -> Unit)? = null,
@@ -47,11 +52,6 @@ fun HandleNodeOptionsActionResult(
         .monitorResult<NodeOptionsBottomSheetResult?>(NodeOptionsBottomSheetNavKey.RESULT)
         .collectAsStateWithLifecycle(null)
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-
-    val actionHandler = rememberSingleNodeActionHandler(
-        viewModel = nodeOptionsActionViewModel,
-        navigationHandler = navigationHandler,
-    )
 
     // Monitor share folder dialog result (moved from bottom sheet)
     val shareFolderDialogResult by navigationHandler
@@ -114,7 +114,7 @@ fun HandleNodeOptionsActionResult(
     LaunchedEffect(nodeBottomSheetResult) {
         val result = nodeBottomSheetResult ?: return@LaunchedEffect
         val execute = {
-            actionHandler(result.action, result.node)
+            nodeActionHandler(result.action, result.node)
         }
         if (result.action is DeferrableMenuAction && onDeferredAction != null) {
             onDeferredAction(execute)
