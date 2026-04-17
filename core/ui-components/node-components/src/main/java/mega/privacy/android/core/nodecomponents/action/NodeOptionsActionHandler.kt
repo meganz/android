@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DeferrableMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -24,6 +25,9 @@ import mega.privacy.android.navigation.megaActivityResultContract
  * @param coroutineScope Optional coroutine scope. Defaults to rememberCoroutineScope()
  * @param megaNavigator The mega navigator instance
  * @param navigationHandler Optional navigation handler
+ * @param onDeferredAction Optional interceptor for [mega.privacy.android.core.nodecomponents.menu.menuaction.DeferrableMenuAction]
+ *  actions (e.g. for rewarded ad gating). When provided, deferrable actions are passed through
+ *  this interceptor before execution.
  * @return A BottomSheetActionHandler instance
  * @see SingleNodeActionHandler
  */
@@ -36,6 +40,7 @@ fun rememberSingleNodeActionHandler(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     megaNavigator: MegaNavigator = rememberMegaNavigator(),
     navigationHandler: NavigationHandler? = null,
+    onDeferredAction: ((() -> Unit) -> Unit)? = null,
 ): SingleNodeActionHandler {
     val context = LocalContext.current
     val megaActivityResultContract = remember { context.megaActivityResultContract }
@@ -124,7 +129,7 @@ fun rememberSingleNodeActionHandler(
         }
     }
 
-    return remember(
+    val baseHandler = remember(
         viewModel,
         versionsLauncher,
         moveLauncher,
@@ -165,6 +170,19 @@ fun rememberSingleNodeActionHandler(
             }
         }
     }
+    return remember(baseHandler, onDeferredAction) {
+        if (onDeferredAction != null) {
+            SingleNodeActionHandler { action, node ->
+                if (action is DeferrableMenuAction) {
+                    onDeferredAction { baseHandler(action, node) }
+                } else {
+                    baseHandler(action, node)
+                }
+            }
+        } else {
+            baseHandler
+        }
+    }
 }
 
 /**
@@ -178,6 +196,9 @@ fun rememberSingleNodeActionHandler(
  * @param coroutineScope Optional coroutine scope. Defaults to rememberCoroutineScope()
  * @param megaNavigator The mega navigator instance
  * @param navigationHandler Optional navigation handler
+ * @param onDeferredAction Optional interceptor for [mega.privacy.android.core.nodecomponents.menu.menuaction.DeferrableMenuAction]
+ *  actions (e.g. for rewarded ad gating). When provided, deferrable actions are passed through
+ *  this interceptor before execution.
  * @return A SelectionModeActionHandler instance
  * @see MultiNodeActionHandler
  */
@@ -190,6 +211,7 @@ fun rememberMultiNodeActionHandler(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     megaNavigator: MegaNavigator = rememberMegaNavigator(),
     navigationHandler: NavigationHandler? = null,
+    onDeferredAction: ((() -> Unit) -> Unit)? = null,
 ): MultiNodeActionHandler {
     val context = LocalContext.current
     val megaActivityResultContract = remember { context.megaActivityResultContract }
@@ -264,7 +286,7 @@ fun rememberMultiNodeActionHandler(
             }
         }
 
-    return remember(
+    val baseHandler = remember(
         viewModel,
         moveLauncher,
         copyLauncher,
@@ -299,6 +321,19 @@ fun rememberMultiNodeActionHandler(
             viewModel.handleMultipleNodesAction(action) { handler ->
                 handler.handle(action, nodes, actionContext)
             }
+        }
+    }
+    return remember(baseHandler, onDeferredAction) {
+        if (onDeferredAction != null) {
+            MultiNodeActionHandler { action, nodes ->
+                if (action is DeferrableMenuAction) {
+                    onDeferredAction { baseHandler(action, nodes) }
+                } else {
+                    baseHandler(action, nodes)
+                }
+            }
+        } else {
+            baseHandler
         }
     }
 }

@@ -41,7 +41,6 @@ import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
-import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SaveToMegaMenuAction
@@ -67,7 +66,6 @@ import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.ads.NewAdsContainer
-import mega.privacy.android.shared.ads.rewarded.RewardedAdGateHandler
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
@@ -86,7 +84,7 @@ internal fun FolderLinkScreen(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
     navigationHandler: NavigationHandler,
     singleNodeActionHandler: SingleNodeActionHandler,
-    rewardedAdGateHandler: RewardedAdGateHandler,
+    selectionModeActionHandler: MultiNodeActionHandler,
     onNavigate: (NavKey) -> Unit,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
@@ -95,11 +93,6 @@ internal fun FolderLinkScreen(
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
-    val selectionModeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(
-        navigationHandler = navigationHandler,
-        viewModel = nodeOptionsActionViewModel,
-        megaNavigator = megaNavigator,
-    )
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -194,21 +187,12 @@ internal fun FolderLinkScreen(
                                     primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
                                     primaryButtonLeadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
                                     onPrimaryButtonClick = {
-                                        rewardedAdGateHandler.requestAction {
-                                            singleNodeActionHandler(
-                                                action = SaveToMegaMenuAction(),
-                                                node = folderNode
-                                            )
-                                        }
+                                        singleNodeActionHandler(SaveToMegaMenuAction(), folderNode)
+
                                     },
                                     textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
                                     onTextOnlyButtonClick = {
-                                        rewardedAdGateHandler.requestAction {
-                                            singleNodeActionHandler(
-                                                action = DownloadMenuAction(),
-                                                node = folderNode
-                                            )
-                                        }
+                                        singleNodeActionHandler(DownloadMenuAction(), folderNode)
                                     },
                                     applyInsets = true
                                 )

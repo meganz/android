@@ -5,6 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -44,13 +45,19 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
             val singleNodeActionHandler = rememberSingleNodeActionHandler(
                 viewModel = nodeOptionsActionViewModel,
                 navigationHandler = navigationHandler,
+                onDeferredAction = rewardedAdGate::requestAction,
+            )
+            val selectionModeActionHandler = rememberMultiNodeActionHandler(
+                viewModel = nodeOptionsActionViewModel,
+                navigationHandler = navigationHandler,
+                onDeferredAction = rewardedAdGate::requestAction,
             )
             FolderLinkScreen(
                 viewModel = viewModel,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
                 navigationHandler = navigationHandler,
                 singleNodeActionHandler = singleNodeActionHandler,
-                rewardedAdGateHandler = rewardedAdGate,
+                selectionModeActionHandler = selectionModeActionHandler,
                 onBack = navigationHandler::back,
                 onNavigate = navigationHandler::navigate,
                 onTransfer = transferHandler::setTransferEvent,
@@ -60,9 +67,6 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                 navigationHandler = navigationHandler,
                 nodeActionHandler = singleNodeActionHandler,
                 onTransfer = transferHandler::setTransferEvent,
-                onDeferredAction = { execute ->
-                    rewardedAdGate.requestAction(execute)
-                },
             )
         }
     }
