@@ -113,6 +113,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -939,15 +940,17 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test that EditAction handle returns result with correct key and node handle`() {
+    fun `test that EditAction handle navigates to text editor in Edit mode`() {
         val action = EditActionClickHandler()
         val menuAction = mock<EditMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).returnResult(
-            EditActionClickHandler.RESULT_KEY,
-            mockFileNode.id.longValue,
+        verify(mockNavigationHandler).navigate(
+            LegacyTextEditorNavKey(
+                nodeHandle = mockFileNode.id.longValue,
+                mode = TextEditorMode.Edit.value,
+            )
         )
     }
 
