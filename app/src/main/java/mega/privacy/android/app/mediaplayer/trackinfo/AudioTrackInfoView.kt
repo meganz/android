@@ -263,7 +263,7 @@ fun AudioNodeInfoView(
         Text(
             text = (locationValue?.location ?: ""),
             fontSize = 14.sp,
-            color = colorResource(R.color.accent_900),
+            color = colorResource(R.color.grey_070_white_070),
             modifier = Modifier
                 .padding(top = 4.dp, start = 72.dp)
                 .clickable { onLocationClicked() }
