@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -1330,9 +1332,9 @@ internal class DefaultAccountRepository @Inject constructor(
         credentialsPreferencesGateway.get().save(credentials)
     }
 
-    override fun monitorCredentials(): Flow<UserCredentials?> =
-        credentialsPreferencesGateway.get().monitorCredentials()
-            .flowOn(ioDispatcher)
+    override fun monitorCredentials(): Flow<UserCredentials?> = flow {
+        emitAll(credentialsPreferencesGateway.get().monitorCredentials())
+    }.flowOn(ioDispatcher)
 
     override suspend fun clearCredentials() = withContext(ioDispatcher) {
         credentialsPreferencesGateway.get().clear()
