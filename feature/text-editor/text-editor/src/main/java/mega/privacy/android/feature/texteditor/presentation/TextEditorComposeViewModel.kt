@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScr
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
@@ -79,6 +81,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
+    private val getChatFileUseCase: GetChatFileUseCase,
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase,
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
@@ -119,6 +122,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     /** Content at last load or last successful save; used for discard. */
     private var lastSavedContent: String = ""
 
+    /** Resolved node handle; updated from chat file resolution when opening from chat. */
+    private var resolvedNodeHandle: Long = args.nodeHandle
+
     /** Last known scroll position reported by the UI, used for persistence. */
     private var lastScrollFraction: Float = 0f
 
@@ -130,11 +136,47 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         if (args.mode != TextEditorMode.Create) {
             viewModelScope.launch {
                 _uiState.update { it.copy(isFullyLoaded = false) }
-                getTextContentForTextEditorUseCase(
-                    nodeHandle = args.nodeHandle,
-                    localPath = args.localPath,
-                    chunkSizeLines = CHUNK_SIZE_LINES,
-                )
+                val chatId = args.chatId
+                val messageId = args.messageId
+                var resolvedNode: TypedFileNode? = null
+                if (chatId != null && messageId != null) {
+                    val chatFileResult = runCatching {
+                        getChatFileUseCase(chatId, messageId)
+                    }
+                    val chatFile = chatFileResult.getOrNull()
+                    if (chatFile != null) {
+                        resolvedNodeHandle = chatFile.id.longValue
+                        resolvedNode = chatFile
+                        _uiState.update {
+                            it.copy(fileName = chatFile.name)
+                        }
+                    } else {
+                        val exception = chatFileResult.exceptionOrNull()
+                        Timber.e(exception, "Text editor: chat file not found for chatId=$chatId, messageId=$messageId")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorEvent = triggered,
+                                errorMessage = exception?.message?.ifBlank { null },
+                            )
+                        }
+                        return@launch
+                    }
+                }
+                val contentFlow = if (resolvedNode != null) {
+                    getTextContentForTextEditorUseCase(
+                        resolvedNode = resolvedNode,
+                        localPath = args.localPath,
+                        chunkSizeLines = CHUNK_SIZE_LINES,
+                    )
+                } else {
+                    getTextContentForTextEditorUseCase(
+                        nodeHandle = resolvedNodeHandle,
+                        localPath = args.localPath,
+                        chunkSizeLines = CHUNK_SIZE_LINES,
+                    )
+                }
+                contentFlow
                     .catch { e ->
                         Timber.e(e, "Text editor: failed to load content gradually")
                         _uiState.update {
@@ -179,29 +221,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 _uiState.update { it.copy(isFullyLoaded = true) }
                 restoreScrollPosition()
                 saveRecentlyUsed()
-            }
-            viewModelScope.launch {
-                val (nodeName, actions) = runCatching {
-                    val node = getNodeByIdUseCase(NodeId(args.nodeHandle))
-                    val accessPermission = getNodeAccessUseCase(NodeId(args.nodeHandle))
-                    val isNodeExported = node?.exportedData != null
-                    val name = node?.name
-                    name to textEditorBottomBarActionsMapper(
-                        args.mode,
-                        accessPermission,
-                        isNodeExported,
-                        args.inExcludedAdapterForGetLinkAndEdit,
-                        args.showDownload,
-                        args.showShare,
-                        args.showSendToChat,
-                    )
-                }.getOrElse { null to emptyList() }
-                _uiState.update {
-                    it.copy(
-                        fileName = nodeName ?: it.fileName,
-                        bottomBarActions = actions,
-                    )
-                }
+                fetchBottomBarActions(resolvedNode)
             }
         } else {
             lastSavedContent = ""
@@ -472,7 +492,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             val wasCreateMode = state.mode == TextEditorMode.Create
             runCatching {
                 saveTextContentForTextEditorUseCase(
-                    nodeHandle = args.nodeHandle,
+                    nodeHandle = resolvedNodeHandle,
                     text = fullTextToSave,
                     fileName = state.fileName.ifEmpty { "untitled.txt" },
                     mode = state.mode,
@@ -576,9 +596,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private fun emitDownloadTransferEvent() {
-        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         viewModelScope.launch {
-            val node = getNodeByIdUseCase(NodeId(args.nodeHandle))
+            val node = getNodeByIdUseCase(NodeId(resolvedNodeHandle))
             if (node != null) {
                 _uiState.update {
                     it.copy(
@@ -588,27 +608,27 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     )
                 }
             } else {
-                Timber.w("Text editor: node %d not found for download", args.nodeHandle)
+                Timber.w("Text editor: node %d not found for download", resolvedNodeHandle)
             }
         }
     }
 
     private fun emitManageLinkEffect() {
-        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         _uiState.update {
-            it.copy(nodeEffectEvent = triggered(TextEditorNodeEffect.ManageLink(args.nodeHandle)))
+            it.copy(nodeEffectEvent = triggered(TextEditorNodeEffect.ManageLink(resolvedNodeHandle)))
         }
     }
 
     private fun emitShareEffect() {
-        if (args.nodeHandle == INVALID_NODE_HANDLE && args.localPath.isNullOrBlank()) return
+        if (resolvedNodeHandle == INVALID_NODE_HANDLE && args.localPath.isNullOrBlank()) return
         val name = _uiState.value.fileName.ifBlank { args.fileName.orEmpty() }.ifBlank { null }
         if (!args.localPath.isNullOrBlank()) {
             _uiState.update {
                 it.copy(
                     nodeEffectEvent = triggered(
                         TextEditorNodeEffect.Share(
-                            nodeHandle = args.nodeHandle,
+                            nodeHandle = resolvedNodeHandle,
                             localPath = args.localPath,
                             fileName = name,
                         ),
@@ -619,10 +639,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
         viewModelScope.launch {
             runCatching {
-                val node = getNodeByIdUseCase(NodeId(args.nodeHandle))
+                val node = getNodeByIdUseCase(NodeId(resolvedNodeHandle))
                 node?.exportedData?.publicLink
                     ?: exportNodeUseCase(
-                        nodeToExport = NodeId(args.nodeHandle),
+                        nodeToExport = NodeId(resolvedNodeHandle),
                         callerName = "TextEditor:share",
                     )
             }.onSuccess { publicLink ->
@@ -630,7 +650,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     it.copy(
                         nodeEffectEvent = triggered(
                             TextEditorNodeEffect.Share(
-                                nodeHandle = args.nodeHandle,
+                                nodeHandle = resolvedNodeHandle,
                                 localPath = null,
                                 fileName = name,
                                 resolvedPublicLink = publicLink,
@@ -646,9 +666,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private fun emitSendToChatEffect() {
-        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         _uiState.update {
-            it.copy(nodeEffectEvent = triggered(TextEditorNodeEffect.SendToChat(args.nodeHandle)))
+            it.copy(nodeEffectEvent = triggered(TextEditorNodeEffect.SendToChat(resolvedNodeHandle)))
         }
     }
 
@@ -725,11 +745,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private suspend fun saveScrollState() {
-        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         runCatching {
             saveTextEditorScrollUseCase(
                 TextEditorScroll(
-                    nodeHandle = args.nodeHandle,
+                    nodeHandle = resolvedNodeHandle,
                     cursorPosition = 0, // TODO: persist actual cursor offset when edit mode cursor tracking is added
                     scrollFraction = lastScrollFraction,
                 )
@@ -738,10 +758,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private fun restoreScrollPosition() {
-        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         viewModelScope.launch {
             runCatching {
-                getTextEditorScrollUseCase(args.nodeHandle)
+                getTextEditorScrollUseCase(resolvedNodeHandle)
             }.onSuccess { scroll ->
                 if (scroll != null) {
                     val chunkCount = getChunkCount()
@@ -767,13 +787,39 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         _uiState.update { it.copy(restoreFocusChunkIndex = null) }
     }
 
+    private suspend fun fetchBottomBarActions(resolvedNode: TypedFileNode?) {
+        val (nodeName, actions) = runCatching {
+            val node = resolvedNode
+                ?: getNodeByIdUseCase(NodeId(resolvedNodeHandle))
+            val accessPermission = if (resolvedNode != null) null
+                else node?.let { getNodeAccessUseCase(NodeId(resolvedNodeHandle)) }
+            val isNodeExported = node?.exportedData != null
+            val name = node?.name
+            name to textEditorBottomBarActionsMapper(
+                args.mode,
+                accessPermission,
+                isNodeExported,
+                args.inExcludedAdapterForGetLinkAndEdit,
+                args.showDownload,
+                args.showShare,
+                args.showSendToChat,
+            )
+        }.getOrElse { null to emptyList() }
+        _uiState.update {
+            it.copy(
+                fileName = nodeName ?: it.fileName,
+                bottomBarActions = actions,
+            )
+        }
+    }
+
     private fun saveRecentlyUsed() {
-        if (args.nodeHandle == INVALID_NODE_HANDLE) return
+        if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         val fileName = _uiState.value.fileName
         viewModelScope.launch {
             runCatching {
                 saveRecentlyUsedItemUseCase(
-                    nodeHandle = args.nodeHandle,
+                    nodeHandle = resolvedNodeHandle,
                     type = RecentlyUsedType.TextEditor,
                     fileName = fileName,
                 )

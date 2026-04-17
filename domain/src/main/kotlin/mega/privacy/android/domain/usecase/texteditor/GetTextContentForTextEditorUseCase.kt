@@ -53,13 +53,51 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
     /**
      * Load text gradually in chunks of lines. First emission is quick for responsive UI.
      * Throws on error; caller (e.g. ViewModel) should catch and map to UI state.
+     *
+     * @param nodeHandle Handle used to look up the node.
+     * @param localPath  Optional local file path to read directly.
+     * @param chunkSizeLines Max lines per emission (default 500).
      */
     operator fun invoke(
         nodeHandle: Long,
         localPath: String? = null,
         chunkSizeLines: Int = 500,
     ): Flow<List<String>> = flow {
-        when (val resolved = resolveContentSource(nodeHandle, localPath)) {
+        val contextLocalPath = localPath
+        if (contextLocalPath != null &&
+            fileSystemRepository.doesFileExist(contextLocalPath) &&
+            !fileSystemRepository.isFolderPath(contextLocalPath)
+        ) {
+            emitAll(fileSystemRepository.readLinesFromPathInChunks(contextLocalPath, chunkSizeLines))
+            return@flow
+        }
+        val node = getNodeByIdUseCase(NodeId(nodeHandle)) as? TypedFileNode
+            ?: throw IllegalStateException("Node not found or not a file")
+        emitAll(buildContentFlow(node, localPath, chunkSizeLines))
+    }.flowOn(ioDispatcher)
+
+    /**
+     * Load text gradually in chunks of lines using a pre-resolved node (e.g. from chat).
+     * Skips the node handle lookup. First emission is quick for responsive UI.
+     * Throws on error; caller (e.g. ViewModel) should catch and map to UI state.
+     *
+     * @param resolvedNode Pre-resolved file node (e.g. from GetChatFileUseCase).
+     * @param localPath  Optional local file path to read directly.
+     * @param chunkSizeLines Max lines per emission (default 500).
+     */
+    operator fun invoke(
+        resolvedNode: TypedFileNode,
+        localPath: String? = null,
+        chunkSizeLines: Int = 500,
+    ): Flow<List<String>> = buildContentFlow(resolvedNode, localPath, chunkSizeLines)
+        .flowOn(ioDispatcher)
+
+    private fun buildContentFlow(
+        node: TypedFileNode,
+        localPath: String?,
+        chunkSizeLines: Int,
+    ): Flow<List<String>> = flow {
+        when (val resolved = resolveContentSource(node, localPath)) {
             is ContentSource.LocalPath ->
                 emitAll(fileSystemRepository.readLinesFromPathInChunks(resolved.path, chunkSizeLines))
 
@@ -68,9 +106,12 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
                 lines.chunked(chunkSizeLines).forEach { emit(it) }
             }
         }
-    }.flowOn(ioDispatcher)
+    }
 
-    private suspend fun resolveContentSource(nodeHandle: Long, localPath: String?): ContentSource {
+    private suspend fun resolveContentSource(
+        node: TypedFileNode,
+        localPath: String?,
+    ): ContentSource {
         val contextLocalPath = localPath
         if (contextLocalPath != null &&
             fileSystemRepository.doesFileExist(contextLocalPath) &&
@@ -78,14 +119,12 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
         ) {
             return ContentSource.LocalPath(contextLocalPath)
         }
-        val node = getNodeByIdUseCase(NodeId(nodeHandle)) as? TypedFileNode
-            ?: throw IllegalStateException("Node not found or not a file")
-        val localPath = getLocalFileForNodeUseCase(node)?.absolutePath
-        if (localPath != null &&
-            fileSystemRepository.doesFileExist(localPath) &&
-            fileSystemRepository.isFilePath(localPath)
+        val nodeLocalPath = getLocalFileForNodeUseCase(node)?.absolutePath
+        if (nodeLocalPath != null &&
+            fileSystemRepository.doesFileExist(nodeLocalPath) &&
+            fileSystemRepository.isFilePath(nodeLocalPath)
         ) {
-            return ContentSource.LocalPath(localPath)
+            return ContentSource.LocalPath(nodeLocalPath)
         }
         return tryStreamingThenDownload(node)
     }
