@@ -28,6 +28,8 @@ import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.io.FileNotFoundException
@@ -356,5 +358,27 @@ internal class GetTextContentForTextEditorUseCaseTest {
 
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(FileNotFoundException::class.java)
+    }
+
+    @Test
+    fun `test that getText uses resolvedNode and skips getNodeByIdUseCase`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(1L)
+            on { name } doReturn "chat_file.txt"
+        }
+        whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+        whenever(startStreamingServer()).thenReturn(Unit)
+        whenever(getStreamingUriStringForNode(node)).thenReturn("https://stream.example/file")
+        whenever(getDataBytesFromUrlUseCase(any()))
+            .thenReturn("chat content".toByteArray(Charsets.UTF_8))
+
+        val chunks = underTest(
+            resolvedNode = node,
+            localPath = null,
+        ).toList()
+        val content = chunks.flatten().joinToString("\n")
+
+        assertThat(content).isEqualTo("chat content")
+        verify(getNodeByIdUseCase, never()).invoke(any())
     }
 }

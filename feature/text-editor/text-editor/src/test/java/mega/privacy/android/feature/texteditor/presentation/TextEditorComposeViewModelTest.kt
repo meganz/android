@@ -17,7 +17,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
@@ -33,6 +35,7 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScr
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
@@ -49,6 +52,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -69,6 +73,7 @@ internal class TextEditorComposeViewModelTest {
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val exportNodeUseCase: ExportNodeUseCase = mock()
+    private val getChatFileUseCase: GetChatFileUseCase = mock()
     private val getShowLineNumbersPreferenceUseCase: GetShowLineNumbersPreferenceUseCase = mock()
     private val setShowLineNumbersPreferenceUseCase: SetShowLineNumbersPreferenceUseCase = mock()
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase = mock()
@@ -90,6 +95,7 @@ internal class TextEditorComposeViewModelTest {
             attachMultipleNodesUseCase,
             get1On1ChatIdUseCase,
             exportNodeUseCase,
+            getChatFileUseCase,
             getShowLineNumbersPreferenceUseCase,
             setShowLineNumbersPreferenceUseCase,
             saveTextEditorScrollUseCase,
@@ -113,6 +119,8 @@ internal class TextEditorComposeViewModelTest {
         showSendToChat: Boolean = false,
         isFromSharedFolder: Boolean = false,
         fromHome: Boolean = false,
+        chatId: Long? = null,
+        messageId: Long? = null,
         localPath: String? = null,
         defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
     ) {
@@ -127,6 +135,8 @@ internal class TextEditorComposeViewModelTest {
                 showSendToChat = showSendToChat,
                 isFromSharedFolder = isFromSharedFolder,
                 fromHome = fromHome,
+                chatId = chatId,
+                messageId = messageId,
                 localPath = localPath,
             ),
             defaultDispatcher = defaultDispatcher,
@@ -140,6 +150,7 @@ internal class TextEditorComposeViewModelTest {
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             exportNodeUseCase = exportNodeUseCase,
+            getChatFileUseCase = getChatFileUseCase,
             saveTextEditorScrollUseCase = saveTextEditorScrollUseCase,
             getTextEditorScrollUseCase = getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
@@ -150,7 +161,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that initial uiState reflects Args`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         runBlocking {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
             whenever(getNodeAccessUseCase(any())).thenReturn(null)
@@ -211,7 +222,7 @@ internal class TextEditorComposeViewModelTest {
             whenever(getNodeAccessUseCase(any())).thenReturn(AccessPermission.OWNER)
         }
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(
             nodeHandle = 1L,
             mode = TextEditorMode.View,
@@ -354,7 +365,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that isContentDirty returns true when chunk state is edited`() = runTest {
         val lines = (1..100).map { "line$it" }
         doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -368,7 +379,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that isContentDirty returns false when no chunks are edited`() = runTest {
         val lines = (1..100).map { "line$it" }
         doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -491,7 +502,7 @@ internal class TextEditorComposeViewModelTest {
         runTest {
             val lines = listOf("hello")
             doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
             whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
                 .thenReturn(
                     TextEditorSaveResult.UploadRequired(
@@ -516,7 +527,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that isContentDirty returns true after chunk disposed with edits`() = runTest {
         val lines = (1..100).map { "line$it" }
         doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -549,7 +560,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that getText failure triggers errorEvent and clears loading`() = runTest {
         doReturn(flow<List<String>> { throw RuntimeException("load failed") })
-            .whenever(getTextContentForTextEditorUseCase).invoke(any(), anyOrNull(), any())
+            .whenever(getTextContentForTextEditorUseCase).invoke(any<Long>(), anyOrNull(), any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
         assertThat(underTest.uiState.value.errorEvent).isEqualTo(triggered)
@@ -574,7 +585,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that setEditMode creates chunks from loaded content`() = runTest {
         val allLines = (1..1500).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -603,7 +614,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that setViewMode without edits switches directly to View`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -686,7 +697,7 @@ internal class TextEditorComposeViewModelTest {
             whenever(getNodeAccessUseCase(any())).thenReturn(AccessPermission.OWNER)
         }
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, showShare = false)
         advanceUntilIdle()
         assertThat(underTest.uiState.value.bottomBarActions)
@@ -698,7 +709,7 @@ internal class TextEditorComposeViewModelTest {
         val chunk1 = (1..500).map { "line$it" }
         val chunk2 = (501..1000).map { "line$it" }
         doReturn(flowOf(chunk1, chunk2)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -711,7 +722,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that getChunkText returns correct lines for chunk index`() = runTest {
         val allLines = (1..200).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -731,7 +742,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that getChunkText returns empty for out of range index`() = runTest {
         val allLines = (1..100).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -742,7 +753,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that disposeChunkState flushes edits back to chunk data`() = runTest {
         val allLines = (1..100).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -758,7 +769,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that disposeChunkState preserves cursor position on recreation`() = runTest {
         val allLines = (1..100).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -775,7 +786,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that disposeChunkState sets restoreFocusChunkIndex for focused chunk`() = runTest {
         val allLines = (1..100).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -789,7 +800,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that disposeChunkState does not set restoreFocusChunkIndex for non-focused chunk`() = runTest {
         val allLines = (1..500).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -804,7 +815,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that consumeRestoreFocusChunkIndex clears the value`() = runTest {
         val allLines = (1..100).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -835,7 +846,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that confirmDiscard restores content and switches to View mode`() = runTest {
         val lines = listOf("line1", "line2", "line3")
         doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -854,7 +865,7 @@ internal class TextEditorComposeViewModelTest {
         runTest {
             val lines = listOf("line1", "line2")
             doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
             initUnderTest(
                 nodeHandle = 1L,
                 mode = TextEditorMode.Edit,
@@ -876,7 +887,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that saveFile flushes edits and saves full content`() = runTest {
         val allLines = (1..100).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         val saveResult = TextEditorSaveResult.UploadRequired(
             tempPath = "/tmp/test.txt",
             parentHandle = 1L,
@@ -932,7 +943,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that saveFile saves when started in View mode and switched to Edit mode`() =
         runTest {
             doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
             val saveResult = TextEditorSaveResult.UploadRequired(
                 tempPath = "/tmp/edited.txt",
                 parentHandle = 1L,
@@ -957,7 +968,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that saveFile sets closeEvent to triggered and mode to View on success`() =
         runTest {
             doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
             val saveResult = TextEditorSaveResult.UploadRequired(
                 tempPath = "/tmp/test.txt",
                 parentHandle = 1L,
@@ -982,7 +993,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that saveFile in Edit mode queues global snackbar message`() =
         runTest {
             doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
             val saveResult = TextEditorSaveResult.UploadRequired(
                 tempPath = "/tmp/test.txt",
                 parentHandle = 1L,
@@ -1006,7 +1017,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that saveFile failure triggers errorEvent and sets errorMessage`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
             .thenThrow(RuntimeException("disk full"))
 
@@ -1024,7 +1035,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that saveFile is no-op when mode is View`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -1038,7 +1049,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that getChunkStartLine returns 1 for first chunk`() = runTest {
         val allLines = (1..400).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -1049,7 +1060,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that getChunkStartLine returns correct offset for second chunk`() = runTest {
         val allLines = (1..400).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -1060,7 +1071,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that setFocusedEditChunk updates focusedEditChunk in uiState`() = runTest {
         val allLines = (1..400).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -1071,7 +1082,7 @@ internal class TextEditorComposeViewModelTest {
     @Test
     fun `test that consumeTransferEvent resets transfer event`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         val saveResult = TextEditorSaveResult.UploadRequired(
             tempPath = "/tmp/test.txt",
             parentHandle = 1L,
@@ -1291,7 +1302,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that getChunkCount returns correct count in View mode`() = runTest {
         val allLines = (1..500).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -1308,7 +1319,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that getChunkCount returns correct count in Edit mode`() = runTest {
         val allLines = (1..500).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -1343,7 +1354,7 @@ internal class TextEditorComposeViewModelTest {
         runTest {
             val lines = listOf("line1")
             doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
             advanceUntilIdle()
 
@@ -1357,7 +1368,7 @@ internal class TextEditorComposeViewModelTest {
         runTest {
             val lines = listOf("line1")
             doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
             advanceUntilIdle()
 
@@ -1372,7 +1383,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that handleClose shows discard dialog when Edit mode has edits`() = runTest {
         val lines = (1..100).map { "line$it" }
         doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
@@ -1398,7 +1409,7 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that saveRecentlyUsedItem is called after content loads`() = runTest {
-        whenever(getTextContentForTextEditorUseCase(any(), anyOrNull(), any()))
+        whenever(getTextContentForTextEditorUseCase(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any()))
             .thenReturn(flowOf(listOf("line1")))
         initUnderTest(nodeHandle = 42L, fileName = "test.txt")
         advanceUntilIdle()
@@ -1412,7 +1423,7 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that scroll state is restored after content loads when saved state exists`() = runTest {
-        whenever(getTextContentForTextEditorUseCase(any(), anyOrNull(), any()))
+        whenever(getTextContentForTextEditorUseCase(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any()))
             .thenReturn(flowOf((1..1000).map { "line $it" }))
         whenever(getTextEditorScrollUseCase(42L)).thenReturn(
             TextEditorScroll(
@@ -1429,7 +1440,7 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that restoreScrollIndex is null when no saved state exists`() = runTest {
-        whenever(getTextContentForTextEditorUseCase(any(), anyOrNull(), any()))
+        whenever(getTextContentForTextEditorUseCase(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any()))
             .thenReturn(flowOf(listOf("line1")))
         whenever(getTextEditorScrollUseCase(any())).thenReturn(null)
         initUnderTest(nodeHandle = 42L)
@@ -1440,7 +1451,7 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that handleClose saves scroll state before closing`() = runTest {
-        whenever(getTextContentForTextEditorUseCase(any(), anyOrNull(), any()))
+        whenever(getTextContentForTextEditorUseCase(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any()))
             .thenReturn(flowOf(listOf("line1")))
         initUnderTest(nodeHandle = 42L, mode = TextEditorMode.View)
         advanceUntilIdle()
@@ -1459,5 +1470,86 @@ internal class TextEditorComposeViewModelTest {
         initUnderTest(mode = TextEditorMode.Create)
         underTest.consumeRestoreScrollIndex()
         assertThat(underTest.uiState.value.restoreScrollIndex).isNull()
+    }
+
+    @Test
+    fun `test that init resolves chat file and loads content when chatId and messageId are provided`() =
+        runTest {
+            val chatId = 100L
+            val messageId = 200L
+            val resolvedHandle = 42L
+            val typedFileNode = mock<TypedFileNode> {
+                on { id } doReturn NodeId(resolvedHandle)
+                on { name } doReturn "chat_file.txt"
+            }
+            val chatFile = ChatDefaultFile(
+                typedFileNode = typedFileNode,
+                chatId = chatId,
+                messageId = messageId,
+            )
+            whenever(getChatFileUseCase(chatId, messageId)).thenReturn(chatFile)
+            doReturn(flowOf(listOf("hello from chat"))).whenever(getTextContentForTextEditorUseCase)
+                .invoke(resolvedNode = any(), localPath = anyOrNull(), chunkSizeLines = any())
+
+            initUnderTest(
+                nodeHandle = -1L,
+                chatId = chatId,
+                messageId = messageId,
+            )
+            advanceUntilIdle()
+
+            verify(getChatFileUseCase, atLeast(1)).invoke(chatId, messageId)
+            verify(getTextContentForTextEditorUseCase).invoke(
+                resolvedNode = chatFile,
+                localPath = null,
+                chunkSizeLines = 500,
+            )
+            val state = underTest.uiState.value
+            assertThat(state.fileName).isEqualTo("chat_file.txt")
+            assertThat(state.isLoading).isFalse()
+        }
+
+    @Test
+    fun `test that init shows error when chat file is not found`() = runTest {
+        val chatId = 100L
+        val messageId = 200L
+        whenever(getChatFileUseCase(chatId, messageId)).thenReturn(null)
+
+        initUnderTest(
+            nodeHandle = -1L,
+            chatId = chatId,
+            messageId = messageId,
+        )
+        advanceUntilIdle()
+
+        verify(getChatFileUseCase, atLeast(1)).invoke(chatId, messageId)
+        verify(getTextContentForTextEditorUseCase, never()).invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        verify(getTextContentForTextEditorUseCase, never()).invoke(resolvedNode = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        val state = underTest.uiState.value
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.errorEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that init shows error with message when getChatFileUseCase throws`() = runTest {
+        val chatId = 100L
+        val messageId = 200L
+        whenever(getChatFileUseCase(chatId, messageId))
+            .thenThrow(RuntimeException("SDK error"))
+
+        initUnderTest(
+            nodeHandle = -1L,
+            chatId = chatId,
+            messageId = messageId,
+        )
+        advanceUntilIdle()
+
+        verify(getChatFileUseCase, atLeast(1)).invoke(chatId, messageId)
+        verify(getTextContentForTextEditorUseCase, never()).invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        verify(getTextContentForTextEditorUseCase, never()).invoke(resolvedNode = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        val state = underTest.uiState.value
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.errorEvent).isEqualTo(triggered)
+        assertThat(state.errorMessage).isEqualTo("SDK error")
     }
 }
