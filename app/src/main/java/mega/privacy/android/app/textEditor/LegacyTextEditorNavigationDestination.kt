@@ -248,7 +248,7 @@ private fun TextEditorEntry(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
             onTransfer = transferHandler::setTransferEvent,
-            onActionExecuted = { result ->
+            onNavResultConsumed = { result ->
                 if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
                     removeDestination()
                 }

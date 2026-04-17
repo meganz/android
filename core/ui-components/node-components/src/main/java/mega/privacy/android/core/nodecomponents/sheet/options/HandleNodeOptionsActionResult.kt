@@ -14,6 +14,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DeferrableMenuAction
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
@@ -21,19 +22,23 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
- * Handler to process results from node options bottom sheet
+ * Handler to process results from node options bottom sheet.
  *
- * @param nodeOptionsActionViewModel
- * @param navigationHandler
- * @param onTransfer
- * @param onActionExecuted Optional callback
+ * @param nodeOptionsActionViewModel ViewModel for node actions
+ * @param navigationHandler Handler for navigation
+ * @param onTransfer Callback for transfer events
+ * @param onDeferredAction Optional interceptor for [DeferrableMenuAction] actions.
+ *  When provided, [DeferrableMenuAction] actions are passed through this interceptor before
+ *  execution. The interceptor receives the execution lambda and decides when to invoke it.
+ * @param onNavResultConsumed Optional callback invoked after the navigation result is consumed
  */
 @Composable
 fun HandleNodeOptionsActionResult(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onActionExecuted: ((NodeOptionsBottomSheetResult) -> Unit)? = null,
+    onDeferredAction: ((() -> Unit) -> Unit)? = null,
+    onNavResultConsumed: ((NodeOptionsBottomSheetResult) -> Unit)? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarQueue = rememberSnackBarQueue()
@@ -108,8 +113,15 @@ fun HandleNodeOptionsActionResult(
 
     LaunchedEffect(nodeBottomSheetResult) {
         val result = nodeBottomSheetResult ?: return@LaunchedEffect
-        actionHandler(result.action, result.node)
-        onActionExecuted?.invoke(result)
+        val execute = {
+            actionHandler(result.action, result.node)
+        }
+        if (result.action is DeferrableMenuAction && onDeferredAction != null) {
+            onDeferredAction(execute)
+        } else {
+            execute()
+        }
+        onNavResultConsumed?.invoke(result)
         navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
     }
 }

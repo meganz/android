@@ -5,13 +5,12 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.shared.resources.R as SharedResR
 import mega.privacy.android.icon.pack.IconPack
-import mega.android.core.ui.model.menu.MenuActionWithIcon
 import javax.inject.Inject
 
 /**
  * Download menu action
  */
-class DownloadMenuAction @Inject constructor() : MenuActionWithIcon {
+class DownloadMenuAction @Inject constructor() : DeferrableMenuAction {
 
     @Composable
     override fun getDescription() = stringResource(id = SharedResR.string.general_save_to_device)

@@ -120,6 +120,7 @@ class GlobalOnEventHandler @Inject constructor(
             runCatching {
                 val isAdsFeatureEnabled =
                     getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+                            || getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)
                 if (isAdsFeatureEnabled) {
                     if (!isMobileAdsInitializeCalled.getAndSet(true)) {
                         Timber.d("Initialising MobileAds")

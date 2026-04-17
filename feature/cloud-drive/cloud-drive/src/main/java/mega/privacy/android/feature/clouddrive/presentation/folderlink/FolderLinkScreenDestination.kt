@@ -13,6 +13,7 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
+import mega.privacy.android.shared.ads.rewarded.rememberRewardedAdGate
 
 fun EntryProviderScope<NavKey>.folderLinkScreen(
     navigationHandler: NavigationHandler,
@@ -36,6 +37,9 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                 hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                     creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
                 )
+            val rewardedAdGate = rememberRewardedAdGate(
+                onNavigate = navigationHandler::navigate,
+            )
             FolderLinkScreen(
                 viewModel = viewModel,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
@@ -45,10 +49,13 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                 onTransfer = transferHandler::setTransferEvent,
             )
             HandleNodeOptionsActionResult(
-            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            navigationHandler = navigationHandler,
-            onTransfer = transferHandler::setTransferEvent,
-        )
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
+                onDeferredAction = { execute ->
+                    rewardedAdGate.requestAction(execute)
+                },
+            )
         }
     }
 }
