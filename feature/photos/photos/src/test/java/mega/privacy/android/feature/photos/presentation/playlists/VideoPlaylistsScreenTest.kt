@@ -1,11 +1,13 @@
 package mega.privacy.android.feature.photos.presentation.playlists
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.palm.composestateevents.triggered
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -51,6 +53,7 @@ class VideoPlaylistsScreenTest {
         getPresetNewVideoPlaylistTitle: (String) -> String = { "" },
         onNavigateToDetail: (Long, PlaylistType) -> Unit = { _, _ -> },
         newlyCreatedVideoPlaylist: (Long) -> Unit = {},
+        contentPadding: PaddingValues = PaddingValues(),
     ) {
         composeTestRule.setContent {
             VideoPlaylistsTabScreen(
@@ -76,6 +79,7 @@ class VideoPlaylistsScreenTest {
                 getPresetNewVideoPlaylistTitle = getPresetNewVideoPlaylistTitle,
                 onNavigateToDetail = onNavigateToDetail,
                 newlyCreatedVideoPlaylist = newlyCreatedVideoPlaylist,
+                contentPadding = contentPadding,
             )
         }
     }
@@ -125,6 +129,19 @@ class VideoPlaylistsScreenTest {
             VIDEO_PLAYLISTS_TAB_LOADING_VIEW_TEST_TAG,
             VIDEO_PLAYLISTS_TAB_EMPTY_VIEW_TEST_TAG
         ).assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that all playlists view is displayed when contentPadding is set`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 32.dp),
+        )
+
+        VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG.assertIsDisplayedWithTag()
     }
 
     @Test

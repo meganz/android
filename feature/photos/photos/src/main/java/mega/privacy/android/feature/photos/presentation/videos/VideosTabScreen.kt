@@ -25,6 +25,8 @@ import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
@@ -69,6 +71,7 @@ fun VideosTabRoute(
     navigationHandler: NavigationHandler,
     onCurrentVideosSearchQueryRequest: () -> Unit,
     updateSelectionModeAvailableActions: (selectedNodes: List<TypedNode>, nodeSourceType: NodeSourceType) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: VideosTabViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -105,7 +108,8 @@ fun VideosTabRoute(
         onClick = viewModel::onItemClicked,
         onLongClick = viewModel::onItemLongClicked,
         onSortNodes = viewModel::setCloudSortOrder,
-        navigationHandler = navigationHandler
+        navigationHandler = navigationHandler,
+        contentPadding = contentPadding,
     )
 }
 
@@ -119,6 +123,7 @@ internal fun VideosTabScreen(
     onSortNodes: (NodeSortConfiguration) -> Unit,
     navigationHandler: NavigationHandler,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -144,7 +149,7 @@ internal fun VideosTabScreen(
     var isAllLocations by rememberSaveable { mutableStateOf(true) }
     var isAllDurations by rememberSaveable { mutableStateOf(true) }
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.padding(contentPadding.excludingBottomPadding())) {
         VideosFilterButtonView(
             isLocationFilterSelected = isAllLocations.not(),
             isDurationFilterSelected = isAllDurations.not(),
@@ -189,7 +194,10 @@ internal fun VideosTabScreen(
                     FastScrollLazyColumn(
                         state = lazyListState,
                         totalItems = items.size,
-                        modifier = Modifier.testTag(VIDEO_TAB_ALL_VIDEOS_VIEW_TEST_TAG)
+                        modifier = Modifier.testTag(VIDEO_TAB_ALL_VIDEOS_VIEW_TEST_TAG),
+                        contentPadding = PaddingValues(
+                            bottom = contentPadding.calculateSafeBottomPadding(),
+                        ),
                     ) {
                         item(key = "header") {
                             NodeHeaderItem(

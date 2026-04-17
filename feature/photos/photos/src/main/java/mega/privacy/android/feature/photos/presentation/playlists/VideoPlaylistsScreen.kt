@@ -24,7 +24,8 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
-import mega.android.core.ui.modifiers.plusSafeBottom
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -54,6 +55,7 @@ fun VideoPlaylistsTabRoute(
     dismissVideoPlaylistRemovedDialog: () -> Unit,
     navigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     viewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -90,7 +92,8 @@ fun VideoPlaylistsTabRoute(
         },
         newlyCreatedVideoPlaylist = { handle ->
             navigate(SelectVideosForPlaylistNavKey(playlistHandle = handle, isNewlyCreated = true))
-        }
+        },
+        contentPadding = contentPadding
     )
 }
 
@@ -119,6 +122,7 @@ internal fun VideoPlaylistsTabScreen(
     getPresetNewVideoPlaylistTitle: (String) -> String = { "" },
     onNavigateToDetail: (Long, PlaylistType) -> Unit = { _, _ -> },
     newlyCreatedVideoPlaylist: (Long) -> Unit = {},
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val lazyListState = rememberLazyListState()
     val resources = LocalResources.current
@@ -217,8 +221,12 @@ internal fun VideoPlaylistsTabScreen(
                 FastScrollLazyColumn(
                     state = lazyListState,
                     totalItems = items.size,
-                    modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG),
-                    contentPadding = PaddingValues().plusSafeBottom()
+                    modifier = modifier
+                        .padding(contentPadding.excludingBottomPadding())
+                        .testTag(VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG),
+                    contentPadding = PaddingValues(
+                        bottom = contentPadding.calculateSafeBottomPadding(),
+                    )
                 ) {
                     item(key = "header") {
                         NodeHeaderItem(
