@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
@@ -335,18 +336,6 @@ private fun TextEditorComposeContent(
         hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
             factory.create(args)
         }
-
-    if (showNodeOptions) {
-        LaunchedEffect(Unit) {
-            navigationHandler.monitorResult<Long>(EditActionClickHandler.RESULT_KEY)
-                .collect { editNodeHandle ->
-                    if (editNodeHandle != null && editNodeHandle == navKey.nodeHandle) {
-                        navigationHandler.clearResult(EditActionClickHandler.RESULT_KEY)
-                        viewModel.setEditMode()
-                    }
-                }
-        }
-    }
 
     TextEditorScreen(
         viewModel = viewModel,
