@@ -48,6 +48,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveEmptyView
@@ -66,6 +67,7 @@ import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.ads.NewAdsContainer
+import mega.privacy.android.shared.ads.rewarded.RewardedAdGateHandler
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
@@ -85,6 +87,7 @@ internal fun FolderLinkScreen(
     navigationHandler: NavigationHandler,
     singleNodeActionHandler: SingleNodeActionHandler,
     selectionModeActionHandler: MultiNodeActionHandler,
+    rewardedAdGate: RewardedAdGateHandler,
     onNavigate: (NavKey) -> Unit,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
@@ -208,7 +211,17 @@ internal fun FolderLinkScreen(
             isListView = isListView,
             spanCount = spanCount,
             onNavigate = onNavigate,
-            onAction = viewModel::processAction,
+            onAction = { action ->
+                // Intercept file clicks
+                if (action is FolderLinkAction.ItemClicked
+                    && action.nodeUiItem.node is TypedFileNode
+                    && !uiState.isInSelectionMode
+                ) {
+                    rewardedAdGate.requestAction { viewModel.processAction(action) }
+                } else {
+                    viewModel.processAction(action)
+                }
+            },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding.excludingBottomPadding()),

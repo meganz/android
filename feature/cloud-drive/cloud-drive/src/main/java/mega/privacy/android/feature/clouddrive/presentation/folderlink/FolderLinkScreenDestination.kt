@@ -58,6 +58,7 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                 navigationHandler = navigationHandler,
                 singleNodeActionHandler = singleNodeActionHandler,
                 selectionModeActionHandler = selectionModeActionHandler,
+                rewardedAdGate = rewardedAdGate,
                 onBack = navigationHandler::back,
                 onNavigate = navigationHandler::navigate,
                 onTransfer = transferHandler::setTransferEvent,
