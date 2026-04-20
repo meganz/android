@@ -26,11 +26,9 @@ import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import org.junit.jupiter.api.AfterEach
@@ -42,9 +40,7 @@ import org.mockito.Mockito.reset
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalCoroutinesApi
@@ -59,7 +55,6 @@ class TrackInfoViewModelTest {
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val getNodeLocationInfoUseCase = mock<GetNodeLocationInfo>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
     private val nodeDestinationMapper = mock<NodeDestinationMapper>()
 
@@ -77,7 +72,6 @@ class TrackInfoViewModelTest {
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             getNodeLocationInfoUseCase = getNodeLocationInfoUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNodeLocationUseCase = getNodeLocationUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
         )
@@ -94,12 +88,9 @@ class TrackInfoViewModelTest {
             removeOfflineNodeUseCase,
             durationInSecondsTextMapper,
             getNodeLocationInfoUseCase,
-            getFeatureFlagValueUseCase,
             getNodeLocationUseCase,
             nodeDestinationMapper,
         )
-
-        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
 
     @Test
@@ -121,30 +112,7 @@ class TrackInfoViewModelTest {
     }
 
     @Test
-    fun `test that getNodeLocationByIdUseCase is not invoked and nodeDestination is not updated if single activity flag is disabled`() =
-        runTest {
-            val handle = 123L
-            val nodeId = NodeId(handle)
-            val node = mock<TypedAudioNode> {
-                on { id } doReturn nodeId
-            }
-
-            whenever(getAudioNodeByHandleUseCase(handle, false)) doReturn node
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn false
-
-            initUnderTest()
-            underTest.getNodeDestination(node)
-            advanceUntilIdle()
-
-            underTest.state.map { it.nodeDestination }.test {
-                assertThat(awaitItem()).isNull()
-            }
-            verifyNoInteractions(getNodeLocationUseCase)
-
-        }
-
-    @Test
-    fun `test that nodeDestination is updated if single activity flag is enabled`() = runTest {
+    fun `test that nodeDestination is updated when getNodeDestination is called`() = runTest {
         val handle = 100L
         val nodeId = NodeId(handle)
         val node = mock<TypedAudioNode> {
@@ -158,7 +126,6 @@ class TrackInfoViewModelTest {
         val expected = listOf(HomeScreensNavKey(DriveSyncNavKey(highlightedNodeHandle = handle)))
 
         whenever(getAudioNodeByHandleUseCase(handle, false)) doReturn node
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
         whenever(getNodeLocationUseCase(node)) doReturn nodeLocation
         whenever(nodeDestinationMapper(nodeLocation)) doReturn expected
 
@@ -188,6 +155,11 @@ class TrackInfoViewModelTest {
             on { modificationTime }.thenReturn(testModificationTime)
             on { duration }.thenReturn(100.seconds)
         }
+        val nodeLocation = mock<NodeLocation> {
+            on { this.node } doReturn testAudioNode
+            on { ancestorIds } doReturn emptyList()
+            on { nodeSourceType } doReturn NodeSourceType.CLOUD_DRIVE
+        }
 
         whenever(getNodeLocationInfoUseCase(anyOrNull())).thenReturn(null)
 
@@ -196,6 +168,8 @@ class TrackInfoViewModelTest {
         )
         whenever(fileSizeStringMapper(anyOrNull())).thenReturn(testSize)
         whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(testDuration)
+        whenever(getNodeLocationUseCase(testAudioNode)).thenReturn(nodeLocation)
+        whenever(nodeDestinationMapper(nodeLocation)).thenReturn(emptyList())
 
         initUnderTest()
         underTest.loadTrackInfo(1L)
@@ -209,6 +183,7 @@ class TrackInfoViewModelTest {
             assertThat(actual.added).isEqualTo(testCreationTime)
             assertThat(actual.lastModified).isEqualTo(testModificationTime)
             assertThat(actual.durationString).isEqualTo(testDuration)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -219,17 +194,25 @@ class TrackInfoViewModelTest {
             val testAudioNode = mock<TypedAudioNode> {
                 on { id }.thenReturn(testNodeId)
             }
+            val nodeLocation = mock<NodeLocation> {
+                on { this.node } doReturn testAudioNode
+                on { ancestorIds } doReturn emptyList()
+                on { nodeSourceType } doReturn NodeSourceType.CLOUD_DRIVE
+            }
             whenever(getAudioNodeByHandleUseCase(anyOrNull(), anyOrNull())).thenReturn(
                 testAudioNode
             )
             whenever(isAvailableOfflineUseCase(anyOrNull())).thenReturn(true)
             whenever(fileSizeStringMapper(anyOrNull())).thenReturn("")
             whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn("")
+            whenever(getNodeLocationUseCase(testAudioNode)).thenReturn(nodeLocation)
+            whenever(nodeDestinationMapper(nodeLocation)).thenReturn(emptyList())
 
             initUnderTest()
             underTest.makeAvailableOffline(testNodeId.longValue)
+            advanceUntilIdle()
 
-            underTest.state.drop(1).test {
+            underTest.state.test {
                 assertThat(awaitItem().offlineRemovedEvent).isEqualTo(triggered)
                 cancelAndIgnoreRemainingEvents()
             }

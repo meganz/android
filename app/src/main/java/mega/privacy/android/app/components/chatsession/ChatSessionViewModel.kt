@@ -7,34 +7,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.CheckChatSessionUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ChatSessionViewModel @Inject constructor(
     private val checkChatSessionUseCase: CheckChatSessionUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatSessionUiState())
     val state = _state.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-            }.onSuccess {
-                _state.update { state ->
-                    state.copy(isSingleActivityEnabled = it)
-                }
-            }.onFailure {
-                Timber.e(it, "Failed to check if single activity feature is enabled")
-            }
-        }
-    }
 
     /**
      * Check if Chat SDK session exists

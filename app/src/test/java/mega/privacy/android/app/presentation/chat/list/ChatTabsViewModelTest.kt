@@ -34,13 +34,11 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -85,7 +83,6 @@ internal class ChatTabsViewModelTest {
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase = mock()
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
         onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
     }
@@ -118,10 +115,8 @@ internal class ChatTabsViewModelTest {
             startMeetingInWaitingRoomChatUseCase,
             monitorChatCallUpdatesUseCase,
             getStringFromStringResMapper,
-            getFeatureFlagValueUseCase,
             monitorChatArchivedUseCase,
         )
-        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }.thenReturn(false)
         whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
     }
 
@@ -152,7 +147,6 @@ internal class ChatTabsViewModelTest {
             hasArchivedChatsUseCase = hasArchivedChatsUseCase,
             monitorHasAnyContactUseCase = monitorHasAnyContactUseCase,
             getStringFromStringResMapper = getStringFromStringResMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorChatArchivedUseCase = monitorChatArchivedUseCase,
         )
     }

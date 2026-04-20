@@ -19,11 +19,9 @@ import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -40,7 +38,6 @@ class TrackInfoViewModel @Inject constructor(
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val getNodeLocationInfoUseCase: GetNodeLocationInfo,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeLocationUseCase: GetNodeLocationUseCase,
     private val nodeDestinationMapper: NodeDestinationMapper,
 ) : ViewModel() {
@@ -74,15 +71,13 @@ class TrackInfoViewModel @Inject constructor(
         } ?: Timber.e("Failed to get audio node by handle: $handle")
 
     internal suspend fun getNodeDestination(node: TypedAudioNode) {
-        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-            runCatching {
-                getNodeLocationUseCase(node)
-            }.onSuccess { nodeLocation ->
-                val nodeDestination = nodeDestinationMapper(nodeLocation)
-                _state.update { state -> state.copy(nodeDestination = nodeDestination) }
-            }.onFailure {
-                Timber.e("Failed to get node location: $it")
-            }
+        runCatching {
+            getNodeLocationUseCase(node)
+        }.onSuccess { nodeLocation ->
+            val nodeDestination = nodeDestinationMapper(nodeLocation)
+            _state.update { state -> state.copy(nodeDestination = nodeDestination) }
+        }.onFailure {
+            Timber.e("Failed to get node location: $it")
         }
     }
 
