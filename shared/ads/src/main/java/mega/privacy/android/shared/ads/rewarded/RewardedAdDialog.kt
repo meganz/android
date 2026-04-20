@@ -169,9 +169,8 @@ private fun ProCard(onUpgradePro: () -> Unit) {
 
             val perkResIds = remember {
                 listOf(
-                    sharedR.string.rewarded_ad_dialog_perk_unlimited_downloads,
+                    sharedR.string.rewarded_ad_dialog_perk_ad_free_downloads,
                     sharedR.string.rewarded_ad_dialog_perk_storage,
-                    sharedR.string.rewarded_ad_dialog_perk_transfer_speed,
                     sharedR.string.rewarded_ad_dialog_perk_pass_vpn,
                 )
             }

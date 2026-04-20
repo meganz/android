@@ -229,3 +229,4 @@ Report the result to the user:
 - List the strings that were uploaded
 - Show the upload script output (success/failure)
 - If screenshot was uploaded: show the screenshot name and how many strings were mapped to it
+- Show the URL, for example: https://translate.developers.mega.co.nz/projects/android/{COMPONENT_SLUG}/

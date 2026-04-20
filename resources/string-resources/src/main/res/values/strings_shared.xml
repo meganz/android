@@ -1739,14 +1739,12 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
-    is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
-    is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1783,11 +1781,9 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
-    is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
-    is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2689,8 +2685,6 @@
     <string name="rewarded_ad_unavailable_toast">Ad is unavailable! Continuing&#8230;</string>
     <!-- General warning shown when the user tries to perform some operation on a read-only folder. E.g.: Select the folder to upload content inside. -->
     <string name="general_read_only_folder_warning">This folder is read-only</string>
-    <!-- The title of the add subtitle option in the subtitles bottom sheet. -->
-    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Add subtitle from Cloud drive</string>
     <!-- Unified folder conflict message. %1$s folder display name, %2$s sync_label_cloud_folder or sync_label_device_folder, %3$s feature (e.g. sync_label_camera_uploads, sync_label_media_uploads, sync_label_a_sync_or_backup), %4$s device name or sync_label_this_device -->
     <string name="sync_error_folder_conflict">“%1$s” %2$s is already part of %3$s on %4$s. Choose another.</string>
     <!-- Label for cloud folder in sync conflict messages -->
@@ -2723,4 +2717,8 @@
     <string name="settings_transfer_connections_default">%1$d (Default)</string>
     <!-- Possible value for transfer connections settings. This value should be faster, but will increase the battery and data usage. -->
     <string name="settings_transfer_connections_higher_usage">%1$d (Higher battery and data usage)</string>
+    <!-- The title of the add subtitle option in the subtitles bottom sheet. -->
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Add subtitle from Cloud drive</string>
+    <!-- Rewarded ad dialog Pro perk: ad-free downloads -->
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Ad-free downloads</string>
 </resources>
