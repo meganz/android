@@ -156,8 +156,13 @@ private fun ListView(
 ) {
     val listState = rememberLazyListState()
     var selectionEnabled by remember { mutableStateOf(false) }
-    var showTooltip = tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
-            || tooltip == MeetingTooltipItem.RECURRING || tooltip == MeetingTooltipItem.PENDING
+    var showTooltip by remember(tooltip) {
+        mutableStateOf(
+            tooltip == MeetingTooltipItem.RECURRING_OR_PENDING
+                    || tooltip == MeetingTooltipItem.RECURRING
+                    || tooltip == MeetingTooltipItem.PENDING
+        )
+    }
 
     FastScrollLazyColumn(
         state = listState,

@@ -30,14 +30,13 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -51,8 +50,6 @@ import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -62,7 +59,6 @@ import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.data.SnackBarItem
-import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
@@ -227,19 +223,6 @@ class ChatTabsFragment : Fragment() {
                 }
             }
         }
-
-    private val drawerListener = object : DrawerLayout.DrawerListener {
-        override fun onDrawerOpened(drawerView: View) {
-            viewModel.showTooltips(false)
-        }
-
-        override fun onDrawerClosed(drawerView: View) {
-            viewModel.showTooltips(true)
-        }
-
-        override fun onDrawerStateChanged(newState: Int) {}
-        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -434,16 +417,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        (activity as? NavigationDrawerManager)?.addDrawerListener(drawerListener)
-        view.post {
-            if (!isVisible) return@post
-            (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
-            (activity as? ManagerActivity?)?.invalidateOptionsMenu()
-            (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener {
-                openChangeStatusDialog()
-            }
-            setupMenu()
-        }
+        setupMenu()
 
         collectFlows()
 
@@ -469,9 +443,6 @@ class ChatTabsFragment : Fragment() {
                 actionMode?.title = state.selectedIds.size.toString()
             } else {
                 actionMode?.finish()
-            }
-            state.currentChatStatus?.text?.let { subtitle ->
-                (activity as? ManagerActivity?)?.supportActionBar?.setSubtitle(subtitle)
             }
             state.currentCallChatId?.let { chatId ->
                 launchChatCallScreen(chatId)
@@ -545,9 +516,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener(null)
         scheduledMeetingManagementViewModel.stopMonitoringLoadMessages()
-        (activity as? NavigationDrawerManager)?.removeDrawerListener(drawerListener)
         super.onDestroyView()
     }
 
@@ -711,8 +680,7 @@ class ChatTabsFragment : Fragment() {
                     MeetingBottomSheetDialogFragment.TAG
                 )
             } else {
-                (activity as? ManagerActivity?)?.onCreateMeeting()
-                    ?: (activity as? ChatActivity?)?.onCreateMeeting()
+                (activity as? MeetingBottomSheetDialogActionListener)?.onCreateMeeting()
             }
 
         } else {

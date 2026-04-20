@@ -738,17 +738,4 @@ class ChatTabsViewModel @Inject constructor(
      * Reset and notify that snackbarMessage is consumed
      */
     fun onSnackbarMessageConsumed() = state.update { it.copy(snackbarMessageContent = consumed()) }
-
-    /**
-     * Temporary show or hide tooltips
-     *
-     * @param show  True to show tooltips, false otherwise
-     */
-    fun showTooltips(show: Boolean) {
-        if (show) {
-            retrieveTooltips(false)
-        } else {
-            state.update { it.copy(tooltip = MeetingTooltipItem.NONE) }
-        }
-    }
 }
