@@ -33,16 +33,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.Scene
-import androidx.navigation3.scene.SceneStrategy
-import androidx.navigation3.scene.SceneStrategyScope
-import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
@@ -50,7 +41,6 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
@@ -61,7 +51,6 @@ import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackS
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
-import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
@@ -70,35 +59,28 @@ import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginNavKey
-import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
-import mega.privacy.android.app.presentation.login.loginEntryProvider
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
-import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
-import mega.privacy.android.core.passcode.presentation.navigation.passcodeView
-import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
-import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.passcode.PasscodeProcessLifecycleOwner
+import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
+import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
+import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
-import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
-import mega.privacy.android.navigation.contract.shared.rememberSharedViewModelStoreNavEntryDecorator
-import mega.privacy.android.navigation.contract.transition.fadeTransition
-import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
+import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -120,6 +102,9 @@ class MegaActivity : FragmentActivity() {
      */
     @Inject
     lateinit var navigationEventQueue: NavigationEventQueue
+
+    @Inject
+    lateinit var appDialogsEventQueue: AppDialogsEventQueue
 
     @Inject
     lateinit var navigationResultManager: NavigationResultManager
@@ -267,7 +252,6 @@ class MegaActivity : FragmentActivity() {
                     factory.create(isInSingleActivity = true)
                 }
             )
-            val navigationEventViewModel = hiltViewModel<QueueEventViewModel>()
 
             val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
             val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()
@@ -344,9 +328,6 @@ class MegaActivity : FragmentActivity() {
 
 
                 val transferHandler = remember { TransferHandlerImpl(appTransferViewModel) }
-                val transparentStrategy = remember { TransparentSceneStrategy<NavKey>() }
-                val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
-                val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
                 AndroidTheme(isDark = globalState.themeMode.isDarkMode()) {
                     Box(
@@ -368,7 +349,6 @@ class MegaActivity : FragmentActivity() {
                                 val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
                                 val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
                                 val loginState by loginViewModel.state.collectAsStateWithLifecycle()
-                                val navigationEvents by navigationEventViewModel.navigationEvents.collectAsStateWithLifecycle()
                                 val currentNavKey = backStack.lastOrNull()
                                 EventEffect(
                                     event = snackbarEventsState,
@@ -386,50 +366,26 @@ class MegaActivity : FragmentActivity() {
                                     ) {
                                         SnackbarLifetimeController()
                                     }
-                                    NavDisplay(
+                                    MegaNavDisplay(
                                         backStack = backStack,
-                                        onBack = { navigationHandler.back() },
-                                        sceneStrategy = transparentStrategy.chain(dialogStrategy)
-                                            .chain(bottomSheetStrategy),
-                                        entryDecorators = listOf(
-                                            rememberSaveableStateHolderNavEntryDecorator(),
-                                            rememberSharedViewModelStoreNavEntryDecorator(),
-                                            rememberAnalyticNavEntryDecorator()
-                                        ),
-                                        entryProvider = entryProvider {
-                                            graphstate.featureDestinations
-                                                .forEach { destination ->
-                                                    destination.navigationGraph(
-                                                        this,
-                                                        navigationHandler,
-                                                        transferHandler
-                                                    )
-                                                }
+                                        navigationHandler = navigationHandler,
+                                        graphstate = graphstate,
+                                        transferHandler = transferHandler,
+                                        loginViewModel = loginViewModel,
+                                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                                        emitNavigationEvent = { event ->
+                                            when (event) {
+                                                is NavigationQueueEvent -> navigationEventQueue.emit(
+                                                    navKeys = event.keys,
+                                                    navOptions = event.navOptions,
+                                                )
 
-                                            graphstate.appDialogDestinations.forEach { destination ->
-                                                destination.navigationGraph(
-                                                    this as EntryProviderScope<DialogNavKey>,
-                                                    navigationHandler,
-                                                    navigationEventViewModel::eventHandled
+                                                is AppDialogEvent -> appDialogsEventQueue.emit(
+                                                    event
                                                 )
                                             }
-
-                                            loginEntryProvider(
-                                                navigationHandler = navigationHandler,
-                                                loginViewModel = loginViewModel,
-                                                onFinish = ::finish
-                                            )
-
-                                            passcodeView(
-                                                cryptObjectFactory = passcodeCryptObjectFactory,
-                                                logoutConfirmationDialog = { onDismissed ->
-                                                    LogoutConfirmationDialog(onDismissed = onDismissed)
-                                                },
-                                            )
                                         },
-                                        transitionSpec = { fadeTransition },
-                                        popTransitionSpec = { fadeTransition },
-                                        predictivePopTransitionSpec = { fadeTransition }
+                                        onFinish = ::finish,
                                     )
 
                                     StartTransferComponent(
@@ -447,21 +403,6 @@ class MegaActivity : FragmentActivity() {
                                                 .align(Alignment.BottomCenter)
                                                 .navigationBarsPadding(),
                                         )
-                                    }
-                                }
-
-                                NavigationEventEffect(
-                                    event = navigationEvents,
-                                    onConsumed = navigationEventViewModel::eventDisplayed
-                                ) {
-                                    when (it) {
-                                        is NavigationQueueEvent -> {
-                                            navigationHandler.navigate(it.keys, it.navOptions)
-                                        }
-
-                                        is AppDialogEvent -> {
-                                            navigationHandler.displayDialog(it.dialogDestination)
-                                        }
                                     }
                                 }
 
@@ -576,15 +517,3 @@ class MegaActivity : FragmentActivity() {
         internal const val ACTION_DEEP_LINKS = "deepLinks"
     }
 }
-
-private infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
-    object : SceneStrategy<T> {
-        override fun SceneStrategyScope<T>.calculateScene(
-            entries: List<NavEntry<T>>,
-        ): Scene<T>? =
-            this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
-                calculateScene(
-                    entries
-                )
-            }
-    }

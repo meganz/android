@@ -9,6 +9,8 @@ import mega.privacy.android.app.appstate.content.navigation.view.PermissionScree
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
+import mega.privacy.android.navigation.contract.suppression.withOverlaySuppression
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 
@@ -24,7 +26,9 @@ class PermissionFeatureDestination : FeatureDestination {
 fun EntryProviderScope<NavKey>.permissionScreensDestination(
     navigationHandler: NavigationHandler,
 ) {
-    entry<PermissionScreensNavKey> {
+    entry<PermissionScreensNavKey>(
+        metadata = buildMetadata { withOverlaySuppression() }
+    ) {
         val activity = LocalActivity.current as? ComponentActivity
 
         PermissionScreens(

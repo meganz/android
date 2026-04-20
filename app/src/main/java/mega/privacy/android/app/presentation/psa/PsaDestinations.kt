@@ -12,17 +12,18 @@ import mega.privacy.android.app.presentation.psa.view.WebPsaScreen
 import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
 import mega.privacy.android.navigation.contract.bottomsheet.withBottomSheet
 import mega.privacy.android.navigation.contract.metadata.buildMetadata
+import mega.privacy.android.navigation.contract.navkey.Suppressable
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 
 @Serializable
-data class StandardPsaBottomSheet(val psa: PsaState.StandardPsa) : NavKey
+data class StandardPsaBottomSheet(val psa: PsaState.StandardPsa) : NavKey, Suppressable
 
 @Serializable
-data class InfoPsaBottomSheet(val psa: PsaState.InfoPsa) : NavKey
+data class InfoPsaBottomSheet(val psa: PsaState.InfoPsa) : NavKey, Suppressable
 
 @Serializable
-data class WebPsaScreen(val psa: PsaState.WebPsa) : NavKey
+data class WebPsaScreen(val psa: PsaState.WebPsa) : NavKey, Suppressable
 
 internal fun EntryProviderScope<NavKey>.standardPsaBottomSheetDestination(
     onNavigate: (NavKey) -> Unit,
