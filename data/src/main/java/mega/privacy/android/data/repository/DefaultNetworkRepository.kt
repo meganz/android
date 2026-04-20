@@ -5,6 +5,8 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -113,10 +115,23 @@ internal class DefaultNetworkRepository @Inject constructor(
                 trySend(getCurrentConnectivityStateInternal())
             }
         }
-        connectivityManager?.registerDefaultNetworkCallback(callback)
+        val handlerThread = HandlerThread("NetworkCallbackThread").apply {
+            start()
+            uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { _, throwable ->
+                Timber.e(
+                    throwable,
+                    "NetworkCallback handler thread crashed due to framework parcel error"
+                )
+            }
+        }
+        connectivityManager?.registerDefaultNetworkCallback(
+            callback,
+            Handler(handlerThread.looper)
+        )
 
         awaitClose {
             connectivityManager?.unregisterNetworkCallback(callback)
+            handlerThread.quitSafely()
             job.cancel()
         }
     }.flowOn(ioDispatcher)
