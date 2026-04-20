@@ -2290,9 +2290,9 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="one">%d dosar,</item>
-        <item quantity="few">%d dosare,</item>
-        <item quantity="other">%d dosare,</item>
+        <item quantity="one">%d dosar&#160;·&#160;</item>
+        <item quantity="few">%d dosare&#160;·&#160;</item>
+        <item quantity="other">%d dosare&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="one">Partajat cu %d persoană</item>
@@ -2338,7 +2338,7 @@
     <plurals name="move_node_snackbar_concat_fail">
         <item quantity="one">%d elementul nu a putut fi mutat</item>
         <item quantity="few">%d elementele nu au putut fi mutate</item>
-        <item quantity="other" />
+        <item quantity="other"></item>
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_fail">
         <item quantity="one">%d elementul nu a putut fi eliminat din coșul de gunoi.</item>
@@ -2439,18 +2439,4 @@
     <string name="sync_label_camera_uploads">Încărcări din Cameră</string>
     <string name="sync_label_media_uploads">Încărcări media</string>
     <string name="general_skip">Omite</string>
-    <!-- Title for the Transfer connections setting -->
-    <string name="settings_transfer_connections_title">Transfer connections</string>
-    <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
-    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
-    <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
-    <string name="settings_transfer_download_connections">Download connections</string>
-    <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
-    <string name="settings_transfer_upload_connections">Upload connections</string>
-    <!-- Possible value for transfer connections settings. This is the recommended value for slow networks -->
-    <string name="settings_transfer_connections_slow_networs">%1$d (Best for slow networks)</string>
-    <!-- Possible value for transfer connections settings. This is the default value -->
-    <string name="settings_transfer_connections_default">%1$d (Default)</string>
-    <!-- Possible value for transfer connections settings. This value should be faster, but will increase the battery and data usage. -->
-    <string name="settings_transfer_connections_higher_usage">%1$d (Higher battery and data usage)</string>
 </resources>

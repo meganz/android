@@ -2355,10 +2355,10 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="one">%d folder,</item>
-        <item quantity="few">%d foldery,</item>
-        <item quantity="many">%d foldery,</item>
-        <item quantity="other">%d foldery,</item>
+        <item quantity="one">%d folder&#160;·&#160;</item>
+        <item quantity="few">%d foldery&#160;·&#160;</item>
+        <item quantity="many">%d foldery&#160;·&#160;</item>
+        <item quantity="other">%d foldery&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="one">Udostępniono %d osobie</item>
@@ -2531,22 +2531,15 @@
     <string name="sync_label_device_folder">folder urządzenia</string>
     <string name="sync_label_a_sync_or_backup">synchronizacja lub kopia zapasowa</string>
     <string name="sync_label_this_device">to urządzenie</string>
-    <string name="sync_label_camera_uploads">Przesyłanie z aparatu</string>
-    <string name="sync_label_media_uploads">Przesyłanie multimediów</string>
+    <string name="sync_label_camera_uploads">Przesyłanie zdjęć z kamery</string>
+    <string name="sync_label_media_uploads">Przesyłanie plików</string>
     <string name="home_widget_continue_where_left_off">Kontynuuj tam, gdzie skończyłeś</string>
     <string name="general_skip">Pomiń</string>
-    <!-- Title for the Transfer connections setting -->
-    <string name="settings_transfer_connections_title">Transfer connections</string>
-    <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
-    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
-    <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
-    <string name="settings_transfer_download_connections">Download connections</string>
-    <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
-    <string name="settings_transfer_upload_connections">Upload connections</string>
-    <!-- Possible value for transfer connections settings. This is the recommended value for slow networks -->
-    <string name="settings_transfer_connections_slow_networs">%1$d (Best for slow networks)</string>
-    <!-- Possible value for transfer connections settings. This is the default value -->
-    <string name="settings_transfer_connections_default">%1$d (Default)</string>
-    <!-- Possible value for transfer connections settings. This value should be faster, but will increase the battery and data usage. -->
-    <string name="settings_transfer_connections_higher_usage">%1$d (Higher battery and data usage)</string>
+    <string name="settings_transfer_connections_title">Połączenia transferowe</string>
+    <string name="settings_transfer_connections_text">Określa liczbę równoległych połączeń podczas transferu pliku. Wyższe wartości mogą przyspieszyć transfer, ale zwiększą zużycie baterii i danych.</string>
+    <string name="settings_transfer_download_connections">Pobieranie połączeń</string>
+    <string name="settings_transfer_upload_connections">Prześlij połączenia</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Najlepsze dla wolnych sieci)</string>
+    <string name="settings_transfer_connections_default">%1$d (Domyślne)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Wyższe zużycie baterii i danych)</string>
 </resources>

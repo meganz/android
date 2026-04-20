@@ -2168,7 +2168,7 @@
     <string name="label_file_size_petabytes">%sPB</string>
     <string name="label_file_size_exabytes">%sEB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="other">폴더 %d개,</item>
+        <item quantity="other">폴더 %d개&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="other">%d명과 공유됨</item>
@@ -2265,18 +2265,4 @@
     <string name="sync_label_camera_uploads">카메라 업로드</string>
     <string name="sync_label_media_uploads">미디어 업로드</string>
     <string name="general_skip">건너뛰기</string>
-    <!-- Title for the Transfer connections setting -->
-    <string name="settings_transfer_connections_title">Transfer connections</string>
-    <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
-    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
-    <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
-    <string name="settings_transfer_download_connections">Download connections</string>
-    <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
-    <string name="settings_transfer_upload_connections">Upload connections</string>
-    <!-- Possible value for transfer connections settings. This is the recommended value for slow networks -->
-    <string name="settings_transfer_connections_slow_networs">%1$d (Best for slow networks)</string>
-    <!-- Possible value for transfer connections settings. This is the default value -->
-    <string name="settings_transfer_connections_default">%1$d (Default)</string>
-    <!-- Possible value for transfer connections settings. This value should be faster, but will increase the battery and data usage. -->
-    <string name="settings_transfer_connections_higher_usage">%1$d (Higher battery and data usage)</string>
 </resources>
