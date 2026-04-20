@@ -713,7 +713,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">無效的電子郵件地址或密碼。請重試。</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">由於違反服務條款，您的帳戶已被暫停。請聯繫 support&#64;mega.io</string>
+    <string name="error_account_suspended">由於違反服務條款，您的帳戶已被停權。請聯繫 support&#64;mega.io</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">嘗試登入失敗的次數太多，請稍候一個小時後再試。</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -733,7 +733,7 @@
         <item quantity="other">%1$d個項目</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_delete_account">由於多次違反我們的服務條款，相關的用戶帳戶已被停用。</string>
+    <string name="file_link_unavaible_delete_account">由於多次違反我們的服務條款，相關的用戶帳戶已被終止。</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">您提供的資料夾連結解密金鑰無效。</string>
     <!-- Item of the navigation title for the chat section -->
@@ -3175,7 +3175,7 @@
     <!-- Description of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_body">這是您備份檔案和資料夾存放的地方。您備份的項目是「唯讀」的，以避免它們在您的雲端硬碟中被意外竄改。您可以使用我們桌面應用程式將您電腦中的項目備份到MEGA。</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交恢復存取申請的更多資訊。</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被停權。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交恢復存取申請的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法再存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
     <!-- Title of the Meetings tab for the chat section -->

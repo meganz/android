@@ -2231,8 +2231,8 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="one">%d map,</item>
-        <item quantity="other">%d mappen,</item>
+        <item quantity="one">%d map&#160;·&#160;</item>
+        <item quantity="other">%d mappen&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="one">Gedeeld met %d persoon</item>
@@ -2358,7 +2358,15 @@
     <string name="sync_label_device_folder">apparaatmap</string>
     <string name="sync_label_a_sync_or_backup">een synchronisatie of back-up</string>
     <string name="sync_label_this_device">dit apparaat</string>
-    <string name="sync_label_camera_uploads">Camera-upload</string>
-    <string name="sync_label_media_uploads">Media-upload</string>
+    <string name="sync_label_camera_uploads">Camera uploads</string>
+    <string name="sync_label_media_uploads">Media uploads</string>
     <string name="general_skip">Overslaan</string>
+    <string name="home_widget_continue_where_left_off">Ga verder waar u gebleven was</string>
+    <string name="settings_transfer_connections_title">Overdracht verbindingen</string>
+    <string name="settings_transfer_connections_text">Definieert het aantal parallelle verbindingen per bestandsoverdracht. Hogere waarden kunnen de snelheid verbeteren, maar verhogen het batterij- en dataverbruik.</string>
+    <string name="settings_transfer_download_connections">Download verbindingen</string>
+    <string name="settings_transfer_upload_connections">Upload verbindingen</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Het beste voor trage netwerken)</string>
+    <string name="settings_transfer_connections_default">%1$d (Standaard)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Hoger batterij en gegevens verbruik)</string>
 </resources>

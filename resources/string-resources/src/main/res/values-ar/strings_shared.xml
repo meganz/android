@@ -2456,12 +2456,12 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="zero">%d مجلد،</item>
-        <item quantity="one">%d مجلد،</item>
-        <item quantity="two">%d مجلدان،</item>
-        <item quantity="few">%d مجلدات،</item>
-        <item quantity="many">%d مجلد،</item>
-        <item quantity="other">%d مجلد،</item>
+        <item quantity="zero">%d مجلد&#160;·&#160;</item>
+        <item quantity="one">%d مجلد&#160;·&#160;</item>
+        <item quantity="two">%d مجلدان&#160;·&#160;</item>
+        <item quantity="few">%d مجلدات&#160;·&#160;</item>
+        <item quantity="many">%d مجلد&#160;·&#160;</item>
+        <item quantity="other">%d مجلد&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="zero">تمت المشاركة مع %d شخص</item>

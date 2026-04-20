@@ -2284,9 +2284,9 @@
     <string name="label_file_size_petabytes">%s&#160;Po</string>
     <string name="label_file_size_exabytes">%s&#160;Eo</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="one">%d dossier,</item>
-        <item quantity="many">%d dossiers,</item>
-        <item quantity="other">%d dossiers,</item>
+        <item quantity="one">%d dossier&#160;·&#160;</item>
+        <item quantity="many">%d dossiers&#160;·&#160;</item>
+        <item quantity="other">%d dossiers&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="one">Partagé avec %d personne</item>
@@ -2434,8 +2434,8 @@
     <string name="sync_label_device_folder">dossier de l\’appareil</string>
     <string name="sync_label_a_sync_or_backup">d\’une synchronisation ou d\’une sauvegarde</string>
     <string name="sync_label_this_device">cet appareil</string>
-    <string name="sync_label_camera_uploads">Téléversements de l\’appareil photo</string>
-    <string name="sync_label_media_uploads">Téléversements de médias</string>
+    <string name="sync_label_camera_uploads">Téléversements de l’appareil photo</string>
+    <string name="sync_label_media_uploads">Téléversements des médias</string>
     <string name="cloud_explorer_select_destination_title">Choisir la destination</string>
     <string name="cloud_explorer_use_this_folder_button">Utiliser ce dossier</string>
     <string name="home_widget_continue_where_left_off">Reprenez où vous étiez</string>

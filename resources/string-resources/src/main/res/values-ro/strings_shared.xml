@@ -2290,9 +2290,9 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="one">%d dosar,</item>
-        <item quantity="few">%d dosare,</item>
-        <item quantity="other">%d dosare,</item>
+        <item quantity="one">%d dosar&#160;·&#160;</item>
+        <item quantity="few">%d dosare&#160;·&#160;</item>
+        <item quantity="other">%d dosare&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="one">Partajat cu %d persoană</item>

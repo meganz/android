@@ -2135,7 +2135,7 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="other">%d folder,</item>
+        <item quantity="other">%d folder&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="other">Dibagikan dengan %d orang</item>

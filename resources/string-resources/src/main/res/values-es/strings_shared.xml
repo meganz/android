@@ -2258,9 +2258,9 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="one">%d carpeta,</item>
-        <item quantity="many">%d carpetas,</item>
-        <item quantity="other">%d carpetas,</item>
+        <item quantity="one">%d carpeta&#160;·&#160;</item>
+        <item quantity="many">%d carpetas&#160;·&#160;</item>
+        <item quantity="other">%d carpetas&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="one">Compartido con %d persona</item>
@@ -2408,8 +2408,8 @@
     <string name="rewarded_ad_unavailable_toast">El anuncio no está disponible. Continuando&#8230;</string>
     <string name="general_read_only_folder_warning">Esta carpeta es de solo lectura</string>
     <string name="sync_error_folder_conflict">La %2$s \“%1$s\“ ya forma parte de %3$s en %4$s. Elige otra carpeta.</string>
-    <string name="sync_label_camera_uploads">las subidas de la cámara</string>
-    <string name="sync_label_media_uploads">las subidas multimedia</string>
+    <string name="sync_label_camera_uploads">Subidas de la cámara</string>
+    <string name="sync_label_media_uploads">Subidas multimedia</string>
     <string name="home_widget_continue_where_left_off">Continúa desde donde lo dejaste</string>
     <string name="general_skip">Saltar</string>
 </resources>

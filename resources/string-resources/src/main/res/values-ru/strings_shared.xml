@@ -2354,10 +2354,10 @@
     <string name="label_file_size_petabytes">%s&#160;ПБ</string>
     <string name="label_file_size_exabytes">%s&#160;ЭБ</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="one">%d папка,</item>
-        <item quantity="few">%d папки,</item>
-        <item quantity="many">%d папок,</item>
-        <item quantity="other">%d папок,</item>
+        <item quantity="one">%d папка&#160;·&#160;</item>
+        <item quantity="few">%d папки&#160;·&#160;</item>
+        <item quantity="many">%d папок&#160;·&#160;</item>
+        <item quantity="other">%d папок&#160;·&#160;</item>
     </plurals>
     <plurals name="move_node_general_snackbar_success">
         <item quantity="one">%d элемент успешно перемещён</item>

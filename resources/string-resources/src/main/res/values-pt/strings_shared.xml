@@ -2292,9 +2292,9 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="one">%d pasta,</item>
-        <item quantity="many">%d de pastas,</item>
-        <item quantity="other">%d pastas,</item>
+        <item quantity="one">%d pasta&#160;·&#160;</item>
+        <item quantity="many">%d de pastas&#160;·&#160;</item>
+        <item quantity="other">%d pastas&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="one">Compartilhada com %d pessoa</item>
@@ -2448,4 +2448,11 @@
     <string name="sync_label_media_uploads">Uploads de mídia</string>
     <string name="home_widget_continue_where_left_off">Continue de onde você parou</string>
     <string name="general_skip">Pular</string>
+    <string name="settings_transfer_connections_title">Conexões de transferência</string>
+    <string name="settings_transfer_connections_text">Define o número de conexões paralelas por transferência de arquivo. Valores mais altos podem melhorar a velocidade, mas aumentam o consumo de bateria e de dados.</string>
+    <string name="settings_transfer_download_connections">Conexões de download</string>
+    <string name="settings_transfer_upload_connections">Conexões de upload</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (melhor opção para redes lentas)</string>
+    <string name="settings_transfer_connections_default">%1$d (valor predeterminado)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (maior consumo de bateria e de dados)</string>
 </resources>

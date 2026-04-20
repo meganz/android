@@ -851,7 +851,7 @@
     <!--General Request Network Failed text-->
     <string name="general_request_failed_message">發生錯誤，請重試</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
-    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被暫停。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交恢復存取申請的更多資訊。</string>
+    <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被停權。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交恢復存取申請的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
     <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法再存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
@@ -2170,7 +2170,7 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="other">%d個資料夾</item>
+        <item quantity="other">%d 資料夾&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="other">已與%d個人共享</item>
