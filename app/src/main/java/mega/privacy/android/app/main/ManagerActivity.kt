@@ -145,7 +145,6 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
-import mega.privacy.android.app.main.mapper.ManagerRedirectIntentMapper
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.main.share.SharesFragment
 import mega.privacy.android.app.main.share.SharesViewModel
@@ -457,9 +456,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
     @Inject
     lateinit var getChatRoomUseCase: GetChatRoomUseCase
-
-    @Inject
-    lateinit var managerRedirectIntentMapper: ManagerRedirectIntentMapper
 
     @Inject
     lateinit var inAppUpdateHandler: InAppUpdateHandler
@@ -1486,9 +1482,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         rootNode = megaApi.rootNode
         if (rootNode == null || LoginActivity.isBackFromLoginPage) {
             Timber.d("Action: %s", intent?.action)
-            if (savedInstanceState != null || !handleRedirectIntentActions(intent)) {
-                refreshSession()
-            }
+            refreshSession()
             return true
         } else {
             attr = dbH.attributes
@@ -1806,19 +1800,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 selectDrawerItem(drawerItem)
             }
         }
-        return false
-    }
-
-    private fun handleRedirectIntentActions(intent: Intent?): Boolean {
-        intent ?: return false
-        managerRedirectIntentMapper(
-            intent = intent,
-        )?.let { redirectIntent ->
-            startActivity(redirectIntent)
-            finish()
-            return true
-        }
-
         return false
     }
 
