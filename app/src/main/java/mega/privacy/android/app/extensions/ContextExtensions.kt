@@ -11,8 +11,6 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.utils.Util
 import timber.log.Timber
 
 /**
@@ -28,15 +26,7 @@ fun Context.navigateToAppSettings() {
     try {
         startActivity(intent)
     } catch (e: Exception) {
-        if (this is ManagerActivity) {
-            // in case few devices cannot handle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
-            Util.showSnackbar(
-                this,
-                getString(R.string.on_permanently_denied)
-            )
-        } else {
-            Timber.e(e, "Exception opening device settings")
-        }
+        Timber.e(e, "Exception opening device settings")
     }
 }
 

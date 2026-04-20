@@ -42,7 +42,6 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ChatLogoutListener
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presence.SignalPresenceViewModel
@@ -986,7 +985,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
         when {
             this is MyAccountActivity && source == UpgradeSource.MyAccount
-                    || this is ManagerActivity && source == UpgradeSource.Main
                     || this is FileManagementPreferencesActivity && source == UpgradeSource.Settings -> {
                 purchaseType = type
                 // Remove the .test suffix for testing SKUs

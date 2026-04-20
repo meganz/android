@@ -19,24 +19,18 @@ import static mega.privacy.android.app.utils.AvatarUtil.getUserAvatar;
 import static mega.privacy.android.app.utils.ChatUtil.getStatusBitmap;
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
-import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PICTURE;
-import static mega.privacy.android.app.utils.Constants.ACTION_TAKE_PROFILE_PICTURE;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PROGRESS;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_OUTGOING;
 import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE_CALLS;
-import static mega.privacy.android.app.utils.Constants.INVALID_TYPE_PERMISSIONS;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATION_CALL_IN_PROGRESS;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA;
 import static mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
-import static mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE;
 import static mega.privacy.android.app.utils.ContactUtil.getNicknameContact;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
-import static mega.privacy.android.app.utils.Util.takePicture;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -70,7 +64,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager;
@@ -426,10 +419,6 @@ public class CallUtil {
 
         callInProgressLayout.setVisibility(View.VISIBLE);
 
-        if (context instanceof ManagerActivity) {
-            ((ManagerActivity) context).changeAppBarElevation(true,
-                    ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
-        }
         if (context instanceof ContactInfoActivity) {
             ((ContactInfoActivity) context).changeToolbarLayoutElevation();
         }
@@ -485,10 +474,6 @@ public class CallUtil {
     private static void hideCallInProgressLayout(Context context, final RelativeLayout callInProgressLayout, final Chronometer callInProgressChrono) {
         callInProgressLayout.setVisibility(View.GONE);
         activateChrono(false, callInProgressChrono, null);
-        if (context instanceof ManagerActivity) {
-            ((ManagerActivity) context).changeAppBarElevation(false,
-                    ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
-        }
         if (context instanceof ContactInfoActivity) {
             ((ContactInfoActivity) context).changeToolbarLayoutElevation();
         }
@@ -577,10 +562,6 @@ public class CallUtil {
         }
         if (callInProgressLayout != null && callInProgressLayout.getVisibility() == View.VISIBLE) {
             callInProgressLayout.setVisibility(View.GONE);
-            if (context instanceof ManagerActivity) {
-                ((ManagerActivity) context).changeAppBarElevation(false,
-                        ManagerActivity.ELEVATION_CALL_IN_PROGRESS);
-            }
             if (context instanceof ContactInfoActivity) {
                 ((ContactInfoActivity) context).changeToolbarLayoutElevation();
             }
@@ -777,19 +758,6 @@ public class CallUtil {
                 case DialogInterface.BUTTON_POSITIVE:
                     Timber.d("Open camera and lost the camera in the call");
                     disableLocalCamera();
-                    if (activity instanceof ManagerActivity) {
-                        switch (action) {
-                            case ACTION_OPEN_QR:
-                                ((ManagerActivity) activity).openQR(openScanQR);
-                                break;
-                            case ACTION_TAKE_PICTURE:
-                                takePicture(activity, TAKE_PHOTO_CODE);
-                                break;
-                            case ACTION_TAKE_PROFILE_PICTURE:
-                                takePicture(activity, TAKE_PICTURE_PROFILE_CODE);
-                                break;
-                        }
-                    }
                     if (activity instanceof AddContactActivity && action.equals(ACTION_OPEN_QR)) {
                         ((AddContactActivity) activity).initScanQR();
                     }
@@ -993,9 +961,6 @@ public class CallUtil {
             if (activity == null)
                 return false;
 
-            if (activity instanceof ManagerActivity) {
-                ((ManagerActivity) activity).setTypesCameraPermission(INVALID_TYPE_PERMISSIONS);
-            }
             requestPermission(activity, REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
         }
@@ -1015,9 +980,6 @@ public class CallUtil {
             if (activity == null)
                 return false;
 
-            if (activity instanceof ManagerActivity) {
-                ((ManagerActivity) activity).setTypesCameraPermission(INVALID_TYPE_PERMISSIONS);
-            }
             requestPermission(activity, REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;
         }

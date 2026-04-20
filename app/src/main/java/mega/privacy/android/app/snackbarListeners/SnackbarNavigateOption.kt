@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
@@ -38,22 +37,18 @@ class SnackbarNavigateOption @JvmOverloads constructor(
             )
 
             MESSAGE_SNACKBAR_TYPE -> {
-                if (context is ManagerActivity) {
-                    context.moveToChatSection(idChat ?: -1)
-                } else {
-                    megaNavigator.openManagerActivity(
-                        context = context,
-                        action = ACTION_CHAT_NOTIFICATION_MESSAGE,
-                        bundle = Bundle().apply {
-                            idChat?.let { putLong(LEGACY_CHAT_ID, idChat) }
-                            putBoolean(EXTRA_MOVE_TO_CHAT_SECTION, true)
-                        },
-                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-                        singleActivityDestination = idChat?.let { ChatNavKey(idChat) }
-                            ?: ChatListNavKey()
-                    )
-                    (context as? Activity)?.finish()
-                }
+                megaNavigator.openManagerActivity(
+                    context = context,
+                    action = ACTION_CHAT_NOTIFICATION_MESSAGE,
+                    bundle = Bundle().apply {
+                        idChat?.let { putLong(LEGACY_CHAT_ID, idChat) }
+                        putBoolean(EXTRA_MOVE_TO_CHAT_SECTION, true)
+                    },
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
+                    singleActivityDestination = idChat?.let { ChatNavKey(idChat) }
+                        ?: ChatListNavKey()
+                )
+                (context as? Activity)?.finish()
             }
         }
     }
