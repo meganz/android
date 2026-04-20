@@ -164,6 +164,7 @@ alwaysApply: true
   ```
 - **Truth**: Use Google Truth for assertions
 - **Coroutines**: Use `runTest` for coroutine testing
+- Create common stub method to reduce boilerplate if necessary
 
 ### Test Method Naming
 - **Format**: Use one of the following patterns for test method names:

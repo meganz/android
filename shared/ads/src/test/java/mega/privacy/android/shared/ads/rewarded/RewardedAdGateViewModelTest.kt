@@ -51,6 +51,20 @@ class RewardedAdGateViewModelTest {
         whenever(monitorRewardedAdAttemptCountUseCase()).thenReturn(emptyFlow())
     }
 
+    private suspend fun commonStub(
+        googleAdsEnabled: Boolean = true,
+        rewardedAdsEnabled: Boolean = true,
+        attemptCount: Int? = null,
+    ) {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag))
+            .thenReturn(googleAdsEnabled)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds))
+            .thenReturn(rewardedAdsEnabled)
+        if (attemptCount != null) {
+            whenever(monitorRewardedAdAttemptCountUseCase()).thenReturn(flowOf(attemptCount))
+        }
+    }
+
     private fun initViewModel() {
         underTest = RewardedAdGateViewModel(
             getFeatureFlagValueUseCase,
@@ -62,7 +76,7 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that initial state has no dialog`() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(false)
+        commonStub(rewardedAdsEnabled = false)
         initViewModel()
         advanceUntilIdle()
 
@@ -74,9 +88,9 @@ class RewardedAdGateViewModelTest {
     }
 
     @Test
-    fun `test that init checks eligibility and marks checking complete when flag is enabled`() =
+    fun `test that init checks eligibility and marks checking complete when both flags are enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(true)
+            commonStub()
 
             initViewModel()
             advanceUntilIdle()
@@ -87,9 +101,22 @@ class RewardedAdGateViewModelTest {
         }
 
     @Test
-    fun `test that init checks eligibility and marks checking complete when flag is disabled`() =
+    fun `test that init marks ineligible when RewardedAds flag is disabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(false)
+            commonStub(rewardedAdsEnabled = false)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.isCheckingEligibility).isFalse()
+            assertThat(state.isEligible).isFalse()
+        }
+
+    @Test
+    fun `test that init marks ineligible when GoogleAdsFeatureFlag is disabled`() =
+        runTest {
+            commonStub(googleAdsEnabled = false)
 
             initViewModel()
             advanceUntilIdle()
@@ -101,6 +128,8 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that init marks ineligible when flag fetch fails`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag))
+            .thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds))
             .thenThrow(RuntimeException("Flag fetch failed"))
 
@@ -114,8 +143,7 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that init collects attempt count and updates state`() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(true)
-        whenever(monitorRewardedAdAttemptCountUseCase()).thenReturn(flowOf(3))
+        commonStub(attemptCount = 3)
 
         initViewModel()
         advanceUntilIdle()
@@ -126,8 +154,7 @@ class RewardedAdGateViewModelTest {
     @Test
     fun `test that requestShowDialog skips and increments when eligible and count below threshold`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(true)
-            whenever(monitorRewardedAdAttemptCountUseCase()).thenReturn(flowOf(0))
+            commonStub(attemptCount = 0)
             initViewModel()
             advanceUntilIdle()
 
@@ -142,8 +169,7 @@ class RewardedAdGateViewModelTest {
     @Test
     fun `test that requestShowDialog shows dialog and increments when count would reach threshold`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(true)
-            whenever(monitorRewardedAdAttemptCountUseCase()).thenReturn(flowOf(4))
+            commonStub(attemptCount = 4)
             initViewModel()
             advanceUntilIdle()
 
@@ -157,8 +183,7 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that requestShowDialog shows dialog when count exceeds threshold`() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(true)
-        whenever(monitorRewardedAdAttemptCountUseCase()).thenReturn(flowOf(6))
+        commonStub(attemptCount = 6)
         initViewModel()
         advanceUntilIdle()
 
@@ -171,8 +196,7 @@ class RewardedAdGateViewModelTest {
     @Test
     fun `test that requestShowDialog triggers skipAdEvent and does not increment when not eligible`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(false)
-            whenever(monitorRewardedAdAttemptCountUseCase()).thenReturn(flowOf(10))
+            commonStub(rewardedAdsEnabled = false, attemptCount = 10)
             initViewModel()
             advanceUntilIdle()
 
@@ -187,10 +211,8 @@ class RewardedAdGateViewModelTest {
     @Test
     fun `test that requestShowDialog does not increment when eligibility check is still in progress`() =
         runTest {
-            // Suspend the flag fetch indefinitely so the eligibility check never completes.
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).doSuspendableAnswer {
-                awaitCancellation()
-            }
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag))
+                .doSuspendableAnswer { awaitCancellation() }
             initViewModel()
 
             underTest.requestShowDialog()
@@ -204,7 +226,7 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that resetAttemptCount calls reset use case`() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(true)
+        commonStub()
         initViewModel()
         advanceUntilIdle()
 
@@ -216,7 +238,7 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that onSkipAdEventConsumed resets event to consumed`() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(false)
+        commonStub(rewardedAdsEnabled = false)
         initViewModel()
         advanceUntilIdle()
         underTest.requestShowDialog()
@@ -228,8 +250,7 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that dismiss resets dialog state but preserves eligibility and count`() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(true)
-        whenever(monitorRewardedAdAttemptCountUseCase()).thenReturn(flowOf(5))
+        commonStub(attemptCount = 5)
         initViewModel()
         advanceUntilIdle()
         underTest.requestShowDialog()
@@ -248,7 +269,7 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that setLoading sets isLoading true`() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(false)
+        commonStub(rewardedAdsEnabled = false)
         initViewModel()
         advanceUntilIdle()
 
@@ -259,7 +280,7 @@ class RewardedAdGateViewModelTest {
 
     @Test
     fun `test that setLoadingComplete sets isLoading false`() = runTest {
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)).thenReturn(false)
+        commonStub(rewardedAdsEnabled = false)
         initViewModel()
         advanceUntilIdle()
         underTest.setLoading()

@@ -47,7 +47,8 @@ class RewardedAdGateViewModel @Inject constructor(
     private fun checkEligibility() {
         viewModelScope.launch {
             val isEligible = runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)
+                getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag) &&
+                        getFeatureFlagValueUseCase(ApiFeatures.RewardedAds)
             }.onFailure {
                 Timber.e(it, "Failed to read RewardedAds feature flag")
             }.getOrDefault(false)
