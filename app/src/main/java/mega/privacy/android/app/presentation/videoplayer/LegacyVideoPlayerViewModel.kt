@@ -615,7 +615,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                 setPlayWhenReady(
                     mediaPlaySources.isRestartPlaying &&
                             !uiState.value.showPlaybackDialog &&
-                            !uiState.value.showSubtitleDialog
+                            !uiState.value.showSubTitlesOptions
                 )
                 playerPrepare()
             }
@@ -1245,7 +1245,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                     && !uiState.value.isAutoReplay
                     && playbackPositionStatus == PlaybackPositionStatus.Initial
                     && !uiState.value.showPlaybackDialog
-                    && !uiState.value.showSubtitleDialog
+                    && !uiState.value.showSubTitlesOptions
                     && !isPausedByUser
                 ) {
                     mediaPlayerGateway.setPlayWhenReady(true)
@@ -1346,7 +1346,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     internal fun handleAutoReplayIfPaused() {
         val shouldAutoReplay = uiState.value.mediaPlaybackState == MediaPlaybackState.Paused &&
                 uiState.value.isAutoReplay &&
-                !uiState.value.showSubtitleDialog &&
+                !uiState.value.showSubTitlesOptions &&
                 !uiState.value.showPlaybackDialog &&
                 !isPausedByUser
 
@@ -2152,7 +2152,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
 
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 subtitleSelectedStatus = SubtitleSelectedStatus.Off
             )
         }
@@ -2162,7 +2162,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         mediaPlayerGateway.showSubtitle()
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 subtitleSelectedStatus = SubtitleSelectedStatus.AddSubtitleItem
             )
         }
@@ -2175,7 +2175,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
 
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 addedSubtitleInfo = info,
                 matchedSubtitleInfo = null,
                 subtitleSelectedStatus = if (info?.url == null)
@@ -2215,7 +2215,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
 
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 matchedSubtitleInfo = info,
                 addedSubtitleInfo = null,
                 subtitleSelectedStatus = if (info?.url == null) {
@@ -2230,7 +2230,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     internal fun navigateToSelectSubtitle() {
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 navigateToSelectSubtitleScreen = true,
             )
         }
@@ -2241,7 +2241,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     internal fun updateShowSubtitleDialog(value: Boolean) {
-        uiState.update { it.copy(showSubtitleDialog = value) }
+        uiState.update { it.copy(showSubTitlesOptions = value) }
         mediaPlayerGateway.setPlayWhenReady(!value)
     }
 

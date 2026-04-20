@@ -608,7 +608,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
                 buildPlaySources(mediaPlaySources)
                 setPlayWhenReady(
                     mediaPlaySources.isRestartPlaying &&
-                            !uiState.value.showSubtitleDialog
+                            !uiState.value.showSubTitlesOptions
                 )
                 playerPrepare()
             }
@@ -1233,7 +1233,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
                 if (playbackState == MediaPlaybackState.Paused
                     && !mediaPlayerGateway.getPlayWhenReady()
                     && !uiState.value.isAutoReplay
-                    && !uiState.value.showSubtitleDialog
+                    && !uiState.value.showSubTitlesOptions
                     && !isPausedByUser
                 ) {
                     mediaPlayerGateway.setPlayWhenReady(true)
@@ -1334,7 +1334,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
     internal fun handleAutoReplayIfPaused() {
         val shouldAutoReplay = uiState.value.mediaPlaybackState == MediaPlaybackState.Paused &&
                 uiState.value.isAutoReplay &&
-                !uiState.value.showSubtitleDialog &&
+                !uiState.value.showSubTitlesOptions &&
                 !isPausedByUser
 
         if (shouldAutoReplay) {
@@ -2119,7 +2119,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
 
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 subtitleSelectedStatus = SubtitleSelectedStatus.Off
             )
         }
@@ -2129,7 +2129,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
         mediaPlayerGateway.showSubtitle()
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 subtitleSelectedStatus = SubtitleSelectedStatus.AddSubtitleItem
             )
         }
@@ -2142,7 +2142,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
 
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 addedSubtitleInfo = info,
                 matchedSubtitleInfo = null,
                 subtitleSelectedStatus = if (info?.url == null)
@@ -2182,7 +2182,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
 
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 matchedSubtitleInfo = info,
                 addedSubtitleInfo = null,
                 subtitleSelectedStatus = if (info?.url == null) {
@@ -2197,7 +2197,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
     internal fun navigateToSelectSubtitle() {
         uiState.update {
             it.copy(
-                showSubtitleDialog = false,
+                showSubTitlesOptions = false,
                 navigateToSelectSubtitleScreen = true,
             )
         }
@@ -2208,7 +2208,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
     }
 
     internal fun updateShowSubtitleDialog(value: Boolean) {
-        uiState.update { it.copy(showSubtitleDialog = value) }
+        uiState.update { it.copy(showSubTitlesOptions = value) }
         mediaPlayerGateway.setPlayWhenReady(!value)
     }
 

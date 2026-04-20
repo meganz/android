@@ -2586,7 +2586,7 @@ class LegacyVideoPlayerViewModelTest {
         testScheduler.advanceUntilIdle()
         verify(mediaPlayerGateway).setPlayWhenReady(!value)
         underTest.uiState.test {
-            assertThat(awaitItem().showSubtitleDialog).isEqualTo(value)
+            assertThat(awaitItem().showSubTitlesOptions).isEqualTo(value)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -2598,10 +2598,10 @@ class LegacyVideoPlayerViewModelTest {
             advanceUntilIdle()
             underTest.uiState.drop(1).test {
                 underTest.updateShowSubtitleDialog(true)
-                assertThat(awaitItem().showSubtitleDialog).isTrue()
+                assertThat(awaitItem().showSubTitlesOptions).isTrue()
                 underTest.navigateToSelectSubtitle()
                 verify(mediaPlayerGateway).setPlayWhenReady(false)
-                assertThat(awaitItem().showSubtitleDialog).isFalse()
+                assertThat(awaitItem().showSubTitlesOptions).isFalse()
             }
         }
 
@@ -2676,7 +2676,7 @@ class LegacyVideoPlayerViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.AddSubtitleItem)
-                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.showSubTitlesOptions).isFalse()
                 assertThat(actual.addedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                 assertThat(actual.matchedSubtitleInfo).isNull()
                 cancelAndConsumeRemainingEvents()
@@ -2696,7 +2696,7 @@ class LegacyVideoPlayerViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
-                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.showSubTitlesOptions).isFalse()
                 assertThat(actual.addedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                 assertThat(actual.matchedSubtitleInfo).isNull()
                 cancelAndConsumeRemainingEvents()
@@ -2727,7 +2727,7 @@ class LegacyVideoPlayerViewModelTest {
                 )
                 awaitItem().let {
                     assertThat(it.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.SelectMatchedItem)
-                    assertThat(it.showSubtitleDialog).isFalse()
+                    assertThat(it.showSubTitlesOptions).isFalse()
                     assertThat(it.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                     assertThat(it.addedSubtitleInfo).isNull()
                 }
@@ -2739,7 +2739,7 @@ class LegacyVideoPlayerViewModelTest {
                 )
                 awaitItem().let {
                     assertThat(it.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.SelectMatchedItem)
-                    assertThat(it.showSubtitleDialog).isFalse()
+                    assertThat(it.showSubTitlesOptions).isFalse()
                     assertThat(it.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                     assertThat(it.addedSubtitleInfo).isNull()
                 }
@@ -2759,7 +2759,7 @@ class LegacyVideoPlayerViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
-                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.showSubTitlesOptions).isFalse()
                 assertThat(actual.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                 assertThat(actual.addedSubtitleInfo).isNull()
                 cancelAndConsumeRemainingEvents()

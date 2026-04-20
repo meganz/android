@@ -163,8 +163,8 @@ internal fun LegacyVideoPlayerScreen(
         }
     }
 
-    LaunchedEffect(uiState.showPlaybackDialog, uiState.showSubtitleDialog) {
-        if (uiState.showPlaybackDialog || uiState.showSubtitleDialog) {
+    LaunchedEffect(uiState.showPlaybackDialog, uiState.showSubTitlesOptions) {
+        if (uiState.showPlaybackDialog || uiState.showSubTitlesOptions) {
             autoHideJob?.cancel()
         } else {
             if (isControllerViewVisible) {
@@ -451,7 +451,7 @@ internal fun LegacyVideoPlayerScreen(
                 )
 
                 AddSubtitlesDialog(
-                    isShown = uiState.showSubtitleDialog,
+                    isShown = uiState.showSubTitlesOptions,
                     selectOptionState = uiState.subtitleSelectedStatus.id,
                     matchedSubtitleFileUpdate = {
                         viewModel.getMatchedSubtitleFileInfo()

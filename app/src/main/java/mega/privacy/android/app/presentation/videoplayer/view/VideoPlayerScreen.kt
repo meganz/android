@@ -17,8 +17,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -95,10 +97,12 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoSpeedPlaybac
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.AddSubtitleDialogEvent
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
 import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
@@ -149,6 +153,35 @@ internal fun VideoPlayerScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    var subtitleSheetMatchedInfo by remember { mutableStateOf<SubtitleFileInfo?>(null) }
+
+    val subtitleSheetRows = remember(
+        uiState.addedSubtitleInfo?.name,
+        subtitleSheetMatchedInfo,
+    ) {
+        buildSubtitleSheetRows(
+            uiState.addedSubtitleInfo?.name,
+            subtitleSheetMatchedInfo,
+        )
+    }
+
+    val subtitleSheetState = key(subtitleSheetRows.size) {
+        rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    }
+
+    LaunchedEffect(uiState.showSubTitlesOptions) {
+        if (uiState.showSubTitlesOptions) {
+            subtitleSheetMatchedInfo = viewModel.getMatchedSubtitleFileInfo()
+            Analytics.tracker.trackEvent(AddSubtitleDialogEvent)
+        }
+    }
+
+    LaunchedEffect(uiState.showSubTitlesOptions, subtitleSheetRows.size) {
+        if (uiState.showSubTitlesOptions) {
+            subtitleSheetState.show()
+        }
+    }
 
     val isShowSubtitleIcon = viewModel.isShowSubtitleIcon()
     val isShowPlaylistOption = uiState.items.size > SINGLE_PLAYLIST_SIZE
@@ -247,9 +280,9 @@ internal fun VideoPlayerScreen(
         }
     }
 
-    LaunchedEffect(playbackState, uiState.showSubtitleDialog, uiState.isMoreOptionShown) {
+    LaunchedEffect(playbackState, uiState.showSubTitlesOptions, uiState.isMoreOptionShown) {
         if (playbackState <= STATE_BUFFERING ||
-            uiState.showSubtitleDialog ||
+            uiState.showSubTitlesOptions ||
             uiState.isMoreOptionShown
         ) {
             autoHideJob?.cancel()
@@ -533,39 +566,47 @@ internal fun VideoPlayerScreen(
                 }
             }
 
-            AddSubtitlesDialog(
-                isShown = uiState.showSubtitleDialog,
-                selectOptionState = uiState.subtitleSelectedStatus.id,
-                matchedSubtitleFileUpdate = {
-                    viewModel.getMatchedSubtitleFileInfo()
-                },
-                subtitleFileName = uiState.addedSubtitleInfo?.name,
-                onOffClicked = {
-                    viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
-                },
-                onAddedSubtitleClicked = {
-                    viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
-                },
-                onAutoMatch = { info ->
-                    if (info.url == null) {
-                        viewModel.updateSnackBarMessage(
-                            resource.getString(R.string.media_player_video_message_adding_subtitle_failed)
-                        )
-                        return@AddSubtitlesDialog
-                    }
-                    Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
-                    viewModel.updateSubtitleSelectedStatus(
-                        SubtitleSelectedStatus.SelectMatchedItem,
-                        info
+            if (uiState.showSubTitlesOptions) {
+                MegaModalBottomSheet(
+                    bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+                    sheetState = subtitleSheetState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .statusBarsPadding(),
+                    windowInsets = WindowInsets.navigationBars,
+                    onDismissRequest = {
+                        viewModel.updateShowSubtitleDialog(false)
+                    },
+                ) {
+                    VideoPlayerSubtitleBottomSheetContent(
+                        rows = subtitleSheetRows,
+                        selectOptionState = uiState.subtitleSelectedStatus.id,
+                        onOffClicked = {
+                            viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.Off)
+                        },
+                        onAddedSubtitleClicked = {
+                            viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
+                        },
+                        onAutoMatch = { info ->
+                            if (info.url == null) {
+                                viewModel.updateSnackBarMessage(
+                                    resource.getString(R.string.media_player_video_message_adding_subtitle_failed)
+                                )
+                            } else {
+                                Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
+                                viewModel.updateSubtitleSelectedStatus(
+                                    SubtitleSelectedStatus.SelectMatchedItem,
+                                    info
+                                )
+                            }
+                        },
+                        onToSelectSubtitle = {
+                            Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
+                            viewModel.navigateToSelectSubtitle()
+                        },
                     )
-                },
-                onDismissRequest = {
-                    viewModel.updateShowSubtitleDialog(false)
-                },
-                onToSelectSubtitle = {
-                    Analytics.tracker.trackEvent(AddSubtitlesOptionPressedEvent)
-                    viewModel.navigateToSelectSubtitle()
-                })
+                }
+            }
 
             if (uiState.isMoreOptionShown) {
                 MegaModalBottomSheet(

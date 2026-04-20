@@ -50,7 +50,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property showPlaybackDialog whether the playback dialog is shown
  * @property playbackPosition the playback position
  * @property currentPlayingItemName the current playing item name
- * @property showSubtitleDialog whether the subtitle dialog is shown
+ * @property showSubTitlesOptions whether the subtitle options are shown
  * @property subtitleSelectedStatus the subtitle selected status
  * @property matchedSubtitleInfo the matched subtitle info
  * @property addedSubtitleInfo the added subtitle info
@@ -93,7 +93,7 @@ data class VideoPlayerUiState(
     val showPlaybackDialog: Boolean = false,
     val playbackPosition: Long? = null,
     val currentPlayingItemName: String? = null,
-    val showSubtitleDialog: Boolean = false,
+    val showSubTitlesOptions: Boolean = false,
     val subtitleSelectedStatus: SubtitleSelectedStatus = SubtitleSelectedStatus.Off,
     val matchedSubtitleInfo: SubtitleFileInfo? = null,
     val addedSubtitleInfo: SubtitleFileInfo? = null,

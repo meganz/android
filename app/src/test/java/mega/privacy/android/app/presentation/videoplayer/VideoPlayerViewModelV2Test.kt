@@ -2512,7 +2512,7 @@ class VideoPlayerViewModelV2Test {
         testScheduler.advanceUntilIdle()
         verify(mediaPlayerGateway).setPlayWhenReady(!value)
         underTest.uiState.test {
-            assertThat(awaitItem().showSubtitleDialog).isEqualTo(value)
+            assertThat(awaitItem().showSubTitlesOptions).isEqualTo(value)
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -2524,10 +2524,10 @@ class VideoPlayerViewModelV2Test {
             advanceUntilIdle()
             underTest.uiState.drop(1).test {
                 underTest.updateShowSubtitleDialog(true)
-                assertThat(awaitItem().showSubtitleDialog).isTrue()
+                assertThat(awaitItem().showSubTitlesOptions).isTrue()
                 underTest.navigateToSelectSubtitle()
                 verify(mediaPlayerGateway).setPlayWhenReady(false)
-                assertThat(awaitItem().showSubtitleDialog).isFalse()
+                assertThat(awaitItem().showSubTitlesOptions).isFalse()
             }
         }
 
@@ -2602,7 +2602,7 @@ class VideoPlayerViewModelV2Test {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.AddSubtitleItem)
-                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.showSubTitlesOptions).isFalse()
                 assertThat(actual.addedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                 assertThat(actual.matchedSubtitleInfo).isNull()
                 cancelAndConsumeRemainingEvents()
@@ -2622,7 +2622,7 @@ class VideoPlayerViewModelV2Test {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
-                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.showSubTitlesOptions).isFalse()
                 assertThat(actual.addedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                 assertThat(actual.matchedSubtitleInfo).isNull()
                 cancelAndConsumeRemainingEvents()
@@ -2653,7 +2653,7 @@ class VideoPlayerViewModelV2Test {
                 )
                 awaitItem().let {
                     assertThat(it.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.SelectMatchedItem)
-                    assertThat(it.showSubtitleDialog).isFalse()
+                    assertThat(it.showSubTitlesOptions).isFalse()
                     assertThat(it.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                     assertThat(it.addedSubtitleInfo).isNull()
                 }
@@ -2665,7 +2665,7 @@ class VideoPlayerViewModelV2Test {
                 )
                 awaitItem().let {
                     assertThat(it.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.SelectMatchedItem)
-                    assertThat(it.showSubtitleDialog).isFalse()
+                    assertThat(it.showSubTitlesOptions).isFalse()
                     assertThat(it.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                     assertThat(it.addedSubtitleInfo).isNull()
                 }
@@ -2685,7 +2685,7 @@ class VideoPlayerViewModelV2Test {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
-                assertThat(actual.showSubtitleDialog).isFalse()
+                assertThat(actual.showSubTitlesOptions).isFalse()
                 assertThat(actual.matchedSubtitleInfo).isEqualTo(mockSubtitleInfo)
                 assertThat(actual.addedSubtitleInfo).isNull()
                 cancelAndConsumeRemainingEvents()
