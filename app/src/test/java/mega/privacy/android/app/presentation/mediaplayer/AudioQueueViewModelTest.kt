@@ -446,6 +446,28 @@ class AudioQueueViewModelTest {
         }
 
     @Test
+    fun `test that initMediaQueueItemList restores selected state for items in selectedItemHandles`() =
+        runTest {
+            val item1 = getMockedMediaQueueItem(NodeId(1L))
+            val item2 = getMockedMediaQueueItem(NodeId(2L))
+            val selectedItem1 = getMockedMediaQueueItem(NodeId(1L), testIsSelected = true)
+            initMediaQueueItemMapperResult(1, item1)
+            initMediaQueueItemMapperResult(2, item2)
+            whenever(item1.copy(isSelected = true)).thenReturn(selectedItem1)
+            val list = (1..2).map { getPlaylistItem(it.toLong()) }
+            initUnderTest()
+
+            underTest.initMediaQueueItemList(list)
+            underTest.onItemClicked(0, item1)
+            underTest.initMediaQueueItemList(list)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.items[0].isSelected).isTrue()
+                assertThat(actual.items[1].isSelected).isFalse()
+            }
+        }
+
+    @Test
     fun `test that non-Next selected items have selection cleared when updateMediaQueueAfterMediaItemTransition is called with select mode enabled`() =
         runTest {
             val item1 = getMockedMediaQueueItem(NodeId(1L), itemType = MediaQueueItemType.Playing)
@@ -457,10 +479,19 @@ class AudioQueueViewModelTest {
             initMediaQueueItemMapperResult(3L, item3, MediaQueueItemType.Next)
 
             val item2Selected =
-                getMockedMediaQueueItem(NodeId(2L), itemType = MediaQueueItemType.Next, testIsSelected = true)
-            val item1Prev = getMockedMediaQueueItem(NodeId(1L), itemType = MediaQueueItemType.Previous)
+                getMockedMediaQueueItem(
+                    NodeId(2L),
+                    itemType = MediaQueueItemType.Next,
+                    testIsSelected = true
+                )
+            val item1Prev =
+                getMockedMediaQueueItem(NodeId(1L), itemType = MediaQueueItemType.Previous)
             val item2Playing =
-                getMockedMediaQueueItem(NodeId(2L), itemType = MediaQueueItemType.Playing, testIsSelected = true)
+                getMockedMediaQueueItem(
+                    NodeId(2L),
+                    itemType = MediaQueueItemType.Playing,
+                    testIsSelected = true
+                )
             val item2Deselected =
                 getMockedMediaQueueItem(NodeId(2L), itemType = MediaQueueItemType.Playing)
             val item3Next = getMockedMediaQueueItem(NodeId(3L), itemType = MediaQueueItemType.Next)

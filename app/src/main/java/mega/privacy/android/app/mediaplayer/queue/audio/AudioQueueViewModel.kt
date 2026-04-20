@@ -38,8 +38,13 @@ class AudioQueueViewModel @Inject constructor(
     private val originalData = mutableListOf<MediaQueueItemUiEntity>()
 
     internal fun initMediaQueueItemList(items: List<PlaylistItem>) {
-        val queueItems =
-            items.convertToMediaQueueItemList().updateOriginalData().filterItemBySearchQuery()
+        val selectedHandles = _uiState.value.selectedItemHandles
+        val queueItems = items.convertToMediaQueueItemList()
+            .map { item ->
+                if (item.id.longValue in selectedHandles) item.copy(isSelected = true) else item
+            }
+            .updateOriginalData()
+            .filterItemBySearchQuery()
         val playingIndex = queueItems.indexOfFirst { it.type == MediaQueueItemType.Playing }
         _uiState.update {
             it.copy(items = queueItems, indexOfCurrentPlayingItem = playingIndex)

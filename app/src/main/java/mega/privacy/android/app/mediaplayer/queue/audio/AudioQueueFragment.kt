@@ -287,6 +287,10 @@ class AudioQueueFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         activity?.addMenuProvider(queueSearchViewProvider)
 
+        if (audioQueueViewModel.uiState.value.isSelectMode) {
+            activateActionMode()
+        }
+
         context?.bindService(
             Intent(
                 requireContext(),
@@ -336,7 +340,9 @@ class AudioQueueFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         actionMode?.let {
-            it.finish()
+            if (activity?.isChangingConfigurations != true) {
+                it.finish()
+            }
             actionMode = null
         }
         playlistObserved = false
