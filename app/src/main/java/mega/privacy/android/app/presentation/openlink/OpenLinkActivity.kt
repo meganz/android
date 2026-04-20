@@ -1,26 +1,18 @@
 package mega.privacy.android.app.presentation.openlink
 
-import android.annotation.SuppressLint
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_MAIN
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.OpenPasswordLinkActivity
-import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.MegaActivity.Companion.ACTION_DEEP_LINKS
@@ -30,78 +22,28 @@ import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
-import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
-import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_REFRESH_AND_OPEN_SESSION_LINK
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.CallUtil.showConfirmationInACall
-import mega.privacy.android.app.utils.Constants.ACCOUNT_INVITATION_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.ACTION_CANCEL_ACCOUNT
-import mega.privacy.android.app.utils.Constants.ACTION_CHANGE_MAIL
-import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SUMMARY
 import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
-import mega.privacy.android.app.utils.Constants.ACTION_EXPORT_MASTER_KEY
-import mega.privacy.android.app.utils.Constants.ACTION_IPC
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_CHAT_LINK
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_CONTACTS_SECTION
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_DEVICE_CENTER
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_HANDLE_NODE
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
-import mega.privacy.android.app.utils.Constants.ALBUM_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.BUSINESS_INVITE_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_MEETING_LINK
-import mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
-import mega.privacy.android.app.utils.Constants.CONFIRMATION_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.CONTACT_HANDLE
-import mega.privacy.android.app.utils.Constants.CONTACT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT
 import mega.privacy.android.app.utils.Constants.EMAIL
-import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.EXPORT_MASTER_KEY_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.EXTRA_CONFIRMATION
-import mega.privacy.android.app.utils.Constants.FILE_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.HANDLE_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.LINK_IS_FOR_MEETING
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
-import mega.privacy.android.app.utils.Constants.MEGA_BLOG_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.MEGA_DROP_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.MEGA_FILE_REQUEST_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.NEW_MESSAGE_CHAT_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT
-import mega.privacy.android.app.utils.Constants.PASSWORD_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.PENDING_CONTACTS_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.RESET_PASSWORD_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.REVERT_CHANGE_PASSWORD_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
-import mega.privacy.android.app.utils.Constants.WEB_SESSION_LINK_REGEX_ARRAY
-import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.Util.matchRegexs
-import mega.privacy.android.app.utils.isURLSanitized
-import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.exception.ResetPasswordLinkException
-import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
-import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
-import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase.Companion.requiresSession
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.DeeplinkHandler
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequest
@@ -112,7 +54,6 @@ import javax.inject.Inject
  * Open link activity
  */
 @AndroidEntryPoint
-@SuppressLint("ManagerActivityIntent") // This is a legacy class that already handles single activity navigation
 class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoadedCallback {
 
     /**
@@ -122,22 +63,10 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
     lateinit var navigator: MegaNavigator
 
     /**
-     * [DeeplinkHandler] injection
-     */
-    @Inject
-    lateinit var deeplinkHandler: DeeplinkHandler
-
-    /**
      * MegaChatRequestHandler injection
      */
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
-
-    /**
-     * Use case to check for matches in Regex Patterns
-     */
-    @Inject
-    lateinit var getUrlRegexPatternTypeUseCase: GetUrlRegexPatternTypeUseCase
 
     /**
      * Use case to check for current user's email
@@ -160,9 +89,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
     }
 
     private fun consumeIntentDataDestination() {
-        intent.data?.let {
-            viewModel.decodeUri(it)
-        }
+        viewModel.decodeUri()
     }
 
     companion object {
@@ -196,45 +123,14 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
 
         collectFlow(viewModel.uiState) {
             with(it) {
-                url = decodedUrl
-                if (urlRedirectionEvent && isLoggedIn != null) {
-                    handleUrlRedirection(
-                        isLoggedIn = isLoggedIn,
-                        needsRefreshSession = needsRefreshSession
-                    )
-                    viewModel.onUrlRedirectionEventConsumed()
-                }
 
-                handleAccountInvitationEmailState(accountInvitationEmail)
+                handleAccountInvitationEmailState(null)
 
                 if (logoutCompletedEvent) {
                     handleLoggedOutState()
                     viewModel.onLogoutCompletedEventConsumed()
                 }
 
-                if (resetPasswordLinkResult != null) {
-                    if (resetPasswordLinkResult.isSuccess) {
-                        val linkInfo = resetPasswordLinkResult.getOrThrow()
-                        val emailForLink = linkInfo.email
-                        if (emailForLink != userEmail && isLoggedIn == true) {
-                            setError(getString(R.string.error_not_logged_with_correct_account))
-                        } else if (linkInfo.isRequiredRecoveryKey) {
-                            navigateToResetPassword(isLoggedIn == true, needsRefreshSession)
-                            finish()
-                        } else {
-                            openWebLink(url)
-                        }
-                    } else {
-                        val errorMessage = when (resetPasswordLinkResult.exceptionOrNull()) {
-                            ResetPasswordLinkException.LinkInvalid -> getString(sharedR.string.general_invalid_link)
-                            ResetPasswordLinkException.LinkExpired -> getString(R.string.recovery_link_expired)
-                            ResetPasswordLinkException.LinkAccessDenied -> getString(R.string.error_not_logged_with_correct_account)
-                            else -> getString(sharedR.string.general_text_error)
-                        }
-                        setError(errorMessage)
-                    }
-                    viewModel.onResetPasswordLinkResultConsumed()
-                }
                 if (navigateToSingleActivity) {
                     val isFromHistory =
                         (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0
@@ -254,437 +150,17 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     }
                     finish()
                 }
-
-                urlToOpen?.let { url -> openWebLink(url) }
             }
         }
 
         consumeIntentDataDestination()
     }
 
-    private fun handleUrlRedirection(isLoggedIn: Boolean, needsRefreshSession: Boolean) {
-        when {
-            // Check if it is a supported link
-            !url.isURLSanitized() -> {
-                Timber.d("OpenLinkActivity: URL doesn't match regex pattern or whitelisted $url")
-                setError(getString(R.string.open_link_not_valid_link))
-            }
-            // Email verification link
-            matchRegexs(url, EMAIL_VERIFY_LINK_REGEX_ARRAY) -> {
-                Timber.d("Open email verification link")
-                MegaApplication.setIsWebOpenDueToEmailVerification(true)
-                openWebLink(url)
-            }
-            // Web session link
-            matchRegexs(url, WEB_SESSION_LINK_REGEX_ARRAY) -> {
-                Timber.d("Open web session link")
-                openWebLink(url)
-            }
-
-            matchRegexs(url, BUSINESS_INVITE_LINK_REGEX_ARRAY) -> {
-                Timber.d("Open business invite link")
-                openWebLink(url)
-            }
-            //MEGA DROP link
-            matchRegexs(url, MEGA_DROP_LINK_REGEX_ARRAY) -> {
-                Timber.d("Open MEGA drop link")
-                openWebLinkInBrowser(url)
-            }
-            //MEGA File Request
-            matchRegexs(url, MEGA_FILE_REQUEST_LINK_REGEX_ARRAY) -> {
-                Timber.d("Open MEGA file request link")
-                openWebLinkInBrowser(url)
-            }
-            // File link
-            matchRegexs(url, FILE_LINK_REGEX_ARRAY) -> {
-                Timber.d("Open link url")
-                val intent =
-                    Intent(this@OpenLinkActivity, FileLinkComposeActivity::class.java).apply {
-                        putExtra(
-                            OPENED_FROM_CHAT,
-                            intent.getBooleanExtra(OPENED_FROM_CHAT, false)
-                        )
-                        flags = FLAG_ACTIVITY_CLEAR_TOP
-                        action = ACTION_OPEN_MEGA_LINK
-                        data = Uri.parse(url)
-                    }
-                startActivity(intent)
-                finish()
-            }
-            // Confirmation link
-            matchRegexs(url, CONFIRMATION_LINK_REGEX_ARRAY) -> {
-                Timber.d("Confirmation url")
-                urlConfirmationLink = url
-                MegaApplication.urlConfirmationLink = urlConfirmationLink
-                if (isLoggedIn) {
-                    setError(getString(sharedR.string.open_link_account_confirmation_error))
-                } else {
-                    viewModel.logout()
-                }
-            }
-            // Folder Download link
-            matchRegexs(url, FOLDER_LINK_REGEX_ARRAY) -> {
-                val intent = Intent(this@OpenLinkActivity, FolderLinkComposeActivity::class.java)
-                startActivity(
-                    intent
-                        .putExtra(
-                            OPENED_FROM_CHAT,
-                            intent.getBooleanExtra(OPENED_FROM_CHAT, false)
-                        )
-                        .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                        .setAction(ACTION_OPEN_MEGA_FOLDER_LINK)
-                        .setData(Uri.parse(url))
-                )
-                finish()
-            }
-            // Chat link or Meeting link
-            matchRegexs(url, CHAT_LINK_REGEX_ARRAY) -> {
-                Timber.d("Open chat url")
-                if (isLoggedIn) {
-                    Timber.d("Logged IN")
-                    startActivity(
-                        Intent(this, ManagerActivity::class.java)
-                            .setAction(ACTION_OPEN_CHAT_LINK)
-                            .setData(Uri.parse(url))
-                    )
-                    finish()
-                } else {
-                    Timber.d("Not logged")
-                    var initResult = megaChatApi.initState
-                    if (initResult < MegaChatApi.INIT_WAITING_NEW_SESSION) {
-                        initResult = megaChatApi.initAnonymous()
-                        Timber.d("Chat init anonymous result: $initResult")
-                    }
-                    if (initResult != MegaChatApi.INIT_ERROR) {
-                        finishAfterConnect()
-                    } else {
-                        Timber.e("Open chat url:initAnonymous:INIT_ERROR")
-                        setError(getString(R.string.error_chat_link_init_error))
-                    }
-                }
-            }
-            // Password link
-            matchRegexs(url, PASSWORD_LINK_REGEX_ARRAY) -> {
-                Timber.d("Link with password url")
-                startActivity(
-                    Intent(this, OpenPasswordLinkActivity::class.java)
-                        .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                        .setData(Uri.parse(url))
-                )
-                finish()
-            }
-            // Create account invitation - user must be logged OUT
-            matchRegexs(url, ACCOUNT_INVITATION_LINK_REGEX_ARRAY) -> {
-                Timber.d("New signup url")
-                if (isLoggedIn) {
-                    Timber.d("Logged IN")
-                    setError(getString(R.string.log_out_warning))
-                } else {
-                    url?.let {
-                        viewModel.getAccountInvitationEmail(it)
-                    }
-                }
-            }
-            // Export Master Key link - user must be logged IN
-            matchRegexs(url, EXPORT_MASTER_KEY_LINK_REGEX_ARRAY) -> {
-                Timber.d("Export master key url")
-                if (isLoggedIn) { //Check fetch nodes is already done in ManagerActivity
-                    Timber.d("Logged IN")
-                    startActivity(
-                        Intent(this, ManagerActivity::class.java)
-                            .setAction(ACTION_EXPORT_MASTER_KEY)
-                    )
-                    finish()
-                } else {
-                    Timber.d("Not logged")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-            // New message chat- user must be logged IN
-            matchRegexs(url, NEW_MESSAGE_CHAT_LINK_REGEX_ARRAY) -> {
-                Timber.d("New message chat url")
-                if (isLoggedIn) { //Check fetch nodes is already done in ManagerActivity
-                    Timber.d("Logged IN")
-                    startActivity(
-                        Intent(this, ManagerActivity::class.java)
-                            .setAction(ACTION_CHAT_SUMMARY)
-                    )
-                    finish()
-                } else {
-                    Timber.d("Not logged")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-            // Cancel account  - user must be logged IN
-            matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEX_ARRAY) -> {
-                Timber.d("Cancel account url")
-                if (isLoggedIn) {
-                    if (needsRefreshSession) {
-                        Timber.d("Go to Login to fetch nodes")
-                        startActivity(
-                            Intent(this, LoginActivity::class.java)
-                                .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                                .setAction(ACTION_CANCEL_ACCOUNT)
-                                .setData(Uri.parse(url))
-                        )
-                    } else {
-                        Timber.d("Logged IN")
-                        startActivity(
-                            Intent(this, ManagerActivity::class.java)
-                                .setAction(ACTION_CANCEL_ACCOUNT)
-                                .setData(Uri.parse(url))
-                        )
-                    }
-                    finish()
-                } else {
-                    Timber.d("Not logged")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-            // Verify change mail - user must be logged IN
-            matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEX_ARRAY) -> {
-                Timber.d("Verify mail url")
-                if (isLoggedIn) {
-                    if (needsRefreshSession) {
-                        Timber.d("Go to Login to fetch nodes")
-                        startActivity(
-                            Intent(this, LoginActivity::class.java)
-                                .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                                .setAction(ACTION_CHANGE_MAIL)
-                                .setData(Uri.parse(url))
-                        )
-                    } else {
-                        startActivity(
-                            Intent(this, ManagerActivity::class.java)
-                                .setAction(ACTION_CHANGE_MAIL)
-                                .setData(Uri.parse(url))
-                        )
-                    }
-                    finish()
-                } else {
-                    setError(getString(R.string.change_email_not_logged_in))
-                }
-            }
-            // Reset password - two options: logged IN or OUT
-            matchRegexs(url, RESET_PASSWORD_LINK_REGEX_ARRAY) && matchesRecoveryUrl(url).not() -> {
-                Timber.d("Reset pass url")
-                viewModel.queryResetPasswordLink(url.orEmpty())
-            }
-            // Pending contacts
-            matchRegexs(url, PENDING_CONTACTS_LINK_REGEX_ARRAY) -> {
-                Timber.d("Pending contacts url")
-                if (isLoggedIn) {
-                    if (needsRefreshSession) {
-                        Timber.d("Go to Login to fetch nodes")
-                        startActivity(
-                            Intent(this, LoginActivity::class.java)
-                                .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                                .setAction(ACTION_IPC)
-                        )
-                    } else {
-                        Timber.d("Logged IN")
-                        startActivity(
-                            Intent(this, ManagerActivity::class.java)
-                                .setAction(ACTION_IPC)
-                        )
-                    }
-                    finish()
-                } else {
-                    Timber.w("Not logged")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-
-            matchRegexs(url, REVERT_CHANGE_PASSWORD_LINK_REGEX_ARRAY)
-                    || matchRegexs(url, MEGA_BLOG_LINK_REGEX_ARRAY) -> {
-                Timber.d("Open revert password change link: $url")
-                openWebLink(url)
-            }
-
-            matchRegexs(url, HANDLE_LINK_REGEX_ARRAY) -> {
-                Timber.d("Handle link url")
-                if (isLoggedIn) {
-                    startActivity(
-                        Intent(this, ManagerActivity::class.java)
-                            .setAction(ACTION_OPEN_HANDLE_NODE)
-                            .addFlags(FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-                            .setData(url?.toUri())
-                    )
-                    finish()
-                } else {
-                    Timber.w("Not logged")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-            //Contact link
-            matchRegexs(url, CONTACT_LINK_REGEX_ARRAY) -> {
-                if (isLoggedIn) {
-                    url?.split("C!")?.get(1)?.let {
-                        startActivity(
-                            Intent(this, ManagerActivity::class.java)
-                                .setAction(ACTION_OPEN_CONTACTS_SECTION)
-                                .putExtra(CONTACT_HANDLE, MegaApiAndroid.base64ToHandle(it))
-                        )
-                        finish()
-                    } ?: let {
-                        // Browser open the link which does not require app to handle
-                        Timber.d("Browser open link: $url")
-                        url?.let {
-                            checkIfRequiresTransferSession(
-                                isLoggedIn = true,
-                                needsRefreshSession = needsRefreshSession,
-                                url = it
-                            )
-                        }
-                    }
-                } else {
-                    Timber.w("Not logged")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-
-            getUrlRegexPatternTypeUseCase(url) == RegexPatternType.INSTALLER_DOWNLOAD_LINK -> {
-                Timber.d("INSTALLER_DOWNLOAD_LINK $url")
-                openWebLinkInBrowser(url)
-            }
-
-            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.PURCHASE_LINK -> {
-                Timber.d("PURCHASE_LINK $url")
-                openWebLinkInBrowser(url)
-            }
-
-            //Upgrade Account link
-            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_PAGE_LINK
-                    || getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.UPGRADE_LINK -> {
-                if (isLoggedIn) {
-                    navigateToUpgradeAccount()
-                    finish()
-                } else {
-                    Timber.w("Not logged")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-            //Enable camera uploads link
-            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.ENABLE_CAMERA_UPLOADS_LINK -> {
-                if (isLoggedIn) {
-                    navigator.openSettingsCameraUploads(this)
-                    finish()
-                } else {
-                    Timber.w("Not logged in")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-
-            // Open Device Center Link
-            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.OPEN_DEVICE_CENTER_LINK -> {
-                if (isLoggedIn) {
-                    Timber.d("Open device center link")
-                    startActivity(
-                        Intent(this, ManagerActivity::class.java)
-                            .setAction(ACTION_OPEN_DEVICE_CENTER)
-                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                    )
-                    finish()
-                } else {
-                    Timber.w("Not logged in")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-
-            // Open Login screen link
-            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.LOGIN_LINK -> {
-                if (isLoggedIn) {
-                    Timber.d("Already logged in, open app")
-                    startActivity(
-                        Intent(this, ManagerActivity::class.java)
-                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                    )
-                    finish()
-                } else {
-                    Timber.d("Open login screen")
-                    lifecycleScope.launch {
-                        getFeatureFlagValueUseCase(AppFeatures.SingleActivity).let { isSingleActivityEnabled ->
-                            Timber.d("SingleActivity feature flag is enabled: $isSingleActivityEnabled")
-                            val targetActivity = if (isSingleActivityEnabled) {
-                                MegaActivity::class.java
-                            } else {
-                                LoginActivity::class.java
-                            }
-                            startActivity(
-                                Intent(this@OpenLinkActivity, targetActivity)
-                                    .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                            )
-                            finish()
-                        }
-                    }
-                }
-            }
-
-            // Open Registration screen link
-            getUrlRegexPatternTypeUseCase(url?.lowercase()) == RegexPatternType.REGISTRATION_LINK -> {
-                if (isLoggedIn) {
-                    Timber.d("Already logged in, open app")
-                    startActivity(
-                        Intent(this, ManagerActivity::class.java)
-                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                    )
-                    finish()
-                } else {
-                    Timber.d("Open registration screen")
-                    lifecycleScope.launch {
-                        getFeatureFlagValueUseCase(AppFeatures.SingleActivity).let { isSingleActivityEnabled ->
-                            Timber.d("SingleActivity feature flag is enabled: $isSingleActivityEnabled")
-                            val targetActivity = if (isSingleActivityEnabled) {
-                                MegaActivity::class.java
-                            } else {
-                                LoginActivity::class.java
-                            }
-                            startActivity(
-                                Intent(this@OpenLinkActivity, targetActivity)
-                                    .putExtra(VISIBLE_FRAGMENT, CREATE_ACCOUNT_FRAGMENT)
-                            )
-                            finish()
-                        }
-                    }
-                }
-            }
-
-            deeplinkHandler.matches(url.toString()) -> {
-                if (isLoggedIn) {
-                    deeplinkHandler.process(this, url.toString())
-                    finish()
-                } else {
-                    Timber.w("Not logged in")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-            }
-
-            else -> {
-                // Browser open the link which does not require app to handle
-                Timber.d("Browser open link: $url")
-                url?.let {
-                    checkIfRequiresTransferSession(
-                        isLoggedIn = isLoggedIn,
-                        needsRefreshSession = needsRefreshSession,
-                        url = it,
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Check if the provided url matches recovery url
-     */
-    private fun matchesRecoveryUrl(url: String?) =
-        url == recoveryUrl(MEGA_NZ_DOMAIN_NAME)
-                || url == recoveryUrl(MEGA_APP_DOMAIN_NAME)
-
     private fun navigateToResetPassword(isLoggedIn: Boolean, needsRefreshSession: Boolean) {
         if (isLoggedIn && !needsRefreshSession) {
             Timber.d("Logged IN")
             startActivity(
-                Intent(this, ManagerActivity::class.java)
+                Intent(this, MegaActivity::class.java)
                     .setAction(ACTION_RESET_PASS)
                     .setData(Uri.parse(url))
             )
@@ -742,15 +218,6 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
     }
 
     /**
-     * Finish after Connect
-     */
-    private fun finishAfterConnect() =
-        megaChatApi.checkChatLink(
-            url,
-            LoadPreviewListener(this, this, CHECK_LINK_TYPE_UNKNOWN_LINK)
-        )
-
-    /**
      * Navigate to ChatActivity
      */
     private fun goToChatActivity(chatId: Long) {
@@ -791,39 +258,6 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
     }
 
     /**
-     * Check the url if requires transfer session, if yes open web link.
-     */
-    private fun checkIfRequiresTransferSession(
-        isLoggedIn: Boolean,
-        needsRefreshSession: Boolean,
-        url: String,
-    ) {
-        if (url.requiresSession()) {
-            when {
-                !isLoggedIn -> {
-                    Timber.w("Not logged in")
-                    setError(getString(sharedR.string.general_alert_not_logged_in))
-                }
-
-                needsRefreshSession -> {
-                    LoginActivity.getIntent(
-                        context = this,
-                        action = ACTION_REFRESH_AND_OPEN_SESSION_LINK,
-                        link = url.toUri(),
-                    ).also { startActivity(it) }
-                    finish()
-                }
-
-                else -> {
-                    viewModel.getLinkWithSession()
-                }
-            }
-        } else {
-            openWebLink(url)
-        }
-    }
-
-    /**
      * Open web link and finish current activity
      *
      * @param url web link
@@ -831,49 +265,6 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
     fun openWebLink(url: String?) = url?.let {
         launchUrl(it)
         finish()
-    }
-
-    private fun openWebLinkInBrowser(url: String?) = url?.let {
-        val intent = Intent(ACTION_VIEW).apply { data = Uri.parse(url) }
-
-        // On Android 12+ devices, Intent.createChooser cannot properly show browser list.
-        // So workaround here: get list of browsers and insert into initial list of
-        // chooser.
-        val initialBrowserList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val browserActivities = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.queryIntentActivities(
-                    intent,
-                    PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong())
-                )
-            } else {
-                packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-            }
-            browserActivities
-                .filterNot { it.activityInfo.packageName.contains(packageName) }
-                .map {
-                    Intent(ACTION_VIEW, Uri.parse(url)).apply {
-                        `package` = it.activityInfo.packageName
-                    }
-                }.takeIf { it.isNotEmpty() }
-        } else {
-            null
-        }
-
-        val chooserIntent = Intent.createChooser(intent, null).apply {
-            putExtra(
-                Intent.EXTRA_EXCLUDE_COMPONENTS,
-                arrayOf(
-                    ComponentName(this@OpenLinkActivity, OpenLinkActivity::class.java)
-                )
-            )
-
-            initialBrowserList?.let {
-                putExtra(Intent.EXTRA_INITIAL_INTENTS, it.toTypedArray())
-            }
-        }
-        startActivity(chooserIntent)
-        finish()
-
     }
 
     /**

@@ -65,18 +65,18 @@ internal class OpenLinkViewModelTest {
 
     private fun initTestClass() {
         underTest = OpenLinkViewModel(
-            getUrlRegexPatternTypeUseCase,
-            savedStateHandle,
-            getHandleFromContactLinkUseCase,
-            getChatLinkContentUseCase,
-            getScheduledMeetingByChatUseCase,
-            getChatCallUseCase,
-            startMeetingInWaitingRoomChatUseCase,
-            answerChatCallUseCase,
-            setChatVideoInDeviceUseCase,
-            rtcAudioManagerGateway,
-            chatManagement,
-            testCoroutineScope,
+            getUrlRegexPatternTypeUseCase = getUrlRegexPatternTypeUseCase,
+            savedStateHandle = savedStateHandle,
+            getHandleFromContactLinkUseCase = getHandleFromContactLinkUseCase,
+            getChatLinkContentUseCase = getChatLinkContentUseCase,
+            getScheduledMeetingByChatUseCase = getScheduledMeetingByChatUseCase,
+            getChatCallUseCase = getChatCallUseCase,
+            startMeetingInWaitingRoomChatUseCase = startMeetingInWaitingRoomChatUseCase,
+            answerChatCallUseCase = answerChatCallUseCase,
+            setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,
+            rtcAudioManagerGateway = rtcAudioManagerGateway,
+            chatManagement = chatManagement,
+            applicationScope = testCoroutineScope,
         )
     }
 

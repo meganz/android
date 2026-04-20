@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.openlink
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,22 +11,23 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.link.DecodeLinkUseCase
-import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * open link view model
+ * Open link view model
+ *
+ * @property localLogoutAppUseCase
+ * @property clearEphemeralCredentialsUseCase
+ * @property logoutUseCase
+ * @property querySignupLinkUseCase
+ * @property queryResetPasswordLinkUseCase
+ * @property applicationScope
  */
 @HiltViewModel
 class OpenLinkViewModel @Inject constructor(
@@ -35,13 +35,8 @@ class OpenLinkViewModel @Inject constructor(
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val querySignupLinkUseCase: QuerySignupLinkUseCase,
-    private val getAccountCredentials: GetAccountCredentialsUseCase,
-    private val getRootNodeUseCase: GetRootNodeUseCase,
-    private val decodeLinkUseCase: DecodeLinkUseCase,
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getSessionLinkUseCase: GetSessionLinkUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OpenLinkUiState())
@@ -54,31 +49,11 @@ class OpenLinkViewModel @Inject constructor(
 
     /**
      * decodes the url and updates the state
-     * @param uri uri to decode
      */
-    fun decodeUri(uri: Uri) {
+    fun decodeUri() {
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                _uiState.update {
-                    it.copy(navigateToSingleActivity = true)
-                }
-            } else {
-                runCatching {
-                    val accountCredentials = getAccountCredentials()
-                    val needToRefresh = getRootNodeUseCase() == null
-                    val decodedUrl = decodeLinkUseCase(uri.toString())
-                    _uiState.update {
-                        it.copy(
-                            decodedUrl = decodedUrl,
-                            userEmail = accountCredentials?.email,
-                            isLoggedIn = accountCredentials != null,
-                            needsRefreshSession = needToRefresh,
-                            urlRedirectionEvent = true
-                        )
-                    }
-                }.onFailure { error ->
-                    Timber.d("Error on decode url $error")
-                }
+            _uiState.update {
+                it.copy(navigateToSingleActivity = true)
             }
         }
     }
@@ -122,31 +97,6 @@ class OpenLinkViewModel @Inject constructor(
     }
 
     /**
-     * Get information about a new signup link
-     */
-    fun getAccountInvitationEmail(link: String) = viewModelScope.launch {
-        runCatching {
-            querySignupLinkUseCase(link)
-        }.onSuccess { email ->
-            Timber.d("Valid signup link")
-            _uiState.update {
-                it.copy(accountInvitationEmail = email)
-            }
-        }.onFailure {
-            Timber.e(it)
-        }
-    }
-
-    /**
-     * Reset url redirection event when consumed
-     */
-    fun onUrlRedirectionEventConsumed() {
-        _uiState.update {
-            it.copy(urlRedirectionEvent = false)
-        }
-    }
-
-    /**
      * Reset logout completed event when consumed
      */
     fun onLogoutCompletedEventConsumed() {
@@ -155,36 +105,5 @@ class OpenLinkViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Get reset password link
-     */
-    fun queryResetPasswordLink(link: String) = viewModelScope.launch {
-        val result = runCatching {
-            queryResetPasswordLinkUseCase(link)
-        }
-        _uiState.update {
-            it.copy(resetPasswordLinkResult = result)
-        }
-    }
 
-    /**
-     * Reset reset password link result when consumed
-     */
-    fun onResetPasswordLinkResultConsumed() {
-        _uiState.update {
-            it.copy(resetPasswordLinkResult = null)
-        }
-    }
-
-    fun getLinkWithSession() {
-        uiState.value.decodedUrl?.let { link ->
-            viewModelScope.launch {
-                val url = runCatching { getSessionLinkUseCase(link) }
-                    .onFailure { Timber.e(it) }
-                    .getOrNull() ?: link
-
-                _uiState.update { state -> state.copy(urlToOpen = url) }
-            }
-        }
-    }
 }
