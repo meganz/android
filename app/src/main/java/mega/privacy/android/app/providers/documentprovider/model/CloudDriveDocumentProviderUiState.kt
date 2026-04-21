@@ -1,4 +1,4 @@
-package mega.privacy.android.app.providers.documentprovider
+package mega.privacy.android.app.providers.documentprovider.model
 
 import androidx.compose.runtime.Stable
 

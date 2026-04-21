@@ -26,6 +26,9 @@ import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentDataProvider.Companion.CLOUD_DRIVE_ROOT_ID
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentProviderUiState
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
+import mega.privacy.android.app.providers.documentprovider.model.HasCredentials
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber

@@ -2,6 +2,7 @@ package mega.privacy.android.app.providers.documentprovider
 
 import android.provider.DocumentsContract.Document
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode

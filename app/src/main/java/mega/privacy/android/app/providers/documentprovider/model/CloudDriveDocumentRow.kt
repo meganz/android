@@ -1,4 +1,4 @@
-package mega.privacy.android.app.providers.documentprovider
+package mega.privacy.android.app.providers.documentprovider.model
 
 /**
  * UI model for a single document row exposed by the Cloud Drive document provider.

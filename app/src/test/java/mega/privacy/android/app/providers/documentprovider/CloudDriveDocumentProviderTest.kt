@@ -21,6 +21,9 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentProviderUiState
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
+import mega.privacy.android.app.providers.documentprovider.model.HasCredentials
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.After

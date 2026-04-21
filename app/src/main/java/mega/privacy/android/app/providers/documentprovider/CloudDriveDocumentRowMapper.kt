@@ -1,6 +1,7 @@
 package mega.privacy.android.app.providers.documentprovider
 
 import android.provider.DocumentsContract.Document
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode

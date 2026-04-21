@@ -14,6 +14,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentProviderUiState
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
