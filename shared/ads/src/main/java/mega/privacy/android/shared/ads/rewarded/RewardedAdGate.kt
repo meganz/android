@@ -126,18 +126,18 @@ private fun RewardedAdGate(
 
     if (state.showDialog) {
         RewardedAdDialog(
-            isAdLoading = state.isLoading,
+            isAdLoading = state.isAdLoading,
             onDismiss = viewModel::dismiss,
             onWatchAd = {
-                if (!state.isLoading && activity != null) {
+                if (!state.isAdLoading && activity != null) {
                     val onComplete = {
                         viewModel.dismiss()
                         handler.executeAndReset()
                     }
                     loadAndShowRewardedAd(
                         activity = activity,
-                        onLoading = viewModel::setLoading,
-                        onLoadingComplete = viewModel::setLoadingComplete,
+                        onLoading = viewModel::setAdLoading,
+                        onLoadingComplete = viewModel::setAdLoadingComplete,
                         onRewardEarned = {
                             viewModel.resetAttemptCount()
                             onComplete()
