@@ -21,11 +21,6 @@ class PhoneNumberBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val phoneNumberCallback = requireActivity() as PhoneNumberCallback
 
-        contentView.findViewById<View>(R.id.modify_phonenumber).setOnClickListener {
-            phoneNumberCallback.showRemovePhoneNumberConfirmation(true)
-            setStateBottomSheetBehaviorHidden()
-        }
-
         contentView.findViewById<View>(R.id.remove_phonenumber).setOnClickListener {
             phoneNumberCallback.showRemovePhoneNumberConfirmation(false)
             setStateBottomSheetBehaviorHidden()
