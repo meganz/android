@@ -255,7 +255,8 @@ pipeline {
                                         failedModules = detectFailedTestModules(moduleList)
 
                                         if (!failedModules.isEmpty()) {
-                                            for (String module in failedModules) {
+                                            for (int i = 0; i < failedModules.size(); i++) {
+                                                String module = failedModules[i]
                                                 UNIT_TEST_RESULT_LINK_MAP.put(
                                                         module,
                                                         unitTestArchiveLink("${module}/build/unittest/html", "unit_test_result_${module.replace('/', '_')}.zip")
@@ -301,7 +302,8 @@ pipeline {
                                 def lintModuleList = common.getModuleList()
 
                                 def totalFatalLintErrors = 0
-                                lintModuleList.each { module ->
+                                for (int i = 0; i < lintModuleList.size(); i++) {
+                                    def module = lintModuleList[i]
                                     def lintJsonContent = generateLintSummary(module)
                                     totalFatalLintErrors += checkFatalErrors(lintJsonContent)
                                     LINT_REPORT_SUMMARY_MAP.put(module, lintJsonContent)
@@ -533,7 +535,8 @@ def archiveLintReports(List<String> moduleList) {
         rm -fv ${LINT_REPORT_ARCHIVE}
     """
 
-    moduleList.each { module ->
+    for (int i = 0; i < moduleList.size(); i++) {
+        String module = moduleList[i]
         sh("cp -fv ${module}/build/reports/lint*.html ${WORKSPACE}/${LINT_REPORT_FOLDER}/${module.replace('/', '_')}_lint_report.html 2>/dev/null || true")
     }
 
@@ -612,7 +615,8 @@ def checkFatalErrors(def lintJsonContent) {
 def detectFailedTestModules(List<String> moduleList) {
     def failedModules = []
 
-    for (String module in moduleList) {
+    for (int i = 0; i < moduleList.size(); i++) {
+        String module = moduleList[i]
         // Check if failure can be found in XML test reports under "build/unittest/junit"
         if (fileExists("${module}/build/unittest/junit")) {
             def testResultFiles = sh(
