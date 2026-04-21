@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.dialog.storagestatus.SubscriptionCheckResult
@@ -40,6 +39,7 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
@@ -64,8 +64,11 @@ import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
+import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -113,7 +116,6 @@ import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatu
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_EARGS
@@ -127,7 +129,6 @@ import javax.inject.Inject
  * My account view model
  *
  * @property context
- * @property myAccountInfo
  * @property megaApi
  * @property setAvatarUseCase
  * @property isMultiFactorAuthEnabledUseCase [IsMultiFactorAuthEnabledUseCase]
@@ -157,13 +158,14 @@ import javax.inject.Inject
  * @property snackBarHandler Handler used to display a Snackbar
  * @property getBusinessStatusUseCase
  * @property monitorAccountDetailUseCase
+ * @property fileSizeStringMapper
  */
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
 class MyAccountViewModel @Inject constructor(
     @ApplicationContext val context: Context,
-    private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
+    private val fileSizeStringMapper: FileSizeStringMapper,
     private val setAvatarUseCase: SetAvatarUseCase,
     private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase,
     private val checkVersionsUseCase: CheckVersionsUseCase,
@@ -226,6 +228,8 @@ class MyAccountViewModel @Inject constructor(
     private val _numberOfSubscription = MutableStateFlow(INVALID_VALUE.toLong())
 
     private var resetJob: Job? = null
+    private var numVersions = INVALID_VALUE
+    private var previousVersionsSize = INVALID_VALUE.toLong()
 
     /**
      * Number of subscription
@@ -300,7 +304,16 @@ class MyAccountViewModel @Inject constructor(
                             subscriptionDetails = accountDetail.levelDetail,
                             accountType = accountDetail.levelDetail?.accountType
                                 ?: AccountType.FREE,
-                            isProSubscription = isProSubscription
+                            isProSubscription = isProSubscription,
+                            usedStorage = accountDetail.storageDetail.formatSize { usedStorage },
+                            totalStorage = accountDetail.storageDetail.formatSize { totalStorage },
+                            usedStoragePercentage = accountDetail.storageDetail?.usedPercentage ?: 0,
+                            cloudStorage = accountDetail.storageDetail.formatSize { usedCloudDrive },
+                            incomingStorage = accountDetail.storageDetail.formatSize { usedIncoming },
+                            rubbishStorage = accountDetail.storageDetail.formatSize { usedRubbish },
+                            usedTransfer = accountDetail.transferDetail.formatSize { usedTransfer },
+                            totalTransfer = accountDetail.transferDetail.formatSize { totalTransfer },
+                            usedTransferPercentage = accountDetail.transferDetail?.usedTransferPercentage ?: 0,
                         )
                     }
                 }
@@ -457,9 +470,12 @@ class MyAccountViewModel @Inject constructor(
         this.withElevation.value = withElevation
     }
 
+    private fun formattedVersionsSize(): String? =
+        if (previousVersionsSize >= 0) fileSizeStringMapper(previousVersionsSize) else null
+
     private fun setVersionsInfo() {
         _state.update {
-            it.copy(versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(context))
+            it.copy(versionsInfo = formattedVersionsSize())
         }
     }
 
@@ -500,35 +516,35 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return
      */
-    fun getUsedStorage(): String = myAccountInfo.usedFormatted
+    fun getUsedStorage(): String = state.value.usedStorage
 
     /**
      * Get used storage percentage
      *
      * @return
      */
-    fun getUsedStoragePercentage(): Int = myAccountInfo.usedPercentage
+    fun getUsedStoragePercentage(): Int = state.value.usedStoragePercentage
 
     /**
      * Get total storage
      *
      * @return
      */
-    fun getTotalStorage(): String = myAccountInfo.totalFormatted
+    fun getTotalStorage(): String = state.value.totalStorage
 
     /**
      * Get used transfer
      *
      * @return
      */
-    fun getUsedTransfer(): String = myAccountInfo.usedTransferFormatted
+    fun getUsedTransfer(): String = state.value.usedTransfer
 
     /**
      * Get used transfer percentage
      *
      * @return
      */
-    fun getUsedTransferPercentage(): Int = myAccountInfo.usedTransferPercentage
+    fun getUsedTransferPercentage(): Int = state.value.usedTransferPercentage
 
 
     /**
@@ -537,21 +553,21 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun getUsedTransferStatus(): UsedTransferStatus =
-        getUsedTransferStatusUseCase(myAccountInfo.usedTransferPercentage)
+        getUsedTransferStatusUseCase(state.value.usedTransferPercentage)
 
     /**
      * Get total transfer
      *
      * @return
      */
-    fun getTotalTransfer(): String = myAccountInfo.totalTransferFormatted
+    fun getTotalTransfer(): String = state.value.totalTransfer
 
     /**
      * Get renew time
      *
      * @return
      */
-    fun getRenewTime(): Long = myAccountInfo.subscriptionRenewTime
+    fun getRenewTime(): Long = state.value.subscriptionDetails?.subscriptionRenewTime ?: 0L
 
     /**
      * Has renewable subscription
@@ -559,8 +575,9 @@ class MyAccountViewModel @Inject constructor(
      * @return
      */
     fun hasRenewableSubscription(): Boolean {
-        return myAccountInfo.subscriptionStatus == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
-                && myAccountInfo.subscriptionRenewTime > 0
+        val details = state.value.subscriptionDetails ?: return false
+        return details.subscriptionStatus == SubscriptionStatus.VALID
+                && details.subscriptionRenewTime > 0
     }
 
     /**
@@ -568,14 +585,15 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return
      */
-    fun getExpirationTime(): Long = myAccountInfo.proExpirationTime
+    fun getExpirationTime(): Long = state.value.subscriptionDetails?.proExpirationTime ?: 0L
 
     /**
      * Has expirable subscription
      *
      * @return
      */
-    fun hasExpirableSubscription(): Boolean = myAccountInfo.proExpirationTime > 0
+    fun hasExpirableSubscription(): Boolean =
+        (state.value.subscriptionDetails?.proExpirationTime ?: 0L) > 0
 
     /**
      * There is no subscription
@@ -603,21 +621,21 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return
      */
-    fun getCloudStorage(): String = myAccountInfo.formattedUsedCloud
+    fun getCloudStorage(): String = state.value.cloudStorage
 
     /**
      * Get incoming storage
      *
      * @return
      */
-    fun getIncomingStorage(): String = myAccountInfo.formattedUsedIncoming
+    fun getIncomingStorage(): String = state.value.incomingStorage
 
     /**
      * Get rubbish storage
      *
      * @return
      */
-    fun getRubbishStorage(): String = myAccountInfo.formattedUsedRubbish
+    fun getRubbishStorage(): String = state.value.rubbishStorage
 
     /**
      * Get master key
@@ -631,15 +649,14 @@ class MyAccountViewModel @Inject constructor(
      *
      */
     fun checkVersions() {
-        if (myAccountInfo.numVersions == INVALID_VALUE) {
+        if (numVersions == INVALID_VALUE) {
             viewModelScope.launch {
                 runCatching { checkVersionsUseCase() }
                     .fold(
                         onSuccess = { value ->
                             value?.let {
-                                myAccountInfo.numVersions = value.numberOfVersions
-                                myAccountInfo.previousVersionsSize =
-                                    value.sizeOfPreviousVersionsInBytes
+                                numVersions = value.numberOfVersions
+                                previousVersionsSize = value.sizeOfPreviousVersionsInBytes
                                 setVersionsInfo()
                             }
                         },
@@ -1047,7 +1064,7 @@ class MyAccountViewModel @Inject constructor(
             }.onSuccess { isDisableFileVersions ->
                 _state.update {
                     it.copy(
-                        versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(context),
+                        versionsInfo = formattedVersionsSize(),
                         isFileVersioningEnabled = isDisableFileVersions.not()
                     )
                 }
@@ -1308,7 +1325,7 @@ class MyAccountViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val accountDetails = getAccountDetailsUseCase(
-                    forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty()
+                    forceRefresh = state.value.usedStorage.trim().isEmpty()
                 )
                 getExtendedAccountDetail(
                     forceRefresh = false,
@@ -1376,6 +1393,12 @@ class MyAccountViewModel @Inject constructor(
      */
     fun isProSubscription(): Boolean =
         state.value.isProSubscription
+
+    private fun AccountStorageDetail?.formatSize(selector: AccountStorageDetail.() -> Long): String =
+        this?.let { fileSizeStringMapper(selector(it)) } ?: ""
+
+    private fun AccountTransferDetail?.formatSize(selector: AccountTransferDetail.() -> Long): String =
+        this?.let { fileSizeStringMapper(selector(it)) } ?: ""
 
     /**
      * Dismiss logout confirmation dialog

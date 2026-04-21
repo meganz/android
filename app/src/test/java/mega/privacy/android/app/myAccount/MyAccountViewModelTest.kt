@@ -14,7 +14,9 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
+import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
@@ -105,7 +107,7 @@ internal class MyAccountViewModelTest {
     private lateinit var underTest: MyAccountViewModel
 
     private val context: Context = mock()
-    private val myAccountInfo: MyAccountInfo = mock()
+    private val fileSizeStringMapper: FileSizeStringMapper = mock()
     private val megaApi: MegaApiAndroid = mock()
     private val setAvatarUseCase: SetAvatarUseCase = mock()
     private val isMultiFactorAuthEnabledUseCase: IsMultiFactorAuthEnabledUseCase = mock()
@@ -190,7 +192,7 @@ internal class MyAccountViewModelTest {
         ).thenReturn(Unit)
         whenever(getPaymentMethodUseCase(anyBoolean())).thenReturn(PaymentMethodFlags(0L))
         whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
-        whenever(myAccountInfo.usedFormatted).thenReturn("")
+        whenever(fileSizeStringMapper(any<Long>())).thenReturn("")
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
         storageStateFlow.value = StorageState.Unknown
@@ -199,8 +201,8 @@ internal class MyAccountViewModelTest {
     private fun initializeViewModel() {
         underTest = MyAccountViewModel(
             context = context,
-            myAccountInfo = myAccountInfo,
             megaApi = megaApi,
+            fileSizeStringMapper = fileSizeStringMapper,
             setAvatarUseCase = setAvatarUseCase,
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
             checkVersionsUseCase = checkVersionsUseCase,
@@ -772,10 +774,18 @@ internal class MyAccountViewModelTest {
         usedTransferPercentage: Int,
         usedTransferStatus: UsedTransferStatus,
     ) = runTest {
-        whenever(myAccountInfo.usedTransferPercentage).thenReturn(usedTransferPercentage)
         whenever(getUsedTransferStatusUseCase(usedTransferPercentage)).thenReturn(usedTransferStatus)
 
-        initializeViewModel()
+        accountDetailFlow.emit(
+            AccountDetail(
+                transferDetail = AccountTransferDetail(
+                    totalTransfer = 100L,
+                    usedTransfer = usedTransferPercentage.toLong(),
+                ),
+            )
+        )
+        advanceUntilIdle()
+
         assertThat(underTest.getUsedTransferPercentage()).isEqualTo(usedTransferPercentage)
         assertThat(underTest.getUsedTransferStatus()).isEqualTo(usedTransferStatus)
     }
@@ -911,8 +921,8 @@ internal class MyAccountViewModelTest {
         Dispatchers.resetMain()
         reset(
             context,
-            myAccountInfo,
             megaApi,
+            fileSizeStringMapper,
             setAvatarUseCase,
             isMultiFactorAuthEnabledUseCase,
             checkVersionsUseCase,
