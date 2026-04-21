@@ -9,7 +9,7 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.destination.SecurityUpgradeDialogNavKey
 
 data object SecurityUpgradeDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             securityUpgradeDialogDestination(
                 remove = navigationHandler::remove,
@@ -18,7 +18,7 @@ data object SecurityUpgradeDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.securityUpgradeDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.securityUpgradeDialogDestination(
     remove: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {

@@ -16,7 +16,7 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.destination.Enable2FANavKey
 
 data object Enable2FADialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             enable2FADialogDestination(
                 remove = navigationHandler::remove,
@@ -25,7 +25,7 @@ data object Enable2FADialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.enable2FADialogDestination(
+fun EntryProviderScope<in DialogNavKey>.enable2FADialogDestination(
     remove: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {

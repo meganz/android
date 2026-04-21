@@ -20,7 +20,7 @@ class ContactFeatureDestination : FeatureDestination {
  * Contact feature dialog destinations
  */
 class ContactFeatureDialogDestinations() : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(navigationHandler: NavigationHandler, onHandled: () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(navigationHandler: NavigationHandler, onHandled: () -> Unit) -> Unit =
         {navigationHandler, onHandled ->
             cannotVerifyContactDialogM3(navigationHandler::remove, onHandled)
         }

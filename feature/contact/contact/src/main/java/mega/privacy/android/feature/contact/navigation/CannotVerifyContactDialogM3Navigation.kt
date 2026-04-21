@@ -14,7 +14,7 @@ import mega.privacy.android.navigation.destination.CannotVerifyContactDialogNavK
  * @param remove
  * @param onHandled
  */
-fun EntryProviderScope<DialogNavKey>.cannotVerifyContactDialogM3(
+fun EntryProviderScope<in DialogNavKey>.cannotVerifyContactDialogM3(
     remove: (NavKey) -> Unit,
     onHandled: () -> Unit,
 ) {

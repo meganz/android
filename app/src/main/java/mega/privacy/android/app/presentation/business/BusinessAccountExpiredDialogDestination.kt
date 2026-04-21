@@ -17,7 +17,7 @@ import mega.privacy.android.navigation.destination.BusinessAccountExpiredDialogN
 import mega.privacy.android.shared.resources.R as sharedR
 
 data object BusinessAccountExpiredDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             businessAccountExpiredDialogDestination(
                 remove = navigationHandler::remove,
@@ -26,7 +26,7 @@ data object BusinessAccountExpiredDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.businessAccountExpiredDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.businessAccountExpiredDialogDestination(
     remove: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {

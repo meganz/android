@@ -7,15 +7,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.EntryProviderScope
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneStrategy
-import androidx.navigation3.scene.SceneStrategyScope
 import androidx.navigation3.ui.NavDisplay
 import de.palm.composestateevents.NavigationEventEffect
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
@@ -30,7 +26,6 @@ import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObject
 import mega.privacy.android.core.passcode.presentation.navigation.passcodeView
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
-import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.QueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
@@ -99,7 +94,7 @@ internal fun MegaNavDisplay(
 
             graphstate.appDialogDestinations.forEach { destination ->
                 destination.navigationGraph(
-                    this as EntryProviderScope<DialogNavKey>,
+                    this,
                     navigationHandler,
                     navigationEventViewModel::eventHandled
                 )
@@ -162,13 +157,10 @@ internal fun MegaNavDisplay(
 }
 
 private infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
-    object : SceneStrategy<T> {
-        override fun SceneStrategyScope<T>.calculateScene(
-            entries: List<NavEntry<T>>,
-        ): Scene<T>? =
-            this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
-                calculateScene(
-                    entries
-                )
-            }
+    SceneStrategy { entries ->
+        this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
+            calculateScene(
+                entries
+            )
+        }
     }

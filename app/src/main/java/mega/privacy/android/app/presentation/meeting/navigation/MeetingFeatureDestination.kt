@@ -35,7 +35,7 @@ data object MeetingFeatureDestination : FeatureDestination {
 }
 
 data object FreePlanParticipantsLimitDialogDestination : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
 
             entry<FreePlanParticipantsLimitNavKey>(

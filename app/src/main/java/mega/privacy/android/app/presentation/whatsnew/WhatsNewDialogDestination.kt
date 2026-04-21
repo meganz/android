@@ -14,7 +14,7 @@ import mega.privacy.mobile.home.presentation.whatsnew.WhatsNewUiState
 import mega.privacy.mobile.home.presentation.whatsnew.WhatsNewViewModel
 
 data object WhatsNewDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             entry<WhatsNewNavKey>(
                 metadata = buildMetadata {

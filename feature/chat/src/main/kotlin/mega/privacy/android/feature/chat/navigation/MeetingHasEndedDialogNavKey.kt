@@ -19,7 +19,7 @@ data class MeetingHasEndedDialogNavKey(
     val chatId: Long?,
 ) : NoSessionNavKey.Optional, DialogNavKey
 
-fun EntryProviderScope<DialogNavKey>.meetingHasEndedDialog(
+fun EntryProviderScope<in DialogNavKey>.meetingHasEndedDialog(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,

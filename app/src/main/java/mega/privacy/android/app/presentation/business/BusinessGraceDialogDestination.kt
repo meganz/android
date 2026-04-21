@@ -11,7 +11,7 @@ import mega.privacy.android.navigation.destination.BusinessGraceDialogNavKey
 import javax.inject.Inject
 
 data object BusinessGraceDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             businessGraceDialogDestination(
                 remove = navigationHandler::remove,
@@ -20,7 +20,7 @@ data object BusinessGraceDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.businessGraceDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.businessGraceDialogDestination(
     remove: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {

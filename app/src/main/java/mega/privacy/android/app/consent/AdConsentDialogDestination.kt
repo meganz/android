@@ -17,7 +17,7 @@ import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 @Serializable
 data object AdConsentDialog : DialogNavKey
 
-fun EntryProviderScope<DialogNavKey>.adConsentDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.adConsentDialogDestination(
     remove: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {

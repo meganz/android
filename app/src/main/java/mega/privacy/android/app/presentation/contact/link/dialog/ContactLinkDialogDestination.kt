@@ -19,7 +19,7 @@ data class ContactLinkDialogNavKey(val contactLinkQueryResult: ContactLinkQueryR
     DialogNavKey
 
 data object ContactLinkDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             contactLinkDialogDestination(
                 navigateBack = navigationHandler::back,
@@ -29,7 +29,7 @@ data object ContactLinkDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.contactLinkDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.contactLinkDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,

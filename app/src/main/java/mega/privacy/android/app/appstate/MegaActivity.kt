@@ -66,7 +66,6 @@ import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.passcode.PasscodeProcessLifecycleOwner
 import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
 import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
@@ -103,18 +102,34 @@ class MegaActivity : FragmentActivity() {
     @Inject
     lateinit var navigationEventQueue: NavigationEventQueue
 
+    /**
+     * App dialogs event queue
+     */
     @Inject
     lateinit var appDialogsEventQueue: AppDialogsEventQueue
 
+
+    /**
+     * Navigation result manager
+     */
     @Inject
     lateinit var navigationResultManager: NavigationResultManager
 
+    /**
+     * In app update handler
+     */
     @Inject
     lateinit var inAppUpdateHandler: InAppUpdateHandler
 
+    /**
+     * Fetch node provider
+     */
     @Inject
     lateinit var fetchNodeProvider: FetchNodeProvider
 
+    /**
+     * Intent action handler
+     */
     @Inject
     lateinit var intentActionHandler: MegaActivityIntentActionHandler
 
@@ -475,6 +490,9 @@ class MegaActivity : FragmentActivity() {
 
         /**
          * Get a pending intent to open this activity with the specified nav key
+         * @param context
+         * @param navKey
+         * @param requestCode
          */
         fun <T> getPendingIntentWithExtraDestination(
             context: Context,
@@ -486,6 +504,9 @@ class MegaActivity : FragmentActivity() {
 
         /**
          * Get a pending intent to open this activity with the specified nav keys
+         * @param context
+         * @param navKeys
+         * @param requestCode
          */
         fun <T> getPendingIntentWithExtraDestinations(
             context: Context,
@@ -498,6 +519,13 @@ class MegaActivity : FragmentActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        /**
+         * Get intent with extra destinations
+         *
+         * @param T
+         * @param context
+         * @param navKeys
+         */
         fun <T> getIntentWithExtraDestinations(
             context: Context,
             navKeys: List<T>,

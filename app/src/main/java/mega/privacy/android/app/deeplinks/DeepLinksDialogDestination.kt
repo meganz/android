@@ -16,7 +16,7 @@ import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialo
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 
 data object DeepLinksDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             deepLinkDialogDestination(
                 remove = navigationHandler::remove,
@@ -36,7 +36,7 @@ data object DeepLinksDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.deepLinkDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.deepLinkDialogDestination(
     remove: (NavKey) -> Unit,
     navigate: (List<NavKey>, NavOptions?) -> Unit,
     onDialogHandled: () -> Unit,
@@ -60,7 +60,7 @@ fun EntryProviderScope<DialogNavKey>.deepLinkDialogDestination(
     }
 }
 
-fun EntryProviderScope<DialogNavKey>.deepLinkAfterFetchNodesDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.deepLinkAfterFetchNodesDialogDestination(
     remove: (NavKey) -> Unit,
     navigate: (List<NavKey>, NavOptions?) -> Unit,
     onDialogHandled: () -> Unit,

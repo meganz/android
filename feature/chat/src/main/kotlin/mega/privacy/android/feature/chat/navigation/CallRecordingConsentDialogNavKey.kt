@@ -15,7 +15,7 @@ import mega.privacy.android.navigation.destination.WebSiteNavKey
 @Serializable
 data class CallRecordingConsentDialogNavKey(val chatId: Long) : DialogNavKey
 
-fun EntryProviderScope<DialogNavKey>.callRecordingConsentDialog(
+fun EntryProviderScope<in DialogNavKey>.callRecordingConsentDialog(
     navigate: (NavKey) -> Unit,
     onHandled: () -> Unit,
     remove: (NavKey) -> Unit,

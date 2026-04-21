@@ -21,7 +21,7 @@ import mega.privacy.android.shared.resources.R as SharedR
 data object RemoteLogoutDialogNavKey : NoSessionNavKey.Mandatory, DialogNavKey
 
 data object RemoteLogoutDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             remoteLogoutDestination(
                 navigateBack = navigationHandler::back,
@@ -30,7 +30,7 @@ data object RemoteLogoutDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.remoteLogoutDestination(
+fun EntryProviderScope<in DialogNavKey>.remoteLogoutDestination(
     navigateBack: () -> Unit,
     onDialogHandled: () -> Unit,
 ) {

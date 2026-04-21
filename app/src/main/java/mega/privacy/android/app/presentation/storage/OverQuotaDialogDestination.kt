@@ -16,7 +16,7 @@ import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 
 data object OverQuotaDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             overQuotaDialogDestination(
                 navigateToUpgradeAccount = {
@@ -38,7 +38,7 @@ data object OverQuotaDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.overQuotaDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.overQuotaDialogDestination(
     navigateToUpgradeAccount: () -> Unit,
     navigateToCustomizedPlan: (Context, String, AccountType) -> Unit,
     navigateToAchievements: () -> Unit,

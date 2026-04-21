@@ -12,7 +12,7 @@ import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 
 data object OpenLinkDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             openLinkDialogDestination(
                 remove = navigationHandler::remove,
@@ -27,7 +27,7 @@ data object OpenLinkDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.openLinkDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.openLinkDialogDestination(
     remove: (NavKey) -> Unit,
     navigate: (List<NavKey>, NavOptions?) -> Unit,
     onDialogHandled: () -> Unit,

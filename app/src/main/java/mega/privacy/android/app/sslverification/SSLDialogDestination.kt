@@ -20,7 +20,7 @@ import mega.privacy.android.navigation.destination.WebSiteNavKey
 data object SSLErrorDialog : DialogNavKey
 
 data object SSLAppDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             sslDialogDestination(
                 remove = navigationHandler::remove,
@@ -30,7 +30,7 @@ data object SSLAppDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.sslDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.sslDialogDestination(
     remove: (NavKey) -> Unit,
     navigateAndClear: (NavKey, NavKey, Boolean) -> Unit,
     onDialogHandled: () -> Unit,

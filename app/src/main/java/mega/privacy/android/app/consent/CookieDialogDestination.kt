@@ -22,7 +22,7 @@ import mega.privacy.android.navigation.destination.WebSiteNavKey
 @Serializable
 data object CookieDialog : DialogNavKey
 
-fun EntryProviderScope<DialogNavKey>.cookieDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.cookieDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,

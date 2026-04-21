@@ -19,7 +19,7 @@ import mega.privacy.android.navigation.destination.PurchaseResultDialogNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 data object PurchaseResultDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             purchaseResultDialogDestination(
                 remove = navigationHandler::remove,
@@ -28,7 +28,7 @@ data object PurchaseResultDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.purchaseResultDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.purchaseResultDialogDestination(
     remove: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {

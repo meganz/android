@@ -19,7 +19,7 @@ import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 data object TransferOverQuotaDialog : NoSessionNavKey.Optional, DialogNavKey
 
 data object TransferOverQuotaDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
+    override val navigationGraph: EntryProviderScope<in DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             transferOverQuotaDialogDestination(
                 navigateBack = navigationHandler::back,
@@ -29,7 +29,7 @@ data object TransferOverQuotaDialogDestinations : AppDialogDestinations {
         }
 }
 
-fun EntryProviderScope<DialogNavKey>.transferOverQuotaDialogDestination(
+fun EntryProviderScope<in DialogNavKey>.transferOverQuotaDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
