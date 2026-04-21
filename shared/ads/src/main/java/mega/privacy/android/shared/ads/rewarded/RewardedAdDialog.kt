@@ -35,12 +35,17 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.RewardedAdDialogCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdDialogDisplayedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdDialogUpgradeToProButtonPressedEvent
 
 
 @Composable
@@ -51,8 +56,15 @@ fun RewardedAdDialog(
     onUpgradePro: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    LaunchedOnceEffect(Unit) {
+        Analytics.tracker.trackEvent(RewardedAdDialogDisplayedEvent)
+    }
+
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            Analytics.tracker.trackEvent(RewardedAdDialogCloseButtonPressedEvent)
+            onDismiss()
+        },
         properties = DialogProperties(decorFitsSystemWindows = false)
     ) {
         ColumnSurface(
@@ -67,7 +79,10 @@ fun RewardedAdDialog(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 IconButton(
-                    onClick = onDismiss,
+                    onClick = {
+                        Analytics.tracker.trackEvent(RewardedAdDialogCloseButtonPressedEvent)
+                        onDismiss()
+                    },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = 10.dp, end = 12.dp)
@@ -184,7 +199,10 @@ private fun ProCard(onUpgradePro: () -> Unit) {
             Spacer(modifier = Modifier.height(14.dp))
 
             MegaOutlinedButton(
-                onClick = onUpgradePro,
+                onClick = {
+                    Analytics.tracker.trackEvent(RewardedAdDialogUpgradeToProButtonPressedEvent)
+                    onUpgradePro()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(sharedR.string.rewarded_ad_dialog_upgrade_button),
             )

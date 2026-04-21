@@ -10,7 +10,9 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
@@ -19,10 +21,12 @@ import mega.privacy.android.domain.usecase.advertisements.MonitorGoogleConsentLo
 import mega.privacy.android.domain.usecase.advertisements.MonitorRewardedAdAttemptCountUseCase
 import mega.privacy.android.domain.usecase.advertisements.ResetRewardedAdAttemptCountUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.RewardedAdGateActionRequestedEvent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -428,4 +432,36 @@ class RewardedAdGateViewModelTest {
                 verify(incrementRewardedAdAttemptCountUseCase, never()).invoke()
             }
         }
+
+    @Test
+    fun `test that requestShowDialog tracks RewardedAdGateActionRequestedEvent when eligible`() =
+        runTest {
+            commonStub(attemptCount = 0)
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.requestShowDialog()
+
+            assertThat(analyticsExtension.events)
+                .contains(RewardedAdGateActionRequestedEvent)
+        }
+
+    @Test
+    fun `test that requestShowDialog does not track RewardedAdGateActionRequestedEvent when not eligible`() =
+        runTest {
+            commonStub(rewardedAdsEnabled = false, attemptCount = 0)
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.requestShowDialog()
+
+            assertThat(analyticsExtension.events)
+                .doesNotContain(RewardedAdGateActionRequestedEvent)
+        }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+    }
 }

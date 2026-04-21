@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import mega.privacy.android.domain.usecase.advertisements.IncrementRewardedAdAttemptCountUseCase
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.usecase.advertisements.MonitorRewardedAdAttem
 import mega.privacy.android.domain.usecase.advertisements.ResetRewardedAdAttemptCountUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.ads.rewarded.RewardedAdGateViewModel.Companion.AD_SHOW_THRESHOLD
+import mega.privacy.mobile.analytics.event.RewardedAdGateActionRequestedEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -134,6 +136,7 @@ class RewardedAdGateViewModel @Inject constructor(
         }
 
         if (isEligible) {
+            Analytics.tracker.trackEvent(RewardedAdGateActionRequestedEvent)
             viewModelScope.launch {
                 runCatching { incrementRewardedAdAttemptCountUseCase() }
                     .onFailure { Timber.e(it, "Failed to increment rewarded ad attempt count") }

@@ -22,10 +22,17 @@ import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAd
 import com.google.android.libraries.ads.mobile.sdk.rewarded.RewardedAdEventCallback
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.ads.BuildConfig
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.RewardedAdClickedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdDialogWatchAdButtonPressedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdImpressionEvent
+import mega.privacy.mobile.analytics.event.RewardedAdLoadedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdRewardEarnedEvent
+import mega.privacy.mobile.analytics.event.RewardedAdUnavailableEvent
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -81,7 +88,9 @@ fun rememberRewardedAdGate(
 ): RewardedAdGateHandler {
     val viewModel: RewardedAdGateViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val handler = remember(viewModel) { RewardedAdGateHandler(viewModel::requestShowDialog) }
+    val handler = remember(viewModel) {
+        RewardedAdGateHandler(viewModel::requestShowDialog)
+    }
 
     EventEffect(
         event = uiState.skipAdEvent,
@@ -130,6 +139,7 @@ private fun RewardedAdGate(
             onDismiss = viewModel::dismiss,
             onWatchAd = {
                 if (!state.isAdLoading && activity != null) {
+                    Analytics.tracker.trackEvent(RewardedAdDialogWatchAdButtonPressedEvent)
                     val onComplete = {
                         viewModel.dismiss()
                         handler.executeAndReset()
@@ -143,6 +153,7 @@ private fun RewardedAdGate(
                             onComplete()
                         },
                         onAdUnavailable = {
+                            Analytics.tracker.trackEvent(RewardedAdUnavailableEvent)
                             coroutineScope.launch {
                                 Toast.makeText(
                                     activity,
@@ -178,6 +189,7 @@ private fun loadAndShowRewardedAd(
     RewardedAd.load(adRequest, object : AdLoadCallback<RewardedAd> {
         override fun onAdLoaded(ad: RewardedAd) {
             Timber.i("Rewarded ad loaded")
+            Analytics.tracker.trackEvent(RewardedAdLoadedEvent)
             onLoadingComplete()
 
             val activityInstance = activityRef.get()
@@ -203,15 +215,18 @@ private fun loadAndShowRewardedAd(
 
                 override fun onAdImpression() {
                     Timber.d("Rewarded ad impression")
+                    Analytics.tracker.trackEvent(RewardedAdImpressionEvent)
                 }
 
                 override fun onAdClicked() {
                     Timber.d("Rewarded ad clicked")
+                    Analytics.tracker.trackEvent(RewardedAdClickedEvent)
                 }
             }
 
             ad.show(activityInstance) { reward ->
                 Timber.i("User earned reward: ${reward.amount} ${reward.type}")
+                Analytics.tracker.trackEvent(RewardedAdRewardEarnedEvent)
                 onRewardEarned()
             }
         }
