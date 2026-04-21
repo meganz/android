@@ -45,12 +45,12 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
             val singleNodeActionHandler = rememberSingleNodeActionHandler(
                 viewModel = nodeOptionsActionViewModel,
                 navigationHandler = navigationHandler,
-                onDeferredAction = rewardedAdGate::requestAction,
+                onDeferredAction = { _, action -> rewardedAdGate.requestAction(action) },
             )
             val selectionModeActionHandler = rememberMultiNodeActionHandler(
                 viewModel = nodeOptionsActionViewModel,
                 navigationHandler = navigationHandler,
-                onDeferredAction = rewardedAdGate::requestAction,
+                onDeferredAction = { _, action -> rewardedAdGate.requestAction(action) },
             )
             FolderLinkScreen(
                 viewModel = viewModel,

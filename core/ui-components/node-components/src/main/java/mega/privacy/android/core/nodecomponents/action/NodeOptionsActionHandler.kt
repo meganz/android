@@ -25,9 +25,10 @@ import mega.privacy.android.navigation.megaActivityResultContract
  * @param coroutineScope Optional coroutine scope. Defaults to rememberCoroutineScope()
  * @param megaNavigator The mega navigator instance
  * @param navigationHandler Optional navigation handler
- * @param onDeferredAction Optional interceptor for [mega.privacy.android.core.nodecomponents.menu.menuaction.DeferrableMenuAction]
- *  actions (e.g. for rewarded ad gating). When provided, deferrable actions are passed through
- *  this interceptor before execution.
+ * @param onDeferredAction Optional interceptor for [DeferrableMenuAction] actions
+ *  (e.g. for rewarded ad gating). When provided, the interceptor receives the
+ *  [DeferrableMenuAction] and a lambda to execute the action. The caller can use the action
+ *  type to decide whether to gate or execute immediately.
  * @return A BottomSheetActionHandler instance
  * @see SingleNodeActionHandler
  */
@@ -40,7 +41,7 @@ fun rememberSingleNodeActionHandler(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     megaNavigator: MegaNavigator = rememberMegaNavigator(),
     navigationHandler: NavigationHandler? = null,
-    onDeferredAction: ((() -> Unit) -> Unit)? = null,
+    onDeferredAction: ((DeferrableMenuAction, () -> Unit) -> Unit)? = null,
 ): SingleNodeActionHandler {
     val context = LocalContext.current
     val megaActivityResultContract = remember { context.megaActivityResultContract }
@@ -174,7 +175,7 @@ fun rememberSingleNodeActionHandler(
         if (onDeferredAction != null) {
             SingleNodeActionHandler { action, node ->
                 if (action is DeferrableMenuAction) {
-                    onDeferredAction { baseHandler(action, node) }
+                    onDeferredAction(action) { baseHandler(action, node) }
                 } else {
                     baseHandler(action, node)
                 }
@@ -196,9 +197,10 @@ fun rememberSingleNodeActionHandler(
  * @param coroutineScope Optional coroutine scope. Defaults to rememberCoroutineScope()
  * @param megaNavigator The mega navigator instance
  * @param navigationHandler Optional navigation handler
- * @param onDeferredAction Optional interceptor for [mega.privacy.android.core.nodecomponents.menu.menuaction.DeferrableMenuAction]
- *  actions (e.g. for rewarded ad gating). When provided, deferrable actions are passed through
- *  this interceptor before execution.
+ * @param onDeferredAction Optional interceptor for [DeferrableMenuAction] actions
+ *  (e.g. for rewarded ad gating). When provided, the interceptor receives the
+ *  [DeferrableMenuAction] and a lambda to execute the action. The caller can use the action
+ *  type to decide whether to gate or execute immediately.
  * @return A SelectionModeActionHandler instance
  * @see MultiNodeActionHandler
  */
@@ -211,7 +213,7 @@ fun rememberMultiNodeActionHandler(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     megaNavigator: MegaNavigator = rememberMegaNavigator(),
     navigationHandler: NavigationHandler? = null,
-    onDeferredAction: ((() -> Unit) -> Unit)? = null,
+    onDeferredAction: ((DeferrableMenuAction, () -> Unit) -> Unit)? = null,
 ): MultiNodeActionHandler {
     val context = LocalContext.current
     val megaActivityResultContract = remember { context.megaActivityResultContract }
@@ -327,7 +329,7 @@ fun rememberMultiNodeActionHandler(
         if (onDeferredAction != null) {
             MultiNodeActionHandler { action, nodes ->
                 if (action is DeferrableMenuAction) {
-                    onDeferredAction { baseHandler(action, nodes) }
+                    onDeferredAction(action) { baseHandler(action, nodes) }
                 } else {
                     baseHandler(action, nodes)
                 }

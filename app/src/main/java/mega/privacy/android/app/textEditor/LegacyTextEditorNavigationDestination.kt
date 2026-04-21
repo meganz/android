@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,7 +20,9 @@ import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
+import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
@@ -38,7 +41,6 @@ import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
-import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import nz.mega.sdk.MegaApiJava
@@ -52,7 +54,7 @@ import java.io.File
 internal fun shouldCloseTextEditorOnNodeOptionsResult(
     result: NodeOptionsBottomSheetResult?,
 ): Boolean = when (result?.action) {
-    is LabelMenuAction, is RemoveLinkMenuAction, is OpenWithMenuAction -> false
+    is LabelMenuAction, is RemoveLinkMenuAction, is OpenWithMenuAction, is EditMenuAction -> false
     null -> false
     else -> true
 }
@@ -213,9 +215,7 @@ fun EntryProviderScope<NavKey>.legacyTextEditorScreen(
     viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
     transferHandler: TransferHandler,
 ) {
-    entry<LegacyTextEditorNavKey>(
-        metadata = transparentMetadata()
-    ) { key ->
+    entry<LegacyTextEditorNavKey> { key ->
         TextEditorEntry(
             navKey = key,
             navigationHandler = navigationHandler,
@@ -233,33 +233,16 @@ private fun TextEditorEntry(
     transferHandler: TransferHandler,
 ) {
     val context = LocalContext.current
-    val removeDestination: () -> Unit = { navigationHandler.back() }
-    val legacyIntent = buildTextEditorIntent(context, navKey)
-
-    if (navKey.chatId == null && navKey.localPath == null) {
-        val nodeOptionsActionViewModel =
-            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
-                creationCallback = {
-                    it.create(viewTypeToNodeSourceTypeMapper(navKey.nodeSourceType))
-                }
-            )
-        HandleNodeOptionsActionResult(
-            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            navigationHandler = navigationHandler,
-            onTransfer = transferHandler::setTransferEvent,
-            onNavResultConsumed = { result ->
-                if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
-                    removeDestination()
-                }
-            },
-        )
+    val chatId = navKey.chatId
+    val removeDestination: () -> Unit = {
+        navigationHandler.back()
+        chatId?.let { navigationHandler.navigate(ChatNavKey(chatId = it)) }
     }
-
     FeatureFlagGate(
         feature = ApiFeatures.TextEditorCompose,
         disabled = {
             LaunchedEffect(Unit) {
-                context.startActivity(legacyIntent)
+                context.startActivity(buildTextEditorIntent(context, navKey))
                 removeDestination()
             }
         },
@@ -286,8 +269,45 @@ private fun TextEditorComposeContent(
     val args = remember(navKey) {
         buildTextEditorViewModelArgs(navKey)
     }
+
+    val viewModel =
+        hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
+            factory.create(args)
+        }
+
     val showNodeOptions = navKey.chatId == null && navKey.localPath == null
         && textEditorModeFromValue(navKey.mode) != TextEditorMode.Create
+
+    if (showNodeOptions) {
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = {
+                    it.create(viewTypeToNodeSourceTypeMapper(navKey.nodeSourceType))
+                }
+            )
+        val nodeActionHandler = rememberSingleNodeActionHandler(
+            viewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onDeferredAction = { action, executeAction ->
+                if (action is EditMenuAction) {
+                    viewModel.setEditMode()
+                } else {
+                    executeAction()
+                }
+            },
+        )
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            nodeActionHandler = nodeActionHandler,
+            onTransfer = transferHandler::setTransferEvent,
+            onNavResultConsumed = { result ->
+                if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
+                    removeDestination()
+                }
+            },
+        )
+    }
     val onOpenNodeOptions: (() -> Unit)? = if (showNodeOptions) {
         remember(
             navKey.nodeHandle,
@@ -323,15 +343,11 @@ private fun TextEditorComposeContent(
         }
     }
 
-    val viewModel =
-        hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
-            factory.create(args)
-        }
-
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     TextEditorScreen(
         viewModel = viewModel,
         onBack = removeDestination,
-        onOpenNodeOptions = onOpenNodeOptions,
+        onOpenNodeOptions = onOpenNodeOptions.takeUnless { uiState.value.isLoading },
         onTransfer = { transferHandler.setTransferEvent(it) },
         onShare = onShare,
     )
