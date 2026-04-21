@@ -803,6 +803,108 @@ ArrayList<String> getUnitTestModuleList() {
 }
 
 
+/**
+ * Build a Map of build statistics for the current Jenkins build.
+ * Reads env vars + currentBuild + params, returns a Map. No I/O, safe to call from any post block.
+ *
+ * @param agentAcquiredMs   When the agent was acquired and execution started on a slave
+ *                          (System.currentTimeMillis() captured at the top of the first agent stage).
+ * @param stageDurationsMs  map keyed by 'build_apk_ms', 'unit_test_ms', 'lint_ms'.
+ *                          Missing keys are emitted as null (stage never ran or was skipped).
+ * @param stageNodeNames    map keyed by 'build_apk', 'unit_test', 'lint' — agent name that ran
+ *                          each parallel stage. Missing keys emit null.
+ * @param status            currentBuild.currentResult (SUCCESS / FAILURE / UNSTABLE / ABORTED).
+ * @param skipped           true if the build was skipped (Draft/WIP MR).
+ * @param codeReviewOnly    true if only the Code Review stage ran.
+ */
+Map collectBuildStats(long agentAcquiredMs, Map stageDurationsMs, Map stageNodeNames,
+                      String status, boolean skipped, boolean codeReviewOnly) {
+    long endMs = System.currentTimeMillis()
+    long scheduledMs = (currentBuild.timeInMillis ?: agentAcquiredMs) as long
+    long queueWaitMs = Math.max(0L, agentAcquiredMs - scheduledMs)
+
+    String mrNumber = getMrNumber()
+    String mrUrl = env.CHANGE_URL
+    if ((mrUrl == null || mrUrl.isEmpty()) && mrNumber != null && !mrNumber.isEmpty()) {
+        String homepage = env.gitlabSourceRepoHomepage
+        if (homepage != null && !homepage.isEmpty()) {
+            mrUrl = "${homepage}/-/merge_requests/${mrNumber}"
+        }
+    }
+
+    Map stages = [
+            build_apk_ms: stageDurationsMs['build_apk_ms'],
+            unit_test_ms: stageDurationsMs['unit_test_ms'],
+            lint_ms     : stageDurationsMs['lint_ms'],
+    ]
+
+    Map nodes = [
+            build_apk: stageNodeNames['build_apk'],
+            unit_test: stageNodeNames['unit_test'],
+            lint     : stageNodeNames['lint'],
+    ]
+
+    return [
+            schema_version  : 1,
+            status          : status?.toLowerCase(),
+            skipped         : skipped,
+            code_review_only: codeReviewOnly,
+            build_number    : env.BUILD_NUMBER,
+            build_url       : env.BUILD_URL,
+            commit_id       : env.GIT_COMMIT,
+            mr_number       : mrNumber,
+            mr_url          : mrUrl,
+            source_branch   : env.CHANGE_BRANCH ?: env.gitlabSourceBranch,
+            target_branch   : env.GITLAB_OA_TARGET_BRANCH ?: env.CHANGE_TARGET,
+            author          : env.CHANGE_AUTHOR_DISPLAY_NAME ?: env.CHANGE_AUTHOR ?: env.gitlabUserName,
+            trigger_kind    : env.gitlabActionType ?: env.GITLAB_OBJECT_KIND,
+            scheduled_ts    : formatBuildStatsTimestamp(scheduledMs),
+            build_start_ts  : formatBuildStatsTimestamp(agentAcquiredMs),
+            build_end_ts    : formatBuildStatsTimestamp(endMs),
+            queue_wait_ms   : queueWaitMs,
+            duration_ms     : endMs - agentAcquiredMs,
+            total_ms        : endMs - scheduledMs,
+            stages          : stages,
+            nodes           : nodes,
+    ]
+}
+
+/**
+ * Upload per-build stats as a JSON file to Artifactory for offline CI performance analysis.
+ * Path: android-mega/cicd/build-stats/<YYYY>/<MM>/<UTC_TS>-<BUILD>-<MR>.json
+ * One file per build — no shared state, no race conditions.
+ *
+ * Wrapped in try/catch so a stats upload failure NEVER fails the pipeline.
+ */
+void recordBuildStats(Map stats) {
+    try {
+        Date now = new Date()
+        TimeZone utc = TimeZone.getTimeZone("UTC")
+        String utcTs = now.format("yyyyMMdd'T'HHmmss'Z'", utc)
+        String monthPath = now.format("yyyy/MM", utc)
+        String mrPart = (stats.mr_number ?: 'no-mr').toString()
+        String fileName = "${utcTs}-${env.BUILD_NUMBER}-${mrPart}.json"
+        String remoteUrl = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/build-stats/${monthPath}/${fileName}"
+
+        String jsonText = JsonOutput.prettyPrint(JsonOutput.toJson(stats))
+        writeFile file: fileName, text: jsonText
+
+        useArtifactory() {
+            sh """
+                cd ${WORKSPACE}
+                curl -f -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T ${fileName} ${remoteUrl}
+            """
+        }
+        println("[build-stats] uploaded ${remoteUrl}")
+    } catch (Exception e) {
+        println("[build-stats] upload failed: ${e}")
+    }
+}
+
+private String formatBuildStatsTimestamp(long ms) {
+    return new Date(ms).format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC"))
+}
+
 return this
 
 

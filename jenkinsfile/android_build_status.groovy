@@ -12,6 +12,17 @@ LINT_REPORT_FOLDER = "lint_reports"
 LINT_REPORT_ARCHIVE = "lint_reports.zip"
 LINT_REPORT_SUMMARY_MAP = [:]
 
+// Per-stage timing for build-stats collection. Keys: 'build_apk_ms', 'unit_test_ms', 'lint_ms'.
+STAGE_START_MS = [:]
+STAGE_DURATIONS_MS = [:]
+
+// Per-stage agent name. Keys: 'build_apk', 'unit_test', 'lint'.
+STAGE_NODE_NAMES = [:]
+
+// Captured at the top of the first agent-running stage so queue-wait (scheduled → agent acquired)
+// can be separated from execution time. Null until the agent is acquired.
+AGENT_ACQUIRED_TIME = null
+
 MERGE_REQUEST_FILE_CHANGES_MESSAGE = ""
 COVERAGE_SUMMARY = ""
 
@@ -113,6 +124,17 @@ pipeline {
                         unitTestResult +
                         lintSummaryMessage
                 common.sendToMR(failureMessage)
+
+                common.recordBuildStats(
+                        common.collectBuildStats(
+                                AGENT_ACQUIRED_TIME ?: BUILD_START_TIME,
+                                STAGE_DURATIONS_MS,
+                                STAGE_NODE_NAMES,
+                                currentBuild.currentResult,
+                                shouldSkipBuild(),
+                                isCodeReviewOnly()
+                        )
+                )
             }
         }
         success {
@@ -146,6 +168,17 @@ pipeline {
                         common.sendToMR(mergeRequestMessage)
                     }
                 }
+
+                common.recordBuildStats(
+                        common.collectBuildStats(
+                                AGENT_ACQUIRED_TIME ?: BUILD_START_TIME,
+                                STAGE_DURATIONS_MS,
+                                STAGE_NODE_NAMES,
+                                currentBuild.currentResult,
+                                shouldSkipBuild(),
+                                isCodeReviewOnly()
+                        )
+                )
             }
         }
         cleanup {
@@ -157,6 +190,7 @@ pipeline {
         stage('Load Common Script') {
             steps {
                 script {
+                    AGENT_ACQUIRED_TIME = System.currentTimeMillis()
                     BUILD_STEP = 'Preparation'
 
                     common = load('jenkinsfile/common.groovy')
@@ -195,6 +229,8 @@ pipeline {
 
                         gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
                             script {
+                                STAGE_START_MS['build_apk_ms'] = System.currentTimeMillis()
+                                STAGE_NODE_NAMES['build_apk'] = env.NODE_NAME
                                 common.downloadDependencyLibForSdk()
 
                                 util.useArtifactory() {
@@ -225,6 +261,14 @@ pipeline {
                         }
                     }
                     post {
+                        always {
+                            script {
+                                def s = STAGE_START_MS['build_apk_ms']
+                                if (s != null) {
+                                    STAGE_DURATIONS_MS['build_apk_ms'] = System.currentTimeMillis() - s
+                                }
+                            }
+                        }
                         failure {
                             script {
                                 BUILD_STEP = "Build APK (GMS+QA)"
@@ -240,6 +284,8 @@ pipeline {
                     }
                     steps {
                         script {
+                            STAGE_START_MS['unit_test_ms'] = System.currentTimeMillis()
+                            STAGE_NODE_NAMES['unit_test'] = env.NODE_NAME
                             common.downloadDependencyLibForSdk()
                         }
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
@@ -273,6 +319,14 @@ pipeline {
                         }
                     }
                     post {
+                        always {
+                            script {
+                                def s = STAGE_START_MS['unit_test_ms']
+                                if (s != null) {
+                                    STAGE_DURATIONS_MS['unit_test_ms'] = System.currentTimeMillis() - s
+                                }
+                            }
+                        }
                         failure {
                             script {
                                 BUILD_STEP = "Unit Test and Code Coverage"
@@ -292,6 +346,8 @@ pipeline {
                     steps {
                         gitlabCommitStatus(name: 'Lint Check') {
                             script {
+                                STAGE_START_MS['lint_ms'] = System.currentTimeMillis()
+                                STAGE_NODE_NAMES['lint'] = env.NODE_NAME
                                 common.downloadDependencyLibForSdk()
 
                                 util.useArtifactory() {
@@ -319,6 +375,14 @@ pipeline {
                         }
                     }
                     post {
+                        always {
+                            script {
+                                def s = STAGE_START_MS['lint_ms']
+                                if (s != null) {
+                                    STAGE_DURATIONS_MS['lint_ms'] = System.currentTimeMillis() - s
+                                }
+                            }
+                        }
                         failure {
                             script {
                                 BUILD_STEP = "Lint Check"
