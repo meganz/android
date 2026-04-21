@@ -3,6 +3,8 @@ package mega.privacy.android.feature.sync.presentation.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.file.FileStorageType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -55,6 +57,7 @@ class SyncUriValidityMapperTest {
 
     @BeforeEach
     fun setUp() {
+        Analytics.initialise(mock<AnalyticsTracker>())
         whenever(folderConflictMessageFormatter.formatDeviceFolderCameraUploadsConflict(any()))
             .thenReturn("camera-uploads-conflict")
         whenever(folderConflictMessageFormatter.formatDeviceFolderMediaUploadsConflict(any()))
@@ -75,6 +78,7 @@ class SyncUriValidityMapperTest {
 
     @AfterEach
     fun resetAndTearDown() {
+        Analytics.initialise(null)
         reset(
             getFolderPairsUseCase,
             getPathByDocumentContentUriUseCase,
