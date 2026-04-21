@@ -185,6 +185,7 @@ class SyncUriValidityMapper @Inject constructor(
 
             val relationship = determinePathRelationship(localPath, externalPath)
             if (relationship != PathRelationship.NO_MATCH) {
+                Analytics.tracker.trackEvent(SyncLocalFolderConflictEvent)
                 return PathMatchDetails(folderPair, localPath, relationship)
             }
         }
