@@ -31,7 +31,6 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
-import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -49,7 +48,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import org.junit.jupiter.api.AfterEach
@@ -87,7 +85,6 @@ class SettingsViewModelTest {
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView>()
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-    private val monitorStartScreenPreference = mock<MonitorStartScreenPreference>()
     private val isMultiFactorAuthAvailable = mock<IsMultiFactorAuthAvailable>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val setSubFolderMediaDiscoveryEnabledUseCase =
@@ -152,10 +149,6 @@ class SettingsViewModelTest {
 
         monitorConnectivityUseCase.stub { on { invoke() }.thenReturn(MutableStateFlow(true)) }
 
-        monitorStartScreenPreference.stub {
-            on { invoke() }.thenReturn(StartScreen.Home.asHotFlow())
-        }
-
         isMultiFactorAuthAvailable.stub { on { invoke() }.thenReturn(true) }
 
         isCameraUploadsEnabledUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
@@ -165,6 +158,7 @@ class SettingsViewModelTest {
         monitorShowHiddenItemsUseCase.stub { onBlocking { invoke() }.thenReturn(emptyFlow()) }
 
         monitorAccountDetailUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
+        monitorStartScreenPreferenceDestinationUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
         whenever(monitorMyAccountUpdateUseCase()).thenReturn(emptyFlow())
 
         whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
@@ -183,7 +177,6 @@ class SettingsViewModelTest {
             isMultiFactorAuthAvailable = isMultiFactorAuthAvailable,
             monitorContactLinksOptionUseCase = monitorContactLinksOptionUseCase,
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
-            startScreen = monitorStartScreenPreference,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             setHideRecentActivityUseCase = setHideRecentActivityUseCase,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
@@ -228,7 +221,6 @@ class SettingsViewModelTest {
             isCameraUploadsEnabledUseCase,
             monitorContactLinksOptionUseCase,
             isMultiFactorAuthEnabledUseCase,
-            monitorStartScreenPreference,
             monitorMediaDiscoveryView,
             toggleContactLinksOptionUseCase,
             monitorConnectivityUseCase,
@@ -575,34 +567,8 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun `test that start screen summary is correct when single activity flag is false`() = runTest {
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(false)
-        }
-
-        val expected = "Expected Start Screen"
-        startScreenSummaryMapper.stub {
-            on { invoke(any<StartScreen>()) } doReturn expected
-        }
-
-        initViewModel()
-
-        underTest.uiState.map { it.startScreenSummary }
-            .distinctUntilChanged()
-            .test {
-                assertThat(awaitItem()).isEmpty()
-                advanceUntilIdle()
-                assertThat(awaitItem()).isEqualTo(expected)
-            }
-    }
-
-    @Test
-    fun `test that start screen summary is correct when single activity flag is true and no value is set`() =
+    fun `test that start screen summary is the default when no destination preference is set`() =
         runTest {
-            getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(true)
-            }
-
             val expected = "Default Single activity Start Screen"
 
             monitorStartScreenPreferenceDestinationUseCase.stub {
@@ -648,11 +614,7 @@ class SettingsViewModelTest {
         }
 
     @Test
-    fun `test that start screen summary is correct when single activity flag is true`() = runTest {
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(true)
-        }
-
+    fun `test that start screen summary reflects the selected destination preference`() = runTest {
         val expected = "Expected Single activity Start Screen"
 
         monitorStartScreenPreferenceDestinationUseCase.stub {

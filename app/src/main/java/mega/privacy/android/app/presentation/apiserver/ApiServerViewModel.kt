@@ -16,8 +16,6 @@ import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.GetCurrentApiServerUseCase
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,7 +31,6 @@ import javax.inject.Inject
 class ApiServerViewModel @Inject constructor(
     private val getCurrentApiServerUseCase: GetCurrentApiServerUseCase,
     private val updateApiServerUseCase: UpdateApiServerUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -42,15 +39,11 @@ class ApiServerViewModel @Inject constructor(
     internal val state: StateFlow<ApiServerUIState> by lazy {
         combine(
             flow { emit(getCurrentApiServerUseCase()) }.catch { Timber.e(it) },
-            flow {
-                emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity))
-            }.catch { Timber.e(it) },
             newApiServerFlow
-        ) { currentApiServer, isSingleActivityEnabled, newApiServer ->
+        ) { currentApiServer, newApiServer ->
             ApiServerUIState(
                 currentApiServer = currentApiServer,
                 newApiServer = newApiServer,
-                isSingleActivityEnabled = isSingleActivityEnabled
             )
         }.catch {
             Timber.e(it)

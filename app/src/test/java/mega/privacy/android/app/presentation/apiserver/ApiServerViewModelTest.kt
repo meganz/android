@@ -14,8 +14,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.apiserver.ApiServer
 import mega.privacy.android.domain.usecase.apiserver.GetCurrentApiServerUseCase
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -38,7 +36,6 @@ class ApiServerViewModelTest {
 
     private val getCurrentApiServerUseCase = mock<GetCurrentApiServerUseCase>()
     private val updateApiServerUseCase = mock<UpdateApiServerUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val applicationScope: CoroutineScope = CoroutineScope(testDispatcher)
 
@@ -55,7 +52,7 @@ class ApiServerViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(getCurrentApiServerUseCase, updateApiServerUseCase, getFeatureFlagValueUseCase)
+        reset(getCurrentApiServerUseCase, updateApiServerUseCase)
     }
 
     @ParameterizedTest(name = " returns {0}")
@@ -64,7 +61,6 @@ class ApiServerViewModelTest {
         apiServer: ApiServer,
     ) = runTest {
         whenever(getCurrentApiServerUseCase()).thenReturn(apiServer)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
         underTest.state.test {
             Truth.assertThat(awaitItem().currentApiServer).isEqualTo(apiServer)
         }
@@ -77,7 +73,6 @@ class ApiServerViewModelTest {
         newApiServer: ApiServer,
     ) = runTest {
         whenever(getCurrentApiServerUseCase()).thenReturn(currentApiServer)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
         whenever(updateApiServerUseCase(currentApiServer, newApiServer)).thenReturn(Unit)
         underTest.state.test {
             assertThat(awaitItem().currentApiServer).isEqualTo(currentApiServer)
@@ -111,17 +106,11 @@ class ApiServerViewModelTest {
         Arguments.of(ApiServer.Sandbox3, ApiServer.Sandbox3),
     )
 
-    @ParameterizedTest(name = " with feature flag value {0}")
-    @org.junit.jupiter.params.provider.ValueSource(booleans = [true, false])
-    fun `test that isSingleActivityEnabled updates correctly when feature flag use case returns value`(
-        isSingleActivityEnabled: Boolean,
-    ) = runTest {
+    @org.junit.jupiter.api.Test
+    fun `test that isSingleActivityEnabled defaults to true`() = runTest {
         whenever(getCurrentApiServerUseCase()).thenReturn(ApiServer.Production)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(
-            isSingleActivityEnabled
-        )
         underTest.state.test {
-            Truth.assertThat(awaitItem().isSingleActivityEnabled).isEqualTo(isSingleActivityEnabled)
+            Truth.assertThat(awaitItem().isSingleActivityEnabled).isTrue()
         }
     }
 
@@ -129,7 +118,6 @@ class ApiServerViewModelTest {
         underTest = ApiServerViewModel(
             getCurrentApiServerUseCase = getCurrentApiServerUseCase,
             updateApiServerUseCase = updateApiServerUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             applicationScope = applicationScope,
         )
     }

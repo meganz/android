@@ -66,7 +66,6 @@ import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUs
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -85,7 +84,6 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
@@ -164,7 +162,6 @@ internal class FileInfoViewModelTest {
 
     private val previewFile: File = mock()
     private val getImageNodeByIdUseCase = mock<GetImageNodeByIdUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val nodeDestinationMapper = mock<NodeDestinationMapper>()
 
     @BeforeEach
@@ -219,7 +216,6 @@ internal class FileInfoViewModelTest {
             isBusinessAccountActiveUseCase,
             monitorAccountDetailsUseCase,
             getNodeLocationByIdUseCase,
-            getFeatureFlagValueUseCase,
             nodeDestinationMapper,
         )
     }
@@ -269,7 +265,6 @@ internal class FileInfoViewModelTest {
             isBusinessAccountActiveUseCase = isBusinessAccountActiveUseCase,
             getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
             iODispatcher = UnconfinedTestDispatcher(),
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
         )
     }
@@ -312,9 +307,6 @@ internal class FileInfoViewModelTest {
             )
         )
         whenever(monitorAccountDetailsUseCase()).thenReturn(emptyFlow())
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(false)
-        }
     }
 
     @Test

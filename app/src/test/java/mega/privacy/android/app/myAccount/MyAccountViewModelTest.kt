@@ -71,7 +71,6 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
@@ -159,8 +158,6 @@ internal class MyAccountViewModelTest {
         on { invoke() }.thenReturn(myAccountUpdateFlow)
     }
 
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
-
     @BeforeEach
     fun setup() = runTest {
         Dispatchers.setMain(testDispatcher)
@@ -194,7 +191,6 @@ internal class MyAccountViewModelTest {
         whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Active)
         whenever(fileSizeStringMapper(any<Long>())).thenReturn("")
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
         storageStateFlow.value = StorageState.Unknown
     }
 
@@ -240,7 +236,6 @@ internal class MyAccountViewModelTest {
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             getUsedTransferStatusUseCase = getUsedTransferStatusUseCase,
             monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 

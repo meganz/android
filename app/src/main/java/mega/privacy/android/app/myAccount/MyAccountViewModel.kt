@@ -38,7 +38,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_NO_NAVIGATION
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -48,12 +47,10 @@ import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_REFRESH
 import mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE
 import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
-import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.Util
@@ -108,13 +105,11 @@ import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -202,7 +197,6 @@ class MyAccountViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
 ) : ViewModel() {
 
@@ -693,17 +687,10 @@ class MyAccountViewModel @Inject constructor(
      * @param activity
      */
     suspend fun refresh(activity: Activity) = runCatching {
-        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-            Intent(activity, MegaActivity::class.java).apply {
-                action = ACTION_REFRESH
-                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }.also { activity.startActivity(it) }
-        } else {
-            Intent(activity, LoginActivity::class.java).apply {
-                putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                action = ACTION_REFRESH
-            }.also { activity.startActivityForResult(it, REQUEST_CODE_REFRESH) }
-        }
+        Intent(activity, MegaActivity::class.java).apply {
+            action = ACTION_REFRESH
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }.also { activity.startActivity(it) }
     }.onFailure {
         Timber.e(it, "Error refreshing account")
     }

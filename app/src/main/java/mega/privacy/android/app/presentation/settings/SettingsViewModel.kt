@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -33,7 +31,6 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
-import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -54,14 +51,12 @@ import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.SetShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetSubFolderMediaDiscoveryEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.ToggleContactLinksOptionUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import timber.log.Timber
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
@@ -70,7 +65,6 @@ class SettingsViewModel @Inject constructor(
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val monitorContactLinksOptionUseCase: MonitorContactLinksOptionUseCase,
-    private val startScreen: MonitorStartScreenPreference,
     private val monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
@@ -204,10 +198,6 @@ class SettingsViewModel @Inject constructor(
                     .map { accountDetail ->
                         { state: SettingsState -> state.copy(accountDetail = accountDetail) }
                     },
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) }
-                    .map { isSingleActivityEnabled ->
-                        { state: SettingsState -> state.copy(isSingleActivityEnabled = isSingleActivityEnabled) }
-                    },
             ).catch {
                 Timber.e(it)
             }.collect {
@@ -223,29 +213,16 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun monitorStartScreenSummary(): Flow<(SettingsState) -> SettingsState> {
-        return flow { emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) }
-            .flatMapLatest { singleActivityFlagEnabled ->
-                if (singleActivityFlagEnabled) {
-                    monitorStartScreenPreferenceDestinationUseCase()
-                        .map { destinationPreference ->
-                            screenPreferenceDestinationMapper(destinationPreference)
-                                ?: defaultStartScreen
-                        }.map { destination ->
-                            startScreenSummaryMapper(mainDestinations.first { it.destination == destination })
-                        }.map { screenName ->
-                            { state: SettingsState -> state.copy(startScreenSummary = screenName) }
-                        }
-                } else {
-                    startScreen()
-                        .map { startScreen ->
-                            startScreenSummaryMapper(startScreen)
-                        }.map { screenName ->
-                            { state: SettingsState -> state.copy(startScreenSummary = screenName) }
-                        }
-                }
+    private fun monitorStartScreenSummary(): Flow<(SettingsState) -> SettingsState> =
+        monitorStartScreenPreferenceDestinationUseCase()
+            .map { destinationPreference ->
+                screenPreferenceDestinationMapper(destinationPreference)
+                    ?: defaultStartScreen
+            }.map { destination ->
+                startScreenSummaryMapper(mainDestinations.first { it.destination == destination })
+            }.map { screenName ->
+                { state: SettingsState -> state.copy(startScreenSummary = screenName) }
             }
-    }
 
     /**
      * Get link for Cookie policy page
