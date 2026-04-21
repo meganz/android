@@ -30,8 +30,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
@@ -50,7 +48,6 @@ import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
-import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -224,19 +221,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         enforceSingleActivityGuard()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
-        collectFlow(
-            combine(
-                flow { emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) },
-                billingViewModel.billingUpdateEvent,
-                ::Pair
-            )
-        ) { (singleActivityFlagEnabled, billingEvent) ->
+        collectFlow(billingViewModel.billingUpdateEvent) { billingEvent ->
             if (billingEvent is BillingEvent.OnPurchaseUpdate) {
                 onPurchasesUpdated(
                     purchases = billingEvent.purchases,
                     activeSubscription = billingEvent.activeSubscription,
                     source = billingEvent.upgradeSource,
-                    singleActivityFlagEnabled = singleActivityFlagEnabled
                 )
                 billingViewModel.markHandleBillingEvent()
             }
@@ -960,7 +950,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         purchases: List<MegaPurchase>,
         activeSubscription: MegaPurchase?,
         source: UpgradeSource,
-        singleActivityFlagEnabled: Boolean,
     ) {
         val type: PurchaseType = if (purchases.isNotEmpty()) {
             val purchase = purchases.first()
@@ -969,9 +958,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             if (billingViewModel.isPurchased(purchase)) {
                 //payment has been processed
                 Timber.d("Purchase $sku successfully")
-                if (singleActivityFlagEnabled.not()) {
-                    RatingHandlerImpl(this).updateTransactionFlag(true)
-                }
                 PurchaseType.SUCCESS
             } else {
                 //payment is being processed or in unknown state

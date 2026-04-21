@@ -7,8 +7,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.SnackbarDuration
@@ -19,8 +17,6 @@ import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,23 +34,12 @@ class SnackBarHandlerImpl @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
 ) : SnackBarHandler {
     private val snackBarDecoration = MutableSharedFlow<SnackBarDecoration>()
-    private var isSingleActivityEnabled = MutableStateFlow<Boolean?>(null)
 
     init {
-        getFeatureEnabledValue()
         monitorSnackbarDecoration()
-    }
-
-    private fun getFeatureEnabledValue() {
-        applicationScope.launch {
-            isSingleActivityEnabled.update {
-                getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-            }
-        }
     }
 
     private fun monitorSnackbarDecoration() {

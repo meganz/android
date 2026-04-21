@@ -23,7 +23,6 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -32,15 +31,12 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadDocumentFileUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadParentDocumentFileUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -64,7 +60,6 @@ class CompletedTransferActionsViewModelTest {
     private val deleteCompletedTransferUseCase = mock<DeleteCompletedTransferUseCase>()
     private val getNodeByHandleUseCase = mock<GetNodeByHandleUseCase>()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getOfflineNodeInformationByNodeIdUseCase =
         mock<GetOfflineNodeInformationByNodeIdUseCase>()
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
@@ -148,7 +143,6 @@ class CompletedTransferActionsViewModelTest {
             deleteCompletedTransferUseCase = deleteCompletedTransferUseCase,
             getNodeByHandleUseCase = getNodeByHandleUseCase,
             fileTypeInfoMapper = fileTypeInfoMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getOfflineNodeInformationByNodeIdUseCase = getOfflineNodeInformationByNodeIdUseCase,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
         )
@@ -164,13 +158,11 @@ class CompletedTransferActionsViewModelTest {
             deleteCompletedTransferUseCase,
             getNodeByHandleUseCase,
             fileTypeInfoMapper,
-            getFeatureFlagValueUseCase,
             getOfflineNodeInformationByNodeIdUseCase,
             isNodeInRubbishBinUseCase,
         )
 
         wheneverBlocking { monitorConnectivityUseCase() } doReturn flowOf(true)
-        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
 
     @Test
@@ -452,69 +444,55 @@ class CompletedTransferActionsViewModelTest {
         verify(deleteCompletedTransferUseCase).invoke(completedDownload, false)
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that onViewInFolder emits new download event when is invoked with a download completed transfer`(
-        singleActivity: Boolean,
-    ) = runTest {
-        mockStatic(Uri::class.java).use {
-            mockCompletedTransferUriPath(completedOffline)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
+    @Test
+    fun `test that onViewInFolder emits new download event when is invoked with a download completed transfer`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                mockCompletedTransferUriPath(completedOffline)
 
-            underTest.onViewInFolder(completedDownload)
+                underTest.onViewInFolder(completedDownload)
+
+                assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
+                    ViewInFolderEvent.Download::class.java
+                )
+                assertThat(((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content as? ViewInFolderEvent.Found)?.singleActivity).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that onViewInFolder emits new download to offline event when is invoked with a download to offline completed transfer`() =
+        runTest {
+            mockStatic(Uri::class.java).use {
+                mockCompletedTransferUriPath(completedOffline)
+                val offlineInfo = mock<OfflineFileInformation> {
+                    on { this.id } doReturn 425
+                    on { this.name } doReturn "parent"
+                }
+                val expected = ViewInFolderEvent.DownloadToOffline(
+                    singleActivity = true,
+                    fileName = completedOffline.fileName,
+                    parentNodeOfflineId = offlineInfo.id,
+                    title = offlineInfo.name,
+                    path = completedOffline.path
+                )
+                whenever(getOfflineNodeInformationByNodeIdUseCase(NodeId(completedOffline.parentHandle))) doReturn offlineInfo
+                underTest.onViewInFolder(completedOffline)
+
+                assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content)
+                    .isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that onViewInFolder emits new upload event when is invoked with an upload completed transfer`() =
+        runTest {
+            underTest.onViewInFolder(completedUpload)
 
             assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
-                ViewInFolderEvent.Download::class.java
+                ViewInFolderEvent.Upload::class.java
             )
-            assertThat(((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content as? ViewInFolderEvent.Found)?.singleActivity).isEqualTo(
-                singleActivity
-            )
+            assertThat(((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content as? ViewInFolderEvent.Found)?.singleActivity).isTrue()
         }
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that onViewInFolder emits new download to offline event when is invoked with a download to offline completed transfer`(
-        singleActivity: Boolean,
-    ) = runTest {
-        mockStatic(Uri::class.java).use {
-            mockCompletedTransferUriPath(completedOffline)
-            val offlineInfo = mock<OfflineFileInformation> {
-                on { this.id } doReturn 425
-                on { this.name } doReturn "parent"
-            }
-            val expected = ViewInFolderEvent.DownloadToOffline(
-                singleActivity = singleActivity,
-                fileName = completedOffline.fileName,
-                parentNodeOfflineId = offlineInfo.id,
-                title = offlineInfo.name,
-                path = completedOffline.path
-            )
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
-            whenever(getOfflineNodeInformationByNodeIdUseCase(NodeId(completedOffline.parentHandle))) doReturn offlineInfo
-            underTest.onViewInFolder(completedOffline)
-
-            assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content)
-                .isEqualTo(expected)
-        }
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that onViewInFolder emits new upload event when is invoked with an upload completed transfer`(
-        singleActivity: Boolean,
-    ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn singleActivity
-
-        underTest.onViewInFolder(completedUpload)
-
-        assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
-            ViewInFolderEvent.Upload::class.java
-        )
-        assertThat(((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content as? ViewInFolderEvent.Found)?.singleActivity).isEqualTo(
-            singleActivity
-        )
-    }
 
     @Test
     fun `test that onViewInFolder emits not found event when is invoked with a completed transfer that does not exist anymore`() =

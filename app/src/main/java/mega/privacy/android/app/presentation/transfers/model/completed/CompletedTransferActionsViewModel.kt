@@ -18,7 +18,6 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -27,7 +26,6 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadDocumentFileUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.GetDownloadParentDocumentFileUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -46,7 +44,6 @@ class CompletedTransferActionsViewModel @Inject constructor(
     private val deleteCompletedTransferUseCase: DeleteCompletedTransferUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getOfflineNodeInformationByNodeIdUseCase: GetOfflineNodeInformationByNodeIdUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
 ) : ViewModel() {
@@ -190,12 +187,11 @@ class CompletedTransferActionsViewModel @Inject constructor(
      */
     fun onViewInFolder(completedTransfer: CompletedTransfer) {
         viewModelScope.launch {
-            val singleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
             val viewInFolderEvent = if (completedTransfer.type.isDownloadType()) {
                 if (completedTransfer.isOffline == true) {
                     getOfflineNodeInformationByNodeIdUseCase(NodeId(completedTransfer.parentHandle))?.let { offlineInfo ->
                         ViewInFolderEvent.DownloadToOffline(
-                            singleActivity = singleActivity,
+                            singleActivity = true,
                             fileName = completedTransfer.fileName,
                             parentNodeOfflineId = offlineInfo.id,
                             title = offlineInfo.name,
@@ -204,7 +200,7 @@ class CompletedTransferActionsViewModel @Inject constructor(
                     }
                 } else {
                     ViewInFolderEvent.Download(
-                        singleActivity = singleActivity,
+                        singleActivity = true,
                         fileName = completedTransfer.fileName,
                         uriPath = _uiState.value.parentUri
                             ?.takeUnless { it.toString().isBlank() }
@@ -214,7 +210,7 @@ class CompletedTransferActionsViewModel @Inject constructor(
                 }
             } else {
                 ViewInFolderEvent.Upload(
-                    singleActivity,
+                    true,
                     completedTransfer.fileName,
                     NodeId(
                         uiState.value.node?.parentId?.longValue

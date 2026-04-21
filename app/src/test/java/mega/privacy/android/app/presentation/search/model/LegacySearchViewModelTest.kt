@@ -42,7 +42,6 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -66,7 +65,6 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LegacySearchViewModelTest {
     private lateinit var underTest: LegacySearchViewModel
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
@@ -104,7 +102,6 @@ class LegacySearchViewModelTest {
 
     private fun initViewModel() {
         underTest = LegacySearchViewModel(
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
@@ -134,7 +131,7 @@ class LegacySearchViewModelTest {
         whenever(
             getSortOrderByNodeSourceTypeUseCase(
                 nodeSourceType,
-                false
+                true
             )
         ).thenReturn(SortOrder.ORDER_SIZE_ASC)
         whenever(stateHandle.get<NodeSourceType>(SearchActivity.SEARCH_TYPE)).thenReturn(
@@ -144,14 +141,12 @@ class LegacySearchViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFakeFlow)
         whenever(nodeSourceTypeToSearchTargetMapper(any())).thenReturn(SearchTarget.ROOT_NODES)
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     @AfterEach
     fun tearDown() {
         nodeList.clear()
         reset(
-            getFeatureFlagValueUseCase,
             monitorNodeUpdatesUseCase,
             setViewType,
             monitorViewType,
@@ -383,7 +378,7 @@ class LegacySearchViewModelTest {
                     isSingleActivityEnabled = any(),
                 )
             ).thenReturn(nodeList)
-            whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType, false)).thenReturn(
+            whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType, true)).thenReturn(
                 SortOrder.ORDER_SIZE_ASC
             )
             underTest.updateSearchQuery("xyz") // Trigger search with a non-empty query first
@@ -393,7 +388,7 @@ class LegacySearchViewModelTest {
                 assertThat(state.searchQuery).isEqualTo(query)
                 assertThat(state.sortOrder).isEqualTo(SortOrder.ORDER_SIZE_ASC)
             }
-            verify(getSortOrderByNodeSourceTypeUseCase, times(1)).invoke(nodeSourceType, false)
+            verify(getSortOrderByNodeSourceTypeUseCase, times(1)).invoke(nodeSourceType, true)
         }
 
     @Test

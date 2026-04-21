@@ -49,7 +49,6 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -59,7 +58,6 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
-import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -67,7 +65,6 @@ import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * SearchActivity View Model
- * @property getFeatureFlagValueUseCase [GetFeatureFlagValueUseCase]
  * @property monitorNodeUpdatesUseCase [MonitorNodeUpdatesUseCase]
  * @property searchFilterMapper [SearchFilterMapper]
  * @property nodeSourceTypeToSearchTargetMapper [NodeSourceTypeToSearchTargetMapper]
@@ -81,7 +78,6 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 @HiltViewModel
 class LegacySearchViewModel @Inject constructor(
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val searchUseCase: SearchUseCase,
     private val searchFilterMapper: SearchFilterMapper,
@@ -182,15 +178,11 @@ class LegacySearchViewModel @Inject constructor(
      */
     private fun executeSearchQuery() = suspend {
         cancelCancelTokenUseCase()
-        val isSingleActivityEnabled =
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }.getOrDefault(
-                false
-            )
         searchUseCase(
             parentHandle = NodeId(getCurrentParentHandle()),
             nodeSourceType = nodeSourceType,
             searchParameters = getSearchParameters(),
-            isSingleActivityEnabled = isSingleActivityEnabled,
+            isSingleActivityEnabled = true,
         )
     }
 
@@ -252,12 +244,8 @@ class LegacySearchViewModel @Inject constructor(
                 )
             }
             val sortOrder = runCatching {
-                val isSingleActivityEnabled =
-                    runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }.getOrDefault(
-                        false
-                    )
                 if (state.value.isAtRootWithEmptyQuery) {
-                    getSortOrderByNodeSourceTypeUseCase(nodeSourceType, isSingleActivityEnabled)
+                    getSortOrderByNodeSourceTypeUseCase(nodeSourceType, true)
                 } else {
                     getCloudSortOrder()
                 }
