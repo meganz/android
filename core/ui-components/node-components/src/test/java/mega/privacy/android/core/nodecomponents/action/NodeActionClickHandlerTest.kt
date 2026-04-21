@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -83,6 +84,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ViewInFolderMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.domain.entity.ShareData
@@ -90,8 +92,10 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeFavoriteUseCase
@@ -110,8 +114,6 @@ import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNodeIdUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.MegaNavigator
@@ -1108,6 +1110,130 @@ class NodeActionClickHandlerTest {
 
         verify(mockGetLocalFilePathUseCase).invoke(mockFileNode)
     }
+
+    @Test
+    fun `test ShareAction single node handle collects connectivity before NonCancellable for offline source`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.OFFLINE)
+            whenever(mockMonitorConnectivityUseCase()).thenReturn(flowOf(true))
+            whenever(mockGetOfflineNodeInformationByNodeIdUseCase(any())).thenReturn(null)
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockMonitorConnectivityUseCase).invoke()
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test ShareAction single node handle does not collect connectivity for non-offline source`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.CLOUD_DRIVE)
+            whenever(mockGetLocalFilePathUseCase(any())).thenReturn("/test/path")
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockMonitorConnectivityUseCase, never()).invoke()
+        }
+
+    @Test
+    fun `test ShareAction single node handle calls dismiss even when share throws exception`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.CLOUD_DRIVE)
+            whenever(mockGetLocalFilePathUseCase(any())).thenThrow(RuntimeException("File error"))
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test ShareAction single node handle falls through to link sharing when local file does not exist`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.CLOUD_DRIVE)
+            whenever(mockGetLocalFilePathUseCase(any())).thenReturn("/nonexistent/path.pdf")
+            whenever(
+                mockExportNodeUseCase(
+                    any(),
+                    anyOrNull(),
+                    any()
+                )
+            ).thenReturn("https://link.example.com")
+
+            action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+            testScope.advanceUntilIdle()
+
+            // Should fall through to export link since file doesn't exist
+            verify(mockExportNodeUseCase).invoke(any(), anyOrNull(), any())
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test ShareAction multi node handle collects connectivity before NonCancellable for offline source`() =
+        runTest {
+            val action = ShareActionClickHandler(
+                mockGetLocalFilePathUseCase,
+                mockExportNodeUseCase,
+                mockGetOfflineNodeInformationByNodeIdUseCase,
+                mockGetOfflineFileUseCase,
+                mockNodeShareContentUrisIntentMapper,
+                mockMonitorConnectivityUseCase
+            )
+            val menuAction = mock<ShareMenuAction>()
+            val nodes = listOf(mockFileNode)
+
+            whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.OFFLINE)
+            whenever(mockMonitorConnectivityUseCase()).thenReturn(flowOf(true))
+            whenever(mockGetOfflineNodeInformationByNodeIdUseCase(any())).thenReturn(null)
+
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockMonitorConnectivityUseCase).invoke()
+            verify(mockViewModel).dismiss()
+        }
 
     // RemoveShareAction Tests
     @Test

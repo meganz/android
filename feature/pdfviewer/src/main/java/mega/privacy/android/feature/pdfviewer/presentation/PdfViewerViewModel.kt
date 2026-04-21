@@ -10,6 +10,8 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
@@ -59,6 +62,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val setOrUpdateLastPageViewedInPdfUseCase: SetOrUpdateLastPageViewedInPdfUseCase,
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
 ) : ViewModel() {
@@ -78,6 +82,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         initializeFromArgs()
         observeSearchPipeline()
         observeConnectivity()
+        monitorOfflineNodeAvailability()
     }
 
     private fun observeConnectivity() {
@@ -86,6 +91,21 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 .catch { Timber.e(it, "Connectivity monitoring failed") }
                 .collect { connected ->
                     _state.update { it.copy(isOnline = connected) }
+                }
+        }
+    }
+
+    private fun monitorOfflineNodeAvailability() {
+        if (args.nodeSourceType != NodeSourceType.OFFLINE) return
+        viewModelScope.launch {
+            monitorOfflineNodeUpdatesUseCase()
+                .catch { Timber.e(it, "Offline node monitoring failed") }
+                .collect { offlineList ->
+                    val handle = args.nodeHandle.toString()
+                    val stillAvailable = offlineList.any { it.handle == handle }
+                    if (!stillAvailable) {
+                        _state.update { it.copy(dismissEvent = triggered) }
+                    }
                 }
         }
     }
@@ -370,6 +390,10 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+
+    fun resetDismissEvent() {
+        _state.update { it.copy(dismissEvent = consumed) }
     }
 
     fun activateSearch() {

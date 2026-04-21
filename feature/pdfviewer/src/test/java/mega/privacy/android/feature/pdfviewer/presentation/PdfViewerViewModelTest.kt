@@ -5,7 +5,9 @@ import android.content.res.Resources
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.shockwave.pdfium.PdfTextMatch
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
@@ -14,9 +16,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
@@ -57,6 +61,7 @@ class PdfViewerViewModelTest {
     private val getDataBytesFromUrlUseCase = mock<GetDataBytesFromUrlUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
+    private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val context = mock<Context>()
 
     private val defaultArgs = PdfViewerViewModel.Args(
@@ -80,6 +85,7 @@ class PdfViewerViewModelTest {
             getDataBytesFromUrlUseCase,
             monitorConnectivityUseCase,
             saveRecentlyUsedItemUseCase,
+            monitorOfflineNodeUpdatesUseCase,
             context,
         )
 
@@ -92,6 +98,7 @@ class PdfViewerViewModelTest {
         whenever(context.resources).thenReturn(resources)
         whenever(getLastPageViewedInPdfUseCase(12345L)).thenReturn(1)
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
     }
 
     private fun initViewModel(
@@ -108,8 +115,9 @@ class PdfViewerViewModelTest {
             setOrUpdateLastPageViewedInPdfUseCase = setOrUpdateLastPageViewedInPdfUseCase,
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            ioDispatcher = testDispatcher,
+            monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
+            ioDispatcher = testDispatcher,
         )
     }
 
@@ -589,5 +597,124 @@ class PdfViewerViewModelTest {
             type = RecentlyUsedType.PDF,
             fileName = "Test Document.pdf",
         )
+    }
+
+    @Test
+    fun `test that monitorOfflineNodeAvailability does not trigger dismissEvent when nodeSourceType is not OFFLINE`() =
+        runTest {
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+
+            underTest = initViewModel(
+                args = defaultArgs.copy(nodeSourceType = NodeSourceType.CLOUD_DRIVE)
+            )
+            advanceUntilIdle()
+
+            verifyNoInteractions(monitorOfflineNodeUpdatesUseCase)
+        }
+
+    @Test
+    fun `test that monitorOfflineNodeAvailability does not trigger dismissEvent when node is still in offline list`() =
+        runTest {
+            val offlineFlow = MutableSharedFlow<List<Offline>>()
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(offlineFlow)
+
+            val offlineArgs = defaultArgs.copy(
+                nodeHandle = 12345L,
+                nodeSourceType = NodeSourceType.OFFLINE,
+                contentUri = "/offline/test.pdf",
+                isLocalContent = true,
+            )
+            underTest = initViewModel(args = offlineArgs)
+            advanceUntilIdle()
+
+            offlineFlow.emit(
+                listOf(
+                    Offline(
+                        id = 1,
+                        handle = "12345",
+                        path = "/offline",
+                        name = "test.pdf",
+                        parentId = 0,
+                        type = "0",
+                        origin = 0,
+                        handleIncoming = "",
+                    )
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.dismissEvent).isEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that monitorOfflineNodeAvailability triggers dismissEvent when node is removed from offline`() =
+        runTest {
+            val offlineFlow = MutableSharedFlow<List<Offline>>()
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(offlineFlow)
+
+            val offlineArgs = defaultArgs.copy(
+                nodeHandle = 12345L,
+                nodeSourceType = NodeSourceType.OFFLINE,
+                contentUri = "/offline/test.pdf",
+                isLocalContent = true,
+            )
+            underTest = initViewModel(args = offlineArgs)
+            advanceUntilIdle()
+
+            offlineFlow.emit(
+                listOf(
+                    Offline(
+                        id = 1,
+                        handle = "12345",
+                        path = "/offline",
+                        name = "test.pdf",
+                        parentId = 0,
+                        type = "0",
+                        origin = 0,
+                        handleIncoming = "",
+                    )
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                awaitItem() // consume current state
+
+                offlineFlow.emit(emptyList())
+                advanceUntilIdle()
+
+                val state = awaitItem()
+                assertThat(state.dismissEvent).isNotEqualTo(consumed)
+            }
+        }
+
+    @Test
+    fun `test that resetDismissEvent consumes dismissEvent`() = runTest {
+        val offlineFlow = MutableSharedFlow<List<Offline>>()
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(offlineFlow)
+
+        val offlineArgs = defaultArgs.copy(
+            nodeHandle = 12345L,
+            nodeSourceType = NodeSourceType.OFFLINE,
+            contentUri = "/offline/test.pdf",
+            isLocalContent = true,
+        )
+        underTest = initViewModel(args = offlineArgs)
+        advanceUntilIdle()
+
+        offlineFlow.emit(emptyList())
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val triggeredState = awaitItem()
+            assertThat(triggeredState.dismissEvent).isNotEqualTo(consumed)
+
+            underTest.resetDismissEvent()
+            val consumedState = awaitItem()
+            assertThat(consumedState.dismissEvent).isEqualTo(consumed)
+        }
     }
 }

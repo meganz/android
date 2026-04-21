@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -51,6 +53,7 @@ class NodeOptionsBottomSheetViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase = mock()
     private val getOfflineFileInformationByIdUseCase = mock<GetOfflineFileInformationByIdUseCase>()
+    private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
 
     private val sampleFileNode = mock<TypedFileNode>().stub {
@@ -66,6 +69,7 @@ class NodeOptionsBottomSheetViewModelTest {
     @BeforeEach
     fun initViewModel() {
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(nodeMenuProviderRegistry.getBottomSheetOptions(any())).thenReturn(emptySet())
 
         viewModel = NodeOptionsBottomSheetViewModel(
@@ -79,6 +83,7 @@ class NodeOptionsBottomSheetViewModelTest {
             nodeUiItemMapper = nodeUiItemMapper,
             offlineTypedNodeMapper = offlineTypedNodeMapper,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
+            monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             snackbarEventQueue = snackbarEventQueue,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
@@ -195,4 +200,31 @@ class NodeOptionsBottomSheetViewModelTest {
 
         verify(snackbarEventQueue).queueMessage(snackbarAttributes)
     }
+
+    @Test
+    fun `test that getBottomSheetOptions starts offline monitoring when source type is OFFLINE`() =
+        runTest {
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+
+            viewModel.getBottomSheetOptions(123L, NodeSourceType.OFFLINE)
+
+            verify(monitorOfflineNodeUpdatesUseCase).invoke()
+        }
+
+    @Test
+    fun `test that getBottomSheetOptions does not start offline monitoring when source type is not OFFLINE`() =
+        runTest {
+            whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+
+            viewModel.getBottomSheetOptions(123L, NodeSourceType.CLOUD_DRIVE)
+
+            verify(monitorOfflineNodeUpdatesUseCase, never()).invoke()
+        }
 }

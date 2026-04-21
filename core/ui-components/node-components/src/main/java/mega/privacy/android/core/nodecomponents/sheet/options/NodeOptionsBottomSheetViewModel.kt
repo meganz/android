@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
@@ -24,6 +26,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
+import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
@@ -54,9 +57,12 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
 ) : ViewModel() {
+
+    private var offlineMonitorJob: Job? = null
 
     internal val uiState: StateFlow<NodeBottomSheetState>
         field = MutableStateFlow(NodeBottomSheetState())
@@ -81,6 +87,9 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
      * @return state
      */
     fun getBottomSheetOptions(nodeId: Long, nodeSourceType: NodeSourceType) {
+        if (nodeSourceType == NodeSourceType.OFFLINE) {
+            monitorOfflineNodeAvailability(nodeId)
+        }
         viewModelScope.launch {
             val bottomSheetOptions = nodeMenuProviderRegistry.getBottomSheetOptions(nodeSourceType)
             val node = async {
@@ -153,6 +162,26 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                     it.copy(error = triggered(Exception("Node is null")))
                 }
             }
+        }
+    }
+
+    /**
+     * Monitor offline node availability and dismiss the bottom sheet when the node is removed.
+     */
+    private fun monitorOfflineNodeAvailability(nodeId: Long) {
+        offlineMonitorJob?.cancel()
+        offlineMonitorJob = viewModelScope.launch {
+            monitorOfflineNodeUpdatesUseCase()
+                .catch { Timber.e(it) }
+                .collect { offlineList ->
+                    val handle = nodeId.toString()
+                    val stillAvailable = offlineList.any { it.handle == handle }
+                    if (!stillAvailable) {
+                        uiState.update {
+                            it.copy(error = triggered(Exception("Offline node removed")))
+                        }
+                    }
+                }
         }
     }
 

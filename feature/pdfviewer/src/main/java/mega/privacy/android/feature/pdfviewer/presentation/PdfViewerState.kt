@@ -2,6 +2,8 @@ package mega.privacy.android.feature.pdfviewer.presentation
 
 import android.graphics.RectF
 import com.shockwave.pdfium.PdfTextMatch
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
@@ -99,6 +101,7 @@ internal data class PdfViewerState(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val pdfBytes: PdfBytes? = null,
+    val dismissEvent: StateEvent = consumed,
 ) {
     /**
      * Whether the PDF has been loaded successfully

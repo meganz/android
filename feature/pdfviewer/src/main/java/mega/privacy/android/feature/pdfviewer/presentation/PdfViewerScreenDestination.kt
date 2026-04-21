@@ -5,6 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -56,6 +57,12 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
             onTransfer = onTransfer,
+        )
+
+        EventEffect(
+            event = uiState.dismissEvent,
+            onConsumed = viewModel::resetDismissEvent,
+            action = onBack,
         )
 
         PdfViewerScreen(
