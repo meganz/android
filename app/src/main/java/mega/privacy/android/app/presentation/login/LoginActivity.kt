@@ -39,8 +39,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.model.LoginScreen
-import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
@@ -128,9 +128,10 @@ class LoginActivity : BaseActivity() {
             return
         }
 
-        val refreshForShare = intent.action == Constants.ACTION_FILE_EXPLORER_UPLOAD
+        val shouldRedirect = intent.action != Constants.ACTION_FILE_EXPLORER_UPLOAD
+                && !intent.hasExtra(Constants.LAUNCH_INTENT)
         collectFlow(viewModel.state, catchBlock = { Timber.e(it) }) { uiState ->
-            if (uiState.accountSession?.session.isNullOrEmpty() && uiState.isSingleActivityEnabled && !refreshForShare) {
+            if (uiState.accountSession?.session.isNullOrEmpty() && uiState.isSingleActivityEnabled && shouldRedirect) {
                 startActivity(Intent(this@LoginActivity, MegaActivity::class.java))
                 finish()
             }
