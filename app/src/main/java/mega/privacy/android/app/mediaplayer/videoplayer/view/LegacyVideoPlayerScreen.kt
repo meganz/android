@@ -71,7 +71,7 @@ import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerViewMo
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.view.AddSubtitlesDialog
-import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerTopBar
+import mega.privacy.android.app.mediaplayer.videoplayer.view.LegacyVideoPlayerTopBar
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -406,7 +406,7 @@ internal fun LegacyVideoPlayerScreen(
 
                         else -> PaddingValues(0.dp)
                     }
-                    VideoPlayerTopBar(
+                    LegacyVideoPlayerTopBar(
                         modifier = Modifier.padding(horizontalPadding),
                         title = if (orientation == ORIENTATION_PORTRAIT) {
                             ""
