@@ -146,9 +146,6 @@
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
             android:value="true" />
         <activity
-            android:name="mega.privacy.android.app.appstate.RerouteActivity"
-            android:exported="true" />
-        <activity
             android:name=".appstate.MegaActivity"
             android:configChanges="screenSize"
             android:exported="true"

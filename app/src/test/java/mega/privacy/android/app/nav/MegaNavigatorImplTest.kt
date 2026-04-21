@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -32,13 +31,11 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.times
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -113,9 +110,8 @@ class MegaNavigatorImplTest {
         }
 
     @Test
-    fun `test that sendMessageConsideringSingleActivity queues message to snackbarEventQueue when SingleActivity is enabled`() =
+    fun `test that sendMessageConsideringSingleActivity queues message to snackbarEventQueue`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
             whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
             val message = "Test warning message"
 
@@ -128,9 +124,8 @@ class MegaNavigatorImplTest {
         }
 
     @Test
-    fun `test that sendMessageConsideringSingleActivity launches MegaActivity when SingleActivity is enabled and current activity is not MegaActivity`() =
+    fun `test that sendMessageConsideringSingleActivity launches MegaActivity when current activity is not MegaActivity`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
             whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
             val message = "Test warning message"
 
@@ -141,20 +136,8 @@ class MegaNavigatorImplTest {
         }
 
     @Test
-    fun `test that sendMessageConsideringSingleActivity does not call snackbarEventQueue when SingleActivity is disabled`() =
+    fun `test that openTextEditor LocalFile offline emits nav key`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-            val message = "Test warning message"
-
-            underTest.sendMessageConsideringSingleActivity(context, message)
-
-            verifyNoInteractions(snackbarEventQueue)
-        }
-
-    @Test
-    fun `test that openTextEditor LocalFile offline emits nav key when SingleActivity is enabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
             whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
 
             underTest.openTextEditor(
@@ -182,27 +165,8 @@ class MegaNavigatorImplTest {
         }
 
     @Test
-    fun `test that openTextEditor LocalFile offline starts legacy activity when SingleActivity is disabled`() =
+    fun `test that openTextEditor LocalFile zip emits nav key`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
-
-            underTest.openTextEditor(
-                context = context,
-                params = OpenTextEditorParams.LocalFile(
-                    localPath = "/data/offline/note.txt",
-                    fileName = "note.txt",
-                    nodeSourceType = Constants.OFFLINE_ADAPTER,
-                ),
-            )
-
-            verify(context).startActivity(any())
-        }
-
-    @Test
-    fun `test that openTextEditor LocalFile zip emits nav key when SingleActivity is enabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
             whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
 
             underTest.openTextEditor(
@@ -230,27 +194,8 @@ class MegaNavigatorImplTest {
         }
 
     @Test
-    fun `test that openTextEditor LocalFile zip starts legacy activity when SingleActivity is disabled`() =
+    fun `test that openTextEditor Chat emits nav key`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
-
-            underTest.openTextEditor(
-                context = context,
-                params = OpenTextEditorParams.LocalFile(
-                    localPath = "/data/zip/readme.txt",
-                    fileName = "readme.txt",
-                    nodeSourceType = Constants.ZIP_ADAPTER,
-                ),
-            )
-
-            verify(context).startActivity(any())
-        }
-
-    @Test
-    fun `test that openTextEditor Chat emits nav key when SingleActivity is enabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
             whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
 
             underTest.openTextEditor(
@@ -269,19 +214,6 @@ class MegaNavigatorImplTest {
                 eq(NavPriority.Default),
                 isNull(),
             )
-        }
-
-    @Test
-    fun `test that openTextEditor Chat starts legacy activity when SingleActivity is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-
-            underTest.openTextEditor(
-                context = context,
-                params = OpenTextEditorParams.Chat(chatId = 123L, messageId = 456L),
-            )
-
-            verify(context).startActivity(any())
         }
 
     @Test

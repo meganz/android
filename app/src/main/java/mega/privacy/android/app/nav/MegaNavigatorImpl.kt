@@ -16,25 +16,16 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
-import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.megachat.ContactAttachmentActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
-import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -42,13 +33,9 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
-import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
-import mega.privacy.android.app.presentation.search.SearchActivity
-import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -62,7 +49,6 @@ import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
-import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
@@ -72,7 +58,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
@@ -110,7 +95,6 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
@@ -159,41 +143,27 @@ internal class MegaNavigatorImpl @Inject constructor(
         context: Context,
         singleActivityDestination: NavKey?,
         singleActivityMessage: String? = null,
-        legacyNavigation: suspend () -> Unit,
     ) = navigateForSingleActivity(
         context = context,
         singleActivityDestinations = listOfNotNull(singleActivityDestination),
         singleActivityMessage = singleActivityMessage,
-        legacyNavigation = legacyNavigation
     )
 
     private fun navigateForSingleActivity(
         context: Context,
         singleActivityDestinations: List<NavKey>,
         singleActivityMessage: String? = null,
-        legacyNavigation: suspend () -> Unit,
     ) {
         applicationScope.launch {
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
-                .onFailure {
-                    withContext(mainDispatcher) {
-                        legacyNavigation()
-                    }
-                }.onSuccess { singleActivity ->
-                    withContext(mainDispatcher) {
-                        if (singleActivity) {
-                            launchMegaActivityIfNeeded(context)
-                            singleActivityDestinations.takeIf { it.isNotEmpty() }?.let {
-                                navigationQueue.emit(it)
-                            }
-                            singleActivityMessage?.let {
-                                snackbarEventQueue.queueMessage(singleActivityMessage)
-                            }
-                        } else {
-                            legacyNavigation()
-                        }
-                    }
+            withContext(mainDispatcher) {
+                launchMegaActivityIfNeeded(context)
+                singleActivityDestinations.takeIf { it.isNotEmpty() }?.let {
+                    navigationQueue.emit(it)
                 }
+                singleActivityMessage?.let {
+                    snackbarEventQueue.queueMessage(singleActivityMessage)
+                }
+            }
         }
     }
 
@@ -206,18 +176,13 @@ internal class MegaNavigatorImpl @Inject constructor(
         legacyNavigation: suspend () -> Unit,
     ) {
         applicationScope.launch {
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
-                .onFailure {
-                    legacyNavigation()
-                }.onSuccess { singleActivity ->
-                    val isMegaActivity =
-                        activityLifecycleHandler.getCurrentActivity() is MegaActivity
-                    if (singleActivity && isMegaActivity) {
-                        singleActivityDestination?.let { navigationQueue.emit(it) }
-                    } else {
-                        legacyNavigation()
-                    }
-                }
+            val isMegaActivity =
+                activityLifecycleHandler.getCurrentActivity() is MegaActivity
+            if (isMegaActivity) {
+                singleActivityDestination?.let { navigationQueue.emit(it) }
+            } else {
+                legacyNavigation()
+            }
         }
     }
 
@@ -236,9 +201,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openSettingsCameraUploads(context: Context) {
         navigateForSingleActivity(
             context = context, singleActivityDestination = SettingsCameraUploadsNavKey
-        ) {
-            context.startActivity(Intent(context, SettingsCameraUploadsActivity::class.java))
-        }
+        )
     }
 
     override fun openChat(
@@ -331,13 +294,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 chatId = chatId,
                 email = email,
             )
-        ) {
-            val intent = Intent(context, ManageChatHistoryActivity::class.java).apply {
-                putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
-                email?.let { putExtra(Constants.EMAIL, it) }
-            }
-            context.startActivity(intent)
-        }
+        )
     }
 
     override fun openZipBrowserActivity(
@@ -372,9 +329,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openTransfers(context: Context) {
         navigateForSingleActivity(
             context = context, singleActivityDestination = TransfersNavKey()
-        ) {
-            context.startActivity(TransfersActivity.getIntent(context))
-        }
+        )
     }
 
     override fun openMediaPlayerActivityByFileNode(
@@ -560,9 +515,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openSyncs(context: Context) {
         navigateForSingleActivity(
             context = context, singleActivityDestination = SyncListNavKey
-        ) {
-            context.startActivity(Intent(context, SyncHostActivity::class.java))
-        }
+        )
     }
 
 
@@ -742,19 +695,6 @@ internal class MegaNavigatorImpl @Inject constructor(
                         fromHome = params.fromHome,
                     )
                 ),
-                legacyNavigation = {
-                    context.startActivity(
-                        TextEditorActivity.createIntent(
-                            context = context,
-                            nodeHandle = params.nodeId.longValue,
-                            mode = params.mode.value,
-                            nodeSourceType = params.nodeSourceType,
-                            fileName = params.fileName,
-                        ).apply {
-                            if (params.fromHome) putExtra(FROM_HOME_PAGE, true)
-                        }
-                    )
-                },
             )
             is OpenTextEditorParams.LocalFile -> navigateForSingleActivity(
                 context = context,
@@ -763,16 +703,6 @@ internal class MegaNavigatorImpl @Inject constructor(
                     fileName = params.fileName,
                     nodeSourceType = params.nodeSourceType,
                 ),
-                legacyNavigation = {
-                    context.startActivity(
-                        Intent(context, TextEditorActivity::class.java).apply {
-                            putExtra(INTENT_EXTRA_KEY_PATH, params.localPath)
-                            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, params.nodeSourceType)
-                            putExtra(INTENT_EXTRA_KEY_FILE_NAME, params.fileName)
-                            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                        }
-                    )
-                },
             )
             is OpenTextEditorParams.Chat -> navigateForSingleActivity(
                 context = context,
@@ -780,15 +710,6 @@ internal class MegaNavigatorImpl @Inject constructor(
                     chatId = params.chatId,
                     messageId = params.messageId,
                 ),
-                legacyNavigation = {
-                    context.startActivity(
-                        Intent(context, TextEditorActivity::class.java).apply {
-                            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
-                            putExtra(LEGACY_MESSAGE_ID, params.messageId)
-                            putExtra(ChatNavKey.LEGACY_CHAT_ID, params.chatId)
-                        }
-                    )
-                },
             )
             is OpenTextEditorParams.FileLink -> {
                 val intent = Intent(context, TextEditorActivity::class.java).apply {
@@ -812,28 +733,14 @@ internal class MegaNavigatorImpl @Inject constructor(
         navigateForSingleActivity(
             context = context,
             singleActivityDestination = GetLinkNavKey(handles = handlesList)
-        ) {
-            val intent = Intent(context, GetLinkActivity::class.java).apply {
-                if (handles.size == 1) {
-                    putExtra(Constants.HANDLE, handles[0])
-                } else {
-                    putExtra(Constants.HANDLE_LIST, longArrayOf(*handles))
-                }
-            }
-            context.startActivity(intent)
-        }
+        )
     }
 
     override fun openFileInfoActivity(context: Context, handle: Long) {
         navigateForSingleActivity(
             context = context,
             singleActivityDestination = FileInfoNavKey(handle = handle)
-        ) {
-            context.startActivity(
-                Intent(context, FileInfoActivity::class.java)
-                    .putExtra(Constants.HANDLE, handle)
-            )
-        }
+        )
     }
 
     override fun openOfflineFileInfoActivity(
@@ -842,14 +749,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     ) {
         navigateForSingleActivity(
             context = context, singleActivityDestination = OfflineInfoNavKey(handle = handle)
-        ) {
-            context.startActivity(
-                Intent(context, OfflineFileInfoActivity::class.java).putExtra(
-                    Constants.HANDLE,
-                    handle
-                )
-            )
-        }
+        )
     }
 
     override fun openFileContactListActivity(
@@ -859,10 +759,6 @@ internal class MegaNavigatorImpl @Inject constructor(
     ) {
         navigateForSingleActivity(
             context = context,
-            legacyNavigation = {
-                @Suppress("DEPRECATION")
-                openFileContactListActivity(context = context, handle = handle)
-            },
             singleActivityDestination = FileContactInfoNavKey(
                 folderHandle = handle,
                 folderName = nodeName
@@ -894,15 +790,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                 email = email,
                 isIncomingShares = isIncomingShares
             )
-        ) {
-            context.startActivity(
-                AuthenticityCredentialsActivity.getIntent(
-                    context = context,
-                    email = email,
-                    isIncomingShares = isIncomingShares
-                )
-            )
-        }
+        )
     }
 
     override fun launchUrl(context: Context?, url: String?, appendNoPlansParam: Boolean) {
@@ -938,16 +826,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             navigateForSingleActivity(
                 context = context,
                 singleActivityDestination = singleActivityDestination
-            ) {
-                val intent = SaveScannedDocumentsActivity.getIntent(
-                    context = context,
-                    fromChat = originatedFromChat,
-                    parentHandle = cloudDriveParentHandle,
-                    pdfUri = scanPdfUri,
-                    imageUris = scanSoloImageUri?.let { listOf(it) } ?: emptyList(),
-                )
-                context.startActivity(intent)
-            }
+            )
         }
     }
 
@@ -960,15 +839,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             context = context, singleActivityDestination = LegacySearchNavKey(
                 nodeSourceType = nodeSourceType, parentHandle = parentHandle
             )
-        ) {
-            context.startActivity(
-                SearchActivity.getIntent(
-                    context = context,
-                    nodeSourceType = nodeSourceType,
-                    parentHandle = parentHandle,
-                )
-            )
-        }
+        )
     }
 
     override fun openTakedownPolicyLink(context: Context) {
@@ -988,14 +859,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openAchievements(context: Context) {
         navigateForSingleActivity(
             context = context, singleActivityDestination = AchievementNavKey
-        ) {
-            context.startActivity(
-                Intent(
-                    context,
-                    MyAccountActivity::class.java
-                ).setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
-            )
-        }
+        )
     }
 
     override fun openAskForCustomizedPlan(
@@ -1013,13 +877,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openMyAccountActivity(context: Context, flags: Int?) {
         navigateForSingleActivity(
             context = context, singleActivityDestination = MyAccountNavKey()
-        ) {
-            val intent = Intent(context, MyAccountActivity::class.java)
-            flags?.let {
-                intent.flags = flags
-            }
-            context.startActivity(intent)
-        }
+        )
     }
 
     @Deprecated("This function will be removed after SingleActivity flag goes live. Note that any calls to it while the flag is enabled will result in an exception")
@@ -1030,19 +888,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         bundle: Bundle?,
         flags: Int?,
     ) {
-        applicationScope.launch {
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
-                .onSuccess {
-                    if (it) {
-                        throw IllegalStateException("Navigating to ManagerActivity is not allowed when the SingleActivity flag is enabled")
-                    } else {
-                        navigateToManagerActivity(context, action, data, bundle, flags)
-                    }
-                }
-                .onFailure {
-                    navigateToManagerActivity(context, action, data, bundle, flags)
-                }
-        }
+        throw IllegalStateException("Navigating to ManagerActivity is not allowed when the SingleActivity flag is enabled")
     }
 
     override fun openManagerActivity(
@@ -1059,9 +905,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             context = context,
             singleActivityDestination = singleActivityDestination,
             singleActivityMessage = singleActivityMessage,
-        ) {
-            navigateToManagerActivity(context, action, data, bundle, flags, onIntentCreated)
-        }
+        )
     }
 
     override fun openManagerActivity(
@@ -1078,9 +922,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             context = context,
             singleActivityDestinations = singleActivityDestinations,
             singleActivityMessage = singleActivityMessage,
-        ) {
-            navigateToManagerActivity(context, action, data, bundle, flags)
-        }
+        )
     }
 
     override suspend fun getPendingIntentConsideringSingleActivity(
@@ -1129,33 +971,14 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override suspend fun sendMessageConsideringSingleActivity(context: Context, message: String) {
-        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-            launchMegaActivityIfNeeded(context)
-            snackbarEventQueue.queueMessage(message)
-        } else {
-            navigateToManagerActivity(
-                context = context,
-                action = Constants.ACTION_SHOW_WARNING,
-                data = null,
-                flags = FLAG_ACTIVITY_CLEAR_TOP,
-                bundle = Bundle().apply {
-                    putString(
-                        Constants.INTENT_EXTRA_WARNING_MESSAGE,
-                        message,
-                    )
-                }
-            )
-        }
+        launchMegaActivityIfNeeded(context)
+        snackbarEventQueue.queueMessage(message)
     }
 
     override fun openContactInfoActivity(context: Context, email: String) {
         navigateForSingleActivity(
             context = context, singleActivityDestination = ContactInfoNavKey(email = email)
-        ) {
-            val i = Intent(context, ContactInfoActivity::class.java)
-            i.putExtra(Constants.NAME, email)
-            context.startActivity(i)
-        }
+        )
     }
 
 
@@ -1165,11 +988,6 @@ internal class MegaNavigatorImpl @Inject constructor(
                 chatId = chatId,
                 messageId = msgId
             )
-        ) {
-            val i = Intent(context, ContactAttachmentActivity::class.java)
-            i.putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
-            i.putExtra(LEGACY_MESSAGE_ID, msgId)
-            context.startActivity(i)
-        }
+        )
     }
 }

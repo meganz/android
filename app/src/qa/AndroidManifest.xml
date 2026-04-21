@@ -9,8 +9,15 @@
             android:exported="true"
             android:theme="@style/Theme.Mega.Starting"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
-            android:launchMode="singleTask"
-            tools:node="replace" />
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
         <service
             android:name="mega.privacy.android.app.featuretoggle.FeatureFlagTileService"
             android:exported="true"
@@ -33,16 +40,6 @@
                 <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
             </intent-filter>
         </provider>
-        <activity
-            android:name="mega.privacy.android.app.appstate.RerouteActivity"
-            android:theme="@style/Theme.Mega.Starting"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
         <activity
             android:name=".presentation.featureflag.FeatureFlagActivity"
             android:exported="false"
