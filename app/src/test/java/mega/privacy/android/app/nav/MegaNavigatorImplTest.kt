@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -100,103 +99,17 @@ class MegaNavigatorImplTest {
     }
 
     @Test
-    fun `test that getPendingIntentConsideringSingleActivity returns singleActivityPendingIntent when SingleActivity is enabled`() =
+    fun `test that getPendingIntentConsideringSingleActivity returns singleActivityPendingIntent`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
             val expectedPendingIntent = mock<PendingIntent>()
-            val createPendingIntent: (Intent) -> PendingIntent = mock()
             val singleActivityPendingIntent: () -> PendingIntent = { expectedPendingIntent }
 
             val result = underTest.getPendingIntentConsideringSingleActivity(
                 context = context,
-                legacyActivityClass = ManagerActivity::class.java,
-                createPendingIntent = createPendingIntent,
                 singleActivityPendingIntent = singleActivityPendingIntent,
             )
 
             assertThat(result).isEqualTo(expectedPendingIntent)
-        }
-
-    @Test
-    fun `test that getPendingIntentConsideringSingleActivity returns legacy pendingIntent when SingleActivity is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-            val expectedPendingIntent = mock<PendingIntent>()
-            val createPendingIntent: (Intent) -> PendingIntent = { intent ->
-                expectedPendingIntent
-            }
-            val singleActivityPendingIntent: () -> PendingIntent = mock()
-
-            val result = underTest.getPendingIntentConsideringSingleActivity(
-                context = context,
-                legacyActivityClass = ManagerActivity::class.java,
-                createPendingIntent = createPendingIntent,
-                singleActivityPendingIntent = singleActivityPendingIntent,
-            )
-
-            assertThat(result).isEqualTo(expectedPendingIntent)
-        }
-
-    @Test
-    fun `test that getPendingIntentConsideringSingleActivity creates intent with correct activity class when SingleActivity is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-            val expected = mock<PendingIntent>()
-            val createPendingIntent: (Intent) -> PendingIntent = { intent ->
-                expected
-            }
-            val singleActivityPendingIntent: () -> PendingIntent = mock()
-
-            val result = underTest.getPendingIntentConsideringSingleActivity(
-                context = context,
-                legacyActivityClass = ManagerActivity::class.java,
-                createPendingIntent = createPendingIntent,
-                singleActivityPendingIntent = singleActivityPendingIntent,
-            )
-
-            assertThat(result).isEqualTo(expected)
-        }
-
-    @Test
-    fun `test that singleActivityPendingIntent lambda is not called when SingleActivity is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-            var singleActivityPendingIntentCalled = false
-            val createPendingIntent: (Intent) -> PendingIntent = { mock() }
-            val singleActivityPendingIntent: () -> PendingIntent = {
-                singleActivityPendingIntentCalled = true
-                mock()
-            }
-
-            underTest.getPendingIntentConsideringSingleActivity(
-                context = context,
-                legacyActivityClass = ManagerActivity::class.java,
-                createPendingIntent = createPendingIntent,
-                singleActivityPendingIntent = singleActivityPendingIntent,
-            )
-
-            assertThat(singleActivityPendingIntentCalled).isFalse()
-        }
-
-    @Test
-    fun `test that createPendingIntent lambda is not called when SingleActivity is enabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
-            var createPendingIntentCalled = false
-            val createPendingIntent: (Intent) -> PendingIntent = {
-                createPendingIntentCalled = true
-                mock()
-            }
-            val singleActivityPendingIntent: () -> PendingIntent = { mock() }
-
-            underTest.getPendingIntentConsideringSingleActivity(
-                context = context,
-                legacyActivityClass = ManagerActivity::class.java,
-                createPendingIntent = createPendingIntent,
-                singleActivityPendingIntent = singleActivityPendingIntent,
-            )
-
-            assertThat(createPendingIntentCalled).isFalse()
         }
 
     @Test

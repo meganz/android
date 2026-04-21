@@ -1,7 +1,6 @@
 package mega.privacy.android.app.nav
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -1086,26 +1085,14 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     override suspend fun getPendingIntentConsideringSingleActivity(
         context: Context,
-        legacyActivityClass: Class<out Activity>,
-        createPendingIntent: (Intent) -> PendingIntent,
         singleActivityPendingIntent: () -> PendingIntent,
-    ): PendingIntent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-        singleActivityPendingIntent()
-    } else {
-        createPendingIntent(Intent(context, legacyActivityClass))
-    }
+    ): PendingIntent = singleActivityPendingIntent()
 
     override suspend fun <T> getPendingIntentConsideringSingleActivityWithDestination(
         context: Context,
-        legacyActivityClass: Class<out Activity>,
-        createPendingIntent: (Intent) -> PendingIntent,
         singleActivityDestination: () -> T,
     ): PendingIntent where T : NavKey, T : Parcelable =
-        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-            MegaActivity.getPendingIntentWithExtraDestination(context, singleActivityDestination())
-        } else {
-            createPendingIntent(Intent(context, legacyActivityClass))
-        }
+        MegaActivity.getPendingIntentWithExtraDestination(context, singleActivityDestination())
 
     @SuppressLint("ManagerActivityIntent")
     private suspend fun navigateToManagerActivity(

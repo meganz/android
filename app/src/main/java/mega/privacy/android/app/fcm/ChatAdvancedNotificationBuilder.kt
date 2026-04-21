@@ -15,7 +15,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.getDbHandler
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -27,7 +26,6 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.navigation.megaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -551,22 +549,8 @@ class ChatAdvancedNotificationBuilder(
         val notificationCallId = MegaApiJava.userHandleToBase64(chatCallId)
         val notificationId = (notificationCallId).hashCode() + Constants.NOTIFICATION_MISSED_CALL
         val pendingIntent =
-            context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, ChatNavKey>(
+            context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
                 context = context,
-                createPendingIntent = { intent ->
-                    intent.also {
-                        it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        it.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)
-                        it.putExtra(ChatNavKey.LEGACY_CHAT_ID, chat.chatId)
-                    }
-
-                    PendingIntent.getActivity(
-                        context,
-                        chat.chatId.toInt(),
-                        intent,
-                        PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                },
                 singleActivityDestination = { ChatNavKey(chatId = chatId) }
             )
 

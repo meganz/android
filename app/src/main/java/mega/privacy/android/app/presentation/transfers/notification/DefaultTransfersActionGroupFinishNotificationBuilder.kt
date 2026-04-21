@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.notification
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -11,13 +10,9 @@ import androidx.core.content.FileProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
-import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
@@ -37,8 +32,6 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.FileStorageNavKey
 import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
-import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivity
-import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.shared.resources.R as sharedR
 import java.io.File
 import java.util.zip.ZipFile
@@ -272,20 +265,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         } else null
         return when {
             previewFile?.exists() == true && isZipFile -> {
-                val legacyActivity = if (isLoggedIn) {
-                    @SuppressLint("ManagerActivityIntent")
-                    ManagerActivity::class.java
-                } else {
-                    ZipBrowserComposeActivity::class.java
-                }
                 megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
                     context = context,
-                    legacyActivityClass = legacyActivity,
-                    createPendingIntent = { intent ->
-                        if (isLoggedIn) intent.action = Constants.ACTION_EXPLORE_ZIP
-                        intent.putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
-                        createPendingIntent(intent, previewFile.absolutePath.hashCode())
-                    },
                     singleActivityDestination = {
                         LegacyZipBrowserNavKey(previewFile.absolutePath)
                     }
@@ -306,16 +287,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 
             else -> {
                 val warningMessage = context.getString(R.string.intent_not_available)
-                megaNavigator.getPendingIntentConsideringSingleActivity<ManagerActivity>(
+                megaNavigator.getPendingIntentConsideringSingleActivity(
                     context = context,
-                    createPendingIntent = { intent ->
-                        intent.action = Constants.ACTION_SHOW_WARNING
-                        intent.putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
-                        createPendingIntent(
-                            intent = intent,
-                            requestCode = R.string.intent_not_available
-                        )
-                    },
                     singleActivityPendingIntent = {
                         MegaActivity.getPendingIntentForWarningMessage(
                             context,
@@ -335,29 +308,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         actionGroup: ActiveTransferTotals.ActionGroup,
     ): PendingIntent? = when {
         isDownload -> {
-            val legacyActivity = if (isLoggedIn) {
-                @SuppressLint("ManagerActivityIntent")
-                ManagerActivity::class.java
-            } else {
-                FileStorageActivity::class.java
-            }
             megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
                 context = context,
-                legacyActivityClass = legacyActivity,
-                createPendingIntent = { intent ->
-                    if (isLoggedIn) {
-                        intent.action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                        intent.putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, isOfflineDownload)
-                    } else {
-                        intent.action = FileStorageActivity.Mode.BROWSE_FILES.action
-                    }
-                    intent.putExtra(FileStorageActivity.EXTRA_PATH, actionGroup.destination)
-                    intent.putStringArrayListExtra(
-                        FileStorageActivity.EXTRA_FILE_NAMES,
-                        ArrayList(actionGroup.selectedNames)
-                    )
-                    createPendingIntent(intent = intent, requestCode = actionGroup.groupId)
-                },
                 singleActivityDestination = {
                     FileStorageNavKey(actionGroup.destination, actionGroup.selectedNames)
                 }
@@ -367,20 +319,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         !uploadLocationExists -> null
 
         else -> { // is not download
-            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, CloudDriveNavKey>(
+            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
                 context = context,
-                createPendingIntent = { intent ->
-                    intent.action = Constants.ACTION_OPEN_FOLDER
-                    intent.putExtra(
-                        Constants.INTENT_EXTRA_KEY_PARENT_HANDLE,
-                        actionGroup.pendingTransferNodeId?.nodeId?.longValue
-                    )
-                    intent.putStringArrayListExtra(
-                        FileStorageActivity.EXTRA_FILE_NAMES,
-                        ArrayList(actionGroup.selectedNames)
-                    )
-                    createPendingIntent(intent, actionGroup.groupId)
-                },
                 singleActivityDestination = {
                     CloudDriveNavKey(
                         nodeHandle = actionGroup.pendingTransferNodeId?.nodeId?.longValue ?: -1,

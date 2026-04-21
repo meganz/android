@@ -13,7 +13,6 @@ import androidx.work.ForegroundInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
@@ -22,7 +21,6 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCame
 import mega.privacy.android.app.presentation.settings.compose.SettingsHomeActivity
 import mega.privacy.android.app.presentation.settings.model.cameraUploadsTargetPreference
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
@@ -36,7 +34,6 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
-import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsFolderConflictDetectedEvent
 import timber.log.Timber
@@ -81,7 +78,6 @@ class CameraUploadsNotificationManager @Inject constructor(
             Constants.NOTIFICATION_NO_NETWORK_CONNECTION
         private const val FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP_NOTIFICATION_ID =
             Constants.NOTIFICATION_FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
-        private const val ACTION_OVER_QUOTA_STORAGE = Constants.ACTION_OVER_QUOTA_STORAGE
     }
 
     /**
@@ -200,31 +196,14 @@ class CameraUploadsNotificationManager @Inject constructor(
     }
 
     private suspend fun getDefaultPendingIntent() = megaNavigator
-        .getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, CameraUploadsProgressNavKey>(
+        .getPendingIntentConsideringSingleActivityWithDestination(
             context = context,
-            createPendingIntent = { intent ->
-                intent.action = ACTION_SHOW_CU_PROGRESS_VIEW
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            },
             singleActivityDestination = { CameraUploadsProgressNavKey }
         )
 
     private suspend fun getCUSettingsPendingIntent() = megaNavigator
-        .getPendingIntentConsideringSingleActivityWithDestination<SettingsCameraUploadsActivity, SettingsCameraUploadsNavKey>(
+        .getPendingIntentConsideringSingleActivityWithDestination(
             context = context,
-            createPendingIntent = { intent ->
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            },
             singleActivityDestination = { SettingsCameraUploadsNavKey }
         )
 
@@ -337,17 +316,8 @@ class CameraUploadsNotificationManager @Inject constructor(
      */
     private suspend fun showStorageOverQuotaNotification() {
         val pendingIntent =
-            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, OverQuotaDialogNavKey>(
+            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
                 context = context,
-                createPendingIntent = { intent ->
-                    intent.action = ACTION_OVER_QUOTA_STORAGE
-                    PendingIntent.getActivity(
-                        context,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                },
                 singleActivityDestination = { OverQuotaDialogNavKey(isOverQuota = true) }
             )
         val notification = createNotification(

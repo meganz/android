@@ -3,7 +3,6 @@ package mega.privacy.android.app.fcm
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.RingtoneManager
@@ -12,8 +11,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.contacts.ContactsActivity
-import mega.privacy.android.app.contacts.ContactsActivity.Companion.getReceivedRequestsIntent
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -24,7 +21,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
-import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.navigation.megaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -330,16 +326,8 @@ class ContactsAdvancedNotificationBuilder(
     }
 
     private suspend fun getIPCPendingIntent(requestCode: Int) =
-        context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ContactsActivity, ContactRequestsNavKey>(
+        context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
             context = context,
-            createPendingIntent = {
-                PendingIntent.getActivity(
-                    context,
-                    requestCode,
-                    getReceivedRequestsIntent(context),
-                    PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-                )
-            },
             singleActivityDestination = { ContactRequestsNavKey(navType = ContactRequestsNavKey.NavType.ReceivedRequests) }
         )
 
@@ -369,16 +357,8 @@ class ContactsAdvancedNotificationBuilder(
     }
 
     private suspend fun getAPCPendingIntent(requestCode: Int) =
-        context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ContactsActivity, ContactsNavKey>(
+        context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
             context = context,
-            createPendingIntent = { intent ->
-                PendingIntent.getActivity(
-                    context,
-                    requestCode,
-                    intent,
-                    PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-                )
-            },
             singleActivityDestination = { ContactsNavKey }
         )
 

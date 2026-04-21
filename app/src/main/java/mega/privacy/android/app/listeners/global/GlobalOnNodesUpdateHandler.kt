@@ -2,9 +2,7 @@ package mega.privacy.android.app.listeners.global
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.media.RingtoneManager
@@ -17,7 +15,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
@@ -27,7 +24,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.pdf.CheckIfShouldDeleteLastPageViewedInPdfUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.SharesNavKey
-import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -95,19 +91,8 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
             val notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY)
             val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID
             val pendingIntent = megaNavigator
-                .getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, SharesNavKey>(
+                .getPendingIntentConsideringSingleActivityWithDestination(
                     context = appContext,
-                    createPendingIntent = { intent ->
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        intent.action = Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION
-
-                        PendingIntent.getActivity(
-                            appContext,
-                            0,
-                            intent,
-                            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    },
                     singleActivityDestination = { SharesNavKey }
                 )
             val notificationManager =
