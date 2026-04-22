@@ -39,12 +39,13 @@ data object SharesNavKey : NavKey, Parcelable
  * Offline route args
  */
 @Serializable
+@Parcelize
 data class OfflineNavKey(
     val title: String? = null,
     val nodeId: Int = -1,
     val path: String? = null,
     val highlightedFiles: String? = null,
-) : NoNodeNavKey
+) : NoNodeNavKey, Parcelable
 
 @Serializable
 data class DriveSyncNavKey(

@@ -12,7 +12,6 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodesToAttachUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
-import mega.privacy.android.navigation.MegaNavigator
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,7 +31,6 @@ class NodeAttachmentViewModelTest {
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val getContactHandleUseCase: GetContactHandleUseCase = mock()
     private val attachContactsUseCase: AttachContactsUseCase = mock()
-    private val megaNavigator = mock<MegaNavigator>()
 
     private lateinit var underTest: NodeAttachmentViewModel
 
@@ -44,7 +42,6 @@ class NodeAttachmentViewModelTest {
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             getContactHandleUseCase = getContactHandleUseCase,
             attachContactsUseCase = attachContactsUseCase,
-            megaNavigator = megaNavigator,
         )
     }
 
@@ -56,7 +53,6 @@ class NodeAttachmentViewModelTest {
             get1On1ChatIdUseCase,
             getContactHandleUseCase,
             attachContactsUseCase,
-            megaNavigator
         )
     }
 

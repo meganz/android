@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.attach
 
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.StorageStatePayWallException
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
@@ -18,7 +16,6 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetNodesToAttachUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.ChatNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,7 +31,6 @@ class NodeAttachmentViewModel @Inject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val getContactHandleUseCase: GetContactHandleUseCase,
     private val attachContactsUseCase: AttachContactsUseCase,
-    private val megaNavigator: MegaNavigator,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(NodeAttachmentUiState())
 
@@ -174,15 +170,11 @@ class NodeAttachmentViewModel @Inject constructor(
     }
 
     fun navigateToChat(chatId: Long, context: Context) {
-        megaNavigator.openManagerActivity(
-            context = context,
-            action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE,
-            bundle = Bundle().apply {
-                putLong(ChatNavKey.LEGACY_CHAT_ID, chatId)
-                putBoolean(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
-            },
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-            singleActivityDestination = ChatNavKey(chatId = chatId, action = null),
+        context.startActivity(
+            MegaActivity.getIntentWithExtraDestinations(
+                context,
+                listOf(ChatNavKey(chatId = chatId, action = null)),
+            )
         )
     }
 }

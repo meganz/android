@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.view.sheet
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -35,8 +34,8 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.getLink.GetLinkActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsViewModel
@@ -311,7 +310,6 @@ private fun onOpenWith(
     }
 }
 
-@SuppressLint("ManagerActivityIntent")
 private fun onViewInFolderLegacy(
     viewInFolderEvent: ViewInFolderEvent.Found,
     activity: Activity,
@@ -326,33 +324,28 @@ private fun onViewInFolderLegacy(
         }
 
         is ViewInFolderEvent.DownloadToOffline -> {
-            Intent(
+            MegaActivity.getIntentWithExtraDestinations(
                 activity,
-                ManagerActivity::class.java
-            ).apply {
-                action = Constants.ACTION_LOCATE_DOWNLOADED_FILE
-                putExtra(Constants.INTENT_EXTRA_IS_OFFLINE_PATH, true)
-                putExtra(FileStorageActivity.EXTRA_PATH, viewInFolderEvent.path)
-                putStringArrayListExtra(
-                    FileStorageActivity.EXTRA_FILE_NAMES,
-                    arrayListOf(viewInFolderEvent.fileName)
+                listOf(
+                    OfflineNavKey(
+                        nodeId = viewInFolderEvent.parentNodeOfflineId,
+                        highlightedFiles = viewInFolderEvent.fileName,
+                        title = viewInFolderEvent.title,
+                    )
                 )
-            }
+            )
         }
 
         is ViewInFolderEvent.Upload -> {
-            Intent(activity, ManagerActivity::class.java).apply {
-                action = Constants.ACTION_OPEN_FOLDER
-                putExtra(
-                    Constants.INTENT_EXTRA_KEY_PARENT_HANDLE,
-                    viewInFolderEvent.parentNodeId.longValue
+            MegaActivity.getIntentWithExtraDestinations(
+                activity,
+                listOf(
+                    CloudDriveNavKey(
+                        nodeHandle = viewInFolderEvent.parentNodeId.longValue,
+                        highlightedNodeNames = listOf(viewInFolderEvent.fileName),
+                    )
                 )
-                putStringArrayListExtra(
-                    FileStorageActivity.EXTRA_FILE_NAMES,
-                    arrayListOf(viewInFolderEvent.fileName)
-                )
-            }
-
+            )
         }
     }.let { activity.startActivity(it) }
 }

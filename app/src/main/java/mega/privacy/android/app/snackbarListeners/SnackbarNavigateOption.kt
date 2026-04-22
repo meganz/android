@@ -2,21 +2,18 @@ package mega.privacy.android.app.snackbarListeners
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
 import android.view.View
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
-import mega.privacy.android.app.utils.Constants.EXTRA_MOVE_TO_CHAT_SECTION
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_CHAT_ID
 
+@Suppress("unused")
 class SnackbarNavigateOption @JvmOverloads constructor(
     private val context: Context,
     private val type: Int? = 0,
@@ -37,17 +34,18 @@ class SnackbarNavigateOption @JvmOverloads constructor(
             )
 
             MESSAGE_SNACKBAR_TYPE -> {
-                megaNavigator.openManagerActivity(
-                    context = context,
-                    action = ACTION_CHAT_NOTIFICATION_MESSAGE,
-                    bundle = Bundle().apply {
-                        idChat?.let { putLong(LEGACY_CHAT_ID, idChat) }
-                        putBoolean(EXTRA_MOVE_TO_CHAT_SECTION, true)
-                    },
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-                    singleActivityDestination = idChat?.let { ChatNavKey(idChat) }
-                        ?: ChatListNavKey()
-                )
+                val intent = if (idChat != null) {
+                    MegaActivity.getIntentWithExtraDestinations(
+                        context,
+                        listOf(ChatNavKey(idChat)),
+                    )
+                } else {
+                    MegaActivity.getIntentWithExtraDestinations(
+                        context,
+                        listOf(ChatListNavKey()),
+                    )
+                }
+                context.startActivity(intent)
                 (context as? Activity)?.finish()
             }
         }
