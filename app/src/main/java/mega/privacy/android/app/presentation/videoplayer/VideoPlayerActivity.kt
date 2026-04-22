@@ -744,7 +744,6 @@ class VideoPlayerActivity : PasscodeActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         mediaPlayerGateway.playerStop()
         mediaPlayerGateway.playerRelease()
         AudioPlayerService.resumeAudioPlayer(this)
@@ -753,6 +752,7 @@ class VideoPlayerActivity : PasscodeActivity() {
             ChatUtil.abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
         }
         mediaSessionHelper.releaseMediaSession()
+        super.onDestroy()
     }
 
     companion object {

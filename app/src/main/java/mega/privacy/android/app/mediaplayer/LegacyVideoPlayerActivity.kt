@@ -15,6 +15,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.material.rememberScaffoldState
@@ -294,7 +296,11 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
             ) {
                 NavHost(
                     navController = navHostController,
-                    startDestination = LegacyVideoPlayerNavigationGraph
+                    startDestination = LegacyVideoPlayerNavigationGraph,
+                    enterTransition = { EnterTransition.None },
+                    exitTransition = { ExitTransition.None },
+                    popEnterTransition = { EnterTransition.None },
+                    popExitTransition = { ExitTransition.None },
                 ) {
                     legacyVideoPlayerComposeNavigationGraph(
                         navHostController = navHostController,
@@ -721,7 +727,6 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         mediaPlayerGateway.playerStop()
         mediaPlayerGateway.playerRelease()
         AudioPlayerService.resumeAudioPlayer(this)
@@ -730,6 +735,7 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
             ChatUtil.abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
         }
         mediaSessionHelper.releaseMediaSession()
+        super.onDestroy()
     }
 
     companion object {
