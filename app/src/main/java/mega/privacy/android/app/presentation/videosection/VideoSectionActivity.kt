@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -28,7 +29,6 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
@@ -51,7 +51,6 @@ import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
@@ -75,7 +74,6 @@ import mega.privacy.android.app.utils.Constants.ORDER_VIDEO_PLAYLIST
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
@@ -89,6 +87,7 @@ import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersM
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -106,9 +105,6 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
     private val videoSectionViewModel: VideoSectionViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase

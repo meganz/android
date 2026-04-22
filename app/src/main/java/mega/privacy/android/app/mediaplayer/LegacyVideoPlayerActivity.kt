@@ -19,6 +19,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,7 +37,6 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
@@ -64,7 +64,6 @@ import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
@@ -141,9 +140,6 @@ import javax.inject.Inject
 class LegacyVideoPlayerActivity : PasscodeActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     /**
      * MediaPlayerGateway for video player
@@ -283,7 +279,6 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
                 { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
                 {
                     PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         canLock = { passcodeEnabled },
                         content = it
                     )

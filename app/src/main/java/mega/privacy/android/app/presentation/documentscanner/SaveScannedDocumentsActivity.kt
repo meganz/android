@@ -22,7 +22,6 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_SOLO_IMAGE_URI
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.INITIAL_FILENAME_FORMAT
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -42,12 +41,6 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
-     * Handles the Passcode
-     */
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
-    /**
      * onCreate
      */
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +58,6 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
 
             MegaAppContainer(
                 themeMode = themeMode,
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory
             ) {
                 SaveScannedDocumentsScreen(
                     viewModel = hiltViewModel<SaveScannedDocumentsViewModel, SaveScannedDocumentsViewModel.Factory> { factory ->

@@ -9,7 +9,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
 import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,7 +21,6 @@ class PasscodeContainerTest {
     var composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private val passcodeCheckViewModel = mock<PasscodeCheckViewModel>()
-    private val passcodeCryptObjectFactory = mock<PasscodeCryptObjectFactory>()
 
     @Test
     fun `test that content is shown if passcode is not locked`() {
@@ -36,7 +34,6 @@ class PasscodeContainerTest {
                 passcodeUI = {},
                 viewModel = passcodeCheckViewModel,
                 content = { Text(expected) },
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             )
         }
 
@@ -56,7 +53,6 @@ class PasscodeContainerTest {
             PasscodeContainer(
                 passcodeUI = { Text(expected) },
                 viewModel = passcodeCheckViewModel,
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             ) {}
         }
 
@@ -75,7 +71,6 @@ class PasscodeContainerTest {
             PasscodeContainer(
                 passcodeUI = { Text(notExpected) },
                 viewModel = passcodeCheckViewModel,
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             ) {}
         }
 
@@ -94,7 +89,6 @@ class PasscodeContainerTest {
                 passcodeUI = {},
                 viewModel = passcodeCheckViewModel,
                 loading = { Text(expected) },
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             )
         }
 
@@ -113,7 +107,6 @@ class PasscodeContainerTest {
                 passcodeUI = {},
                 viewModel = passcodeCheckViewModel,
                 content = { Text(expected) },
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
             )
         }
 

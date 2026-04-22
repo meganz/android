@@ -6,7 +6,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.MegaPsaContainer
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
@@ -20,7 +19,6 @@ val LocalIsDarkTheme = staticCompositionLocalOf { false }
  * Mega app container
  *
  * @param themeMode
- * @param passcodeCryptObjectFactory
  * @param content
  *
  * *** IMPORTANT PLEASE NOTE ***
@@ -29,7 +27,6 @@ val LocalIsDarkTheme = staticCompositionLocalOf { false }
 @Composable
 fun MegaAppContainer(
     themeMode: ThemeMode,
-    passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     content: @Composable () -> Unit,
 ) {
     val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
@@ -37,7 +34,6 @@ fun MegaAppContainer(
         { PsaContainer(content = it) },
         {
             PasscodeContainer(
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                 content = it
             )
         },
@@ -63,7 +59,6 @@ fun MegaAppContainer(
  * Implements the same functionality as [MegaAppContainer] using the updated ui components and theme
  *
  * @param themeMode
- * @param passcodeCryptObjectFactory
  * @param useLegacyStatusBarColor
  * @param includePsa
  * @param content
@@ -72,7 +67,6 @@ fun MegaAppContainer(
 @Composable
 fun SharedAppContainer(
     themeMode: ThemeMode,
-    passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     useLegacyStatusBarColor: Boolean = true,
     includePsa: Boolean = true,
     content: @Composable () -> Unit,
@@ -82,7 +76,6 @@ fun SharedAppContainer(
         add(
             {
                 PasscodeContainer(
-                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = it
                 )
             }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,7 +21,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
@@ -37,7 +37,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.navigation.showGr
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startWaitingRoom
 import mega.privacy.android.app.presentation.meeting.chat.view.showPermissionNotAllowedSnackbar
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
@@ -56,9 +55,6 @@ internal class ChatFragment : Fragment() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     /**
      * The centralized navigator in the :app module
@@ -87,7 +83,6 @@ internal class ChatFragment : Fragment() {
                 ChatSessionContainer {
                     OriginalTheme(isDark = mode.isDarkMode()) {
                         PasscodeContainer(
-                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                             canLock = { passcodeEnabled },
                             content = {
                                 PsaContainer {

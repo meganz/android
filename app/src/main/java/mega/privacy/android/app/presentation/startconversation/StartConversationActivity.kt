@@ -24,7 +24,6 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.view.StartConversationView
 import mega.privacy.android.app.utils.Constants
@@ -43,9 +42,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class StartConversationActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
@@ -122,7 +118,6 @@ class StartConversationActivity : ComponentActivity() {
 
         MegaAppContainer(
             themeMode = themeMode,
-            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
         ) {
             StartConversationView(
                 state = uiState,

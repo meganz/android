@@ -16,11 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.view.navigation.transfersScreen
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -42,12 +41,6 @@ class TransfersActivity : AppCompatActivity() {
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
     /**
-     * passcodeCryptObjectFactory
-     */
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
-    /**
      * megaNavigator
      */
     @Inject
@@ -65,7 +58,6 @@ class TransfersActivity : AppCompatActivity() {
                 SessionContainer(optimistic = true) {
                     ChatSessionContainer(optimistic = true) {
                         PasscodeContainer(
-                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                             content = {
                                 PsaContainer {
                                     val tab = intent?.getStringExtra(EXTRA_TAB)

@@ -6,7 +6,6 @@ import androidx.biometric.BiometricPrompt
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.app.presentation.settings.passcode.mapper.BiometricAuthErrorMapper
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.shared.original.core.ui.utils.findFragmentActivity
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
@@ -16,7 +15,6 @@ import javax.inject.Inject
  */
 class BiometricAuth @Inject constructor(
     private val biometricAuthErrorMapper: BiometricAuthErrorMapper,
-    private val passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
 ) {
 
     /**

@@ -68,7 +68,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
 import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
@@ -89,12 +88,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class MegaActivity : FragmentActivity() {
-
-    /**
-     * Passcode crypt object factory
-     */
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     /**
      * Navigation event queue
@@ -387,7 +380,6 @@ class MegaActivity : FragmentActivity() {
                                         graphstate = graphstate,
                                         transferHandler = transferHandler,
                                         loginViewModel = loginViewModel,
-                                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                                         emitNavigationEvent = { event ->
                                             when (event) {
                                                 is NavigationQueueEvent -> navigationEventQueue.emit(

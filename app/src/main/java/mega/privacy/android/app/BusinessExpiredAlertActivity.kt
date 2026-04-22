@@ -13,7 +13,6 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.presentation.business.BusinessExpiredAlertScreen
 import mega.privacy.android.app.presentation.business.BusinessExpiredAlertViewModel
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
@@ -28,9 +27,6 @@ class BusinessExpiredAlertActivity : FragmentActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
@@ -52,7 +48,6 @@ class BusinessExpiredAlertActivity : FragmentActivity() {
             SessionContainer {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
                     PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = {
                             BusinessExpiredAlertScreen(
                                 uiState = uiState,

@@ -26,11 +26,10 @@ import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContain
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContentView
 import mega.privacy.android.app.presentation.psa.PsaViewModel
-import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -49,7 +48,6 @@ import javax.inject.Inject
 class ActivityAppContainerWrapper @Inject constructor(
     @ActivityContext private val context: Context,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
-    private val passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
 ) : AppContainerWrapper, LifecycleEventObserver {
 
     init {
@@ -113,7 +111,6 @@ class ActivityAppContainerWrapper @Inject constructor(
                                     },
                                     {
                                         PasscodeContainer(
-                                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                                             canLock = { passcodeCheck?.canLock() != false },
                                             content = it,
                                         )
@@ -138,7 +135,6 @@ class ActivityAppContainerWrapper @Inject constructor(
                                     },
                                     {
                                         PasscodeContainer(
-                                            passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                                             canLock = { passcodeCheck?.canLock() != false },
                                             content = it,
                                         )

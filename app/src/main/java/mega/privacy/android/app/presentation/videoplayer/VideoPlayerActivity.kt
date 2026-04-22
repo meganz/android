@@ -54,6 +54,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -63,16 +65,10 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerNavigationHandler
-import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerScreenNavKey
-import mega.privacy.android.app.presentation.videoplayer.navigation.videoPlayerEntryProvider
-import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
-import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
@@ -93,6 +89,9 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAc
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerSendToChatAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerUnhideAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
+import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerNavigationHandler
+import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerScreenNavKey
+import mega.privacy.android.app.presentation.videoplayer.navigation.videoPlayerEntryProvider
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
@@ -149,9 +148,6 @@ import javax.inject.Inject
 class VideoPlayerActivity : PasscodeActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     @Inject
     lateinit var navigationResultManager: NavigationResultManager
@@ -298,7 +294,6 @@ class VideoPlayerActivity : PasscodeActivity() {
                 { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
                 {
                     PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         canLock = { passcodeEnabled },
                         content = it
                     )

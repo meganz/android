@@ -15,10 +15,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.container.AppContainer
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.settings.compose.home.SettingsHomeDestinationWrapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.settings.arguments.TargetPreference
@@ -29,9 +28,6 @@ class SettingsHomeActivity : FragmentActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +40,6 @@ class SettingsHomeActivity : FragmentActivity() {
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
                 {
                     PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                         content = it
                     )
                 },

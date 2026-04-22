@@ -17,11 +17,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
@@ -55,7 +55,7 @@ internal class PasscodeViewTest {
     private val biometricAuthIsAvailable = mock<(Context) -> Boolean>()
 
     private val showBiometricAuth =
-        mock<(onSuccess: () -> Unit, onError: () -> Unit, onFail: () -> Unit, context: Context, promptInfo: BiometricPrompt.PromptInfo, cryptoObject: CryptoObject) -> Unit>()
+        mock<(onSuccess: () -> Unit, onError: () -> Unit, onFail: () -> Unit, context: Context, promptInfo: BiometricPrompt.PromptInfo) -> Unit>()
 
     @Before
     internal fun setUp() {
@@ -266,7 +266,7 @@ internal class PasscodeViewTest {
             )
         )
 
-        verify(showBiometricAuth).invoke(any(), any(), any(), any(), any(), any())
+        verify(showBiometricAuth).invoke(any(), any(), any(), any(), any())
 
     }
 
@@ -285,7 +285,7 @@ internal class PasscodeViewTest {
 
         val onError = argumentCaptor<() -> Unit>()
 
-        verify(showBiometricAuth).invoke(any(), onError.capture(), any(), any(), any(), any())
+        verify(showBiometricAuth).invoke(any(), onError.capture(), any(), any(), any())
 
         composeTestRule.onNodeWithTag(PASSCODE_FIELD_TAG, useUnmergedTree = true)
             .assertDoesNotExist()
@@ -328,7 +328,7 @@ internal class PasscodeViewTest {
             )
         )
 
-        verify(showBiometricAuth).invoke(any(), any(), any(), any(), any(), any())
+        verify(showBiometricAuth).invoke(any(), any(), any(), any(), any())
 
         assertThat(analyticsRule.events).contains(PasscodeBiometricUnlockDialogEvent)
     }
@@ -431,11 +431,6 @@ internal class PasscodeViewTest {
                 passcodeUnlockViewModel = passcodeUnlockViewModel,
                 biometricAuthIsAvailable = biometricAuthIsAvailable,
                 showBiometricAuth = showBiometricAuth,
-                cryptObjectFactory = mock {
-                    on { invoke() }.thenReturn(
-                        cryptoObject
-                    )
-                }
             )
         }
     }

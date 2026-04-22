@@ -22,7 +22,6 @@ import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.loginEntryProvider
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.passcode.presentation.navigation.passcodeView
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
@@ -43,7 +42,6 @@ import mega.privacy.android.navigation.contract.transparent.TransparentSceneStra
  * @param graphstate
  * @param transferHandler
  * @param loginViewModel
- * @param passcodeCryptObjectFactory
  * @param emitNavigationEvent
  * @param onFinish
  */
@@ -54,7 +52,6 @@ internal fun MegaNavDisplay(
     graphstate: NavigationGraphState.Data,
     transferHandler: TransferHandler,
     loginViewModel: LoginViewModel,
-    passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     emitNavigationEvent: suspend (QueueEvent) -> Unit,
     onFinish: () -> Unit,
 ) {
@@ -107,7 +104,6 @@ internal fun MegaNavDisplay(
             )
 
             passcodeView(
-                cryptObjectFactory = passcodeCryptObjectFactory,
                 logoutConfirmationDialog = { onDismissed ->
                     LogoutConfirmationDialog(onDismissed = onDismissed)
                 },

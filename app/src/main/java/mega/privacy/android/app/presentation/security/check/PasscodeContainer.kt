@@ -9,17 +9,23 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
 import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.passcode.presentation.view.PasscodeLoadingView
 import mega.privacy.android.core.passcode.presentation.view.PasscodeView
 import timber.log.Timber
 
+/**
+ * Passcode container
+ *
+ * @param passcodeUI
+ * @param viewModel
+ * @param canLock
+ * @param loading
+ * @param content
+ */
 @Composable
 internal fun PasscodeContainer(
-    passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     passcodeUI: @Composable () -> Unit = {
         PasscodeView(
-            cryptObjectFactory = passcodeCryptObjectFactory,
             logoutConfirmationDialog = { onDismissed ->
                 LogoutConfirmationDialog(onDismissed = onDismissed)
             },

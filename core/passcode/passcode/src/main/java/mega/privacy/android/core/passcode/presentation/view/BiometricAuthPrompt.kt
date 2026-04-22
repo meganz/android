@@ -13,7 +13,6 @@ import androidx.fragment.app.FragmentActivity
  * @param onFail
  * @param context
  * @param promptInfo
- * @param cryptObject
  */
 internal fun biometricAuthPrompt(
     onSuccess: () -> Unit,
@@ -21,7 +20,6 @@ internal fun biometricAuthPrompt(
     onFail: () -> Unit,
     context: Context,
     promptInfo: BiometricPrompt.PromptInfo,
-    cryptObject: BiometricPrompt.CryptoObject,
 ) {
     val activity = context.findFragmentActivity()
     if (activity == null) onError()

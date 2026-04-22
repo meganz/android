@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.biometric.BiometricPrompt.CryptoObject
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -56,7 +55,6 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.passcode.components.PasscodeField
 import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
 import mega.privacy.android.shared.resources.R
@@ -70,7 +68,6 @@ import timber.log.Timber
 /**
  * Passcode dialog
  *
- * @param cryptObjectFactory
  * @param passcodeUnlockViewModel
  * @param logoutConfirmationDialog
  * @param biometricAuthIsAvailable
@@ -78,7 +75,6 @@ import timber.log.Timber
  */
 @Composable
 fun PasscodeView(
-    cryptObjectFactory: PasscodeCryptObjectFactory,
     passcodeUnlockViewModel: PasscodeUnlockViewModel = hiltViewModel(),
     logoutConfirmationDialog: @Composable (onDismissed: () -> Unit) -> Unit = {},
     biometricAuthIsAvailable: (Context) -> Boolean = ::areBiometricsEnabled,
@@ -88,7 +84,6 @@ fun PasscodeView(
         onFail: () -> Unit,
         context: Context,
         promptInfo: BiometricPrompt.PromptInfo,
-        cryptObject: CryptoObject,
     ) -> Unit = ::biometricAuthPrompt,
 ) {
     LaunchedEffect(Unit) {
@@ -142,7 +137,6 @@ fun PasscodeView(
                             passcodeUnlockViewModel::onBiometricAuthFailed,
                             context,
                             promptInfo,
-                            cryptObjectFactory()
                         )
                     }
 

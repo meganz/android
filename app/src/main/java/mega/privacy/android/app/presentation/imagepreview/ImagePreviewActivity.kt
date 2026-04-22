@@ -46,9 +46,9 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.FETCHER_PARAMS
@@ -68,14 +68,12 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewStat
 import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowActivity
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.presentation.offline.action.HandleOfflineNodeActions
-import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.LinksUtil
@@ -84,6 +82,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
@@ -113,9 +112,6 @@ import javax.inject.Inject
 class ImagePreviewActivity : BaseActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
 
     @Inject
     lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
@@ -185,7 +181,6 @@ class ImagePreviewActivity : BaseActivity() {
             val uiState by viewModel.state.collectAsStateWithLifecycle()
             OriginalTheme(isDark = isDarkMode) {
                 PasscodeContainer(
-                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
                     content = {
                         PsaContainer {
                             ImagePreviewScreen(
