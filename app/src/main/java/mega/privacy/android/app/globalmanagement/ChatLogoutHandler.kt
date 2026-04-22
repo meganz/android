@@ -7,18 +7,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,9 +22,7 @@ class ChatLogoutHandler @Inject constructor(
     private val mainDispatcher: CoroutineDispatcher,
     @ApplicationScope
     private val sharingScope: CoroutineScope,
-    private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationContext
     private val context: Context,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
@@ -46,44 +39,15 @@ class ChatLogoutHandler @Inject constructor(
                     Timber.d("Already in Login Activity, not necessary to launch it again")
                     return@withContext
                 }
-                val isSingleActivityEnable = runCatching {
-                    getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-                }.getOrDefault(false)
-                if (isSingleActivityEnable) {
-                    localLogoutUseCase(disableChatApiUseCase)
-                    activityLifecycleHandler.getCurrentActivity()?.let { activity ->
-                        if (activity !is MegaActivity) {
-                            activity.startActivity(Intent(context, MegaActivity::class.java).apply {
-                                flags =
-                                    Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                            })
-                        }
-                    }
-                } else {
-                    //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
-                    broadcastFinishActivityUseCase()
-                    val loginIntent = Intent(context, LoginActivity::class.java).apply {
-                        putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                        if (MegaApplication.urlConfirmationLink != null) {
-                            putExtra(
-                                Constants.EXTRA_CONFIRMATION,
-                                MegaApplication.urlConfirmationLink
-                            )
-                            if (activityLifecycleHandler.isActivityVisible) {
-                                flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                            } else {
-                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            }
-                            action = Constants.ACTION_CONFIRM
-                            MegaApplication.urlConfirmationLink = null
-                        } else {
+                localLogoutUseCase(disableChatApiUseCase)
+                activityLifecycleHandler.getCurrentActivity()?.let { activity ->
+                    if (activity !is MegaActivity) {
+                        activity.startActivity(Intent(context, MegaActivity::class.java).apply {
                             flags =
-                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        }
+                                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                        })
                     }
-                    context.startActivity(loginIntent)
                 }
             }
         }

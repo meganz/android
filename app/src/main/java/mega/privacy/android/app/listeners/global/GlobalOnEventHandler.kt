@@ -1,21 +1,17 @@
 package mega.privacy.android.app.listeners.global
 
 import android.content.Context
-import android.content.Intent
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
 import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
-import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
@@ -24,7 +20,6 @@ import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCas
 import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastMiscStateUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaEvent
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -77,27 +72,8 @@ class GlobalOnEventHandler @Inject constructor(
                 initialiseAdsIfNeeded()
             }
 
-            MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
                 setSecurityUpgradeInAppUseCase(true)
-            }
-        }
-    }
-
-    /**
-     * A force reload account has been received. A fetch nodes is in progress and the
-     * Login screen should be shown.
-     */
-    private fun showLoginFetchingNodes() {
-        applicationScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity).not()) {
-                appContext.startActivity(Intent(appContext, LoginActivity::class.java).apply {
-                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    action = RefreshEvent.SdkReload.name
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                })
-            } else {
-                // Handled by ReloadEventInitialiser
             }
         }
     }

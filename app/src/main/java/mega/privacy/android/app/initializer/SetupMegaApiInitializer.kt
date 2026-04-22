@@ -9,14 +9,11 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.globalmanagement.BackgroundRequestListener
 import mega.privacy.android.app.listeners.global.GlobalListener
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.global.InitialiseGlobalListenersUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -47,19 +44,6 @@ class SetupMegaApiInitializer : Initializer<Unit> {
          *
          */
         fun globalListener(): GlobalListener
-
-        /**
-         * Request listener
-         *
-         */
-        fun requestListener(): BackgroundRequestListener
-
-        /**
-         * Get feature flag value use case
-         *
-         * @return [GetFeatureFlagValueUseCase]
-         */
-        fun getFeatureFlagValueUseCase(): GetFeatureFlagValueUseCase
 
         /**
          * App scope
@@ -102,11 +86,7 @@ class SetupMegaApiInitializer : Initializer<Unit> {
     ) {
         Timber.d("ADD REQUEST LISTENER")
         setupMegaApiInitializerEntryPoint.appScope().launch {
-            if (setupMegaApiInitializerEntryPoint.getFeatureFlagValueUseCase()(AppFeatures.SingleActivity)) {
-                setupMegaApiInitializerEntryPoint.initialiseGlobalRequestListenerUseCase()()
-            } else {
-                megaApiAndroid.addRequestListener(setupMegaApiInitializerEntryPoint.requestListener())
-            }
+            setupMegaApiInitializerEntryPoint.initialiseGlobalRequestListenerUseCase()()
         }
 
         megaApiAndroid.addGlobalListener(setupMegaApiInitializerEntryPoint.globalListener())

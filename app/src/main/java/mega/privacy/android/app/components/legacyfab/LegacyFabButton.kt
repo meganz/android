@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.theme.AndroidTheme
 
@@ -23,7 +22,6 @@ abstract class LegacyFabButton @JvmOverloads constructor(
 
     @get:DrawableRes
     abstract val iconResource: Int
-    private val legacyView: FloatingActionButton?
     private val composeView: ComposeView?
     private var clickListener: () -> Unit = {}
 
@@ -31,8 +29,7 @@ abstract class LegacyFabButton @JvmOverloads constructor(
         this.clipChildren = false
         this.clipToOutline = false
         this.clipToPadding = false
-        val childView = if (useNewComponent) {
-            legacyView = null
+        val childView =
             ComposeView(context).apply {
                 setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
                 setContent {
@@ -45,13 +42,7 @@ abstract class LegacyFabButton @JvmOverloads constructor(
                 }
                 composeView = this
             }
-        } else {
-            composeView = null
-            FloatingActionButton(context).apply {
-                setImageResource(iconResource)
-                legacyView = this
-            }
-        }
+
         addView(
             childView,
             LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT),
@@ -59,25 +50,14 @@ abstract class LegacyFabButton @JvmOverloads constructor(
     }
 
     override fun setOnClickListener(l: OnClickListener?) {
-        legacyView?.setOnClickListener(l)
         clickListener = { l?.onClick(composeView) }
     }
 
     fun show() {
-        legacyView?.show()
         composeView?.visibility = VISIBLE
     }
 
     fun hide() {
-        legacyView?.hide()
         composeView?.visibility = GONE
-    }
-
-    companion object {
-        private var useNewComponent: Boolean = false
-
-        fun useNewComponentsForLegacyFabButtons(value: Boolean) {
-            useNewComponent = value
-        }
     }
 }

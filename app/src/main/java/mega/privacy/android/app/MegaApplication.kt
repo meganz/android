@@ -62,16 +62,13 @@ import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.logging.Log
-import mega.privacy.android.domain.logging.Logger
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.ChatNavKey
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -217,12 +214,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
 
     @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
-    @Inject
-    lateinit var domainLogger: Logger
-
-    @Inject
     lateinit var fcmManager: FcmManager
 
     var localIpAddress: String? = ""
@@ -245,11 +236,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         super<MultiDexApplication>.onCreate()
         enableStrictMode()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        applicationScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity).not()) {
-                Log.setLogger(domainLogger)
-            }
-        }
         themeModeState.initialise()
         callChangesObserver.init()
 
