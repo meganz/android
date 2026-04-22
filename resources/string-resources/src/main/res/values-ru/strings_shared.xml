@@ -2534,4 +2534,18 @@
     <string name="cloud_explorer_use_this_folder_button">Использовать эту папку</string>
     <string name="home_widget_continue_where_left_off">Продолжите, где остановились</string>
     <string name="general_skip">Пропустить</string>
+    <string name="settings_passcode_lock">Код блокировки</string>
+    <string name="action_use_passcode">Использовать код доступа</string>
+    <string name="settings_passcode_enter_password_title">Введите пароль</string>
+    <string name="unlock_pin_title">Введите код доступа</string>
+    <string name="unlock_pin_title_2">Повторно введите код доступа</string>
+    <string name="pin_lock_alert">После 10 неудачных попыток локальные файлы будут удалены, а вы выйдете из системы</string>
+    <string name="action_logout">Выйти</string>
+    <string name="settings_passcode_forgot_passcode_button">Забыли код доступа?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d неудачная попытка ввода пароля</item>
+        <item quantity="few">%1$d неудачные попытки ввода пароля</item>
+        <item quantity="many">%1$d неудачных попыток ввода пароля</item>
+        <item quantity="other">%1$d неудачных попыток ввода пароля</item>
+    </plurals>
 </resources>

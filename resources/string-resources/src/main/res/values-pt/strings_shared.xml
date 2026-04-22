@@ -2455,4 +2455,23 @@
     <string name="settings_transfer_connections_slow_networs">%1$d (melhor opção para redes lentas)</string>
     <string name="settings_transfer_connections_default">%1$d (valor predeterminado)</string>
     <string name="settings_transfer_connections_higher_usage">%1$d (maior consumo de bateria e de dados)</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Adicionar legenda a partir da Nuvem de arquivos</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Downloads sem anúncios</string>
+    <string name="settings_passcode_lock">Bloqueio com código de acesso</string>
+    <string name="action_use_passcode">Usar código de acesso</string>
+    <string name="settings_passcode_enter_password_title">Digite a sua senha</string>
+    <string name="unlock_pin_title">Digite o seu código de acesso</string>
+    <string name="unlock_pin_title_2">Digite seu código de acesso novamente</string>
+    <string name="pin_lock_alert">Depois de 10 tentativas incorretas, você será deslogado e os arquivos salvos em Offline serão deletados</string>
+    <string name="action_logout">Fazer&#160;logout</string>
+    <string name="settings_passcode_forgot_passcode_button">Esqueceu o seu código de acesso?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d tentativa de acesso com código incorreto</item>
+        <item quantity="many">%1$d tentativas de acesso com código incorreto</item>
+        <item quantity="other">%1$d tentativas de acesso com código incorreto</item>
+    </plurals>
+    <string name="setting_biometric_id">Identificação biométrica</string>
+    <string name="title_enable_biometrics">Confirme os seus dados biométricos para desbloquear</string>
+    <string name="confirmation_biometric_enabled">Os seus dados biométricos foram confirmados</string>
+    <string name="title_unlock_biometric">Desbloqueie usando os seus dados biométricos</string>
 </resources>

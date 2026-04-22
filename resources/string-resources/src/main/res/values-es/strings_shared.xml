@@ -2412,4 +2412,30 @@
     <string name="sync_label_media_uploads">Subidas multimedia</string>
     <string name="home_widget_continue_where_left_off">Continúa desde donde lo dejaste</string>
     <string name="general_skip">Saltar</string>
+    <string name="settings_transfer_connections_title">Conexiones de las transferencias</string>
+    <string name="settings_transfer_connections_text">Define el número de conexiones paralelas por transferencia de archivo. Valores más altos pueden mejorar la velocidad, pero aumentan el consumo de batería y datos.</string>
+    <string name="settings_transfer_download_connections">Conexiones de las descargas</string>
+    <string name="settings_transfer_upload_connections">Conexiones de las subidas</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Ideal para redes lentas)</string>
+    <string name="settings_transfer_connections_default">%1$d (Predeterminado)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Mayor consumo de batería y datos)</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Añadir subtítulo desde la nube</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Descargas sin anuncios</string>
+    <string name="unlock_pin_title">Introduce el código de acceso</string>
+    <string name="settings_passcode_lock">Bloqueo con código de acceso</string>
+    <string name="pin_lock_alert">Se cerrará la sesión y tus archivos sin conexión se eliminarán después de 10 intentos fallidos</string>
+    <string name="action_logout">Cerrar&#160;la sesión</string>
+    <string name="settings_passcode_forgot_passcode_button">¿Has olvidado tu código de acceso?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d intento fallido</item>
+        <item quantity="many">%1$d de intentos fallidos</item>
+        <item quantity="other">%1$d intentos fallidos</item>
+    </plurals>
+    <string name="action_use_passcode">Usar código</string>
+    <string name="settings_passcode_enter_password_title">Introduce tu contraseña</string>
+    <string name="unlock_pin_title_2">Vuelve a introducir el código de acceso</string>
+    <string name="setting_biometric_id">Identificación biométrica</string>
+    <string name="title_enable_biometrics">Confirma tu información biométrica para desbloquear</string>
+    <string name="confirmation_biometric_enabled">Información biométrica confirmada</string>
+    <string name="title_unlock_biometric">Desbloquear usando tu información biométrica</string>
 </resources>

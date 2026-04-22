@@ -2239,7 +2239,7 @@
     <string name="pdf_viewer_error_streaming">파일을 열려고 시도하던 중에 오류가 발생했습니다</string>
     <string name="homepage_empty_hint_audio">[B]발견된[/B] [A]오디오[/A] [B]없음[/B]</string>
     <string name="cloud_explorer_select_destination_title">목적지 선택</string>
-    <string name="cloud_explorer_use_this_folder_button">이 폴더 이용</string>
+    <string name="cloud_explorer_use_this_folder_button">이 폴더 사용</string>
     <string name="video_player_more_options_playlist_option">재생목록</string>
     <string name="video_player_more_options_lock_option">동영상 재생기 잠금</string>
     <string name="video_section_add_to_playlist_success">“%1$s”에 항목 1개 추가됨</string>
@@ -2249,7 +2249,7 @@
     <string name="rewarded_ad_dialog_upgrade_button">Pro로 업그레이드</string>
     <string name="rewarded_ad_dialog_title">광고 이후 계속 됩니다</string>
     <string name="rewarded_ad_dialog_watch_ad_button">광고 보기</string>
-    <string name="rewarded_ad_dialog_upgrade_subtitle">또는 즉시, 광고 없는 접근을 하려면 Pro 요금제로 업그레이드 하세요</string>
+    <string name="rewarded_ad_dialog_upgrade_subtitle">또는 즉시, 광고 없이 이용하려면 Pro 요금제로 업그레이드 하세요</string>
     <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
     <string name="rewarded_ad_dialog_perk_unlimited_downloads">무제한 다운로드, 광고 건너뛰기</string>
     <string name="rewarded_ad_dialog_perk_storage">암호화 저장소 최대 20TB</string>
@@ -2257,7 +2257,7 @@
     <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass와 MEGA VPN 포함</string>
     <string name="rewarded_ad_unavailable_toast">사용 가능한 광고가 없습니다! 계속 합니다&#8230;</string>
     <string name="general_read_only_folder_warning">이 폴더는 읽기 전용입니다</string>
-    <string name="sync_error_folder_conflict">““%1$s” %2$s은 이미 %4$s에서 %3$s의 일부입니다. 다른 것을 선택하세요.”</string>
+    <string name="sync_error_folder_conflict">““%1$s” %2$s는 이미 %4$s에서 %3$s의 일부입니다. 다른 것을 선택하세요.</string>
     <string name="sync_label_cloud_folder">클라우드 폴더</string>
     <string name="sync_label_device_folder">기기 폴더</string>
     <string name="sync_label_a_sync_or_backup">동기화 또는 백업</string>
@@ -2265,4 +2265,25 @@
     <string name="sync_label_camera_uploads">카메라 업로드</string>
     <string name="sync_label_media_uploads">미디어 업로드</string>
     <string name="general_skip">건너뛰기</string>
+    <string name="home_widget_continue_where_left_off">중단했던 곳에서 계속 하세요</string>
+    <string name="settings_transfer_connections_title">전송 연결</string>
+    <string name="settings_transfer_connections_text">파일 전송당 병렬 연결 수를 정의합니다. 높은 값은 속도를 향상시키지만 배터리와 데이터 이용량을 늘립니다.</string>
+    <string name="settings_transfer_download_connections">다운로드 연결</string>
+    <string name="settings_transfer_upload_connections">업로드 연결</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (느린 네트워크에 최적)</string>
+    <string name="settings_transfer_connections_default">%1$d (기본값)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (더 높은 배터리와 데이터 이용량)</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">클라우드 드라이브에서 자막 추가</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">광고 없는 다운로드</string>
+    <string name="settings_passcode_lock">암호 잠금</string>
+    <string name="action_use_passcode">암호 사용</string>
+    <string name="settings_passcode_enter_password_title">암호를 입력하세요</string>
+    <string name="unlock_pin_title">암호 입력</string>
+    <string name="unlock_pin_title_2">암호 재입력</string>
+    <string name="pin_lock_alert">당신은 로그아웃 되고 오프라인 파일은 10번의 실패 후에 삭제됩니다</string>
+    <string name="action_logout">로그아웃</string>
+    <string name="settings_passcode_forgot_passcode_button">암호를 잊었나요?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="other">암호 %1$d회 틀림</item>
+    </plurals>
 </resources>

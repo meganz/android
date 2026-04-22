@@ -2679,10 +2679,26 @@
     <string name="sync_label_device_folder">مجلد الجهاز</string>
     <string name="sync_label_a_sync_or_backup">مزامنة أو نسخة احتياطية</string>
     <string name="sync_label_this_device">هذا الجهاز</string>
-    <string name="sync_label_camera_uploads">تحميلات الكاميرا</string>
-    <string name="sync_label_media_uploads">تحميلات الوسائط</string>
+    <string name="sync_label_camera_uploads">ترفيعات الكاميرا</string>
+    <string name="sync_label_media_uploads">ترفيعات الوسائط</string>
     <string name="cloud_explorer_select_destination_title">اختر الوجهة</string>
     <string name="cloud_explorer_use_this_folder_button">استخدم هذا المجلد</string>
     <string name="home_widget_continue_where_left_off">استمر من حيث توقفت</string>
     <string name="general_skip">تخطى</string>
+    <string name="unlock_pin_title">إدخال رمز المرور الخاص بك</string>
+    <string name="settings_passcode_lock">قفل رمز المرور</string>
+    <string name="pin_lock_alert">سيتم تسجيل خروجك وسيتم حذف ملفاتك غير المتصلة بالانترنت بعد 10 محاولات فاشلة</string>
+    <string name="action_logout">تسجيل خروج</string>
+    <string name="settings_passcode_forgot_passcode_button">نسيت رمز المرور الخاص بك؟</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="zero">%1$d محاولة فاشلة لإدخال رمز المرور</item>
+        <item quantity="one">%1$d محاولة فاشلة لإدخال رمز المرور</item>
+        <item quantity="two">%1$d محاولتان فاشلتان لإدخال رمز المرور</item>
+        <item quantity="few">%1$d محاولات فاشلة لإدخال رمز المرور</item>
+        <item quantity="many">%1$d محاولة فاشلة لإدخال رمز المرور</item>
+        <item quantity="other">%1$d محاولة فاشلة لإدخال رمز المرور</item>
+    </plurals>
+    <string name="action_use_passcode">استخدم رمز المرور</string>
+    <string name="settings_passcode_enter_password_title">أدخل كلمة المرور الخاصة بك</string>
+    <string name="unlock_pin_title_2">إعادة إدخال رمز المرور الخاص بك</string>
 </resources>

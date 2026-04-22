@@ -2372,4 +2372,18 @@
     <string name="settings_transfer_connections_slow_networs">%1$d (Yavaş ağlar için en iyisi)</string>
     <string name="settings_transfer_connections_default">%1$d (Varsayılan)</string>
     <string name="settings_transfer_connections_higher_usage">%1$d (Daha yüksek şarj ve veri kullanımı)</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Bulut depolamadan altyazı ekle</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Reklamsız indirmeler</string>
+    <string name="settings_passcode_lock">Giriş kodu kilidi</string>
+    <string name="action_use_passcode">Giriş kodunu kullan</string>
+    <string name="settings_passcode_enter_password_title">Şifrenizi girin</string>
+    <string name="unlock_pin_title">Giriş kodunuzu girin</string>
+    <string name="unlock_pin_title_2">Giriş kodunuzu tekrar girin</string>
+    <string name="pin_lock_alert">10 başarısız denemeden sonra çıkış yapacaksınız ve çevrim dışı dosyalarınız silinecek</string>
+    <string name="action_logout">Çıkış&#160;yap</string>
+    <string name="settings_passcode_forgot_passcode_button">Giriş kodunuzu mu unuttunuz?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d başarısız giriş kodu denemesi</item>
+        <item quantity="other">%1$d başarısız giriş kodu denemesi</item>
+    </plurals>
 </resources>

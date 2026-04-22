@@ -3251,7 +3251,7 @@
     <!-- Header title for meeting list past meetings -->
     <string name="meetings_list_past_header">過去的會議</string>
     <!-- Label for upcoming meetings -->
-    <string name="meetings_list_upcoming_meeting_label">即將到來的會議</string>
+    <string name="meetings_list_upcoming_meeting_label">即將進行的會議</string>
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">週期性會議</string>
     <!-- Label for scheduled weekly meetings -->

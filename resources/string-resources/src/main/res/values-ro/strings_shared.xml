@@ -2436,7 +2436,20 @@
     <string name="sync_label_device_folder">Folder de pe dispozitiv</string>
     <string name="sync_label_a_sync_or_backup">sincronizare sau backup</string>
     <string name="sync_label_this_device">acest dispozitiv</string>
-    <string name="sync_label_camera_uploads">Încărcări din Cameră</string>
+    <string name="sync_label_camera_uploads">Încărcări cameră</string>
     <string name="sync_label_media_uploads">Încărcări media</string>
     <string name="general_skip">Omite</string>
+    <string name="settings_passcode_lock">Blocare prin cod de acces</string>
+    <string name="action_use_passcode">Folosește codul de acces</string>
+    <string name="settings_passcode_enter_password_title">Introduceți parola dvs.</string>
+    <string name="unlock_pin_title">Introduceți codul de acces</string>
+    <string name="unlock_pin_title_2">Reintroduceți codul de acces</string>
+    <string name="pin_lock_alert">Veți fi deconectat și fișierele dvs. offline vor fi șterse după 10 încercări eșuate</string>
+    <string name="action_logout">Deconectați-vă</string>
+    <string name="settings_passcode_forgot_passcode_button">Ți-ai uitat codul de acces?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d încercare eșuată pentru codul de acces</item>
+        <item quantity="few">%1$d încercări eșuate pentru codul de acces</item>
+        <item quantity="other">%1$d de încercări eșuate pentru codul de acces</item>
+    </plurals>
 </resources>

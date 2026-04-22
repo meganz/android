@@ -2262,9 +2262,20 @@
     <string name="sync_label_device_folder">โฟลเดอร์อุปกรณ์</string>
     <string name="sync_label_a_sync_or_backup">การซิงค์หรือการสำรองข้อมูล</string>
     <string name="sync_label_this_device">อุปกรณ์นี้</string>
-    <string name="sync_label_camera_uploads">การอัปโหลดจากกล้อง</string>
-    <string name="sync_label_media_uploads">การอัปโหลดสื่อ</string>
+    <string name="sync_label_camera_uploads">อัปโหลดจากกล้อง</string>
+    <string name="sync_label_media_uploads">อัปโหลดสื่อ</string>
     <string name="cloud_explorer_select_destination_title">เลือกปลายทาง</string>
     <string name="cloud_explorer_use_this_folder_button">ใช้โฟลเดอร์นี้</string>
     <string name="general_skip">ข้าม</string>
+    <string name="settings_passcode_lock">ล็อกรหัสผ่าน</string>
+    <string name="action_use_passcode">ใช้รหัส</string>
+    <string name="settings_passcode_enter_password_title">กรอกรหัสผ่านของคุณ</string>
+    <string name="unlock_pin_title">กรอกรหัสของคุณ</string>
+    <string name="unlock_pin_title_2">กรอกรหัสอีกครั้ง</string>
+    <string name="pin_lock_alert">คุณจะถูกออกจากระบบและไฟล์ออฟไลน์ของคุณจะถูกลบหลังจากความพยายามล้มเหลวเกิน 10 ครั้ง</string>
+    <string name="action_logout">ออกจากระบบ</string>
+    <string name="settings_passcode_forgot_passcode_button">คุณลืมรหัสหรือไม่</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="other">รหัสผ่านไม่ถูกต้องแล้ว %1$d ครั้ง</item>
+    </plurals>
 </resources>
