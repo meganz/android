@@ -2,6 +2,7 @@ package mega.privacy.android.app.textEditor
 
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.FileProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -18,8 +19,8 @@ import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
+import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
@@ -330,7 +331,29 @@ private fun TextEditorComposeContent(
                 val file = File(localPath)
                 if (file.exists()) {
                     val name = fileName?.ifBlank { null } ?: file.name
-                    FileUtil.shareUri(context, name, FileUtil.getUriForFile(context, file))
+                    val uri = FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.providers.fileprovider",
+                        file,
+                    )
+                    val shareIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                        type = "*/*"
+                        putParcelableArrayListExtra(
+                            Intent.EXTRA_STREAM,
+                            arrayListOf(uri),
+                        )
+                        putExtra(Intent.EXTRA_SUBJECT, name)
+                        addFlags(
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        )
+                    }
+                    context.startActivity(
+                        Intent.createChooser(
+                            shareIntent,
+                            context.getString(R.string.context_share),
+                        )
+                    )
                 }
             }
         }
