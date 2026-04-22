@@ -226,9 +226,37 @@ internal fun ImagePreviewBottomSheet(
                 value = showAddToAlbum(imageNode)
             }
 
+            // Temporary solution to handle group divider visibility in this legacy code
+            val isHideItemVisible = !forceHideHiddenMenus()
+                    && accountType != null
+                    && (!accountType.isPaid || isBusinessAccountExpired
+                    || (isHideMenuVisible && isHiddenNodesOnboarded != null))
+            val isUnhideItemVisible = !forceHideHiddenMenus()
+                    && accountType?.isPaid == true
+                    && !isBusinessAccountExpired && isUnhideMenuVisible
+
+            // Group visibility flags — a divider after group N shows only when
+            // group N is visible AND at least one later group is also visible.
+            val isGroup1Visible =
+                isInfoMenuVisible || isFavouriteMenuVisible || isLabelMenuVisible
+            val isGroup2Visible =
+                isDisputeMenuVisible || isOpenWithMenuVisible
+            val isGroup3Visible =
+                isForwardMenuVisible || isSaveToDeviceMenuVisible
+                        || isImportMenuVisible || isAvailableOfflineMenuVisible
+            val isGroup4Visible =
+                isGetLinkMenuVisible || isSendToChatMenuVisible || isShareMenuVisible
+            val isGroup5Visible =
+                isRenameMenuVisible || isHideItemVisible || isUnhideItemVisible
+                        || isMoveMenuVisible || isAddToAlbumMenuVisible
+            val isGroup6Visible =
+                isCopyMenuVisible || isRestoreMenuVisible || isRemoveMenuVisible
+                        || isRemoveOfflineMenuVisible || isMoveToRubbishBinMenuVisible
+
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
             ) {
+                // Group 1: Info, Favourite, Label
                 if (isInfoMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Info),
@@ -288,8 +316,11 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup1Visible && (isGroup2Visible || isGroup3Visible || isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
+                    Divider(modifier = Modifier.padding(start = 72.dp))
+                }
 
+                // Group 2: Dispute, OpenWith
                 if (isDisputeMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.AlertTriangle),
@@ -310,8 +341,11 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup2Visible && (isGroup3Visible || isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
+                    Divider(modifier = Modifier.padding(start = 72.dp))
+                }
 
+                // Group 3: Forward, SaveToDevice, Import, AvailableOffline
                 if (isForwardMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CornerUpRight),
@@ -358,8 +392,11 @@ internal fun ImagePreviewBottomSheet(
                     }
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup3Visible && (isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
+                    Divider(modifier = Modifier.padding(start = 72.dp))
+                }
 
+                // Group 4: GetLink, RemoveLink, SendToChat, Share
                 if (isGetLinkMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01),
@@ -407,8 +444,11 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup4Visible && (isGroup5Visible || isGroup6Visible)) {
+                    Divider(modifier = Modifier.padding(start = 72.dp))
+                }
 
+                // Group 5: Rename, Hide, Unhide, Move, AddToAlbum
                 if (isRenameMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
@@ -419,7 +459,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (!forceHideHiddenMenus() && accountType != null && (!accountType.isPaid || isBusinessAccountExpired || (isHideMenuVisible && isHiddenNodesOnboarded != null))) {
+                if (isHideItemVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.EyeOff),
                         text = stringResource(id = R.string.general_hide_node),
@@ -449,7 +489,7 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                if (!forceHideHiddenMenus() && accountType?.isPaid == true && !isBusinessAccountExpired && isUnhideMenuVisible) {
+                if (isUnhideItemVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eye),
                         text = stringResource(id = R.string.general_unhide_node),
@@ -478,8 +518,11 @@ internal fun ImagePreviewBottomSheet(
                     )
                 }
 
-                Divider(modifier = Modifier.padding(start = 72.dp))
+                if (isGroup5Visible && isGroup6Visible) {
+                    Divider(modifier = Modifier.padding(start = 72.dp))
+                }
 
+                // Group 6: Copy, Restore, Remove, RemoveOffline, MoveToRubbishBin
                 if (isCopyMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Copy01),
