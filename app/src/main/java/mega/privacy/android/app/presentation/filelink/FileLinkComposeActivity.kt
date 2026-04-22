@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -30,7 +31,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
@@ -49,6 +49,9 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.shared.ads.advertisements.GoogleAdsManager
+import mega.privacy.android.shared.ads.rewarded.rememberRewardedAdGate
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -141,19 +144,32 @@ class FileLinkComposeActivity : PasscodeActivity(),
 
             val snackBarHostState = remember { SnackbarHostState() }
             OriginalTheme(isDark = themeMode.isDarkMode()) {
-                FileLinkView(
-                    viewState = uiState,
-                    snackBarHostState = snackBarHostState,
-                    onBackPressed = { onBackPressedDispatcher.onBackPressed() },
-                    onShareClicked = ::onShareClicked,
-                    onPreviewClick = ::onPreviewClick,
-                    onSaveToDeviceClicked = viewModel::handleSaveFile,
-                    onImportClicked = ::onImportClicked,
-                    onErrorMessageConsumed = viewModel::resetErrorMessage,
-                    onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
-                    onForeignNodeErrorConsumed = viewModel::resetForeignNodeError,
-                    request = request,
-                )
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    val rewardedAdGate = rememberRewardedAdGate(
+                        onNavigate = { navKey ->
+                            // Rewarded Ad Gate only navigates to UpgradeAccountNavKey
+                            if (navKey is UpgradeAccountNavKey) {
+                                megaNavigator.openUpgradeAccount(
+                                    this@FileLinkComposeActivity,
+                                    navKey.source,
+                                )
+                            }
+                        },
+                    )
+                    FileLinkView(
+                        viewState = uiState,
+                        snackBarHostState = snackBarHostState,
+                        onBackPressed = { onBackPressedDispatcher.onBackPressed() },
+                        onShareClicked = ::onShareClicked,
+                        onPreviewClick = { rewardedAdGate.requestAction(::onPreviewClick) },
+                        onSaveToDeviceClicked = { rewardedAdGate.requestAction { viewModel.handleSaveFile() } },
+                        onImportClicked = { rewardedAdGate.requestAction(::onImportClicked) },
+                        onErrorMessageConsumed = viewModel::resetErrorMessage,
+                        onOverQuotaErrorConsumed = viewModel::resetOverQuotaError,
+                        onForeignNodeErrorConsumed = viewModel::resetForeignNodeError,
+                        request = request,
+                    )
+                }
                 StartTransferComponent(
                     event = uiState.downloadEvent,
                     onConsumeEvent = viewModel::resetDownloadFile,
