@@ -241,7 +241,11 @@ private fun TextEditorEntry(
     transferHandler: TransferHandler,
 ) {
     val context = LocalContext.current
-    val removeDestination: () -> Unit = { navigationHandler.back() }
+    val chatId = navKey.chatId
+    val removeDestination: () -> Unit = {
+        navigationHandler.back()
+        chatId?.let { navigationHandler.navigate(ChatNavKey(chatId = it)) }
+    }
     val legacyIntent = buildTextEditorIntent(context, navKey)
 
     if (navKey.chatId == null && navKey.localPath == null) {
