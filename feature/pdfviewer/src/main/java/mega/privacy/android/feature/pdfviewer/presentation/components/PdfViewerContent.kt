@@ -34,6 +34,8 @@ import java.io.File
  * @param password The password for protected PDFs
  * @param highlightPageIndex The page index to highlight (0-indexed)
  * @param highlightPdfRects Pre-calculated screen-coordinate RectFs for highlighting the current search match
+ * @param scrubProgress Optional scrub position in 0f..1f while the user is dragging the page indicator.
+ *                      Null when not scrubbing.
  * @param onPageChanged Callback when page changes (page: 1-indexed, totalPages)
  * @param onLoadComplete Callback when PDF finishes loading
  * @param onError Callback when an error occurs
@@ -48,6 +50,7 @@ internal fun PdfViewerContent(
     password: String?,
     highlightPageIndex: Int?,
     highlightPdfRects: List<RectF>?,
+    scrubProgress: Float?,
     onPageChanged: (Int, Int) -> Unit,
     onLoadComplete: (Int) -> Unit,
     onError: (PdfViewerError) -> Unit,
@@ -111,8 +114,12 @@ internal fun PdfViewerContent(
             // If PDF is already loaded, just handle page navigation or reload on source change
             if (pdfView.pageCount > 0) {
                 if (currentSignature == lastSourceSignature.value) {
-                    if (pdfView.currentPage != currentPage - 1) {
-                        pdfView.jumpTo(currentPage - 1)
+                    if (scrubProgress != null) {
+                        // User is dragging the page indicator - scrub continuously.
+                        pdfView.setPositionOffset(scrubProgress.coerceIn(0f, 1f), false)
+                    } else if (pdfView.currentPage != currentPage - 1) {
+                        // Page changed programmatically (e.g. prev/next button). Animate.
+                        pdfView.jumpTo(currentPage - 1, true)
                     }
                     return@AndroidView
                 }
@@ -180,6 +187,8 @@ internal fun PdfViewerContent(
                 .enableAnnotationRendering(true)
                 .spacing(10.dp.toPx(pdfView.context).toInt())
                 .password(password)
+                // Compose owns the page indicator; do not attach the legacy Java DefaultScrollHandle.
+                .scrollHandle(null)
                 .load()
         },
         onReset = { pdfView ->

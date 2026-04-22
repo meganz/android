@@ -11,6 +11,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_PAGE_INDICATOR_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_ERROR_DIALOG_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_PASSWORD_DIALOG_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
@@ -113,12 +114,16 @@ class PdfViewerScreenTest {
         title: String? = "Test Document.pdf",
         error: PdfViewerError? = null,
         searchState: PdfViewerSearchState = PdfViewerSearchState(),
+        currentPage: Int = 1,
+        totalPages: Int = 0,
     ) = PdfViewerState(
         isLoading = false,
         source = source,
         title = title,
         error = error,
         searchState = searchState,
+        currentPage = currentPage,
+        totalPages = totalPages,
     )
 
     @Test
@@ -210,6 +215,43 @@ class PdfViewerScreenTest {
         composeTestRule.onNodeWithText(cancelLabel).performClick()
 
         verify(onDismissPasswordDialog).invoke()
+    }
+
+    @Test
+    fun `test that page indicator is not displayed when totalPages is 1`() {
+        setContent(defaultState(currentPage = 1, totalPages = 1))
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that page indicator is not displayed when search is active`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(
+            defaultState(
+                currentPage = 2,
+                totalPages = 4,
+                searchState = PdfViewerSearchState(isSearchActive = true),
+            )
+        )
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that page indicator is displayed when totalPages is greater than 1`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(defaultState(currentPage = 2, totalPages = 4))
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
     @Test

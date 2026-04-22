@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
+import mega.privacy.android.feature.pdfviewer.presentation.components.PdfPageIndicator
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfSearchResultsBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerContent
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerErrorDialog
@@ -104,25 +105,47 @@ internal fun PdfViewerScreen(
     val pdfUri = remember(uiState.source) { getPdfUri(uiState.source) }
     val bytes = uiState.pdfBytes?.bytes
 
+    // Null when not scrubbing; 0f..1f while the user drags the page indicator.
+    var scrubProgress by remember { mutableStateOf<Float?>(null) }
+    var indicatorVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.currentPage, uiState.totalPages, scrubProgress) {
+        if (uiState.totalPages > 1) {
+            indicatorVisible = true
+            if (scrubProgress == null) {
+                delay(PAGE_INDICATOR_AUTO_HIDE_MS)
+                indicatorVisible = false
+            }
+        } else {
+            indicatorVisible = false
+        }
+    }
+
+    // Only show loading spinner when waiting for remote bytes to download
+    // For local content, render PdfViewerContent immediately and let PDFView handle its own loading
+    val showLoading = uiState.source?.isRemote == true && uiState.pdfBytes == null
+
     Box(modifier = modifier.fillMaxSize()) {
         MegaScaffoldWithTopAppBarScrollBehavior(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                if (searchState.isSearchActive) {
-                    PdfViewerSearchTopBar(
-                        query = searchState.query,
-                        onQueryChanged = onSearchQueryChanged,
-                        onClose = onDeactivateSearch,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                } else {
-                    PdfViewerTopBar(
-                        title = uiState.title,
-                        onBack = onBack,
-                        onSearch = onActivateSearch,
-                        onOpenNodeOptions = onMoreClicked,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                if (showLoading.not()) {
+                    if (searchState.isSearchActive) {
+                        PdfViewerSearchTopBar(
+                            query = searchState.query,
+                            onQueryChanged = onSearchQueryChanged,
+                            onClose = onDeactivateSearch,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    } else {
+                        PdfViewerTopBar(
+                            title = uiState.title,
+                            onBack = onBack,
+                            onSearch = onActivateSearch,
+                            onOpenNodeOptions = onMoreClicked,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             },
             content = { innerPadding ->
@@ -131,9 +154,6 @@ internal fun PdfViewerScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-                    // Only show loading spinner when waiting for remote bytes to download
-                    // For local content, render PdfViewerContent immediately and let PDFView handle its own loading
-                    val showLoading = uiState.source?.isRemote == true && uiState.pdfBytes == null
 
                     when {
                         showLoading -> {
@@ -164,6 +184,7 @@ internal fun PdfViewerScreen(
                                 password = uiState.currentPassword,
                                 highlightPageIndex = searchState.currentMatchPageIndex,
                                 highlightPdfRects = searchState.currentMatchPdfRects,
+                                scrubProgress = scrubProgress,
                                 onPageChanged = onPageChanged,
                                 onLoadComplete = onLoadComplete,
                                 onError = onError,
@@ -173,10 +194,14 @@ internal fun PdfViewerScreen(
                         }
                     }
 
-                    // Floating page indicator (top-end) - transient overlay
-                    if (!searchState.isSearchActive) {
-                        // TODO: show PdfPageIndicatorOverlay when page is changing, then hide after a delay
-                    }
+                    // Fast-scroll page indicator — draggable thumb on the right edge that
+                    // also reflects the current scroll position of the document.
+                    PdfPageIndicator(
+                        currentPage = uiState.currentPage,
+                        totalPages = uiState.totalPages,
+                        isVisible = indicatorVisible && !searchState.isSearchActive,
+                        onScrub = { scrubProgress = it },
+                    )
 
                     // Floating search results bar (bottom-center)
                     if (searchState.isSearchActive && searchState.hasResults) {
@@ -222,3 +247,4 @@ internal fun PdfViewerScreen(
 }
 
 private const val PASSWORD_DIALOG_DELAY_MS = 500L
+private const val PAGE_INDICATOR_AUTO_HIDE_MS = 2000L
