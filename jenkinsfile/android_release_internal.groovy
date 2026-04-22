@@ -64,8 +64,6 @@ pipeline {
         gitlabUserName = "Jenkins Pipeline"
         // default gitlabSourceBranch for this script
         gitlabSourceBranch = "develop"
-
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
         failure {

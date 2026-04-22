@@ -78,8 +78,8 @@ for ABI in ${BUILD_ARCHS}; do
     cp -fv ${BUILD_DIR}/bindings/java/libmega.so ${LIB_OUTPUT_DIR} &>>${LOG_FILE}
     cp -fv ${BUILD_DIR}/bindings/java/nz/mega/sdk/*.java ../java/nz/mega/sdk &>>${LOG_FILE}
 
-    mkdir -p megachat/webrtc
-    cp -fv `find ${BUILD_DIR} -name "libwebrtc.jar"` megachat/webrtc/ &>> ${LOG_FILE}
+    mkdir -p ../../../libs
+    cp -fv `find ${BUILD_DIR} -name "libwebrtc.jar"` ../../../libs/ &>> ${LOG_FILE}
 
     ${STRIP_TOOL} "../jniLibs/${ABI}/libmega.so" &>> ${LOG_FILE}
 

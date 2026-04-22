@@ -39,8 +39,6 @@ pipeline {
         // Jenkins build log will be saved in this file.
         CONSOLE_LOG_FILE = "console.txt"
 
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-
         COMBINE_LINT_REPORTS = "true"
         DO_NOT_SUPPRESS_WARNINGS = "true"
     }
@@ -91,14 +89,6 @@ pipeline {
             }
         }
 
-        stage('Download Dependency Lib for SDK') {
-            steps {
-                script {
-                    BUILD_STEP = "Download Dependency Lib for SDK"
-                    common.downloadDependencyLibForSdk()
-                }
-            }
-        }
         stage('Build APK (GMS)') {
             steps {
                 script {

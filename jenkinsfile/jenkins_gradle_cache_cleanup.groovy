@@ -26,8 +26,6 @@ pipeline {
 
         // Jenkins build log will be saved in this file.
         CONSOLE_LOG_FILE = "console.txt"
-
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
         failure {
@@ -145,7 +143,6 @@ void cleanCache() {
  */
 void buildProject() {
     def common = load('jenkinsfile/common.groovy')
-    common.downloadDependencyLibForSdk()
 
     withCredentials([
             string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),

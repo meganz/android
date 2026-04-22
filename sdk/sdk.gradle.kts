@@ -64,7 +64,7 @@ android {
 
 dependencies {
     implementation(androidx.exifinterface)
-    implementation(files("src/main/jni/megachat/webrtc/libwebrtc.jar"))
+    implementation(files("libs/libwebrtc.jar"))
 
     testImplementation(testlib.junit)
     androidTestImplementation(testlib.junit.test.ktx)

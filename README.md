@@ -130,6 +130,7 @@ Build the SDK by running `./cmake.sh` from `sdk/src/main/jni/`.
 
 1. Download the WebRTC files from: https://mega.nz/file/N2k2XRaA#bS9iudrjiULmMaGbBKErsYosELbnU22b8Zj213Ti1nE
 2. Uncompress the archive and place the `webrtc` folder in `sdk/src/main/jni/megachat/`.
+3. Copy `sdk/src/main/jni/megachat/webrtc/libwebrtc.jar` to `sdk/libs/libwebrtc.jar` (overwriting the committed jar) so that Gradle picks up the matching version.
 
 **Note:** The WebRTC download link may change over time. Please verify it matches the one specified in `build.sh`.
 

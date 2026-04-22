@@ -598,22 +598,6 @@ void downloadAndExtractNativeSymbols() {
 }
 
 
-void downloadDependencyLibForSdk() {
-    gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
-        sh """
-            # we still have to download webrtc file for lint check. :( 
-            cd "${WORKSPACE}/jenkinsfile/"
-            bash download_webrtc.sh
-
-            mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-            cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-
-            pwd 
-            ls -lh
-        """
-    }
-}
-
 /**
  * Enable Artifactory and call the closure function
  * @param closure

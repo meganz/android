@@ -390,7 +390,7 @@ dependencies {
     debugImplementation(lib.xray)
 
     if (!shouldUsePrebuiltSdk()) {
-        implementation(files("../sdk/src/main/jni/megachat/webrtc/libwebrtc.jar"))
+        implementation(files("../sdk/libs/libwebrtc.jar"))
     }
 
     // Testing dependencies

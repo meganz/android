@@ -72,8 +72,6 @@ pipeline {
         // Jenkins build log will be saved in this file.
         CONSOLE_LOG_FILE = "console.txt"
 
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-
         IS_CI_BUILD = 'true'
     }
     post {
@@ -231,8 +229,6 @@ pipeline {
                             script {
                                 STAGE_START_MS['build_apk_ms'] = System.currentTimeMillis()
                                 STAGE_NODE_NAMES['build_apk'] = env.NODE_NAME
-                                common.downloadDependencyLibForSdk()
-
                                 util.useArtifactory() {
                                     sh "./gradlew app:assembleGmsDebug --no-daemon 2>&1  | tee ${GMS_APK_BUILD_LOG}"
                                     sh "./gradlew app:assembleGmsQa --no-daemon 2>&1  | tee ${QA_APK_BUILD_LOG}"
@@ -286,7 +282,6 @@ pipeline {
                         script {
                             STAGE_START_MS['unit_test_ms'] = System.currentTimeMillis()
                             STAGE_NODE_NAMES['unit_test'] = env.NODE_NAME
-                            common.downloadDependencyLibForSdk()
                         }
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
                             script {
@@ -348,8 +343,6 @@ pipeline {
                             script {
                                 STAGE_START_MS['lint_ms'] = System.currentTimeMillis()
                                 STAGE_NODE_NAMES['lint'] = env.NODE_NAME
-                                common.downloadDependencyLibForSdk()
-
                                 util.useArtifactory() {
                                     sh "mv custom_lint.xml lint.xml"
                                     sh "./gradlew --no-daemon lint"

@@ -41,8 +41,6 @@ pipeline {
 
         // Channel to add in the suffix of the version name
         APK_VERSION_NAME_CHANNEL_FOR_CD = "-internal-appsharing"
-
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
     }
     post {
         failure {
