@@ -16,10 +16,12 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.NetworkUnavailableException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.transfers.NoTransferToShowException
 import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
@@ -38,6 +40,7 @@ class LoadingPreviewViewModel @Inject constructor(
     private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val broadcastTransferTagToCancelUseCase: BroadcastTransferTagToCancelUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     savedStateHandle: SavedStateHandle,
     @ApplicationScope private val appScope: CoroutineScope,
@@ -52,6 +55,7 @@ class LoadingPreviewViewModel @Inject constructor(
         checkArgs()
         getTransfer()
         monitorTransferEvents()
+        monitorConnectivity()
 
         loadingPreviewInfo.transferTag?.let {
             checkTransferTagToCancel(it)
@@ -145,6 +149,23 @@ class LoadingPreviewViewModel @Inject constructor(
                         }
                     }
             }
+        }
+    }
+
+    private fun monitorConnectivity() {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .collect { isConnected ->
+                    if (!isConnected) {
+                        _uiState.update { state ->
+                            if (state.error == null && state.previewFilePathToOpen == null) {
+                                state.copy(error = NetworkUnavailableException())
+                            } else {
+                                state
+                            }
+                        }
+                    }
+                }
         }
     }
 
