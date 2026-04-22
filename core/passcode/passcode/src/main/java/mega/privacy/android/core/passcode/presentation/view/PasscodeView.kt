@@ -54,12 +54,12 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.passcode.R
 import mega.privacy.android.core.passcode.components.PasscodeField
 import mega.privacy.android.core.passcode.presentation.PasscodeUnlockViewModel
 import mega.privacy.android.core.passcode.presentation.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
+import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.ForgotPasscodeButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PasscodeBiometricUnlockDialogEvent
 import mega.privacy.mobile.analytics.event.PasscodeEnteredEvent
@@ -124,13 +124,13 @@ fun PasscodeView(
 
                 if (showBiometricPrompt) {
                     Timber.d("Show biometrics UI composed")
-                    val title = stringResource(id = R.string.title_unlock_fingerprint)
+                    val title = stringResource(id = R.string.title_unlock_biometric)
                     val negativeButton = stringResource(R.string.action_use_passcode)
                     val promptInfo = remember {
                         BiometricPrompt.PromptInfo.Builder()
                             .setTitle(title)
                             .setNegativeButtonText(negativeButton)
-                            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_WEAK)
                             .build()
                     }
 
@@ -336,7 +336,7 @@ private fun FailedAttemptsView(
 }
 
 private fun areBiometricsEnabled(context: Context) = BiometricManager.from(context).canAuthenticate(
-    BiometricManager.Authenticators.BIOMETRIC_STRONG
+    BiometricManager.Authenticators.BIOMETRIC_WEAK
 ) == BiometricManager.BIOMETRIC_SUCCESS
 
 internal const val PASSCODE_FIELD_TAG = "passcode_dialog:passcode_field"

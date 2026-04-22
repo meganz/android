@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import mega.privacy.android.app.R
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -15,6 +14,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.GenericTwoLin
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R
 
 /**
  * Fingerprint id tile
@@ -24,7 +24,7 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
  * @param modifier
  */
 @Composable
-internal fun FingerprintIdTile(
+internal fun BiometricIdTile(
     isChecked: Boolean,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -32,7 +32,7 @@ internal fun FingerprintIdTile(
     Column(modifier) {
         GenericTwoLineListItem(
             modifier = Modifier.testTag(FINGERPRINT_ID_TILE),
-            title = stringResource(R.string.setting_fingerprint),
+            title = stringResource(R.string.setting_biometric_id),
             onItemClicked = onItemClicked,
             trailingIcons = {
                 MegaSwitch(
@@ -60,7 +60,7 @@ private fun KeepFileNamesTilePreview(
     @PreviewParameter(BooleanProvider::class) isChecked: Boolean,
 ) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        FingerprintIdTile(
+        BiometricIdTile(
             isChecked = isChecked,
             onItemClicked = {},
         )

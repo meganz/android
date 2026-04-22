@@ -45,7 +45,7 @@ internal fun biometricAuthPrompt(
             onSuccess()
         }
     }
-    activity?.let { BiometricPrompt(it, callback).authenticate(promptInfo, cryptObject) }
+    activity?.let { BiometricPrompt(it, callback).authenticate(promptInfo) }
 }
 
 /**

@@ -34,7 +34,7 @@ internal fun NavGraphBuilder.passCodeSettings(
         val context = LocalContext.current
         val hasBiometricCapability = remember {
             BiometricManager.from(context).canAuthenticate(
-                BiometricManager.Authenticators.BIOMETRIC_STRONG
+                BiometricManager.Authenticators.BIOMETRIC_WEAK
             ) == BIOMETRIC_SUCCESS
         }
 

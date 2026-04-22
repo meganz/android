@@ -2721,4 +2721,33 @@
     <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Add subtitle from Cloud drive</string>
     <!-- Rewarded ad dialog Pro perk: ad-free downloads -->
     <string name="rewarded_ad_dialog_perk_ad_free_downloads">Ad-free downloads</string>
+    <!-- Settings label which allows to enable or disable biometric unlock. -->
+    <string name="setting_biometric_id">Biometric ID</string>
+    <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
+    <string name="title_enable_biometrics">Confirm your biometric information to unlock</string>
+    <!-- Message informing the biometrics was enabled successfully -->
+    <string name="confirmation_biometric_enabled">Your biometric information is confirmed</string>
+    <!-- Settings of the Passcode -->
+    <string name="settings_passcode_lock">Passcode lock</string>
+    <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
+    <string name="title_unlock_biometric">Unlock using your biometric information</string>
+    <!-- Button to unlock the app with the fingerprint.-->
+    <string name="action_use_passcode">Use passcode</string>
+    <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_enter_password_title">Enter your password</string>
+    <!-- Title of the screen to unlock screen with Passcode -->
+    <string name="unlock_pin_title">Enter your passcode</string>
+    <!-- Title of the screen to unlock screen with Passcode in second round -->
+    <string name="unlock_pin_title_2">Re-enter your passcode</string>
+    <!-- Error message when not typing the Passcode code correctly -->
+    <string name="pin_lock_alert">You will be logged out and your offline files will be deleted after 10 failed attempts</string>
+    <!-- Button where the user can sign off or logout -->
+    <string name="action_logout">Log&#160;out</string>
+    <!-- Button in the Passcode screen to open the app with the password if it does not remember the passcode. -->
+    <string name="settings_passcode_forgot_passcode_button">Forgot your passcode?</string>
+    <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d failed passcode attempt</item>
+        <item quantity="other">%1$d failed passcode attempts</item>
+    </plurals>
 </resources>

@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":core:passcode:passcode-snowflake-components"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":resources:string-resources"))
     implementation(lib.logging.timber)
     implementation(lib.mega.analytics)
     implementation(lib.mega.core.ui)
