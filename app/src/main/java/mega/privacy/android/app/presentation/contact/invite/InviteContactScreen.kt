@@ -34,7 +34,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
@@ -54,17 +53,16 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
@@ -113,7 +111,6 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.LinkButton
-import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChipStyle
@@ -147,6 +144,7 @@ internal fun InviteContactRoute(
     viewModel: InviteContactViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val localKeyboardController = LocalSoftwareKeyboardController.current
 
     val snackBarHostState = remember { SnackbarHostState() }
@@ -175,11 +173,11 @@ internal fun InviteContactRoute(
         uiState.emailValidationMessage?.let {
             if (it is Singular) {
                 val message = if (it.argument != null) {
-                    context.resources.getString(
+                    resources.getString(
                         it.id,
                         it.argument
                     )
-                } else context.getString(it.id)
+                } else resources.getString(it.id)
                 snackBarHostState.showAutoDurationSnackbar(message)
             }
         }
@@ -200,7 +198,7 @@ internal fun InviteContactRoute(
                     val message = status.messages.fold("") { acc, messageType ->
                         acc + when (messageType) {
                             is Plural -> {
-                                context.resources.getQuantityString(
+                                resources.getQuantityString(
                                     messageType.id,
                                     messageType.quantity,
                                     messageType.quantity
@@ -209,15 +207,15 @@ internal fun InviteContactRoute(
 
                             is Singular -> {
                                 if (messageType.argument != null) {
-                                    context.resources.getString(
+                                    resources.getString(
                                         messageType.id,
                                         messageType.argument
                                     )
-                                } else context.resources.getString(messageType.id)
+                                } else resources.getString(messageType.id)
                             }
                         }
                     }
-                    val action = status.actionId?.let { context.resources.getString(it) }
+                    val action = status.actionId?.let { resources.getString(it) }
 
                     snackBarHostState.showAutoDurationSnackbar(message, action).let { result ->
                         if (result == SnackbarResult.ActionPerformed && action != null) {
@@ -293,18 +291,19 @@ internal fun InviteContactRoute(
                             localKeyboardController?.hide()
                         }
 
-                        else -> Toast.makeText(
-                            context,
-                            R.string.invalid_input,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        else -> {
+                            Toast.makeText(
+                                context,
+                                R.string.invalid_input,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 } else {
                     localKeyboardController?.hide()
                 }
             },
             onContactChipClick = viewModel::onContactChipClick,
-            isSingleActivity = uiState.isSingleActivity,
         )
 
         if (uiState.showOpenCameraConfirmation) {
@@ -363,7 +362,6 @@ internal fun InviteContactScreen(
     onDoneImeActionClick: () -> Unit,
     onContactChipClick: (contactInfo: InvitationContactInfo) -> Unit,
     modifier: Modifier = Modifier,
-    isSingleActivity: Boolean = false,
 ) {
     val localConfiguration = LocalConfiguration.current
     val localKeyboardController = LocalSoftwareKeyboardController.current
@@ -437,31 +435,15 @@ internal fun InviteContactScreen(
                 .padding(16.dp)
                 .size(56.dp)
                 .testTag(INVITE_CONTACT_FAB_TAG)
-            if (isSingleActivity) {
-                if (isInviteButtonEnabled) {
-                    MegaFab(
-                        modifier = modifier,
-                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SendHorizontal),
-                        onClick = {
-                            isInviteButtonEnabled = false
-                            onInviteContactClick()
-                        }
-                    )
-                }
-            } else {
-                MegaFloatingActionButton(
+            if (isInviteButtonEnabled) {
+                MegaFab(
                     modifier = modifier,
-                    enabled = isInviteButtonEnabled,
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SendHorizontal),
                     onClick = {
                         isInviteButtonEnabled = false
                         onInviteContactClick()
                     }
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_send_horizontal_medium_thin_outline),
-                        contentDescription = null,
-                    )
-                }
+                )
             }
         }
     ) { paddingValues ->

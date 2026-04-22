@@ -30,9 +30,7 @@ import mega.privacy.android.domain.usecase.contact.FilterPendingOrAcceptedLocalC
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
 import mega.privacy.android.domain.usecase.contact.InviteContactWithEmailsUseCase
 import mega.privacy.android.domain.usecase.contact.ValidateEmailInputForInvitationUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -53,7 +51,6 @@ class InviteContactViewModel @Inject constructor(
     private val emailValidationResultMapper: EmailValidationResultMapper,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(InviteContactUiState())
@@ -74,7 +71,6 @@ class InviteContactViewModel @Inject constructor(
     private val isFromAchievement = savedStateHandle.get<Boolean>(KEY_FROM) ?: false
 
     init {
-        updateSingleActivityFeatureFlag()
         createContactLink()
     }
 
@@ -84,16 +80,6 @@ class InviteContactViewModel @Inject constructor(
             runCatching { createContactLinkUseCase(renew = false) }
                 .onSuccess { contactLink -> _uiState.update { it.copy(contactLink = contactLink) } }
                 .onFailure { Timber.e(it, "Failed to generate a contact link") }
-        }
-    }
-
-    private fun updateSingleActivityFeatureFlag() {
-        viewModelScope.launch {
-            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
-                .onSuccess { isSingleActivity ->
-                    _uiState.update { it.copy(isSingleActivity = isSingleActivity) }
-                }
-                .onFailure { Timber.e(it, "Failed to get single activity feature flag") }
         }
     }
 

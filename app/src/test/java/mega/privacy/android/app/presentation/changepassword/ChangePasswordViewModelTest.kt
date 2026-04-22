@@ -21,10 +21,8 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -51,7 +49,6 @@ internal class ChangePasswordViewModelTest {
     private val isMultiFactorAuthEnabledUseCase = mock<IsMultiFactorAuthEnabledUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val logoutUseCase = mock<LogoutUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private fun initTestClass() {
         underTest = ChangePasswordViewModel(
@@ -64,7 +61,6 @@ internal class ChangePasswordViewModelTest {
             getRootNodeUseCase = getRootNodeUseCase,
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
             logoutUseCase = logoutUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -79,7 +75,6 @@ internal class ChangePasswordViewModelTest {
             getRootNodeUseCase,
             isMultiFactorAuthEnabledUseCase,
             logoutUseCase,
-            getFeatureFlagValueUseCase,
         )
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
     }
@@ -494,38 +489,6 @@ internal class ChangePasswordViewModelTest {
                 assertFalse(state.isPasswordChanged)
             }
         }
-    }
-
-    @Test
-    fun `test that when feature flag is enabled should return true`() = runTest {
-        val fakeFeatureFlag = AppFeatures.AppTest
-        whenever(getFeatureFlagValueUseCase(fakeFeatureFlag)).thenReturn(true)
-        initTestClass()
-
-        val result = underTest.isFeatureFlagEnabled(fakeFeatureFlag)
-        assertThat(result).isTrue()
-    }
-
-    @Test
-    fun `test that when feature flag is disabled should return false`() = runTest {
-        val fakeFeatureFlag = AppFeatures.AppTest
-        whenever(getFeatureFlagValueUseCase(fakeFeatureFlag)).thenReturn(false)
-        initTestClass()
-
-        val result = underTest.isFeatureFlagEnabled(fakeFeatureFlag)
-        assertThat(result).isFalse()
-    }
-
-    @Test
-    fun `test that when feature flag use case throws exception should return false`() = runTest {
-        val fakeFeatureFlag = AppFeatures.AppTest
-        whenever(getFeatureFlagValueUseCase(fakeFeatureFlag)).thenAnswer {
-            throw Exception("Feature flag error")
-        }
-        initTestClass()
-
-        val result = underTest.isFeatureFlagEnabled(fakeFeatureFlag)
-        assertThat(result).isFalse()
     }
 
     private fun verifyChangePasswordUiState(

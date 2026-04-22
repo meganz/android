@@ -83,7 +83,7 @@ class InviteContactScreenTest {
             val onInviteContactClick = mock<() -> Unit>()
             setScreen(onInviteContactClick = onInviteContactClick)
 
-            onNodeWithTag(INVITE_CONTACT_FAB_TAG).performClick()
+            onNodeWithTag(INVITE_CONTACT_FAB_TAG).assertDoesNotExist()
 
             verify(onInviteContactClick, never()).invoke()
         }

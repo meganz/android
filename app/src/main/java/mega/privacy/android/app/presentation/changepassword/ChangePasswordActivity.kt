@@ -23,7 +23,6 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
@@ -33,7 +32,6 @@ import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -185,23 +183,13 @@ class ChangePasswordActivity : PasscodeActivity() {
             }
         }
 
-    private suspend fun navigateToLoginAfterPasswordChanged(errorCode: Int?) {
-        val intent: Intent =
-            if (viewModel.isFeatureFlagEnabled(AppFeatures.SingleActivity)) {
-                MegaActivity.getIntent(
-                    this@ChangePasswordActivity,
-                    getString(R.string.pass_changed_alert).takeIf {
-                        errorCode == MegaError.API_OK || errorCode == null
-                    },
-                )
-            } else {
-                Intent(this@ChangePasswordActivity, LoginActivity::class.java).apply {
-                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                }.apply {
-                    action = Constants.ACTION_PASS_CHANGED
-                    putExtra(Constants.RESULT, errorCode)
-                }
-            }
+    private fun navigateToLoginAfterPasswordChanged(errorCode: Int?) {
+        val intent: Intent = MegaActivity.getIntent(
+            this@ChangePasswordActivity,
+            getString(R.string.pass_changed_alert).takeIf {
+                errorCode == MegaError.API_OK || errorCode == null
+            },
+        )
         startActivity(intent)
         finish()
     }

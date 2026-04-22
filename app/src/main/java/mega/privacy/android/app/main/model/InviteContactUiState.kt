@@ -38,7 +38,6 @@ data class InviteContactUiState(
     val invitationContactInfoWithMultipleContacts: InvitationContactInfo? = null,
     val invitationStatusResult: InvitationStatusMessageUiState? = null,
     val emailValidationMessage: MessageTypeUiState? = null,
-    val isSingleActivity: Boolean = true,
 ) {
 
     /**
