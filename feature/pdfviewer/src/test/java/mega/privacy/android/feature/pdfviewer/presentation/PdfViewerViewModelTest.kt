@@ -36,6 +36,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -717,4 +718,49 @@ class PdfViewerViewModelTest {
             assertThat(consumedState.dismissEvent).isEqualTo(consumed)
         }
     }
+
+    private val externalFileArgs = PdfViewerViewModel.Args(
+        nodeHandle = -1L,
+        contentUri = "content://authority/external.pdf",
+        isLocalContent = true,
+        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        mimeType = "application/pdf",
+        title = "external.pdf",
+        chatId = null,
+        messageId = null,
+        shouldStopHttpServer = false,
+        isExternalFile = true,
+    )
+
+    @Test
+    fun `test that init does not load last viewed page when isExternalFile is true`() = runTest {
+        underTest = initViewModel(args = externalFileArgs)
+        advanceUntilIdle()
+
+        verify(getLastPageViewedInPdfUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that onPageChanged does not persist last page when isExternalFile is true`() =
+        runTest {
+            underTest = initViewModel(args = externalFileArgs)
+            advanceUntilIdle()
+
+            underTest.onPageChanged(2, 10)
+            advanceUntilIdle()
+
+            verify(setOrUpdateLastPageViewedInPdfUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that onLoadComplete does not save recently used when isExternalFile is true`() =
+        runTest {
+            underTest = initViewModel(args = externalFileArgs)
+            advanceUntilIdle()
+
+            underTest.onLoadComplete(10)
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemUseCase)
+        }
 }

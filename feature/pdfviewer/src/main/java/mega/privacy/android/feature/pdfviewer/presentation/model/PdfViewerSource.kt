@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.pdfviewer.presentation.model
 
-import android.net.Uri
 import mega.privacy.android.domain.entity.node.NodeSourceType
 
 /**
@@ -98,7 +97,7 @@ internal sealed class PdfViewerSource {
      * PDF from ZIP file
      */
     data class ZipFile(
-        val uri: Uri,
+        val contentUri: String,
     ) : PdfViewerSource() {
         override val isRemote: Boolean get() = false
     }
@@ -107,9 +106,10 @@ internal sealed class PdfViewerSource {
      * PDF from external intent (file open)
      */
     data class ExternalFile(
-        val uri: Uri,
+        val contentUri: String,
         val fileName: String?,
     ) : PdfViewerSource() {
-        override val isRemote: Boolean get() = false
+        override val isRemote: Boolean get() =
+            contentUri.startsWith("http://") || contentUri.startsWith("https://")
     }
 }

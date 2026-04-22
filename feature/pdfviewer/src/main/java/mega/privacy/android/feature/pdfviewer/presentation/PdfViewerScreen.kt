@@ -143,6 +143,7 @@ internal fun PdfViewerScreen(
                             onBack = onBack,
                             onSearch = onActivateSearch,
                             onOpenNodeOptions = onMoreClicked,
+                            showMoreAction = !uiState.isExternalFile,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }

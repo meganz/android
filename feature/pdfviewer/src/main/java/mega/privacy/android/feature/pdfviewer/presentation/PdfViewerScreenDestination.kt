@@ -41,6 +41,7 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
                         chatId = navKey.chatId,
                         messageId = navKey.messageId,
                         shouldStopHttpServer = navKey.shouldStopHttpServer,
+                        isExternalFile = navKey.isExternalFile,
                     )
                 )
             }

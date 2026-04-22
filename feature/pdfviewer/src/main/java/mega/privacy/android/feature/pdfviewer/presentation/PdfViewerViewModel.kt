@@ -120,11 +120,15 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 isFromFolderLink = args.nodeSourceType == NodeSourceType.FOLDER_LINK,
                 isFromFileLink = args.nodeSourceType == NodeSourceType.FILE_LINK,
                 isOffline = args.nodeSourceType == NodeSourceType.OFFLINE,
+                isExternalFile = args.isExternalFile,
                 source = createSourceFromArgs(),
             )
         }
 
-        loadLastViewedPage()
+        // External PDFs have no MEGA node handle; skip last-page / recently-used persistence.
+        if (!args.isExternalFile) {
+            loadLastViewedPage()
+        }
 
         // For remote http/https URLs, fetch bytes before rendering (and searching).
         if (!args.isLocalContent &&
@@ -236,8 +240,8 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     private fun resolveLocalUri(source: PdfViewerSource): Uri? = when (source) {
         is PdfViewerSource.Offline -> Uri.fromFile(File(source.localPath))
-        is PdfViewerSource.ZipFile -> source.uri
-        is PdfViewerSource.ExternalFile -> source.uri
+        is PdfViewerSource.ZipFile -> Uri.parse(source.contentUri)
+        is PdfViewerSource.ExternalFile -> Uri.parse(source.contentUri)
         is PdfViewerSource.CloudNode ->
             if (source.isLocalContent) source.contentUri.toLocalUri() else null
 
@@ -308,13 +312,15 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     fun onPageChanged(page: Int, totalPages: Int) {
         _state.update { it.copy(currentPage = page, totalPages = totalPages) }
-        viewModelScope.launch {
-            setOrUpdateLastPageViewedInPdfUseCase(
-                LastPageViewedInPdf(
-                    nodeHandle = args.nodeHandle,
-                    lastPageViewed = page.toLong()
+        if (!args.isExternalFile) {
+            viewModelScope.launch {
+                setOrUpdateLastPageViewedInPdfUseCase(
+                    LastPageViewedInPdf(
+                        nodeHandle = args.nodeHandle,
+                        lastPageViewed = page.toLong()
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -326,14 +332,16 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 error = null,
             )
         }
-        viewModelScope.launch {
-            runCatching {
-                saveRecentlyUsedItemUseCase(
-                    nodeHandle = args.nodeHandle,
-                    type = RecentlyUsedType.PDF,
-                    fileName = args.title.orEmpty(),
-                )
-            }.onFailure { Timber.e(it, "Failed to save recently used PDF item") }
+        if (!args.isExternalFile) {
+            viewModelScope.launch {
+                runCatching {
+                    saveRecentlyUsedItemUseCase(
+                        nodeHandle = args.nodeHandle,
+                        type = RecentlyUsedType.PDF,
+                        fileName = args.title.orEmpty(),
+                    )
+                }.onFailure { Timber.e(it, "Failed to save recently used PDF item") }
+            }
         }
     }
 
@@ -474,6 +482,13 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         val contentUri = args.contentUri
         val isLocal = args.isLocalContent
 
+        if (args.isExternalFile) {
+            return PdfViewerSource.ExternalFile(
+                contentUri = contentUri,
+                fileName = args.title,
+            )
+        }
+
         if (args.nodeSourceType == NodeSourceType.OFFLINE) {
             return PdfViewerSource.Offline(
                 handle = args.nodeHandle.toString(),
@@ -534,7 +549,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     /**
      * Arguments for the PdfViewerViewModel.
      *
-     * @param nodeHandle The handle of the node to display
+     * @param nodeHandle The handle of the node to display. -1L for external files.
      * @param contentUri The content URI string for the PDF (local file path or remote URL)
      * @param isLocalContent True if content is local, false if remote streaming
      * @param nodeSourceType The source type of the node (use FOLDER_LINK/FILE_LINK for links)
@@ -543,6 +558,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * @param chatId The chat ID if opening from chat (optional)
      * @param messageId The message ID if opening from chat (optional)
      * @param shouldStopHttpServer True if HTTP server should be stopped when done
+     * @param isExternalFile True if the PDF was opened from an external app intent (no MEGA node)
      */
     data class Args(
         val nodeHandle: Long,
@@ -554,6 +570,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         val chatId: Long?,
         val messageId: Long?,
         val shouldStopHttpServer: Boolean,
+        val isExternalFile: Boolean = false,
     )
 
     @AssistedFactory

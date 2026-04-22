@@ -247,10 +247,10 @@ internal fun getPdfUri(source: PdfViewerSource?): Uri? {
         }
 
         is PdfViewerSource.ZipFile ->
-            source.uri
+            Uri.parse(source.contentUri)
 
         is PdfViewerSource.ExternalFile ->
-            source.uri
+            Uri.parse(source.contentUri)
     }
 }
 
