@@ -24,9 +24,11 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.NetworkUnavailableException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.transfers.NoTransferToShowException
 import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
@@ -54,6 +56,9 @@ class LoadingPreviewViewModelTest {
         onBlocking { invoke() } doReturn emptyFlow()
     }
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
+        onBlocking { invoke() } doReturn flowOf(true)
+    }
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -68,8 +73,10 @@ class LoadingPreviewViewModelTest {
             getTransferByUniqueIdUseCase,
             monitorTransferEventsUseCase,
             broadcastTransferTagToCancelUseCase,
+            monitorConnectivityUseCase,
             fileTypeIconMapper,
         )
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
     }
 
     @After
@@ -82,6 +89,7 @@ class LoadingPreviewViewModelTest {
             getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             broadcastTransferTagToCancelUseCase = broadcastTransferTagToCancelUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             savedStateHandle = savedStateHandle,
             appScope = appScope,
@@ -105,9 +113,11 @@ class LoadingPreviewViewModelTest {
     private suspend fun commonStub(
         transfer: Transfer?,
         flow: Flow<TransferEvent> = emptyFlow(),
+        connectivityFlow: Flow<Boolean> = flowOf(true),
     ) {
         whenever(getTransferByUniqueIdUseCase(transferUniqueId)) doReturn transfer
         whenever(monitorTransferEventsUseCase()).thenReturn(flow)
+        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
     }
 
     @Test
@@ -445,5 +455,58 @@ class LoadingPreviewViewModelTest {
             }
 
             verify(broadcastTransferTagToCancelUseCase).invoke(transferTagToCancel)
+        }
+
+    @Test
+    fun `test that network disconnection during transfer sets NetworkUnavailableException error`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.uniqueId } doReturn transferUniqueId
+                on { this.fileName } doReturn fileName
+            }
+
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            commonStub(
+                transfer = transfer,
+                connectivityFlow = flowOf(true, false),
+            )
+
+            initTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().error)
+                    .isInstanceOf(NetworkUnavailableException::class.java)
+            }
+        }
+
+    @Test
+    fun `test that network disconnection does not set error when preview is already loaded`() =
+        runTest {
+            val localPath = "localPath"
+            val transfer = mock<Transfer> {
+                on { this.uniqueId } doReturn transferUniqueId
+                on { this.fileName } doReturn fileName
+                on { this.localPath } doReturn localPath
+            }
+            val event = mock<TransferEvent.TransferFinishEvent> {
+                on { this.transfer } doReturn transfer
+            }
+
+            initSavedStateHandle(transferUniqueId = transferUniqueId)
+            commonStub(
+                transfer = transfer,
+                flow = flowOf(event),
+                connectivityFlow = flowOf(true, false),
+            )
+
+            initTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.previewFilePathToOpen).isEqualTo(localPath)
+                assertThat(actual.error).isNull()
+            }
         }
 }
