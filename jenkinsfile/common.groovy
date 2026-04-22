@@ -751,18 +751,32 @@ ArrayList<String> getModuleList() {
         returnStdout: true
     ).trim()
 
-    def moduleList = moduleListRaw.readLines()
+    List<String> candidatePaths = moduleListRaw.readLines()
         .findAll { it.startsWith("SUBPROJECT_PATH:") }
         .collect { it.replace("SUBPROJECT_PATH:", "").trim() }
-        .findAll {
-            // Filter out modules that do not have a gradle.kts file
-            def files = sh(
-                    script: "ls -1 ${WORKSPACE}/${it}",
-                    returnStdout: true
-            ).trim().readLines()
-            files?.any { fileName -> fileName.endsWith("gradle.kts") } ?: false
-        }
 
+    if (candidatePaths.isEmpty()) {
+        return new ArrayList<String>()
+    }
+
+    // Probe every module's directory in one `sh` call instead of one per module. Each `sh`
+    // step pays ~300ms of Jenkins overhead, so per-module probes cost ~22s across 70 modules.
+    // `find` lists every *.gradle.kts file under the workspace once (skipping build outputs);
+    // we then keep candidate paths whose parent directory appeared in that listing.
+    def gradleFilesRaw = sh(
+            script: "cd ${WORKSPACE} && find . -type d -name build -prune -o -type f -name '*.gradle.kts' -print",
+            returnStdout: true
+    ).trim()
+
+    Set<String> dirsWithGradleFile = new HashSet<String>()
+    for (String line : gradleFilesRaw.readLines()) {
+        String rel = line.trim()
+        if (rel.startsWith("./")) rel = rel.substring(2)
+        int slash = rel.lastIndexOf('/')
+        if (slash >= 0) dirsWithGradleFile.add(rel.substring(0, slash))
+    }
+
+    List<String> moduleList = candidatePaths.findAll { dirsWithGradleFile.contains(it) }
     print("MODULE_LIST: ${moduleList}")
     return new ArrayList<String>(moduleList)
 }

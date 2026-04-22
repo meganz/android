@@ -350,13 +350,7 @@ pipeline {
 
                                 def lintModuleList = common.getModuleList()
 
-                                def totalFatalLintErrors = 0
-                                for (int i = 0; i < lintModuleList.size(); i++) {
-                                    def module = lintModuleList[i]
-                                    def lintJsonContent = generateLintSummary(module)
-                                    totalFatalLintErrors += checkFatalErrors(lintJsonContent)
-                                    LINT_REPORT_SUMMARY_MAP.put(module, lintJsonContent)
-                                }
+                                def totalFatalLintErrors = generateLintSummary(lintModuleList)
                                 archiveLintReports(lintModuleList)
 
                                 this.JSON_LINT_REPORT_LINK = common.uploadFileToArtifactory(LINT_REPORT_ARCHIVE)
@@ -538,47 +532,40 @@ static String wrapBuildWarnings(String rawWarning) {
 }
 
 /**
- * Executes a specific Gradle Task to parse the raw Lint Results and returns a Lint Summary
+ * Executes the `generateLintReport` Gradle task once for all modules and populates
+ * LINT_REPORT_SUMMARY_MAP with per-module severity counts parsed from the aggregated JSON.
  *
- * @param module The name of the module (e.g. app, domain, sdk)
- * @return A List containing the module's Lint Summary.
- * Here's a Sample Result:
- *
- * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
+ * @param moduleList List of module paths (e.g. ["app", "domain", "core:ui"]).
+ * @return The total number of fatal lint errors across all modules.
  */
-def generateLintSummary(String module) {
-    def reportsDir = "$WORKSPACE/${module}/build/reports"
+def generateLintSummary(List<String> moduleList) {
+    String aggregatedJson = "lint_summary.json"
+    sh "./gradlew --no-daemon generateLintReport " +
+            "--modules \"${moduleList.join(",")}\" " +
+            "--target-file ${aggregatedJson}"
 
-    // Find lint XML result files, which matches "lint-*.xml"
-    def lintResultsFiles = sh(
-            script: "ls ${reportsDir}/lint-*.xml 2>/dev/null || true",
-            returnStdout: true
-    ).trim().split("\\r?\\n").findAll { it }
-
-    if (!lintResultsFiles) {
-        print("No lint-*.xml file found in ${reportsDir}")
-        return [
-                "fatalCount"      : 0,
-                "errorCount"      : 0,
-                "warningCount"    : 0,
-                "informationCount": 0,
-                "errorMessage"    : "No lint results found"
+    String aggregatedJsonText = readFile(aggregatedJson)
+    def rawModules = new groovy.json.JsonSlurper().parseText(aggregatedJsonText).modules
+    int totalFatal = 0
+    for (int i = 0; i < moduleList.size(); i++) {
+        String module = moduleList[i]
+        def raw = rawModules[module]
+        def perModule = [
+                "fatalCount"      : (raw?.fatalCount ?: 0) as int,
+                "errorCount"      : (raw?.errorCount ?: 0) as int,
+                "warningCount"    : (raw?.warningCount ?: 0) as int,
+                "informationCount": (raw?.informationCount ?: 0) as int,
+                "errorMessage"    : (raw == null ? "No lint results found" : (raw.errorMessage ?: "None")).toString()
         ]
+        totalFatal += perModule.fatalCount
+        print("lintSummary($module) = ${perModule}")
+        LINT_REPORT_SUMMARY_MAP.put(module, perModule)
     }
 
-    // Process first lint results file
-    def lintResultsFile = lintResultsFiles[0]
-    def targetFile = "${module}_processed-lint-results.json"
-
-    // Generate JSON report from XML
-    sh "./gradlew --no-daemon generateLintReport --lint-results ${lintResultsFile} --target-file ${targetFile}"
-
-    // Parse JSON report
-    def lintJsonFile = readFile(targetFile)
-    def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
-
-    print("lintSummary($module) = ${lintJsonContent}")
-    return lintJsonContent
+    if (totalFatal > 0) {
+        println("Detected ${totalFatal} fatal lint error(s) across all modules.")
+    }
+    return totalFatal
 }
 
 /**
@@ -643,24 +630,6 @@ def unitTestArchiveLink(String reportPath, String archiveTargetName) {
         result = "Unit Test report not available, perhaps test code has compilation error. Please check full build log."
     }
     return result
-}
-
-/**
- * Checks if the specific module has any Fatal Errors and returns the count. The caller is
- * responsible for deciding when to fail the pipeline so that all artifacts can be uploaded first.
- *
- * @param lintJsonContent A List containing the module's Lint Summary.
- * Here's a Sample Result:
- *
- * [errorCount:20, errorMessage:None, fatalCount:10, informationCount:40, warningCount:30]
- */
-def checkFatalErrors(def lintJsonContent) {
-    println("Check if there are Fatal Lint errors. ${lintJsonContent}")
-    def fatalCount = lintJsonContent.fatalCount as int
-    if (fatalCount > 0) {
-        println("Detected ${fatalCount} fatal lint error(s).")
-    }
-    return fatalCount
 }
 
 /**
