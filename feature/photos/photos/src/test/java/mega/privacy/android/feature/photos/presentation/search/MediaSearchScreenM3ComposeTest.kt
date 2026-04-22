@@ -143,7 +143,6 @@ class MediaSearchScreenM3ComposeTest {
             contentState = MediaContentState.NoResults,
             query = "nonexistent",
             photos = emptyList(),
-            legacyAlbums = emptyList(),
             isSearchingPhotos = false,
             isSearchingAlbums = false,
         )
@@ -165,7 +164,6 @@ class MediaSearchScreenM3ComposeTest {
             contentState = MediaContentState.SearchResults,
             query = "photo",
             photos = photos,
-            legacyAlbums = emptyList(),
         )
 
         setComposeContent(state)
@@ -214,7 +212,6 @@ class MediaSearchScreenM3ComposeTest {
             contentState = MediaContentState.SearchResults,
             query = "photo",
             photos = photos,
-            legacyAlbums = emptyList(),
         )
         val mockOnOpenImagePreviewScreen: (Photo) -> Unit = mock()
 
@@ -317,7 +314,6 @@ class MediaSearchScreenM3ComposeTest {
             contentState = MediaContentState.SearchResults,
             query = "test",
             photos = photos,
-            legacyAlbums = emptyList(),
         )
 
         setComposeContent(state)

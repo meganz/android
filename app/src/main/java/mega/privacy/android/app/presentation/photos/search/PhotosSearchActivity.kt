@@ -53,14 +53,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.photos.Album
-import mega.privacy.android.domain.entity.photos.Album.FavouriteAlbum
-import mega.privacy.android.domain.entity.photos.Album.GifAlbum
-import mega.privacy.android.domain.entity.photos.Album.RawAlbum
-import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
@@ -81,9 +75,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
 
     @Inject
     lateinit var listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val photosSearchViewModel: PhotosSearchViewModel by viewModels()
 
@@ -122,52 +113,24 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
                             startDestination = searchRoute,
                         ) {
                             composable(searchRoute) {
-                                when (state.isSingleActivityEnabled) {
-                                    true -> {
-                                        MediaSearchScreenM3(
-                                            state = state,
-                                            photoDownloaderViewModel = photoDownloaderViewModel,
-                                            onOpenAlbum = ::openAlbum,
-                                            onOpenImagePreviewScreen = ::openImagePreview,
-                                            onShowMoreMenu = { nodeId ->
-                                                val route =
-                                                    "$nodeBottomSheetRoute/${nodeId.longValue}/${NodeSourceType.OTHER.name}"
-                                                navController.navigate(route)
-                                            },
-                                            updateQuery = photosSearchViewModel::updateQuery,
-                                            updateSelectedQuery = {
-                                                photosSearchViewModel.updateSelectedQuery(null)
-                                            },
-                                            updateRecentQueries = photosSearchViewModel::updateRecentQueries,
-                                            searchPhotos = photosSearchViewModel::search,
-                                            onCloseScreen = ::finish,
-                                        )
-                                    }
-
-                                    false -> {
-                                        PhotosSearchScreen(
-                                            state = state,
-                                            photoDownloaderViewModel = photoDownloaderViewModel,
-                                            scaffoldState = scaffoldState,
-                                            onOpenAlbum = ::openLegacyAlbum,
-                                            onOpenImagePreviewScreen = ::openImagePreview,
-                                            onShowMoreMenu = { nodeId ->
-                                                val route =
-                                                    "$nodeBottomSheetRoute/${nodeId.longValue}/${NodeSourceType.OTHER.name}"
-                                                navController.navigate(route)
-                                            },
-                                            updateQuery = photosSearchViewModel::updateQuery,
-                                            updateSelectedQuery = {
-                                                photosSearchViewModel.updateSelectedQuery(null)
-                                            },
-                                            updateRecentQueries = photosSearchViewModel::updateRecentQueries,
-                                            searchPhotos = photosSearchViewModel::search,
-                                            onCloseScreen = ::finish,
-                                        )
-                                    }
-
-                                    else -> {}
-                                }
+                                MediaSearchScreenM3(
+                                    state = state,
+                                    photoDownloaderViewModel = photoDownloaderViewModel,
+                                    onOpenAlbum = ::openAlbum,
+                                    onOpenImagePreviewScreen = ::openImagePreview,
+                                    onShowMoreMenu = { nodeId ->
+                                        val route =
+                                            "$nodeBottomSheetRoute/${nodeId.longValue}/${NodeSourceType.OTHER.name}"
+                                        navController.navigate(route)
+                                    },
+                                    updateQuery = photosSearchViewModel::updateQuery,
+                                    updateSelectedQuery = {
+                                        photosSearchViewModel.updateSelectedQuery(null)
+                                    },
+                                    updateRecentQueries = photosSearchViewModel::updateRecentQueries,
+                                    searchPhotos = photosSearchViewModel::search,
+                                    onCloseScreen = ::finish,
+                                )
                             }
 
                             nodeBottomSheetNavigation(
@@ -264,26 +227,6 @@ internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
             params = mapOf(DefaultImageNodeFetcher.NODE_IDS to photoIds),
         )
         startActivity(intent)
-    }
-
-    private fun openLegacyAlbum(album: Album) {
-        val data = Intent().apply {
-            val bundle = bundleOf(
-                "type" to when (album) {
-                    FavouriteAlbum -> "favourite"
-
-                    GifAlbum -> "gif"
-
-                    RawAlbum -> "raw"
-
-                    else -> "custom"
-                },
-                "id" to if (album is UserAlbum) album.id.id else null,
-            )
-            putExtras(bundle)
-        }
-        setResult(RESULT_OK, data)
-        finish()
     }
 
     private fun openAlbum(album: AlbumContentNavKey) {
