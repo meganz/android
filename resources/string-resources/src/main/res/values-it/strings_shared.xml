@@ -2424,8 +2424,21 @@
     <string name="sync_label_device_folder">Cartella del dispositivo</string>
     <string name="sync_label_a_sync_or_backup">una sincronizzazione o backup</string>
     <string name="sync_label_this_device">questo dispositivo</string>
-    <string name="sync_label_camera_uploads">Caricamenti dalla fotocamera</string>
-    <string name="sync_label_media_uploads">Caricamenti multimediali</string>
+    <string name="sync_label_camera_uploads">Caricamenti da fotocamera</string>
+    <string name="sync_label_media_uploads">Caricamenti dei media</string>
     <string name="home_recents_bucket_subtitle_added_to">Aggiunto a %s</string>
     <string name="general_skip">Salta</string>
+    <string name="unlock_pin_title">Inserisci il codice</string>
+    <string name="settings_passcode_lock">Codice di accesso</string>
+    <string name="pin_lock_alert">Effettuerai il logout e i tuoi file salvati per l’offline saranno eliminati dopo 10 tentativi falliti</string>
+    <string name="action_logout">Esci</string>
+    <string name="settings_passcode_forgot_passcode_button">Hai dimenticato il tuo passcode?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d tentativo fallito del passcode</item>
+        <item quantity="many">%1$d tentativi falliti del passcode</item>
+        <item quantity="other">%1$d tentativi falliti del passcode</item>
+    </plurals>
+    <string name="action_use_passcode">Utilizza passcode</string>
+    <string name="settings_passcode_enter_password_title">Inserisci la tua password</string>
+    <string name="unlock_pin_title_2">Reinserisci il codice</string>
 </resources>

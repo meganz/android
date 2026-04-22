@@ -2002,8 +2002,8 @@
     <string name="sync_label_device_folder">Thư mục thiết bị</string>
     <string name="sync_label_a_sync_or_backup">một đồng bộ hoặc sao lưu</string>
     <string name="sync_label_this_device">thiết bị này</string>
-    <string name="sync_label_camera_uploads">Tải lên từ máy ảnh</string>
-    <string name="sync_label_media_uploads">Tải lên phương tiện truyền thông</string>
+    <string name="sync_label_camera_uploads">Đăng tải camêra</string>
+    <string name="sync_label_media_uploads">Đăng tải phương tiện số</string>
     <string name="general_error_file_not_found">Không thể tìm thấy tệp này</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Lỗi. Tệp PDF bị hỏng hoặc không tồn tại.</string>
     <string name="pdf_viewer_error_streaming">Đã xảy ra lỗi khi cố mở tệp</string>
@@ -2246,4 +2246,15 @@
     <string name="album_import_snackbar_error_message">%1$s không thể được lưu vào ổ đám mây. Hãy thử lại sau. Nếu sự cố tiếp tục, liên hệ với người đã chia sẻ liên kết cho bạn.</string>
     <string name="saf_passcode_lock_enabled_message">Để duyệt các tập tin MEGA của bạn, vô hiệu hóa mã mở khóa trong ứng dụng MEGA. Vào Cài đặt, sau đó chạm Bảo mật.</string>
     <string name="general_skip">Bỏ qua</string>
+    <string name="settings_passcode_lock">Khóa bằng mã số</string>
+    <string name="action_use_passcode">Dùng mã số</string>
+    <string name="settings_passcode_enter_password_title">Nhập mật khẩu</string>
+    <string name="unlock_pin_title">Nhập mã số của bạn</string>
+    <string name="unlock_pin_title_2">Nhập lại mã số</string>
+    <string name="pin_lock_alert">Tài khoản sẽ đăng xuất và tất cả tệp tin lưu về ngoại tuyến sẽ xóa khỏi máy sau 10 lần nhập sai mã</string>
+    <string name="action_logout">Đăng&#160;xuất</string>
+    <string name="settings_passcode_forgot_passcode_button">Quên mất mã số?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="other">%1$d lần thử mã số bị sai</item>
+    </plurals>
 </resources>

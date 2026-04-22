@@ -2440,4 +2440,17 @@
     <string name="cloud_explorer_use_this_folder_button">Utiliser ce dossier</string>
     <string name="home_widget_continue_where_left_off">Reprenez où vous étiez</string>
     <string name="general_skip">Ignorer</string>
+    <string name="unlock_pin_title">Saisissez votre code d’accès</string>
+    <string name="settings_passcode_lock">Code d’accès</string>
+    <string name="pin_lock_alert">Vous serez déconnecté et vos fichiers Hors&#160;ligne seront supprimés après dix tentatives infructueuses</string>
+    <string name="action_logout">Me&#160;déconnecter</string>
+    <string name="settings_passcode_forgot_passcode_button">Code d’accès oublié ?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d&#160;tentative d’accès infructueuse</item>
+        <item quantity="many">%1$d de tentatives d’accès infructueuses</item>
+        <item quantity="other">%1$d&#160;tentatives d’accès infructueuses</item>
+    </plurals>
+    <string name="action_use_passcode">Utiliser le code d’accès</string>
+    <string name="settings_passcode_enter_password_title">Saisissez votre mot de passe</string>
+    <string name="unlock_pin_title_2">Saisissez votre code d’accès de nouveau</string>
 </resources>

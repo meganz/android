@@ -2274,4 +2274,24 @@
     <string name="sync_label_camera_uploads">相機上傳</string>
     <string name="sync_label_media_uploads">媒體上傳</string>
     <string name="general_skip">跳過</string>
+    <string name="sync_error_folder_conflict">「%1$s」%2$s已包含在%4$s的%3$s內了。請選擇其它。</string>
+    <string name="home_widget_continue_where_left_off">從上次中斷的地方繼續</string>
+    <string name="settings_transfer_connections_title">傳輸連線數</string>
+    <string name="settings_transfer_connections_text">設定每個檔案傳輸任務的並行連線數。調高數值可提升傳輸速度，但會增加耗電量與傳輸用量。</string>
+    <string name="settings_transfer_download_connections">下載連線數</string>
+    <string name="settings_transfer_upload_connections">上傳連線數</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d（最適合慢速網路）</string>
+    <string name="settings_transfer_connections_default">%1$d（預設）</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d（耗電量與傳輸用量較高）</string>
+    <string name="settings_passcode_lock">密碼鎖定</string>
+    <string name="action_use_passcode">使用密碼</string>
+    <string name="settings_passcode_enter_password_title">請輸入您的密碼</string>
+    <string name="unlock_pin_title">輸入密碼</string>
+    <string name="unlock_pin_title_2">重新輸入密碼</string>
+    <string name="pin_lock_alert">嘗試10次失敗後，您將被強制登出而且您的離線檔案將被刪除</string>
+    <string name="action_logout">登出</string>
+    <string name="settings_passcode_forgot_passcode_button">忘記密碼？</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="other">密碼錯誤%1$d次</item>
+    </plurals>
 </resources>

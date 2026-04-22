@@ -2369,4 +2369,17 @@
     <string name="settings_transfer_connections_slow_networs">%1$d (Het beste voor trage netwerken)</string>
     <string name="settings_transfer_connections_default">%1$d (Standaard)</string>
     <string name="settings_transfer_connections_higher_usage">%1$d (Hoger batterij en gegevens verbruik)</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Ondertiteling toevoegen vanaf Cloud Schijf</string>
+    <string name="settings_passcode_lock">Toegangscode Slot</string>
+    <string name="action_use_passcode">Gebruik passcode</string>
+    <string name="settings_passcode_enter_password_title">Voer uw wachtwoord in</string>
+    <string name="unlock_pin_title">Voer uw toegangscode in</string>
+    <string name="unlock_pin_title_2">Herhaal uw toegangscode</string>
+    <string name="pin_lock_alert">U wordt uitgelogd en uw offline bestanden worden verwijderd na 10 mislukte pogingen</string>
+    <string name="action_logout">Log&#160;uit</string>
+    <string name="settings_passcode_forgot_passcode_button">Uw wachtwoord vergeten?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d mislukte poging tot toegangscode</item>
+        <item quantity="other">%1$d mislukte toegangscode pogingen</item>
+    </plurals>
 </resources>

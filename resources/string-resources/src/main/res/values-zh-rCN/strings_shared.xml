@@ -2170,7 +2170,7 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="other">%d 文件夹&#160;·&#160;</item>
+        <item quantity="other">%d 个文件夹&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="other">与 %d 人共享</item>
@@ -2283,4 +2283,16 @@
     <string name="settings_transfer_connections_slow_networs">%1$d（慢速网络最佳）</string>
     <string name="settings_transfer_connections_default">%1$d (默认)</string>
     <string name="settings_transfer_connections_higher_usage">%1$d（更高的耗电和数据使用）</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">从云盘添加字幕</string>
+    <string name="settings_passcode_lock">密码锁</string>
+    <string name="action_use_passcode">使用密码解锁</string>
+    <string name="settings_passcode_enter_password_title">请输入您的密码</string>
+    <string name="unlock_pin_title">请输入您的密码</string>
+    <string name="unlock_pin_title_2">重新输入您的密码</string>
+    <string name="pin_lock_alert">若尝试10次失败后，您的帐户将被登出，您的离线文件将被删除。</string>
+    <string name="action_logout">登&#160;出</string>
+    <string name="settings_passcode_forgot_passcode_button">忘记密码？</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="other">密码尝试失败%1$d次</item>
+    </plurals>
 </resources>

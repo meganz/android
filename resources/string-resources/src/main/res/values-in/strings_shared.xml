@@ -2190,8 +2190,8 @@
     <string name="sync_label_device_folder">Folder perangkat</string>
     <string name="sync_label_a_sync_or_backup">Sinkronisasi atau cadangan</string>
     <string name="sync_label_this_device">Perangkat ini</string>
-    <string name="sync_label_camera_uploads">Unggahan Kamera</string>
-    <string name="sync_label_media_uploads">Unggahan Media</string>
+    <string name="sync_label_camera_uploads">Unggahan kamera</string>
+    <string name="sync_label_media_uploads">Unggahan media</string>
     <string name="general_error_file_not_found">Berkas ini tidak dapat ditemukan</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Kesalahan. Berkas PDF rusak atau tidak ada.</string>
     <string name="pdf_viewer_error_streaming">Terjadi kesalahan saat mencoba membuka berkas.</string>
@@ -2235,4 +2235,15 @@
         <item quantity="other">%d item-item dipulihkan dari sampah</item>
     </plurals>
     <string name="general_skip">Lewati</string>
+    <string name="unlock_pin_title">Masukkan passcode anda</string>
+    <string name="settings_passcode_lock">Kunci Passcode</string>
+    <string name="pin_lock_alert">Anda akan keluar dan file offline anda akan dihapus setelah 10 upaya gagal</string>
+    <string name="action_logout">Keluar</string>
+    <string name="settings_passcode_forgot_passcode_button">Lupa kode sandi anda?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="other">%1$d upaya passcode gagal</item>
+    </plurals>
+    <string name="action_use_passcode">Gunakan kode sandi</string>
+    <string name="settings_passcode_enter_password_title">Masukkan password anda</string>
+    <string name="unlock_pin_title_2">Masukkan ulang passcode anda</string>
 </resources>

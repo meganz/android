@@ -2160,7 +2160,7 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="other">%d フォルダ&#160;·&#160;</item>
+        <item quantity="other">%d個のフォルダ、</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="other">%d人と共有</item>
@@ -2284,4 +2284,21 @@
     <string name="settings_transfer_connections_slow_networs">%1$d（低速ネットワークに最適）</string>
     <string name="settings_transfer_connections_default">%1$d（デフォルト）</string>
     <string name="settings_transfer_connections_higher_usage">%1$d（バッテリーとデータ消費が増加）</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">クラウドドライブから字幕を追加</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">広告なしでダウンロード</string>
+    <string name="settings_passcode_lock">パスコードロック</string>
+    <string name="action_use_passcode">パスコードを使用</string>
+    <string name="settings_passcode_enter_password_title">パスワードを入力</string>
+    <string name="unlock_pin_title">パスコードを入力</string>
+    <string name="unlock_pin_title_2">パスコードを再入力</string>
+    <string name="pin_lock_alert">10回失敗するとログアウトされ、オフラインファイルが削除されます</string>
+    <string name="action_logout">ログ&#160;アウト</string>
+    <string name="settings_passcode_forgot_passcode_button">パスコードをお忘れですか？</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="other">パスコード試行に%1$d回失敗</item>
+    </plurals>
+    <string name="setting_biometric_id">生体認証</string>
+    <string name="title_enable_biometrics">ロック解除に使用する生体情報を認証</string>
+    <string name="confirmation_biometric_enabled">生体認証が有効になりました</string>
+    <string name="title_unlock_biometric">生体認証でロック解除</string>
 </resources>

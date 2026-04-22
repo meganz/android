@@ -2542,4 +2542,24 @@
     <string name="settings_transfer_connections_slow_networs">%1$d (Najlepsze dla wolnych sieci)</string>
     <string name="settings_transfer_connections_default">%1$d (Domyślne)</string>
     <string name="settings_transfer_connections_higher_usage">%1$d (Wyższe zużycie baterii i danych)</string>
+    <string name="settings_passcode_lock">Blokada PIN</string>
+    <string name="action_use_passcode">Użyj kodu dostępu</string>
+    <string name="settings_passcode_enter_password_title">Wprowadz swoje hasło</string>
+    <string name="unlock_pin_title">Wprowadź pin</string>
+    <string name="unlock_pin_title_2">Wprowadź ponownie pin</string>
+    <string name="pin_lock_alert">Zostaniesz wylogowany, a Twoje pliki lokalne zostaną usunięte po 10 nieudanych próbach</string>
+    <string name="action_logout">Wyloguj się</string>
+    <string name="settings_passcode_forgot_passcode_button">Zapomniałeś hasła?</string>
+    <plurals name="passcode_lock_alert_attempts">
+        <item quantity="one">%1$d nieudana próba podania hasła</item>
+        <item quantity="few">%1$d nieudanych prób wprowadzenia kodu</item>
+        <item quantity="many">%1$d nieudanych prób wprowadzenia kodu</item>
+        <item quantity="other">%1$d nieudanych prób wprowadzenia kodu</item>
+    </plurals>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Dodaj napis z dysku w chmurze</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Pobieranie bez reklam</string>
+    <string name="setting_biometric_id">Tożsamość biometryczna</string>
+    <string name="title_enable_biometrics">Potwierdź swoje dane biometryczne, aby odblokować</string>
+    <string name="confirmation_biometric_enabled">Twoje dane biometryczne zostały potwierdzone</string>
+    <string name="title_unlock_biometric">Odblokuj za pomocą swoich danych biometrycznych</string>
 </resources>
