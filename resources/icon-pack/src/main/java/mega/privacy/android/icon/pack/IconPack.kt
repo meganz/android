@@ -248,8 +248,7 @@ public object IconPack : IconPackInterface {
                         createMediumThinOutlineChevronRightImageVector() }
 
                 override val ChevronUpDown: ImageVector by lazy {
-                    createMediumThinOutlineChevronUpDownImageVector()
-                }
+                        createMediumThinOutlineChevronUpDownImageVector() }
 
                 override val CircleSmall: ImageVector by lazy {
                         createMediumThinOutlineCircleSmallImageVector() }

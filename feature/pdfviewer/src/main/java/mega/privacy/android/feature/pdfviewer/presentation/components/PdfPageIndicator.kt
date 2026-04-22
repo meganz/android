@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -105,9 +106,22 @@ private fun PdfPageIndicatorContent(
     val travelScale = travelScaleForTotalPages(totalPages)
     val state = rememberPdfIndicatorScrubState(pageProportion, travelScale, onScrub)
 
+    // Snap Y until the track is measured once; enabling tween in the same pass as first layout
+    // would animate from target 0 (trackHeightPx was 0) to the real offset.
+    var hasCompletedInitialTrackPlacement by remember { mutableStateOf(false) }
+    LaunchedEffect(state.trackHeightPx) {
+        if (state.trackHeightPx > 0f) {
+            hasCompletedInitialTrackPlacement = true
+        }
+    }
+
     val animatedYPx by animateIntAsState(
         targetValue = state.targetYPx,
-        animationSpec = if (state.isPressed) snap() else tween(durationMillis = SLIDE_DURATION_MS),
+        animationSpec = when {
+            state.isPressed -> snap()
+            !hasCompletedInitialTrackPlacement -> snap()
+            else -> tween(durationMillis = SLIDE_DURATION_MS)
+        },
         label = "pdfPageIndicatorY",
     )
 
@@ -364,35 +378,6 @@ private val thumbEndPadding = 8.dp
 private val thumbTrackVerticalInset = 4.dp
 private const val HIDE_DELAY_MILLIS = 900
 private const val SLIDE_DURATION_MS = 250
-
-/** Below this page count, indicator travel interpolates from [MIN_TRAVEL_SCALE] toward full track. */
-private const val FULL_TRAVEL_MIN_PAGES = 12
-
-/** Tightest vertical band (2-page documents); interpolated up to full height by [FULL_TRAVEL_MIN_PAGES]. */
-private const val MIN_TRAVEL_SCALE = 0.28f
-
-private const val TRAVEL_SCALE_EPSILON = 1e-4f
-
-/**
- * Maps [totalPages] to a 0..1 scale on half the track from center: 1f = full top-to-bottom travel.
- */
-private fun travelScaleForTotalPages(totalPages: Int): Float {
-    if (totalPages <= 1) return 1f
-    if (totalPages >= FULL_TRAVEL_MIN_PAGES) return 1f
-    val span = (FULL_TRAVEL_MIN_PAGES - 2).coerceAtLeast(1)
-    val t = ((totalPages - 2).toFloat() / span).coerceIn(0f, 1f)
-    return MIN_TRAVEL_SCALE + (1f - MIN_TRAVEL_SCALE) * t
-}
-
-private fun documentToVisualProportion(document: Float, travelScale: Float): Float {
-    val s = travelScale.coerceAtLeast(TRAVEL_SCALE_EPSILON)
-    return 0.5f + (document - 0.5f) * s
-}
-
-private fun visualToDocumentProportion(visual: Float, travelScale: Float): Float {
-    val s = travelScale.coerceAtLeast(TRAVEL_SCALE_EPSILON)
-    return ((visual - 0.5f) / s + 0.5f).coerceIn(0f, 1f)
-}
 
 @CombinedThemePreviews
 @Composable
