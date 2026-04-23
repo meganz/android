@@ -79,6 +79,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -212,6 +213,15 @@ class MegaActivity : FragmentActivity() {
         }
     }
 
+    private suspend fun handlePendingChatJoinLink(rootNodeState: RootNodeState) {
+        if (rootNodeState.exists && intent.action == Constants.ACTION_JOIN_OPEN_CHAT_LINK) {
+            intent.dataString?.let { link ->
+                navigationEventQueue.emit(DeepLinksDialogNavKey(link))
+            }
+            intent.action = null
+        }
+    }
+
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(SupportedLanguageContextWrapper.wrap(newBase))
     }
@@ -328,6 +338,7 @@ class MegaActivity : FragmentActivity() {
                 LaunchedEffect(rootNodeState) {
                     navigationHandler.onRootNodeChange(rootNodeState)
                     launchLastActivityIfNeeded(rootNodeState)
+                    handlePendingChatJoinLink(rootNodeState)
                 }
 
                 LaunchedEffect(passcodeState) {

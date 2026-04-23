@@ -26,17 +26,12 @@ import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.core.sharedcomponents.parcelable
-import mega.privacy.android.core.sharedcomponents.serializable
-import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountActivity
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.megaNavigator
-import nz.mega.sdk.MegaError
 import timber.log.Timber
 
 /**
@@ -579,75 +574,6 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
         }
     }
 
-    LaunchedEffect(Unit) {
-        activity.intent?.let { intent ->
-            intentAction = intent.action
-
-            intentAction?.let { action ->
-                Timber.d("action is: %s", action)
-                when (action) {
-                    //Already managed in LoginNavigation.checkActions for deep links and new navigation.
-                    Constants.ACTION_CONFIRM -> {
-                        Timber.d("querySignupLink")
-                        intent.getStringExtra(Constants.EXTRA_CONFIRMATION)
-                            ?.let { viewModel.checkSignupLink(it, System.currentTimeMillis()) }
-                        return@LaunchedEffect
-                    }
-
-                    //Already managed in LoginNavigation.checkActions for deep links and new navigation.
-                    Constants.ACTION_RESET_PASS -> {
-                        val link = intent.dataString
-                        val isLoggedIn =
-                            intent.getBooleanExtra(LoginActivity.EXTRA_IS_LOGGED_IN, false)
-                        if (link != null && !isLoggedIn) {
-                            Timber.d("Link to resetPass: %s", link)
-                            viewModel.onRequestRecoveryKey(link)
-                            viewModel.intentSet()
-                        }
-                        return@LaunchedEffect
-                    }
-
-                    Constants.ACTION_PASS_CHANGED -> {
-                        when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
-                            MegaError.API_OK -> viewModel.setSnackbarMessageId(R.string.pass_changed_alert)
-                        }
-                        viewModel.intentSet()
-                        return@LaunchedEffect
-                    }
-
-                    Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
-                        val accountBlockedString =
-                            intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
-                        val accountBlockedType: AccountBlockedType? =
-                            intent.serializable(Constants.ACCOUNT_BLOCKED_TYPE)
-
-                        if (accountBlockedString != null && accountBlockedType != null && !TextUtil.isTextEmpty(
-                                accountBlockedString
-                            )
-                        ) {
-                            viewModel.triggerAccountBlockedEvent(
-                                AccountBlockedEvent(
-                                    handle = -1L,
-                                    type = accountBlockedType,
-                                    text = accountBlockedString
-                                )
-                            )
-                        }
-                    }
-
-                    Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
-                        intentDataString = intent.dataString
-                    }
-
-                    RefreshEvent.SdkReload.name -> {
-                        viewModel.setForceReloadAccountAsPendingAction()
-                        return@LaunchedEffect
-                    }
-                }
-            } ?: Timber.w("ACTION NULL")
-        } ?: Timber.w("No INTENT")
-    }
-
     LaunchedEffect(uiState.intentState) {
         uiState.intentState?.let {
             when (it) {
@@ -662,7 +588,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                 }
 
                 LoginIntentState.AlreadySet -> {
-                    activity.intent.action = null
+                    // no-op: intent already processed
                 }
 
                 else -> {

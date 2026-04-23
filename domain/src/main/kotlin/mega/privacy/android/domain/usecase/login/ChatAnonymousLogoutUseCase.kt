@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.login
 
+import kotlinx.coroutines.delay
 import mega.privacy.android.domain.entity.chat.ChatInitState
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
@@ -20,6 +21,7 @@ class ChatAnonymousLogoutUseCase @Inject constructor(
     suspend operator fun invoke() {
         if (chatRepository.getChatInitState() == ChatInitState.ANONYMOUS) {
             loginRepository.chatLogout()
+            delay(200L)
         }
     }
 }
