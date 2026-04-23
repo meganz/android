@@ -1,8 +1,6 @@
 package mega.privacy.android.feature.payment.presentation.upgrade
 
 import android.app.Activity
-import android.content.Intent
-import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -14,11 +12,8 @@ import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.BillingEvent
-import mega.privacy.android.feature.payment.model.mapper.toAccountTypeInt
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
-import mega.privacy.android.navigation.ExtraConstant
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.payment.toSource
@@ -61,11 +56,9 @@ fun UpgradeAccountRoute(
             if (it is BillingEvent.OnPurchaseUpdate) {
                 activity?.let { activity ->
                     onPurchasesUpdated(
-                        megaNavigator = megaNavigator,
                         activity = activity,
                         isUpgradeAccount = isUpgradeAccount,
                         openFromSource = openFromSource,
-                        isSingleActivityEnabled = uiState.isSingleActivityEnabled
                     )
                 }
                 billingViewModel.markHandleBillingEvent()
@@ -85,8 +78,6 @@ fun UpgradeAccountRoute(
             activity?.let {
                 onFreeClick(
                     activity = it,
-                    megaNavigator = megaNavigator,
-                    isSingleActivityEnabled = uiState.isSingleActivityEnabled,
                     onBack = onBack
                 )
             }
@@ -98,8 +89,6 @@ fun UpgradeAccountRoute(
             activity?.let {
                 onFreeClick(
                     activity = it,
-                    megaNavigator = megaNavigator,
-                    isSingleActivityEnabled = uiState.isSingleActivityEnabled,
                     onBack = onBack
                 )
             }
@@ -163,82 +152,26 @@ private fun sendAccountTypeAnalytics(
 
 private fun onFreeClick(
     activity: Activity,
-    megaNavigator: MegaNavigator,
-    isSingleActivityEnabled: Boolean,
     onBack: () -> Unit,
 ) {
-    if (isSingleActivityEnabled) {
-        if (activity is UpgradeAccountActivity) {
-            activity.finish()
-        } else {
-            onBack()
-        }
+    if (activity is UpgradeAccountActivity) {
+        activity.finish()
     } else {
-        val bundle = createNavigationBundle(activity, AccountType.FREE)
-        navigateToManagerActivity(megaNavigator, activity, bundle)
-    }
-}
-
-/**
- * Creates a bundle for navigation with common extras
- */
-private fun createNavigationBundle(activity: Activity, accountType: AccountType? = null): Bundle {
-    return Bundle().apply {
-        activity.intent.extras?.let { putAll(it) }
-        putBoolean(ExtraConstant.EXTRA_FIRST_LOGIN, true)
-        if (!containsKey(ExtraConstant.EXTRA_NEW_ACCOUNT)) {
-            putBoolean(ExtraConstant.EXTRA_NEW_ACCOUNT, true)
-        }
-        if (!containsKey(ExtraConstant.NEW_CREATION_ACCOUNT)) {
-            putBoolean(ExtraConstant.NEW_CREATION_ACCOUNT, true)
-        }
-        accountType?.let {
-            putBoolean(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, it != AccountType.FREE)
-            putInt(ExtraConstant.EXTRA_ACCOUNT_TYPE, it.toAccountTypeInt())
-        }
+        onBack()
     }
 }
 
 private fun onPurchasesUpdated(
-    megaNavigator: MegaNavigator,
     activity: Activity,
     isUpgradeAccount: Boolean,
     openFromSource: UpgradeAccountSource,
-    isSingleActivityEnabled: Boolean,
 ) {
     if (isUpgradeAccount) {
         if (openFromSource == UpgradeAccountSource.MY_ACCOUNT_SCREEN) {
-            if (!isSingleActivityEnabled) {
-                megaNavigator.openMyAccountActivity(
-                    context = activity,
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                )
-            }
             activity.finish()
         }
         // other cases stay in the same activity
-    } else if (!isSingleActivityEnabled) {
-        // Reuse the common navigation logic for non-upgrade account cases
-        val bundle = createNavigationBundle(activity)
-        navigateToManagerActivity(megaNavigator, activity, bundle)
     } else {
         activity.finish()
     }
-}
-
-/**
- * Navigates to ManagerActivity with the provided bundle
- */
-private fun navigateToManagerActivity(
-    megaNavigator: MegaNavigator,
-    activity: Activity,
-    bundle: Bundle,
-) {
-    megaNavigator.openManagerActivity(
-        context = activity,
-        data = activity.intent.data,
-        action = activity.intent.action,
-        bundle = bundle
-    )
-    activity.finish()
 }

@@ -35,7 +35,6 @@ import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyC
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountViewModel
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -275,7 +274,6 @@ class UpgradeAccountViewModelTest {
             )
             wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
                 .thenReturn(false)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
             initViewModel()
 
@@ -296,7 +294,6 @@ class UpgradeAccountViewModelTest {
             )
             wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
                 .thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
             wheneverBlocking { ageSignalUseCase() }.thenReturn(UserAgeComplianceStatus.AdultVerified)
 
             initViewModel()
@@ -318,7 +315,6 @@ class UpgradeAccountViewModelTest {
             )
             wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
                 .thenReturn(true)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
             wheneverBlocking { ageSignalUseCase() }.thenReturn(
                 UserAgeComplianceStatus.RequiresMinorRestriction
             )
@@ -440,7 +436,6 @@ class UpgradeAccountViewModelTest {
         )
         wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
             .thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
         initViewModel()
 

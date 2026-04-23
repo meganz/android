@@ -26,7 +26,6 @@ import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailabl
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 
 /**
@@ -71,14 +70,6 @@ class UpgradeAccountViewModel @AssistedInject constructor(
                             yearlySubscription = cheapest
                         )
                     }
-                )
-            }
-        }
-        viewModelScope.launch {
-            val isSingleActivityEnabled = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-            _state.update {
-                it.copy(
-                    isSingleActivityEnabled = isSingleActivityEnabled
                 )
             }
         }
