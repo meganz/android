@@ -51,6 +51,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.io.FileNotFoundException
+import dagger.Lazy as DaggerLazy
 
 /**
  * Unit tests for [CloudDriveDocumentDataProvider].
@@ -124,23 +125,25 @@ class CloudDriveDocumentDataProviderTest {
         initUnderTest()
     }
 
+    private fun <T> lazyOf(value: T): DaggerLazy<T> = DaggerLazy { value }
+
     private fun initUnderTest() {
         underTest = CloudDriveDocumentDataProvider(
             applicationScope = testScope,
-            getRootNodeIdUseCase = getRootNodeIdUseCase,
-            getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
-            getNodeByHandleUseCase = getNodeByHandleUseCase,
-            backgroundFastLoginUseCase = backgroundFastLoginUseCase,
-            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
-            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
-            getAccountCredentialsUseCase = getAccountCredentialsUseCase,
-            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            cloudDriveDocumentRowMapper = cloudDriveDocumentRowMapper,
-            addNodeType = addNodeType,
-            documentIdToNodeIdMapper = documentIdToNodeIdMapper,
-            monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
-            getOpenableLocalFileForCloudDriveSafUseCase = getOpenableLocalFileForCloudDriveSafUseCase,
+            getRootNodeIdUseCase = lazyOf(getRootNodeIdUseCase),
+            getNodesByIdInChunkUseCase = lazyOf(getNodesByIdInChunkUseCase),
+            getNodeByHandleUseCase = lazyOf(getNodeByHandleUseCase),
+            backgroundFastLoginUseCase = lazyOf(backgroundFastLoginUseCase),
+            monitorNodeUpdatesUseCase = lazyOf(monitorNodeUpdatesUseCase),
+            monitorUserCredentialsUseCase = lazyOf(monitorUserCredentialsUseCase),
+            getAccountCredentialsUseCase = lazyOf(getAccountCredentialsUseCase),
+            monitorHiddenNodesEnabledUseCase = lazyOf(monitorHiddenNodesEnabledUseCase),
+            monitorShowHiddenItemsUseCase = lazyOf(monitorShowHiddenItemsUseCase),
+            cloudDriveDocumentRowMapper = lazyOf(cloudDriveDocumentRowMapper),
+            addNodeType = lazyOf(addNodeType),
+            documentIdToNodeIdMapper = lazyOf(documentIdToNodeIdMapper),
+            monitorPasscodeLockPreferenceUseCase = lazyOf(monitorPasscodeLockPreferenceUseCase),
+            getOpenableLocalFileForCloudDriveSafUseCase = lazyOf(getOpenableLocalFileForCloudDriveSafUseCase),
         )
     }
 

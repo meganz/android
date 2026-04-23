@@ -6,6 +6,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.getSystemService
+import dagger.Lazy as DaggerLazy
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -61,20 +63,20 @@ import kotlin.coroutines.cancellation.CancellationException
 @Singleton
 class CloudDriveDocumentDataProvider @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
-    private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
-    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
-    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
-    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
-    private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
-    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
-    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    private val cloudDriveDocumentRowMapper: CloudDriveDocumentRowMapper,
-    private val addNodeType: AddNodeType,
-    private val documentIdToNodeIdMapper: DocumentIdToNodeIdMapper,
-    private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
-    private val getOpenableLocalFileForCloudDriveSafUseCase: GetOpenableLocalFileForCloudDriveSafUseCase,
+    private val getRootNodeIdUseCase: DaggerLazy<GetRootNodeIdUseCase>,
+    private val getNodesByIdInChunkUseCase: DaggerLazy<GetNodesByIdInChunkUseCase>,
+    private val getNodeByHandleUseCase: DaggerLazy<GetNodeByHandleUseCase>,
+    private val backgroundFastLoginUseCase: DaggerLazy<BackgroundFastLoginUseCase>,
+    private val monitorNodeUpdatesUseCase: DaggerLazy<MonitorNodeUpdatesUseCase>,
+    private val monitorUserCredentialsUseCase: DaggerLazy<MonitorUserCredentialsUseCase>,
+    private val getAccountCredentialsUseCase: DaggerLazy<GetAccountCredentialsUseCase>,
+    private val monitorHiddenNodesEnabledUseCase: DaggerLazy<MonitorHiddenNodesEnabledUseCase>,
+    private val monitorShowHiddenItemsUseCase: DaggerLazy<MonitorShowHiddenItemsUseCase>,
+    private val cloudDriveDocumentRowMapper: DaggerLazy<CloudDriveDocumentRowMapper>,
+    private val addNodeType: DaggerLazy<AddNodeType>,
+    private val documentIdToNodeIdMapper: DaggerLazy<DocumentIdToNodeIdMapper>,
+    private val monitorPasscodeLockPreferenceUseCase: DaggerLazy<MonitorPasscodeLockPreferenceUseCase>,
+    private val getOpenableLocalFileForCloudDriveSafUseCase: DaggerLazy<GetOpenableLocalFileForCloudDriveSafUseCase>,
 ) {
 
     /**
@@ -155,12 +157,12 @@ class CloudDriveDocumentDataProvider @Inject constructor(
 
     private fun monitorSessionState(): Flow<SessionState> =
         combine(
-            monitorPasscodeLockPreferenceUseCase().catch {
+            monitorPasscodeLockPreferenceUseCase.get()().catch {
                 Timber.e(it)
                 emit(false)
             },
             connectivityState,
-            monitorUserCredentialsUseCase().onStart { emit(getAccountCredentialsUseCase()) }
+            monitorUserCredentialsUseCase.get()().onStart { emit(getAccountCredentialsUseCase.get()()) }
                 .catch {
                     Timber.e(it)
                     emit(null)
@@ -228,10 +230,10 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     }
 
     private suspend fun getRootNodeWithFastLoginIfNeeded(): NodeId? =
-        getRootNodeIdUseCase() ?: run {
+        getRootNodeIdUseCase.get()() ?: run {
             Timber.d("CloudDriveDocumentDataProvider getRootNodeUseCase returned null, attempting fast login")
-            backgroundFastLoginUseCase().let {
-                getRootNodeIdUseCase()
+            backgroundFastLoginUseCase.get()().let {
+                getRootNodeIdUseCase.get()()
             }
         }
 
@@ -246,7 +248,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         MutableStateFlow(DocumentDataRequest.Document(CLOUD_DRIVE_ROOT_ID))
 
     private fun getDataFlows(accountName: String, rootNodeDocumentId: String) =
-        monitorNodeUpdatesUseCase().catch {
+        monitorNodeUpdatesUseCase.get()().catch {
             Timber.e(
                 it,
                 "CloudDriveDocumentDataProvider monitorNodeUpdates"
@@ -289,7 +291,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         notificationString: String? = null,
     ): Flow<CloudDriveDocumentProviderUiState> {
         val effectiveId = notificationString ?: parentDocumentId
-        val parentId = documentIdToNodeIdMapper(parentDocumentId, CLOUD_DRIVE_ROOT_ID)
+        val parentId = documentIdToNodeIdMapper.get()(parentDocumentId, CLOUD_DRIVE_ROOT_ID)
             ?: return flowOf(
                 CloudDriveDocumentProviderUiState.FileNotFound(
                     accountName = accountName,
@@ -297,12 +299,12 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                 )
             )
         return flow {
-            val nodesFlow = getNodesByIdInChunkUseCase(parentId).runningFold<
+            val nodesFlow = getNodesByIdInChunkUseCase.get()(parentId).runningFold<
                     Pair<List<TypedNode>, Boolean>,
                     Pair<List<TypedNode>, Boolean>
                     >(Pair(listOf(), true)) { acc, newValue ->
                 Pair(acc.first + newValue.first, newValue.second)
-            }
+            }.drop(1) // skip initial value
             emit(
                 CloudDriveDocumentProviderUiState.LoadingChildren(
                     accountName = accountName,
@@ -323,7 +325,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                         accountName = accountName,
                         parentId = effectiveId,
                         children = filteredNodes.map {
-                            cloudDriveDocumentRowMapper(it, CLOUD_DRIVE_ROOT_ID)
+                            cloudDriveDocumentRowMapper.get()(it, CLOUD_DRIVE_ROOT_ID)
                         },
                         hasMore = hasMore,
                     )
@@ -334,13 +336,13 @@ class CloudDriveDocumentDataProvider @Inject constructor(
 
     private fun hiddenNodesFilterFlow(): Flow<Pair<Boolean, Boolean>> =
         combine(
-            monitorHiddenNodesEnabledUseCase().catch {
+            monitorHiddenNodesEnabledUseCase.get()().catch {
                 Timber.e(
                     it,
                     "CloudDriveDocumentDataProvider monitorHiddenNodesEnabled"
                 )
             },
-            monitorShowHiddenItemsUseCase().catch {
+            monitorShowHiddenItemsUseCase.get()().catch {
                 Timber.e(
                     it,
                     "CloudDriveDocumentDataProvider monitorShowHiddenItems"
@@ -376,10 +378,10 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                 )
             )
             val typedNode = runCatching {
-                val nodeId = documentIdToNodeIdMapper(
+                val nodeId = documentIdToNodeIdMapper.get()(
                     documentName, CLOUD_DRIVE_ROOT_ID
                 ) ?: return@runCatching null
-                getNodeByHandleUseCase(nodeId.longValue)?.let { addNodeType(it) }
+                getNodeByHandleUseCase.get()(nodeId.longValue)?.let { node -> addNodeType.get()(node) }
             }.getOrNull()
 
             if (typedNode == null) {
@@ -404,7 +406,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                             )
                         } else {
                             val document =
-                                cloudDriveDocumentRowMapper(typedNode, CLOUD_DRIVE_ROOT_ID)
+                                cloudDriveDocumentRowMapper.get()(typedNode, CLOUD_DRIVE_ROOT_ID)
                             val finalDocument =
                                 notificationString?.let { document.copy(documentId = it) }
                                     ?: document
@@ -441,13 +443,13 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     /** Local [File] for SAF [documentId]. @throws FileNotFoundException */
     suspend fun openDocumentFile(documentId: String): File {
         try {
-            val nodeId = documentIdToNodeIdMapper(documentId, CLOUD_DRIVE_ROOT_ID)
+            val nodeId = documentIdToNodeIdMapper.get()(documentId, CLOUD_DRIVE_ROOT_ID)
                 ?: throw FileNotFoundException("Invalid document id: $documentId")
-            val untypedNode = getNodeByHandleUseCase(nodeId.longValue)
+            val untypedNode = getNodeByHandleUseCase.get()(nodeId.longValue)
                 ?: throw FileNotFoundException("Node not found: $documentId")
-            val fileNode = addNodeType(untypedNode) as? TypedFileNode
+            val fileNode = addNodeType.get()(untypedNode) as? TypedFileNode
                 ?: throw FileNotFoundException("Document is not a file: $documentId")
-            return getOpenableLocalFileForCloudDriveSafUseCase(fileNode)
+            return getOpenableLocalFileForCloudDriveSafUseCase.get()(fileNode)
         } catch (e: FileNotFoundException) {
             throw e
         } catch (e: CancellationException) {
