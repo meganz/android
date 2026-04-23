@@ -55,9 +55,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQu
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_STRING
 import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_TYPE
-import mega.privacy.android.app.utils.Constants.ACTION_OVER_QUOTA_STORAGE
-import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVER_QUOTA_STORAGE
-import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
@@ -840,11 +837,13 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * Launches an intent to navigate to Upgrade Account screen.
      */
     open fun navigateToUpgradeAccount() {
-        megaNavigator.openManagerActivity(
-            context = this,
-            action = ACTION_SHOW_UPGRADE_ACCOUNT,
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK,
-            singleActivityDestination = UpgradeAccountNavKey(source = UpgradeAccountSource.UNKNOWN)
+        startActivity(
+            MegaActivity.getIntentWithExtraDestinations(
+                this,
+                listOf(UpgradeAccountNavKey(source = UpgradeAccountSource.UNKNOWN))
+            ).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
         )
     }
 
@@ -1137,27 +1136,31 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     /**
-     * Launches ManagerActivity intent to show over quota warning.
+     * Launches MegaActivity to show over quota warning.
      */
     protected fun launchOverQuota() {
-        megaNavigator.openManagerActivity(
-            context = this,
-            action = ACTION_OVER_QUOTA_STORAGE,
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-            singleActivityDestination = OverQuotaDialogNavKey(true)
+        startActivity(
+            MegaActivity.getIntentWithExtraDestinations(
+                this,
+                listOf(OverQuotaDialogNavKey(true))
+            ).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
         )
         finish()
     }
 
     /**
-     * Launches ManagerActivity intent to show pre over quota warning.
+     * Launches MegaActivity to show pre over quota warning.
      */
     protected fun launchPreOverQuota() {
-        megaNavigator.openManagerActivity(
-            context = this@BaseActivity,
-            action = ACTION_PRE_OVER_QUOTA_STORAGE,
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-            singleActivityDestination = OverQuotaDialogNavKey(false)
+        startActivity(
+            MegaActivity.getIntentWithExtraDestinations(
+                this@BaseActivity,
+                listOf(OverQuotaDialogNavKey(false))
+            ).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
         )
         finish()
     }
