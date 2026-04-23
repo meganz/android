@@ -39,7 +39,9 @@ fun UpgradeAccountRoute(
     isUpgradeAccount: Boolean,
     openFromSource: UpgradeAccountSource,
     onBack: () -> Unit = {},
-    chooseAccountViewModel: UpgradeAccountViewModel = hiltViewModel<UpgradeAccountViewModel>(),
+    chooseAccountViewModel: UpgradeAccountViewModel = hiltViewModel<UpgradeAccountViewModel, UpgradeAccountViewModel.Factory> { factory ->
+        factory.create(isUpgradeAccount = isUpgradeAccount)
+    },
     billingViewModel: BillingViewModel = hiltViewModel<BillingViewModel>(),
     accountStorageViewModel: AccountStorageViewModel = hiltViewModel<AccountStorageViewModel>(),
 ) {

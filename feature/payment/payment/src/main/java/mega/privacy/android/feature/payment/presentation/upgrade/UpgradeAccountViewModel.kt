@@ -1,8 +1,10 @@
 package mega.privacy.android.feature.payment.presentation.upgrade
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +28,6 @@ import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Choose account view model
@@ -38,8 +39,8 @@ import javax.inject.Inject
  *
  * @property state The current UI state
  */
-@HiltViewModel
-class UpgradeAccountViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = UpgradeAccountViewModel.Factory::class)
+class UpgradeAccountViewModel @AssistedInject constructor(
     private val getPricing: GetPricing,
     private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
@@ -48,14 +49,11 @@ class UpgradeAccountViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val ageSignalUseCase: AgeSignalUseCase,
-    savedStateHandle: SavedStateHandle,
+    @Assisted val isUpgradeAccount: Boolean,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UpgradeAccountState())
     val state: StateFlow<UpgradeAccountState> = _state
-
-    private val isUpgradeAccountFlow =
-        savedStateHandle.get<Boolean>(EXTRA_IS_UPGRADE_ACCOUNT) ?: false
 
     init {
         loadSubscriptions()
@@ -109,7 +107,7 @@ class UpgradeAccountViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
-        if (isUpgradeAccountFlow) {
+        if (isUpgradeAccount) {
             loadCurrentSubscriptionPlan()
         }
         refreshPricing()
@@ -179,6 +177,11 @@ class UpgradeAccountViewModel @Inject constructor(
                 it.copy(product = pricing.products)
             }
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(isUpgradeAccount: Boolean): UpgradeAccountViewModel
     }
 
     companion object {

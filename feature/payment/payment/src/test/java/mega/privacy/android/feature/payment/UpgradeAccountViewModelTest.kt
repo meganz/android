@@ -91,7 +91,7 @@ class UpgradeAccountViewModelTest {
         wheneverBlocking { isSubscriptionFeatureAvailableUseCase() }.thenReturn(true)
     }
 
-    private fun initViewModel() {
+    private fun initViewModel(isUpgradeAccount: Boolean = true) {
         underTest = UpgradeAccountViewModel(
             getPricing = getPricing,
             getSubscriptionsUseCase = getSubscriptionsUseCase,
@@ -101,7 +101,7 @@ class UpgradeAccountViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ageSignalUseCase = ageSignalUseCase,
-            savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) },
+            isUpgradeAccount = isUpgradeAccount,
         )
     }
 
