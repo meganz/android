@@ -2754,4 +2754,14 @@
         <item quantity="one">%1$d failed passcode attempt</item>
         <item quantity="other">%1$d failed passcode attempts</item>
     </plurals>
+    <!-- Title of the auth alert bottom sheet shown to guest users when opening a public folder link, prompting them to sign up or log in to save the folder -->
+    <string name="public_link_auth_alert_title_folder">Save this folder to your MEGA account</string>
+    <!-- Title of the auth alert bottom sheet shown to guest users when opening a public album link, prompting them to sign up or log in to save the album -->
+    <string name="public_link_auth_alert_title_album">Save this album to your MEGA account</string>
+    <!-- Description of the auth alert bottom sheet shown to guest users for folder and file links, encouraging them to save the content to their MEGA account -->
+    <string name="public_link_auth_alert_description_default">Access it anytime, from any device.\nNo need to keep the link or download files again.</string>
+    <!-- Description of the auth alert bottom sheet shown to guest users for album links, encouraging them to save photos to their MEGA account -->
+    <string name="public_link_auth_alert_description_album">Keep these photos safe and access them anytime</string>
+    <!-- Title of the auth alert bottom sheet shown to guest users when opening a public file link, prompting them to sign up or log in to save the file -->
+    <string name="public_link_auth_alert_title_file">Save this file to your MEGA account</string>
 </resources>
