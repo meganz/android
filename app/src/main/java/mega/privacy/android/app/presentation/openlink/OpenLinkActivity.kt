@@ -41,7 +41,6 @@ import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatApi
@@ -179,25 +178,17 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
     /**
      * Handle the isLoggedOut state from [OpenLinkUiState]
      *
-     * Navigates to [LoginActivity] if the user logged out
+     * Navigates to [MegaActivity] if the user logged out
      */
     private fun handleLoggedOutState() = lifecycleScope.launch {
-        getFeatureFlagValueUseCase(AppFeatures.SingleActivity).let { isSingleActivityEnabled ->
-            Timber.d("SingleActivity feature flag is enabled: $isSingleActivityEnabled")
-            val targetActivity = if (isSingleActivityEnabled) {
-                MegaActivity::class.java
-            } else {
-                LoginActivity::class.java
-            }
-            startActivity(
-                Intent(this@OpenLinkActivity, targetActivity)
-                    .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                    .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
-                    .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                    .setAction(ACTION_CONFIRM)
-            )
-            finish()
-        }
+        startActivity(
+            Intent(this@OpenLinkActivity, MegaActivity::class.java)
+                .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
+                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                .setAction(ACTION_CONFIRM)
+        )
+        finish()
     }
 
     /**

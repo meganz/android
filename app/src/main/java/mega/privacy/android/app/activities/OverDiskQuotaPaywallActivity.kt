@@ -11,8 +11,8 @@ import androidx.core.view.WindowInsetsCompat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
 import mega.privacy.android.app.utils.ColorUtils
@@ -20,10 +20,7 @@ import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
-import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -35,9 +32,6 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
     @Inject
     @ApplicationScope
     lateinit var globalScope: CoroutineScope
-
-    @Inject
-    lateinit var isFirstLaunchUseCase: IsFirstLaunchUseCase
 
     private val viewModel: OverDiskQuotaPaywallViewModel by viewModels()
 
@@ -96,7 +90,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
             R.id.dismiss_button -> {
                 Timber.i("Over Disk Quota Paywall warning dismissed")
                 if (isTaskRoot) {
-                    launchManagerActivity()
+                    launchMegaActivity()
                 }
                 finish()
             }
@@ -104,17 +98,16 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
             R.id.upgrade_button -> {
                 Timber.i("Starting upgrade process after Over Disk Quota Paywall")
                 runCatching {
-                    megaNavigator.openManagerActivity(
-                        context = this,
-                        bundle = Bundle().apply {
-                            putBoolean(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, true)
-                            proPlanNeeded?.let { putInt(ExtraConstant.EXTRA_ACCOUNT_TYPE, it) }
-                        },
-                        singleActivityDestination = UpgradeAccountNavKey(
-                            source = UpgradeAccountSource.MY_ACCOUNT_SCREEN, //Matches the call made from managerActivity
+                    startActivity(
+                        MegaActivity.getIntentWithExtraDestinations(
+                            context = this,
+                            navKeys = listOf(
+                                UpgradeAccountNavKey(
+                                    source = UpgradeAccountSource.MY_ACCOUNT_SCREEN,
+                                )
+                            ),
                         )
                     )
-
                 }.onFailure {
                     Timber.e(it)
                 }
@@ -123,17 +116,11 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         }
     }
 
-    private fun launchManagerActivity() {
+    private fun launchMegaActivity() {
         runCatching {
-            megaNavigator.openManagerActivity(
-                context = this@OverDiskQuotaPaywallActivity,
-                onIntentCreated = {
-                    it.putExtra(
-                        EXTRA_ASK_PERMISSIONS,
-                        isFirstLaunchUseCase()
-                    )
-                },
-                singleActivityDestination = null //MegaActivity already handles ask permission logic
+            // MegaActivity already handles ask permission logic internally
+            startActivity(
+                MegaActivity.getIntent(this@OverDiskQuotaPaywallActivity)
             )
         }.onFailure {
             Timber.e(it)

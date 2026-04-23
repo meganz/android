@@ -219,7 +219,7 @@ internal class BillingFacade @Inject constructor(
             }
 
             /*
-              If do a full login, ManagerActivity's mIntent will be set as null.
+              If do a full login, MegaActivity's mIntent will be set as null.
               Work around, check the intent's nullity first, if null, set an empty Intent, as we don't use "PROXY_PACKAGE",
               otherwise billing library crashes internally.
               @see com.android.billingclient.api.BillingClientImpl -> var1.getIntent().getStringExtra("PROXY_PACKAGE")

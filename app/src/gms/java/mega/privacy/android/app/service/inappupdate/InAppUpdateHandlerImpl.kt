@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -28,7 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.core.passcode.PasscodeProcessLifecycleOwner
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -185,18 +183,6 @@ class InAppUpdateHandlerImpl @Inject constructor(
                     Analytics.tracker.trackEvent(InAppUpdateRestartButtonPressedEvent)
                     completeUpdate()
                 }
-            }
-
-            (context as? ManagerActivity)?.systemBarInsets?.let { insets ->
-                val snackbarLayout = snackbar.view as? Snackbar.SnackbarLayout
-                val params = snackbarLayout?.layoutParams as? FrameLayout.LayoutParams
-                params?.setMargins(
-                    0,
-                    0,
-                    0,
-                    insets.bottom
-                )
-                snackbarLayout?.layoutParams = params
             }
             snackbar.show()
 
