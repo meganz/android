@@ -33,7 +33,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.destination.MyAccountNavKey
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -160,17 +159,19 @@ class ChangePasswordActivity : PasscodeActivity() {
     }
 
     private fun navigateToHomeAfterPasswordChanged(errCode: Int? = MegaError.API_OK) {
-        megaNavigator.openManagerActivity(
+        val intent = MegaActivity.getIntentWithExtraDestinations(
             context = this,
-            action = Constants.ACTION_PASS_CHANGED,
-            bundle = Bundle().apply {
-                errCode?.let { putInt(Constants.RESULT, it) }
-            },
-            singleActivityDestination = MyAccountNavKey(
-                action = Constants.ACTION_PASS_CHANGED,
-                resultCode = MegaError.API_OK
-            )
-        )
+            navKeys = listOf(
+                MyAccountNavKey(
+                    action = Constants.ACTION_PASS_CHANGED,
+                    resultCode = MegaError.API_OK
+                )
+            ),
+        ).apply {
+            action = Constants.ACTION_PASS_CHANGED
+            errCode?.let { putExtra(Constants.RESULT, it) }
+        }
+        startActivity(intent)
         finish()
     }
 

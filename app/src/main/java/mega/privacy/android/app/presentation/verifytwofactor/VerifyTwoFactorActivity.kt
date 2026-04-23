@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
@@ -32,7 +33,6 @@ import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
-import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EACCESS
@@ -47,7 +47,6 @@ import nz.mega.sdk.MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK
 import nz.mega.sdk.MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK
 import nz.mega.sdk.MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Activity for verifying two factor authentication code
@@ -62,9 +61,6 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     }
 
     private val viewModel by viewModels<VerifyTwoFactorViewModel>()
-
-    @Inject
-    lateinit var megaNavigator: MegaNavigator
 
     /**
      * @see KEY_VERIFY_TYPE
@@ -499,15 +495,19 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                     viewModel.logout()
                 } else {
                     //Intent to MyAccount
-                    megaNavigator.openManagerActivity(
+                    val intent = MegaActivity.getIntentWithExtraDestinations(
                         context = this,
-                        action = ACTION_PASS_CHANGED,
-                        bundle = Bundle().apply { putInt(RESULT, e.errorCode) },
-                        singleActivityDestination = MyAccountNavKey(
-                            action = ACTION_PASS_CHANGED,
-                            resultCode = e.errorCode
-                        )
-                    )
+                        navKeys = listOf(
+                            MyAccountNavKey(
+                                action = ACTION_PASS_CHANGED,
+                                resultCode = e.errorCode
+                            )
+                        ),
+                    ).apply {
+                        action = ACTION_PASS_CHANGED
+                        putExtra(RESULT, e.errorCode)
+                    }
+                    startActivity(intent)
                     finish()
                 }
             }
