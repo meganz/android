@@ -5,17 +5,12 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -26,8 +21,6 @@ import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContain
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.psa.PsaContentView
-import mega.privacy.android.app.presentation.psa.PsaViewModel
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
@@ -86,28 +79,10 @@ class ActivityAppContainerWrapper @Inject constructor(
                             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
                         if (!isLoginActivity) {
-                            val viewModel: PsaViewModel = hiltViewModel()
-                            val psaState by viewModel.state.collectAsStateWithLifecycle((context as LifecycleOwner))
-
                             val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> =
                                 listOf(
                                     {
                                         BusinessAccountContainer(content = it)
-                                    },
-                                    { content ->
-                                        PsaContentView(
-                                            context = context,
-                                            state = psaState,
-                                            coroutineScope = rememberCoroutineScope(),
-                                            markAsSeen = { psaId ->
-                                                viewModel.markAsSeen(psaId)
-                                            },
-                                            containerModifier = Modifier
-                                                .navigationBarsPadding(),
-                                            innerModifier = { it.padding(bottom = 16.dp) },
-                                            content = content,
-                                            onDisplay = viewModel::setDisplayed,
-                                        )
                                     },
                                     {
                                         PasscodeContainer(
