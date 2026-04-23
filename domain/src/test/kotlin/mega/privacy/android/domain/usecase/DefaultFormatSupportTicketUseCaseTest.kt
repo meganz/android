@@ -62,7 +62,7 @@ class DefaultFormatSupportTicketUseCaseTest {
                 Email: $expectedAccountEmail
                 Type: $expectedAccountType
                 
-                AppInformation:
+                App Information:
                 App name: Mega
                 App version: $expectedAndroidAppVersion
                 Sdk version: $expectedSdkVersion
