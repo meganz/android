@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.app.utils.Constants.ACTION_JOIN_OPEN_CHAT_LINK
 
 internal fun startLoginActivity(

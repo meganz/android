@@ -1,0 +1,24 @@
+package mega.privacy.android.navigation.destination
+
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+
+
+@Serializable
+@Parcelize
+data class LoginNavKey(
+    val action: String? = null,
+    val link: String? = null,
+    val timeStamp: Long = System.currentTimeMillis(),
+) : NoSessionNavKey.Mandatory, Parcelable
+
+/**
+ * Create Account Screen
+ * @param initialEmail if set, the email field will be pre-filled with this value
+ */
+@Serializable
+data class CreateAccountNavKey(
+    val initialEmail: String? = null,
+) : NoSessionNavKey.Mandatory

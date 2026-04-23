@@ -3,7 +3,7 @@ package mega.privacy.android.app.myAccount.navigation
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.CANCEL_ACCOUNT_LINK

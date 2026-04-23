@@ -17,7 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityGuestLeaveMeetingBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.app.presentation.meeting.LeftMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout

@@ -14,8 +14,7 @@ class SaveToMegaActionClickHandler @Inject constructor() : SingleNodeAction, Mul
         if (provider.viewModel.uiState.value.isLoggedIn) {
             provider.copyLauncher.launch(longArrayOf(node.id.longValue))
         } else {
-            provider.viewModel.postMessage("You need to login first") // TODO to be confirmed
-            // TODO navigate to login screen
+            provider.viewModel.triggerLoginRequiredEvent()
         }
     }
 
@@ -28,8 +27,7 @@ class SaveToMegaActionClickHandler @Inject constructor() : SingleNodeAction, Mul
             val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
             provider.copyLauncher.launch(nodeHandleArray)
         } else {
-            provider.viewModel.postMessage("You need to login first") // TODO to be confirmed
-            // TODO navigate to login screen
+            provider.viewModel.triggerLoginRequiredEvent()
         }
     }
 }

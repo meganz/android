@@ -8,7 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils

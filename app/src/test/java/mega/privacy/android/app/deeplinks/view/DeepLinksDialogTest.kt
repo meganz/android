@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.deeplinks.model.DeepLinksUIState
-import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.contract.NavOptions
 import org.junit.Rule
 import org.junit.Test

@@ -5,7 +5,7 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.resetpassword.ResetPasswordLinkInfo

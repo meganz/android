@@ -791,6 +791,14 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }
     }
 
+    fun triggerLoginRequiredEvent() {
+        uiState.update { it.copy(loginRequiredEvent = triggered) }
+    }
+
+    fun resetLoginRequiredEvent() {
+        uiState.update { it.copy(loginRequiredEvent = consumed) }
+    }
+
     fun updateSelectionModeAvailableActions(
         selectedNodes: Set<TypedNode>,
         nodeSourceType: NodeSourceType,

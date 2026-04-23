@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.shared.resources.R
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

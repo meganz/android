@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import javax.inject.Inject
 
 class CreateAccountDeepLinkHandler @Inject constructor(

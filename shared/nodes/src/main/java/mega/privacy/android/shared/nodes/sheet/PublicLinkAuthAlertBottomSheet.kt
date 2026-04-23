@@ -97,7 +97,7 @@ fun PublicLinkAuthAlertBottomSheet(
             IconButton(
                 onClick = onDismissSheet,
                 modifier = Modifier
-                    .align(Alignment.Start)
+                    .align(Alignment.End)
             ) {
                 MegaIcon(
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),

@@ -14,7 +14,6 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.LoginGraph
-import mega.privacy.android.app.presentation.login.LoginNavKey
 import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
@@ -22,15 +21,8 @@ import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmai
 import mega.privacy.android.app.presentation.login.createaccount.view.NewCreateAccountRoute
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
-
-/**
- * Create Account Screen
- * @param initialEmail if set, the email field will be pre-filled with this value
- */
-@Serializable
-data class CreateAccountNavKey(
-    val initialEmail: String? = null,
-) : NoSessionNavKey.Mandatory
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 
 internal fun NavGraphBuilder.createAccountScreen(
     navController: NavController,
