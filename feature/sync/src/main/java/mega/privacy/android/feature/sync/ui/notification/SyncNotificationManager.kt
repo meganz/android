@@ -5,10 +5,8 @@ import android.app.Notification
 import android.content.Context
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationManagerCompat
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.CreateSyncNotificationIdUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import javax.inject.Inject
 
 /**
@@ -18,7 +16,6 @@ class SyncNotificationManager @Inject constructor(
     private val notificationManagerCompat: NotificationManagerCompat,
     private val syncNotificationMapper: SyncNotificationMapper,
     private val createSyncNotificationIdUseCase: CreateSyncNotificationIdUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     /**
@@ -29,8 +26,7 @@ class SyncNotificationManager @Inject constructor(
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     suspend fun show(context: Context, notificationMessage: SyncNotificationMessage): Int {
         val notificationId = createSyncNotificationIdUseCase()
-        val singleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-        val notification = syncNotificationMapper(context, notificationMessage, singleActivity)
+        val notification = syncNotificationMapper(context, notificationMessage)
         notificationManagerCompat.notify(notificationId, notification)
         return notificationId
     }

@@ -6,7 +6,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.feature.sync.R as SyncR
 import mega.privacy.android.feature.sync.domain.entity.NotificationDetails
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
@@ -24,21 +23,17 @@ internal class SyncNotificationMapperTest {
 
     private lateinit var underTest: SyncNotificationMapper
 
-    private val getDomainNameUseCase: GetDomainNameUseCase = mock()
     private val syncPendingIntentProvider: SyncPendingIntentProvider = mock()
     private lateinit var context: Context
 
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        underTest = SyncNotificationMapper(getDomainNameUseCase, syncPendingIntentProvider)
+        underTest = SyncNotificationMapper(syncPendingIntentProvider)
     }
 
     @Test
     fun `test that notification is created for stalled issue`() = runTest {
-        val domainName = "mega.nz"
-        whenever(getDomainNameUseCase()).thenReturn(domainName)
-
         val notificationMessage = SyncNotificationMessage(
             title = sharedResR.string.general_sync_notification_stalled_issues_title,
             text = sharedResR.string.general_sync_notification_stalled_issues_text,
@@ -46,7 +41,7 @@ internal class SyncNotificationMapperTest {
             notificationDetails = NotificationDetails(path = "Test/Path", errorCode = null)
         )
 
-        val notification = underTest(context, notificationMessage, singleActivity = true)
+        val notification = underTest(context, notificationMessage)
 
         assertThat(notification).isNotNull()
         assertThat(notification.channelId).isEqualTo(SyncNotificationManager.CHANNEL_ID)
@@ -54,29 +49,8 @@ internal class SyncNotificationMapperTest {
     }
 
     @Test
-    fun `test that notification content intent is set correctly when singleActivity is false`() =
+    fun `test that notification content intent is set correctly`() =
         runTest {
-            val domainName = "mega.nz"
-            whenever(getDomainNameUseCase()).thenReturn(domainName)
-
-            val notificationMessage = SyncNotificationMessage(
-                title = sharedResR.string.general_sync_notification_stalled_issues_title,
-                text = sharedResR.string.general_sync_notification_stalled_issues_text,
-                syncNotificationType = SyncNotificationType.STALLED_ISSUE,
-                notificationDetails = NotificationDetails(path = "Test/Path", errorCode = null)
-            )
-
-            val notification = underTest(context, notificationMessage, singleActivity = false)
-
-            assertThat(notification.contentIntent).isNotNull()
-        }
-
-    @Test
-    fun `test that notification content intent is set correctly when singleActivity is true`() =
-        runTest {
-            val domainName = "mega.nz"
-            whenever(getDomainNameUseCase()).thenReturn(domainName)
-
             val notificationMessage = SyncNotificationMessage(
                 title = sharedResR.string.general_sync_notification_stalled_issues_title,
                 text = sharedResR.string.general_sync_notification_stalled_issues_text,
@@ -88,17 +62,13 @@ internal class SyncNotificationMapperTest {
                 mock()
             )
 
+            val notification = underTest(context, notificationMessage)
 
-            val notification = underTest(context, notificationMessage, singleActivity = false)
             assertThat(notification.contentIntent).isNotNull()
-
         }
 
     @Test
     fun `test that notification is auto cancel`() = runTest {
-        val domainName = "mega.nz"
-        whenever(getDomainNameUseCase()).thenReturn(domainName)
-
         val notificationMessage = SyncNotificationMessage(
             title = sharedResR.string.general_sync_notification_stalled_issues_title,
             text = sharedResR.string.general_sync_notification_stalled_issues_text,
@@ -106,7 +76,7 @@ internal class SyncNotificationMapperTest {
             notificationDetails = NotificationDetails(path = "Test/Path", errorCode = null)
         )
 
-        val notification = underTest(context, notificationMessage, singleActivity = true)
+        val notification = underTest(context, notificationMessage)
 
         assertThat(notification.flags and Notification.FLAG_AUTO_CANCEL).isNotEqualTo(0)
     }
