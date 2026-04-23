@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.versions.dialog.model.VersionsBotto
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
@@ -25,6 +26,7 @@ import javax.inject.Inject
  * @property getNodeAccessPermission Retrieves the Node Access Permission
  * @property getNodeByHandle Retrieves the Node from the given Handle
  * @property isNodeInBackupsUseCase Checks whether the Node is a Backup Node or not
+ * @property isNodeInRubbishBinUseCase Checks whether the Node is in the Rubbish Bin or not
  * @property savedStateHandle The Saved State Handle to retrieve the parameters sent
  */
 @HiltViewModel
@@ -32,6 +34,7 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val getNodeByHandle: GetNodeByHandle,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -55,6 +58,7 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
                 // Async-Await is used here in order to prevent the hidden options from being
                 // blackened and taking up space in the popup Dialog
                 val isNodeInBackups = async { isNodeInBackupsUseCase(nodeHandle) }
+                val isNodeInRubbishBin = async { isNodeInRubbishBinUseCase(NodeId(nodeHandle)) }
                 val node = async { getNodeByHandle(nonNullHandle) }
                 val accessPermission = async { getNodeAccessPermission(NodeId(nonNullHandle)) }
 
@@ -69,6 +73,7 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
                 )
                 val canRevertVersion = canRevertVersion(
                     isNodeInBackups = isNodeInBackups.await(),
+                    isNodeInRubbishBin = isNodeInRubbishBin.await(),
                     isNodeTheCurrentVersion = isNodeTheCurrentVersion,
                     isRevertAccessPermissionEligible = isRevertAccessPermissionEligible(
                         accessPermission.await(),
@@ -113,6 +118,7 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
      * Checks whether this Version can be reverted or not
      *
      * @param isNodeInBackups true if the Node exists in Backups, and false if otherwise
+     * @param isNodeInRubbishBin true if the Node is in the Rubbish Bin, and false if otherwise
      * @param isNodeTheCurrentVersion true if this is the Current Version, and false if otherwise
      * @param isRevertAccessPermissionEligible true if the current Node Access Permission meets any
      * of the listed [AccessPermission] for reverting a Version, and false if otherwise
@@ -121,9 +127,10 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
      */
     private fun canRevertVersion(
         isNodeInBackups: Boolean,
+        isNodeInRubbishBin: Boolean,
         isNodeTheCurrentVersion: Boolean,
         isRevertAccessPermissionEligible: Boolean,
-    ) = if (isNodeInBackups) {
+    ) = if (isNodeInBackups || isNodeInRubbishBin) {
         false
     } else {
         isNodeTheCurrentVersion.not() && isRevertAccessPermissionEligible
