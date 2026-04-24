@@ -37,6 +37,11 @@ data class MegaPurchase(
      * Time of the purchase, in milliseconds since epoch (Jan 1, 1970).
      */
     val time: Long = 0,
+
+    /**
+     * Whether the subscription is set to auto-renew.
+     */
+    val isAutoRenewing: Boolean = false,
 ) {
     /**
      * product level

@@ -121,7 +121,8 @@ internal class DefaultBillingRepository @Inject constructor(
         offerId: String?,
     ) {
         sourceCache.set(source)
-        billingGateway.launchPurchaseFlow(activity, productId, offerId)
+        val currentAccountType = accountRepository.getAccountType()
+        billingGateway.launchPurchaseFlow(activity, productId, offerId, currentAccountType)
     }
 
     override suspend fun getCurrentPaymentMethod(): PaymentMethod? {

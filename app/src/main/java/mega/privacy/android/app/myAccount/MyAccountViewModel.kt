@@ -60,6 +60,7 @@ import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -1370,9 +1371,8 @@ class MyAccountViewModel @Inject constructor(
     private fun isProSubscriptionCheck(subscriptionDetails: AccountLevelDetail?): Boolean {
         val subscriptionList = subscriptionDetails?.accountSubscriptionDetailList ?: return false
         val planDetail = subscriptionDetails.accountPlanDetail
-        return subscriptionList.size == 1
+        return subscriptionList.any { it.paymentMethodType == PaymentMethodType.GOOGLE_WALLET }
                 && planDetail?.accountType?.isPaid == true
-                && planDetail.accountType == subscriptionList.first().subscriptionLevel
     }
 
     /**

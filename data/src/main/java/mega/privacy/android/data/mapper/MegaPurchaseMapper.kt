@@ -16,5 +16,6 @@ internal fun toMegaPurchase(purchase: Purchase) = MegaPurchase(
         else -> MegaPurchaseState.Unspecified
     },
     token = purchase.purchaseToken,
-    time = purchase.purchaseTime
+    time = purchase.purchaseTime,
+    isAutoRenewing = purchase.isAutoRenewing
 )

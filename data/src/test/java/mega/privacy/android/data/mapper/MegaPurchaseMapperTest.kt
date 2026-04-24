@@ -14,16 +14,19 @@ internal class MegaPurchaseMapperTest {
         val expectedRecipe = "expectedRecipe"
         val expectedState = 1
         val expectedToken = "expectedToken"
+        val expectedAutoRenewing = true
         val purchase = mock<Purchase> {
             on { products }.thenReturn(listOf(expectedSku))
             on { originalJson }.thenReturn(expectedRecipe)
             on { purchaseState }.thenReturn(expectedState)
             on { purchaseToken }.thenReturn(expectedToken)
+            on { isAutoRenewing }.thenReturn(expectedAutoRenewing)
         }
         val megaPurchase = underTest(purchase)
         assertEquals(megaPurchase.sku, expectedSku)
         assertEquals(megaPurchase.receipt, expectedRecipe)
         assertEquals(megaPurchase.state, expectedState)
         assertEquals(megaPurchase.token, expectedToken)
+        assertEquals(megaPurchase.isAutoRenewing, expectedAutoRenewing)
     }
 }

@@ -639,7 +639,7 @@ internal class MyAccountViewModelTest {
         Arguments.of(
             AccountType.PRO_III,
             accountDetailsOneOffPlan(AccountType.PRO_III),
-            true
+            false
         ),
         Arguments.of(
             AccountType.PRO_LITE,
@@ -839,13 +839,15 @@ internal class MyAccountViewModelTest {
         isFreeTrial = false,
     )
 
-    private fun expectedAccountSubscriptionDetail(accountType: AccountType) =
-        AccountSubscriptionDetail(
+    private fun expectedAccountSubscriptionDetail(
+        accountType: AccountType,
+        paymentMethodType: PaymentMethodType = PaymentMethodType.GOOGLE_WALLET,
+    ) = AccountSubscriptionDetail(
             subscriptionId = expectedSubscriptionId,
             subscriptionStatus = SubscriptionStatus.VALID,
             subscriptionCycle = AccountSubscriptionCycle.MONTHLY,
             subscriptionLevel = accountType,
-            paymentMethodType = PaymentMethodType.STRIPE2,
+            paymentMethodType = paymentMethodType,
             renewalTime = expectedSubscriptionRenewTime,
             featuresList = listOf("vpn", "pwm"),
             isFreeTrial = false,
@@ -907,7 +909,9 @@ internal class MyAccountViewModelTest {
             accountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
             proExpirationTime = expectedProExpirationTime,
             accountPlanDetail = expectedAccountPlanDetailOneOff,
-            accountSubscriptionDetailList = listOf(expectedAccountSubscriptionDetail(accountType))
+            accountSubscriptionDetailList = listOf(
+                expectedAccountSubscriptionDetail(accountType, PaymentMethodType.STRIPE2)
+            )
         )
     )
 
