@@ -135,14 +135,7 @@ private fun MyAccountWidgetShimmerView() {
             )
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Chevron shimmer
-        Spacer(
-            modifier = Modifier
-                .size(16.dp)
-                .shimmerEffect(RoundedCornerShape(4.dp))
-        )
+        Spacer(modifier = Modifier.width(24.dp))
     }
 }
 
