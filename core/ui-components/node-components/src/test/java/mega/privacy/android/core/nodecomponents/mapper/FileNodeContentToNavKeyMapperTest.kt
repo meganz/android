@@ -110,7 +110,7 @@ class FileNodeContentToNavKeyMapperTest {
             shouldStopHttpServer = shouldStopServer,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             mimeType = "application/pdf",
-            title = null,
+            title = "remote.pdf",
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -144,7 +144,7 @@ class FileNodeContentToNavKeyMapperTest {
             shouldStopHttpServer = false,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             mimeType = "application/pdf",
-            title = null,
+            title = "local.pdf",
         )
         assertThat(result).isEqualTo(expected)
     }
@@ -178,7 +178,7 @@ class FileNodeContentToNavKeyMapperTest {
             shouldStopHttpServer = false,
             nodeSourceType = NodeSourceType.FOLDER_LINK,
             mimeType = "application/pdf",
-            title = null,
+            title = "folder-link.pdf",
         )
         assertThat(result).isEqualTo(expected)
     }

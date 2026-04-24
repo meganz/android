@@ -4,17 +4,18 @@ import android.content.Intent
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.app.deeplinks.ExternalPdfDeepLinkHandler
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.entity.ConnectivityState
 import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
 import mega.privacy.mobile.analytics.event.ShortcutActionChatButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ShortcutActionScanDocumentButtonPressedEvent
@@ -27,14 +28,29 @@ class MegaActivityIntentActionHandler @Inject constructor(
     private val navigationResultManager: NavigationResultManager,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val getCurrentConnectivityStateUseCase: GetCurrentConnectivityStateUseCase,
+    private val externalPdfDeepLinkHandler: ExternalPdfDeepLinkHandler,
 ) {
 
     suspend fun handleAction(
         intent: Intent,
         refreshSession: suspend (RefreshEvent) -> Unit,
         getShareUris: () -> List<UriPath>?,
+        launchLegacyPdfViewer: () -> Unit = {},
+        navigateToComposePdfViewer: (PdfViewerNavKey) -> Unit = {},
     ) {
         when (intent.action) {
+            Intent.ACTION_VIEW -> {
+                if (externalPdfDeepLinkHandler.consumeExternalActionViewPdfIfApplicable(
+                        intent = intent,
+                        launchLegacyPdfViewer = launchLegacyPdfViewer,
+                        navigateToComposePdfViewer = navigateToComposePdfViewer,
+                    )
+                ) {
+                    intent.action = null
+                    intent.data = null
+                }
+            }
+
             Constants.ACTION_REFRESH -> {
                 refreshSession(RefreshEvent.ManualRefresh)
                 intent.action = null

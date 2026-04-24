@@ -1,6 +1,11 @@
 package mega.privacy.android.feature.pdfviewer.presentation
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -12,6 +17,12 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
 
 /**
  * Extension function to register the PDF viewer screen in the navigation graph.
@@ -28,6 +39,18 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<PdfViewerNavKey> { navKey ->
+        val context = LocalContext.current
+        val pdfViewerOnBack: () -> Unit = remember(navKey.isExternalFile, onBack, context) {
+            {
+                val activity = context.findActivity()
+                if (navKey.isExternalFile && activity != null) {
+                    activity.finish()
+                } else {
+                    onBack()
+                }
+            }
+        }
+
         val viewModel = hiltViewModel<PdfViewerViewModel, PdfViewerViewModel.Factory>(
             creationCallback = { factory ->
                 factory.create(
@@ -63,12 +86,12 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
         EventEffect(
             event = uiState.dismissEvent,
             onConsumed = viewModel::resetDismissEvent,
-            action = onBack,
+            action = pdfViewerOnBack,
         )
 
         PdfViewerScreen(
             uiState = uiState,
-            onBack = onBack,
+            onBack = pdfViewerOnBack,
             onMoreClicked = { onOpenNodeOptions(uiState.nodeHandle, uiState.nodeSourceType) },
             onPageChanged = viewModel::onPageChanged,
             onLoadComplete = viewModel::onLoadComplete,
@@ -76,15 +99,15 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             onSubmitPassword = viewModel::submitPassword,
             onDismissPasswordDialog = {
                 viewModel.clearError()
-                onBack()
+                pdfViewerOnBack()
             },
             onDismissErrorDialog = {
                 viewModel.clearError()
-                onBack()
+                pdfViewerOnBack()
             },
             onPasswordInputChanged = viewModel::onPasswordDialogInputChanged,
             onRetry = viewModel::retryLoad,
-            onUploadToCloudDrive = onBack,
+            onUploadToCloudDrive = pdfViewerOnBack,
             onActivateSearch = viewModel::activateSearch,
             onDeactivateSearch = viewModel::deactivateSearch,
             onSearchQueryChanged = viewModel::onSearchQueryChanged,

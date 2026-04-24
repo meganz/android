@@ -71,7 +71,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                     shouldStopHttpServer = shouldStop,
                     nodeSourceType = nodeSourceData.nodeSourceType,
                     mimeType = fileNode.type.mimeType,
-                    title = null,
+                    title = fileNode.name,
                 )
             }
 

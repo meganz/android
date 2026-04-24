@@ -55,6 +55,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityPdfviewerBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.extensions.isHttpScheme
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
@@ -291,7 +292,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             } else {
                 Timber.w("msgId or chatId null")
             }
-            if (uri.toString().contains("http://")) {
+            if (uri?.isHttpScheme() == true) {
                 when {
                     credentials != null -> megaApi
                     isFolderLink -> megaApiFolder
@@ -344,7 +345,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         loading = true
         setupView()
 
-        if (uri.toString().contains("http://")) {
+        if (uri?.isHttpScheme() == true) {
             isUrl = true
             loadStreamPDF()
         } else {
