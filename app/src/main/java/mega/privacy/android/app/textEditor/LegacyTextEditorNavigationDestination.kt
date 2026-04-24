@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import java.io.File
@@ -242,12 +243,6 @@ private fun TextEditorEntry(
     transferHandler: TransferHandler,
 ) {
     val context = LocalContext.current
-    val chatId = navKey.chatId
-    val removeDestination: () -> Unit = {
-        navigationHandler.back()
-        chatId?.let { navigationHandler.navigate(ChatNavKey(chatId = it)) }
-    }
-    val legacyIntent = buildTextEditorIntent(context, navKey)
 
     if (navKey.chatId == null && navKey.localPath == null) {
         LaunchedEffect(Unit) {
@@ -263,7 +258,7 @@ private fun TextEditorEntry(
                     }
                     if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
                         navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
-                        removeDestination()
+                        navigationHandler.back()
                     }
                 }
         }
@@ -273,15 +268,15 @@ private fun TextEditorEntry(
         feature = ApiFeatures.TextEditorCompose,
         disabled = {
             LaunchedEffect(Unit) {
-                context.startActivity(legacyIntent)
-                removeDestination()
+                context.startActivity(buildTextEditorIntent(context, navKey))
+                navigationHandler.back()
             }
         },
         enabled = {
             TextEditorComposeContent(
                 navKey = navKey,
                 navigationHandler = navigationHandler,
-                removeDestination = removeDestination,
+                removeDestination = navigationHandler::back,
                 transferHandler = transferHandler,
                 viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
             )

@@ -346,12 +346,10 @@ class MegaNavigatorImplTest {
             )
 
             verify(navigationQueue).emit(
-                argThat<List<NavKey>> { navKeys ->
-                    navKeys.size == 1 &&
-                            navKeys[0] is LegacyTextEditorNavKey &&
-                            (navKeys[0] as LegacyTextEditorNavKey).let {
-                                it.chatId == 123L && it.messageId == 456L
-                            }
+                argThat<NavKey> { navKey ->
+                    navKey is LegacyTextEditorNavKey &&
+                            navKey.chatId == 123L &&
+                            navKey.messageId == 456L
                 },
                 eq(NavPriority.Default),
                 isNull(),
@@ -359,15 +357,20 @@ class MegaNavigatorImplTest {
         }
 
     @Test
-    fun `test that openTextEditor Chat starts legacy activity when SingleActivity is disabled`() =
+    fun `test that openTextEditor Chat starts activity when not in single activity`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
 
             underTest.openTextEditor(
                 context = context,
                 params = OpenTextEditorParams.Chat(chatId = 123L, messageId = 456L),
             )
 
+            verify(navigationQueue, never()).emit(
+                any<NavKey>(),
+                any(),
+                any(),
+            )
             verify(context).startActivity(any())
         }
 
