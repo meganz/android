@@ -1,5 +1,6 @@
 package mega.privacy.android.navigation.destination
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 
@@ -10,3 +11,9 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
  */
 @Serializable
 data class CannotVerifyContactDialogNavKey(val email: String) : DialogNavKey
+
+/**
+ * Add contacts nav key
+ */
+@Serializable
+data object AddContactsNavKey : NavKey
