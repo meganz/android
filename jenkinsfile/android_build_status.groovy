@@ -545,7 +545,7 @@ def generateLintSummary(List<String> moduleList) {
             "--target-file ${aggregatedJson}"
 
     String aggregatedJsonText = readFile(aggregatedJson)
-    def rawModules = new groovy.json.JsonSlurper().parseText(aggregatedJsonText).modules
+    def rawModules = new groovy.json.JsonSlurperClassic().parseText(aggregatedJsonText).modules
     int totalFatal = 0
     for (int i = 0; i < moduleList.size(); i++) {
         String module = moduleList[i]
