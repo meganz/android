@@ -9,9 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
-import androidx.navigation3.runtime.NavKey
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -22,7 +22,6 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
@@ -36,6 +35,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -48,6 +48,8 @@ import mega.privacy.android.app.utils.Constants.ACTION_OPEN_SYNC_MEGA_FOLDER
 import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
@@ -58,8 +60,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
-import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
-import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -76,11 +76,11 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.CancelAccountPlanActivity
@@ -380,7 +380,11 @@ internal class MegaNavigatorImpl @Inject constructor(
         runCatching { getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerRevamp) }
             .getOrDefault(false)
 
-    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo, useRevamp: Boolean = false) = when {
+    private fun getIntent(
+        context: Context,
+        fileTypeInfo: FileTypeInfo,
+        useRevamp: Boolean = false,
+    ) = when {
         fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
             if (useRevamp) Intent(context, VideoPlayerActivity::class.java)
             else Intent(context, LegacyVideoPlayerActivity::class.java)
@@ -696,6 +700,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                     )
                 ),
             )
+
             is OpenTextEditorParams.LocalFile -> navigateForSingleActivity(
                 context = context,
                 singleActivityDestination = LegacyTextEditorNavKey(
@@ -704,13 +709,28 @@ internal class MegaNavigatorImpl @Inject constructor(
                     nodeSourceType = params.nodeSourceType,
                 ),
             )
-            is OpenTextEditorParams.Chat -> navigateForSingleActivity(
-                context = context,
+
+            is OpenTextEditorParams.Chat -> navigateIfInSingleActivity(
                 singleActivityDestination = LegacyTextEditorNavKey(
                     chatId = params.chatId,
                     messageId = params.messageId,
                 ),
+                legacyNavigation = {
+                    withContext(mainDispatcher) {
+                        context.startActivity(
+                            Intent(context, TextEditorActivity::class.java).apply {
+                                putExtra(
+                                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                                    Constants.FROM_CHAT
+                                )
+                                putExtra(ChatNavKey.LEGACY_MESSAGE_ID, params.messageId)
+                                putExtra(ChatNavKey.LEGACY_CHAT_ID, params.chatId)
+                            }
+                        )
+                    }
+                },
             )
+
             is OpenTextEditorParams.FileLink -> {
                 val intent = Intent(context, TextEditorActivity::class.java).apply {
                     putExtra(EXTRA_SERIALIZE_STRING, params.serializedNode)

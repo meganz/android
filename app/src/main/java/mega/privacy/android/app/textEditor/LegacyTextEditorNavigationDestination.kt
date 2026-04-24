@@ -5,10 +5,10 @@ import android.content.Intent
 import androidx.core.content.FileProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.utils.Constants
@@ -234,24 +234,19 @@ private fun TextEditorEntry(
     transferHandler: TransferHandler,
 ) {
     val context = LocalContext.current
-    val chatId = navKey.chatId
-    val removeDestination: () -> Unit = {
-        navigationHandler.back()
-        chatId?.let { navigationHandler.navigate(ChatNavKey(chatId = it)) }
-    }
     FeatureFlagGate(
         feature = ApiFeatures.TextEditorCompose,
         disabled = {
             LaunchedEffect(Unit) {
                 context.startActivity(buildTextEditorIntent(context, navKey))
-                removeDestination()
+                navigationHandler.back()
             }
         },
         enabled = {
             TextEditorComposeContent(
                 navKey = navKey,
                 navigationHandler = navigationHandler,
-                removeDestination = removeDestination,
+                removeDestination = navigationHandler::back,
                 transferHandler = transferHandler,
                 viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
             )
