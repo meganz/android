@@ -2186,53 +2186,53 @@
     <string name="rewarded_ad_unavailable_toast">Iklan tidak tersedia! Melanjutkan&#8230;</string>
     <string name="general_read_only_folder_warning">Folder ini hanya bisa dibaca</string>
     <string name="sync_error_folder_conflict">“%1$s” %2$s sudah menjadi bagian dari %3$s pada %4$s. Pilih yang lain.</string>
-    <string name="sync_label_cloud_folder">Folder cloud</string>
-    <string name="sync_label_device_folder">Folder perangkat</string>
-    <string name="sync_label_a_sync_or_backup">Sinkronisasi atau cadangan</string>
-    <string name="sync_label_this_device">Perangkat ini</string>
+    <string name="sync_label_cloud_folder">folder cloud</string>
+    <string name="sync_label_device_folder">folder perangkat</string>
+    <string name="sync_label_a_sync_or_backup">sinkronisasi atau cadangan</string>
+    <string name="sync_label_this_device">perangkat ini</string>
     <string name="sync_label_camera_uploads">Unggahan kamera</string>
     <string name="sync_label_media_uploads">Unggahan media</string>
     <string name="general_error_file_not_found">Berkas ini tidak dapat ditemukan</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Kesalahan. Berkas PDF rusak atau tidak ada.</string>
-    <string name="pdf_viewer_error_streaming">Terjadi kesalahan saat mencoba membuka berkas.</string>
-    <string name="homepage_empty_hint_audio">[B]Tidak[/B] [A]audio[/A] [B]ditemukan[/B]</string>
+    <string name="pdf_viewer_error_streaming">Terjadi kesalahan saat mencoba membuka berkas</string>
+    <string name="homepage_empty_hint_audio">[B]Tidak ada[/B] [A]audio[/A] [B]ditemukan[/B]</string>
     <string name="cloud_explorer_select_destination_title">Pilih tujuan</string>
     <string name="cloud_explorer_use_this_folder_button">Gunakan folder ini</string>
     <plurals name="rubbish_remove_items_snackbar_fail">
-        <item quantity="other">%d item-item gagal dihapus dari sampah</item>
+        <item quantity="other">%d item gagal dihapus dari sampah</item>
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_concat_success">
-        <item quantity="other">%d item-item berhasil dihapus dari sampah</item>
+        <item quantity="other">%d item berhasil dihapus dari sampah</item>
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_concat_fail">
-        <item quantity="other">%d item-item gagal dihapus dari sampah</item>
+        <item quantity="other">%d item gagal dihapus dari sampah</item>
     </plurals>
     <plurals name="copy_node_general_snackbar_fail">
-        <item quantity="other">%d item-item gagal disalin</item>
+        <item quantity="other">%d item gagal disalin</item>
     </plurals>
     <plurals name="copy_node_general_snackbar_success">
-        <item quantity="other">%d item-item berhasil disalin</item>
+        <item quantity="other">%d item berhasil disalin</item>
     </plurals>
     <plurals name="copy_node_snackbar_concat_success">
-        <item quantity="other">%d item-item berhasil disalin</item>
+        <item quantity="other">%d item berhasil disalin</item>
     </plurals>
     <plurals name="copy_node_snackbar_concat_fail">
-        <item quantity="other">%d item-item gagal disalin</item>
+        <item quantity="other">%d item gagal disalin</item>
     </plurals>
     <plurals name="cloud_drive_sharing_folder_snackbar_failed">
-        <item quantity="other">%d folder-folder gagal dibagikan</item>
+        <item quantity="other">%d folder gagal dibagikan</item>
     </plurals>
     <plurals name="cloud_drive_sharing_folder_snackbar_success">
-        <item quantity="other">%d folder-folder berhasil dibagikan</item>
+        <item quantity="other">%d folder berhasil dibagikan</item>
     </plurals>
     <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
-        <item quantity="other">%d folder-folder gagal dibagikan</item>
+        <item quantity="other">%d folder gagal dibagikan</item>
     </plurals>
     <plurals name="count_items_failed_restore_from_rubbish">
-        <item quantity="other">%d item-item gagal dipulihkan dari sampah</item>
+        <item quantity="other">%d item gagal dipulihkan dari sampah</item>
     </plurals>
     <plurals name="count_items_restored_from_rubbish">
-        <item quantity="other">%d item-item dipulihkan dari sampah</item>
+        <item quantity="other">%d item dipulihkan dari sampah</item>
     </plurals>
     <string name="general_skip">Lewati</string>
     <string name="unlock_pin_title">Masukkan passcode anda</string>
@@ -2246,4 +2246,18 @@
     <string name="action_use_passcode">Gunakan kode sandi</string>
     <string name="settings_passcode_enter_password_title">Masukkan password anda</string>
     <string name="unlock_pin_title_2">Masukkan ulang passcode anda</string>
+    <string name="home_widget_continue_where_left_off">Lanjutkan dari tempat Anda terakhir</string>
+    <string name="settings_transfer_connections_title">Pindahkan koneksi</string>
+    <string name="settings_transfer_connections_text">Menentukan jumlah koneksi paralel per transfer file. Nilai yang lebih tinggi dapat meningkatkan kecepatan tetapi meningkatkan penggunaan baterai dan data.</string>
+    <string name="settings_transfer_download_connections">Unduh koneksi</string>
+    <string name="settings_transfer_upload_connections">Unggah koneksi</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Cocok untuk jaringan lambat)</string>
+    <string name="settings_transfer_connections_default">%1$d (Default)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Penggunaan baterai dan data yang lebih tinggi)</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Tambahkan subtitle dari Cloud drive</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Unduhan tanpa-iklan</string>
+    <string name="setting_biometric_id">Biometric ID</string>
+    <string name="title_enable_biometrics">Konfirmasikan informasi biometrik anda untuk membuka</string>
+    <string name="confirmation_biometric_enabled">Informasi biometrik anda telah dikonfirmasi</string>
+    <string name="title_unlock_biometric">Buka kunci menggunakan informasi biometrik anda</string>
 </resources>

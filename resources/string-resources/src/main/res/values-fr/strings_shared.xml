@@ -2429,7 +2429,7 @@
     <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass et MEGA VPN inclus</string>
     <string name="rewarded_ad_unavailable_toast">La publicité est indisponible ! Poursuite en cours&#8230;</string>
     <string name="general_read_only_folder_warning">Ce dossier est en lecture seule</string>
-    <string name="sync_error_folder_conflict">Le %2$s «&#160;%1$s&#160;» fait déjà partie %3$s sur %4$s. Choisissez-en un autre.</string>
+    <string name="sync_error_folder_conflict">Le %2$s « %1$s » fait déjà partie %3$s sur %4$s. Choisissez-en un autre.</string>
     <string name="sync_label_cloud_folder">dossier cloud</string>
     <string name="sync_label_device_folder">dossier de l\’appareil</string>
     <string name="sync_label_a_sync_or_backup">d\’une synchronisation ou d\’une sauvegarde</string>
@@ -2453,4 +2453,23 @@
     <string name="action_use_passcode">Utiliser le code d’accès</string>
     <string name="settings_passcode_enter_password_title">Saisissez votre mot de passe</string>
     <string name="unlock_pin_title_2">Saisissez votre code d’accès de nouveau</string>
+    <string name="settings_transfer_connections_title">Connexions par transfert</string>
+    <string name="settings_transfer_connections_text">Définit le nombre de connexions parallèles par transfert de fichier. Des valeurs plus élevées peuvent accélérer le transfert, mais augmenter la consommation de batterie et la consommation de données.</string>
+    <string name="settings_transfer_download_connections">Connexions par téléchargement</string>
+    <string name="settings_transfer_upload_connections">Connexions par téléversement</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Idéal pour les réseaux lents)</string>
+    <string name="settings_transfer_connections_default">%1$d (Par défaut)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Haute consommation de batterie et de données)</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Ajouter des sous-titres depuis le disque Cloud</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Téléchargements sans pubs</string>
+    <string name="setting_biometric_id">Identifiant biométrique</string>
+    <string name="title_enable_biometrics">Confirmez vos informations biométriques pour déverrouiller</string>
+    <string name="confirmation_biometric_enabled">Vos informations biométriques sont confirmées</string>
+    <string name="title_unlock_biometric">Déverrouillez avec vos informations biométriques</string>
+    <string name="public_link_auth_alert_title_folder">Enregistrez ce dossier dans votre compte MEGA</string>
+    <string name="public_link_auth_alert_title_link">Enregistrez ce lien dans votre compte MEGA</string>
+    <string name="public_link_auth_alert_title_album">Enregistrez cet album dans votre compte MEGA</string>
+    <string name="public_link_auth_alert_description_default">Accédez-y à tout moment, depuis n\’importe quel appareil.\nPlus besoin de garder le lien ni de télécharger les fichiers à nouveau.</string>
+    <string name="public_link_auth_alert_description_album">Conservez ces photos en sécurité et accédez-y à tout moment</string>
+    <string name="public_link_auth_alert_title_file">Enregistrez ce fichier dans votre compte MEGA</string>
 </resources>

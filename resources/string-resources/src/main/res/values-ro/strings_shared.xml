@@ -2452,4 +2452,24 @@
         <item quantity="few">%1$d încercări eșuate pentru codul de acces</item>
         <item quantity="other">%1$d de încercări eșuate pentru codul de acces</item>
     </plurals>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Adaugă subtitrare din Cloud</string>
+    <string name="home_widget_continue_where_left_off">Continuă de unde ai rămas</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Descărcări fără reclame</string>
+    <string name="setting_biometric_id">Identificare biometrică</string>
+    <string name="title_enable_biometrics">Confirmă informațiile tale biometrice pentru a debloca</string>
+    <string name="confirmation_biometric_enabled">Informațiile tale biometrice au fost confirmate</string>
+    <string name="title_unlock_biometric">Deblochează folosind informațiile tale biometrice</string>
+    <string name="settings_transfer_connections_title">Conexiuni de transfer</string>
+    <string name="settings_transfer_connections_text">Definește numărul de conexiuni paralele pentru transferul de fișiere. Valorile mai mari pot accelera transferul, dar cresc consumul de baterie și utilizarea datelor.</string>
+    <string name="settings_transfer_download_connections">Conexiuni de descărcare</string>
+    <string name="settings_transfer_upload_connections">Conexiuni de încărcare</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Cel mai bun pentru rețele lente)</string>
+    <string name="settings_transfer_connections_default">%1$d (Implicit)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Consum mai mare de baterie și date)</string>
+    <string name="public_link_auth_alert_title_folder">Salvează acest folder în contul tău MEGA</string>
+    <string name="public_link_auth_alert_title_link">Salvează acest link în contul tău MEGA</string>
+    <string name="public_link_auth_alert_title_album">Salvează acest album în contul tău MEGA</string>
+    <string name="public_link_auth_alert_description_default">Accesează-l de oriunde, de pe orice dispozitiv.\nNu este nevoie să păstrezi link-ul sau să descarci din nou fișierele.</string>
+    <string name="public_link_auth_alert_description_album">Păstrează aceste fotografii în siguranță și accesează-le oricând</string>
+    <string name="public_link_auth_alert_title_file">Salvează acest fișier în contul tău MEGA</string>
 </resources>
