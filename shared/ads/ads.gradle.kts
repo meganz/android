@@ -38,11 +38,10 @@ android {
         }
         release {
             buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-2135147798858967/9835644604\"")
-            // TODO will be updated with real ad unit id
             buildConfigField(
                 "String",
                 "REWARDED_AD_UNIT_ID",
-                "\"ca-app-pub-3940256099942544/5224354917\""
+                "\"ca-app-pub-2135147798858967/1942333326\""
             )
         }
     }

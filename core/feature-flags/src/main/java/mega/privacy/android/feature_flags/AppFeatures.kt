@@ -41,7 +41,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     FolderLinkRevamp(
         "Enable folder link revamp screen",
-        false,
+        true,
     ),
 
     /**
