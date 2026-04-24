@@ -2301,4 +2301,10 @@
     <string name="title_enable_biometrics">ロック解除に使用する生体情報を認証</string>
     <string name="confirmation_biometric_enabled">生体認証が有効になりました</string>
     <string name="title_unlock_biometric">生体認証でロック解除</string>
+    <string name="public_link_auth_alert_title_folder">このフォルダをMEGAアカウントに保存</string>
+    <string name="public_link_auth_alert_title_link">このリンクをMEGAアカウントに保存</string>
+    <string name="public_link_auth_alert_title_album">このアルバムをMEGAアカウントに保存</string>
+    <string name="public_link_auth_alert_description_default">いつでも、どのデバイスからでもアクセスできます。\nリンクを保管したり、ファイルを再ダウンロードしたりする必要はありません。</string>
+    <string name="public_link_auth_alert_description_album">これらの写真を安全に保管し、いつでもアクセス可能に</string>
+    <string name="public_link_auth_alert_title_file">このファイルをMEGAアカウントに保存</string>
 </resources>

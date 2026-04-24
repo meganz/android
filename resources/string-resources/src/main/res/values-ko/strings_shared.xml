@@ -2280,10 +2280,14 @@
     <string name="settings_passcode_enter_password_title">암호를 입력하세요</string>
     <string name="unlock_pin_title">암호 입력</string>
     <string name="unlock_pin_title_2">암호 재입력</string>
-    <string name="pin_lock_alert">당신은 로그아웃 되고 오프라인 파일은 10번의 실패 후에 삭제됩니다</string>
+    <string name="pin_lock_alert">10번 실패한 후 로그아웃 되고 오프라인 파일은 삭제됩니다</string>
     <string name="action_logout">로그아웃</string>
     <string name="settings_passcode_forgot_passcode_button">암호를 잊었나요?</string>
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="other">암호 %1$d회 틀림</item>
     </plurals>
+    <string name="setting_biometric_id">생체 ID</string>
+    <string name="title_enable_biometrics">잠금 해제하려면 생체 정보를 인증하세요</string>
+    <string name="confirmation_biometric_enabled">생체 정보가 인증되었습니다</string>
+    <string name="title_unlock_biometric">생체 정보를 이용하여 잠금 해제하세요</string>
 </resources>

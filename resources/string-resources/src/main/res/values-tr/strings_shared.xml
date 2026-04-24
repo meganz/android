@@ -2386,4 +2386,8 @@
         <item quantity="one">%1$d başarısız giriş kodu denemesi</item>
         <item quantity="other">%1$d başarısız giriş kodu denemesi</item>
     </plurals>
+    <string name="setting_biometric_id">Biyometrik kimlik</string>
+    <string name="title_enable_biometrics">Kilidi açmak için biyometrik bilgilerinizi onaylayın</string>
+    <string name="confirmation_biometric_enabled">Biyometrik bilgileriniz onaylandı</string>
+    <string name="title_unlock_biometric">Biyometrik bilgilerinizle kilidi açın</string>
 </resources>

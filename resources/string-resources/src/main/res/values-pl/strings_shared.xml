@@ -2562,4 +2562,10 @@
     <string name="title_enable_biometrics">Potwierdź swoje dane biometryczne, aby odblokować</string>
     <string name="confirmation_biometric_enabled">Twoje dane biometryczne zostały potwierdzone</string>
     <string name="title_unlock_biometric">Odblokuj za pomocą swoich danych biometrycznych</string>
+    <string name="public_link_auth_alert_title_folder">Zapisz ten folder na swoje konto MEGA</string>
+    <string name="public_link_auth_alert_title_link">Zapisz ten link na swoim koncie MEGA</string>
+    <string name="public_link_auth_alert_title_album">Zapisz ten album na swoje konto MEGA</string>
+    <string name="public_link_auth_alert_description_default">Dostęp do niego w dowolnym momencie z dowolnego urządzenia.\nNie ma potrzeby przechowywania linku ani ponownego pobierania plików.</string>
+    <string name="public_link_auth_alert_description_album">Zabezpiecz te zdjęcia i uzyskaj do nich dostęp w każdej chwili</string>
+    <string name="public_link_auth_alert_title_file">Zapisz ten plik na swoje konto MEGA</string>
 </resources>

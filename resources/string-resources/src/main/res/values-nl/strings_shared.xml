@@ -2382,4 +2382,15 @@
         <item quantity="one">%1$d mislukte poging tot toegangscode</item>
         <item quantity="other">%1$d mislukte toegangscode pogingen</item>
     </plurals>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Reclame-vrije downloads</string>
+    <string name="setting_biometric_id">Biometrische ID</string>
+    <string name="title_enable_biometrics">Bevestig uw biometrische informtie om te ontgrendelen</string>
+    <string name="confirmation_biometric_enabled">Uw biometrische informatie is bevestigd</string>
+    <string name="title_unlock_biometric">Ontgrendel met uw biometrische informatie</string>
+    <string name="public_link_auth_alert_title_folder">Deze map opslaan naar uw MEGA account</string>
+    <string name="public_link_auth_alert_title_link">Deze link opslaan naar uw MEGA account</string>
+    <string name="public_link_auth_alert_title_album">Deze map opslaan naar uw MEGA account</string>
+    <string name="public_link_auth_alert_description_default">U heeft er altijd en overal toegang toe, vanaf elk apparaat. U hoeft de link niet te bewaren of bestanden opnieuw te downloaden.</string>
+    <string name="public_link_auth_alert_description_album">Bewaar deze foto\’s veilig en bekijk ze op elk gewenst moment</string>
+    <string name="public_link_auth_alert_title_file">Bewaar dit bestand in uw MEGA account</string>
 </resources>
