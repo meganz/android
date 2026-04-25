@@ -2766,4 +2766,6 @@
     <string name="public_link_auth_alert_description_album">Keep these photos safe and access them anytime</string>
     <!-- Title of the auth alert bottom sheet shown to guest users when opening a public file link, prompting them to sign up or log in to save the file -->
     <string name="public_link_auth_alert_title_file">Save this file to your MEGA account</string>
+    <!-- Empty state message for continue where you left off list screen -->
+    <string name="home_cwlo_empty_state">Items you left unfinished will appear here</string>
 </resources>

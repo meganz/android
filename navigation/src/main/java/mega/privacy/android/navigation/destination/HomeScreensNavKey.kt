@@ -17,6 +17,9 @@ data object WhatsNewNavKey : DialogNavKey
 data object RecentsScreenNavKey : NavKey
 
 @Serializable
+data object ContinueWhereLeftOffScreenNavKey : NavKey
+
+@Serializable
 data class RecentsBucketScreenNavKey(
     val identifier: String,
     val isMediaBucket: Boolean,

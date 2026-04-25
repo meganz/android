@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.continuewhereleftoff
+package mega.privacy.mobile.home.presentation.continuewhereleftoff
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,18 +20,20 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-internal class ContinueWhereLeftOffViewModel @Inject constructor(
+internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     monitorContinueWhereLeftOffItemsUseCase: MonitorContinueWhereLeftOffItemsUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ContinueWhereLeftOffUiState())
-    val uiState: StateFlow<ContinueWhereLeftOffUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ContinueWhereLeftOffListUiState())
+    val uiState: StateFlow<ContinueWhereLeftOffListUiState> = _uiState.asStateFlow()
 
     init {
-        monitorContinueWhereLeftOffItemsUseCase(limit = MAX_CAROUSEL_ITEMS)
+        monitorContinueWhereLeftOffItemsUseCase(limit = MAX_LIST_ITEMS)
             .onEach { items ->
-                _uiState.update { it.copy(items = items) }
+                _uiState.update {
+                    it.copy(items = items, isLoading = false)
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -53,6 +55,6 @@ internal class ContinueWhereLeftOffViewModel @Inject constructor(
     }
 
     companion object {
-        private const val MAX_CAROUSEL_ITEMS = 10
+        private const val MAX_LIST_ITEMS = 50
     }
 }

@@ -38,17 +38,19 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.home.presentation.continuewhereleftoff.iconForType
 
 @Composable
 internal fun ContinueWhereLeftOffCarousel(
     items: List<ContinueWhereLeftOffItem>,
     onItemClick: (ContinueWhereLeftOffItem) -> Unit,
+    onViewAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (items.isEmpty()) return
 
     Column(modifier = modifier) {
-        ContinueWhereLeftOffHeader()
+        ContinueWhereLeftOffHeader(onViewAllClick = onViewAllClick)
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 16.dp),
@@ -66,6 +68,7 @@ internal fun ContinueWhereLeftOffCarousel(
 
 @Composable
 private fun ContinueWhereLeftOffHeader(
+    onViewAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -84,7 +87,8 @@ private fun ContinueWhereLeftOffHeader(
             modifier = Modifier
                 .size(24.dp)
                 .wrapContentSize(unbounded = true, align = Alignment.Center)
-                .size(48.dp),
+                .size(48.dp)
+                .clickable { onViewAllClick() },
             contentAlignment = Alignment.Center,
         ) {
             MegaIcon(
@@ -117,16 +121,7 @@ private fun ContinueWhereLeftOffCard(
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                painter = painterResource(
-                    id = when (item.type) {
-                        RecentlyUsedType.Video -> IconPackR.drawable.ic_video_medium_solid
-                        RecentlyUsedType.Audio -> IconPackR.drawable.ic_audio_medium_solid
-                        RecentlyUsedType.PDF -> IconPackR.drawable.ic_pdf_medium_solid
-                        RecentlyUsedType.TextEditor -> IconPackR.drawable.ic_text_medium_solid
-                        RecentlyUsedType.FileLink -> IconPackR.drawable.ic_link_01_medium_regular_solid
-                        RecentlyUsedType.FolderLink -> IconPackR.drawable.ic_folder_medium_solid
-                    }
-                ),
+                painter = painterResource(id = iconForType(item.type)),
                 contentDescription = item.title,
                 modifier = Modifier.size(48.dp),
             )
@@ -186,6 +181,7 @@ private fun ContinueWhereLeftOffCarouselPreview() {
                 ),
             ),
             onItemClick = {},
+            onViewAllClick = {},
         )
     }
 }

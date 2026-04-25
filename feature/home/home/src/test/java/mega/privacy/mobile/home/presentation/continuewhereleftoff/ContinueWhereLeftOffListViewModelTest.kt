@@ -1,4 +1,4 @@
-package mega.privacy.mobile.home.presentation.home.widget.continuewhereleftoff
+package mega.privacy.mobile.home.presentation.continuewhereleftoff
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -23,7 +23,7 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ContinueWhereLeftOffViewModelTest {
+class ContinueWhereLeftOffListViewModelTest {
 
     companion object {
         @JvmField
@@ -36,15 +36,30 @@ class ContinueWhereLeftOffViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val fakeFlow = MutableSharedFlow<List<ContinueWhereLeftOffItem>>()
 
-    private lateinit var underTest: ContinueWhereLeftOffViewModel
+    private lateinit var underTest: ContinueWhereLeftOffListViewModel
 
     @BeforeEach
     fun setUp() {
-        whenever(monitorContinueWhereLeftOffItemsUseCase(10)).thenReturn(fakeFlow)
-        underTest = ContinueWhereLeftOffViewModel(
+        whenever(monitorContinueWhereLeftOffItemsUseCase(50)).thenReturn(fakeFlow)
+        underTest = ContinueWhereLeftOffListViewModel(
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
         )
+    }
+
+    @Test
+    fun `test that isLoading is initially true`() = runTest {
+        underTest.uiState.test {
+            assertThat(awaitItem().isLoading).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isLoading becomes false after first emission`() = runTest {
+        assertThat(underTest.uiState.value.isLoading).isTrue()
+        fakeFlow.emit(emptyList())
+        assertThat(underTest.uiState.value.isLoading).isFalse()
     }
 
     @Test
@@ -63,7 +78,13 @@ class ContinueWhereLeftOffViewModelTest {
                 type = RecentlyUsedType.PDF,
                 title = "test.pdf",
                 lastAccessedTimestamp = 1000L,
-            )
+            ),
+            ContinueWhereLeftOffItem(
+                nodeHandle = 2L,
+                type = RecentlyUsedType.Video,
+                title = "video.mp4",
+                lastAccessedTimestamp = 2000L,
+            ),
         )
 
         underTest.uiState.test {
