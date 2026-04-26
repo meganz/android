@@ -985,14 +985,20 @@ public class PDFView extends RelativeLayout {
                     page, pdfFile != null ? pdfFile.getPagesCount() : -1);
             return new RectF();
         }
-        return pdfFile.mapRectToDevice(
-                page,
-                0,                  // startX: page origin on canvas
-                0,                  // startY: page origin on canvas
-                (int) pageWidth,    // sizeX: zoomed page width
-                (int) pageHeight,   // sizeY: zoomed page height
-                pdfRect
-        );
+        try {
+            return pdfFile.mapRectToDevice(
+                    page,
+                    0,                  // startX: page origin on canvas
+                    0,                  // startY: page origin on canvas
+                    (int) pageWidth,    // sizeX: zoomed page width
+                    (int) pageHeight,   // sizeY: zoomed page height
+                    pdfRect
+            );
+        } catch (NullPointerException e) {
+            // Protect PdfiumCore for reading native page
+            Timber.w(e, "mapRectToCanvas: mapRectToDevice failed for page %d", page);
+            return new RectF();
+        }
     }
 
     public void fitToWidth(int page) {

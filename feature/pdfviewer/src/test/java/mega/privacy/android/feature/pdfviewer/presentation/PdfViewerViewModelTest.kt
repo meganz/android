@@ -2,6 +2,7 @@ package mega.privacy.android.feature.pdfviewer.presentation
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.RectF
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.shockwave.pdfium.PdfTextMatch
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
@@ -553,8 +555,7 @@ class PdfViewerViewModelTest {
     fun `test that search pipeline updates state with results when engine returns matches`() =
         runTest {
             val fakeEngine = FakePdfSearchEngine()
-            val mockMatch = mock<PdfTextMatch>()
-            fakeEngine.searchResults = listOf(mockMatch)
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
 
             whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
 
@@ -756,6 +757,117 @@ class PdfViewerViewModelTest {
             assertThat(consumedState.dismissEvent).isEqualTo(consumed)
         }
     }
+
+    private fun TestScope.triggerSearch(query: String = "abc") {
+        underTest.activateSearch()
+        underTest.onSearchQueryChanged(query)
+        advanceTimeBy(300) // passes the 300 ms debounce window
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `test that search pipeline populates allMatchRectsByPage when results arrive`() =
+        runTest {
+            val expectedRects = listOf(RectF(0f, 0f, 100f, 20f))
+            val fakeEngine = FakePdfSearchEngine().apply {
+                searchResults = listOf(PdfTextMatch(2, 0, 1, emptyList()))
+                getPdfRectsResult = expectedRects
+            }
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                }
+            )
+            advanceUntilIdle()
+
+            underTest.onPageChanged(1, 10) // simulate document loaded
+            triggerSearch()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.searchState.allMatchRectsByPage).containsKey(2)
+                assertThat(state.searchState.allMatchRectsByPage[2]).isEqualTo(expectedRects)
+            }
+        }
+
+    @Test
+    fun `test that onPageChanged populates allMatchRectsByPage for visible pages`() =
+        runTest {
+            val expectedRects = listOf(RectF(0f, 0f, 100f, 20f))
+            val fakeEngine = FakePdfSearchEngine().apply {
+                searchResults = listOf(PdfTextMatch(5, 0, 1, emptyList()))
+                getPdfRectsResult = expectedRects
+            }
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                }
+            )
+            advanceUntilIdle()
+
+            triggerSearch()
+            // Navigate to page 6 (1-indexed) — triggers fetch for pages 4, 5, 6 (0-indexed)
+            underTest.onPageChanged(6, 20)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.searchState.allMatchRectsByPage).containsKey(5)
+            }
+        }
+
+    @Test
+    fun `test that onSearchQueryChanged clears allMatchRectsByPage`() = runTest {
+        underTest = initViewModel()
+
+        underTest.onSearchQueryChanged("xyz")
+
+        underTest.state.test {
+            assertThat(awaitItem().searchState.allMatchRectsByPage).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that deactivateSearch clears allMatchRectsByPage`() = runTest {
+        underTest = initViewModel()
+
+        underTest.deactivateSearch()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.searchState.allMatchRectsByPage).isEmpty()
+            assertThat(state.searchState.isSearchActive).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that allMatchRectsByPage retains all pages as user scrolls`() =
+        runTest {
+            val totalPages = 22
+            val fakeEngine = FakePdfSearchEngine().apply {
+                searchResults = (0 until totalPages).map { page -> PdfTextMatch(page, 0, 1, emptyList()) }
+                getPdfRectsResult = listOf(RectF(0f, 0f, 100f, 20f))
+            }
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                }
+            )
+            advanceUntilIdle()
+
+            triggerSearch()
+            for (page in 1..totalPages) {
+                underTest.onPageChanged(page, totalPages)
+            }
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().searchState.allMatchRectsByPage.size).isEqualTo(totalPages)
+            }
+        }
 
     private val externalFileArgs = PdfViewerViewModel.Args(
         nodeHandle = -1L,

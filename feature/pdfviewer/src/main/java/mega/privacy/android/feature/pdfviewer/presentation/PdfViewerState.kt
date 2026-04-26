@@ -43,6 +43,9 @@ data class SearchMatch(
  * @param currentMatchPdfRects PDF-coordinate RectFs for the current match highlight.
  *        These are in PDF point space and are converted to canvas coordinates at draw time.
  * @param currentMatchPageIndex 0-based page index of the current match (-1 = none)
+ * @param allMatchRectsByPage PDF-coordinate RectFs for all matches, keyed by 0-based page index.
+ *        Populated on demand as the user scrolls to each page and retained for the lifetime
+ *        of the current search query. Cleared whenever the query changes.
  */
 data class PdfViewerSearchState(
     val query: String = "",
@@ -52,6 +55,7 @@ data class PdfViewerSearchState(
     val isSearching: Boolean = false,
     val currentMatchPdfRects: List<RectF>? = null,
     val currentMatchPageIndex: Int = -1,
+    val allMatchRectsByPage: Map<Int, List<RectF>> = emptyMap(),
 ) {
     val totalMatches: Int get() = results.size
     val hasResults: Boolean get() = results.isNotEmpty()

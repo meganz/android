@@ -194,6 +194,7 @@ internal fun PdfViewerScreen(
                                 password = uiState.currentPassword,
                                 highlightPageIndex = searchState.currentMatchPageIndex,
                                 highlightPdfRects = searchState.currentMatchPdfRects,
+                                allMatchRectsByPage = searchState.allMatchRectsByPage,
                                 scrubProgress = scrubProgress,
                                 onPageChanged = onPageChanged,
                                 onLoadComplete = onLoadComplete,

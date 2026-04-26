@@ -33,7 +33,9 @@ import java.io.File
  * @param currentPage The current page to display (1-indexed)
  * @param password The password for protected PDFs
  * @param highlightPageIndex The page index to highlight (0-indexed)
- * @param highlightPdfRects Pre-calculated screen-coordinate RectFs for highlighting the current search match
+ * @param highlightPdfRects Pre-calculated screen-coordinate RectFs for highlighting the current selected search match
+ * @param allMatchRectsByPage PDF-coordinate RectFs for all matches keyed by 0-based page index;
+ *        drawn in a lighter colour so every result is visible at a glance
  * @param scrubProgress Optional scrub position in 0f..1f while the user is dragging the page indicator.
  *                      Null when not scrubbing.
  * @param onPageChanged Callback when page changes (page: 1-indexed, totalPages)
@@ -50,6 +52,7 @@ internal fun PdfViewerContent(
     password: String?,
     highlightPageIndex: Int?,
     highlightPdfRects: List<RectF>?,
+    allMatchRectsByPage: Map<Int, List<RectF>>,
     scrubProgress: Float?,
     onPageChanged: (Int, Int) -> Unit,
     onLoadComplete: (Int) -> Unit,
@@ -65,19 +68,30 @@ internal fun PdfViewerContent(
     val highlightPageIndexRef = remember { mutableIntStateOf(highlightPageIndex ?: -1) }
     val highlightRectsRef: MutableState<List<RectF>?> =
         remember { mutableStateOf(highlightPdfRects) }
-    val highlightColor = supportColor(SupportColor.Warning).copy(alpha = 0.5f)
+    val allMatchRectsByPageRef: MutableState<Map<Int, List<RectF>>> =
+        remember { mutableStateOf(allMatchRectsByPage) }
+
+    val currentMatchColor = supportColor(SupportColor.Warning).copy(alpha = 0.5f)
+    val allMatchColor = supportColor(SupportColor.Warning).copy(alpha = 0.15f)
 
     // Track highlight identity to trigger redraws without using the generic View.tag
     val lastHighlightIdentity = remember { mutableStateOf<Any?>(null) }
+    val lastAllMatchIdentity = remember { mutableStateOf<Any?>(null) }
 
     // Track source identity to detect document changes requiring full reload
     val lastSourceSignature = remember { mutableStateOf<String?>(null) }
 
-    // Highlight paint - yellow fill with 60% opacity for visibility.
-    // Keyed on highlightColor so it updates on theme changes.
-    val highlightPaint = remember(highlightColor) {
+    // Paint for the currently-selected match (brighter) and all other matches (lighter).
+    // Keyed on their respective colors so they update on theme changes.
+    val highlightPaint = remember(currentMatchColor) {
         Paint().apply {
-            color = highlightColor.toArgb()
+            color = currentMatchColor.toArgb()
+            style = Paint.Style.FILL
+        }
+    }
+    val allMatchPaint = remember(allMatchColor) {
+        Paint().apply {
+            color = allMatchColor.toArgb()
             style = Paint.Style.FILL
         }
     }
@@ -101,10 +115,17 @@ internal fun PdfViewerContent(
             // Always update the mutable refs so the onDrawAll closure sees fresh data
             highlightPageIndexRef.intValue = highlightPageIndex ?: -1
             highlightRectsRef.value = highlightPdfRects
+            allMatchRectsByPageRef.value = allMatchRectsByPage
 
-            // Trigger redraw when highlights change (reference equality check)
+            // Trigger redraw when current-match highlights change
             if (highlightPdfRects !== lastHighlightIdentity.value) {
                 lastHighlightIdentity.value = highlightPdfRects
+                pdfView.invalidate()
+            }
+
+            // Trigger redraw when the all-matches cache gains new pages
+            if (allMatchRectsByPage !== lastAllMatchIdentity.value) {
+                lastAllMatchIdentity.value = allMatchRectsByPage
                 pdfView.invalidate()
             }
 
@@ -170,6 +191,22 @@ internal fun PdfViewerContent(
                     true // consume the tap
                 }
                 .onDrawAll { canvas, pageWidth, pageHeight, displayedPage ->
+                    // Draw all match rects for this page in light yellow.
+                    val allRects = allMatchRectsByPageRef.value[displayedPage]
+                    if (!allRects.isNullOrEmpty()) {
+                        allRects.forEach { pdfRect ->
+                            val canvasRect = pdfView.mapRectToCanvas(
+                                displayedPage, pdfRect, pageWidth, pageHeight
+                            )
+                            canvasRect.left -= highlightPadding
+                            canvasRect.top -= highlightPadding
+                            canvasRect.right += highlightPadding
+                            canvasRect.bottom += highlightPadding
+                            canvas.drawRect(canvasRect, allMatchPaint)
+                        }
+                    }
+
+                    // Draw the currently-selected match on top in bright yellow.
                     val currentHighlightPage = highlightPageIndexRef.intValue
                     val currentHighlightRects = highlightRectsRef.value
                     if (displayedPage == currentHighlightPage && !currentHighlightRects.isNullOrEmpty()) {
@@ -177,13 +214,11 @@ internal fun PdfViewerContent(
                             val canvasRect = pdfView.mapRectToCanvas(
                                 displayedPage, pdfRect, pageWidth, pageHeight
                             )
-                            val paddedRect = RectF(
-                                canvasRect.left - highlightPadding,
-                                canvasRect.top - highlightPadding,
-                                canvasRect.right + highlightPadding,
-                                canvasRect.bottom + highlightPadding
-                            )
-                            canvas.drawRect(paddedRect, highlightPaint)
+                            canvasRect.left -= highlightPadding
+                            canvasRect.top -= highlightPadding
+                            canvasRect.right += highlightPadding
+                            canvasRect.bottom += highlightPadding
+                            canvas.drawRect(canvasRect, highlightPaint)
                         }
                     }
                 }

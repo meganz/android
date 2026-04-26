@@ -1,10 +1,12 @@
 package mega.privacy.android.feature.pdfviewer.presentation
 
 import android.content.Context
+import android.graphics.RectF
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shockwave.pdfium.PdfTextMatch
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -85,6 +87,19 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val engineLock = Any()
 
     private var searchEngine: PdfSearchEngine? = null
+
+    // All three fields below are accessed only on Dispatchers.Main (viewModelScope default),
+    // so no synchronization is needed.
+
+    // Incremented on every query change; captured once per fetchRectsForVisiblePages call so
+    // all coroutines launched from that call skip state updates if the query has since changed.
+    private var rectFetchGeneration = 0
+
+    // Pages that currently have an in-flight rect fetch.
+    private val fetchingPages = mutableSetOf<Int>()
+
+    // results grouped by pageIndex for O(1) lookup in fetchRectsForVisiblePages.
+    private var searchMatchesByPage: Map<Int, List<PdfTextMatch>> = emptyMap()
 
     init {
         loadFileExplorerFeatureFlag()
@@ -313,6 +328,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                     }
                 }
                 .collect { results ->
+                    searchMatchesByPage = results.groupBy { it.pageIndex }
                     val firstMatch = results.firstOrNull()
                     val pdfRects = firstMatch?.let {
                         withContext(ioDispatcher) {
@@ -330,10 +346,68 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                                 currentMatchPdfRects = pdfRects,
                                 currentMatchPageIndex = firstMatch?.pageIndex ?: -1,
                                 isSearching = false,
+                                allMatchRectsByPage = emptyMap(),
+                            )
+                        )
+                    }
+                    if (firstMatch != null) {
+                        fetchRectsForVisiblePages(firstMatch.pageIndex)
+                    }
+                }
+        }
+    }
+
+    /**
+     * Invalidates all in-flight rect fetches by incrementing the generation counter and
+     * clearing the in-flight tracking set. Callers are responsible for clearing
+     * [PdfViewerSearchState.allMatchRectsByPage] in their own state update.
+     */
+    private fun clearRectCache() {
+        rectFetchGeneration++
+        fetchingPages.clear()
+        searchMatchesByPage = emptyMap()
+    }
+
+    /**
+     * Fetches bounding rects for all matches on pages surrounding [centerPageIndex] (±[PREFETCH_RADIUS] pages).
+     * Results are stored in [PdfViewerSearchState.allMatchRectsByPage]. Already-fetched or
+     * in-flight pages are skipped. All results are retained until the search query changes.
+     */
+    private fun fetchRectsForVisiblePages(centerPageIndex: Int) {
+        val searchState = _state.value.searchState
+        if (!searchState.hasResults) return
+
+        val totalPages = _state.value.totalPages
+        if (totalPages == 0) return
+        val from = (centerPageIndex - PREFETCH_RADIUS).coerceAtLeast(0)
+        val to = (centerPageIndex + PREFETCH_RADIUS).coerceAtMost(totalPages - 1)
+        val pageRange = from..to
+        val generation = rectFetchGeneration
+
+        for (pageIndex in pageRange) {
+            if (searchState.allMatchRectsByPage.containsKey(pageIndex)) continue
+            val matchesForPage = searchMatchesByPage[pageIndex] ?: emptyList()
+            if (matchesForPage.isEmpty()) continue
+            if (!fetchingPages.add(pageIndex)) continue  // already in-flight
+
+            viewModelScope.launch {
+                val allRects = withContext(ioDispatcher) {
+                    matchesForPage.flatMap { match ->
+                        runCatching { searchEngine?.getPdfRects(match) ?: emptyList() }
+                            .getOrElse { emptyList() }
+                    }
+                }
+                if (generation == rectFetchGeneration) {
+                    fetchingPages.remove(pageIndex)
+                    _state.update { current ->
+                        current.copy(
+                            searchState = current.searchState.copy(
+                                allMatchRectsByPage = current.searchState.allMatchRectsByPage + (pageIndex to allRects)
                             )
                         )
                     }
                 }
+            }
         }
     }
 
@@ -347,6 +421,9 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     fun onPageChanged(page: Int, totalPages: Int) {
         _state.update { it.copy(currentPage = page, totalPages = totalPages) }
+        if (_state.value.searchState.hasResults) {
+            fetchRectsForVisiblePages(page - 1) // page is 1-indexed; convert to 0-indexed
+        }
         if (!args.isExternalFile) {
             viewModelScope.launch {
                 setOrUpdateLastPageViewedInPdfUseCase(
@@ -444,6 +521,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     }
 
     fun deactivateSearch() {
+        clearRectCache()
         _rawQuery.value = ""
         _state.update { it.copy(searchState = PdfViewerSearchState(isSearchActive = false)) }
     }
@@ -453,12 +531,14 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * The reactive pipeline ([observeSearchPipeline]) handles debounce and cancellation.
      */
     fun onSearchQueryChanged(text: String) {
+        clearRectCache()
         _rawQuery.value = text
         _state.update {
             it.copy(
                 searchState = it.searchState.copy(
                     query = text,
                     isSearching = text.length >= 2,
+                    allMatchRectsByPage = emptyMap(),
                 )
             )
         }
@@ -613,5 +693,10 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(args: Args): PdfViewerViewModel
+    }
+
+    private companion object {
+        /** Number of pages to prefetch on each side of the current page. */
+        const val PREFETCH_RADIUS = 1
     }
 }
