@@ -5,7 +5,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -67,7 +67,7 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                 onDeferredAction = { _, action -> rewardedAdGate.requestAction(action) },
             )
             val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-            var showLoginRequiredSheet by remember { mutableStateOf(false) }
+            var showLoginRequiredSheet by rememberSaveable { mutableStateOf(false) }
             val activity = LocalActivity.current
 
             FolderLinkScreen(
