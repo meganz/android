@@ -1,12 +1,14 @@
 package mega.privacy.android.app.appstate
 
 import android.content.Intent
+import android.os.Bundle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.deeplinks.ExternalPdfDeepLinkHandler
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
+import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -30,6 +32,49 @@ class MegaActivityIntentActionHandler @Inject constructor(
     private val getCurrentConnectivityStateUseCase: GetCurrentConnectivityStateUseCase,
     private val externalPdfDeepLinkHandler: ExternalPdfDeepLinkHandler,
 ) {
+
+    private var pendingDeepLinkUrl: String? = null
+
+    /**
+     * Save the pending deep link URL from the current intent before it gets overwritten by a new intent.
+     */
+    fun savePendingDeepLink(intent: Intent) {
+        if (isPendingDeepLinkAction(intent)) {
+            pendingDeepLinkUrl = intent.dataString
+        }
+    }
+
+    /**
+     * Persist the pending deep link URL to the outState bundle for config change or process death.
+     */
+    fun savePendingDeepLinkToBundle(outState: Bundle) {
+        pendingDeepLinkUrl?.let { outState.putString(EXTRA_PENDING_DEEP_LINK_URL, it) }
+    }
+
+    /**
+     * Restore the pending deep link URL from the saved instance state bundle.
+     */
+    fun restorePendingDeepLinkFromBundle(savedInstanceState: Bundle?) {
+        pendingDeepLinkUrl = savedInstanceState?.getString(EXTRA_PENDING_DEEP_LINK_URL)
+    }
+
+    /**
+     * Re-emit the pending deep link after login completes and root node exists.
+     */
+    suspend fun handlePendingDeepLinks(intent: Intent, rootNodeExists: Boolean) {
+        if (!rootNodeExists) return
+        val link = pendingDeepLinkUrl
+            ?: intent.dataString?.takeIf { isPendingDeepLinkAction(intent) }
+        pendingDeepLinkUrl = null
+        if (isPendingDeepLinkAction(intent)) {
+            intent.action = null
+        }
+        link?.let { navigationEventQueue.emit(DeepLinksDialogNavKey(it)) }
+    }
+
+    private fun isPendingDeepLinkAction(intent: Intent): Boolean =
+        intent.action == ACTION_PENDING_DEEP_LINK
+                || intent.action == Constants.ACTION_JOIN_OPEN_CHAT_LINK
 
     suspend fun handleAction(
         intent: Intent,
@@ -123,5 +168,9 @@ class MegaActivityIntentActionHandler @Inject constructor(
         } else {
             snackbarEventQueue.queueMessage(R.string.error_server_connection_problem)
         }
+    }
+
+    companion object {
+        private const val EXTRA_PENDING_DEEP_LINK_URL = "pendingDeepLinkUrl"
     }
 }

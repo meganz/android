@@ -58,12 +58,12 @@ import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
@@ -80,7 +80,6 @@ import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
-import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
@@ -141,6 +140,7 @@ class MegaActivity : FragmentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        intentActionHandler.savePendingDeepLink(this.intent)
         this.intent = intent
         Timber.d("New intent received. Action: ${intent.action}")
         lifecycleScope.launch {
@@ -231,13 +231,8 @@ class MegaActivity : FragmentActivity() {
         }
     }
 
-    private suspend fun handlePendingChatJoinLink(rootNodeState: RootNodeState) {
-        if (rootNodeState.exists && intent.action == Constants.ACTION_JOIN_OPEN_CHAT_LINK) {
-            intent.dataString?.let { link ->
-                navigationEventQueue.emit(DeepLinksDialogNavKey(link))
-            }
-            intent.action = null
-        }
+    private suspend fun handlePendingDeepLinks(rootNodeState: RootNodeState) {
+        intentActionHandler.handlePendingDeepLinks(intent, rootNodeState.exists)
     }
 
     override fun attachBaseContext(newBase: Context?) {
@@ -267,11 +262,17 @@ class MegaActivity : FragmentActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        intentActionHandler.savePendingDeepLinkToBundle(outState)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("MegaActivity created ${this.hashCode()}")
         val splashScreen = installSplashScreen()
         var keepSplashScreen by mutableStateOf(true)
         super.onCreate(savedInstanceState)
+        intentActionHandler.restorePendingDeepLinkFromBundle(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }
         enableEdgeToEdge()
         lifecycleScope.launch {
@@ -363,7 +364,7 @@ class MegaActivity : FragmentActivity() {
                 LaunchedEffect(rootNodeState) {
                     navigationHandler.onRootNodeChange(rootNodeState)
                     launchLastActivityIfNeeded(rootNodeState)
-                    handlePendingChatJoinLink(rootNodeState)
+                    handlePendingDeepLinks(rootNodeState)
                 }
 
                 LaunchedEffect(passcodeState) {

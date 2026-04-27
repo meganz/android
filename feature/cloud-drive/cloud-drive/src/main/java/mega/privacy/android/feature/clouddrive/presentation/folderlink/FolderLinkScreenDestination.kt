@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.folderlink
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
+import mega.privacy.android.navigation.setPendingDeepLink
 import mega.privacy.android.shared.ads.rewarded.rememberRewardedAdGate
 import mega.privacy.android.shared.nodes.sheet.PublicLinkAuthAlertBottomSheet
 import mega.privacy.android.shared.nodes.sheet.PublicLinkType
@@ -66,6 +68,7 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
             )
             val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
             var showLoginRequiredSheet by remember { mutableStateOf(false) }
+            val activity = LocalActivity.current
 
             FolderLinkScreen(
                 viewModel = viewModel,
@@ -98,10 +101,12 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                     type = PublicLinkType.Folder,
                     onSignupClicked = {
                         showLoginRequiredSheet = false
+                        activity.setPendingDeepLink(key.uriString)
                         navigationHandler.navigate(CreateAccountNavKey())
                     },
                     onLoginClicked = {
                         showLoginRequiredSheet = false
+                        activity.setPendingDeepLink(key.uriString)
                         navigationHandler.navigate(LoginNavKey())
                     },
                     onDismissSheet = { showLoginRequiredSheet = false },
