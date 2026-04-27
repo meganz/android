@@ -111,7 +111,6 @@ data class LoginState(
     val recoveryKeyLink: String? = null,
     val shouldShowNotificationPermission: Boolean = false,
     val initialEmail: String? = null,
-    val isSingleActivityEnabled: Boolean = true,
     val isPendingToGetLinkWithSession: Boolean = false,
 ) {
 

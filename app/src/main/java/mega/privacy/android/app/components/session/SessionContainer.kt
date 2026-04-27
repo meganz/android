@@ -20,9 +20,9 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
@@ -40,7 +40,6 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 @Composable
 internal fun SessionContainer(
     isSessionRequired: Boolean = true,
-    shouldFinish: Boolean = true,
     optimistic: Boolean = false,
     viewModel: SessionViewModel = hiltViewModel(),
     loadingView: @Composable () -> Unit = {},
@@ -67,31 +66,20 @@ internal fun SessionContainer(
                 content()
             }
 
-        state.doesRootNodeExist == false -> navigateToLogin(
+        state.doesRootNodeExist == false -> navigateToRefreshSession(
             context,
-            shouldFinish,
-            state.isSingleActivityEnabled
         )
 
         state.doesRootNodeExist == null -> loadingView()
     }
 }
 
-private fun navigateToLogin(
+internal fun navigateToRefreshSession(
     context: Context,
-    shouldFinish: Boolean,
-    isSingleActivityEnabled: Boolean,
 ) {
     context.findActivity()?.let { activity ->
-        val targetActivity = if (isSingleActivityEnabled && activity is MegaActivity) {
-            MegaActivity::class.java
-        } else {
-            LoginActivity::class.java
-        }
-        val intent = Intent(context, targetActivity).apply {
-            if (shouldFinish) {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }
+        val intent = Intent(context, MegaActivity::class.java).apply {
+            action = RefreshEvent.SdkReload.name
             putExtra(
                 Constants.LAUNCH_INTENT,
                 activity.intent.apply {
@@ -101,9 +89,7 @@ private fun navigateToLogin(
             )
         }
         context.startActivity(intent)
-        if (shouldFinish) {
-            activity.finish()
-        }
+        activity.finish()
     }
 }
 

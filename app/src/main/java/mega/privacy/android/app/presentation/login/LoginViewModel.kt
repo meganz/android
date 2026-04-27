@@ -257,25 +257,9 @@ class LoginViewModel @AssistedInject constructor(
                 }
             }
 
-        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-            // default navigation already handled in PendingBackStackNavigationHandler
-            val visibleFragment = savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT)
-            LoginScreen.entries.find { it.value == visibleFragment }?.let {
-                setPendingFragmentToShow(it)
-            }
-        } else {
-            val visibleFragment =
-                savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT) ?: run {
-                    val session = getSession()
-                    if (session.isNullOrEmpty()) Constants.TOUR_FRAGMENT else Constants.LOGIN_FRAGMENT
-                }
-
-            savedStateHandle.get<String>(Constants.EMAIL)?.let { initialEmail ->
-                _state.update { state -> state.copy(initialEmail = initialEmail) }
-            }
-
-            setPendingFragmentToShow(LoginScreen.entries.find { it.value == visibleFragment }
-                ?: LoginScreen.LoginScreen)
+        val visibleFragment = savedStateHandle.get<Int>(Constants.VISIBLE_FRAGMENT)
+        LoginScreen.entries.find { it.value == visibleFragment }?.let {
+            setPendingFragmentToShow(it)
         }
     }
 
@@ -385,14 +369,6 @@ class LoginViewModel @AssistedInject constructor(
                     .map { shouldShowNotificationPermission ->
                         { state: LoginState ->
                             state.copy(shouldShowNotificationPermission = shouldShowNotificationPermission)
-                        }
-                    },
-                flow {
-                    emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity))
-                }.catch { Timber.e(it) }
-                    .map { isSingleActivityEnabled ->
-                        { state: LoginState ->
-                            state.copy(isSingleActivityEnabled = isSingleActivityEnabled)
                         }
                     }
             ).collect {
@@ -1165,12 +1141,6 @@ class LoginViewModel @AssistedInject constructor(
      */
     fun onFirstTime2FAConsumed() =
         _state.update { state -> state.copy(isFirstTime2FA = consumed) }
-
-    /**
-     * Get session
-     */
-    private suspend fun getSession() =
-        runCatching { monitorUserCredentialsUseCase().map { it?.session }.first() }.getOrNull()
 
     /**
      * Set temporal email

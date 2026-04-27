@@ -90,7 +90,6 @@ import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCas
 import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -267,7 +266,6 @@ internal class LoginViewModelTest {
         whenever(getFeatureFlagValueUseCase(any())).thenReturn(
             true
         )
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(monitorEphemeralCredentialsUseCase()).thenReturn(emptyFlow())
         whenever(monitorUserCredentialsUseCase()).thenReturn(monitorUserCredentialsFlow)
@@ -893,7 +891,6 @@ internal class LoginViewModelTest {
         runTest {
             val mappedText = "mapped message"
             whenever(accountBlockedTypeStringMapper(any())).thenReturn(mappedText)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
             val accountBlockedFlow = MutableSharedFlow<AccountBlockedEvent>()
             whenever(monitorAccountBlockedUseCase()).thenReturn(accountBlockedFlow)
             initViewModel(isInSingleActivity = true)

@@ -129,9 +129,8 @@ class LoginActivity : BaseActivity() {
         }
 
         val shouldRedirect = intent.action != Constants.ACTION_FILE_EXPLORER_UPLOAD
-                && !intent.hasExtra(Constants.LAUNCH_INTENT)
         collectFlow(viewModel.state, catchBlock = { Timber.e(it) }) { uiState ->
-            if (uiState.accountSession?.session.isNullOrEmpty() && uiState.isSingleActivityEnabled && shouldRedirect) {
+            if (uiState.accountSession?.session.isNullOrEmpty() && shouldRedirect) {
                 startActivity(Intent(this@LoginActivity, MegaActivity::class.java))
                 finish()
             }

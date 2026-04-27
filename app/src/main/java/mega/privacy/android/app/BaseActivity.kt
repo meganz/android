@@ -74,6 +74,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.AccountBlockedEvent
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
@@ -921,13 +922,15 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         return false
     }
 
-    /**
-     * Refresh session.
-     * We still keep navigating to LoginActivity for single activity architecture, to keep the backstack
-     * because MegaActivity is launched always as singleTask.
-     */
     protected fun refreshSession(keepCurrentActivity: Boolean = false) {
-        navigateToLogin(keepCurrentActivity = keepCurrentActivity)
+        val intent = Intent(this, MegaActivity::class.java)
+        intent.action = RefreshEvent.SdkReload.name
+        if (keepCurrentActivity) {
+            intent.putExtra(LAUNCH_INTENT, this.intent)
+        } else {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+        startActivity(intent)
         finish()
     }
 
