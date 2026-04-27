@@ -21,22 +21,27 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
@@ -65,6 +70,8 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val monitorViewTypeUseCase: MonitorViewType,
     private val setViewTypeUseCase: SetViewType,
     private val stopAudioService: StopAudioService,
+    private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted private val args: Args,
 ) : ViewModel() {
@@ -292,12 +299,39 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                         hasMediaItems = hasMediaItems,
                     )
                 }
+                _uiState.value.url?.let { url ->
+                    result.rootNode?.let { rootNode ->
+                        saveViewedFolderLink(url, rootNode)
+                    }
+                }
             }.onFailure { throwable ->
                 if (throwable is FetchFolderNodesException.Expired) {
                     _uiState.update { it.copy(contentState = FolderLinkContentState.Expired) }
                 } else {
                     _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
                 }
+            }
+        }
+    }
+
+    private fun saveViewedFolderLink(link: String, rootNode: TypedFolderNode) {
+        viewModelScope.launch {
+            val isEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
+            }.getOrDefault(false)
+            if (!isEnabled) return@launch
+
+            runCatching {
+                saveViewedLinkUseCase(
+                    ViewedLink(
+                        nodeHandle = rootNode.id.longValue,
+                        name = rootNode.name,
+                        linkUrl = link,
+                        type = RecentlyUsedType.FolderLink,
+                    )
+                )
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }

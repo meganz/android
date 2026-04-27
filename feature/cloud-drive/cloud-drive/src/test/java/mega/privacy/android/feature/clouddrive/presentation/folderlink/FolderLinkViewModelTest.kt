@@ -29,8 +29,13 @@ import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
@@ -74,6 +79,8 @@ internal class FolderLinkViewModelTest {
     private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val stopAudioService: StopAudioService = mock()
+    private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private lateinit var underTest: FolderLinkViewModel
 
@@ -94,6 +101,8 @@ internal class FolderLinkViewModelTest {
             monitorViewTypeUseCase = monitorViewTypeUseCase,
             setViewTypeUseCase = setViewTypeUseCase,
             stopAudioService = stopAudioService,
+            saveViewedLinkUseCase = saveViewedLinkUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
             args = args,
         )
@@ -114,6 +123,8 @@ internal class FolderLinkViewModelTest {
             monitorViewTypeUseCase,
             setViewTypeUseCase,
             stopAudioService,
+            saveViewedLinkUseCase,
+            getFeatureFlagValueUseCase,
         )
         whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
@@ -1080,5 +1091,75 @@ internal class FolderLinkViewModelTest {
             advanceUntilIdle()
 
             verify(stopAudioService, times(0)).invoke()
+        }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is called when fetchNodes succeeds and feature flag is enabled`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            val rootNode = mockFolderNode(id = 10L, name = "Shared Folder")
+
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult().apply {
+                    this.rootNode = rootNode
+                    this.parentNode = rootNode
+                }
+            )
+            stubNodeUiItemMapper()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+            advanceUntilIdle()
+
+            verify(saveViewedLinkUseCase).invoke(
+                ViewedLink(
+                    nodeHandle = 10L,
+                    name = "Shared Folder",
+                    linkUrl = url,
+                    type = RecentlyUsedType.FolderLink,
+                    accessedTimestamp = null,
+                )
+            )
+        }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is not called when feature flag is disabled`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            val rootNode = mockFolderNode(id = 10L, name = "Shared Folder")
+
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult().apply {
+                    this.rootNode = rootNode
+                    this.parentNode = rootNode
+                }
+            )
+            stubNodeUiItemMapper()
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveViewedLinkUseCase)
+        }
+
+    @Test
+    fun `test that saveViewedLinkUseCase is not called when fetchNodes fails`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull()))
+                .thenThrow(FetchFolderNodesException.GenericError())
+
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveViewedLinkUseCase)
         }
 }

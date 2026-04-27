@@ -39,6 +39,7 @@ import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
+import mega.privacy.android.navigation.destination.ViewedLinksScreenNavKey
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
@@ -84,7 +85,10 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget {
                 },
                 onFileLinkClicked = { link ->
                     navigationHandler.navigate(LegacyFileLinkNavKey(link))
-                }
+                },
+                onViewAllClicked = {
+                    navigationHandler.navigate(ViewedLinksScreenNavKey)
+                },
             )
         }
     }
@@ -95,6 +99,7 @@ internal fun ViewedLinksView(
     uiState: ViewedLinksUiState,
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
+    onViewAllClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -108,7 +113,7 @@ internal fun ViewedLinksView(
 
         else -> {
             Column(modifier = modifier) {
-                ViewedLinksWidgetHeader()
+                ViewedLinksWidgetHeader(onViewAllClicked = onViewAllClicked)
 
                 uiState.items.take(4).forEach { item ->
                     OneLineListItem(
@@ -148,10 +153,13 @@ internal fun ViewedLinksView(
 }
 
 @Composable
-internal fun ViewedLinksWidgetHeader() {
+internal fun ViewedLinksWidgetHeader(
+    onViewAllClicked: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onViewAllClicked() }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
