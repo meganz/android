@@ -763,7 +763,7 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that photosInMonth contains one entry per distinct year-month`() = runTest {
-        val now = ZonedDateTime.now()
+        val now = ZonedDateTime.of(2025, 6, 15, 12, 0, 0, 0, ZoneId.systemDefault())
         val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
             on { extension } doReturn ".jpg"
         }
@@ -810,7 +810,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that photosInMonth groups photos from the same month across different days into one card`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val now = ZonedDateTime.of(2025, 6, 15, 12, 0, 0, 0, ZoneId.systemDefault())
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
