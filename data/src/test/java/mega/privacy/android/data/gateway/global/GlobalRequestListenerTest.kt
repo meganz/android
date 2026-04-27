@@ -1,6 +1,5 @@
 package mega.privacy.android.data.gateway.global
 
-import dagger.Lazy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
@@ -11,10 +10,10 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
@@ -61,9 +60,9 @@ class GlobalRequestListenerTest {
     private val setupMegaChatApiWrapper = mock<SetupMegaChatApiWrapper>()
     private val accountInfoWrapper = mock<AccountInfoWrapper>()
     private val megaChatApi = mock<MegaChatApiAndroid>()
-    private val dbH = mock<Lazy<DatabaseHandler>>()
-    private val databaseHandler = mock<DatabaseHandler>()
+    private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val megaApi = mock<MegaApiAndroid>()
+    private val ioDispatcher = UnconfinedTestDispatcher()
     private val applicationScope = TestScope(UnconfinedTestDispatcher())
     private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
     private val broadcastFetchNodesFinishUseCase = mock<BroadcastFetchNodesFinishUseCase>()
@@ -95,8 +94,6 @@ class GlobalRequestListenerTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
-        whenever(dbH.get()).thenReturn(databaseHandler)
-
         underTest = GlobalRequestListener(
             appEventGateway = appEventGateway,
             setLogoutFlagWrapper = setLogoutFlagWrapper,
@@ -104,9 +101,10 @@ class GlobalRequestListenerTest {
             setupMegaChatApiWrapper = setupMegaChatApiWrapper,
             accountInfoWrapper = accountInfoWrapper,
             megaChatApi = megaChatApi,
-            dbH = dbH,
+            localStorageGateway = localStorageGateway,
             megaApi = megaApi,
             applicationScope = applicationScope,
+            ioDispatcher = ioDispatcher,
             getFullAccountInfoUseCase = getFullAccountInfoUseCase,
             broadcastFetchNodesFinishUseCase = broadcastFetchNodesFinishUseCase,
             localLogoutAppUseCase = localLogoutAppUseCase,
@@ -129,8 +127,8 @@ class GlobalRequestListenerTest {
         Dispatchers.resetMain()
         reset(
             appEventGateway, setLogoutFlagWrapper, userAttributeDatabaseUpdater,
-            setupMegaChatApiWrapper, accountInfoWrapper, megaChatApi, dbH,
-            databaseHandler, megaApi, getFullAccountInfoUseCase,
+            setupMegaChatApiWrapper, accountInfoWrapper, megaChatApi,
+            localStorageGateway, megaApi, getFullAccountInfoUseCase,
             broadcastFetchNodesFinishUseCase, localLogoutAppUseCase,
             setupDeviceNameUseCase, broadcastBusinessAccountExpiredUseCase,
             loginMutex, updatePushNotificationSettingsUseCase,
@@ -420,8 +418,8 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(mock<MegaApiJava>(), request, error)
 
-            verify(databaseHandler).setNonContactEmail(testEmail, testUserHandle.toString())
-            verify(databaseHandler).setNonContactFirstName(testFirstName, testUserHandle.toString())
+            verify(localStorageGateway).setNonContactEmail(testUserHandle, testEmail)
+            verify(localStorageGateway).setNonContactFirstName(testUserHandle, testFirstName)
         }
 
     @Test
@@ -445,7 +443,7 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(mock<MegaApiJava>(), request, error)
 
-            verify(databaseHandler).setNonContactLastName(testLastName, testUserHandle.toString())
+            verify(localStorageGateway).setNonContactLastName(testUserHandle, testLastName)
         }
 
     @Test
@@ -470,8 +468,8 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(api, request, error)
 
-            verify(databaseHandler, never()).setNonContactEmail(any(), any())
-            verify(databaseHandler, never()).setNonContactFirstName(any(), any())
+            verify(localStorageGateway, never()).setNonContactEmail(any(), any())
+            verify(localStorageGateway, never()).setNonContactFirstName(any(), any())
         }
 
     @Test
@@ -492,8 +490,8 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(api, request, error)
 
-            verify(databaseHandler, never()).setNonContactEmail(any(), any())
-            verify(databaseHandler, never()).setNonContactFirstName(any(), any())
+            verify(localStorageGateway, never()).setNonContactEmail(any(), any())
+            verify(localStorageGateway, never()).setNonContactFirstName(any(), any())
         }
 
     @Test
@@ -512,8 +510,29 @@ class GlobalRequestListenerTest {
 
             underTest.onRequestFinish(api, request, error)
 
-            verify(databaseHandler, never()).setNonContactEmail(any(), any())
-            verify(databaseHandler, never()).setNonContactFirstName(any(), any())
+            verify(localStorageGateway, never()).setNonContactEmail(any(), any())
+            verify(localStorageGateway, never()).setNonContactFirstName(any(), any())
+        }
+
+    @Test
+    fun `test that handleGetAttrUserRequest does not crash when getContact throws`() =
+        runTest {
+            val request = mock<MegaRequest> {
+                on { type } doReturn MegaRequest.TYPE_GET_ATTR_USER
+                on { paramType } doReturn MegaApiJava.USER_ATTR_FIRSTNAME
+                on { email } doReturn testEmail
+                on { text } doReturn testFirstName
+            }
+            val error = mock<MegaError> {
+                on { errorCode } doReturn MegaError.API_OK
+            }
+
+            whenever(megaApi.getContact(testEmail)).thenThrow(RuntimeException("boom"))
+
+            underTest.onRequestFinish(mock<MegaApiJava>(), request, error)
+
+            verify(localStorageGateway, never()).setNonContactEmail(any(), any())
+            verify(localStorageGateway, never()).setNonContactFirstName(any(), any())
         }
 
     @Test

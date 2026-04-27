@@ -100,6 +100,18 @@ internal class MegaLocalStorageFacade @Inject constructor(
         }
     }
 
+    override suspend fun setNonContactFirstName(userHandle: Long, firstName: String?) {
+        withContext(databaseDispatcher) {
+            dbHandler.get().setNonContactFirstName(firstName, userHandle.toString())
+        }
+    }
+
+    override suspend fun setNonContactLastName(userHandle: Long, lastName: String?) {
+        withContext(databaseDispatcher) {
+            dbHandler.get().setNonContactLastName(lastName, userHandle.toString())
+        }
+    }
+
     override suspend fun getContactByEmail(email: String?) = withContext(databaseDispatcher) {
         dbHandler.get().findContactByEmail(email)
     }

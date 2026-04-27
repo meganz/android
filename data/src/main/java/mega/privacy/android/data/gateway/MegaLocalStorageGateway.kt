@@ -85,6 +85,21 @@ interface MegaLocalStorageGateway {
      */
     suspend fun setNonContactEmail(userHandle: Long, email: String)
 
+    /**
+     * Set non contact first name
+     *
+     * @param userHandle
+     * @param firstName
+     */
+    suspend fun setNonContactFirstName(userHandle: Long, firstName: String?)
+
+    /**
+     * Set non contact last name
+     *
+     * @param userHandle
+     * @param lastName
+     */
+    suspend fun setNonContactLastName(userHandle: Long, lastName: String?)
 
     /**
      * Get contact by email
