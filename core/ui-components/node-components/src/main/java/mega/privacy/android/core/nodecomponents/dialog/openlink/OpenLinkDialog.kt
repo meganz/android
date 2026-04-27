@@ -36,6 +36,7 @@ fun OpenLinkDialog(
         modifier = modifier.testTag(OPEN_LINK_DIALOG_TAG),
         title = stringResource(id = sharedR.string.open_link_dialog_title),
         placeholder = stringResource(id = sharedR.string.open_link_dialog_hint),
+        description = stringResource(id = sharedR.string.open_link_dialog_description),
         positiveButtonText = stringResource(id = sharedR.string.general_open_button),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onValueChange = { inputValue = it },

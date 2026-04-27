@@ -1262,7 +1262,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Restart</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Save to device</string>
+    <string name="general_save_to_device">Download to device</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Hide</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2641,7 +2641,7 @@
     <!-- Title for the open link dialog and bottom sheet action -->
     <string name="open_link_dialog_title">Open link</string>
     <!-- Hint text for the open link input field -->
-    <string name="open_link_dialog_hint">Paste link</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is upload, import, copy or move content inside -->
     <string name="cloud_explorer_select_destination_title">Select destination</string>
     <!-- Title for the cloud explorer screen, in folder picker mode, which purpose is choose a folder -->
@@ -2762,8 +2762,10 @@
     <string name="public_link_auth_alert_description_album">Keep these photos safe and access them anytime</string>
     <!-- Title of the auth alert bottom sheet shown to guest users when opening a public file link, prompting them to sign up or log in to save the file -->
     <string name="public_link_auth_alert_title_file">Save this file to your MEGA account</string>
-    <!-- Empty state message for continue where you left off list screen -->
-    <string name="home_cwlo_empty_state">Items you left unfinished will appear here</string>
     <!-- Home widget section header for viewed links -->
     <string name="home_widget_viewed_links_section_header">Viewed links</string>
+    <!-- Empty state message for continue where you left off list screen -->
+    <string name="home_cwlo_empty_state">Items you left unfinished will appear here</string>
+    <!-- Description text for the open link input field -->
+    <string name="open_link_dialog_description">Paste any MEGA link to open it</string>
 </resources>
