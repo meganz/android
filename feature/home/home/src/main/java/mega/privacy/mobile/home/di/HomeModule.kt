@@ -16,6 +16,7 @@ import mega.privacy.mobile.home.presentation.home.widget.banner.BannerWidget
 import mega.privacy.mobile.home.presentation.home.widget.chips.HomeChipsWidget
 import mega.privacy.mobile.home.presentation.home.widget.continuewhereleftoff.ContinueWhereLeftOffWidget
 import mega.privacy.mobile.home.presentation.home.widget.recents.RecentsWidget
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.ViewedLinksWidget
 
 
 @Module
@@ -49,4 +50,8 @@ class HomeModule {
     @Provides
     @IntoSet
     fun provideContinueWhereLeftOffWidget(widget: ContinueWhereLeftOffWidget): HomeWidget = widget
+
+    @Provides
+    @IntoSet
+    fun provideViewedLinksWidget(widget: ViewedLinksWidget): HomeWidget = widget
 }

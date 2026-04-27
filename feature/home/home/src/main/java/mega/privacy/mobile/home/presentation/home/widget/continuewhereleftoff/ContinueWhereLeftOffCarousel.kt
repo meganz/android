@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
@@ -79,7 +80,7 @@ private fun ContinueWhereLeftOffHeader(
     ) {
         MegaText(
             text = stringResource(sharedR.string.home_widget_continue_where_left_off),
-            style = AppTheme.typography.titleMedium,
+            style = AppTheme.typography.titleMedium.copy(fontSize = 18.sp),
             textColor = TextColor.Primary,
             modifier = Modifier.weight(1f),
         )
