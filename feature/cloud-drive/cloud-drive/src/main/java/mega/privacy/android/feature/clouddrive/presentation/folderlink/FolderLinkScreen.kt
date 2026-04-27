@@ -183,7 +183,7 @@ internal fun FolderLinkScreen(
                         )
                     } else {
                         uiState.currentFolderNode?.let { folderNode ->
-                            if (isLoaded) {
+                            if (isLoaded && !uiState.items.isEmpty()) {
                                 InlineAnchoredButtonGroup(
                                     modifier = modifier
                                         .testTag(FOLDER_LINK_BOTTOM_BAR_TAG),
