@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,14 +33,17 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.text.SpannableText
-import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -45,6 +51,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
+import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -53,6 +60,12 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.shared.nodes.components.NodeHeaderItem
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +78,8 @@ internal fun ContinueWhereLeftOffListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
+    val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val optionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     EventEffect(
         event = uiState.openNodeEvent,
@@ -78,6 +93,11 @@ internal fun ContinueWhereLeftOffListScreen(
             MegaTopAppBar(
                 title = stringResource(sharedR.string.home_widget_continue_where_left_off),
                 navigationType = AppBarNavigationType.Back { onBack() },
+                actions = listOf(
+                    MenuActionWithClick(CommonMenuAction.More) {
+                        viewModel.showOptionsSheet()
+                    }
+                ),
             )
         },
     ) { paddingValues ->
@@ -111,6 +131,19 @@ internal fun ContinueWhereLeftOffListScreen(
                         .fillMaxSize()
                         .padding(paddingValues),
                 ) {
+                    item(key = "sort_header") {
+                        NodeHeaderItem(
+                            onSortOrderClick = viewModel::showSortSheet,
+                            onChangeViewTypeClick = {},
+                            sortConfiguration = uiState.sortConfiguration,
+                            isListView = true,
+                            showSortOrder = true,
+                            showChangeViewType = false,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 16.dp),
+                        )
+                    }
                     items(uiState.items, key = { it.nodeHandle }) { item ->
                         ContinueWhereLeftOffListItem(
                             title = item.title,
@@ -128,6 +161,46 @@ internal fun ContinueWhereLeftOffListScreen(
                     }
                 }
             }
+        }
+    }
+
+    if (uiState.showSortSheet) {
+        SortBottomSheet(
+            title = stringResource(sharedR.string.action_sort_by_header),
+            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
+            sheetState = sortSheetState,
+            selectedSort = SortBottomSheetResult(
+                sortOptionItem = uiState.sortConfiguration.sortOption,
+                sortDirection = uiState.sortConfiguration.sortDirection,
+            ),
+            onDismissRequest = viewModel::dismissSortSheet,
+            onSortOptionSelected = { result ->
+                if (result != null) {
+                    viewModel.updateSortConfiguration(
+                        NodeSortConfiguration(
+                            sortOption = result.sortOptionItem,
+                            sortDirection = result.sortDirection,
+                        )
+                    )
+                } else {
+                    viewModel.dismissSortSheet()
+                }
+            },
+        )
+    }
+
+    if (uiState.showOptionsSheet) {
+        MegaModalBottomSheet(
+            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+            sheetState = optionsSheetState,
+            onDismissRequest = viewModel::dismissOptionsSheet,
+        ) {
+            NodeActionListTile(
+                text = stringResource(sharedR.string.home_cwlo_clear_history),
+                icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
+                onActionClicked = viewModel::clearAll,
+                modifier = Modifier.testTag(CLEAR_HISTORY_TAG),
+            )
         }
     }
 
@@ -191,6 +264,8 @@ private fun ContinueWhereLeftOffListItem(
         }
     }
 }
+
+internal const val CLEAR_HISTORY_TAG = "cwlo_list:clear_history"
 
 @CombinedThemePreviews
 @Composable

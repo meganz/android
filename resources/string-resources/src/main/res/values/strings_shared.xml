@@ -2772,4 +2772,6 @@
     <string name="home_cwlo_empty_state">Items you left unfinished will appear here</string>
     <!-- Description text for the open link input field -->
     <string name="open_link_dialog_description">Paste any MEGA link to open it</string>
+    <!-- Bottom sheet option to clear continue where you left off history -->
+    <string name="home_cwlo_clear_history">Clear \u201CContinue where you left\u201D history</string>
 </resources>
