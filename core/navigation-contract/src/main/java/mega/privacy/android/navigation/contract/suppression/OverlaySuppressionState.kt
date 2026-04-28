@@ -15,14 +15,16 @@ class OverlaySuppressionState {
     /**
      * `true` when the currently active screen declares overlay suppression.
      */
-    val isSuppressing: StateFlow<Boolean>
-        field = MutableStateFlow(false)
+    val isSuppressing: StateFlow<SuppressionType>
+        field = MutableStateFlow<SuppressionType>(SuppressionType.None)
 
     /**
      * Update the suppression state. Called by the decorator when entries
      * enter or leave composition.
+     *
+     * @param suppressionType The new suppression state.
      */
-    fun setSuppressing(suppressing: Boolean) {
-        isSuppressing.value = suppressing
+    fun setSuppressing(suppressionType: SuppressionType) {
+        isSuppressing.value = suppressionType
     }
 }

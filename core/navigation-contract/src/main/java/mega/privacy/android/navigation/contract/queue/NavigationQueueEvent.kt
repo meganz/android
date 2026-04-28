@@ -14,6 +14,6 @@ class NavigationQueueEvent(
     val keys: List<NavKey>,
     val navOptions: NavOptions? = null,
 ) : QueueEvent {
-    override val isSuppressable: Boolean
-        get() = keys.last() is Suppressable
+    override val suppressableKey: NavKey?
+        get() = keys.last().takeIf { it is Suppressable }
 }

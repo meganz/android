@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -54,12 +55,17 @@ internal fun MegaNavDisplay(
     loginViewModel: LoginViewModel,
     emitNavigationEvent: suspend (QueueEvent) -> Unit,
     onFinish: () -> Unit,
+    entryDecorators: List<NavEntryDecorator<NavKey>> = listOf(
+        rememberSaveableStateHolderNavEntryDecorator(),
+        rememberSharedViewModelStoreNavEntryDecorator(),
+        rememberAnalyticNavEntryDecorator(),
+    ),
 ) {
     val transparentStrategy = remember { TransparentSceneStrategy<NavKey>() }
 
     val suppressionState = remember { OverlaySuppressionState() }
     val deferredEvents = remember { mutableStateListOf<QueueEvent>() }
-    val isSuppressing by suppressionState.isSuppressing.collectAsStateWithLifecycle()
+    val suppressionType by suppressionState.isSuppressing.collectAsStateWithLifecycle()
 
     val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
@@ -71,10 +77,7 @@ internal fun MegaNavDisplay(
         onBack = { navigationHandler.back() },
         sceneStrategy = transparentStrategy.chain(dialogStrategy)
             .chain(bottomSheetStrategy),
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberSharedViewModelStoreNavEntryDecorator(),
-            rememberAnalyticNavEntryDecorator(),
+        entryDecorators = entryDecorators + listOf(
             rememberOverlaySuppressionNavEntryDecorator(
                 suppressionState
             ),
@@ -120,7 +123,7 @@ internal fun MegaNavDisplay(
         onConsumed = navigationEventViewModel::eventDisplayed
     ) { queueEvent: QueueEvent ->
 
-        if (isSuppressing && queueEvent.isSuppressable) {
+        if (suppressionType.suppressesEvent(queueEvent)) {
             deferredEvents.add(queueEvent)
             if (queueEvent is AppDialogEvent) {
                 navigationEventViewModel.eventHandled()
@@ -141,12 +144,16 @@ internal fun MegaNavDisplay(
         }
     }
 
-    LaunchedEffect(isSuppressing) {
-        if (!isSuppressing && deferredEvents.isNotEmpty()) {
+    LaunchedEffect(suppressionType) {
+        if (deferredEvents.isNotEmpty()) {
             val events = deferredEvents.toList()
             deferredEvents.clear()
             events.forEach { event ->
-                emitNavigationEvent(event)
+                if (suppressionType.suppressesEvent(event).not()) {
+                    emitNavigationEvent(event)
+                } else {
+                    deferredEvents.add(event)
+                }
             }
         }
     }

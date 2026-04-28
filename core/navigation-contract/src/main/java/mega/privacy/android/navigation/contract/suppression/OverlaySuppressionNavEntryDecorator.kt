@@ -35,17 +35,19 @@ fun <T : Any> rememberOverlaySuppressionNavEntryDecorator(
  *
  * Overlay entries (dialogs, bottom sheets) do not declare this metadata,
  * so they have no effect on the suppression state.
+ *
+ * @param suppressionState The shared state holder read by the event
  */
 class OverlaySuppressionNavEntryDecorator<T : Any>(
     private val suppressionState: OverlaySuppressionState,
 ) : NavEntryDecorator<T>(
     onPop = { _ -> },
     decorate = { entry ->
-        val suppresses = entry.suppressesOverlays()
-        if (suppresses) {
+        val suppressionType = entry.suppressesOverlays()
+        if (suppressionType != SuppressionType.None) {
             DisposableEffect(Unit) {
-                suppressionState.setSuppressing(true)
-                onDispose { suppressionState.setSuppressing(false) }
+                suppressionState.setSuppressing(suppressionType)
+                onDispose { suppressionState.setSuppressing(SuppressionType.None) }
             }
         }
         entry.Content()

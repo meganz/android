@@ -1,6 +1,7 @@
 package mega.privacy.android.navigation.contract.suppression
 
 import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.metadata.NavEntryMetadataScope
 
 /**
@@ -30,12 +31,16 @@ object OverlaySuppressionMetadata {
  * }
  * ```
  */
-fun NavEntryMetadataScope.withOverlaySuppression() {
-    set(OverlaySuppressionMetadata.KEY, true)
+fun NavEntryMetadataScope.withOverlaySuppression(vararg exclusions: NavKey = emptyArray()) {
+    if (exclusions.isNotEmpty()) {
+        set(OverlaySuppressionMetadata.KEY, SuppressionType.WithExceptions(exclusions.toList()))
+    } else {
+        set(OverlaySuppressionMetadata.KEY, SuppressionType.Complete)
+    }
 }
 
 /**
  * Returns `true` if this entry's metadata declares overlay suppression.
  */
-fun NavEntry<*>.suppressesOverlays(): Boolean =
-    metadata[OverlaySuppressionMetadata.KEY] == true
+fun NavEntry<*>.suppressesOverlays(): SuppressionType =
+    metadata[OverlaySuppressionMetadata.KEY] as? SuppressionType ?: SuppressionType.None
