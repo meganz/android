@@ -45,7 +45,6 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertDialogUtil
@@ -242,13 +241,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 onConsumeEvent = viewModel::resetDownloadNode,
                 snackBarHostState = scaffoldState.snackbarHostState,
             )
-
-            EventEffect(
-                event = uiState.showLoginEvent,
-                onConsumed = viewModel::onShowLoginEventConsumed
-            ) {
-                showLoginScreen()
-            }
 
             EventEffect(
                 event = uiState.finishActivityEvent,
@@ -451,19 +443,6 @@ class FolderLinkComposeActivity : PasscodeActivity(),
             return
         }
         MegaNodeUtil.shareLink(this, viewModel.state.value.url, viewModel.state.value.title)
-    }
-
-    private fun showLoginScreen() {
-        Timber.d("Refresh session - sdk or karere")
-        intent?.data?.let { data ->
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-            intent.data = data
-            intent.action = Constants.ACTION_OPEN_FOLDER_LINK_ROOT_NODES_NULL
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            startActivity(intent)
-            finish()
-        } ?: Timber.w("Cannot refresh session - intent data is null")
     }
 
     private fun showAskForDecryptionKeyDialog() {

@@ -1017,13 +1017,6 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Reset finishActivityEvent when consumed
      */
-    fun onShowLoginEventConsumed() {
-        _state.update { it.copy(showLoginEvent = consumed) }
-    }
-
-    /**
-     * Reset finishActivityEvent when consumed
-     */
     fun onFinishActivityEventConsumed() {
         _state.update { it.copy(finishActivityEvent = consumed) }
     }

@@ -136,7 +136,6 @@ class FileLinkViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
-            assertThat(initial.showLoginScreenEvent).isEqualTo(consumed)
             assertThat(initial.hasDbCredentials).isFalse()
             assertThat(initial.url).isEmpty()
             assertThat(initial.fileNode).isNull()
@@ -160,18 +159,7 @@ class FileLinkViewModelTest {
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val newValue = expectMostRecentItem()
-                assertThat(newValue.showLoginScreenEvent).isEqualTo(consumed)
                 assertThat(newValue.hasDbCredentials).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that showLoginScreenEvent is consumed when onShowLoginScreenEventConsumed is invoked`() =
-        runTest {
-            underTest.state.test {
-                underTest.onShowLoginScreenEventConsumed()
-                val newValue = expectMostRecentItem()
-                assertThat(newValue.showLoginScreenEvent).isEqualTo(consumed)
             }
         }
 

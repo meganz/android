@@ -36,7 +36,6 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
@@ -134,12 +133,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 event = uiState.openFile,
                 onConsumed = viewModel::resetOpenFile,
                 action = ::onOpenFile
-            )
-
-            EventEffect(
-                event = uiState.showLoginScreenEvent,
-                onConsumed = viewModel::onShowLoginScreenEventConsumed,
-                action = ::showLoginScreen
             )
 
             val snackBarHostState = remember { SnackbarHostState() }
@@ -248,17 +241,6 @@ class FileLinkComposeActivity : PasscodeActivity(),
             context = this,
             message = getString(R.string.context_correctly_copied)
         )
-        finish()
-    }
-
-    private fun showLoginScreen() {
-        Timber.d("Refresh session - sdk or karere")
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-        intent.data = Uri.parse(viewModel.state.value.url)
-        intent.action = Constants.ACTION_OPEN_FILE_LINK_ROOT_NODES_NULL
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
         finish()
     }
 

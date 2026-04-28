@@ -117,15 +117,6 @@ class FileLinkViewModel @Inject constructor(
     }
 
     /**
-     * Consume show login screen event
-     */
-    fun onShowLoginScreenEventConsumed() {
-        _state.update {
-            it.copy(showLoginScreenEvent = consumed)
-        }
-    }
-
-    /**
      * Handle intent
      */
     fun handleIntent(intent: Intent) {

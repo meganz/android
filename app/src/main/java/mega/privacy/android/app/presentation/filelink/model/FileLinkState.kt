@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity]
  *
- * @property showLoginScreenEvent   Event to show login screen
  * @property url                    Url of the file
  * @property hasDbCredentials       Whether has db credentials
  * @property fileNode               Current file node
@@ -36,7 +35,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property errorState             Error state of the file link
  */
 data class FileLinkState(
-    val showLoginScreenEvent: StateEvent = consumed,
     val hasDbCredentials: Boolean = false,
     val url: String = "",
     val fileNode: TypedFileNode? = null,
