@@ -24,6 +24,7 @@ install-referrer = "2.2"
 tink = "1.8.0"
 guava = "33.0.0-jre"
 ump = "3.1.0"
+googleid = "1.1.1"
 
 [libraries]
 accompanist-placeholder = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist" }
@@ -63,6 +64,7 @@ install-referrer = { module = "com.android.installreferrer:installreferrer", ver
 tink = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
+identity-googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 [bundles]
 firebase-bom = ["firebase-crashlytics-ndk", "firebase-crashlytics", "firebase-messaging", "firebase-perf"]

@@ -188,6 +188,18 @@ enum class ApiFeatures(
         experimentName = "hrvl",
         description = "Enable viewed links section on Home Screen (Home Revamp Phase 2)",
         defaultValue = false
+    ),
+
+    /**
+     * Google Sign-In on the login screen (AND-23415).
+     * When enabled, shows a "Sign in with Google" button on the login screen.
+     * Resolved pre-login via getMiscFlags() (unauthenticated SDK call).
+     */
+    GoogleSignIn(
+        experimentName = "gsign",
+        description = "Enable Google Sign-In on login screen",
+        singleCheckPerRun = true,
+        defaultValue = false
     );
 
     companion object : FeatureFlagValueProvider {

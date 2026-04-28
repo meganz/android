@@ -36,6 +36,7 @@ paging-compose = "3.3.6"
 splashscreen = "1.2.0"
 browser = "1.8.0"
 nav3 = "1.0.0"
+credentials = "1.6.0"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
@@ -113,6 +114,8 @@ material3-adaptive-navigation-suite = { group = "androidx.compose.material3", na
 splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
 material3-window = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 browser = { module = "androidx.browser:browser", version.ref = "browser" }
+credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+credentials-play = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 
 [bundles]
 lifecycle = ["lifecycle-livedata", "lifecycle-viewmodel", "lifecycle-runtime", "lifecycle-reactivestreams", "lifecycle-common", "lifecycle-process", "lifecycle-service", "lifecycle-runtime-compose"]
