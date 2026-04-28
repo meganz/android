@@ -290,7 +290,11 @@ class PendingBackStackNavigationHandler(
     }
 
     private fun findPopUpToKey(popUpTo: NavOptions.PopUpTo): NavKey? =
-        backstack.lastOrNull { it::class == popUpTo.routeClass }
+        if (popUpTo.routeClass == null) {
+            backstack.firstOrNull()
+        } else {
+            backstack.lastOrNull { it::class == popUpTo.routeClass }
+        }
 
     /**
      * Removes elements from the back stack up to the specified destination.

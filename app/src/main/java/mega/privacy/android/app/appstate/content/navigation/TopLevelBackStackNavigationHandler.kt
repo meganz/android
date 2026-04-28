@@ -63,7 +63,11 @@ class TopLevelBackStackNavigationHandler(
     }
 
     private fun findPopUpToKey(popUpTo: NavOptions.PopUpTo): NavKey? =
-        backStack.backStack.lastOrNull { it::class == popUpTo.routeClass }
+        if (popUpTo.routeClass == null) {
+            backStack.backStack.firstOrNull()
+        } else {
+            backStack.backStack.lastOrNull { it::class == popUpTo.routeClass }
+        }
 
     /**
      * Removes elements from the back stack up to the specified destination.

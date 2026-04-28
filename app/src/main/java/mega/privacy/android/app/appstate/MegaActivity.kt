@@ -37,7 +37,6 @@ import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
@@ -82,7 +81,6 @@ import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueu
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
-import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -133,11 +131,6 @@ class MegaActivity : FragmentActivity() {
 
     private val globalStateViewModel: GlobalStateViewModel by viewModels()
 
-    // Channel for external PDF intents (ACTION_VIEW from e.g. Files app).
-    // Routed via this Activity's own navigationHandler to ensure navigation targets the correct
-    // task stack when multiple Activity task stacks coexist.
-    private val externalPdfNavChannel = Channel<PdfViewerNavKey>(Channel.CONFLATED)
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intentActionHandler.savePendingDeepLink(this.intent)
@@ -164,9 +157,6 @@ class MegaActivity : FragmentActivity() {
                     Intent(intent).setClass(this, PdfViewerActivity::class.java)
                 )
                 finish()
-            },
-            navigateToComposePdfViewer = { navKey ->
-                externalPdfNavChannel.trySend(navKey)
             },
         )
     }
@@ -325,12 +315,6 @@ class MegaActivity : FragmentActivity() {
                         fetchNodeProvider = fetchNodeProvider,
                         navigationResultManager = navigationResultManager,
                     )
-                }
-                // Opens the PDF viewer in this Activity's own back stack.
-                LaunchedEffect(navigationHandler) {
-                    for (navKey in externalPdfNavChannel) {
-                        navigationHandler.navigateAndClearBackStack(navKey)
-                    }
                 }
 
                 SessionConnectivityObserver(

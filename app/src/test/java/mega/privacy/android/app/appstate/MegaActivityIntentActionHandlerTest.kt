@@ -31,6 +31,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.check
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -246,22 +247,26 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.data).thenReturn(uri)
             whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("file.pdf")
-            var receivedNavKey: PdfViewerNavKey? = null
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
                 getShareUris = { null },
-                navigateToComposePdfViewer = { receivedNavKey = it },
             )
 
-            assertThat(receivedNavKey).isEqualTo(
-                PdfViewerNavKey(
-                    contentUri = contentUriString,
-                    isLocalContent = true,
-                    isExternalFile = true,
-                    title = "file.pdf",
-                )
+            verify(navigationEventQueue).emit(
+                navKey = check {
+                    assertThat(it).isEqualTo(
+                        PdfViewerNavKey(
+                            contentUri = contentUriString,
+                            isLocalContent = true,
+                            isExternalFile = true,
+                            title = "file.pdf",
+                        )
+                    )
+                },
+                priority = any(),
+                navOptions = anyOrNull(),
             )
         }
 
@@ -278,22 +283,26 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.data).thenReturn(uri)
             whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpsUriString)).thenReturn("sample.pdf")
-            var receivedNavKey: PdfViewerNavKey? = null
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
                 getShareUris = { null },
-                navigateToComposePdfViewer = { receivedNavKey = it },
             )
 
-            assertThat(receivedNavKey).isEqualTo(
-                PdfViewerNavKey(
-                    contentUri = httpsUriString,
-                    isLocalContent = false,
-                    isExternalFile = true,
-                    title = "sample.pdf",
-                )
+            verify(navigationEventQueue).emit(
+                navKey = check {
+                    assertThat(it).isEqualTo(
+                        PdfViewerNavKey(
+                            contentUri = httpsUriString,
+                            isLocalContent = false,
+                            isExternalFile = true,
+                            title = "sample.pdf",
+                        )
+                    )
+                },
+                priority = any(),
+                navOptions = anyOrNull(),
             )
         }
 
@@ -310,22 +319,26 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.data).thenReturn(uri)
             whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpUriString)).thenReturn("sample.pdf")
-            var receivedNavKey: PdfViewerNavKey? = null
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
                 getShareUris = { null },
-                navigateToComposePdfViewer = { receivedNavKey = it },
             )
 
-            assertThat(receivedNavKey).isEqualTo(
-                PdfViewerNavKey(
-                    contentUri = httpUriString,
-                    isLocalContent = false,
-                    isExternalFile = true,
-                    title = "sample.pdf",
-                )
+            verify(navigationEventQueue).emit(
+                navKey = check {
+                    assertThat(it).isEqualTo(
+                        PdfViewerNavKey(
+                            contentUri = httpUriString,
+                            isLocalContent = false,
+                            isExternalFile = true,
+                            title = "sample.pdf",
+                        )
+                    )
+                },
+                priority = any(),
+                navOptions = anyOrNull(),
             )
         }
 
@@ -364,22 +377,26 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.data).thenReturn(uri)
             whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(fileUriString)).thenReturn("document.pdf")
-            var receivedNavKey: PdfViewerNavKey? = null
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
                 getShareUris = { null },
-                navigateToComposePdfViewer = { receivedNavKey = it },
             )
 
-            assertThat(receivedNavKey).isEqualTo(
-                PdfViewerNavKey(
-                    contentUri = fileUriString,
-                    isLocalContent = true,
-                    isExternalFile = true,
-                    title = "document.pdf",
-                )
+            verify(navigationEventQueue).emit(
+                navKey = check {
+                    assertThat(it).isEqualTo(
+                        PdfViewerNavKey(
+                            contentUri = fileUriString,
+                            isLocalContent = true,
+                            isExternalFile = true,
+                            title = "document.pdf",
+                        )
+                    )
+                },
+                priority = any(),
+                navOptions = anyOrNull(),
             )
         }
 
@@ -419,22 +436,26 @@ class MegaActivityIntentActionHandlerTest {
             whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
             // Resolver returns base name without extension; production adds ".pdf" via FileUtil.addPdfFileExtension
             whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("file")
-            var receivedNavKey: PdfViewerNavKey? = null
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
                 getShareUris = { null },
-                navigateToComposePdfViewer = { receivedNavKey = it },
             )
 
-            assertThat(receivedNavKey).isEqualTo(
-                PdfViewerNavKey(
-                    contentUri = contentUriString,
-                    isLocalContent = true,
-                    isExternalFile = true,
-                    title = "file.pdf",
-                )
+            verify(navigationEventQueue).emit(
+                navKey = check {
+                    assertThat(it).isEqualTo(
+                        PdfViewerNavKey(
+                            contentUri = contentUriString,
+                            isLocalContent = true,
+                            isExternalFile = true,
+                            title = "file.pdf",
+                        )
+                    )
+                },
+                priority = any(),
+                navOptions = anyOrNull(),
             )
         }
 
@@ -446,18 +467,20 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(null)
             var legacyLaunched = false
-            var composeCalled = false
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
                 getShareUris = { null },
                 launchLegacyPdfViewer = { legacyLaunched = true },
-                navigateToComposePdfViewer = { composeCalled = true },
             )
 
             assertThat(legacyLaunched).isFalse()
-            assertThat(composeCalled).isFalse()
+            verify(navigationEventQueue, never()).emit(
+                navKey = any(),
+                priority = any(),
+                navOptions = anyOrNull(),
+            )
         }
 
     @Test
@@ -471,18 +494,20 @@ class MegaActivityIntentActionHandlerTest {
             whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI))
                 .thenThrow(RuntimeException("Feature flag service unavailable"))
             var legacyLaunched = false
-            var composeCalled = false
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
                 getShareUris = { null },
                 launchLegacyPdfViewer = { legacyLaunched = true },
-                navigateToComposePdfViewer = { composeCalled = true },
             )
 
             assertThat(legacyLaunched).isTrue()
-            assertThat(composeCalled).isFalse()
+            verify(navigationEventQueue, never()).emit(
+                navKey = any(),
+                priority = any(),
+                navOptions = anyOrNull(),
+            )
         }
 
     @Test
@@ -499,22 +524,26 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.data).thenReturn(uri)
             whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpsUriString)).thenReturn(null)
-            var receivedNavKey: PdfViewerNavKey? = null
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
                 getShareUris = { null },
-                navigateToComposePdfViewer = { receivedNavKey = it },
             )
 
-            assertThat(receivedNavKey).isEqualTo(
-                PdfViewerNavKey(
-                    contentUri = httpsUriString,
-                    isLocalContent = false,
-                    isExternalFile = true,
-                    title = "sample.pdf",
-                )
+            verify(navigationEventQueue).emit(
+                navKey = check {
+                    assertThat(it).isEqualTo(
+                        PdfViewerNavKey(
+                            contentUri = httpsUriString,
+                            isLocalContent = false,
+                            isExternalFile = true,
+                            title = "sample.pdf",
+                        )
+                    )
+                },
+                priority = any(),
+                navOptions = anyOrNull(),
             )
         }
 

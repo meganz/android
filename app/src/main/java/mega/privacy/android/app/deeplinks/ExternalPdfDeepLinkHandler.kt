@@ -31,7 +31,7 @@ class ExternalPdfDeepLinkHandler @Inject constructor(
     suspend fun consumeExternalActionViewPdfIfApplicable(
         intent: Intent,
         launchLegacyPdfViewer: () -> Unit,
-        navigateToComposePdfViewer: (PdfViewerNavKey) -> Unit,
+        navigateToComposePdfViewer: suspend (PdfViewerNavKey) -> Unit,
     ): Boolean {
         if (intent.action != Intent.ACTION_VIEW) return false
         if (!isPdfIntent(intent)) return false

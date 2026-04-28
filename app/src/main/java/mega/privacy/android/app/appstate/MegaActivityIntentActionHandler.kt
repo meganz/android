@@ -13,11 +13,11 @@ import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomS
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
-import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
 import mega.privacy.mobile.analytics.event.ShortcutActionChatButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ShortcutActionScanDocumentButtonPressedEvent
@@ -81,14 +81,19 @@ class MegaActivityIntentActionHandler @Inject constructor(
         refreshSession: suspend (RefreshEvent) -> Unit,
         getShareUris: () -> List<UriPath>?,
         launchLegacyPdfViewer: () -> Unit = {},
-        navigateToComposePdfViewer: (PdfViewerNavKey) -> Unit = {},
     ) {
         when (intent.action) {
             Intent.ACTION_VIEW -> {
                 if (externalPdfDeepLinkHandler.consumeExternalActionViewPdfIfApplicable(
                         intent = intent,
                         launchLegacyPdfViewer = launchLegacyPdfViewer,
-                        navigateToComposePdfViewer = navigateToComposePdfViewer,
+                        navigateToComposePdfViewer = {
+                            navigationEventQueue.emit(navKey = it, navOptions = navOptions {
+                                popUpToRoot {
+                                    inclusive = true
+                                }
+                            })
+                        },
                     )
                 ) {
                     intent.action = null

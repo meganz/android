@@ -696,6 +696,34 @@ class PendingBackStackNavigationHandlerTest {
     }
 
     @Test
+    fun `test that navigate with popUpToRoot clears back stack to root`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpToRoot {
+                inclusive = false
+            }
+        }
+        underTest.navigate(Destination2, options)
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination2)
+    }
+
+    @Test
+    fun `test that navigate with popUpToRoot inclusive clears entire back stack`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpToRoot {
+                inclusive = true
+            }
+        }
+        underTest.navigate(Destination2, options)
+
+        assertThat(backStack).containsExactly(Destination2)
+    }
+
+    @Test
     fun `test that navigate with null navOptions does not pop back stack`() {
         backStack.addAll(listOf(Destination1, Destination2))
 

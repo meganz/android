@@ -15,9 +15,12 @@ class NavOptions internal constructor(
 
     /**
      * Pop-up-to configuration specifying which destination to pop the back stack to.
+     *
+     * When [routeClass] is `null`, the pop targets the root of the back stack
+     * (equivalent to `popUpTo(0)` in `androidx.navigation`).
      */
     class PopUpTo internal constructor(
-        val routeClass: KClass<*>,
+        val routeClass: KClass<*>?,
         val inclusive: Boolean,
     ) {
 
@@ -25,7 +28,7 @@ class NavOptions internal constructor(
          * Builder for constructing [PopUpTo] instances via DSL.
          */
         class Builder @PublishedApi internal constructor(
-            private val routeClass: KClass<*>,
+            private val routeClass: KClass<*>?,
         ) {
             /**
              * Whether the destination itself should be popped from the back stack.
@@ -59,6 +62,14 @@ class NavOptions internal constructor(
             popUpTo = PopUpTo.Builder(routeClass = routeClass).apply(block).build()
         }
 
+        /**
+         * Pop up to the root of the back stack, equivalent to `popUpTo(0)` in
+         * `androidx.navigation`.
+         */
+        fun popUpToRoot(block: PopUpTo.Builder.() -> Unit = {}) {
+            popUpTo = PopUpTo.Builder(routeClass = null).apply(block).build()
+        }
+
         fun build() = NavOptions(launchSingleTop, popUpTo)
     }
 }
@@ -74,6 +85,12 @@ class NavOptions internal constructor(
  *
  * navOptions {
  *     popUpTo<Destination> {
+ *         inclusive = true
+ *     }
+ * }
+ *
+ * navOptions {
+ *     popUpToRoot {
  *         inclusive = true
  *     }
  * }
