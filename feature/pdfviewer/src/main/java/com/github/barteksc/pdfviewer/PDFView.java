@@ -979,7 +979,10 @@ public class PDFView extends RelativeLayout {
      * @return rectangle in canvas-local coordinates, or empty rect if mapping fails
      */
     public RectF mapRectToCanvas(int page, RectF pdfRect, float pageWidth, float pageHeight) {
-        if (pdfFile == null) {
+        // Guard against invalid page index (e.g. -1, or page not load)
+        if (pdfFile == null || pdfFile.pageHasError(page)) {
+            Timber.w("mapRectToCanvas: invalid page index %d (pagesCount=%d)",
+                    page, pdfFile != null ? pdfFile.getPagesCount() : -1);
             return new RectF();
         }
         return pdfFile.mapRectToDevice(

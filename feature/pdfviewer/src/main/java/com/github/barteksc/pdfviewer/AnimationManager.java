@@ -17,6 +17,7 @@ package com.github.barteksc.pdfviewer;
 
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.graphics.PointF;
@@ -53,6 +54,7 @@ class AnimationManager {
         animation = ValueAnimator.ofFloat(xFrom, xTo);
         animation.setInterpolator(new DecelerateInterpolator());
         animation.addUpdateListener(new XAnimation());
+        animation.addListener(new PageLoadOnAnimationEnd(pdfView));
         animation.setDuration(400);
         animation.start();
     }
@@ -63,6 +65,7 @@ class AnimationManager {
         animation = ValueAnimator.ofFloat(yFrom, yTo);
         animation.setInterpolator(new DecelerateInterpolator());
         animation.addUpdateListener(new YAnimation());
+        animation.addListener(new PageLoadOnAnimationEnd(pdfView));
         animation.setDuration(400);
         animation.start();
     }
@@ -175,6 +178,37 @@ class AnimationManager {
             Timber.d("onAnimationStart");
         }
 
+    }
+
+    // Triggers loadPages() when a page-jump animation ends naturally so that the pages
+    // at the final scroll position are rendered. Skipped on cancel because the next
+    // animation will trigger its own load when it completes. isCancelled is cleared in
+    // onAnimationStart so the same listener instance remains correct if reused.
+    static class PageLoadOnAnimationEnd extends AnimatorListenerAdapter {
+
+        private final PDFView pdfView;
+        private boolean isCancelled = false;
+
+        PageLoadOnAnimationEnd(PDFView pdfView) {
+            this.pdfView = pdfView;
+        }
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+            isCancelled = false;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            isCancelled = true;
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (!isCancelled) {
+                pdfView.loadPages();
+            }
+        }
     }
 
     private void hideHandle() {
