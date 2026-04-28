@@ -74,6 +74,7 @@ import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
@@ -445,11 +446,17 @@ class MegaActivity : FragmentActivity() {
 
                                     when (it) {
                                         LoginScreen.LoginScreen -> navigationHandler.navigate(
-                                            LoginNavKey()
+                                            LoginNavKey(),
+                                            navOptions {
+                                                popUpTo<CreateAccountNavKey> { inclusive = true }
+                                            },
                                         )
 
                                         LoginScreen.CreateAccount -> navigationHandler.navigate(
-                                            CreateAccountNavKey()
+                                            CreateAccountNavKey(),
+                                            navOptions {
+                                                popUpTo<LoginNavKey> { inclusive = true }
+                                            },
                                         )
 
                                         LoginScreen.Tour -> {

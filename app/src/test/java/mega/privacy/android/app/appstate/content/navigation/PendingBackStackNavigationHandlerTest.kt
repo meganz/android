@@ -227,7 +227,9 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
             underTest.navigate(Destination1)
-            assertThat(backStack).containsExactly(DefaultLoginDestination)
+            assertThat(backStack).containsExactly(
+                InitialLoginDestination, DefaultLoginDestination
+            )
         }
 
     @Test
@@ -235,7 +237,9 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
             underTest.navigate(listOf(NoSessionDestination1, Destination2))
-            assertThat(backStack).containsExactly(DefaultLoginDestination)
+            assertThat(backStack).containsExactly(
+                InitialLoginDestination, DefaultLoginDestination
+            )
         }
 
     @Test
@@ -288,7 +292,7 @@ class PendingBackStackNavigationHandlerTest {
 
         underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
 
-        assertThat(backStack).containsExactly(DefaultLoginDestination)
+        assertThat(backStack).containsExactly(InitialLoginDestination, DefaultLoginDestination)
     }
 
     @Test
@@ -514,7 +518,9 @@ class PendingBackStackNavigationHandlerTest {
 
         tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
 
-        assertThat(tempBackStack).containsExactly(DefaultLoginDestination)
+        assertThat(tempBackStack).containsExactly(
+            InitialLoginDestination, DefaultLoginDestination
+        )
     }
 
     @Test

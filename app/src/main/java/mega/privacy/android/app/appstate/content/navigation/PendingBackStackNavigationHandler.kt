@@ -23,7 +23,7 @@ class PendingBackStackNavigationHandler(
     private var isPasscodeLocked: Boolean,
     private val passcodeDestination: NavKey,
     private val defaultLoginDestination: NoSessionNavKey,
-    initialLoginDestination: NoSessionNavKey,
+    private val initialLoginDestination: NoSessionNavKey,
     private val fetchNodeProvider: FetchNodeProvider,
     private val navigationResultManager: NavigationResultManager,
 ) : NavigationHandler, NavigationResultsHandler by navigationResultManager {
@@ -228,7 +228,7 @@ class PendingBackStackNavigationHandler(
         repeat(authRequiredDestinations.size) {
             backstack.removeLastOrNull()
         }
-        if (backstack.isEmpty()) backstack.add(newDestination)
+        if (backstack.isEmpty()) backstack.addAll(setOf(initialLoginDestination, newDestination))
         // show non-required destinations immediately
         backstack.addAll(backstack.pending.filter { it is NoSessionNavKey })
         backstack.pending = backstack.pending.filterNot { it is NoSessionNavKey }

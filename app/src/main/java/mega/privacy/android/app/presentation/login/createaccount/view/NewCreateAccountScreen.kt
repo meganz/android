@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login.createaccount.view
 
 import android.content.res.Configuration
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -119,11 +118,6 @@ internal fun NewCreateAccountRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    BackHandler(
-        onBack = {
-            activityViewModel.setPendingFragmentToShow(LoginScreen.Tour)
-        },
-    )
     val snackBarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
     NewCreateAccountScreen(
         uiState = uiState,

@@ -93,7 +93,15 @@ fun LoginScreen(
         }
     }
 
-    BackHandler {
+    val needsBackOverride = with(uiState) {
+        Constants.ACTION_REFRESH == activity?.intent?.action ||
+                Constants.ACTION_REFRESH_API_SERVER == activity?.intent?.action ||
+                is2FARequired || multiFactorAuthState != null ||
+                viewModel.loginMutex.isLocked || isLoginInProgress ||
+                isFastLoginInProgress || fetchNodesUpdate != null
+    }
+
+    BackHandler(enabled = needsBackOverride) {
         with(uiState) {
             when {
                 Constants.ACTION_REFRESH == activity?.intent?.action || Constants.ACTION_REFRESH_API_SERVER == activity?.intent?.action ->
@@ -105,11 +113,6 @@ fun LoginScreen(
 
                 viewModel.loginMutex.isLocked || isLoginInProgress || isFastLoginInProgress || fetchNodesUpdate != null ->
                     activity?.moveTaskToBack(true)
-
-                else -> {
-                    LoginActivity.isBackFromLoginPage = true
-                    viewModel.setPendingFragmentToShow(LoginScreen.Tour)
-                }
             }
         }
     }
