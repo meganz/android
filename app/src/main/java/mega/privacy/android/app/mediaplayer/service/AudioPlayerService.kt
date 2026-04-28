@@ -19,6 +19,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -182,22 +183,29 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun onCreate() {
         super.onCreate()
-        Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
-        // startForegroundService() requires startForeground() within a short window. The media
-        // notification is posted asynchronously from createPlayerControlNotification(); if that
-        // callback runs late, the system throws ForegroundServiceDidNotStartInTimeException.
-        startForegroundWithMediaPlaybackType(createNotificationForStartForeground())
-        if (!isNotificationCreated) {
-            createPlayerControlNotification()
-            isNotificationCreated = true
+        isRunning = true
+        runCatching {
+            Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
+            // startForegroundService() requires startForeground() within a short window. The media
+            // notification is posted asynchronously from createPlayerControlNotification(); if that
+            // callback runs late, the system throws ForegroundServiceDidNotStartInTimeException.
+            startForegroundWithMediaPlaybackType(createNotificationForStartForeground())
+            if (!isNotificationCreated) {
+                createPlayerControlNotification()
+                isNotificationCreated = true
+            }
+            createPlayer()
+            audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
+            audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
+            initMediaSession()
+            observeData()
+            ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+            registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
+        }.onFailure { e ->
+            Timber.e(e, "AudioPlayerService failed to initialise — stopping self")
+            isRunning = false
+            stopSelf()
         }
-        createPlayer()
-        audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
-        audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
-        initMediaSession()
-        observeData()
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
     }
 
     private fun createPlayer() {
@@ -401,7 +409,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     }
 
     private fun startForegroundWithMediaPlaybackType(notification: Notification) {
-        try {
+        runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 startForeground(
                     PLAYBACK_NOTIFICATION_ID,
@@ -415,7 +423,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             } else {
                 startForeground(PLAYBACK_NOTIFICATION_ID, notification)
             }
-        } catch (e: Exception) {
+        }.onFailure { e ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
                 && e is ForegroundServiceStartNotAllowedException
             ) {
@@ -528,6 +536,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun onDestroy() {
         super.onDestroy()
+        isRunning = false
         viewModelGateway.cancelSearch()
         mainHandler.removeCallbacks(resumePlayRunnable)
 
@@ -681,6 +690,14 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1
+
+        /**
+         * Whether an instance of [AudioPlayerService] is currently running.
+         * Set in [onCreate] and cleared in [onDestroy].
+         */
+        var isRunning = false
+            @VisibleForTesting
+            internal set
 
         private const val INTENT_EXTRA_KEY_COMMAND = "command"
         private const val COMMAND_CREATE = 1
