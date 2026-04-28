@@ -26,6 +26,8 @@ Merge Request automatically.
 /create-mr --draft                           # Create as draft MR
 /create-mr --squash                          # Force squash on merge (overrides default)
 /create-mr --no-squash                       # Force no squash on merge (overrides default)
+/create-mr --wip-label                       # Explicitly add "WIP" label (same as default)
+/create-mr --no-wip-label                    # Skip the default "WIP" label
 ```
 
 ## Arguments
@@ -39,6 +41,8 @@ Merge Request automatically.
 | `--draft`           | Create MR as draft                                                          |                                      |
 | `--squash`          | Force squash on merge, regardless of target branch                          |                                      |
 | `--no-squash`       | Force no squash on merge, regardless of target branch                       |                                      |
+| `--wip-label`       | Explicitly add the "WIP" label                                              |                                      |
+| `--no-wip-label`    | Skip adding the "WIP" label                                                 |                                      |
 
 ## Steps
 
@@ -224,7 +228,8 @@ git push --set-upstream origin "<current branch>" \
   -o merge_request.create \
   -o "merge_request.title=<title>" \
   -o "merge_request.description=${DESCRIPTION}" \
-  -o "merge_request.target_branch=<base>"
+  -o "merge_request.target_branch=<base>" \
+  -o "merge_request.label=WIP"
 ```
 
 Rules for building `DESCRIPTION`:
@@ -238,6 +243,12 @@ Squash behaviour (in priority order):
 1. If `--squash` was passed → append `-o merge_request.squash`
 2. If `--no-squash` was passed → do not append squash
 3. Otherwise (default) → append `-o merge_request.squash`
+
+WIP label behaviour (in priority order):
+1. If `--no-wip-label` was passed → do not append the label option
+2. Otherwise (default, or `--wip-label` explicitly passed) → append `-o "merge_request.label=WIP"`
+
+The `merge_request.label` push option can be repeated to add multiple labels; only `WIP` is added by this skill. The label must already exist in the GitLab project (it does for this repo).
 
 ### Step 5 — Confirm
 
