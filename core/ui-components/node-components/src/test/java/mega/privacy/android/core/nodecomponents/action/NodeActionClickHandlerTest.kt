@@ -597,7 +597,7 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test AvailableOfflineAction single node handle calls downloadNodeForOffline when node is not available offline`() =
+    fun `test AvailableOfflineAction single node handle calls downloadNodesForOffline when node is not available offline`() =
         runTest {
             val action = AvailableOfflineActionClickHandler()
             val menuAction = mock<AvailableOfflineMenuAction>()
@@ -608,18 +608,24 @@ class NodeActionClickHandlerTest {
 
             action.handle(menuAction, nodeNotOffline, mockSingleNodeActionProvider)
 
-            verify(mockViewModel).downloadNodeForOffline(withStartMessage = false)
+            verify(mockViewModel).downloadNodesForOffline(
+                nodes = listOf(nodeNotOffline),
+                withStartMessage = false,
+            )
         }
 
     @Test
-    fun `test AvailableOfflineAction multiple nodes handle calls downloadNodeForOffline`() {
+    fun `test AvailableOfflineAction multiple nodes handle calls downloadNodesForOffline`() {
         val action = AvailableOfflineActionClickHandler()
         val menuAction = mock<AvailableOfflineMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockViewModel).downloadNodeForOffline(withStartMessage = false)
+        verify(mockViewModel).downloadNodesForOffline(
+            nodes = nodes,
+            withStartMessage = false,
+        )
     }
 
     @Test

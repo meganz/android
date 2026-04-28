@@ -130,19 +130,29 @@ sealed interface TransferTriggerEvent {
 
 
     /**
-     * Event to start downloading a node for offline use
-     * @param node the node to be saved offline
+     * Event to start downloading nodes for offline use
      */
     data class StartDownloadForOffline(
-        val node: TypedNode?,
         override val isHighPriority: Boolean = false,
         override val waitNotificationPermissionResponseToStart: Boolean = false,
         override val withStartMessage: Boolean,
+        override val nodes: List<TypedNode>,
     ) : DownloadTriggerEvent {
-        override val nodes = node?.let { listOf(node) } ?: emptyList()
         override val appData = TransferAppData.OfflineDownload
-    }
 
+        /**
+         * Event to start downloading a single node for offline use
+         * @param node TypedNode
+         * @param withStartMessage True if a message should be shown when the transfer starts.
+         */
+        constructor(
+            node: TypedNode?,
+            withStartMessage: Boolean,
+        ) : this(
+            nodes = node?.let { listOf(node) } ?: emptyList(),
+            withStartMessage = withStartMessage
+        )
+    }
 
     /**
      * Event to start downloading a list of nodes to download folder

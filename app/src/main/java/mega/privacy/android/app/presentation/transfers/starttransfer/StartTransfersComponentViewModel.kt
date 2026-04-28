@@ -263,14 +263,12 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                 when (event) {
                     is TransferTriggerEvent.DownloadTriggerEvent -> {
                         (if (event is TransferTriggerEvent.StartDownloadForOffline) {
-                            if (event.node == null) {
+                            if (event.nodes.isEmpty()) {
                                 Timber.e("Node in $event must exist")
                                 null
                             } else {
                                 runCatching {
-                                    val node = event.node
-                                    requireNotNull(node)
-                                    getOfflinePathForNodeUseCase(node)
+                                    getOfflinePathForNodeUseCase(event.nodes.first())
                                 }.onFailure { Timber.e(it) }
                                     .getOrNull()
                             }
@@ -636,18 +634,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
      * @param event the [TransferTriggerEvent.StartDownloadForOffline] event that starts this download
      */
     private fun startDownloadForOffline(event: TransferTriggerEvent.StartDownloadForOffline) {
-        if (event.node == null) {
+        if (event.nodes.isEmpty()) {
             return
         }
         viewModelScope.launch {
             startDownloadNodes(
-                nodes = listOfNotNull(event.node),
+                nodes = event.nodes,
                 isHighPriority = event.isHighPriority,
                 getUri = {
                     runCatching {
-                        val node = event.node
-                        requireNotNull(node)
-                        getOfflinePathForNodeUseCase(node)
+                        getOfflinePathForNodeUseCase(event.nodes.first())
                     }.onFailure { Timber.e(it) }
                         .getOrNull()
                 },

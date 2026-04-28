@@ -10,6 +10,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddL
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToAlbumSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToFavouritesSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AvailableOfflineSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.CopySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DeletePermanentlySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DisputeTakeDownSelectionMenuItem
@@ -72,6 +73,8 @@ abstract class NodeSelectionModeModule {
             addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
             addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
             removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             hideSelectionModeMenuAction,
@@ -93,6 +96,8 @@ abstract class NodeSelectionModeModule {
             addLabelSelectionMenuItem,
             addToFavouritesSelectionMenuItem,
             removeFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
 
         @Provides
@@ -119,6 +124,8 @@ abstract class NodeSelectionModeModule {
             leaveShareSelectionMenuItem: LeaveShareSelectionMenuItem,
             rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
             sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuItem,
             moveSelectionModeMenuItem,
@@ -126,7 +133,9 @@ abstract class NodeSelectionModeModule {
             renameSelectionMenuItem,
             leaveShareSelectionMenuItem,
             rubbishBinSelectionMenuAction,
-            sendToChatSelectionMenuItem
+            sendToChatSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
 
         @Provides
@@ -151,6 +160,8 @@ abstract class NodeSelectionModeModule {
             addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
             addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
             removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -169,6 +180,8 @@ abstract class NodeSelectionModeModule {
             addLabelSelectionMenuItem,
             addToFavouritesSelectionMenuItem,
             removeFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
 
 
@@ -189,6 +202,8 @@ abstract class NodeSelectionModeModule {
             addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
             addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
             removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem: AvailableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem: RemoveOfflineSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -202,6 +217,8 @@ abstract class NodeSelectionModeModule {
             addLabelSelectionMenuItem,
             addToFavouritesSelectionMenuItem,
             removeFromFavouritesSelectionMenuItem,
+            availableOfflineSelectionMenuItem,
+            removeOfflineSelectionMenuItem,
         )
 
 

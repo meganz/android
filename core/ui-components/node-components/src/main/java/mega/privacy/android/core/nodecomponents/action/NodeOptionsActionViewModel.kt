@@ -567,24 +567,23 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     }
 
     /**
-     * Download node for offline
+     * Download nodes for offline
      * Triggers TransferTriggerEvent.StartDownloadNode with parameter [mega.privacy.android.domain.entity.node.TypedNode]
      *
+     * @param nodes list of TypedNode
      * @param withStartMessage  Whether show start message or not.
      *                          It should be true only if the widget is not visible.
      */
-    fun downloadNodeForOffline(withStartMessage: Boolean) {
-        uiState.value.selectedNodes.firstOrNull().let { node ->
-            uiState.update {
-                it.copy(
-                    downloadEvent = triggered(
-                        TransferTriggerEvent.StartDownloadForOffline(
-                            node = node,
-                            withStartMessage = withStartMessage,
-                        )
+    fun downloadNodesForOffline(nodes: List<TypedNode>, withStartMessage: Boolean) {
+        uiState.update {
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadForOffline(
+                        nodes = nodes,
+                        withStartMessage = withStartMessage,
                     )
                 )
-            }
+            )
         }
     }
 
