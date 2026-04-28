@@ -36,8 +36,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -49,15 +47,14 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
-import mega.privacy.android.shared.nodes.components.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
-import mega.privacy.android.shared.nodes.model.text
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.shared.nodes.components.NodeListViewItem
+import mega.privacy.android.shared.nodes.model.text
 import timber.log.Timber
 
 /**
@@ -73,21 +70,18 @@ private const val SKELETON_MENU_ITEM_COUNT = 6
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun NodeOptionsBottomSheetRoute(
+internal fun NodeOptionsBottomSheet(
     navigationHandler: NavigationHandler,
     onDismiss: () -> Unit,
-    nodeId: Long,
-    nodeSourceType: NodeSourceType,
-    partiallyExpand: Boolean,
     onActionClicked: (MenuAction, TypedNode) -> Unit,
-    viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
+    uiState: NodeBottomSheetState,
+    onConsumeErrorState: () -> Unit,
+    showSnackbar: suspend (SnackbarAttributes) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         keyboardController?.hide()
-        viewModel.getBottomSheetOptions(nodeId, nodeSourceType)
     }
 
     BackHandler {
@@ -96,7 +90,7 @@ internal fun NodeOptionsBottomSheetRoute(
 
     EventEffect(
         event = uiState.error,
-        onConsumed = viewModel::onConsumeErrorState,
+        onConsumed = onConsumeErrorState,
         action = {
             Timber.e(it)
             onDismiss()
@@ -113,11 +107,9 @@ internal fun NodeOptionsBottomSheetRoute(
         uiState = uiState,
         navigationHandler = navigationHandler,
         actionHandler = actionHandler,
-        nodeSourceType = nodeSourceType,
-        partiallyExpand = partiallyExpand,
         onDismiss = onDismiss,
-        showSnackbar = viewModel::showSnackbar,
-        onConsumeErrorState = viewModel::onConsumeErrorState,
+        showSnackbar = showSnackbar,
+        onConsumeErrorState = onConsumeErrorState,
     )
 }
 
@@ -142,8 +134,6 @@ internal fun NodeOptionsBottomSheetContent(
     uiState: NodeBottomSheetState,
     navigationHandler: NavigationHandler,
     actionHandler: SingleNodeActionHandler,
-    nodeSourceType: NodeSourceType,
-    partiallyExpand: Boolean,
     onDismiss: () -> Unit,
     showSnackbar: suspend (SnackbarAttributes) -> Unit,
     onConsumeErrorState: () -> Unit = {},
@@ -185,7 +175,6 @@ internal fun NodeOptionsBottomSheetContent(
     if (isContentReady) {
         NodeOptionsHeader(
             uiState = uiState,
-            nodeSourceType = nodeSourceType,
             isScrolled = isScrolled,
         )
 
@@ -201,7 +190,7 @@ internal fun NodeOptionsBottomSheetContent(
             )
         }
     } else {
-        NodeOptionsLoadingSkeleton(partiallyExpand = partiallyExpand)
+        NodeOptionsLoadingSkeleton(partiallyExpand = uiState.partiallyExpand)
     }
 }
 
@@ -212,7 +201,6 @@ internal fun NodeOptionsBottomSheetContent(
 @Composable
 private fun NodeOptionsHeader(
     uiState: NodeBottomSheetState,
-    nodeSourceType: NodeSourceType,
     isScrolled: Boolean,
 ) {
     val node = uiState.node ?: return
@@ -228,8 +216,8 @@ private fun NodeOptionsHeader(
         icon = node.iconRes,
         thumbnailData = node.thumbnailData,
         accessPermissionIcon = node.accessPermissionIcon,
-        showBlurEffect = !nodeSourceType.isSharedSource() && node.showBlurEffect,
-        isSensitive = !nodeSourceType.isSharedSource() && node.isSensitive,
+        showBlurEffect = !uiState.nodeSourceType.isSharedSource() && node.showBlurEffect,
+        isSensitive = !uiState.nodeSourceType.isSharedSource() && node.isSensitive,
         onItemClicked = {},
         enableClick = false,
     )

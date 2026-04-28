@@ -1,6 +1,9 @@
 package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
@@ -38,12 +41,17 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
             navigationHandler.back()
             return@entry
         }
-        NodeOptionsBottomSheetRoute(
+        val viewModel =
+            hiltViewModel<NodeOptionsBottomSheetViewModel, NodeOptionsBottomSheetViewModel.Factory>(
+                creationCallback = { factory ->
+                    factory.create(it.nodeHandle, it.nodeSourceType, it.partiallyExpand)
+                }
+            )
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        NodeOptionsBottomSheet(
             navigationHandler = navigationHandler,
             onDismiss = { navigationHandler.remove(it) },
-            nodeId = it.nodeHandle,
-            nodeSourceType = it.nodeSourceType,
-            partiallyExpand = it.partiallyExpand,
             onActionClicked = { action, node ->
                 returnResult(
                     NodeOptionsBottomSheetNavKey.RESULT,
@@ -51,6 +59,9 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
                 )
                 navigationHandler.remove(it)
             },
+            uiState = uiState,
+            onConsumeErrorState = viewModel::onConsumeErrorState,
+            showSnackbar = viewModel::showSnackbar,
         )
     }
 }

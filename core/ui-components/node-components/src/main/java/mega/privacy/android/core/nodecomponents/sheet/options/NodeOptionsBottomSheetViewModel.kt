@@ -2,6 +2,9 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -31,7 +34,6 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Node options bottom sheet view model
@@ -44,8 +46,8 @@ import javax.inject.Inject
  * @property getNodeByIdUseCase
  * @property getPublicNodeByIdUseCase
  */
-@HiltViewModel
-class NodeOptionsBottomSheetViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = NodeOptionsBottomSheetViewModel.Factory::class)
+class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     private val nodeBottomSheetActionMapper: NodeBottomSheetActionMapper,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
@@ -60,12 +62,21 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
+    @Assisted private val nodeId: Long,
+    @Assisted private val nodeSourceType: NodeSourceType,
+    @Assisted private val partiallyExpand: Boolean,
 ) : ViewModel() {
 
     private var offlineMonitorJob: Job? = null
 
     internal val uiState: StateFlow<NodeBottomSheetState>
-        field = MutableStateFlow(NodeBottomSheetState())
+        field = MutableStateFlow(
+            NodeBottomSheetState(
+                nodeId = nodeId,
+                nodeSourceType = nodeSourceType,
+                partiallyExpand = partiallyExpand,
+            )
+        )
 
     init {
         viewModelScope.launch {
@@ -75,21 +86,16 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                 }
             }
         }
+        getBottomSheetOptions()
+        if (nodeSourceType == NodeSourceType.OFFLINE) {
+            monitorOfflineNodeAvailability(nodeId)
+        }
     }
 
     suspend fun showSnackbar(attributes: SnackbarAttributes) =
         snackbarEventQueue.queueMessage(attributes)
 
-    /**
-     * Get bottom sheet options
-     *
-     * @param nodeId [mega.privacy.android.domain.entity.node.TypedNode]
-     * @return state
-     */
-    fun getBottomSheetOptions(nodeId: Long, nodeSourceType: NodeSourceType) {
-        if (nodeSourceType == NodeSourceType.OFFLINE) {
-            monitorOfflineNodeAvailability(nodeId)
-        }
+    private fun getBottomSheetOptions() {
         viewModelScope.launch {
             val bottomSheetOptions = nodeMenuProviderRegistry.getBottomSheetOptions(nodeSourceType)
             val node = async {
@@ -192,4 +198,12 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
         uiState.update { it.copy(error = consumed()) }
     }
 
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            nodeId: Long,
+            nodeSourceType: NodeSourceType,
+            partiallyExpand: Boolean,
+        ): NodeOptionsBottomSheetViewModel
+    }
 }

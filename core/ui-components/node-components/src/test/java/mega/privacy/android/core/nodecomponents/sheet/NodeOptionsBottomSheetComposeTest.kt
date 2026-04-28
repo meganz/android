@@ -43,11 +43,9 @@ class NodeOptionsBottomSheetComposeTest {
 
     @OptIn(ExperimentalMaterial3Api::class)
     private fun setContent(
-        uiState: NodeBottomSheetState = NodeBottomSheetState(),
+        uiState: NodeBottomSheetState = nodeBottomSheetState(),
         actionHandler: SingleNodeActionHandler = mock(),
         navigationHandler: NavigationHandler = mock(),
-        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-        partiallyExpand: Boolean = false,
         onDismiss: () -> Unit = {},
         onConsumeErrorState: () -> Unit = {},
         showSnackbar: suspend (SnackbarAttributes) -> Unit = { _ -> },
@@ -67,14 +65,26 @@ class NodeOptionsBottomSheetComposeTest {
                 uiState = uiState,
                 actionHandler = actionHandler,
                 navigationHandler = navigationHandler,
-                nodeSourceType = nodeSourceType,
-                partiallyExpand = partiallyExpand,
                 onDismiss = onDismiss,
                 onConsumeErrorState = onConsumeErrorState,
                 showSnackbar = showSnackbar
             )
         }
     }
+
+    private fun nodeBottomSheetState(
+        nodeId: Long = -1L,
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        partiallyExpand: Boolean = false,
+        node: NodeUiItem<TypedNode>? = null,
+        actions: List<List<NodeActionModeMenuItem>> = persistentListOf(),
+    ) = NodeBottomSheetState(
+        nodeId = nodeId,
+        nodeSourceType = nodeSourceType,
+        partiallyExpand = partiallyExpand,
+        node = node,
+        actions = actions,
+    )
 
     /**
      * Wait for the sheet content to be ready (after SHEET_READY_DELAY_MS).
@@ -121,7 +131,7 @@ class NodeOptionsBottomSheetComposeTest {
             iconRes = R.drawable.ic_send_horizontal,
             thumbnailData = null
         )
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = nodeUiItem,
             actions = persistentListOf(),
         )
@@ -148,7 +158,7 @@ class NodeOptionsBottomSheetComposeTest {
             )
         }
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = createMockNodeUiItem(),
             actions = listOf(listOf(mockAction)),
         )
@@ -165,7 +175,7 @@ class NodeOptionsBottomSheetComposeTest {
 
     @Test
     fun `test that empty state is handled gracefully`() {
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = null,
             actions = persistentListOf(),
         )
@@ -182,7 +192,7 @@ class NodeOptionsBottomSheetComposeTest {
         var dismissCalled = false
         val onDismiss = { dismissCalled = true }
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = null,
             actions = persistentListOf(),
         )
@@ -203,7 +213,7 @@ class NodeOptionsBottomSheetComposeTest {
         var errorConsumed = false
         val onConsumeErrorState = { errorConsumed = true }
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = null,
             actions = persistentListOf(),
         )
@@ -247,7 +257,7 @@ class NodeOptionsBottomSheetComposeTest {
             }
         }
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = nodeUiItem,
             actions = listOf(actions),
         )
@@ -296,7 +306,7 @@ class NodeOptionsBottomSheetComposeTest {
             }
         }
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = nodeUiItem,
             actions = listOf(actions),
         )
@@ -322,7 +332,7 @@ class NodeOptionsBottomSheetComposeTest {
             )
         }
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = createMockNodeUiItem(),
             actions = listOf(listOf(mockAction)),
         )
@@ -357,7 +367,7 @@ class NodeOptionsBottomSheetComposeTest {
             )
         }
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = createMockNodeUiItem(),
             actions = listOf(
                 listOf(mockAction1),
@@ -388,7 +398,7 @@ class NodeOptionsBottomSheetComposeTest {
             }
         }
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
             node = createMockNodeUiItem(),
             actions = listOf(
                 listOf(mockActions[0]),
@@ -425,15 +435,13 @@ class NodeOptionsBottomSheetComposeTest {
             isSensitive = true,
         )
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
+            nodeSourceType = NodeSourceType.INCOMING_SHARES,
             node = nodeUiItem,
             actions = persistentListOf(),
         )
 
-        setContent(
-            uiState = uiState,
-            nodeSourceType = NodeSourceType.INCOMING_SHARES
-        )
+        setContent(uiState = uiState)
 
         waitForSheetReady()
         // Verify the component renders correctly for shared items.
@@ -468,15 +476,13 @@ class NodeOptionsBottomSheetComposeTest {
             isSensitive = true,
         )
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
+            nodeSourceType = NodeSourceType.OUTGOING_SHARES,
             node = nodeUiItem,
             actions = persistentListOf(),
         )
 
-        setContent(
-            uiState = uiState,
-            nodeSourceType = NodeSourceType.OUTGOING_SHARES
-        )
+        setContent(uiState = uiState)
 
         waitForSheetReady()
         // Verify the component renders correctly for shared items.
@@ -505,15 +511,13 @@ class NodeOptionsBottomSheetComposeTest {
             isSensitive = true,
         )
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
+            nodeSourceType = NodeSourceType.LINKS,
             node = nodeUiItem,
             actions = persistentListOf(),
         )
 
-        setContent(
-            uiState = uiState,
-            nodeSourceType = NodeSourceType.LINKS
-        )
+        setContent(uiState = uiState)
 
         waitForSheetReady()
         // Verify the component renders correctly for shared items.
@@ -542,15 +546,13 @@ class NodeOptionsBottomSheetComposeTest {
             isSensitive = true,
         )
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             node = nodeUiItem,
             actions = persistentListOf(),
         )
 
-        setContent(
-            uiState = uiState,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
-        )
+        setContent(uiState = uiState)
 
         waitForSheetReady()
         // Verify the component renders correctly for non-shared items.
@@ -583,15 +585,13 @@ class NodeOptionsBottomSheetComposeTest {
             isSensitive = true,
         )
 
-        val uiState = NodeBottomSheetState(
+        val uiState = nodeBottomSheetState(
+            nodeSourceType = NodeSourceType.HOME,
             node = nodeUiItem,
             actions = persistentListOf(),
         )
 
-        setContent(
-            uiState = uiState,
-            nodeSourceType = NodeSourceType.HOME
-        )
+        setContent(uiState = uiState)
 
         waitForSheetReady()
         // Verify the component renders correctly for non-shared items.
