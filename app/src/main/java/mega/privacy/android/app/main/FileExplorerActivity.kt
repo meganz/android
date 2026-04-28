@@ -2,7 +2,6 @@ package mega.privacy.android.app.main
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.Intent.ACTION_VIEW
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -29,6 +28,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.NavKey
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
@@ -36,6 +36,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
@@ -121,6 +122,7 @@ import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -128,6 +130,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -198,6 +201,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var navigationEventQueue: NavigationEventQueue
+
+    @Inject
+    @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
 
     @Inject
     @LoginMutex
@@ -1613,7 +1623,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun startChatUploadService() {
         if (chatListItems.isEmpty()) {
             Timber.w("ERROR null chats to upload")
-            openManagerAndFinish()
+            openMainActivityAndFinish()
             return
         }
 
@@ -1650,13 +1660,29 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         )
     }
 
-    private fun openManagerAndFinish() {
-        megaNavigator.openManagerActivity(
-            context = this,
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-            singleActivityDestination = null
-        )
+    private fun openMainActivityAndFinish() {
+        startActivity(MegaActivity.getIntent(this).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP))
         finish()
+    }
+
+    /**
+     * Starts [MegaActivity] and queues the provided [destinations] so they are consumed
+     * after the activity is created. Uses an application-scoped coroutine because this
+     * activity is typically finishing immediately after the call.
+     */
+    private fun launchMegaActivityWithDestinations(
+        destinations: List<NavKey>,
+        warningMessage: String? = null,
+    ) {
+        startActivity(
+            MegaActivity.getIntent(this, warningMessage = warningMessage)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        )
+        if (destinations.isNotEmpty()) {
+            applicationScope.launch {
+                navigationEventQueue.emit(destinations)
+            }
+        }
     }
 
     private fun finishFileExplorer() {
@@ -2038,25 +2064,14 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         folderDestinations: List<CloudDriveNavKey>?,
         message: String?,
     ) {
-        megaNavigator.openManagerActivity(
-            context = this,
-            action = if (nodeId != null) {
-                Constants.ACTION_OPEN_FOLDER
-            } else {
-                ACTION_VIEW
-            },
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
-            bundle = Bundle().apply {
-                putString(Constants.EXTRA_MESSAGE, message)
-                nodeId?.let {
-                    putLong(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, nodeId.longValue)
-                }
-            },
-            singleActivityDestination = HomeScreensNavKey(
-                root = DriveSyncNavKey(),
-                destinations = folderDestinations
+        launchMegaActivityWithDestinations(
+            destinations = listOf(
+                HomeScreensNavKey(
+                    root = DriveSyncNavKey(),
+                    destinations = folderDestinations,
+                )
             ),
-            singleActivityMessage = message,
+            warningMessage = message,
         )
         finish()
     }
@@ -2511,21 +2526,14 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun navigateToChat() {
         val singleChatId = chatListItems.singleOrNull()?.chatId
-        val singleChat = singleChatId != null
-        megaNavigator.openManagerActivity(
-            context = this,
-            action = if (singleChat) Constants.ACTION_CHAT_NOTIFICATION_MESSAGE else Constants.ACTION_CHAT_SUMMARY,
-            flags = if (singleChat) Intent.FLAG_ACTIVITY_CLEAR_TOP else 0,
-            bundle = Bundle().apply {
-                singleChatId?.let { putLong(ChatNavKey.LEGACY_CHAT_ID, singleChatId) }
-            },
-            singleActivityDestinations = listOfNotNull(
+        launchMegaActivityWithDestinations(
+            destinations = listOfNotNull(
                 HomeScreensNavKey(MenuHomeScreen),
                 ChatListNavKey(),
                 singleChatId?.let {
                     ChatNavKey(chatId = singleChatId, action = null)
                 },
-            )
+            ),
         )
         finish()
     }
