@@ -200,7 +200,9 @@ internal fun PdfViewerScreen(
                     PdfPageIndicator(
                         currentPage = uiState.currentPage,
                         totalPages = uiState.totalPages,
-                        isVisible = indicatorVisible && !searchState.isSearchActive,
+                        // scrubProgress != null guards the race window where the auto-hide timer
+                        // fires (e.g. jump to next search result) before LaunchedEffect re-runs when a drag begins.
+                        isVisible = indicatorVisible || scrubProgress != null,
                         onScrub = { scrubProgress = it },
                     )
 

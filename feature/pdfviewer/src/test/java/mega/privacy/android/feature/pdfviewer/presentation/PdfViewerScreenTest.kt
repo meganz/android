@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.pdfviewer.presentation
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -8,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -227,7 +229,7 @@ class PdfViewerScreenTest {
     }
 
     @Test
-    fun `test that page indicator is not displayed when search is active`() {
+    fun `test that PdfPageIndicator is displayed when page changes during active search`() {
         composeTestRule.mainClock.autoAdvance = false
         setContent(
             defaultState(
@@ -237,6 +239,64 @@ class PdfViewerScreenTest {
             )
         )
         composeTestRule.mainClock.advanceTimeBy(100)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator is hidden when auto-hide delay elapses during active search`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(
+            defaultState(
+                currentPage = 2,
+                totalPages = 4,
+                searchState = PdfViewerSearchState(isSearchActive = true),
+            )
+        )
+        // Advance past auto-hide delay (2000ms) and the exit animation (900ms delay + fade)
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator remains visible when scrubbing during active search`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(
+            defaultState(
+                currentPage = 2,
+                totalPages = 4,
+                searchState = PdfViewerSearchState(isSearchActive = true),
+            )
+        )
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        // Begin scrubbing — sets scrubProgress to non-null, keeping indicator alive past auto-hide
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(0f, 10f))
+            }
+
+        // Advance past the auto-hide delay while the scrub is still active
+        composeTestRule.mainClock.advanceTimeBy(2100)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+
+        // End scrub — finger up should allow auto-hide to proceed
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput { up() }
+
+        // Advance past auto-hide delay (2000ms) and exit animation
+        composeTestRule.mainClock.advanceTimeBy(5000)
 
         composeTestRule
             .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
@@ -252,6 +312,40 @@ class PdfViewerScreenTest {
         composeTestRule
             .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator remains visible when scrubbing after auto-hide delay`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(defaultState(currentPage = 2, totalPages = 4))
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        // Advance past auto-hide delay without search active
+        composeTestRule.mainClock.advanceTimeBy(2100)
+
+        // Begin scrubbing — scrubProgress != null keeps indicator alive
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput {
+                down(center)
+                moveBy(Offset(0f, 10f))
+            }
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+
+        // End scrub — finger up should allow auto-hide to proceed
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput { up() }
+
+        // Advance past auto-hide delay (2000ms) and exit animation
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
     }
 
     @Test
