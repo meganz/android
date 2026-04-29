@@ -9,4 +9,5 @@ import mega.privacy.android.navigation.settings.SettingsNavigator
  */
 interface MegaNavigator : AppNavigator, SettingsNavigator {
     fun launchMegaActivityIfNeeded(context: Context)
+    fun openHomeScreen(context: Context)
 }

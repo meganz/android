@@ -100,6 +100,7 @@ import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
@@ -1009,5 +1010,9 @@ internal class MegaNavigatorImpl @Inject constructor(
                 messageId = msgId
             )
         )
+    }
+
+    override fun openHomeScreen(context: Context) {
+        navigateForSingleActivity(context, HomeScreensNavKey())
     }
 }

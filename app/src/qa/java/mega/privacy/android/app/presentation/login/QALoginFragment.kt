@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.login
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +16,6 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,9 +26,15 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class QALoginFragment : DialogFragment() {
 
+    /**
+     * Monitor theme mode use case
+     */
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
+    /**
+     * Mega navigator
+     */
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
@@ -57,7 +61,7 @@ class QALoginFragment : DialogFragment() {
                         qaLoginViewModel.events.collect { event ->
                             when (event) {
                                 is LoginEvent.NavigateToHome -> {
-                                    Timber.d("QA Login successful, navigating to ManagerActivity")
+                                    Timber.d("QA Login successful, navigating to MegaActivity")
                                     navigateToMainActivity()
                                 }
                             }
@@ -81,17 +85,13 @@ class QALoginFragment : DialogFragment() {
     private fun navigateToMainActivity() {
         runCatching {
             context?.let {
-                megaNavigator.openManagerActivity(
-                    context = it,
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK,
-                    singleActivityDestination = HomeScreensNavKey(),
-                )
+                megaNavigator.openHomeScreen(it)
 
                 activity?.finish()
                 dismiss()
             }
         }.onFailure {
-            Timber.e(it, "Failed to navigate to ManagerActivity")
+            Timber.e(it, "Failed to navigate to MegaActivity")
         }
     }
 }

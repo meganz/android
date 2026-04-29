@@ -31,7 +31,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.canBeHandled
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
@@ -39,11 +38,18 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * QA settings fragment
+ */
 @AndroidEntryPoint
 class QASettingsFragment : PreferenceFragmentCompat() {
 
+    /**
+     * Mega navigator
+     */
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
     private val settingViewModel by viewModels<QASettingViewModel>()
     private val accountViewModel by viewModels<QAAccountViewModel>()
 
@@ -294,7 +300,7 @@ class QASettingsFragment : PreferenceFragmentCompat() {
             (it as? StateEventWithContentTriggered)?.content?.let { content ->
                 when (content) {
                     is QAAccountSwitchEvent.Success -> {
-                        Timber.d("Account switch successful, navigating to ManagerActivity")
+                        Timber.d("Account switch successful, navigating to MegaActivity")
                         navigateToMainActivity()
                     }
 
@@ -315,16 +321,11 @@ class QASettingsFragment : PreferenceFragmentCompat() {
     private fun navigateToMainActivity() {
         runCatching {
             context?.let {
-                megaNavigator.openManagerActivity(
-                    context = it,
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK,
-                    singleActivityDestination = HomeScreensNavKey(),
-                )
-
+                megaNavigator.openHomeScreen(it)
                 activity?.finish()
             }
         }.onFailure {
-            Timber.e(it, "Failed to navigate to ManagerActivity")
+            Timber.e(it, "Failed to navigate to MegaActivity")
         }
     }
 
