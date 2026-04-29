@@ -1144,6 +1144,7 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.FOLDER_LINK,
         NodeSourceType.FILE_LINK,
         NodeSourceType.VIDEO_RECENTLY_WATCHED,
+        NodeSourceType.CHAT
             -> MegaApiJava.INVALID_HANDLE
 
         NodeSourceType.HOME, NodeSourceType.OTHER, NodeSourceType.OFFLINE -> getRootNodeUseCase()?.id?.longValue

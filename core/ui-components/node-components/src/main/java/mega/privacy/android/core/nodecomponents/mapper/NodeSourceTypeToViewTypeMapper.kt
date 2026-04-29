@@ -28,6 +28,7 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
         NodeSourceType.SEARCH -> NodeSourceTypeInt.SEARCH_BY_ADAPTER
         NodeSourceType.VIDEO_PLAYLISTS -> NodeSourceTypeInt.VIDEO_PLAYLISTS_ADAPTER
         NodeSourceType.VIDEO_RECENTLY_WATCHED -> NodeSourceTypeInt.VIDEO_RECENTLY_WATCHED_ADAPTER
+        NodeSourceType.CHAT -> NodeSourceTypeInt.CHAT_ADAPTER
 
         NodeSourceType.OTHER,
         NodeSourceType.OFFLINE,

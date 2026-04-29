@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.entity.node
 
 import com.google.common.truth.Truth.assertThat
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -50,6 +49,7 @@ class NodeSourceTypeTest {
             Arguments.of(NodeSourceType.VIDEO_RECENTLY_WATCHED),
             Arguments.of(NodeSourceType.VIDEOS),
             Arguments.of(NodeSourceType.SEARCH),
+            Arguments.of(NodeSourceType.CHAT),
         )
     }
 }

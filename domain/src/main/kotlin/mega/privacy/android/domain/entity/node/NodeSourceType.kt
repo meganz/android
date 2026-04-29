@@ -106,7 +106,12 @@ enum class NodeSourceType {
     /**
      * When node source is File Link
      */
-    FILE_LINK
+    FILE_LINK,
+
+    /**
+     * When node source is Chat
+     */
+    CHAT
 }
 
 /**

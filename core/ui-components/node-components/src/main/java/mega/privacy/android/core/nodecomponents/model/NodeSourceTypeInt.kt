@@ -22,4 +22,5 @@ object NodeSourceTypeInt {
     const val VIDEO_RECENTLY_WATCHED_ADAPTER: Int = 2036
     const val FOLDER_LINK_ADAPTER: Int = 2005
     const val FILE_LINK_ADAPTER: Int = 2019
+    const val CHAT_ADAPTER: Int = 2020
 }
