@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeft
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.ClearRecentlyUsedItemsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
@@ -70,6 +71,17 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     fun updateSortConfiguration(configuration: NodeSortConfiguration) {
         _sortConfig.value = configuration
         _uiState.update { it.copy(sortConfiguration = configuration, showSortSheet = false) }
+    }
+
+    fun onChangeViewTypeClicked() {
+        _uiState.update { current ->
+            current.copy(
+                currentViewType = when (current.currentViewType) {
+                    ViewType.LIST -> ViewType.GRID
+                    ViewType.GRID -> ViewType.LIST
+                },
+            )
+        }
     }
 
     fun showSortSheet() {

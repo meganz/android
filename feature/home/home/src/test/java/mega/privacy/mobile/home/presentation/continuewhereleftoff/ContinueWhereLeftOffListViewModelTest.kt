@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.ClearRecentlyUsedItemsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
@@ -216,6 +217,36 @@ class ContinueWhereLeftOffListViewModelTest {
             assertThat(awaitItem().showOptionsSheet).isTrue()
             underTest.clearAll()
             assertThat(awaitItem().showOptionsSheet).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that default view type is LIST`() = runTest {
+        underTest.uiState.test {
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.LIST)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClicked toggles from LIST to GRID`() = runTest {
+        underTest.uiState.test {
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.LIST)
+            underTest.onChangeViewTypeClicked()
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClicked toggles from GRID back to LIST`() = runTest {
+        underTest.uiState.test {
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.LIST)
+            underTest.onChangeViewTypeClicked()
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+            underTest.onChangeViewTypeClicked()
+            assertThat(awaitItem().currentViewType).isEqualTo(ViewType.LIST)
             cancelAndIgnoreRemainingEvents()
         }
     }

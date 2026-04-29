@@ -3,15 +3,22 @@ package mega.privacy.mobile.home.presentation.continuewhereleftoff
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +47,8 @@ import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.surface.BoxSurface
+import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -56,9 +65,10 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.feature.home.R
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
@@ -80,6 +90,7 @@ internal fun ContinueWhereLeftOffListScreen(
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val optionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isListView = uiState.currentViewType == ViewType.LIST
 
     EventEffect(
         event = uiState.openNodeEvent,
@@ -125,7 +136,7 @@ internal fun ContinueWhereLeftOffListScreen(
                 )
             }
 
-            else -> {
+            isListView -> {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -134,14 +145,14 @@ internal fun ContinueWhereLeftOffListScreen(
                     item(key = "sort_header") {
                         NodeHeaderItem(
                             onSortOrderClick = viewModel::showSortSheet,
-                            onChangeViewTypeClick = {},
+                            onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                             sortConfiguration = uiState.sortConfiguration,
                             isListView = true,
                             showSortOrder = true,
-                            showChangeViewType = false,
+                            showChangeViewType = true,
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
-                                .padding(top = 16.dp),
+                                .padding(bottom = 16.dp),
                         )
                     }
                     items(uiState.items, key = { it.nodeHandle }) { item ->
@@ -157,6 +168,42 @@ internal fun ContinueWhereLeftOffListScreen(
                                     )
                                 )
                             },
+                        )
+                    }
+                }
+            }
+
+            else -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    item(
+                        key = "sort_header",
+                        span = { GridItemSpan(maxLineSpan) },
+                    ) {
+                        NodeHeaderItem(
+                            onSortOrderClick = viewModel::showSortSheet,
+                            onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
+                            sortConfiguration = uiState.sortConfiguration,
+                            isListView = false,
+                            showSortOrder = true,
+                            showChangeViewType = true,
+                        )
+                    }
+                    items(
+                        items = uiState.items,
+                        key = { it.nodeHandle },
+                    ) { item ->
+                        ContinueWhereLeftOffGridItem(
+                            title = item.title,
+                            icon = iconForType(item.type),
+                            onItemClicked = { viewModel.onItemClicked(item.nodeHandle) },
                         )
                     }
                 }
@@ -265,6 +312,43 @@ private fun ContinueWhereLeftOffListItem(
     }
 }
 
+@Composable
+private fun ContinueWhereLeftOffGridItem(
+    title: String,
+    @DrawableRes icon: Int,
+    onItemClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onItemClicked() },
+    ) {
+        BoxSurface(
+            surfaceColor = SurfaceColor.Surface1,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(90.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(icon),
+                contentDescription = title,
+                modifier = Modifier.size(48.dp),
+            )
+        }
+        MegaText(
+            text = title,
+            textColor = TextColor.Primary,
+            style = AppTheme.typography.bodySmall,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+        )
+    }
+}
+
 internal const val CLEAR_HISTORY_TAG = "cwlo_list:clear_history"
 
 @CombinedThemePreviews
@@ -284,11 +368,26 @@ private fun ContinueWhereLeftOffListItemPreview() {
                 onItemClicked = {},
                 onMenuClicked = {},
             )
-            ContinueWhereLeftOffListItem(
-                title = "Annemarie_Jacir_notes.txt",
-                icon = IconPackR.drawable.ic_text_medium_solid,
+        }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ContinueWhereLeftOffGridItemPreview() {
+    AndroidThemeForPreviews {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ContinueWhereLeftOffGridItem(
+                title = "Falastin36_press_trailer.mov",
+                icon = IconPackR.drawable.ic_video_medium_solid,
                 onItemClicked = {},
-                onMenuClicked = {},
+                modifier = Modifier.width(140.dp),
+            )
+            ContinueWhereLeftOffGridItem(
+                title = "Interview Agnes Varda.pdf",
+                icon = IconPackR.drawable.ic_pdf_medium_solid,
+                onItemClicked = {},
+                modifier = Modifier.width(140.dp),
             )
         }
     }
