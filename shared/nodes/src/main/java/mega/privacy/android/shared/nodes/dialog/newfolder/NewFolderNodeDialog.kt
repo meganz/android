@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -101,6 +102,7 @@ fun NewFolderNodeDialog(
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onNegativeButtonClicked = onDismiss,
         keyboardType = KeyboardType.Text,
+        capitalization = KeyboardCapitalization.None,
         onDismiss = onDismiss,
     )
 }
