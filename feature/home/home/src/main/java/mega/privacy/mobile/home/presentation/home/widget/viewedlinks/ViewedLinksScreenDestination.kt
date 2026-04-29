@@ -58,6 +58,7 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
                     )
                 )
             },
+            onClearAllLinks = viewModel::clearAllLinks,
             onBack = navigationHandler::back,
         )
     }

@@ -8,20 +8,30 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.OneLineListItem
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
@@ -41,6 +51,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onFolderLinkClicked Callback when a folder link is tapped.
  * @param onFileLinkClicked Callback when a file link is tapped.
  * @param onMenuClicked Callback when the per-item more-options icon is tapped.
+ * @param onClearAllLinks Callback when the user confirms clearing the viewed links history.
  * @param onBack Callback when the back button is pressed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,8 +61,13 @@ internal fun ViewedLinksScreen(
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
     onMenuClicked: (ViewedLinkUiItem) -> Unit,
+    onClearAllLinks: () -> Unit,
     onBack: () -> Unit,
 ) {
+    var showOptionsSheet by rememberSaveable { mutableStateOf(false) }
+    var showClearConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    val optionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
             MegaTopAppBar(
@@ -59,7 +75,7 @@ internal fun ViewedLinksScreen(
                 navigationType = AppBarNavigationType.Back(onBack),
                 actions = listOf(
                     MenuActionWithClick(CommonMenuAction.More) {
-                        // Todo: Show bottom sheet to clear entries
+                        showOptionsSheet = true
                     }
                 )
             )
@@ -125,7 +141,46 @@ internal fun ViewedLinksScreen(
             }
         }
     }
+
+    if (showOptionsSheet) {
+        MegaModalBottomSheet(
+            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+            sheetState = optionsSheetState,
+            onDismissRequest = { showOptionsSheet = false },
+        ) {
+            NodeActionListTile(
+                text = stringResource(sharedR.string.home_widget_viewed_links_clear_history),
+                icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
+                onActionClicked = {
+                    showOptionsSheet = false
+                    showClearConfirmationDialog = true
+                },
+                modifier = Modifier.testTag(CLEAR_HISTORY_TAG),
+            )
+        }
+    }
+
+    if (showClearConfirmationDialog) {
+        BasicDialog(
+            modifier = Modifier.testTag(CLEAR_HISTORY_DIALOG_TAG),
+            title = stringResource(sharedR.string.home_widget_viewed_links_clear_history),
+            description = stringResource(
+                sharedR.string.home_widget_viewed_links_clear_history_dialog_message
+            ),
+            positiveButtonText = stringResource(sharedR.string.general_clear),
+            negativeButtonText = stringResource(sharedR.string.general_dismiss_dialog),
+            onPositiveButtonClicked = {
+                showClearConfirmationDialog = false
+                onClearAllLinks()
+            },
+            onDismiss = { showClearConfirmationDialog = false },
+            onNegativeButtonClicked = { showClearConfirmationDialog = false },
+        )
+    }
 }
+
+internal const val CLEAR_HISTORY_TAG = "viewed_links:clear_history"
+internal const val CLEAR_HISTORY_DIALOG_TAG = "viewed_links:clear_history_dialog"
 
 @CombinedThemePreviews
 @Composable
@@ -210,6 +265,7 @@ private fun ViewedLinksScreenPreview() {
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
             onMenuClicked = {},
+            onClearAllLinks = {},
             onBack = {},
         )
     }

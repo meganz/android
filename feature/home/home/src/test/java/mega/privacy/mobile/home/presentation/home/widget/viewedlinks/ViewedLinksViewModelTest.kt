@@ -11,10 +11,12 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
-import mega.privacy.android.shared.nodes.mapper.IconType
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -43,6 +45,8 @@ class ViewedLinksViewModelTest {
     private val monitorViewedLinksUseCase = mock<MonitorViewedLinksUseCase>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
+    private val clearViewedLinksUseCase = mock<ClearViewedLinksUseCase>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val fakeFlow = MutableSharedFlow<List<ViewedLink>>()
 
     private lateinit var underTest: ViewedLinksViewModel
@@ -54,12 +58,14 @@ class ViewedLinksViewModelTest {
             monitorViewedLinksUseCase = monitorViewedLinksUseCase,
             getPublicNodeUseCase = getPublicNodeUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
+            clearViewedLinksUseCase = clearViewedLinksUseCase,
+            snackbarEventQueue = snackbarEventQueue
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getPublicNodeUseCase, fileTypeIconMapper)
+        reset(getPublicNodeUseCase, fileTypeIconMapper, clearViewedLinksUseCase, snackbarEventQueue)
     }
 
     @Test
@@ -162,4 +168,26 @@ class ViewedLinksViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that clearing all viewed links invokes use case and snackbar `() = runTest {
+        underTest.clearAllLinks()
+
+        verify(clearViewedLinksUseCase).invoke()
+        verify(snackbarEventQueue).queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
+    }
+
+    @Test
+    fun `test that clearing all viewed links invokes clearViewedLinksUseCase`() = runTest {
+        underTest.clearAllLinks()
+        verify(clearViewedLinksUseCase).invoke()
+    }
+
+    @Test
+    fun `test that clearing all viewed links queues snackbar message when use case succeeds`() =
+        runTest {
+            underTest.clearAllLinks()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
+        }
+
 }
