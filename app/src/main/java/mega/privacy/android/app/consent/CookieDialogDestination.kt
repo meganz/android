@@ -10,24 +10,21 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.consent.model.CookieConsentState
 import mega.privacy.android.app.consent.view.CookieConsentDialog
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.destination.CookieDialogNavKey
 import mega.privacy.android.navigation.destination.CookieSettingsNavKey
 import mega.privacy.android.navigation.destination.WebSiteNavKey
-
-@Serializable
-data object CookieDialog : DialogNavKey
 
 fun EntryProviderScope<in DialogNavKey>.cookieDialogDestination(
     navigateBack: () -> Unit,
     navigate: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
-    entry<CookieDialog>(
+    entry<CookieDialogNavKey>(
         metadata = DialogSceneStrategy.dialog(
             DialogProperties(
                 windowTitle = "Route B dialog"

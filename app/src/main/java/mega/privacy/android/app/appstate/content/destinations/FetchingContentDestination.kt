@@ -13,7 +13,9 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.FetchNodesViewModel
 import mega.privacy.android.app.presentation.login.view.FetchNodesContent
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
+import mega.privacy.android.navigation.contract.suppression.withOverlaySuppression
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 
 @Serializable
@@ -29,7 +31,7 @@ fun EntryProviderScope<NavKey>.fetchingContentDestination(
     entry<FetchingContentNavKey>(
         metadata = NavDisplay.transitionSpec {
             EnterTransition.None togetherWith ExitTransition.None
-        }
+        } + buildMetadata { withOverlaySuppression() }
     ) {
         val viewModel = hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
             creationCallback = { factory ->

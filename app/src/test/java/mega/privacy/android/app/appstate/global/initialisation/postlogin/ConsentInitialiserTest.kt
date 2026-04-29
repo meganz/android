@@ -4,13 +4,13 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.consent.AdConsentWrapper
-import mega.privacy.android.app.consent.CookieDialog
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.destination.CookieDialogNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -61,10 +61,10 @@ class ConsentInitialiserTest {
         getCookieSettingsUseCase.stub { onBlocking { invoke() } doReturn emptySet() }
         shouldShowGenericCookieDialogUseCase.stub { onBlocking { invoke(any()) } doReturn true }
 
-        underTest.invoke("test-session", true)
+        underTest.invoke()
 
         verify(appDialogsEventQueue).emit(
-            argThat<AppDialogEvent> { event -> event.dialogDestination == CookieDialog },
+            argThat<AppDialogEvent> { event -> event.dialogDestination == CookieDialogNavKey },
             any()
         )
     }
@@ -83,7 +83,7 @@ class ConsentInitialiserTest {
             getCookieSettingsUseCase.stub { onBlocking { invoke() } doReturn emptySet() }
             shouldShowGenericCookieDialogUseCase.stub { onBlocking { invoke(any()) } doReturn false }
 
-            underTest.invoke("test-session", true)
+            underTest.invoke()
 
             verify(adConsentWrapper).refreshConsent()
         }
@@ -101,7 +101,7 @@ class ConsentInitialiserTest {
             }
         }
 
-        underTest.invoke("test-session", true)
+        underTest.invoke()
 
         verifyNoInteractions(
             appDialogsEventQueue,

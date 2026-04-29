@@ -12,14 +12,16 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.LoginGraph
-import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
-import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import mega.privacy.android.navigation.contract.suppression.withOverlaySuppression
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 
 /**
  * function to build the ChangeEmailAddress screen.
@@ -76,7 +78,9 @@ data class UpdateEmailForAccountCreationScreen(
 internal fun EntryProviderScope<NavKey>.updateEmailForAccountCreation(
     onChangeEmailSuccess: (String) -> Unit,
 ) {
-    entry<UpdateEmailForAccountCreationScreen> { key ->
+    entry<UpdateEmailForAccountCreationScreen>(
+        metadata = buildMetadata { withOverlaySuppression() }
+    ) { key ->
         val viewModel =
             hiltViewModel<UpdateEmailForAccountCreationViewModel, UpdateEmailForAccountCreationViewModel.Factory>(
                 creationCallback = { it.create(key.email, key.fullName) }

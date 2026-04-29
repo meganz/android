@@ -9,19 +9,17 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.google.android.ump.UserMessagingPlatform
 import de.palm.composestateevents.EventEffect
-import kotlinx.serialization.Serializable
 import mega.privacy.android.app.consent.model.AdsConsentState
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.AdConsentDialogNavKey
 
-@Serializable
-data object AdConsentDialog : DialogNavKey
 
 fun EntryProviderScope<in DialogNavKey>.adConsentDialogDestination(
     remove: (NavKey) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
-    entry<AdConsentDialog>(
+    entry<AdConsentDialogNavKey>(
         metadata = transparentMetadata()
     ) {
         val viewModel = hiltViewModel<AdsConsentViewModel>()

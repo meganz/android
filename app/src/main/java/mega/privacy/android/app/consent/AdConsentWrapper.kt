@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.advertisements.SetGoogleConsentLoaded
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
+import mega.privacy.android.navigation.destination.AdConsentDialogNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,7 +56,7 @@ class AdConsentWrapper @Inject constructor(
                     if (consentInformation.canRequestAds()) {
                         setGoogleConsentLoadedUseCase(true)
                     } else {
-                        appDialogEventQueue.emit(AppDialogEvent(AdConsentDialog))
+                        appDialogEventQueue.emit(AppDialogEvent(AdConsentDialogNavKey))
                     }
                 }
             }.onFailure { Timber.e(it, "Error in refreshing ad consent") }

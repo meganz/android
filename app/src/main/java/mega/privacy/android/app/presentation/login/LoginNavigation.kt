@@ -11,11 +11,13 @@ import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
-import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
 import mega.privacy.android.app.utils.Constants.ACTION_CONFIRM
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
+import mega.privacy.android.navigation.contract.suppression.withOverlaySuppression
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
 
 internal fun NavGraphBuilder.loginScreen(
@@ -56,7 +58,9 @@ internal fun NavGraphBuilder.loginScreen(
 internal fun EntryProviderScope<NavKey>.loginScreen(
     sharedViewModel: LoginViewModel,
 ) {
-    entry<LoginNavKey> { key ->
+    entry<LoginNavKey>(
+        metadata = buildMetadata { withOverlaySuppression() }
+    ) { key ->
         val billingViewModel = hiltViewModel<BillingViewModel>()
 
         LaunchedEffect(key.timeStamp, key.action, key.link) {
@@ -87,12 +91,6 @@ private fun checkActions(
             sharedViewModel.onRequestRecoveryKey(it)
             sharedViewModel.intentSet()
         }
-    }
-}
-
-internal fun EntryProviderScope<NavKey>.loginStartScreen(
-) {
-    entry<StartRoute> { key ->
     }
 }
 

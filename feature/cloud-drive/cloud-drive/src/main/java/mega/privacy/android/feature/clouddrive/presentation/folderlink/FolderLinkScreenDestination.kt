@@ -21,6 +21,10 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
+import mega.privacy.android.navigation.contract.suppression.withOverlaySuppression
+import mega.privacy.android.navigation.destination.AdConsentDialogNavKey
+import mega.privacy.android.navigation.destination.CookieDialogNavKey
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
@@ -35,7 +39,11 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
     navigationHandler: NavigationHandler,
     transferHandler: TransferHandler,
 ) {
-    entry<FolderLinkNavKey> { key ->
+    entry<FolderLinkNavKey>(
+        metadata = buildMetadata {
+            withOverlaySuppression(AdConsentDialogNavKey, CookieDialogNavKey)
+        }
+    ) { key ->
         FeatureFlagGate(
             feature = AppFeatures.FolderLinkRevamp,
             disabled = {

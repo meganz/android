@@ -62,6 +62,11 @@ class InitialisersModule {
 
     @Provides
     @IntoSet
+    fun provideConsentInitialiser(initialiser: ConsentInitialiser): AppStartInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
     fun provideChatPostLoginInitialisers(useCase: InitialiseMegaChatUseCase): PostLoginInitialiser =
         PostLoginInitialiserAction { session, isFastLogin ->
             useCase(session)
@@ -95,11 +100,6 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideSecurityUpgradeInitialiser(initialiser: SecurityUpgradeInitialiser): PostLoginInitialiser =
-        initialiser
-
-    @Provides
-    @IntoSet
-    fun provideConsentInitialiser(initialiser: ConsentInitialiser): PostLoginInitialiser =
         initialiser
 
     @Provides

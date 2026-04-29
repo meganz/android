@@ -11,14 +11,16 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.LoginGraph
-import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.app.presentation.login.LoginNavigationHandler
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
-import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.onboarding.view.NewTourRoute
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import mega.privacy.android.navigation.contract.suppression.withOverlaySuppression
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 
 @Serializable
 data object TourNavKey : NoSessionNavKey.Mandatory
@@ -64,7 +66,9 @@ internal fun EntryProviderScope<NavKey>.tourScreen(
     sharedViewModel: LoginViewModel,
     onBackPressed: () -> Unit,
 ) {
-    entry<TourNavKey> { key ->
+    entry<TourNavKey>(
+        metadata = buildMetadata { withOverlaySuppression() }
+    ) { key ->
         NewTourRoute(
             activityViewModel = sharedViewModel,
             onBackPressed = onBackPressed,

@@ -1,7 +1,6 @@
 package mega.privacy.android.navigation.contract.suppression
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavEntryDecorator
 
@@ -44,12 +43,7 @@ class OverlaySuppressionNavEntryDecorator<T : Any>(
     onPop = { _ -> },
     decorate = { entry ->
         val suppressionType = entry.suppressesOverlays()
-        if (suppressionType != SuppressionType.None) {
-            DisposableEffect(Unit) {
-                suppressionState.setSuppressing(suppressionType)
-                onDispose { suppressionState.setSuppressing(SuppressionType.None) }
-            }
-        }
+        suppressionState.setSuppressing(suppressionType)
         entry.Content()
     },
 )
