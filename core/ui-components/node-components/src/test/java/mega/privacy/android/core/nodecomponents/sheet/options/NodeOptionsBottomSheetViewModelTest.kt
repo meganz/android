@@ -14,8 +14,11 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
@@ -49,6 +52,7 @@ class NodeOptionsBottomSheetViewModelTest {
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicNodeByIdUseCase = mock<GetPublicNodeByIdUseCase>()
+    private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
     private val nodeBottomSheetActionMapper = mock<NodeBottomSheetActionMapper>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase = mock()
@@ -77,6 +81,7 @@ class NodeOptionsBottomSheetViewModelTest {
         nodeId: Long = sampleFileNode.id.longValue,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         partiallyExpand: Boolean = true,
+        publicLinkUrl: String? = null,
     ) {
         viewModel = NodeOptionsBottomSheetViewModel(
             nodeBottomSheetActionMapper = nodeBottomSheetActionMapper,
@@ -86,6 +91,7 @@ class NodeOptionsBottomSheetViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getPublicNodeByIdUseCase = getPublicNodeByIdUseCase,
+            getPublicNodeUseCase = getPublicNodeUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             offlineTypedNodeMapper = offlineTypedNodeMapper,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
@@ -96,6 +102,7 @@ class NodeOptionsBottomSheetViewModelTest {
             nodeId = nodeId,
             nodeSourceType = nodeSourceType,
             partiallyExpand = partiallyExpand,
+            publicLinkUrl = publicLinkUrl,
         )
     }
 
@@ -242,5 +249,97 @@ class NodeOptionsBottomSheetViewModelTest {
             )
 
             verify(monitorOfflineNodeUpdatesUseCase, never()).invoke()
+        }
+
+    @Test
+    fun `test that state contains public node when publicLinkUrl is provided`() = runTest {
+        val publicLink = "https://mega.nz/file/abc#xyz"
+        val publicFileNode = mock<TypedFileNode>().stub {
+            on { id } doReturn NodeId(456)
+            on { name } doReturn "public_file.txt"
+            on { isIncomingShare } doReturn false
+            on { previewPath } doReturn null
+        }
+        val expectedNodeUi = mock<NodeUiItem<TypedNode>>()
+        whenever(getPublicNodeUseCase(publicLink)).thenReturn(publicFileNode)
+        whenever(nodeUiItemMapper(listOf(publicFileNode))).thenReturn(listOf(expectedNodeUi))
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            .thenReturn(emptyList())
+
+        initViewModel(
+            nodeId = publicFileNode.id.longValue,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            publicLinkUrl = publicLink,
+        )
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertThat(state.node).isEqualTo(expectedNodeUi)
+        }
+    }
+
+    @Test
+    fun `test that init does not invoke getPublicNodeUseCase when publicLinkUrl is blank`() =
+        runTest {
+            whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+
+            initViewModel(
+                nodeId = sampleFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                publicLinkUrl = "   ",
+            )
+
+            verify(getPublicNodeUseCase, never()).invoke(any())
+            verify(getNodeByIdUseCase).invoke(sampleFileNode.id)
+        }
+
+    @Test
+    fun `test that state actions are grouped by group ascending and sorted by orderInGroup within each group`() =
+        runTest {
+            val groupTwoOrderOne = NodeActionModeMenuItem(2, 1, mock())
+            val groupOneOrderTwo = NodeActionModeMenuItem(1, 2, mock())
+            val groupOneOrderOne = NodeActionModeMenuItem(1, 1, mock())
+            val groupTwoOrderTwo = NodeActionModeMenuItem(2, 2, mock())
+            val groupZeroOrderFive = NodeActionModeMenuItem(0, 5, mock())
+            whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            whenever(nodeUiItemMapper(listOf(sampleFileNode)))
+                .thenReturn(listOf(mock<NodeUiItem<TypedNode>>()))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(
+                    listOf(
+                        groupTwoOrderOne,
+                        groupOneOrderTwo,
+                        groupOneOrderOne,
+                        groupTwoOrderTwo,
+                        groupZeroOrderFive,
+                    )
+                )
+
+            initViewModel(
+                nodeId = sampleFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            )
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.actions).containsExactly(
+                    listOf(groupZeroOrderFive),
+                    listOf(groupOneOrderOne, groupOneOrderTwo),
+                    listOf(groupTwoOrderOne, groupTwoOrderTwo),
+                ).inOrder()
+            }
         }
 }

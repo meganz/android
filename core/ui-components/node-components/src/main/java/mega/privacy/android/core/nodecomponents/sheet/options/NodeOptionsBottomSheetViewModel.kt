@@ -20,9 +20,17 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapp
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
+import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
+import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
@@ -33,6 +41,7 @@ import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseC
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import timber.log.Timber
 
 /**
@@ -56,6 +65,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicNodeByIdUseCase: GetPublicNodeByIdUseCase,
+    private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
@@ -65,6 +75,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     @Assisted private val nodeId: Long,
     @Assisted private val nodeSourceType: NodeSourceType,
     @Assisted private val partiallyExpand: Boolean,
+    @Assisted private val publicLinkUrl: String?,
 ) : ViewModel() {
 
     private var offlineMonitorJob: Job? = null
@@ -97,78 +108,111 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
 
     private fun getBottomSheetOptions() {
         viewModelScope.launch {
-            val bottomSheetOptions = nodeMenuProviderRegistry.getBottomSheetOptions(nodeSourceType)
-            val node = async {
-                runCatching {
-                    if (nodeSourceType == NodeSourceType.FOLDER_LINK) {
-                        getPublicNodeByIdUseCase(NodeId(nodeId))
+            val nodeId = NodeId(nodeId)
+            val options = nodeMenuProviderRegistry.getBottomSheetOptions(nodeSourceType)
+            val deferredNode = async { loadPrimaryNode(nodeId) }
+            val deferredPermission = async {
+                runCatching { getNodeAccessPermission(nodeId) }.getOrNull()
+            }
+            val isInRubbish = runCatching { isNodeInRubbishBinUseCase(nodeId) }.getOrDefault(false)
+            val deferredInBackups = async { loadIsInBackups(nodeId, isInRubbish) }
+            val effectiveNode = deferredNode.await() ?: loadOfflineFallbackNode(nodeId)
+
+            if (effectiveNode == null) {
+                uiState.update { it.copy(error = triggered(Exception("Node is null"))) }
+                return@launch
+            }
+
+            val bottomSheetItems = buildBottomSheetItems(
+                options = options,
+                node = effectiveNode,
+                isInRubbish = isInRubbish,
+                permission = deferredPermission.await(),
+                isInBackUps = deferredInBackups.await(),
+            )
+            val nodeUiItem = nodeUiItemMapper(listOf(effectiveNode))
+                .firstOrNull()
+                ?.withPublicLinkPreview(effectiveNode)
+
+            uiState.update {
+                it.copy(
+                    actions = bottomSheetItems,
+                    node = nodeUiItem,
+                    error = if (bottomSheetItems.isEmpty()) {
+                        triggered(Exception("No actions available"))
                     } else {
-                        getNodeByIdUseCase(NodeId(nodeId))
-                    }
-                }.getOrNull()
-            }
-            val isNodeInRubbish =
-                runCatching { isNodeInRubbishBinUseCase(NodeId(nodeId)) }.getOrDefault(false)
-            val accessPermission =
-                async { runCatching { getNodeAccessPermission(NodeId(nodeId)) }.getOrNull() }
-            val isInBackUps =
-                async {
-                    runCatching {
-                        if (isNodeInRubbish) {
-                            isNodeDeletedFromBackupsUseCase(NodeId(nodeId))
-                        } else {
-                            isNodeInBackupsUseCase(nodeId)
-                        }
-                    }.getOrDefault(false)
-                }
-            val typedNode = node.await()
-            val permission = accessPermission.await()
-
-            // Fallback for offline nodes when cloud node has been deleted
-            val effectiveNode =
-                typedNode ?: nodeSourceType.takeIf { it == NodeSourceType.OFFLINE }?.let {
-                    runCatching { getOfflineFileInformationByIdUseCase(NodeId(nodeId)) }
-                        .onFailure {
-                            Timber.e(
-                                it,
-                                "Failed to load offline file information for nodeId=$nodeId"
-                            )
-                        }
-                        .getOrNull()
-                        ?.let(offlineTypedNodeMapper::invoke)
-            }
-
-            effectiveNode?.let {
-                val bottomSheetItems = nodeBottomSheetActionMapper(
-                    toolbarOptions = bottomSheetOptions,
-                    selectedNode = effectiveNode,
-                    isNodeInRubbish = isNodeInRubbish,
-                    accessPermission = permission,
-                    isInBackUps = isInBackUps.await(),
-                    isConnected = uiState.value.isOnline,
-                    nodeSourceType = nodeSourceType
+                        consumed()
+                    },
                 )
-                    .groupBy { it.group }
-                    .toSortedMap()
-                    .mapValues { (_, list) ->
-                        list.sortedBy { it.orderInGroup }.toList()
-                    }
-                    .values.toList()
-                val nodeUiItem = nodeUiItemMapper(listOf(effectiveNode)).firstOrNull()
-
-                uiState.update {
-                    it.copy(
-                        actions = bottomSheetItems,
-                        node = nodeUiItem,
-                        error = if (bottomSheetItems.isEmpty()) triggered(Exception("No actions available")) else consumed(),
-                    )
-                }
-            } ?: run {
-                uiState.update {
-                    it.copy(error = triggered(Exception("Node is null")))
-                }
             }
         }
+    }
+
+    /**
+     * The lookup branches in priority order:
+     *  1. Public file link — when [publicLinkUrl] is not blank, fetch the node directly from
+     *     the link via [getPublicNodeUseCase]. Used for items that are not in the user's account
+     *     (e.g. a `FileLink` entry in Viewed Links).
+     *  2. Folder link — when [nodeSourceType] is [NodeSourceType.FOLDER_LINK], the node lives
+     *     inside a public folder link, so [getPublicNodeByIdUseCase] is used with [nodeId].
+     *  3. Account node — otherwise the node belongs to the user's own cloud / rubbish /
+     *     shares, fetched by id via [getNodeByIdUseCase].
+     */
+    private suspend fun loadPrimaryNode(nodeId: NodeId): TypedNode? = runCatching {
+        when {
+            !publicLinkUrl.isNullOrBlank() -> getPublicNodeUseCase(publicLinkUrl)
+            nodeSourceType == NodeSourceType.FOLDER_LINK -> getPublicNodeByIdUseCase(nodeId)
+            else -> getNodeByIdUseCase(nodeId)
+        }
+    }.getOrNull()
+
+    private suspend fun loadOfflineFallbackNode(nodeId: NodeId): TypedNode? {
+        if (nodeSourceType != NodeSourceType.OFFLINE) return null
+        return runCatching { getOfflineFileInformationByIdUseCase(nodeId) }
+            .onFailure {
+                Timber.e(it, "Failed to load offline file information for nodeId=$nodeId")
+            }
+            .getOrNull()
+            ?.let(offlineTypedNodeMapper::invoke)
+    }
+
+    private suspend fun loadIsInBackups(nodeId: NodeId, isInRubbish: Boolean): Boolean =
+        runCatching {
+            if (isInRubbish) {
+                isNodeDeletedFromBackupsUseCase(nodeId)
+            } else {
+                isNodeInBackupsUseCase(nodeId.longValue)
+            }
+        }.getOrDefault(false)
+
+    private suspend fun buildBottomSheetItems(
+        options: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<*>>,
+        node: TypedNode,
+        isInRubbish: Boolean,
+        permission: AccessPermission?,
+        isInBackUps: Boolean,
+    ): List<List<NodeActionModeMenuItem>> =
+        nodeBottomSheetActionMapper(
+            toolbarOptions = options,
+            selectedNode = node,
+            isNodeInRubbish = isInRubbish,
+            accessPermission = permission,
+            isInBackUps = isInBackUps,
+            isConnected = uiState.value.isOnline,
+            nodeSourceType = nodeSourceType,
+        )
+            .groupBy { it.group }
+            .toSortedMap()
+            .mapValues { (_, list) -> list.sortedBy { it.orderInGroup } }
+            .values
+            .toList()
+
+    private fun NodeUiItem<TypedNode>.withPublicLinkPreview(
+        source: TypedNode,
+    ): NodeUiItem<TypedNode> {
+        if (publicLinkUrl.isNullOrBlank()) return this
+        val previewPath = (source as? TypedFileNode)?.previewPath ?: return this
+        return copy(thumbnailData = ThumbnailUriRequest(UriPath(previewPath)))
     }
 
     /**
@@ -204,6 +248,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             nodeId: Long,
             nodeSourceType: NodeSourceType,
             partiallyExpand: Boolean,
+            publicLinkUrl: String?,
         ): NodeOptionsBottomSheetViewModel
     }
 }

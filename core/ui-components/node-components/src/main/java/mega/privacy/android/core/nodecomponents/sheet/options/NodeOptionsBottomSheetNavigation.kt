@@ -19,6 +19,7 @@ data class NodeOptionsBottomSheetNavKey(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val partiallyExpand: Boolean = true,
+    val publicLinkUrl: String? = null,
 ) : NoSessionNavKey.Optional {
 
     companion object {
@@ -44,7 +45,12 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
         val viewModel =
             hiltViewModel<NodeOptionsBottomSheetViewModel, NodeOptionsBottomSheetViewModel.Factory>(
                 creationCallback = { factory ->
-                    factory.create(it.nodeHandle, it.nodeSourceType, it.partiallyExpand)
+                    factory.create(
+                        it.nodeHandle,
+                        it.nodeSourceType,
+                        it.partiallyExpand,
+                        it.publicLinkUrl,
+                    )
                 }
             )
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()

@@ -34,6 +34,7 @@ class HomeFeatureGraph : FeatureDestination {
 
             viewedLinksScreen(
                 navigationHandler = navigationHandler,
+                transferHandler = transferHandler,
             )
         }
 }

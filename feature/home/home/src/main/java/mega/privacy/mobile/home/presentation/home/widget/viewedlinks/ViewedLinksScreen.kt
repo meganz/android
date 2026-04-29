@@ -40,6 +40,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param uiState The UI state containing the list of viewed link items.
  * @param onFolderLinkClicked Callback when a folder link is tapped.
  * @param onFileLinkClicked Callback when a file link is tapped.
+ * @param onMenuClicked Callback when the per-item more-options icon is tapped.
  * @param onBack Callback when the back button is pressed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +49,7 @@ internal fun ViewedLinksScreen(
     uiState: ViewedLinksUiState,
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
+    onMenuClicked: (ViewedLinkUiItem) -> Unit,
     onBack: () -> Unit,
 ) {
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -104,9 +106,7 @@ internal fun ViewedLinksScreen(
                                         IconPack.Medium.Thin.Outline.MoreVertical
                                     ),
                                     contentDescription = null,
-                                    modifier = Modifier.clickable {
-                                        // Todo: Open bottom sheet
-                                    },
+                                    modifier = Modifier.clickable { onMenuClicked(item) },
                                     tint = IconColor.Primary,
                                 )
                             },
@@ -209,6 +209,7 @@ private fun ViewedLinksScreenPreview() {
             ),
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
+            onMenuClicked = {},
             onBack = {},
         )
     }

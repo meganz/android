@@ -27,6 +27,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
@@ -68,7 +69,7 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val nodeOptionsActionViewModel =
                 hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
-                    creationCallback = { it.create(NodeSourceType.LINKS) }
+                    creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
                 )
 
             HandleNodeOptionsActionResult(
@@ -89,6 +90,16 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget {
                 onViewAllClicked = {
                     navigationHandler.navigate(ViewedLinksScreenNavKey)
                 },
+                onMenuClicked = { item ->
+                    navigationHandler.navigate(
+                        NodeOptionsBottomSheetNavKey(
+                            nodeHandle = item.viewedLink.nodeHandle,
+                            nodeSourceType = NodeSourceType.FOLDER_LINK,
+                            publicLinkUrl = item.viewedLink.linkUrl
+                                .takeIf { item.viewedLink.type == RecentlyUsedType.FileLink },
+                        )
+                    )
+                },
             )
         }
     }
@@ -100,6 +111,7 @@ internal fun ViewedLinksView(
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
     onViewAllClicked: () -> Unit,
+    onMenuClicked: (ViewedLinkUiItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -133,9 +145,7 @@ internal fun ViewedLinksView(
                                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .clickable {
-                                        // Todo: Open bottom sheet
-                                    },
+                                    .clickable { onMenuClicked(item) },
                                 tint = IconColor.Primary,
                             )
                         },
