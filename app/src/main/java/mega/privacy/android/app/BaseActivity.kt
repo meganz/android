@@ -23,7 +23,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
@@ -46,26 +45,20 @@ import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
-import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_STRING
-import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_TYPE
-import mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
-import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -74,12 +67,12 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.AccountBlockedEvent
-import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -721,7 +714,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.TOS_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener {
                     showAccountBlockedDialog(
-                        AccountBlockedType.TOS_COPYRIGHT,
                         getString(sharedR.string.dialog_account_suspended_ToS_copyright_message)
                     )
                 }
@@ -730,7 +722,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.TOS_NON_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener {
                     showAccountBlockedDialog(
-                        AccountBlockedType.TOS_NON_COPYRIGHT,
                         getString(sharedR.string.dialog_account_suspended_ToS_non_copyright_message)
                     )
                 }
@@ -739,7 +730,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.SUBUSER_DISABLED -> megaChatApi.logout(
                 ChatLogoutListener {
                     showAccountBlockedDialog(
-                        AccountBlockedType.SUBUSER_DISABLED,
                         getString(sharedR.string.error_business_disabled)
                     )
                 }
@@ -748,7 +738,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             AccountBlockedType.SUBUSER_REMOVED -> megaChatApi.logout(
                 ChatLogoutListener {
                     showAccountBlockedDialog(
-                        AccountBlockedType.SUBUSER_REMOVED,
                         getString(sharedR.string.error_business_removed)
                     )
                 }
@@ -773,7 +762,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
             AccountBlockedType.VERIFICATION_EMAIL -> {
                 showAccountBlockedDialog(
-                    AccountBlockedType.VERIFICATION_EMAIL,
                     getString(sharedR.string.login_account_suspension_email_verification_message)
                 )
             }
@@ -782,56 +770,13 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
     }
 
-    private fun showAccountBlockedDialog(
-        accountBlockedType: AccountBlockedType,
-        accountBlockedString: String,
-    ) {
+    private fun showAccountBlockedDialog(accountBlockedString: String) {
         if (!TextUtil.isTextEmpty(accountBlockedString)) {
-            if (this is LoginActivity) {
-                this.showAccountBlockedDialog(
-                    AccountBlockedEvent(
-                        handle = -1L,
-                        type = accountBlockedType,
-                        text = accountBlockedString
-                    )
-                )
-            } else {
-                val loginIntent =
-                    Intent(this, LoginActivity::class.java).apply {
-                        action = ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                        putExtra(
-                            ACCOUNT_BLOCKED_STRING, accountBlockedString
-                        )
-                        putExtra(
-                            ACCOUNT_BLOCKED_TYPE, accountBlockedType
-                        )
-                    }
-                startActivity(loginIntent)
+            val intent = MegaActivity.getIntent(this).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
+            startActivity(intent)
         }
-    }
-
-    /**
-     * Launches an intent to navigate to Login screen.
-     */
-    @JvmOverloads
-    protected fun navigateToLogin(
-        isNewTask: Boolean = false,
-        keepCurrentActivity: Boolean = false,
-    ) {
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-        if (isNewTask) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        } else {
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
-        if (keepCurrentActivity) {
-            intent.putExtra(LAUNCH_INTENT, this.intent)
-        }
-        startActivity(intent)
     }
 
     /**
