@@ -89,7 +89,6 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -406,14 +405,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
 
         if (needLogin) {
-            val loginIntent = intent.setClass(this@FileExplorerActivity, LoginActivity::class.java)
-                .apply {
-                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    putExtra(EXTRA_FROM_SHARE, true)
-                    // close previous login page
-                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    action = Constants.ACTION_FILE_EXPLORER_UPLOAD
-                }
+            val targetIntent = Intent(intent).apply {
+                setClass(this@FileExplorerActivity, FileExplorerActivity::class.java)
+            }
+            val loginIntent = MegaActivity.getIntent(
+                context = this@FileExplorerActivity,
+                warningMessage = getString(R.string.login_before_share),
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                putExtra(Constants.LAUNCH_INTENT, targetIntent)
+            }
 
             needLogin = false
             startActivity(loginIntent)
@@ -612,15 +613,20 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (credentials == null) {
             Timber.w("User credentials NULL")
             if (viewModel.isImportingText(intent)) {
+                val targetIntent = Intent(this, FileExplorerActivity::class.java)
+                    .putExtra(Intent.EXTRA_TEXT, intent.getStringExtra(Intent.EXTRA_TEXT))
+                    .putExtra(Intent.EXTRA_SUBJECT, intent.getStringExtra(Intent.EXTRA_SUBJECT))
+                    .putExtra(Intent.EXTRA_EMAIL, intent.getStringExtra(Intent.EXTRA_EMAIL))
+                    .setAction(intent.action)
+                    .setType(Constants.TYPE_TEXT_PLAIN)
                 startActivity(
-                    Intent(this, LoginActivity::class.java)
-                        .putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                        .putExtra(Intent.EXTRA_TEXT, intent.getStringExtra(Intent.EXTRA_TEXT))
-                        .putExtra(Intent.EXTRA_SUBJECT, intent.getStringExtra(Intent.EXTRA_SUBJECT))
-                        .putExtra(Intent.EXTRA_EMAIL, intent.getStringExtra(Intent.EXTRA_EMAIL))
-                        .setAction(Constants.ACTION_FILE_EXPLORER_UPLOAD)
-                        .setType(Constants.TYPE_TEXT_PLAIN)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    MegaActivity.getIntent(
+                        context = this,
+                        warningMessage = getString(R.string.login_before_share),
+                    ).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        putExtra(Constants.LAUNCH_INTENT, targetIntent)
+                    }
                 )
 
                 finish()

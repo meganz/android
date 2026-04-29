@@ -60,8 +60,6 @@ fun LoginScreen(
         mutableStateOf<String?>(null)
     }
 
-    LoginIntentActionHandler(viewModel = viewModel, uiState = uiState)
-
     EventEffect(uiState.checkRecoveryKeyEvent, viewModel::onCheckRecoveryKeyEventConsumed) {
         if (it.isSuccess) {
             val data = it.getOrThrow()
