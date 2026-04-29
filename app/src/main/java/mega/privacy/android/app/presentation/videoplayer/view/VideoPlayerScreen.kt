@@ -496,7 +496,9 @@ internal fun VideoPlayerScreen(
                     },
                     menuActions = uiState.menuActions,
                     onBackPressed = { backDispatcher?.onBackPressed() },
-                    onMenuActionClicked = viewModel::updateClickedMenuAction,
+                    onMenuActionClicked = {
+                        //TODO will implement in another ticket
+                    },
                 )
             }
 

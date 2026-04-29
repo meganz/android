@@ -12,9 +12,6 @@ import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.material.rememberScaffoldState
@@ -32,113 +29,50 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.Scene
 import androidx.navigation3.scene.SceneStrategy
-import androidx.navigation3.scene.SceneStrategyScope
 import androidx.navigation3.ui.NavDisplay
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
-import mega.privacy.android.app.interfaces.ActionNodeCallback
-import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.mediaplayer.MediaSessionHelper
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.container.AppContainer
-import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
-import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
-import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
-import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
-import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
-import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerAddToAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerChatImportAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerCopyAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerFileInfoAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerHideAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerMoveAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRubbishBinAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerSaveForOfflineAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerSendToChatAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerUnhideAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerNavigationHandler
 import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerScreenNavKey
 import mega.privacy.android.app.presentation.videoplayer.navigation.videoPlayerEntryProvider
-import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getRequest
-import mega.privacy.android.app.utils.Constants.FROM_BACKUPS
-import mega.privacy.android.app.utils.Constants.FROM_CHAT
-import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
-import mega.privacy.android.app.utils.Constants.HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_HANDLES
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_TO
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_HANDLES
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.NAME
-import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
-import mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.MegaNodeDialogUtil
-import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.BACKUPS_ADAPTER
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerInfoMenuItemEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerSendToChatMenuToolbarEvent
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -160,7 +94,6 @@ class VideoPlayerActivity : PasscodeActivity() {
     lateinit var mediaPlayerGateway: MediaPlayerGateway
 
     private val videoPlayerViewModelV2: VideoPlayerViewModelV2 by viewModels()
-    private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
 
     private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -184,7 +117,7 @@ class VideoPlayerActivity : PasscodeActivity() {
 
                 AudioManager.AUDIOFOCUS_GAIN -> {
                     // Do not resume when the activity is not visible (e.g. app in background).
-                    // Otherwise transient focus loss (ringtone, notification sounds) can call
+                    // Otherwise, transient focus loss (ringtone, notification sounds) can call
                     // AUDIOFOCUS_GAIN after the user left the player, incorrectly restarting video.
                     // Do not resume when the user explicitly paused — wait for their play action.
                     if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED) &&
@@ -195,68 +128,6 @@ class VideoPlayerActivity : PasscodeActivity() {
                 }
             }
         }
-
-    private val selectImportFolderLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
-                ?: return@registerForActivityResult
-            videoPlayerViewModelV2.importChatNode(newParentHandle = NodeId(toHandle))
-        }
-
-    private val nameCollisionActivityContract = registerForActivityResult(
-        NameCollisionActivityContract()
-    ) { result ->
-        result?.let {
-            videoPlayerViewModelV2.updateSnackBarMessage(it)
-        }
-    }
-
-    private val selectFolderToMoveLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val moveHandles = result.data?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
-            val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
-            if (moveHandles != null && moveHandles.isNotEmpty() && toHandle != null)
-                videoPlayerViewModelV2.moveNode(
-                    nodeHandle = moveHandles[0],
-                    newParentHandle = toHandle,
-                )
-        }
-
-    private val selectFolderToCopyLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            val copyHandles = result.data?.getLongArrayExtra(INTENT_EXTRA_KEY_COPY_HANDLES)
-            val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
-            if (copyHandles != null && copyHandles.isNotEmpty() && toHandle != null) {
-                videoPlayerViewModelV2.copyNode(
-                    nodeHandle = copyHandles[0],
-                    newParentHandle = toHandle,
-                )
-            }
-        }
-
-    private val addToAlbumLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-            ::handleAddToAlbumResult,
-        )
-
-    private val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-            ::handleHiddenNodesOnboardingResult,
-        )
-
-    private fun handleHiddenNodesOnboardingResult(result: ActivityResult) {
-        if (result.resultCode != RESULT_OK) return
-
-        videoPlayerViewModelV2.hideOrUnhideNode(
-            nodeId = NodeId(videoPlayerViewModelV2.uiState.value.currentPlayingHandle),
-            hide = true,
-        )
-
-        val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
-        videoPlayerViewModelV2.updateSnackBarMessage(message)
-    }
 
     override fun attachBaseContext(newBase: Context?) {
         delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
@@ -320,17 +191,6 @@ class VideoPlayerActivity : PasscodeActivity() {
                             handleAutoReplayIfPaused = videoPlayerViewModelV2::handleAutoReplayIfPaused,
                         )
                     },
-                )
-
-                StartTransferComponent(
-                    event = uiState.downloadEvent,
-                    onConsumeEvent = videoPlayerViewModelV2::resetDownloadNode,
-                    snackBarHostState = scaffoldState.snackbarHostState,
-                )
-
-                NodeAttachmentView(
-                    viewModel = nodeAttachmentViewModel,
-                    snackbarHostState = scaffoldState.snackbarHostState,
                 )
 
                 if (showBlockedDialog) {
@@ -431,71 +291,8 @@ class VideoPlayerActivity : PasscodeActivity() {
             }
         }.launchIn(lifecycleScope)
 
-        videoPlayerViewModelV2.getCollision().observe(this) { collision ->
-            nameCollisionActivityContract.launch(arrayListOf(collision))
-        }
-
         videoPlayerViewModelV2.onSnackbarMessage().observe(this) { message ->
             videoPlayerViewModelV2.updateSnackBarMessage(getString(message))
-        }
-
-        videoPlayerViewModelV2.onExceptionThrown().observe(this, ::manageException)
-
-        videoPlayerViewModelV2.onStartChatFileOfflineDownload().observe(this) {
-            videoPlayerViewModelV2.startDownloadForOffline(it)
-        }
-
-        collectFlow(
-            videoPlayerViewModelV2.uiState.map { it.clickedMenuAction }.distinctUntilChanged()
-        ) {
-            handleMenuActions(it)
-        }
-
-        collectFlow(videoPlayerViewModelV2.uiState.map { it.menuOptionClickedContent }
-            .distinctUntilChanged()) {
-            it?.let { content ->
-                when (content) {
-                    is MenuOptionClickedContent.ShareFile ->
-                        FileUtil.shareUri(this, content.fileName, content.contentUri)
-
-                    is MenuOptionClickedContent.ShareLink ->
-                        MegaNodeUtil.shareLink(this, content.fileLink, content.title)
-
-                    is MenuOptionClickedContent.ShareNode ->
-                        MegaNodeUtil.shareNode(context = this, node = content.node)
-
-                    is MenuOptionClickedContent.GetLink ->
-                        if (!showTakenDownNodeActionNotAvailableDialog(content.node, this)) {
-                            LinksUtil.showGetLinkActivity(
-                                this,
-                                videoPlayerViewModelV2.uiState.value.currentPlayingHandle
-                            )
-                        }
-
-                    is MenuOptionClickedContent.RemoveLink ->
-                        if (!showTakenDownNodeActionNotAvailableDialog(content.node, this)) {
-                            AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
-                                videoPlayerViewModelV2.removeLink()
-                            }
-                        }
-
-                    is MenuOptionClickedContent.Rename ->
-                        MegaNodeDialogUtil.showRenameNodeDialog(
-                            context = this,
-                            node = content.node,
-                            snackbarShower = this,
-                            actionNodeCallback = object : ActionNodeCallback {
-                                override fun finishRenameActionWithSuccess(newName: String) {
-                                    val newMetadata =
-                                        videoPlayerViewModelV2.uiState.value.metadata.copy(
-                                            nodeName = newName
-                                        )
-                                    videoPlayerViewModelV2.updateMetadata(newMetadata)
-                                }
-                            })
-                }
-                videoPlayerViewModelV2.clearMenuOptionClickedContent()
-            }
         }
 
         collectFlow(videoPlayerViewModelV2.uiState.map { it.isClosedAfterHidingNode }
@@ -504,210 +301,6 @@ class VideoPlayerActivity : PasscodeActivity() {
                 finish()
             }
         }
-    }
-
-    /**
-     * Shows the result of an exception.
-     *
-     * @param throwable The exception.
-     */
-    private fun manageException(throwable: Throwable) {
-        if (!manageCopyMoveException(throwable) && throwable is MegaException) {
-            throwable.message?.let { errorMessage ->
-                videoPlayerViewModelV2.updateSnackBarMessage(errorMessage)
-            }
-        }
-    }
-
-    private fun handleMenuActions(action: VideoPlayerMenuAction?) {
-        if (action == null) return
-        val launchSource = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
-        val playingHandle = videoPlayerViewModelV2.uiState.value.currentPlayingHandle
-        when (action) {
-            VideoPlayerFileInfoAction -> handleFileInfoAction(launchSource, playingHandle)
-            VideoPlayerChatImportAction -> handleChatImportAction()
-            VideoPlayerSendToChatAction -> handleSendToChatAction(playingHandle)
-            VideoPlayerSaveForOfflineAction -> handleSaveForOfflineAction()
-            VideoPlayerHideAction -> handleHideAction(playingHandle)
-            VideoPlayerUnhideAction -> handleUnhideAction(playingHandle)
-            VideoPlayerMoveAction -> handleMoveAction(playingHandle)
-            VideoPlayerCopyAction -> handleCopyAction(playingHandle)
-            VideoPlayerRubbishBinAction -> handleMoveToRubbishAction(playingHandle)
-            VideoPlayerAddToAction -> handleAddToAction(playingHandle)
-            else ->
-                if (launchSource == FROM_CHAT)
-                    handleRemoveAction()
-                else
-                    handleMoveToRubbishAction(playingHandle)
-        }
-        videoPlayerViewModelV2.updateClickedMenuAction(null)
-    }
-
-    private fun handleFileInfoAction(launchSource: Int, playingHandle: Long) {
-        lifecycleScope.launch {
-            Analytics.tracker.trackEvent(VideoPlayerInfoMenuItemEvent)
-            val fileInfoIntent = when (launchSource) {
-                OFFLINE_ADAPTER ->
-                    Intent(
-                        this@VideoPlayerActivity,
-                        OfflineFileInfoActivity::class.java
-                    ).apply {
-                        putExtra(HANDLE, playingHandle.toString())
-                    }
-
-                else -> {
-                    val nodeName = videoPlayerViewModelV2.uiState.value.currentPlayingItemName
-                    Intent(this@VideoPlayerActivity, FileInfoActivity::class.java).apply {
-                        putExtra(HANDLE, playingHandle)
-                        putExtra(NAME, nodeName)
-                    }.apply {
-                        val fromIncoming = launchSource in listOf(SEARCH_ADAPTER, RECENTS_ADAPTER)
-                                && videoPlayerViewModelV2.isNodeComesFromIncoming()
-                        when {
-                            launchSource == INCOMING_SHARES_ADAPTER || fromIncoming -> {
-                                putExtra(INTENT_EXTRA_KEY_FROM, FROM_INCOMING_SHARES)
-                                putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false)
-                            }
-
-                            launchSource == BACKUPS_ADAPTER ->
-                                putExtra(INTENT_EXTRA_KEY_FROM, FROM_BACKUPS)
-                        }
-                    }
-                }
-            }
-            startActivity(fileInfoIntent)
-        }
-    }
-
-    private fun handleChatImportAction() {
-        selectImportFolderLauncher.launch(
-            Intent(this, FileExplorerActivity::class.java).apply {
-                this.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
-            }
-        )
-    }
-
-    private fun handleSendToChatAction(playingHandle: Long) {
-        Analytics.tracker.trackEvent(VideoPlayerSendToChatMenuToolbarEvent)
-        val ids = listOf(NodeId(playingHandle))
-        nodeAttachmentViewModel.startAttachNodes(ids)
-    }
-
-    private fun handleSaveForOfflineAction() {
-        if (getStorageState() == StorageState.PayWall) {
-            AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
-        } else {
-            videoPlayerViewModelV2.saveChatNodeToOffline()
-        }
-    }
-
-    private fun handleHideAction(playingHandle: Long) {
-        Analytics.tracker.trackEvent(HideNodeMultiSelectMenuItemEvent)
-        var isPaid: Boolean
-        var isHiddenNodesOnboarded: Boolean
-        var isBusinessAccountExpired: Boolean
-
-
-        with(videoPlayerViewModelV2.uiState.value) {
-            isPaid = this.accountType?.isPaid == true
-            isHiddenNodesOnboarded = this.isHiddenNodesOnboarded
-            isBusinessAccountExpired = this.isBusinessAccountExpired
-        }
-
-        if (!isPaid || isBusinessAccountExpired) {
-            val intent = HiddenNodesOnboardingActivity.createScreen(
-                context = this,
-                isOnboarding = false,
-            )
-            hiddenNodesOnboardingLauncher.launch(intent)
-            overridePendingTransition(0, 0)
-        } else if (isHiddenNodesOnboarded) {
-            videoPlayerViewModelV2.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = true)
-            val message = resources.getQuantityString(R.plurals.hidden_nodes_result_message, 1, 1)
-            videoPlayerViewModelV2.updateSnackBarMessage(message)
-        } else {
-            showHiddenNodesOnboarding()
-        }
-    }
-
-    private fun showHiddenNodesOnboarding() {
-        videoPlayerViewModelV2.setHiddenNodesOnboarded()
-
-        val intent = HiddenNodesOnboardingActivity.createScreen(
-            context = this,
-            isOnboarding = true,
-        )
-        hiddenNodesOnboardingLauncher.launch(intent)
-        overridePendingTransition(0, 0)
-    }
-
-    private fun handleUnhideAction(playingHandle: Long) {
-        videoPlayerViewModelV2.hideOrUnhideNode(nodeId = NodeId(playingHandle), hide = false)
-        val message =
-            resources.getQuantityString(sharedR.plurals.unhidden_nodes_result_message, 1, 1)
-        videoPlayerViewModelV2.updateSnackBarMessage(message)
-    }
-
-    private fun handleMoveAction(playingHandle: Long) {
-        selectFolderToMoveLauncher.launch(
-            Intent(this, FileExplorerActivity::class.java).apply {
-                action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-                putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
-            }
-        )
-    }
-
-    private fun handleCopyAction(playingHandle: Long) {
-        if (getStorageState() == StorageState.PayWall) {
-            AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
-        } else {
-            selectFolderToCopyLauncher.launch(
-                Intent(this, FileExplorerActivity::class.java).apply {
-                    action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
-                    putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(playingHandle))
-                }
-            )
-        }
-    }
-
-    private fun handleRemoveAction() {
-        MaterialAlertDialogBuilder(this@VideoPlayerActivity)
-            .setMessage(getString(R.string.confirmation_delete_one_attachment))
-            .setPositiveButton(
-                getString(R.string.context_remove)
-            ) { _, _ ->
-                lifecycleScope.launch {
-                    runCatching { videoPlayerViewModelV2.deleteMessageFromChat() }
-                        .onSuccess { finish() }
-                        .onFailure { Timber.e(it) }
-                }
-            }
-            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
-            .show()
-    }
-
-    private fun handleMoveToRubbishAction(playingHandle: Long) {
-        MegaNodeDialogUtil.moveToRubbishOrRemove(
-            handle = playingHandle,
-            activity = this,
-            snackbarShower = this
-        )
-    }
-
-    private fun handleAddToAction(playingHandle: Long) {
-        val intent = Intent(this, AddToAlbumActivity::class.java).apply {
-            val ids = listOf(playingHandle).toTypedArray()
-            putExtra("ids", ids)
-            putExtra("type", 1)
-        }
-        addToAlbumLauncher.launch(intent)
-    }
-
-    private fun handleAddToAlbumResult(result: ActivityResult) {
-        if (result.resultCode != RESULT_OK) return
-        val message = result.data?.getStringExtra("message") ?: return
-
-        videoPlayerViewModelV2.updateSnackBarMessage(message)
     }
 
     private fun initMediaSession() {
@@ -757,11 +350,8 @@ class VideoPlayerActivity : PasscodeActivity() {
 }
 
 private infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
-    object : SceneStrategy<T> {
-        override fun SceneStrategyScope<T>.calculateScene(
-            entries: List<NavEntry<T>>,
-        ): Scene<T>? =
-            this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
-                calculateScene(entries)
-            }
+    SceneStrategy { entries ->
+        this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
+            calculateScene(entries)
+        }
     }

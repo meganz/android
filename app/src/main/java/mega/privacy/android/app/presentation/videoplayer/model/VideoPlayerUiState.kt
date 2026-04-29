@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 /**
@@ -99,5 +100,6 @@ data class VideoPlayerUiState(
     val addedSubtitleInfo: SubtitleFileInfo? = null,
     val navigateToSelectSubtitleScreen: Boolean = false,
     val blockedError: StateEvent = consumed,
-    val isClosedAfterHidingNode: Boolean = false
+    val isClosedAfterHidingNode: Boolean = false,
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 )

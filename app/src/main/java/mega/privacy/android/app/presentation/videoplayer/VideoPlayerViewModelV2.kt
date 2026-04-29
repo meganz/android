@@ -29,7 +29,6 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -54,43 +53,30 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
-import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerDownloadAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerGetLinkAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRemoveLinkAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRenameAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerShareAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
-import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
-import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
@@ -100,7 +86,6 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
-import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
@@ -122,20 +107,14 @@ import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.NameCollision
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartDownloadForOffline
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -151,22 +130,15 @@ import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
-import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
-import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
-import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
-import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
-import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
@@ -182,17 +154,12 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoR
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
-import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
-import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
-import mega.privacy.android.domain.usecase.node.DisableExportUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
-import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
-import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -206,14 +173,9 @@ import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerShareMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
@@ -273,23 +235,10 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val canRemoveFromChatUseCase: CanRemoveFromChatUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val isNodeInBackupsNodeUseCase: IsNodeInBackupsUseCase,
     private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
-    private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
-    private val getPublicAlbumNodeDataUseCase: GetPublicAlbumNodeDataUseCase,
-    private val getChatFileUseCase: GetChatFileUseCase,
-    private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
-    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
-    private val getFileUriUseCase: GetFileUriUseCase,
-    private val disableExportUseCase: DisableExportUseCase,
-    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
-    private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
-    private val checkNodesNameCollisionWithActionUseCase: CheckNodesNameCollisionWithActionUseCase,
-    private val deleteNodeAttachmentMessageByIdsUseCase: DeleteNodeAttachmentMessageByIdsUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    private val launchSourceMapper: LaunchSourceMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
@@ -317,21 +266,6 @@ class VideoPlayerViewModelV2 @Inject constructor(
         savedStateHandle[INTENT_EXTRA_KEY_FILE_NAME] ?: ""
     }
 
-    private val shouldShowAddTo: Boolean by lazy {
-        savedStateHandle.get<Boolean>(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM) == true
-    }
-
-    private val chatId: Long by lazy {
-        savedStateHandle[INTENT_EXTRA_KEY_CHAT_ID] ?: INVALID_HANDLE
-    }
-
-    private val messageId: Long by lazy {
-        savedStateHandle[INTENT_EXTRA_KEY_MSG_ID] ?: INVALID_HANDLE
-    }
-
-    private val canRemoveFromChatFunction =
-        suspend { runCatching { canRemoveFromChatUseCase(chatId, messageId) }.getOrDefault(false) }
-
     private val collectionTitle: String? by lazy {
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE]
     }
@@ -340,18 +274,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID]
     }
 
-    private val serialize: String? by lazy {
-        savedStateHandle[EXTRA_SERIALIZE_STRING]
-    }
-
-    private val fileLink: String? by lazy {
-        savedStateHandle[URL_FILE_LINK]
-    }
-
-    private val collision = SingleLiveEvent<NameCollision>()
-    private val throwable = SingleLiveEvent<Throwable>()
     private val snackbarMessage = SingleLiveEvent<Int>()
-    private val startChatFileOfflineDownload = SingleLiveEvent<ChatFile>()
     private var searchQuery: String = ""
     private val mediaItemsDuringChanged = mutableListOf<MediaItem>()
     private var searchJob: Job? = null
@@ -364,15 +287,31 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private var allowUpdatePausedByUser = true
 
     init {
+        uiState.update { it.copy(nodeSourceType = currentLaunchSourcesToNodeSourceType()) }
         setupTransferListener()
 
         handleHiddenNodesUIFlow()
         monitorIsHiddenNodesOnboarded()
 
-        refreshMenuActionsWhenNodeUpdates()
+        updateNameWhenNodeUpdates()
     }
 
-    private fun refreshMenuActionsWhenNodeUpdates() {
+    private fun currentLaunchSourcesToNodeSourceType(): NodeSourceType =
+        when (currentLaunchSources) {
+            OFFLINE_ADAPTER -> NodeSourceType.OFFLINE
+            RUBBISH_BIN_ADAPTER -> NodeSourceType.RUBBISH_BIN
+            INCOMING_SHARES_ADAPTER -> NodeSourceType.INCOMING_SHARES
+            OUTGOING_SHARES_ADAPTER -> NodeSourceType.OUTGOING_SHARES
+            LINKS_ADAPTER -> NodeSourceType.LINKS
+            BACKUPS_ADAPTER -> NodeSourceType.BACKUPS
+            FILE_BROWSER_ADAPTER -> NodeSourceType.CLOUD_DRIVE
+            VIDEO_BROWSE_ADAPTER -> NodeSourceType.VIDEOS
+            RECENTS_BUCKET_ADAPTER -> NodeSourceType.RECENTS_BUCKET
+            FAVOURITES_ADAPTER -> NodeSourceType.FAVOURITES
+            else -> NodeSourceType.CLOUD_DRIVE
+        }
+
+    private fun updateNameWhenNodeUpdates() {
         viewModelScope.launch {
             monitorNodeUpdatesUseCase().filter {
                 it.changes.keys.any { node ->
@@ -382,15 +321,24 @@ class VideoPlayerViewModelV2 @Inject constructor(
                 .conflate()
                 .catch {
                     Timber.e(it)
-                }.collectLatest {
-                    val actions = getMenuActionsForVideo(
-                        launchSource = currentLaunchSources,
-                        videoNodeHandle = uiState.value.currentPlayingHandle,
-                        isPaidUser = uiState.value.accountType?.isPaid == true,
-                        isExpiredBusinessUser = uiState.value.isBusinessAccountExpired
-                    )
-                    uiState.update { it.copy(menuActions = actions) }
+                }.collectLatest { changes ->
+                    val currentHandle = uiState.value.currentPlayingHandle
+                    val renamedNode = changes.entries
+                        .firstOrNull { (node, changeList) ->
+                            node.id.longValue == currentHandle &&
+                                    NodeChanges.Name in changeList
+                        }?.key
+                    uiState.update { state ->
+                        state.copy(
+                            metadata = renamedNode
+                                ?.let { state.metadata.copy(nodeName = it.name) }
+                                ?: state.metadata,
+                            currentPlayingItemName = renamedNode?.name
+                                ?: state.currentPlayingItemName,
+                        )
+                    }
                 }
+
         }
     }
 
@@ -433,20 +381,12 @@ class VideoPlayerViewModelV2 @Inject constructor(
                     getBusinessStatusUseCase()
                 } else null
 
-            val actions = getMenuActionsForVideo(
-                launchSource = currentLaunchSources,
-                videoNodeHandle = uiState.value.currentPlayingHandle,
-                isPaidUser = accountType?.isPaid == true,
-                isExpiredBusinessUser = businessStatus == BusinessAccountStatus.Expired
-            )
-
             uiState.update {
                 it.copy(
                     accountType = accountType,
                     isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
                     hiddenNodeEnabled = true,
                     showHiddenItems = showHiddenItems,
-                    menuActions = actions
                 )
             }
         }.catch { Timber.e(it) }
@@ -617,7 +557,14 @@ class VideoPlayerViewModelV2 @Inject constructor(
             // find playbackPosition = null (already cleared here) and be a no-op.
             applyPendingSavedPlaybackPositionSeek()
             mediaPlaySources.nameToDisplay?.let { name ->
-                uiState.update { it.copy(metadata = Metadata(null, null, null, nodeName = name)) }
+                uiState.update {
+                    it.copy(
+                        currentPlayingItemName = name,
+                        metadata = Metadata(
+                            null, null, null, nodeName = name
+                        )
+                    )
+                }
             }
         }
 
@@ -1143,7 +1090,6 @@ class VideoPlayerViewModelV2 @Inject constructor(
             savePlaybackTimesUseCase()
             handlePlaybackPositionAfterVideoTransition(handle, isCheckPlaybackPosition)
             updatePlaybackStatus(handle, items)
-            updateMenuActions(handle)
         }
     }
 
@@ -1196,17 +1142,6 @@ class VideoPlayerViewModelV2 @Inject constructor(
                 currentPlayingItemName = playingItemName
             )
         }
-    }
-
-    private suspend fun updateMenuActions(handle: Long) {
-        val actions = getMenuActionsForVideo(
-            launchSource = currentLaunchSources,
-            videoNodeHandle = handle,
-            isPaidUser = uiState.value.accountType?.isPaid == true,
-            isExpiredBusinessUser = uiState.value.isBusinessAccountExpired
-        )
-
-        uiState.update { it.copy(menuActions = actions) }
     }
 
     private fun applyPendingSavedPlaybackPositionSeek() {
@@ -1354,173 +1289,6 @@ class VideoPlayerViewModelV2 @Inject constructor(
     internal fun updateSnackBarMessage(message: String?) =
         uiState.update { it.copy(snackBarMessage = message) }
 
-    private suspend fun getMenuActionsForVideo(
-        launchSource: Int,
-        videoNodeHandle: Long,
-        isPaidUser: Boolean,
-        isExpiredBusinessUser: Boolean,
-    ): List<VideoPlayerMenuAction> {
-        val videoNode = getNodeByHandle(videoNodeHandle)
-        return launchSourceMapper(
-            launchSource = launchSource,
-            videoNode = videoNode,
-            shouldShowAddTo = shouldShowAddTo,
-            canRemoveFromChat = canRemoveFromChatFunction,
-            isPaidUser = isPaidUser,
-            isExpiredBusinessUser = isExpiredBusinessUser,
-        )
-    }
-
-    internal fun updateClickedMenuAction(action: VideoPlayerMenuAction?) {
-        val playingHandle = uiState.value.currentPlayingHandle
-        when (action) {
-            VideoPlayerDownloadAction -> handleDownloadAction(playingHandle)
-            VideoPlayerShareAction -> handleShareAction(playingHandle)
-            VideoPlayerGetLinkAction -> handleGetLinkAction(playingHandle)
-            VideoPlayerRemoveLinkAction -> handleRemoveLinkAction(playingHandle)
-            VideoPlayerRenameAction -> handleRenameAction(playingHandle)
-            else -> uiState.update { it.copy(clickedMenuAction = action) }
-        }
-    }
-
-    private fun handleDownloadAction(playingHandle: Long) {
-        viewModelScope.launch {
-            Analytics.tracker.trackEvent(VideoPlayerSaveToDeviceMenuToolbarEvent)
-            val downloadEvent: DownloadTriggerEvent? = when (currentLaunchSources) {
-                ZIP_ADAPTER -> {
-                    val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
-                    val uri = mediaItem?.localConfiguration?.uri ?: return@launch
-                    val nodeName = uiState.value.currentPlayingItemName ?: return@launch
-                    TransferTriggerEvent.CopyUri(nodeName, UriPath(uri.toString()))
-                }
-
-                FROM_CHAT -> {
-                    getChatFileUseCase(chatId, messageId)?.let { chatFile ->
-                        TransferTriggerEvent.StartDownloadNode(
-                            nodes = listOf(chatFile),
-                            withStartMessage = true,
-                        )
-                    }
-                }
-
-                FILE_LINK_ADAPTER -> {
-                    serialize?.let {
-                        val nodes = listOfNotNull(getPublicNodeFromSerializedDataUseCase(it))
-                        TransferTriggerEvent.StartDownloadNode(
-                            nodes = nodes,
-                            withStartMessage = true,
-                        )
-                    }
-                }
-
-                FOLDER_LINK_ADAPTER -> {
-                    val nodes =
-                        listOfNotNull(getPublicChildNodeFromIdUseCase(NodeId(playingHandle)))
-                    TransferTriggerEvent.StartDownloadNode(
-                        nodes = nodes,
-                        withStartMessage = true,
-                    )
-                }
-
-                FROM_ALBUM_SHARING -> {
-                    val data = getPublicAlbumNodeDataUseCase(NodeId(playingHandle)) ?: return@launch
-                    val nodes = listOfNotNull(getPublicNodeFromSerializedDataUseCase(data))
-                    TransferTriggerEvent.StartDownloadNode(
-                        nodes = nodes,
-                        withStartMessage = true,
-                    )
-                }
-
-                else -> {
-                    val nodes = listOfNotNull(getVideoNodeByHandleUseCase(playingHandle))
-                    TransferTriggerEvent.StartDownloadNode(
-                        nodes = nodes,
-                        withStartMessage = true,
-                    )
-                }
-            }
-            if (downloadEvent != null)
-                uiState.update { it.copy(downloadEvent = triggered(downloadEvent)) }
-        }
-    }
-
-    private fun handleShareAction(playingHandle: Long) {
-        viewModelScope.launch {
-            Analytics.tracker.trackEvent(VideoPlayerShareMenuToolbarEvent)
-            when (currentLaunchSources) {
-                OFFLINE_ADAPTER, ZIP_ADAPTER -> runCatching {
-                    val path =
-                        mediaPlayerGateway.getCurrentMediaItem()?.localConfiguration?.uri?.path
-                            ?: return@launch
-
-                    val file = File(path)
-                    if (file.exists()) {
-                        val contentUri =
-                            getFileUriUseCase(file, Constants.AUTHORITY_STRING_FILE_PROVIDER)
-                        val content =
-                            MenuOptionClickedContent.ShareFile(contentUri.toUri(), file.name)
-                        uiState.update { it.copy(menuOptionClickedContent = content) }
-                    }
-                }.onFailure {
-                    Timber.e(it)
-                }
-
-                FILE_LINK_ADAPTER -> {
-                    val nodeName = uiState.value.currentPlayingItemName ?: ""
-                    val content = MenuOptionClickedContent.ShareLink(fileLink, nodeName)
-                    uiState.update { it.copy(menuOptionClickedContent = content) }
-                }
-
-                else -> {
-                    val node = getMegaNode(playingHandle)
-                    val content = MenuOptionClickedContent.ShareNode(node)
-                    uiState.update { it.copy(menuOptionClickedContent = content) }
-                }
-            }
-        }
-    }
-
-    private suspend fun getMegaNode(playingHandle: Long): MegaNode? {
-        val serializedData = getNodeByHandle(playingHandle)?.serializedData ?: return null
-        return MegaNode.unserialize(serializedData)
-    }
-
-    internal fun clearMenuOptionClickedContent() =
-        uiState.update { it.copy(menuOptionClickedContent = null) }
-
-    private fun handleGetLinkAction(playingHandle: Long) {
-        viewModelScope.launch {
-            Analytics.tracker.trackEvent(VideoPlayerGetLinkMenuToolbarEvent)
-            val node = getMegaNode(playingHandle)
-            val content = MenuOptionClickedContent.GetLink(node)
-            uiState.update { it.copy(menuOptionClickedContent = content) }
-        }
-    }
-
-    private fun handleRemoveLinkAction(playingHandle: Long) {
-        viewModelScope.launch {
-            Analytics.tracker.trackEvent(VideoPlayerRemoveLinkMenuToolbarEvent)
-            val node = getMegaNode(playingHandle)
-            val content = MenuOptionClickedContent.RemoveLink(node)
-            uiState.update { it.copy(menuOptionClickedContent = content) }
-        }
-    }
-
-    private fun handleRenameAction(playingHandle: Long) {
-        viewModelScope.launch {
-            val node = getMegaNode(playingHandle)
-            val content = MenuOptionClickedContent.Rename(node)
-            uiState.update { it.copy(menuOptionClickedContent = content) }
-        }
-    }
-
-    internal fun removeLink() {
-        viewModelScope.launch {
-            val nodeId = NodeId(uiState.value.currentPlayingHandle)
-            runCatching { disableExportUseCase(nodeId) }.onFailure { Timber.e(it) }
-        }
-    }
-
     internal suspend fun isNodeComesFromIncoming(): Boolean {
         val handle = uiState.value.currentPlayingHandle
         return runCatching {
@@ -1528,111 +1296,6 @@ class VideoPlayerViewModelV2 @Inject constructor(
                     isNodeInCloudDriveUseCase(handle) &&
                     isNodeInBackupsNodeUseCase(handle)
         }.getOrDefault(false)
-    }
-
-    /**
-     * Imports a chat node if there is no name collision.
-     *
-     * @param newParentHandle   Parent handle in which the node will be copied.
-     */
-    fun importChatNode(
-        newParentHandle: NodeId,
-    ) = viewModelScope.launch {
-        runCatching {
-            checkChatNodesNameCollisionAndCopyUseCase(
-                chatId = chatId,
-                messageIds = listOf(messageId),
-                newNodeParent = newParentHandle,
-            )
-        }.onSuccess {
-            it.firstChatNodeCollisionOrNull?.let { item ->
-                collision.value = item
-            }
-            it.moveRequestResult?.let { result ->
-                snackbarMessage.value = if (result.isSuccess) {
-                    R.string.context_correctly_copied
-                } else {
-                    R.string.context_no_copied
-                }
-            }
-        }.onFailure {
-            throwable.value = it
-            Timber.e(it)
-        }
-    }
-
-    /**
-     * Moves a node if there is no name collision.
-     *
-     * @param nodeHandle        Node handle to move.
-     * @param newParentHandle   Parent handle in which the node will be moved.
-     */
-    fun moveNode(nodeHandle: Long, newParentHandle: Long) {
-        viewModelScope.launch {
-            runCatching {
-                checkNodesNameCollisionWithActionUseCase(
-                    nodes = mapOf(nodeHandle to newParentHandle),
-                    type = NodeNameCollisionType.MOVE,
-                )
-            }.onSuccess {
-                it.firstNodeCollisionOrNull?.let { item ->
-                    collision.value = item
-                }
-                it.moveRequestResult?.let { result ->
-                    if (result.isSuccess) {
-                        snackbarMessage.value = sharedR.string.node_moved_success_message
-                    } else {
-                        snackbarMessage.value = R.string.context_no_moved
-                    }
-                }
-            }.onFailure {
-                Timber.e(it, "Error not moved")
-                if (it is NodeDoesNotExistsException) {
-                    snackbarMessage.value = R.string.general_error
-                } else {
-                    throwable.value = it
-                }
-            }
-        }
-    }
-
-    /**
-     * Copies a node if there is no name collision.
-     *
-     * @param nodeHandle        Node handle to copy.
-     * @param newParentHandle   Parent handle in which the node will be copied.
-     */
-    fun copyNode(
-        nodeHandle: Long? = null,
-        newParentHandle: Long,
-    ) {
-        if (nodeHandle == null) return
-        viewModelScope.launch {
-            runCatching {
-                checkNodesNameCollisionWithActionUseCase(
-                    nodes = mapOf(nodeHandle to newParentHandle),
-                    type = NodeNameCollisionType.COPY,
-                )
-            }.onSuccess {
-                it.firstNodeCollisionOrNull?.let { item ->
-                    collision.value = item
-                }
-                it.moveRequestResult?.let { result ->
-                    snackbarMessage.value = if (result.isSuccess) {
-                        R.string.context_correctly_copied
-                    } else {
-                        R.string.context_no_copied
-                    }
-                }
-            }.onFailure {
-                Timber.e(it, "Error not copied")
-                if (it is NodeDoesNotExistsException) {
-                    snackbarMessage.value = R.string.general_error
-                } else {
-                    throwable.value = it
-                }
-            }
-        }
     }
 
     internal fun updateIsMoreOptionShown(value: Boolean) {
@@ -1754,76 +1417,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
             }
     }
 
-    internal fun resetDownloadNode() = uiState.update {
-        it.copy(downloadEvent = consumed())
-    }
-
-    private suspend fun getNodeByHandle(handle: Long) =
-        runCatching { getVideoNodeByHandleUseCase(handle) }.getOrNull()
-
-    internal fun getCollision(): LiveData<NameCollision> = collision
-
     internal fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
-
-    internal fun onExceptionThrown(): LiveData<Throwable> = throwable
-
-    internal fun onStartChatFileOfflineDownload(): LiveData<ChatFile> = startChatFileOfflineDownload
-
-    internal fun startDownloadForOffline(chatFile: ChatFile) = uiState.update {
-        it.copy(
-            downloadEvent = triggered(
-                StartDownloadForOffline(
-                    node = chatFile,
-                    withStartMessage = true,
-                )
-            )
-        )
-    }
-
-    /**
-     * Save chat node to offline
-     *
-     * @param chatId    Chat ID where the node is.
-     * @param messageId Message ID where the node is.
-     */
-    fun saveChatNodeToOffline() {
-        viewModelScope.launch {
-            runCatching {
-                val chatFile = getChatFileUseCase(chatId = chatId, messageId = messageId)
-                    ?: throw IllegalStateException("Chat file not found")
-                val isAvailableOffline = isAvailableOfflineUseCase(chatFile)
-                if (isAvailableOffline) {
-                    snackbarMessage.value = R.string.file_already_exists
-                } else {
-                    startChatFileOfflineDownload.value = chatFile
-                }
-            }.onFailure {
-                Timber.e(it)
-                throwable.value = it
-            }
-        }
-    }
-
-    internal fun hideOrUnhideNode(nodeId: NodeId, hide: Boolean) =
-        viewModelScope.launch {
-            runCatching {
-                updateNodeSensitiveUseCase(nodeId = nodeId, isSensitive = hide)
-                if (uiState.value.showHiddenItems == false && hide) {
-                    delay(1000)
-                    uiState.update { it.copy(isClosedAfterHidingNode = true) }
-                }
-            }.onFailure { Timber.e("Update sensitivity failed: $it") }
-        }
-
-    internal fun setHiddenNodesOnboarded() {
-        uiState.update {
-            it.copy(isHiddenNodesOnboarded = true)
-        }
-    }
-
-    internal suspend fun deleteMessageFromChat() {
-        deleteNodeAttachmentMessageByIdsUseCase(chatId, messageId)
-    }
 
     internal fun updatePlaybackStateWithReplay(value: Boolean) {
         if (mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser) {

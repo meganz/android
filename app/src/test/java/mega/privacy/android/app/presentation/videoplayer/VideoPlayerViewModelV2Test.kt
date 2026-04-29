@@ -9,12 +9,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.media3.common.MediaItem
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.jraska.livedata.test
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
@@ -22,56 +20,29 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
-import mega.privacy.android.app.R
 import mega.privacy.android.app.TimberJUnit5Extension
-import mega.privacy.android.app.data.extensions.observeOnce
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
-import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
-import mega.privacy.android.app.presentation.videoplayer.model.MenuOptionClickedContent
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerAddToAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerChatImportAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerCopyAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerDownloadAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerFileInfoAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerGetLinkAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerHideAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerMoveAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRemoveAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRemoveLinkAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRenameAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerRubbishBinAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerSaveForOfflineAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerSendToChatAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerShareAction
-import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerUnhideAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
-import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
-import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
-import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
-import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
@@ -83,7 +54,6 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
-import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
@@ -101,24 +71,21 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
-import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -133,22 +100,15 @@ import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
-import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
-import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
-import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
-import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
-import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStopUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.CanRemoveFromChatUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetVideoNodesByEmailUseCase
@@ -164,17 +124,12 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoR
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
-import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
-import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
-import mega.privacy.android.domain.usecase.node.DisableExportUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
-import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
-import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -182,17 +137,12 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerGetLinkMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerRemoveLinkMenuToolbarEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerSaveToDeviceMenuToolbarEvent
-import mega.privacy.mobile.analytics.event.VideoPlayerShareMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -207,6 +157,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.clearInvocations
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -280,30 +231,13 @@ class VideoPlayerViewModelV2Test {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val fakeMonitorShowHiddenItemsFlow = MutableSharedFlow<Boolean>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
-    private val canRemoveFromChatUseCase = mock<CanRemoveFromChatUseCase>()
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val isNodeInBackupsNodeUseCase = mock<IsNodeInBackupsUseCase>()
     private val isNodeInCloudDriveUseCase = mock<IsNodeInCloudDriveUseCase>()
-    private val checkChatNodesNameCollisionAndCopyUseCase =
-        mock<CheckChatNodesNameCollisionAndCopyUseCase>()
-    private val getPublicAlbumNodeDataUseCase = mock<GetPublicAlbumNodeDataUseCase>()
-    private val getChatFileUseCase = mock<GetChatFileUseCase>()
-    private val getPublicNodeFromSerializedDataUseCase =
-        mock<GetPublicNodeFromSerializedDataUseCase>()
-    private val getPublicChildNodeFromIdUseCase = mock<GetPublicChildNodeFromIdUseCase>()
-    private val getFileUriUseCase = mock<GetFileUriUseCase>()
-    private val disableExportUseCase = mock<DisableExportUseCase>()
-    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
-    private val updateNodeSensitiveUseCase = mock<UpdateNodeSensitiveUseCase>()
-    private val checkNodesNameCollisionWithActionUseCase =
-        mock<CheckNodesNameCollisionWithActionUseCase>()
-    private val deleteNodeAttachmentMessageByIdsUseCase =
-        mock<DeleteNodeAttachmentMessageByIdsUseCase>()
     private val fakeMonitorNodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
-    private val launchSourceMapper = mock<LaunchSourceMapper>()
     private val savedStateHandle = SavedStateHandle(mapOf())
     private val trackPlaybackPositionUseCase = mock<TrackPlaybackPositionUseCase>()
     private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
@@ -319,8 +253,6 @@ class VideoPlayerViewModelV2Test {
     private val testTitle = "video queue title"
     private val expectedCollectionId = 123456L
     private val expectedCollectionTitle = "collection title"
-    private val expectedChatId = 1000L
-    private val expectedMessageId = 2000L
 
     private fun initViewModel() {
         fakeMonitorTransferEventsFlow = MutableSharedFlow()
@@ -370,24 +302,10 @@ class VideoPlayerViewModelV2Test {
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
-            canRemoveFromChatUseCase = canRemoveFromChatUseCase,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isNodeInBackupsNodeUseCase = isNodeInBackupsNodeUseCase,
             isNodeInCloudDriveUseCase = isNodeInCloudDriveUseCase,
-            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
-            getPublicAlbumNodeDataUseCase = getPublicAlbumNodeDataUseCase,
-            getChatFileUseCase = getChatFileUseCase,
-            getPublicNodeFromSerializedDataUseCase = getPublicNodeFromSerializedDataUseCase,
-            getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
-            getFileUriUseCase = getFileUriUseCase,
-            disableExportUseCase = disableExportUseCase,
-            isAvailableOfflineUseCase = isAvailableOfflineUseCase,
-            updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
-            checkNodesNameCollisionWithActionUseCase = checkNodesNameCollisionWithActionUseCase,
-            deleteNodeAttachmentMessageByIdsUseCase = deleteNodeAttachmentMessageByIdsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
-            launchSourceMapper = launchSourceMapper,
-            savedStateHandle = savedStateHandle,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase = trackPlaybackPositionUseCase,
@@ -395,13 +313,8 @@ class VideoPlayerViewModelV2Test {
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            savedStateHandle = savedStateHandle,
         )
-        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
-        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
-        savedStateHandle[INTENT_EXTRA_KEY_CHAT_ID] = expectedChatId
-        savedStateHandle[INTENT_EXTRA_KEY_MSG_ID] = expectedMessageId
-        savedStateHandle[INTENT_EXTRA_KEY_HANDLE] = testHandle
-        savedStateHandle[INTENT_EXTRA_KEY_FILE_NAME] = testFileName
     }
 
     @BeforeEach
@@ -418,7 +331,6 @@ class VideoPlayerViewModelV2Test {
             monitorVideoRepeatModeUseCase()
         }.thenReturn(flowOf(RepeatToggleMode.REPEAT_NONE))
         whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
-        initViewModel()
     }
 
     @AfterEach
@@ -465,23 +377,10 @@ class VideoPlayerViewModelV2Test {
             isHiddenNodesOnboardedUseCase,
             monitorShowHiddenItemsUseCase,
             getBusinessStatusUseCase,
-            canRemoveFromChatUseCase,
             isNodeInRubbishBinUseCase,
             isNodeInBackupsNodeUseCase,
             isNodeInCloudDriveUseCase,
-            checkChatNodesNameCollisionAndCopyUseCase,
-            getPublicAlbumNodeDataUseCase,
-            getChatFileUseCase,
-            getPublicNodeFromSerializedDataUseCase,
-            getPublicChildNodeFromIdUseCase,
-            getFileUriUseCase,
-            disableExportUseCase,
-            isAvailableOfflineUseCase,
-            updateNodeSensitiveUseCase,
-            checkNodesNameCollisionWithActionUseCase,
-            deleteNodeAttachmentMessageByIdsUseCase,
             monitorNodeUpdatesUseCase,
-            launchSourceMapper,
             durationInSecondsTextMapper,
             isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase,
@@ -612,7 +511,7 @@ class VideoPlayerViewModelV2Test {
         }
 
     @Test
-    fun `test that the isRetry is false when currentPlayingUri is null when getLocalFolderLink return null`() =
+    fun `test that the isRetry is null when currentPlayingUri is null when getLocalFolderLink return null`() =
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(
@@ -626,7 +525,7 @@ class VideoPlayerViewModelV2Test {
             whenever(getLocalFolderLinkUseCase(any())).thenReturn(null)
             underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
-                assertThat(awaitItem().isRetry).isFalse()
+                assertThat(awaitItem().isRetry).isNull()
             }
         }
 
@@ -645,6 +544,7 @@ class VideoPlayerViewModelV2Test {
                 handle = testHandle,
                 fileName = testFileName
             )
+            initViewModel()
             underTest.initVideoPlayerData(intent)
             advanceUntilIdle()
             underTest.uiState.test {
@@ -688,6 +588,7 @@ class VideoPlayerViewModelV2Test {
             ).thenReturn(videoPlayerItem)
             whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(false)
             whenever(getVideoNodeByHandleUseCase(testHandle)).thenReturn(node)
+            initViewModel()
             underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
                 val actual = awaitItem()
@@ -778,6 +679,7 @@ class VideoPlayerViewModelV2Test {
                 )
             ).thenReturn(true)
 
+            initViewModel()
             mockStatic(Uri::class.java).use {
                 whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
                 underTest.initVideoPlayerData(intent)
@@ -880,6 +782,7 @@ class VideoPlayerViewModelV2Test {
             whenever(
                 intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)
             ).thenReturn(true)
+            initViewModel()
             mockStatic(FileUtil::class.java).use {
                 testFiles.forEach { file ->
                     whenever(FileUtil.getUriForFile(context, file)).thenReturn(mock())
@@ -1041,6 +944,7 @@ class VideoPlayerViewModelV2Test {
                 true
             )
         ).thenReturn(true)
+        initViewModel()
         mockStatic(Uri::class.java).use {
             whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
             underTest.initVideoPlayerData(intent)
@@ -1283,9 +1187,6 @@ class VideoPlayerViewModelV2Test {
             val testItems = (1..3).map {
                 initVideoPlayerItem(it.toLong(), it.toString())
             }
-            whenever(launchSourceMapper(any(), any(), any(), any(), any(), any())).thenReturn(
-                emptyList()
-            )
             val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
             whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
             whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
@@ -1338,6 +1239,9 @@ class VideoPlayerViewModelV2Test {
         runTest {
             val expectedId = 1L
             val instant = Instant.ofEpochMilli(2000L)
+            savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
+            savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
+            initViewModel()
             mockStatic(Instant::class.java).use {
                 it.`when`<Instant> { Instant.now() }.thenReturn(instant)
                 val testMediaItem = MediaItem.Builder()
@@ -1351,6 +1255,11 @@ class VideoPlayerViewModelV2Test {
                     2,
                     expectedCollectionId,
                     expectedCollectionTitle
+                )
+                verify(saveRecentlyUsedItemUseCase).invoke(
+                    expectedId,
+                    RecentlyUsedType.Video,
+                    underTest.uiState.value.metadata.nodeName,
                 )
             }
         }
@@ -1558,12 +1467,8 @@ class VideoPlayerViewModelV2Test {
                 on { isBusinessAccount }.thenReturn(true)
             }
             whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+            initViewModel()
             fakeMonitorShowHiddenItemsFlow.emit(true)
-            val testActions = listOf(
-                VideoPlayerDownloadAction,
-                VideoPlayerFileInfoAction,
-            )
-            initLaunchSourceMapperReturned(testActions)
             emitAccountDetail(testAccountType)
             advanceUntilIdle()
             underTest.uiState.test {
@@ -1571,11 +1476,7 @@ class VideoPlayerViewModelV2Test {
                 assertThat(actual.accountType?.isBusinessAccount).isTrue()
                 assertThat(actual.isBusinessAccountExpired).isTrue()
                 assertThat(actual.hiddenNodeEnabled).isTrue()
-                assertThat(actual.menuActions).isNotEmpty()
-                assertThat(actual.menuActions.size).isEqualTo(testActions.size)
-                testActions.onEachIndexed { index, item ->
-                    assertThat(actual.menuActions[index]).isEqualTo(item)
-                }
+                assertThat(actual.showHiddenItems).isTrue()
                 cancelAndConsumeRemainingEvents()
             }
         }
@@ -1589,41 +1490,6 @@ class VideoPlayerViewModelV2Test {
         }
         fakeMonitorAccountDetailFlow.emit(testAccountDetail)
     }
-
-    private suspend fun initLaunchSourceMapperReturned(actions: List<VideoPlayerMenuAction>) {
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-        whenever(launchSourceMapper(any(), any(), any(), any(), any(), any())).thenReturn(actions)
-    }
-
-    @Test
-    fun `the state is updated correctly when updateCurrentPlayingHandle is invoked`() =
-        runTest {
-            val testHandle = 1L
-            val testItems: List<VideoPlayerItem> = listOf(
-                initVideoPlayerItem(2L, ""),
-                initVideoPlayerItem(testHandle, testHandle.toString()),
-            )
-            val testActions = listOf(
-                VideoPlayerDownloadAction,
-                VideoPlayerFileInfoAction,
-            )
-            initLaunchSourceMapperReturned(testActions)
-            underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
-            advanceUntilIdle()
-            underTest.uiState.test {
-                val actual = awaitItem()
-                assertThat(actual.currentPlayingHandle).isEqualTo(testHandle)
-                assertThat(actual.currentPlayingIndex).isEqualTo(
-                    testItems.indexOfFirst { it.nodeHandle == testHandle }
-                )
-                assertThat(actual.menuActions).isNotEmpty()
-                assertThat(actual.menuActions.size).isEqualTo(testActions.size)
-                testActions.onEachIndexed { index, item ->
-                    assertThat(actual.menuActions[index]).isEqualTo(item)
-                }
-                cancelAndConsumeRemainingEvents()
-            }
-        }
 
     @ParameterizedTest(name = "when value is {0}")
     @ValueSource(booleans = [true, false])
@@ -1688,427 +1554,12 @@ class VideoPlayerViewModelV2Test {
     private fun provideSpeedPlaybackItem() = VideoSpeedPlaybackItem.entries
 
     @Test
-    internal fun `test that copy complete snack bar message is shown when node is copied to different directory`() =
-        runTest {
-            val selectedNode = 73248538798194
-            val newParentNode = 158401030174851
-            whenever(
-                checkNodesNameCollisionWithActionUseCase(
-                    nodes = mapOf(selectedNode to newParentNode),
-                    type = NodeNameCollisionType.COPY,
-                )
-            ) doReturn NodeNameCollisionWithActionResult(
-                collisionResult = mock(),
-                moveRequestResult = MoveRequestResult.GeneralMovement(
-                    count = 1,
-                    errorCount = 0
-                )
-            )
-
-            underTest.copyNode(
-                nodeHandle = selectedNode,
-                newParentHandle = newParentNode,
-            )
-            testScheduler.advanceUntilIdle()
-
-            underTest.onSnackbarMessage().test().assertValue(R.string.context_correctly_copied)
-        }
-
-    @Test
-    internal fun `test that copy error snack bar message is shown when node is not copied to different directory`() =
-        runTest {
-            val selectedNode = 73248538798194
-            val newParentNode = 158401030174851
-            whenever(
-                checkNodesNameCollisionWithActionUseCase(
-                    nodes = mapOf(selectedNode to newParentNode),
-                    type = NodeNameCollisionType.COPY,
-                )
-            ) doReturn NodeNameCollisionWithActionResult(
-                collisionResult = mock(),
-                moveRequestResult = MoveRequestResult.GeneralMovement(
-                    count = 1,
-                    errorCount = 1
-                )
-            )
-
-            underTest.copyNode(
-                nodeHandle = selectedNode,
-                newParentHandle = newParentNode,
-            )
-            testScheduler.advanceUntilIdle()
-
-            underTest.onSnackbarMessage().test().assertValue(R.string.context_no_copied)
-        }
-
-    @Test
-    internal fun `test that onExceptionThrown is triggered when copy failed`() =
-        runTest {
-            val selectedNode = 73248538798194
-            val newParentNode = 158401030174851
-            val runtimeException = RuntimeException("Copy node failed")
-            whenever(
-                checkNodesNameCollisionWithActionUseCase(
-                    nodes = mapOf(selectedNode to newParentNode),
-                    type = NodeNameCollisionType.COPY,
-                )
-            ).thenThrow(runtimeException)
-            underTest.copyNode(
-                nodeHandle = selectedNode,
-                newParentHandle = newParentNode,
-            )
-            advanceUntilIdle()
-            underTest.onExceptionThrown().test().assertValue(runtimeException)
-        }
-
-    @Test
-    internal fun `test move complete snack bar message is shown when node is moved to different directory`() =
-        runTest {
-            val selectedNode = 73248538798194
-            val newParentNode = 158401030174851
-            whenever(
-                checkNodesNameCollisionWithActionUseCase(
-                    nodes = mapOf(selectedNode to newParentNode),
-                    type = NodeNameCollisionType.MOVE,
-                )
-            ) doReturn NodeNameCollisionWithActionResult(
-                collisionResult = mock(),
-                moveRequestResult = MoveRequestResult.GeneralMovement(
-                    count = 1,
-                    errorCount = 0
-                )
-            )
-            underTest.moveNode(
-                nodeHandle = selectedNode,
-                newParentHandle = newParentNode,
-            )
-            advanceUntilIdle()
-            underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(sharedResR.string.node_moved_success_message)
-            }
-        }
-
-    @Test
-    internal fun `test move error snack bar message is shown when node is not moved to different directory`() =
-        runTest {
-            val selectedNode = 73248538798194
-            val newParentNode = 158401030174851
-            whenever(
-                checkNodesNameCollisionWithActionUseCase(
-                    nodes = mapOf(selectedNode to newParentNode),
-                    type = NodeNameCollisionType.MOVE,
-                )
-            ) doReturn NodeNameCollisionWithActionResult(
-                collisionResult = mock(),
-                moveRequestResult = MoveRequestResult.GeneralMovement(
-                    count = 1,
-                    errorCount = 1
-                )
-            )
-            underTest.moveNode(
-                nodeHandle = selectedNode,
-                newParentHandle = newParentNode,
-            )
-            advanceUntilIdle()
-            underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_no_moved)
-            }
-        }
-
-    @Test
-    internal fun `test that onExceptionThrown is triggered when move failed`() =
-        runTest {
-            val selectedNode = 73248538798194
-            val newParentNode = 158401030174851
-            val runtimeException = RuntimeException("Move node failed")
-            whenever(
-                checkNodesNameCollisionWithActionUseCase(
-                    nodes = mapOf(selectedNode to newParentNode),
-                    type = NodeNameCollisionType.MOVE,
-                )
-            ).thenThrow(runtimeException)
-
-            underTest.moveNode(
-                nodeHandle = selectedNode,
-                newParentHandle = newParentNode,
-            )
-            advanceUntilIdle()
-
-            underTest.onExceptionThrown().test().assertValue(runtimeException)
-        }
-
-    @Test
-    internal fun `test that copy complete snack bar message is shown when chat node is imported to different directory`() =
-        runTest {
-            val newParentNode = NodeId(158401030174851)
-            whenever(
-                checkChatNodesNameCollisionAndCopyUseCase(
-                    chatId = expectedChatId,
-                    messageIds = listOf(expectedMessageId),
-                    newNodeParent = newParentNode,
-                )
-            ) doReturn NodeNameCollisionWithActionResult(
-                collisionResult = mock(),
-                moveRequestResult = MoveRequestResult.GeneralMovement(
-                    count = 1,
-                    errorCount = 0
-                )
-            )
-            underTest.importChatNode(newParentNode)
-            advanceUntilIdle()
-            underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_correctly_copied)
-            }
-        }
-
-    @Test
-    internal fun `test that copy error snack bar message is shown when chat node is not imported to different directory`() =
-        runTest {
-            val newParentNode = NodeId(158401030174851)
-            whenever(
-                checkChatNodesNameCollisionAndCopyUseCase(
-                    chatId = expectedChatId,
-                    messageIds = listOf(expectedMessageId),
-                    newNodeParent = newParentNode,
-                )
-            ) doReturn NodeNameCollisionWithActionResult(
-                collisionResult = mock(),
-                moveRequestResult = MoveRequestResult.GeneralMovement(
-                    count = 1,
-                    errorCount = 1
-                )
-            )
-            underTest.importChatNode(newParentNode)
-            advanceUntilIdle()
-            underTest.onSnackbarMessage().observeOnce {
-                assertThat(it).isEqualTo(R.string.context_no_copied)
-            }
-        }
-
-    @Test
-    internal fun `test that onExceptionThrown is triggered when import failed`() =
-        runTest {
-            val newParentNode = NodeId(158401030174851)
-
-            val runtimeException = RuntimeException("Import node failed")
-            whenever(
-                checkChatNodesNameCollisionAndCopyUseCase(
-                    chatId = expectedChatId,
-                    messageIds = listOf(expectedMessageId),
-                    newNodeParent = newParentNode,
-                )
-            ).thenThrow(runtimeException)
-
-            underTest.importChatNode(newParentNode)
-            advanceUntilIdle()
-
-            underTest.onExceptionThrown().observeOnce {
-                assertThat(it).isEqualTo(runtimeException)
-            }
-        }
-
-    @Test
-    internal fun `test that snackbar message is shown when chat file is already available offline`() =
-        runTest {
-            val chatFile = mock<ChatDefaultFile>()
-            whenever(getChatFileUseCase(expectedChatId, expectedMessageId)).thenReturn(chatFile)
-            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(true)
-
-            underTest.saveChatNodeToOffline()
-            advanceUntilIdle()
-
-            underTest.onSnackbarMessage().test().assertValue(R.string.file_already_exists)
-        }
-
-    @Test
-    internal fun `test that startChatFileOfflineDownload event is triggered when chat file is not available offline`() =
-        runTest {
-            val chatFile = mock<ChatDefaultFile>()
-            whenever(getChatFileUseCase(expectedChatId, expectedMessageId)).thenReturn(chatFile)
-            whenever(isAvailableOfflineUseCase(chatFile)).thenReturn(false)
-
-            underTest.saveChatNodeToOffline()
-            advanceUntilIdle()
-
-            underTest.onStartChatFileOfflineDownload().test().assertValue(chatFile)
-        }
-
-    @Test
-    internal fun `test that exception is handled correctly when chat file is not found`() =
-        runTest {
-            whenever(getChatFileUseCase(expectedChatId, expectedMessageId)).thenReturn(null)
-
-            underTest.saveChatNodeToOffline()
-            advanceUntilIdle()
-
-            underTest.onExceptionThrown().test().assertValue {
-                it is IllegalStateException
-            }
-        }
-
-    @ParameterizedTest(name = "action is {0}")
-    @MethodSource("provideMenuActions")
-    fun `test clickedMenuAction is updated correctly when action is not VideoPlayerDownloadAction`(
-        action: VideoPlayerMenuAction,
-    ) = runTest {
-        underTest.updateClickedMenuAction(action)
-        underTest.uiState.test {
-            val actual = awaitItem()
-            assertThat(actual.clickedMenuAction).isEqualTo(action)
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    private fun provideMenuActions() = listOf(
-        VideoPlayerFileInfoAction,
-        VideoPlayerChatImportAction,
-        VideoPlayerSendToChatAction,
-        VideoPlayerSaveForOfflineAction,
-        VideoPlayerHideAction,
-        VideoPlayerUnhideAction,
-        VideoPlayerMoveAction,
-        VideoPlayerCopyAction,
-        VideoPlayerRemoveAction,
-        VideoPlayerRubbishBinAction,
-        VideoPlayerAddToAction,
-    )
-
-    @Test
-    fun `test disableExportUseCase is invoked correctly`() = runTest {
-        underTest.removeLink()
-        verify(disableExportUseCase).invoke(any())
-    }
-
-    @Test
     fun `test isNodeComesFromIncoming is return true`() = runTest {
         whenever(isNodeInRubbishBinUseCase(any())).thenReturn(true)
         whenever(isNodeInCloudDriveUseCase(any())).thenReturn(true)
         whenever(isNodeInBackupsNodeUseCase(any())).thenReturn(true)
         assertThat(underTest.isNodeComesFromIncoming()).isTrue()
     }
-
-    @ParameterizedTest(name = "when hide is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test updateNodeSensitiveUseCase is invoked correctly`(hide: Boolean) = runTest {
-        val testNodeId = NodeId(1L)
-        val testActions = listOf(
-            VideoPlayerDownloadAction,
-            VideoPlayerHideAction,
-        )
-        initLaunchSourceMapperReturned(testActions)
-        fakeMonitorShowHiddenItemsFlow.emit(false)
-        fakeMonitorAccountDetailFlow.emit(mock())
-        advanceUntilIdle()
-        underTest.uiState.test {
-            assertThat(awaitItem().showHiddenItems).isFalse()
-            underTest.hideOrUnhideNode(testNodeId, hide)
-            verify(updateNodeSensitiveUseCase).invoke(testNodeId, hide)
-            delay(1000)
-            if (hide) {
-                assertThat(awaitItem().isClosedAfterHidingNode).isTrue()
-                cancelAndConsumeRemainingEvents()
-            }
-        }
-    }
-
-    @Test
-    fun `test deleteMessageFromChatUseCase is invoked correctly`() = runTest {
-        underTest.deleteMessageFromChat()
-        verify(deleteNodeAttachmentMessageByIdsUseCase).invoke(any(), any())
-    }
-
-    @ParameterizedTest(name = "when launchSources is {0}")
-    @ValueSource(ints = [FROM_CHAT, FILE_LINK_ADAPTER, FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING, FILE_BROWSER_ADAPTER])
-    fun `test downloadEvent is updated correctly`(
-        launchSource: Int,
-    ) = runTest {
-        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = launchSource
-        when (launchSource) {
-            FROM_CHAT -> whenever(
-                getChatFileUseCase(any(), any(), any())
-            ).thenReturn(mock<ChatDefaultFile>())
-
-
-            FILE_LINK_ADAPTER -> {
-                savedStateHandle[EXTRA_SERIALIZE_STRING] = "test"
-                whenever(getPublicNodeFromSerializedDataUseCase(any())).thenReturn(mock<PublicLinkFile>())
-            }
-
-            FOLDER_LINK_ADAPTER ->
-                whenever(getPublicChildNodeFromIdUseCase(any())).thenReturn(mock<PublicLinkFile>())
-
-            FROM_ALBUM_SHARING -> {
-                whenever(getPublicAlbumNodeDataUseCase(any())).thenReturn("test")
-                whenever(getPublicNodeFromSerializedDataUseCase(any())).thenReturn(mock<PublicLinkFile>())
-            }
-
-            else -> whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-        }
-
-        underTest.updateClickedMenuAction(VideoPlayerDownloadAction)
-        advanceUntilIdle()
-        underTest.uiState.test {
-            assertThat(analyticsExtension.events.first()).isInstanceOf(
-                VideoPlayerSaveToDeviceMenuToolbarEvent::class.java
-            )
-            val actual = awaitItem()
-            assertThat(actual.downloadEvent.triggeredContent()).isInstanceOf(
-                DownloadTriggerEvent::class.java
-            )
-        }
-    }
-
-    @ParameterizedTest(name = "when launchSources is {0} and ClickedMenuAction is {1}")
-    @MethodSource("provideMenuClickTestParams")
-    fun `test menuOptionClickedContent is updated correctly`(
-        launchSource: Int,
-        action: VideoPlayerMenuAction,
-    ) = runTest {
-        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = launchSource
-        val testFileLink = "testFileLink"
-        savedStateHandle[URL_FILE_LINK] = testFileLink
-        whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-        underTest.updateClickedMenuAction(action)
-        advanceUntilIdle()
-        underTest.uiState.test {
-            if (action != VideoPlayerRenameAction) {
-                assertThat(analyticsExtension.events.first()).isInstanceOf(
-                    when (action) {
-                        VideoPlayerShareAction -> VideoPlayerShareMenuToolbarEvent::class.java
-                        VideoPlayerGetLinkAction -> VideoPlayerGetLinkMenuToolbarEvent::class.java
-                        VideoPlayerRemoveLinkAction -> VideoPlayerRemoveLinkMenuToolbarEvent::class.java
-                        else -> null
-                    }
-                )
-            }
-            val actual = awaitItem()
-            assertThat(actual.menuOptionClickedContent).isInstanceOf(
-                when (action) {
-                    VideoPlayerShareAction -> {
-                        if (launchSource == FILE_LINK_ADAPTER) {
-                            MenuOptionClickedContent.ShareLink::class.java
-                        } else {
-                            MenuOptionClickedContent.ShareNode::class.java
-                        }
-                    }
-
-                    VideoPlayerGetLinkAction -> MenuOptionClickedContent.GetLink::class.java
-                    VideoPlayerRemoveLinkAction -> MenuOptionClickedContent.RemoveLink::class.java
-                    else -> MenuOptionClickedContent.Rename::class.java
-                }
-            )
-            underTest.clearMenuOptionClickedContent()
-            assertThat(awaitItem().menuOptionClickedContent).isNull()
-        }
-    }
-
-    private fun provideMenuClickTestParams() = listOf(
-        Arguments.of(FILE_LINK_ADAPTER, VideoPlayerShareAction),
-        Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerShareAction),
-        Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerGetLinkAction),
-        Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerRemoveLinkAction),
-        Arguments.of(FILE_BROWSER_ADAPTER, VideoPlayerRenameAction),
-    )
 
     @ParameterizedTest(name = "when value is {0}")
     @ValueSource(booleans = [true, false])
@@ -2169,7 +1620,7 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
-    fun `test that swapItems reinitialises mediaItemsDuringChanged when size mismatch occurs`() =
+    fun `test that swapItems re-initialises mediaItemsDuringChanged when size mismatch occurs`() =
         runTest {
             val initialItems = (0..2).map {
                 initVideoPlayerItem(it.toLong(), it.toString())
@@ -2405,13 +1856,10 @@ class VideoPlayerViewModelV2Test {
             .build()
         whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
         whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
-        whenever(launchSourceMapper(any(), any(), any(), any(), any(), any())).thenReturn(
-            emptyList()
-        )
         initViewModel()
         underTest.onMediaItemTransition(testHandle.toString(), isUpdateName)
         assertThat(analyticsExtension.events.first()).isInstanceOf(VideoPlayerIsActivatedEvent::class.java)
-        verify(saveVideoRecentlyWatchedUseCase).invoke(any(), any(), any(), any())
+        verify(saveVideoRecentlyWatchedUseCase).invoke(any(), any(), any(), anyOrNull())
         if (isUpdateName) {
             underTest.uiState.test {
                 val metadata = awaitItem().metadata
@@ -2444,8 +1892,8 @@ class VideoPlayerViewModelV2Test {
                 on { currentPosition }.thenReturn(100)
             }
             val map = mapOf(testHandle to playbackInfo)
+            savedStateHandle[INTENT_EXTRA_KEY_HANDLE] = testHandle
             whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(map))
-            initViewModel()
             val intent = mock<Intent>()
             val uri: Uri = mock()
             initTestDataForTestingInvalidParams(
@@ -2457,8 +1905,9 @@ class VideoPlayerViewModelV2Test {
                 fileName = testFileName
             )
             whenever(getVideoNodesUseCase(any())).thenReturn(emptyList())
+            initViewModel()
             underTest.initVideoPlayerData(intent)
-            advanceUntilIdle()
+
             verify(mediaPlayerGateway).playerSeekToPositionInMs(100)
             assertThat(underTest.uiState.value.showPlaybackDialog).isFalse()
             assertThat(underTest.uiState.value.playbackPosition).isNull()
@@ -2496,6 +1945,7 @@ class VideoPlayerViewModelV2Test {
             }
         )
         whenever(getSRTSubtitleFileListUseCase()).thenReturn(testInfoList)
+        savedStateHandle[INTENT_EXTRA_KEY_FILE_NAME] = testFileName
         initViewModel()
         val actual = underTest.getMatchedSubtitleFileInfo()
         assertThat(actual).isNotNull()
@@ -2758,9 +2208,6 @@ class VideoPlayerViewModelV2Test {
         whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
         whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
 
-        val testActions = listOf(VideoPlayerDownloadAction, VideoPlayerHideAction)
-        initLaunchSourceMapperReturned(testActions)
-
         val entities = testVideoNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
 
         entities.forEach { entity ->
@@ -2785,6 +2232,7 @@ class VideoPlayerViewModelV2Test {
 
         whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
 
+        initViewModel()
         mockStatic(Uri::class.java).use {
             whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
             accountType?.let { emitAccountDetail(it) }
@@ -2897,15 +2345,11 @@ class VideoPlayerViewModelV2Test {
                 initVideoPlayerItem(it.toLong(), it.toString())
             }
             val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
-
-            whenever(launchSourceMapper(any(), any(), any(), any(), any(), any()))
-                .thenReturn(emptyList())
             whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
             whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
 
             initViewModel()
             underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
-
 
             fakeMonitorTransferEventsFlow.emit(quotaEvent)
             advanceUntilIdle()
@@ -2962,15 +2406,11 @@ class VideoPlayerViewModelV2Test {
                 initVideoPlayerItem(it.toLong(), it.toString())
             }
             val testItem = initVideoPlayerItem(2.toLong(), "2", MediaQueueItemType.Playing)
-
-            whenever(launchSourceMapper(any(), any(), any(), any(), any(), any()))
-                .thenReturn(emptyList())
             whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
             whenever(testItems[1].copy(type = MediaQueueItemType.Playing)).thenReturn(testItem)
 
             initViewModel()
             underTest.updateCurrentPlayingHandle(testHandle, false, testItems)
-
 
             fakeMonitorTransferEventsFlow.emit(quotaEvent)
             advanceUntilIdle()
@@ -2989,6 +2429,149 @@ class VideoPlayerViewModelV2Test {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.blockedError).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that saveRecentlyUsedItemUseCase is invoked with Video type when saveVideoWatchedTime is called`() =
+        runTest {
+            val expectedId = 1L
+            val instant = Instant.ofEpochMilli(2000L)
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                underTest.saveVideoWatchedTime()
+
+                verify(saveRecentlyUsedItemUseCase).invoke(
+                    nodeHandle = expectedId,
+                    type = RecentlyUsedType.Video,
+                    fileName = underTest.uiState.value.metadata.nodeName,
+                )
+            }
+        }
+
+    @Test
+    fun `test that saveRecentlyUsedItemUseCase is still invoked when saveVideoRecentlyWatchedUseCase throws`() =
+        runTest {
+            val expectedId = 1L
+            val instant = Instant.ofEpochMilli(2000L)
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                whenever(
+                    saveVideoRecentlyWatchedUseCase(any(), any(), any(), any())
+                ).thenThrow(RuntimeException("test error"))
+                underTest.saveVideoWatchedTime()
+                advanceUntilIdle()
+
+                verify(saveRecentlyUsedItemUseCase).invoke(
+                    nodeHandle = expectedId,
+                    type = RecentlyUsedType.Video,
+                    fileName = underTest.uiState.value.metadata.nodeName,
+                )
+            }
+        }
+
+    @Test
+    fun `test that saveVideoRecentlyWatchedUseCase is still invoked when saveRecentlyUsedItemUseCase throws`() =
+        runTest {
+            val expectedId = 1L
+            val instant = Instant.ofEpochMilli(2000L)
+            savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
+            savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
+            initViewModel()
+            mockStatic(Instant::class.java).use {
+                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
+                val testMediaItem = MediaItem.Builder()
+                    .setMediaId(expectedId.toString())
+                    .build()
+                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                whenever(
+                    saveRecentlyUsedItemUseCase(any(), any(), any())
+                ).thenThrow(RuntimeException("test error"))
+                underTest.saveVideoWatchedTime()
+                advanceUntilIdle()
+
+                verify(saveVideoRecentlyWatchedUseCase).invoke(
+                    expectedId,
+                    2,
+                    expectedCollectionId,
+                    expectedCollectionTitle
+                )
+            }
+        }
+
+    @ParameterizedTest(name = "when adapter type is {0}, nodeSourceType should be {1}")
+    @MethodSource("provideAdapterToNodeSourceType")
+    fun `test that nodeSourceType in uiState is set correctly based on adapter type`(
+        adapterType: Int,
+        expected: NodeSourceType,
+    ) = runTest {
+        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = adapterType
+        initViewModel()
+        assertThat(underTest.uiState.value.nodeSourceType).isEqualTo(expected)
+    }
+
+    private fun provideAdapterToNodeSourceType() = listOf(
+        Arguments.of(OFFLINE_ADAPTER, NodeSourceType.OFFLINE),
+        Arguments.of(RUBBISH_BIN_ADAPTER, NodeSourceType.RUBBISH_BIN),
+        Arguments.of(INCOMING_SHARES_ADAPTER, NodeSourceType.INCOMING_SHARES),
+        Arguments.of(OUTGOING_SHARES_ADAPTER, NodeSourceType.OUTGOING_SHARES),
+        Arguments.of(LINKS_ADAPTER, NodeSourceType.LINKS),
+        Arguments.of(BACKUPS_ADAPTER, NodeSourceType.BACKUPS),
+        Arguments.of(FILE_BROWSER_ADAPTER, NodeSourceType.CLOUD_DRIVE),
+        Arguments.of(VIDEO_BROWSE_ADAPTER, NodeSourceType.VIDEOS),
+        Arguments.of(RECENTS_BUCKET_ADAPTER, NodeSourceType.RECENTS_BUCKET),
+        Arguments.of(FAVOURITES_ADAPTER, NodeSourceType.FAVOURITES),
+        Arguments.of(INVALID_VALUE, NodeSourceType.CLOUD_DRIVE),
+    )
+
+    @Test
+    fun `test that updateNameWhenNodeUpdates updates metadata and currentPlayingItemName when name changes for current playing node`() =
+        runTest {
+            val newName = "renamed.mp4"
+            val mockNode = mock<FileNode> {
+                on { id } doReturn NodeId(INVALID_HANDLE)
+                on { type } doReturn mock<VideoFileTypeInfo>()
+                on { name } doReturn newName
+            }
+            initViewModel()
+
+            fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(mapOf(mockNode to listOf(NodeChanges.Name))))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.metadata.nodeName).isEqualTo(newName)
+                assertThat(actual.currentPlayingItemName).isEqualTo(newName)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that updateNameWhenNodeUpdates does not update state when name changes for a different node`() =
+        runTest {
+            val mockNode = mock<FileNode> {
+                on { id } doReturn NodeId(testHandle)
+                on { type } doReturn mock<VideoFileTypeInfo>()
+                on { name } doReturn "other.mp4"
+            }
+            initViewModel()
+            // currentPlayingHandle defaults to INVALID_HANDLE, not testHandle
+
+            fakeMonitorNodeUpdatesFlow.emit(NodeUpdate(mapOf(mockNode to listOf(NodeChanges.Name))))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.currentPlayingItemName).isNotEqualTo("other.mp4")
                 cancelAndConsumeRemainingEvents()
             }
         }
