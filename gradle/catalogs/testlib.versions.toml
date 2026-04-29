@@ -24,6 +24,7 @@ truth-ext = "1.6.0"
 test-ext-junit = "1.3.0"
 uiautomator = "2.3.0"
 benchmark-macro-junit4 = "1.4.1"
+compose-screenshot = "0.0.1-alpha14"
 
 [libraries]
 androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test" }
@@ -64,6 +65,7 @@ coil3-test = { module = "io.coil-kt.coil3:coil-test", version.ref = "coil3" }
 uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "benchmark-macro-junit4" }
 system-stubs-jupiter = { module = "uk.org.webcompere:system-stubs-jupiter", version.ref = "system-stubs-jupiter" }
+compose-screenshot = { module = "com.android.tools.screenshot:screenshot-validation-api", version.ref = "compose-screenshot" }
 
 [bundles]
 unit-test = ["junit", "truth", "hamcrest", "mockito", "mockito-inline", "mockito-kotlin", "turbine"]

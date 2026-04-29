@@ -16,6 +16,7 @@ megagradle = "0.83.20260422085054"
 jfrog-artifactory = "5.2.0"
 serialisation = "2.1.0"
 benchmark-baseline-profile = "1.4.1"
+compose-screenshot = "0.0.1-alpha14"
 
 [libraries]
 build-tools = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
@@ -43,3 +44,4 @@ mega-android-release = { id = "mega.android.release", version.ref = "megagradle"
 mega-android-cicd = { id = "mega.android.cicd", version.ref = "megagradle" }
 de-mannodermaus-android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "android-junit5" }
 kotlin-serialisation = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialisation"}
+compose-screenshot = { id = "com.android.compose.screenshot", version.ref = "compose-screenshot" }
