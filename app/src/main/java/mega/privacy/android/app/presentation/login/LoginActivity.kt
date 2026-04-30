@@ -238,12 +238,6 @@ class LoginActivity : BaseActivity() {
         @JvmField
         var isBackFromLoginPage = false
 
-        /**
-         * Intent extra for knowing if the user is logged in.
-         */
-        const val EXTRA_IS_LOGGED_IN = "isLoggedIn"
-        const val ACTION_REFRESH_AND_OPEN_SESSION_LINK = "REFRESH_AND_OPEN_SESSION_LINK"
-
         fun getIntent(
             context: Context,
             action: String?,

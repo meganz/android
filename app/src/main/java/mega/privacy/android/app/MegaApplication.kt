@@ -587,13 +587,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         @JvmStatic
         var isClosedChat = true
 
-        /**
-         * Url confirmation link
-         */
-        @JvmStatic
-        @Volatile
-        var urlConfirmationLink: String? = null
-
         private var registeredChatListeners = false
 
         /**
