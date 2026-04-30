@@ -1275,7 +1275,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Riavvia</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Salva nel dispositivo</string>
+    <string name="general_save_to_device">Scarica</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Nascondi</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2441,4 +2441,27 @@
     <string name="action_use_passcode">Utilizza passcode</string>
     <string name="settings_passcode_enter_password_title">Inserisci la tua password</string>
     <string name="unlock_pin_title_2">Reinserisci il codice</string>
+    <string name="home_widget_viewed_links_section_header">Collegamenti visualizzati</string>
+    <string name="open_link_dialog_description">Incolla un link MEGA qualsiasi per aprirlo</string>
+    <string name="home_cwlo_clear_history">Elimina la cronologia di \’Continua da dove hai lasciato\’</string>
+    <string name="home_widget_continue_where_left_off">Continua da dove hai lasciato</string>
+    <string name="setting_biometric_id">Identità biometrica</string>
+    <string name="title_enable_biometrics">Conferma le tue informazioni biometriche per sbloccare</string>
+    <string name="confirmation_biometric_enabled">Le tue informazioni biometriche sono state confermate</string>
+    <string name="title_unlock_biometric">Sblocca utilizzando le tue informazioni biometriche</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Download privi di annunci</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Aggiungi sottotitolo da Cloud Drive</string>
+    <string name="settings_transfer_connections_title">Connessioni per il trasferimento</string>
+    <string name="settings_transfer_connections_text">Definisce il numero di connessioni parallele per il trasferimento di file. Valori più elevati possono migliorare la velocità ma aumentano il consumo di batteria e dati.</string>
+    <string name="settings_transfer_download_connections">Connessioni di download</string>
+    <string name="settings_transfer_upload_connections">Connessioni di caricamento</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Il migliore per reti lente)</string>
+    <string name="settings_transfer_connections_default">%1$d (Predefinito)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Aumenta il consumo di batteria e dati)</string>
+    <string name="public_link_auth_alert_title_folder">Salva questa cartella nel tuo account MEGA</string>
+    <string name="public_link_auth_alert_title_link">Salva questo link nel tuo account MEGA</string>
+    <string name="public_link_auth_alert_title_album">Salva questo album nel tuo account MEGA</string>
+    <string name="public_link_auth_alert_description_default">Accedi in qualsiasi momento, da qualsiasi dispositivo.\nNon è necessario conservare nuovamente il link o scaricare i file.</string>
+    <string name="public_link_auth_alert_description_album">Mantieni queste foto al sicuro e accedile in qualsiasi momento</string>
+    <string name="public_link_auth_alert_title_file">Salva questo file nel tuo account MEGA</string>
 </resources>

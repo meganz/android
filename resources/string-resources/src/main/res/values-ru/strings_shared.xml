@@ -1292,7 +1292,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Перезапустить</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Сохранить на устройстве</string>
+    <string name="general_save_to_device">Скачать</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Скрыть</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2548,4 +2548,26 @@
         <item quantity="many">%1$d неудачных попыток ввода пароля</item>
         <item quantity="other">%1$d неудачных попыток ввода пароля</item>
     </plurals>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Добавить субтитры из Облачного диска</string>
+    <string name="home_widget_viewed_links_section_header">Просмотренные ссылки</string>
+    <string name="open_link_dialog_description">Вставьте любую ссылку MEGA, чтобы открыть её</string>
+    <string name="home_cwlo_clear_history">Очистить историю «Продолжить с того места, на котором вы остановились».</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Загрузки без рекламы</string>
+    <string name="setting_biometric_id">Биометрический идентификатор</string>
+    <string name="title_enable_biometrics">Подтвердите свои биометрические данные для разблокировки</string>
+    <string name="confirmation_biometric_enabled">Ваши биометрические данные подтверждены</string>
+    <string name="title_unlock_biometric">Разблокировать с помощью ваших биометрических данных</string>
+    <string name="settings_transfer_connections_title">Соединения для передачи</string>
+    <string name="settings_transfer_connections_text">Определяет количество параллельных соединений для каждой передачи файла. Более высокие значения могут увеличить скорость, но привести к большему расходу батареи и трафика.</string>
+    <string name="settings_transfer_download_connections">Соединения загрузки</string>
+    <string name="settings_transfer_upload_connections">Соединения отправки</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Лучшее для медленных сетей)</string>
+    <string name="settings_transfer_connections_default">%1$d (По умолчанию)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Более высокий расход батареи и трафика)</string>
+    <string name="public_link_auth_alert_title_folder">Сохранить эту папку в ваш аккаунт MEGA</string>
+    <string name="public_link_auth_alert_title_link">Сохранить эту ссылку в ваш аккаунт MEGA</string>
+    <string name="public_link_auth_alert_title_album">Сохранить этот альбом в ваш аккаунт MEGA</string>
+    <string name="public_link_auth_alert_description_default">Доступ к нему в любое время с любого устройства.\nНе нужно сохранять ссылку или снова загружать файлы.</string>
+    <string name="public_link_auth_alert_description_album">Храните эти фотографии в безопасности и получайте к ним доступ в любое время</string>
+    <string name="public_link_auth_alert_title_file">Сохранить этот файл в ваш аккаунт MEGA</string>
 </resources>

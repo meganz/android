@@ -1326,7 +1326,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">إعادة تشغيل</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">حفظ على الجهاز</string>
+    <string name="general_save_to_device">تنزيل</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">إخفاء</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2701,4 +2701,26 @@
     <string name="action_use_passcode">استخدم رمز المرور</string>
     <string name="settings_passcode_enter_password_title">أدخل كلمة المرور الخاصة بك</string>
     <string name="unlock_pin_title_2">إعادة إدخال رمز المرور الخاص بك</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">إضافة ترجمة subtitle من السواقة السحابية</string>
+    <string name="open_link_dialog_description">الصق أي رابط ميغا MEGA لفتحه</string>
+    <string name="home_widget_viewed_links_section_header">الروابط التي تمت مشاهدتها</string>
+    <string name="home_cwlo_clear_history">امسح سجل \’استمر من حيث توقفت\’</string>
+    <string name="setting_biometric_id">الهوية البيومترية</string>
+    <string name="title_enable_biometrics">قم بتأكيد معلوماتك البيومترية لفتح القفل</string>
+    <string name="confirmation_biometric_enabled">تم تأكيد معلوماتك البيومترية</string>
+    <string name="title_unlock_biometric">افتح باستخدام معلوماتك البيومترية</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">تنزيلات بلا إعلانات</string>
+    <string name="settings_transfer_connections_title">اتصالات النقل</string>
+    <string name="settings_transfer_connections_text">يحدد عدد الاتصالات المتوازية لكل نقل ملف. قد تحسن السرعة لكنها تزيد من استهلاك البطارية والبيانات.</string>
+    <string name="settings_transfer_download_connections">اتصالات التنزيل</string>
+    <string name="settings_transfer_upload_connections">اتصالات الرفع</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (الأفضل للشبكات البطيئة)</string>
+    <string name="settings_transfer_connections_default">%1$d (افتراضي)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (استهلاك بطارية وبيانات أعلى)</string>
+    <string name="public_link_auth_alert_title_folder">احفظ هذا المجلد في حساب MEGA الخاص بك</string>
+    <string name="public_link_auth_alert_title_link">احفظ هذا الرابط في حساب MEGA الخاص بك</string>
+    <string name="public_link_auth_alert_title_album">احفظ هذا الألبوم في حساب MEGA الخاص بك</string>
+    <string name="public_link_auth_alert_description_default">يمكنك الوصول إليه في أي وقت، من أي جهاز.\nلا حاجة إلى إبقاء الرابط أو تنزيل الملفات مرة أخرى.</string>
+    <string name="public_link_auth_alert_description_album">احفظ هذه الصور آمنة ويمكنك الوصول إليها في أي وقت.</string>
+    <string name="public_link_auth_alert_title_file">احفظ هذا الملف في حساب MEGA الخاص بك</string>
 </resources>

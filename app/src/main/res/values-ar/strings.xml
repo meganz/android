@@ -2024,7 +2024,7 @@
     <!-- General label for files -->
     <string name="general_files">ملفات</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">حفظ على الجهاز</string>
+    <string name="general_save_to_device">تنزيل</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">الترفيع إلى ميغا MEGA</string>
     <!-- Label choose destination -->

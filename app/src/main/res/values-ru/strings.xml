@@ -1952,7 +1952,7 @@
     <!-- General label for files -->
     <string name="general_files">Файлы</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Сохранить на устройстве</string>
+    <string name="general_save_to_device">Скачать</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Загрузить в MEGA</string>
     <!-- Label choose destination -->

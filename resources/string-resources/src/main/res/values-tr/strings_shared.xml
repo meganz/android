@@ -1262,7 +1262,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Yeniden başlat</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Cihaza kaydet</string>
+    <string name="general_save_to_device">İndir</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Gizle</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2332,7 +2332,7 @@
     <string name="pdf_viewer_error_streaming">Dosya açılmaya çalışılırken bir hata oluştu</string>
     <string name="homepage_empty_hint_audio">[B]Hiç[/B] [A]ses[/A] [B]bulunamadı[/B]</string>
     <string name="open_link_dialog_title">Bağlantıyı aç</string>
-    <string name="open_link_dialog_hint">Bağlantıyı yapıştırın</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="cloud_explorer_select_destination_title">Hedef seç</string>
     <string name="cloud_explorer_use_this_folder_button">Bu klasörü kullan</string>
     <string name="cloud_explorer_choose_folder_title">Klasör seç</string>
@@ -2390,4 +2390,16 @@
     <string name="title_enable_biometrics">Kilidi açmak için biyometrik bilgilerinizi onaylayın</string>
     <string name="confirmation_biometric_enabled">Biyometrik bilgileriniz onaylandı</string>
     <string name="title_unlock_biometric">Biyometrik bilgilerinizle kilidi açın</string>
+    <string name="public_link_auth_alert_title_folder">Bu klasörü MEGA hesabınıza kaydedin</string>
+    <string name="public_link_auth_alert_title_link">Bu bağlantıyı MEGA hesabınıza kaydedin</string>
+    <string name="public_link_auth_alert_title_album">Bu albümü MEGA hesabınıza kaydedin</string>
+    <string name="public_link_auth_alert_description_default">Herhangi bir cihazdan istediğiniz zaman erişin.\nBağlantıyı saklamaya veya dosyaları yeniden indirmeye gerek yok.</string>
+    <string name="public_link_auth_alert_description_album">Bu fotoğrafları güvende tutun ve istediğiniz zaman erişin</string>
+    <string name="public_link_auth_alert_title_file">Bu dosyayı MEGA hesabınıza kaydedin</string>
+    <string name="home_widget_viewed_links_section_header">Görüntülenen bağlantılar</string>
+    <string name="open_link_dialog_description">Açmak için herhangi bir MEGA bağlantısını yapıştırın</string>
+    <string name="home_cwlo_clear_history">“Kaldığın yerden devam et” geçmişini temizle</string>
+    <string name="home_widget_viewed_links_clear_history">Görüntülenen bağlantı geçmişini temizle</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">Görüntülenen tüm bağlantı geçmişini temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">Görüntülenen bağlantı geçmişi temizlendi</string>
 </resources>

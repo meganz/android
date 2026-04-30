@@ -1878,7 +1878,7 @@
     <!-- General label for files -->
     <string name="general_files">Files</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Save to device</string>
+    <string name="general_save_to_device">Download</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Upload to MEGA</string>
     <!-- Label choose destination -->

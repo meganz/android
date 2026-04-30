@@ -1241,7 +1241,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Phát từ đầu</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Lưu vào thiết bị</string>
+    <string name="general_save_to_device">Tải xuống</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Ẩn</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2257,4 +2257,27 @@
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="other">%1$d lần thử mã số bị sai</item>
     </plurals>
+    <string name="home_widget_continue_where_left_off">Tiếp tục từ nơi bạn đã dừng</string>
+    <string name="settings_transfer_connections_title">Số đường kết nối truyền tải</string>
+    <string name="settings_transfer_download_connections">Đường kết nối tải xuống</string>
+    <string name="settings_transfer_upload_connections">Đường kết nối tải lên</string>
+    <string name="settings_transfer_connections_slow_networs">%1$d (Phù hợp cho mạng chậm)</string>
+    <string name="settings_transfer_connections_default">%1$d (Mặc định)</string>
+    <string name="settings_transfer_connections_higher_usage">%1$d (Dùng nhiều pin và dữ liệu mạng hơn)</string>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">Lấy tệp phụ đề từ Ổ Mây</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">Tải xuống không xem quảng cáo</string>
+    <string name="public_link_auth_alert_title_folder">Lưu thư mục này vào tài khoản MEGA của bạn</string>
+    <string name="public_link_auth_alert_title_link">Lưu đường liên kết này vài tài khoản MEGA của bạn</string>
+    <string name="public_link_auth_alert_title_album">Lưu album này vào tài khoản MEGA của bạn</string>
+    <string name="public_link_auth_alert_description_default">Truy cập bất cứ lúc nào, từ bất kỳ thiết bị nào.\nKhông cần phải lưu lại đường liên kết hoặc tải xuống tệp tin nữa.</string>
+    <string name="public_link_auth_alert_description_album">Giữ lại những bức ảnh này an toàn và truy cập lại vào bất cứ lúc nào</string>
+    <string name="public_link_auth_alert_title_file">Lưu tệp tin này vào tài khoản MEGA của bạn</string>
+    <string name="home_widget_viewed_links_section_header">Các liên kết đã xem</string>
+    <string name="settings_transfer_connections_text">Xác định số lượng kết nối song song cho mỗi lần truyền tệp. Giá trị càng cao có thể cải thiện tốc độ nhưng sẽ làm tăng tiêu thụ pin và dữ liệu.</string>
+    <string name="setting_biometric_id">ID sinh trắc học</string>
+    <string name="title_enable_biometrics">Xác nhận thông tin sinh trắc học của bạn để mở khóa</string>
+    <string name="confirmation_biometric_enabled">Thông tin sinh trắc học của bạn đã được xác nhận</string>
+    <string name="title_unlock_biometric">Mở khóa bằng thông tin sinh trắc học của bạn</string>
+    <string name="open_link_dialog_description">Dán bất kỳ liên kết MEGA nào để mở nó</string>
+    <string name="home_cwlo_clear_history">Xóa lịch sử “Tiếp tục từ nơi bạn đã dừng”</string>
 </resources>

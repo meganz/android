@@ -1275,7 +1275,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Repornește</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Salvați pe dispozitiv</string>
+    <string name="general_save_to_device">Descarcă</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Ascunde</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2472,4 +2472,7 @@
     <string name="public_link_auth_alert_description_default">Accesează-l de oriunde, de pe orice dispozitiv.\nNu este nevoie să păstrezi link-ul sau să descarci din nou fișierele.</string>
     <string name="public_link_auth_alert_description_album">Păstrează aceste fotografii în siguranță și accesează-le oricând</string>
     <string name="public_link_auth_alert_title_file">Salvează acest fișier în contul tău MEGA</string>
+    <string name="home_widget_viewed_links_section_header">Linkuri vizualizate</string>
+    <string name="open_link_dialog_description">Lipește orice link MEGA pentru a-l deschide</string>
+    <string name="home_cwlo_clear_history">Șterge istoricul „Continuă de unde ai rămas”</string>
 </resources>

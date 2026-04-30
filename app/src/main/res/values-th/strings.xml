@@ -1839,7 +1839,7 @@
     <!-- General label for files -->
     <string name="general_files">ไฟล์</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">บันทึกลงในอุปกรณ์</string>
+    <string name="general_save_to_device">ดาวน์โหลด</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">อัปโหลดไปยัง MEGA</string>
     <!-- Label choose destination -->

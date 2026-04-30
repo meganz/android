@@ -1275,7 +1275,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Redémarrer</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Enregistrer sur l’appareil</string>
+    <string name="general_save_to_device">Télécharger</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Cacher</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2401,7 +2401,7 @@
     </plurals>
     <string name="general_title_incoming_shares">Partages entrants</string>
     <string name="pdf_viewer_error_no_network">Il n’y a pas de connexion réseau. Veuillez vous reconnecter pour ouvrir le fichier.</string>
-    <string name="open_link_dialog_hint">Copiez le lien</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="open_link_dialog_title">Ouvrir un lien</string>
     <string name="general_error_file_not_found">Ce fichier n\’a pas pu être trouvé</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Erreur. Le fichier PDF est corrompu ou n’existe pas.</string>
@@ -2427,7 +2427,7 @@
     <string name="rewarded_ad_dialog_perk_storage">Jusqu’à 20 To de stockage chiffré</string>
     <string name="rewarded_ad_dialog_perk_transfer_speed">Vitesses de transfert prioritaires</string>
     <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass et MEGA VPN inclus</string>
-    <string name="rewarded_ad_unavailable_toast">La publicité est indisponible ! Poursuite en cours&#8230;</string>
+    <string name="rewarded_ad_unavailable_toast">Pub indisponible ! Poursuite en cours&#8230;</string>
     <string name="general_read_only_folder_warning">Ce dossier est en lecture seule</string>
     <string name="sync_error_folder_conflict">Le %2$s « %1$s » fait déjà partie %3$s sur %4$s. Choisissez-en un autre.</string>
     <string name="sync_label_cloud_folder">dossier cloud</string>
@@ -2472,4 +2472,7 @@
     <string name="public_link_auth_alert_description_default">Accédez-y à tout moment, depuis n\’importe quel appareil.\nPlus besoin de garder le lien ni de télécharger les fichiers à nouveau.</string>
     <string name="public_link_auth_alert_description_album">Conservez ces photos en sécurité et accédez-y à tout moment</string>
     <string name="public_link_auth_alert_title_file">Enregistrez ce fichier dans votre compte MEGA</string>
+    <string name="home_widget_viewed_links_section_header">Liens consultés</string>
+    <string name="open_link_dialog_description">Collez n\’importe quel lien MEGA pour l\’ouvrir</string>
+    <string name="home_cwlo_clear_history">Effacer l\’historique «&#160;Continuez là où vous vous étiez arrêté&#160;»</string>
 </resources>
