@@ -40,7 +40,7 @@ internal fun ChangeApiServerDialog(
         },
         onConfirmRequest = {
             viewModel.confirmUpdateApiServer()
-            openLoginActivity(context, uiState.isSingleActivityEnabled)
+            openLoginActivity(context)
             onDismissRequest()
         },
     )

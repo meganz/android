@@ -106,14 +106,6 @@ class ApiServerViewModelTest {
         Arguments.of(ApiServer.Sandbox3, ApiServer.Sandbox3),
     )
 
-    @org.junit.jupiter.api.Test
-    fun `test that isSingleActivityEnabled defaults to true`() = runTest {
-        whenever(getCurrentApiServerUseCase()).thenReturn(ApiServer.Production)
-        underTest.state.test {
-            Truth.assertThat(awaitItem().isSingleActivityEnabled).isTrue()
-        }
-    }
-
     private fun initTestClass() {
         underTest = ApiServerViewModel(
             getCurrentApiServerUseCase = getCurrentApiServerUseCase,
