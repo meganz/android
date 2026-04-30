@@ -497,19 +497,17 @@ fun Project.downloadGoogleServicesJsonIfNeeded() {
     if (!googleServicesFile.exists() && !artifactoryHost.isNullOrBlank()) {
         println("Downloading google-services.json")
         val proxyArgs = detectCurlProxyArgs()
-        exec {
-            commandLine(
-                listOf(
-                    "curl",
-                    "--fail",
-                    "--location",
-                ) + proxyArgs + listOf(
-                    "$artifactoryHost:443/artifactory/android-mega/cicd/firebase/google-services.json",
-                    "-o",
-                    googleServicesFile.absolutePath
-                )
+        ProcessBuilder(
+            listOf(
+                "curl",
+                "--fail",
+                "--location",
+            ) + proxyArgs + listOf(
+                "$artifactoryHost:443/artifactory/android-mega/cicd/firebase/google-services.json",
+                "-o",
+                googleServicesFile.absolutePath
             )
-        }
+        ).inheritIO().start().waitFor()
     }
 }
 
@@ -521,19 +519,17 @@ fun Project.downloadDebugKeyStoreIfNeeded(debugKeyStoreFile: File) {
     if (!debugKeyStoreFile.exists() && !artifactoryHost.isNullOrBlank()) {
         println("Downloading debug keystore")
         val proxyArgs = detectCurlProxyArgs()
-        exec {
-            commandLine(
-                listOf(
-                    "curl",
-                    "--fail",
-                    "--location",
-                ) + proxyArgs + listOf(
-                    "$artifactoryHost:443/artifactory/android-mega/cicd/debug-keystore/debug.keystore",
-                    "-o",
-                    debugKeyStoreFile.absolutePath
-                )
+        ProcessBuilder(
+            listOf(
+                "curl",
+                "--fail",
+                "--location",
+            ) + proxyArgs + listOf(
+                "$artifactoryHost:443/artifactory/android-mega/cicd/debug-keystore/debug.keystore",
+                "-o",
+                debugKeyStoreFile.absolutePath
             )
-        }
+        ).inheritIO().start().waitFor()
     }
 }
 

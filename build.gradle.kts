@@ -8,7 +8,6 @@ plugins {
     alias(plugin.plugins.jfrog.artifactory) apply false
     alias(plugin.plugins.mega.artifactory.publish.convention) apply false
     alias(plugin.plugins.de.mannodermaus.android.junit5) apply false
-    alias(plugin.plugins.jetbrains.kotlin.android) apply false
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -28,7 +27,6 @@ buildscript {
         classpath(plugin.firebase.performance)
         classpath(plugin.firebase.app.distribution)
         classpath(plugin.jacoco)
-        classpath(plugin.paparazzi)
         classpath(plugin.jfrog)
         classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)

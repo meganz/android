@@ -6,10 +6,6 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.analytics"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

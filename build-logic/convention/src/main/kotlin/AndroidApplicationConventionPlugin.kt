@@ -24,7 +24,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
-                apply("kotlin-android")
                 apply("org.jetbrains.kotlin.plugin.compose")
                 apply("mega.android.application.jacoco")
                 apply("mega.android.test")

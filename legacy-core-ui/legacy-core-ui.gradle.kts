@@ -2,16 +2,11 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
-    id("kotlin-android")
 }
 
 android {
     buildFeatures {
         buildConfig = true
-    }
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     lint {

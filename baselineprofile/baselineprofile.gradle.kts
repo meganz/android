@@ -5,7 +5,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.test")
-    id("org.jetbrains.kotlin.android")
     id("androidx.baselineprofile")
 }
 
@@ -60,8 +59,8 @@ android {
         create("gms") { dimension = "service" }
     }
 
-    testOptions.managedDevices.devices {
-        create<ManagedVirtualDevice>("pixel6Api34") {
+    testOptions.managedDevices.localDevices {
+        create("pixel6Api34") {
             device = "Pixel 6"
             apiLevel = 34
             systemImageSource = "google"

@@ -5,7 +5,6 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.de.mannodermaus.android.junit5)
-    id("kotlin-android")
     id("kotlin-parcelize")
 }
 
@@ -81,6 +80,7 @@ dependencies {
     implementation(androidx.hilt.navigation)
 
     implementation(androidx.appcompat)
+    implementation(androidx.compose.activity)
     implementation(androidx.fragment)
     implementation(google.material)
     implementation(google.accompanist.permissions)

@@ -2,7 +2,6 @@ package mega.privacy.android.build
 
 import org.gradle.api.Project
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
@@ -10,6 +9,16 @@ import java.util.Date
 import java.util.Locale
 import java.util.Properties
 import java.util.TimeZone
+
+private fun runCommand(workingDir: File, command: List<String>): String {
+    val process = ProcessBuilder(command)
+        .directory(workingDir)
+        .redirectError(ProcessBuilder.Redirect.DISCARD)
+        .start()
+    val output = process.inputStream.bufferedReader().use { it.readText() }
+    process.waitFor()
+    return output
+}
 
 /**
  * This file contains the commit gradle functions that may be used by multiple files.
@@ -106,14 +115,10 @@ fun shouldCombineLintReports(): Boolean =
  * @return commit ID of the app
  */
 fun getAppGitHash(project: Project): String {
-    // Read commit ID from local
-    val stdout = ByteArrayOutputStream()
-    project.exec {
-        workingDir = File("./")
-        commandLine = listOf("git", "rev-parse", "--short", "HEAD")
-        standardOutput = stdout
-    }
-    val commit = stdout.toString().trim()
+    val commit = runCommand(
+        workingDir = File("./"),
+        command = listOf("git", "rev-parse", "--short", "HEAD"),
+    ).trim()
 
     println("app_commit = $commit")
     return commit
@@ -227,10 +232,7 @@ fun shouldApplyDefaultConfiguration(project: Project): Boolean =
  * @return path of native library symbols. The returned path is relative to root of app module
  */
 fun nativeLibsDir(project: Project): String {
-    project.exec {
-        workingDir = File("../")
-        commandLine = listOf("mkdir", "-p", "sdk/src/main/obj/local")
-    }
+    File("../sdk/src/main/obj/local").mkdirs()
     return "../sdk/src/main/obj/local"
 }
 
@@ -247,16 +249,13 @@ fun queryPrebuiltSdkProperty(property: String, version: String, project: Project
     val default = "N/A"
     // Only query SDK property in CI. Skip this step in local build to reduce compile time
     if (isServerBuild()) {
-        val stdout = ByteArrayOutputStream()
         System.getenv("ARTIFACTORY_BASE_URL")
         val url =
             "${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
-        project.exec {
-            workingDir = File(".")
-            commandLine = listOf("curl", url)
-            standardOutput = stdout
-        }
-        val response = stdout.toString().trim()
+        val response = runCommand(
+            workingDir = File("."),
+            command = listOf("curl", url),
+        ).trim()
         val jsonObject = JSONObject(response)
 
         return jsonObject.getJSONObject("properties")?.takeIf { it.has(property) }
@@ -283,14 +282,10 @@ fun getSdkGitHash(version: String, project: Project): String {
             project = project
         )
     } else {
-        // Read commit ID from local SDK folder
-        val stdout = ByteArrayOutputStream()
-        project.exec {
-            workingDir = File("../sdk/src/main/jni/mega/sdk")
-            commandLine = listOf("git", "rev-parse", "--short", "HEAD")
-            standardOutput = stdout
-        }
-        commit = stdout.toString().trim()
+        commit = runCommand(
+            workingDir = File("../sdk/src/main/jni/mega/sdk"),
+            command = listOf("git", "rev-parse", "--short", "HEAD"),
+        ).trim()
     }
 
     println("sdk_commit = $commit")
@@ -311,14 +306,10 @@ fun getChatGitHash(version: String, project: Project): String {
     if (shouldUsePrebuiltSdk()) {
         commit = queryPrebuiltSdkProperty("chat-commit", version, project)
     } else {
-        // Read commit ID from local SDK folder
-        val stdout = ByteArrayOutputStream()
-        project.exec {
-            workingDir = File("../sdk/src/main/jni/megachat/sdk")
-            commandLine = listOf("git", "rev-parse", "--short", "HEAD")
-            standardOutput = stdout
-        }
-        commit = stdout.toString().trim()
+        commit = runCommand(
+            workingDir = File("../sdk/src/main/jni/megachat/sdk"),
+            command = listOf("git", "rev-parse", "--short", "HEAD"),
+        ).trim()
     }
 
     println("chat_commit = $commit")

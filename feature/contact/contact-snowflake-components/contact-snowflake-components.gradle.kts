@@ -4,7 +4,6 @@ plugins {
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
     alias(plugin.plugins.compose.screenshot)
-    id("kotlin-android")
 }
 
 android {

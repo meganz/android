@@ -23,4 +23,5 @@ dependencies {
     testImplementation(tools.lint.tests)
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

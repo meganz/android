@@ -4,7 +4,6 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
-    id("kotlin-android")
     alias(plugin.plugins.kotlin.serialisation)
 }
 
@@ -16,7 +15,7 @@ android {
     }
     sourceSets {
         // Adds exported schema location as test app assets.
-        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+        getByName("androidTest").assets.directories.add("$projectDir/schemas")
     }
     configurations {
         implementation {
@@ -31,9 +30,8 @@ android {
     namespace = "mega.privacy.android.data"
 }
 
-android.testVariants.all {
-    compileConfiguration.exclude(group = "com.google.guava", module = "listenablefuture")
-    runtimeConfiguration.exclude(group = "com.google.guava", module = "listenablefuture")
+configurations.matching { it.name.contains("AndroidTest") }.configureEach {
+    exclude(group = "com.google.guava", module = "listenablefuture")
 }
 
 dependencies {

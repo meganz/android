@@ -3,7 +3,6 @@ import mega.privacy.android.build.isServerBuild
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
-    id("kotlin-android")
 }
 
 android {
@@ -11,10 +10,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-    }
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
     }
 }
 
