@@ -204,6 +204,14 @@ internal fun ContinueWhereLeftOffListScreen(
                             title = item.title,
                             icon = iconForType(item.type),
                             onItemClicked = { viewModel.onItemClicked(item.nodeHandle) },
+                            onMenuClicked = {
+                                onNavigate(
+                                    NodeOptionsBottomSheetNavKey(
+                                        nodeHandle = item.nodeHandle,
+                                        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                                    )
+                                )
+                            },
                         )
                     }
                 }
@@ -317,6 +325,7 @@ private fun ContinueWhereLeftOffGridItem(
     title: String,
     @DrawableRes icon: Int,
     onItemClicked: () -> Unit,
+    onMenuClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -338,14 +347,36 @@ private fun ContinueWhereLeftOffGridItem(
                 modifier = Modifier.size(48.dp),
             )
         }
-        MegaText(
-            text = title,
-            textColor = TextColor.Primary,
-            style = AppTheme.typography.bodySmall,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            MegaText(
+                text = title,
+                textColor = TextColor.Primary,
+                style = AppTheme.typography.bodySmall,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp, top = 6.dp, bottom = 6.dp),
+            )
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .wrapContentSize(unbounded = true, align = Alignment.Center)
+                    .size(36.dp)
+                    .clickable { onMenuClicked() },
+                contentAlignment = Alignment.Center,
+            ) {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                    contentDescription = null,
+                    tint = IconColor.Secondary,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
     }
 }
 
@@ -381,12 +412,14 @@ private fun ContinueWhereLeftOffGridItemPreview() {
                 title = "Falastin36_press_trailer.mov",
                 icon = IconPackR.drawable.ic_video_medium_solid,
                 onItemClicked = {},
+                onMenuClicked = {},
                 modifier = Modifier.width(140.dp),
             )
             ContinueWhereLeftOffGridItem(
                 title = "Interview Agnes Varda.pdf",
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
                 onItemClicked = {},
+                onMenuClicked = {},
                 modifier = Modifier.width(140.dp),
             )
         }
