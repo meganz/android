@@ -12,7 +12,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,6 +77,9 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     // search engine is ready to accept queries.
     private val _searchEngineReady = MutableStateFlow(false)
+
+    // Guards searchEngine assignment against race between init coroutine and onCleared.
+    private val engineLock = Any()
 
     private var searchEngine: PdfSearchEngine? = null
 
@@ -178,8 +183,14 @@ internal class PdfViewerViewModel @AssistedInject constructor(
             val password = _state.value.currentPassword
             val opened = engine.openFromBytes(bytes, password)
             if (opened) {
-                searchEngine?.close()
-                searchEngine = engine
+                synchronized(engineLock) {
+                    if (!isActive) {
+                        engine.close()
+                        return@launch
+                    }
+                    searchEngine?.close()
+                    searchEngine = engine
+                }
                 _searchEngineReady.value = true
                 Timber.d("PdfSearchEngine initialised from bytes")
             } else {
@@ -213,8 +224,14 @@ internal class PdfViewerViewModel @AssistedInject constructor(
             }
 
             if (opened) {
-                searchEngine?.close()
-                searchEngine = engine
+                synchronized(engineLock) {
+                    if (!isActive) {
+                        engine.close()
+                        return@launch
+                    }
+                    searchEngine?.close()
+                    searchEngine = engine
+                }
                 _searchEngineReady.value = true
                 Timber.d("PdfSearchEngine initialised from source: $source")
             } else {
@@ -272,7 +289,13 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                         flow { emit(emptyList()) }
                     } else {
                         flow {
-                            val results = searchEngine?.searchAllPages(query) ?: emptyList()
+                            val results = runCatching {
+                                searchEngine?.searchAllPages(query) ?: emptyList()
+                            }.onFailure { e ->
+                                // Re-throw so flatMapLatest can cancel this flow when a new query arrives.
+                                if (e is CancellationException) throw e
+                                Timber.e(e, "Search error")
+                            }.getOrDefault(emptyList())
                             emit(results)
                         }.flowOn(ioDispatcher)
                     }
@@ -474,8 +497,10 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        searchEngine?.close()
-        searchEngine = null
+        synchronized(engineLock) {
+            searchEngine?.close()
+            searchEngine = null
+        }
     }
 
     private fun createSourceFromArgs(): PdfViewerSource {

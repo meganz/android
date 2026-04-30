@@ -9,7 +9,6 @@ import com.shockwave.pdfium.PdfTextMatch
 import com.shockwave.pdfium.PdfiumCore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngineImpl.Companion.FLAG_CONSECUTIVE
@@ -24,6 +23,11 @@ import java.io.File
  * Owns its own [PdfDocument] instance, independent of the rendering [PDFView].
  * This ensures thread-safety: the rendering thread and search coroutines never
  * touch the same native pointers simultaneously.
+ *
+ * [close], [searchAllPages], and [getPdfRects] are guarded by an internal lock so that
+ * [closeDocument] cannot invalidate native pointers while a page is being searched.
+ * The lock is held for one page at a time (not the entire loop), so [close] can run
+ * between pages and [searchAllPages] detects the closed state via a null check.
  *
  * Usage:
  * 1. Call [openFromBytes] or [openFromUri] to open the document
@@ -41,7 +45,16 @@ internal class PdfSearchEngineImpl(
     private val dispatcher: CoroutineDispatcher,
 ) : PdfSearchEngine {
 
+    /**
+     * Guards [pdfDocument]/[pfd] access shared between [searchAllPages] (per-page blocks)
+     * and [close]. Held for one page at a time so [close] can run between pages.
+     */
+    private val lock = Any()
+
     private var pdfDocument: PdfDocument? = null
+
+    // Retained so pdfium can read the file during search
+    private var pfd: ParcelFileDescriptor? = null
 
     /**
      * Open a PDF from a byte array.
@@ -69,14 +82,16 @@ internal class PdfSearchEngineImpl(
     override fun openFromUri(uri: Uri, password: String?): Boolean {
         closeDocument()
         return runCatching {
-            val pfd: ParcelFileDescriptor = context.contentResolver.openFileDescriptor(uri, "r")
+            val descriptor = context.contentResolver.openFileDescriptor(uri, "r")
                 ?: return false
-            pfd.use { descriptor ->
-                pdfDocument = pdfiumCore.newDocument(descriptor, password)
-            }
+            pfd = descriptor
+            pdfDocument = pdfiumCore.newDocument(descriptor, password)
             true
-        }.onFailure { Timber.e(it, "PdfSearchEngine: failed to open from URI $uri") }
-            .getOrDefault(false)
+        }.onFailure {
+            pfd?.close()
+            pfd = null
+            Timber.e(it, "PdfSearchEngine: failed to open from URI $uri")
+        }.getOrDefault(false)
     }
 
     /**
@@ -96,11 +111,15 @@ internal class PdfSearchEngineImpl(
                 Timber.w("PdfSearchEngine: file does not exist: $filePath")
                 return false
             }
-            val pfd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
-            pfd.use { pdfDocument = pdfiumCore.newDocument(it, password) }
+            val descriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            pfd = descriptor
+            pdfDocument = pdfiumCore.newDocument(descriptor, password)
             true
-        }.onFailure { Timber.e(it, "PdfSearchEngine: failed to open from file path $filePath") }
-            .getOrDefault(false)
+        }.onFailure {
+            pfd?.close()
+            pfd = null
+            Timber.e(it, "PdfSearchEngine: failed to open from file path $filePath")
+        }.getOrDefault(false)
     }
 
     /**
@@ -110,6 +129,11 @@ internal class PdfSearchEngineImpl(
      * is always the closest one to the currently visible page.
      * Only [FLAG_MATCH_CASE] is currently applied; [FLAG_MATCH_WHOLE_WORD] and [FLAG_CONSECUTIVE]
      * are reserved for future use (native API support may vary).
+     *
+     * The lock is held for one page at a time. [ensureActive] is called twice per iteration:
+     * once before acquiring the lock (between pages) and once inside the lock after [openPage],
+     * giving cancellation two chances to exit. Inside the lock, a null check on [pdfDocument]
+     * detects a concurrent [close] call and exits early with results collected so far.
      *
      * @param query The search query string (queries with fewer than 2 characters return no results)
      * @param startPage The 0-based page index to start searching from
@@ -121,8 +145,13 @@ internal class PdfSearchEngineImpl(
         startPage: Int,
         flags: Int,
     ): List<PdfTextMatch> = withContext(dispatcher) {
-        val doc = pdfDocument ?: return@withContext emptyList()
-        val totalPages = pdfiumCore.getPageCount(doc)
+        val (doc, totalPages) = synchronized(lock) {
+            val d = pdfDocument ?: return@withContext emptyList()
+            val count = runCatching { pdfiumCore.getPageCount(d) }
+                .onFailure { Timber.e(it, "PdfSearchEngine: failed to get page count") }
+                .getOrDefault(0)
+            d to count
+        }
         if (shouldSkipSearch(totalPages, query)) {
             return@withContext emptyList()
         }
@@ -133,30 +162,34 @@ internal class PdfSearchEngineImpl(
 
         for (pageIndex in pageOrder) {
             ensureActive()
-            try {
-                pdfiumCore.openPage(doc, pageIndex)
+            synchronized(lock) {
+                // Exit early if close() was called between pages.
+                if (pdfDocument == null) return@withContext results
                 try {
-                    val matches = searchPage(doc.docPtr, pageIndex, trimmed, flags)
-                    results.addAll(matches)
-                } finally {
-                    pdfiumCore.closeTextPage(doc, pageIndex)
+                    pdfiumCore.openPage(doc, pageIndex)
+                    try {
+                        ensureActive()
+                        val matches = searchPage(doc.docPtr, pageIndex, trimmed, flags)
+                        results.addAll(matches)
+                    } finally {
+                        pdfiumCore.closeTextPage(doc, pageIndex)
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Timber.w(e, "PdfSearchEngine: error searching page $pageIndex")
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Timber.w(e, "PdfSearchEngine: error searching page $pageIndex")
             }
         }
         results
     }
 
-    private suspend fun searchPage(
+    private fun searchPage(
         docPtr: Long,
         pageIndex: Int,
         query: String,
         flags: Int,
     ): List<PdfTextMatch> {
-        currentCoroutineContext().ensureActive()
         return try {
             val matchCase = (flags and FLAG_MATCH_CASE) == FLAG_MATCH_CASE
             pdfiumCore.searchOnePage(docPtr, pageIndex, query, matchCase)
@@ -178,12 +211,12 @@ internal class PdfSearchEngineImpl(
      * @param match The search match to retrieve rects for
      * @return List of [RectF] in PDF coordinate space (points, 1/72", origin at bottom-left)
      */
-    override fun getPdfRects(match: PdfTextMatch): List<RectF> {
+    override fun getPdfRects(match: PdfTextMatch): List<RectF> = synchronized(lock) {
         val doc = pdfDocument ?: run {
             Timber.w("PdfSearchEngine: getPdfRects called but document is null")
             return emptyList()
         }
-        return runCatching {
+        runCatching {
             val textPagePtr = pdfiumCore.openTextPage(doc, match.pageIndex)
             try {
                 pdfiumCore.getMatchRects(textPagePtr, match.charIndex, match.charCount)
@@ -197,17 +230,26 @@ internal class PdfSearchEngineImpl(
     /**
      * Returns true if the document has been successfully opened.
      */
-    override val isOpen: Boolean get() = pdfDocument != null
+    override val isOpen: Boolean get() = synchronized(lock) { pdfDocument != null }
 
+    /**
+     * Closes the native PDF document and [pfd] and releases native resources.
+     * Called from [close] (which holds [lock]) or from [open*] methods during
+     * initialisation (single-threaded, no concurrent access at that point).
+     */
     private fun closeDocument() {
-        runCatching {
-            pdfDocument?.let { pdfiumCore.closeDocument(it) }
-        }
+        runCatching { pdfDocument?.let { pdfiumCore.closeDocument(it) } }
+            .onFailure { Timber.w(it, "PdfSearchEngine: failed to close document") }
+        runCatching { pfd?.close() }
+            .onFailure { Timber.w(it, "PdfSearchEngine: failed to close file descriptor") }
         pdfDocument = null
+        pfd = null
     }
 
     override fun close() {
-        closeDocument()
+        synchronized(lock) {
+            closeDocument()
+        }
     }
 
     companion object {
