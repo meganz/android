@@ -93,8 +93,7 @@ class ViewedLinksViewModelTest {
         underTest.uiState.test {
             awaitItem()
             fakeFlow.emit(listOf(viewedLink))
-            val state = awaitItem()
-            assertThat(state.isLoading).isFalse()
+            val state = awaitItem() as ViewedLinksUiState.Ready
             assertThat(state.items).hasSize(1)
             assertThat(state.items[0].previewPath).isEqualTo("/cache/preview.jpg")
             assertThat(state.items[0].iconRes).isEqualTo(iconPackR.drawable.ic_pdf_medium_solid)
@@ -116,7 +115,7 @@ class ViewedLinksViewModelTest {
         underTest.uiState.test {
             awaitItem()
             fakeFlow.emit(listOf(folderLink))
-            val state = awaitItem()
+            val state = awaitItem() as ViewedLinksUiState.Ready
             assertThat(state.items).hasSize(1)
             assertThat(state.items[0].previewPath).isNull()
             assertThat(state.items[0].iconRes)
@@ -146,7 +145,7 @@ class ViewedLinksViewModelTest {
         underTest.uiState.test {
             awaitItem() // consume current/stale StateFlow value
             fakeFlow.emit(listOf(viewedLink))
-            val state = awaitItem()
+            val state = awaitItem() as ViewedLinksUiState.Ready
             assertThat(state.items).hasSize(1)
             assertThat(state.items[0].previewPath).isNull()
             assertThat(state.items[0].iconRes).isEqualTo(expectedIcon)
@@ -160,8 +159,7 @@ class ViewedLinksViewModelTest {
         underTest.uiState.test {
             awaitItem()
             fakeFlow.emit(emptyList())
-            val state = awaitItem()
-            assertThat(state.isLoading).isFalse()
+            val state = awaitItem() as ViewedLinksUiState.Ready
             assertThat(state.items).isEmpty()
             verifyNoMoreInteractions(getPublicNodeUseCase)
             verifyNoMoreInteractions(fileTypeIconMapper)

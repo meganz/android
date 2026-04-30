@@ -1,12 +1,15 @@
 package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +29,7 @@ import mega.android.core.ui.components.list.OneLineListItem
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
@@ -33,6 +38,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -44,6 +50,8 @@ import mega.privacy.android.navigation.destination.ViewedLinksScreenNavKey
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.ViewedLinksWidget.Companion.MAX_VISIBLE_VIEWED_LINK
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkLoadingItem
 import javax.inject.Inject
 
 /**
@@ -103,6 +111,10 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget {
             )
         }
     }
+
+    companion object {
+        const val MAX_VISIBLE_VIEWED_LINK = 4
+    }
 }
 
 @Composable
@@ -114,48 +126,62 @@ internal fun ViewedLinksView(
     onMenuClicked: (ViewedLinkUiItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when {
-        uiState.isLoading -> {
-            // Todo: Add loading placeholder
-        }
+    Column(modifier = modifier) {
+        ViewedLinksWidgetHeader(
+            onViewAllClicked = onViewAllClicked,
+            showMoreButton = uiState is ViewedLinksUiState.Ready
+                    && uiState.items.size > MAX_VISIBLE_VIEWED_LINK,
+        )
 
-        uiState.items.isEmpty() -> {
-            // Todo: Add empty layout
-        }
+        when (uiState) {
+            is ViewedLinksUiState.Loading -> {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onViewAllClicked() }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    ViewedLinkLoadingItem()
+                }
+            }
 
-        else -> {
-            Column(modifier = modifier) {
-                ViewedLinksWidgetHeader(onViewAllClicked = onViewAllClicked)
-
-                uiState.items.take(4).forEach { item ->
-                    OneLineListItem(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.viewedLink.name,
-                        leadingElement = {
-                            NodeThumbnailView(
-                                modifier = Modifier.size(32.dp),
-                                layoutType = ThumbnailLayoutType.List,
-                                data = item.previewPath?.let { ThumbnailUriRequest(UriPath(it)) },
-                                defaultImage = item.iconRes,
-                                contentDescription = "Thumbnail",
-                            )
-                        },
-                        trailingElement = {
-                            MegaIcon(
-                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .clickable { onMenuClicked(item) },
-                                tint = IconColor.Primary,
-                            )
-                        },
-                        onClickListener = {
-                            when (item.viewedLink.type) {
-                                RecentlyUsedType.FolderLink -> onFolderLinkClicked(item.viewedLink.linkUrl)
-                                else -> onFileLinkClicked(item.viewedLink.linkUrl)
-                            }
-                        },
-                    )
+            is ViewedLinksUiState.Ready -> {
+                if (uiState.items.isEmpty()) {
+                    ViewedLinksEmptyView()
+                } else {
+                    uiState.items.take(MAX_VISIBLE_VIEWED_LINK).forEach { item ->
+                        OneLineListItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(VIEWED_LINKS_ITEM_TEST_TAG),
+                            text = item.viewedLink.name,
+                            leadingElement = {
+                                NodeThumbnailView(
+                                    modifier = Modifier.size(32.dp),
+                                    layoutType = ThumbnailLayoutType.List,
+                                    data = item.previewPath?.let { ThumbnailUriRequest(UriPath(it)) },
+                                    defaultImage = item.iconRes,
+                                    contentDescription = "Thumbnail",
+                                )
+                            },
+                            trailingElement = {
+                                MegaIcon(
+                                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .clickable { onMenuClicked(item) },
+                                    tint = IconColor.Primary,
+                                )
+                            },
+                            onClickListener = {
+                                when (item.viewedLink.type) {
+                                    RecentlyUsedType.FolderLink -> onFolderLinkClicked(item.viewedLink.linkUrl)
+                                    else -> onFileLinkClicked(item.viewedLink.linkUrl)
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -165,6 +191,7 @@ internal fun ViewedLinksView(
 @Composable
 internal fun ViewedLinksWidgetHeader(
     onViewAllClicked: () -> Unit,
+    showMoreButton: Boolean = false,
 ) {
     Row(
         modifier = Modifier
@@ -181,21 +208,51 @@ internal fun ViewedLinksWidgetHeader(
                 .testTag(VIEWED_LINKS_TITLE_TEST_TAG),
         )
 
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .wrapContentSize(unbounded = true, align = Alignment.Center)
-                .size(48.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.ChevronRight,
-                contentDescription = null,
-                tint = IconColor.Secondary,
-                modifier = Modifier.size(24.dp),
-            )
+        if (showMoreButton) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .wrapContentSize(unbounded = true, align = Alignment.Center)
+                    .size(48.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.ChevronRight,
+                    contentDescription = null,
+                    tint = IconColor.Secondary,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
         }
     }
 }
 
+@Composable
+internal fun ViewedLinksEmptyView(
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MegaText(
+            text = stringResource(sharedR.string.home_widget_viewed_links_empty_state),
+            style = AppTheme.typography.titleSmall,
+            textColor = TextColor.Secondary,
+            modifier = Modifier
+                .weight(1f)
+                .testTag(VIEWED_LINKS_EMPTY_TEXT_TEST_TAG),
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Image(
+            painter = painterResource(R.drawable.illustration_mega_secondary_link),
+            contentDescription = null,
+            modifier = Modifier.size(60.dp),
+        )
+    }
+}
+
 internal const val VIEWED_LINKS_TITLE_TEST_TAG = "viewed_links_widget:title"
+internal const val VIEWED_LINKS_EMPTY_TEXT_TEST_TAG = "viewed_links_widget:empty_text"

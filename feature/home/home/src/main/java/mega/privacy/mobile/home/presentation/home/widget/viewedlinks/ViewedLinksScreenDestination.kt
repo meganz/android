@@ -5,6 +5,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.consumed
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
@@ -38,6 +40,12 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
             onTransfer = transferHandler::setTransferEvent,
+        )
+
+        EventEffect(
+            event = (uiState as? ViewedLinksUiState.Ready)?.clearAllLinksEvent ?: consumed,
+            onConsumed = viewModel::onClearAllLinksEventConsumed,
+            action = { navigationHandler.remove(it) }
         )
 
         ViewedLinksScreen(

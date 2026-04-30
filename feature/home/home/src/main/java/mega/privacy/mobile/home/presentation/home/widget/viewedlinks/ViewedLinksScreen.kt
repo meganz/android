@@ -42,6 +42,7 @@ import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkLoadingItem
 
 /**
  * Full-screen Viewed Links list. Displays all viewed file and folder links
@@ -81,62 +82,60 @@ internal fun ViewedLinksScreen(
             )
         },
     ) { paddingValues ->
-        when {
-            uiState.isLoading -> {
-                // Todo: Add loading state
-            }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+        ) {
+            // Todo: Add header item
 
-            uiState.items.isEmpty() -> {
-                // Todo: Add empty state
-            }
-
-            else -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                ) {
-                    // Todo: Add header item
-
-                    items(
-                        items = uiState.items,
-                        key = { it.viewedLink.nodeHandle },
-                    ) { item ->
-                        OneLineListItem(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = item.viewedLink.name,
-                            leadingElement = {
-                                NodeThumbnailView(
-                                    modifier = Modifier.size(32.dp),
-                                    layoutType = ThumbnailLayoutType.List,
-                                    data = item.previewPath?.let {
-                                        ThumbnailUriRequest(UriPath(it))
-                                    },
-                                    defaultImage = item.iconRes,
-                                    contentDescription = "Thumbnail",
-                                )
-                            },
-                            trailingElement = {
-                                MegaIcon(
-                                    painter = rememberVectorPainter(
-                                        IconPack.Medium.Thin.Outline.MoreVertical
-                                    ),
-                                    contentDescription = null,
-                                    modifier = Modifier.clickable { onMenuClicked(item) },
-                                    tint = IconColor.Primary,
-                                )
-                            },
-                            onClickListener = {
-                                when (item.viewedLink.type) {
-                                    RecentlyUsedType.FolderLink ->
-                                        onFolderLinkClicked(item.viewedLink.linkUrl)
-
-                                    else ->
-                                        onFileLinkClicked(item.viewedLink.linkUrl)
-                                }
-                            },
-                        )
+            when (uiState) {
+                is ViewedLinksUiState.Loading -> {
+                    items(count = 6) {
+                        ViewedLinkLoadingItem()
                     }
+                }
+
+                is ViewedLinksUiState.Ready -> items(
+                    items = uiState.items,
+                    key = { it.viewedLink.nodeHandle },
+                ) { item ->
+                    OneLineListItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(VIEWED_LINKS_ITEM_TEST_TAG),
+                        text = item.viewedLink.name,
+                        leadingElement = {
+                            NodeThumbnailView(
+                                modifier = Modifier.size(32.dp),
+                                layoutType = ThumbnailLayoutType.List,
+                                data = item.previewPath?.let {
+                                    ThumbnailUriRequest(UriPath(it))
+                                },
+                                defaultImage = item.iconRes,
+                                contentDescription = "Thumbnail",
+                            )
+                        },
+                        trailingElement = {
+                            MegaIcon(
+                                painter = rememberVectorPainter(
+                                    IconPack.Medium.Thin.Outline.MoreVertical
+                                ),
+                                contentDescription = null,
+                                modifier = Modifier.clickable { onMenuClicked(item) },
+                                tint = IconColor.Primary,
+                            )
+                        },
+                        onClickListener = {
+                            when (item.viewedLink.type) {
+                                RecentlyUsedType.FolderLink ->
+                                    onFolderLinkClicked(item.viewedLink.linkUrl)
+
+                                else ->
+                                    onFileLinkClicked(item.viewedLink.linkUrl)
+                            }
+                        },
+                    )
                 }
             }
         }
@@ -181,14 +180,14 @@ internal fun ViewedLinksScreen(
 
 internal const val CLEAR_HISTORY_TAG = "viewed_links:clear_history"
 internal const val CLEAR_HISTORY_DIALOG_TAG = "viewed_links:clear_history_dialog"
+internal const val VIEWED_LINKS_ITEM_TEST_TAG = "viewed_links:item"
 
 @CombinedThemePreviews
 @Composable
 private fun ViewedLinksScreenPreview() {
     AndroidThemeForPreviews {
         ViewedLinksScreen(
-            uiState = ViewedLinksUiState(
-                isLoading = false,
+            uiState = ViewedLinksUiState.Ready(
                 items = listOf(
                     ViewedLinkUiItem(
                         viewedLink = ViewedLink(
@@ -262,6 +261,21 @@ private fun ViewedLinksScreenPreview() {
                     ),
                 ),
             ),
+            onFolderLinkClicked = {},
+            onFileLinkClicked = {},
+            onMenuClicked = {},
+            onClearAllLinks = {},
+            onBack = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ViewedLinksScreenLoadingPreview() {
+    AndroidThemeForPreviews {
+        ViewedLinksScreen(
+            uiState = ViewedLinksUiState.Loading,
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
             onMenuClicked = {},

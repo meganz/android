@@ -3,10 +3,14 @@ package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.ViewedLink
@@ -16,11 +20,12 @@ import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * ViewModel for the Viewed Links widget on the Home page.
@@ -38,6 +43,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param monitorViewedLinksUseCase
  * @param getPublicNodeUseCase
  * @param fileTypeIconMapper
+ * @param clearViewedLinksUseCase
+ * @param snackbarEventQueue
  */
 @HiltViewModel
 internal class ViewedLinksViewModel @Inject constructor(
@@ -48,21 +55,24 @@ internal class ViewedLinksViewModel @Inject constructor(
     private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
 
+    private val clearAllLinksEvent = MutableStateFlow<StateEvent>(consumed)
     private val resolvedLinkCache = mutableMapOf<String, ViewedLinkUiItem>()
 
-    val uiState: StateFlow<ViewedLinksUiState> =
-        monitorViewedLinksUseCase()
-            .map { viewedLinks ->
-                ViewedLinksUiState(
-                    isLoading = false,
-                    items = viewedLinks.toUiItems(),
-                )
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = ViewedLinksUiState(),
+    val uiState: StateFlow<ViewedLinksUiState> by lazy {
+        combine(
+            monitorViewedLinksUseCase(),
+            clearAllLinksEvent,
+        ) { viewedLinks, clearEvent ->
+            ViewedLinksUiState.Ready(
+                items = viewedLinks.toUiItems(),
+                clearAllLinksEvent = clearEvent,
             )
+        }.catch { Timber.e(it) }
+            .asUiStateFlow(
+                scope = viewModelScope,
+                initialValue = ViewedLinksUiState.Loading,
+            )
+    }
 
     /**
      * Maps a list of [ViewedLink]s to [ViewedLinkUiItem]s in parallel.
@@ -105,7 +115,12 @@ internal class ViewedLinksViewModel @Inject constructor(
                 .onFailure { Timber.e(it, "Failed to clear viewed links history") }
                 .onSuccess {
                     snackbarEventQueue.queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
+                    clearAllLinksEvent.update { triggered }
                 }
         }
+    }
+
+    internal fun onClearAllLinksEventConsumed() {
+        clearAllLinksEvent.update { consumed }
     }
 }

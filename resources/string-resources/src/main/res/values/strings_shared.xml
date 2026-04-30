@@ -2776,4 +2776,6 @@
     <string name="home_widget_viewed_links_clear_history_dialog_message">Are you sure you want to clear all viewed links history? This cannot be undone.</string>
     <!-- Success message to shown when viewed links cleared -->
     <string name="home_widget_viewed_links_clear_history_success_message">Viewed links history has been cleared</string>
+    <!-- Empty state message for the viewed links home widget -->
+    <string name="home_widget_viewed_links_empty_state">Viewed links will appear here</string>
 </resources>
