@@ -1292,7 +1292,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Zrestartuj</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Zapisz na urządzeniu</string>
+    <string name="general_save_to_device">Pobierz</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Ukryj</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2168,9 +2168,9 @@
     <string name="section_banners">Banery</string>
     <string name="prolite_account">Pro Lite</string>
     <string name="pro1_account">Pro I</string>
-    <string name="pro2_account">Pro&#160;II</string>
-    <string name="pro3_account">Pro&#160;III</string>
-    <string name="pro_flexi_account">Pro&#160;Flexi</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
     <string name="recovering_info">Ładowanie&#8230;</string>
     <string name="section_my_account">Moje konto</string>
     <string name="storage_usage_format">Użyto %1$s z %2$s</string>
@@ -2496,7 +2496,7 @@
     </plurals>
     <string name="pdf_viewer_error_no_network">Brak połączenia z siecią. Proszę połączyć się ponownie, aby otworzyć plik.</string>
     <string name="open_link_dialog_title">Otwórz link</string>
-    <string name="open_link_dialog_hint">Wklej link</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="general_error_file_not_found">Nie można odnaleźć tego pliku</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Błąd. Plik PDF jest uszkodzony lub nie istnieje.</string>
     <string name="pdf_viewer_error_streaming">Wystąpił błąd podczas próby otwierania pliku</string>
@@ -2568,4 +2568,10 @@
     <string name="public_link_auth_alert_description_default">Dostęp do niego w dowolnym momencie z dowolnego urządzenia.\nNie ma potrzeby przechowywania linku ani ponownego pobierania plików.</string>
     <string name="public_link_auth_alert_description_album">Zabezpiecz te zdjęcia i uzyskaj do nich dostęp w każdej chwili</string>
     <string name="public_link_auth_alert_title_file">Zapisz ten plik na swoje konto MEGA</string>
+    <string name="home_widget_viewed_links_section_header">Odwiedzone linki</string>
+    <string name="open_link_dialog_description">Wklej dowolny link MEGA, aby go otworzyć</string>
+    <string name="home_cwlo_clear_history">Wyczyść historię „Kontynuuj tam, gdzie przerwałeś”</string>
+    <string name="home_widget_viewed_links_clear_history">Wyczyść historię odwiedzonych linków</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">Czy na pewno chcesz usunąć całą historię wyświetlanych linków? Nie da się tego cofnąć.</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">Historia odwiedzonych linków została wyczyszczona</string>
 </resources>

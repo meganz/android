@@ -1241,7 +1241,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">再起動</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">端末に保存</string>
+    <string name="general_save_to_device">ダウンロード</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">隠す</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2245,7 +2245,7 @@
     <string name="pdf_viewer_error_no_network">ネットワーク接続がありません。ファイルを開くには再接続してください。</string>
     <string name="homepage_empty_hint_audio">[B][A]音声[/A]は見つかりませんでした[/B]</string>
     <string name="open_link_dialog_title">リンクを開く</string>
-    <string name="open_link_dialog_hint">リンクを貼り付ける</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="cloud_explorer_select_destination_title">保存先を選択</string>
     <string name="cloud_explorer_use_this_folder_button">このフォルダを使用する</string>
     <string name="cloud_explorer_choose_folder_title">フォルダを選択</string>
@@ -2307,4 +2307,10 @@
     <string name="public_link_auth_alert_description_default">いつでも、どのデバイスからでもアクセスできます。\nリンクを保管したり、ファイルを再ダウンロードしたりする必要はありません。</string>
     <string name="public_link_auth_alert_description_album">これらの写真を安全に保管し、いつでもアクセス可能に</string>
     <string name="public_link_auth_alert_title_file">このファイルをMEGAアカウントに保存</string>
+    <string name="home_widget_viewed_links_section_header">閲覧済みリンク</string>
+    <string name="open_link_dialog_description">MEGAリンクを貼り付けて開いてください</string>
+    <string name="home_cwlo_clear_history">「中断したところから再開」履歴をクリア</string>
+    <string name="home_widget_viewed_links_clear_history">リンクの閲覧履歴を消去</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">リンクの閲覧履歴をすべて消去します。よろしいですか？この操作は取り消せません。</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">リンクの閲覧履歴を消去しました</string>
 </resources>

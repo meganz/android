@@ -1913,9 +1913,9 @@
     <!-- General label for files -->
     <string name="general_files">Arquivos</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Salvar no dispositivo</string>
+    <string name="general_save_to_device">Fazer download</string>
     <!-- Title of cloud explorer to upload a file -->
-    <string name="title_upload_explorer">Fazer upload ao MEGA</string>
+    <string name="title_upload_explorer">Fazer upload no MEGA</string>
     <!-- Label choose destination -->
     <string name="choose_destionation">Escolher destino</string>
     <!-- Label that indicates show more items -->

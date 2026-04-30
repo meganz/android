@@ -1241,7 +1241,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">重頭播放</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">儲存到裝置</string>
+    <string name="general_save_to_device">下載</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">隱藏</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2097,7 +2097,7 @@
     <string name="create_new_video_playlist_input_title_placeholder">新的播放列表</string>
     <string name="text_editor_show_line_numbers">顯示行數</string>
     <string name="text_editor_hide_line_numbers">隱藏行數</string>
-    <string name="settings_help_rate_app">請幫我們評分</string>
+    <string name="settings_help_rate_app">請為我們評分</string>
     <string name="general_dialog_discard_button">捨棄</string>
     <string name="choose_account_screen_subscriptions_not_available_via_google_play">您所在的地區無法透過Google Play進行訂閱。</string>
     <string name="home_recents_snackbar_activity_cleared">您最近的活動已清除</string>
@@ -2170,7 +2170,7 @@
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
-        <item quantity="other">%d 資料夾&#160;·&#160;</item>
+        <item quantity="other">%d個資料夾&#160;·&#160;</item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="other">已與%d個人共享</item>
@@ -2243,7 +2243,7 @@
     <string name="pdf_viewer_error_corrupt_or_missing">錯誤。PDF檔案已損毀或不存在。</string>
     <string name="pdf_viewer_error_streaming">嘗試開啟檔案時發生錯誤</string>
     <string name="open_link_dialog_title">開啟連結</string>
-    <string name="open_link_dialog_hint">貼上連結</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="homepage_empty_hint_audio">[B]找不到[/B][A]音訊檔案[/A]</string>
     <string name="cloud_explorer_choose_folder_title">選擇資料夾</string>
     <string name="cloud_explorer_use_this_folder_button">使用此資料夾</string>
@@ -2294,4 +2294,19 @@
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="other">密碼錯誤%1$d次</item>
     </plurals>
+    <string name="video_player_subtitle_bottom_sheet_add_subtitle_option">從雲端硬碟新增字幕</string>
+    <string name="rewarded_ad_dialog_perk_ad_free_downloads">無廣告下載</string>
+    <string name="setting_biometric_id">生物辨識ID</string>
+    <string name="title_enable_biometrics">確認您的生物辨識資訊以進行解鎖</string>
+    <string name="confirmation_biometric_enabled">已確認您的生物辨識資訊</string>
+    <string name="title_unlock_biometric">使用您的生物辨識資訊進行解鎖</string>
+    <string name="public_link_auth_alert_title_folder">將此資料夾儲存到您的MEGA帳戶</string>
+    <string name="public_link_auth_alert_title_link">將此連結儲存到您的MEGA帳戶</string>
+    <string name="public_link_auth_alert_title_album">將此相簿儲存到您的MEGA帳戶</string>
+    <string name="public_link_auth_alert_description_default">隨時隨地透過任何裝置存取。\n無需保留連結或重複下載檔案。</string>
+    <string name="public_link_auth_alert_description_album">安全地保存這些照片，隨時隨地進行存取</string>
+    <string name="public_link_auth_alert_title_file">將此檔案儲存到您的MEGA帳戶</string>
+    <string name="home_widget_viewed_links_section_header">已檢視的連結</string>
+    <string name="open_link_dialog_description">貼上任何MEGA連結即可開啟</string>
+    <string name="home_cwlo_clear_history">清除「繼續上次進度」的歷史紀錄</string>
 </resources>

@@ -1913,7 +1913,7 @@
     <!-- General label for files -->
     <string name="general_files">File</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Salva nel dispositivo</string>
+    <string name="general_save_to_device">Scarica</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">Upload</string>
     <!-- Label choose destination -->

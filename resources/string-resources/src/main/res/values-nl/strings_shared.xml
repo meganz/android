@@ -1258,7 +1258,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Herstarten</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Opslaan op apparaat</string>
+    <string name="general_save_to_device">Downloaden</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Verbergen</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2005,7 +2005,7 @@
     <string name="album_get_link_share_link_dialog_description">De decryptiesleutel is geëxporteerd en wordt via de link gedeeld.</string>
     <string name="album_get_link_share_link_dialog_share_action_only_link">Link alleen delen</string>
     <string name="album_get_link_share_link_dialog_share_action_link_key">Link en sleutel delen</string>
-    <string name="album_get_link_share_link_with_key">Link: %1$s\n\nKey: %2$s</string>
+    <string name="album_get_link_share_link_with_key">Link: %1$s\n\nSleutel: %2$s</string>
     <string name="album_has_hidden_nodes_dialog_description">Dit album bevat verborgen items. Door het album te delen, worden de verborgen items zichtbaar voor de personen met wie u het deelt. De items blijven echter verborgen in uw cloudopslag.</string>
     <plurals name="album_get_link_screen_title">
         <item quantity="one">Link delen</item>
@@ -2054,9 +2054,9 @@
     <string name="pro2_account">Pro II</string>
     <string name="pro3_account">Pro III</string>
     <string name="pro_flexi_account">Pro Flexi</string>
-    <string name="recovering_info">Loading&#8230;</string>
+    <string name="recovering_info">Laden&#8230;</string>
     <string name="section_my_account">Mijn Account</string>
-    <string name="storage_usage_format">%1$s of %2$s used</string>
+    <string name="storage_usage_format">%1$s van %2$s gebruikt</string>
     <string name="general_hi">Hi</string>
     <string name="home_recents_options_menu_hide_activity">Recente activiteit verbergen</string>
     <string name="home_recents_empty_button_upload">Upload</string>
@@ -2325,7 +2325,7 @@
     </plurals>
     <string name="pdf_viewer_error_no_network">Geen netwerk verbinding. Verbind opnieuw om het bestand te openen.</string>
     <string name="open_link_dialog_title">Link openen</string>
-    <string name="open_link_dialog_hint">Link plakken</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="general_error_file_not_found">Dit bestand kon niet gevonden worden</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Fout. Het PDF bestand is beschadigd of bestaat niet.</string>
     <string name="pdf_viewer_error_streaming">Een fout heeft opgetreden tijdens het openen van het bestand</string>
@@ -2393,4 +2393,10 @@
     <string name="public_link_auth_alert_description_default">U heeft er altijd en overal toegang toe, vanaf elk apparaat. U hoeft de link niet te bewaren of bestanden opnieuw te downloaden.</string>
     <string name="public_link_auth_alert_description_album">Bewaar deze foto\’s veilig en bekijk ze op elk gewenst moment</string>
     <string name="public_link_auth_alert_title_file">Bewaar dit bestand in uw MEGA account</string>
+    <string name="home_widget_viewed_links_section_header">Bekeken links</string>
+    <string name="open_link_dialog_description">Plak hier een MEGA-link om deze te openen</string>
+    <string name="home_cwlo_clear_history">Wis de geschiedenis van \“Verdergaan waar u gebleven was\“</string>
+    <string name="home_widget_viewed_links_clear_history">Wis de geschiedenis van bekeken links</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">Weet u zeker dat u de geschiedenis van alle bekeken links wilt wissen? Deze actie kan niet ongedaan worden gemaakt.</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">De geschiedenis van bekeken links is gewist</string>
 </resources>

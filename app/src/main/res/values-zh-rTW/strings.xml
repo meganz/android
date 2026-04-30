@@ -1841,9 +1841,9 @@
     <!-- General label for files -->
     <string name="general_files">檔案</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">儲存至裝置</string>
+    <string name="general_save_to_device">下載</string>
     <!-- Title of cloud explorer to upload a file -->
-    <string name="title_upload_explorer">上傳至MEGA</string>
+    <string name="title_upload_explorer">上傳到MEGA</string>
     <!-- Label choose destination -->
     <string name="choose_destionation">選擇目的地</string>
     <!-- Label that indicates show more items -->
@@ -2119,7 +2119,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">忽略</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s已將此通話靜音</string>
+    <string name="muted_contact_micro">%s已靜音</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">靜音</string>
     <!-- Subtitle of the call screen when the call is on hold -->

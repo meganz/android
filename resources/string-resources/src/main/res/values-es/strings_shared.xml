@@ -1269,7 +1269,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Reiniciar</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Guardar en el dispositivo</string>
+    <string name="general_save_to_device">Descargar</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Ocultar</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2377,7 +2377,7 @@
     <string name="pdf_viewer_error_corrupt_or_missing">Error. El archivo PDF está dañado o no existe.</string>
     <string name="pdf_viewer_error_streaming">No se ha podido abrir el archivo</string>
     <string name="homepage_empty_hint_audio">[B]No[/B] se han [B]encontrado[/B] [A]audios/A]</string>
-    <string name="open_link_dialog_hint">Pegar enlace</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="open_link_dialog_title">Abrir enlace</string>
     <string name="cloud_explorer_choose_folder_title">Elige carpeta</string>
     <string name="cloud_explorer_select_destination_title">Seleccionar destino</string>
@@ -2438,4 +2438,17 @@
     <string name="title_enable_biometrics">Confirma tu información biométrica para desbloquear</string>
     <string name="confirmation_biometric_enabled">Información biométrica confirmada</string>
     <string name="title_unlock_biometric">Desbloquear usando tu información biométrica</string>
+    <string name="public_link_auth_alert_title_folder">Guarda esta carpeta en tu cuenta de MEGA</string>
+    <string name="public_link_auth_alert_title_link">Guarda este enlace en tu cuenta de MEGA</string>
+    <string name="public_link_auth_alert_title_album">Guarda este álbum en tu cuenta de MEGA</string>
+    <string name="public_link_auth_alert_description_default">Accede a ello en cualquier momento desde cualquier dispositivo.\nNo es necesario conservar el enlace ni volver a descargar los archivos.</string>
+    <string name="public_link_auth_alert_description_album">Mantén estas fotos seguras y accede a ellas en cualquier momento</string>
+    <string name="public_link_auth_alert_title_file">Guarda este archivo en tu cuenta de MEGA</string>
+    <string name="home_widget_viewed_links_section_header">Enlaces visualizados</string>
+    <string name="open_link_dialog_description">Pega un enlace de MEGA para abrirlo</string>
+    <string name="home_cwlo_clear_history">Borrar el historial de “Continúa desde donde lo dejaste”</string>
+    <string name="home_widget_viewed_links_clear_history">Borrar historial de enlaces visualizados</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">¿Estás seguro de que quieres borrar el historial de enlaces visualizados? Esta operación no se puede deshacer.</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">El historial de enlaces visualizados ha sido borrado</string>
+    <string name="home_widget_viewed_links_empty_state">Los enlaces visualizados aparecerán aquí</string>
 </resources>

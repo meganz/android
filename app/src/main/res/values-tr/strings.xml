@@ -1878,7 +1878,7 @@
     <!-- General label for files -->
     <string name="general_files">Dosya</string>
     <!-- Item menu option upon right click on one or multiple files -->
-    <string name="general_save_to_device">Cihaza kaydet</string>
+    <string name="general_save_to_device">İndir</string>
     <!-- Title of cloud explorer to upload a file -->
     <string name="title_upload_explorer">MEGA’ya yükle</string>
     <!-- Label choose destination -->

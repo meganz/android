@@ -1235,7 +1235,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Restart</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Simpan ke perangkat</string>
+    <string name="general_save_to_device">Unduh</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Menyembunyikan</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2260,4 +2260,13 @@
     <string name="title_enable_biometrics">Konfirmasikan informasi biometrik anda untuk membuka</string>
     <string name="confirmation_biometric_enabled">Informasi biometrik anda telah dikonfirmasi</string>
     <string name="title_unlock_biometric">Buka kunci menggunakan informasi biometrik anda</string>
+    <string name="home_widget_viewed_links_section_header">Tautan dilihat</string>
+    <string name="public_link_auth_alert_title_folder">Simpan folder ini ke akun MEGA Anda</string>
+    <string name="public_link_auth_alert_title_link">Simpan tautan ini ke akun MEGA Anda</string>
+    <string name="public_link_auth_alert_title_album">Simpan album ini ke akun MEGA Anda</string>
+    <string name="public_link_auth_alert_description_default">Akses kapan saja, dari perangkat mana pun.\nTidak perlu lagi menyimpan tautan atau mengunduh file lagi</string>
+    <string name="public_link_auth_alert_description_album">Simpan foto-foto ini dengan aman dan akses kapan saja</string>
+    <string name="public_link_auth_alert_title_file">Simpan file ini ke akun MEGA Anda</string>
+    <string name="open_link_dialog_description">Tempelkan tautan MEGA apa pun untuk membukanya</string>
+    <string name="home_cwlo_clear_history">Hapus riwayat \’Lanjutkan dari tempat terakhir Anda\’</string>
 </resources>

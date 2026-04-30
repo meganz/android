@@ -1275,7 +1275,7 @@
     <!--Resume of playback position dialog for playing audio from beginning. -->
     <string name="audio_playback_position_dialog_restart_button">Reiniciar</string>
     <!-- General save to device. A menu option to save node(s), file(s) or folder(s) to the device's storage -->
-    <string name="general_save_to_device">Salvar no dispositivo</string>
+    <string name="general_save_to_device">Fazer download</string>
     <!-- General hide. A menu option to hide node(s), file(s) or folder(s) on the device -->
     <string name="general_hide_node">Ocultar</string>
     <!-- General move. A menu option to move node(s), file(s) or folder(s) on the device -->
@@ -2412,7 +2412,7 @@
     <string name="general_error_file_not_found">Não foi possível encontrar este arquivo</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Erro. O arquivo PDF está corrompido ou não existe.</string>
     <string name="open_link_dialog_title">Abrir link</string>
-    <string name="open_link_dialog_hint">Colar link</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="pdf_viewer_error_streaming">Ocorreu um erro ao tentar abrir o arquivo</string>
     <string name="homepage_empty_hint_audio">[B]Nenhum[/B] [A]áudio[/A] [B]foi encontrado[/B]</string>
     <string name="cloud_explorer_choose_folder_title">Escolher pasta</string>
@@ -2474,4 +2474,17 @@
     <string name="title_enable_biometrics">Confirme os seus dados biométricos para desbloquear</string>
     <string name="confirmation_biometric_enabled">Os seus dados biométricos foram confirmados</string>
     <string name="title_unlock_biometric">Desbloqueie usando os seus dados biométricos</string>
+    <string name="public_link_auth_alert_title_folder">Salve esta pasta na sua conta do MEGA</string>
+    <string name="public_link_auth_alert_title_link">Salve este link na sua conta do MEGA</string>
+    <string name="public_link_auth_alert_title_album">Salve este álbum na sua conta do MEGA</string>
+    <string name="public_link_auth_alert_description_default">Acesse a qualquer momento, de qualquer dispositivo.\nNão é necessário guardar o link nem fazer o download dos arquivos novamente.</string>
+    <string name="public_link_auth_alert_description_album">Guarde estas fotos com segurança e acesse-as a qualquer momento</string>
+    <string name="public_link_auth_alert_title_file">Salve este arquivo na sua conta do MEGA</string>
+    <string name="home_widget_viewed_links_section_header">Links visualizados</string>
+    <string name="open_link_dialog_description">Cole qualquer link do MEGA para abri-lo</string>
+    <string name="home_cwlo_clear_history">Limpar o histórico de “Continue de onde você parou”</string>
+    <string name="home_widget_viewed_links_clear_history">Deletar o histórico de links visualizados</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">Você tem certeza de que quer deletar todo o histórico de links visualizados? Esta ação não pode ser desfeita.</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">O histórico de links visualizados foi deletado</string>
+    <string name="home_widget_viewed_links_empty_state">Os links visualizados aparecerão aqui</string>
 </resources>
