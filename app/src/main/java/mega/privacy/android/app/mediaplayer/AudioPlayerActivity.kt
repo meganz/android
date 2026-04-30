@@ -246,7 +246,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
         if (savedInstanceState == null) {
             PermissionUtils.checkNotificationsPermission(this)
-            if (rebuildPlaylist) {
+            if (rebuildPlaylist && !AudioPlayerService.isRunning) {
                 playerServiceIntent.setDataAndType(intent.data, intent.type)
                 Util.startForegroundService(this, playerServiceIntent)
             }
