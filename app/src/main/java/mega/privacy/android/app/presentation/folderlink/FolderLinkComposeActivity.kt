@@ -23,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
@@ -164,16 +163,22 @@ class FolderLinkComposeActivity : PasscodeActivity(),
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
-        viewModel.state.map { it.shouldShowAdsForLink }
-            .distinctUntilChanged()
-            .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
-                if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+        collectFlow(
+            viewModel.state.map { it.shouldShowAdsForLink }
+                .distinctUntilChanged()
+                .combine(googleAdsManager.isAdsFeatureEnabled) { shouldShowAdsForLink, isAdsFeatureEnabled ->
+                    shouldShowAdsForLink to isAdsFeatureEnabled
+                }
+        ) { (shouldShowAdsForLink, isAdsFeatureEnabled) ->
+            if (shouldShowAdsForLink && isAdsFeatureEnabled) {
+                lifecycleScope.launch {
                     googleAdsManager.checkLatestConsentInformation(
-                        activity = this,
+                        activity = this@FolderLinkComposeActivity,
                         onConsentInformationUpdated = { googleAdsManager.fetchAdRequest() }
                     )
                 }
-            }.launchIn(lifecycleScope)
+            }
+        }
 
         setContent {
             StartFolderLinkView()

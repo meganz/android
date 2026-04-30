@@ -30,9 +30,13 @@ class AdConsentWrapper @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
 ) {
     fun getCanRequestConsentFlow(activity: Activity) = callbackFlow {
-        val params =
-            ConsentRequestParameters.Builder()
-                .build()
+        if (activity.isFinishing || activity.isDestroyed) {
+            Timber.w("Skip consent request: activity finishing or destroyed")
+            trySend(false)
+            close()
+            return@callbackFlow
+        }
+        val params = ConsentRequestParameters.Builder().build()
 
         consentInformation.requestConsentInfoUpdate(
             activity,

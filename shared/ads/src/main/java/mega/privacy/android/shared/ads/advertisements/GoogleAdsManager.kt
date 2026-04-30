@@ -7,7 +7,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.libraries.ads.mobile.sdk.banner.AdSize
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
-import mega.privacy.android.shared.ads.BuildConfig
 import com.google.android.ump.ConsentInformation
 import com.google.android.ump.ConsentRequestParameters
 import com.google.android.ump.FormError
@@ -24,6 +23,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
+import mega.privacy.android.shared.ads.BuildConfig
 import mega.privacy.android.shared.ads.advertisements.AdsViewModel.Companion.MINIMUM_AD_REFRESH_INTERVAL
 import timber.log.Timber
 import javax.inject.Inject
@@ -120,6 +120,10 @@ class GoogleAdsManager @Inject constructor(
 
             val successCallback = ConsentInformation.OnConsentInfoUpdateSuccessListener {
                 Timber.d("success loading consent $shouldShowGenericCookieDialog")
+                if (activity.isDestroyedOrFinishing()) {
+                    Timber.w("Skip loadAndShowConsentFormIfRequired: activity gone")
+                    return@OnConsentInfoUpdateSuccessListener
+                }
                 if (forceAskConsent || shouldShowGenericCookieDialog.not()) {
                     UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { loadAndShowError: FormError? ->
                         if (loadAndShowError != null) {
@@ -134,6 +138,10 @@ class GoogleAdsManager @Inject constructor(
                     Timber.e("Error loading or showing consent form: ${fromError.message}")
                     onConsentInformationUpdated()
                 }
+            if (activity.isDestroyedOrFinishing()) {
+                Timber.w("Skip requestConsentInfoUpdate: activity gone after suspend")
+                return
+            }
             Timber.d("Requesting consent information")
             consentInformation.requestConsentInfoUpdate(
                 activity,
@@ -150,7 +158,11 @@ class GoogleAdsManager @Inject constructor(
      * @param onConsentFormDismissed Callback to be called when the form is dismissed.
      */
     fun showPrivacyOptionsForm(activity: Activity, onConsentFormDismissed: () -> Unit = {}) {
-
+        if (activity.isDestroyedOrFinishing()) {
+            Timber.w("Skip showPrivacyOptionsForm: activity finishing or destroyed")
+            onConsentFormDismissed()
+            return
+        }
         UserMessagingPlatform.showPrivacyOptionsForm(activity) { fromError: FormError? ->
             if (fromError != null) {
                 Timber.e("Error loading or showing consent form: ${fromError.message}")
@@ -200,4 +212,6 @@ class GoogleAdsManager @Inject constructor(
             lastFetchTime = System.currentTimeMillis()
         }
     }
+
+    private fun Activity.isDestroyedOrFinishing(): Boolean = isFinishing || isDestroyed
 }
