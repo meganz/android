@@ -771,8 +771,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         }
 
         /**
-         * Send the command to audio player service
-         * Check the AudioPlayerService whether is started before send command to avoid ForegroundServiceDidNotStartInTimeException
+         * Send the command to audio player service.
+         * Checks that [AudioPlayerService] is started before sending the command to avoid
+         * [android.app.ForegroundServiceDidNotStartInTimeException] (duplicate start) and
+         * [android.app.ForegroundServiceStartNotAllowedException] (called from background on Android 12+).
          *
          * @param context
          * @param command
@@ -808,7 +810,17 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
                     val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
                     audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, command)
-                    ContextCompat.startForegroundService(context, audioPlayerIntent)
+                    runCatching {
+                        ContextCompat.startForegroundService(context, audioPlayerIntent)
+                    }.onFailure { e ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                            && e is ForegroundServiceStartNotAllowedException
+                        ) {
+                            Timber.e("App not in a valid state to start foreground service: ${e.message}")
+                        } else {
+                            throw e
+                        }
+                    }
                 }
             }
         }
