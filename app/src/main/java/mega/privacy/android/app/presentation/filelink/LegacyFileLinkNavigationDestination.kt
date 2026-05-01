@@ -5,9 +5,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.app.components.session.LoginInProgressContainer
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
+import mega.privacy.android.shared.account.login.LoginInProgressContainer
 
 fun EntryProviderScope<NavKey>.legacyFileLinkScreen(removeDestination: () -> Unit) {
     entry<LegacyFileLinkNavKey>(

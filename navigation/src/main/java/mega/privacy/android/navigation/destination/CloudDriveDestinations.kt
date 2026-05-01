@@ -109,3 +109,12 @@ data class OverQuotaDialogNavKey(
 data class FolderLinkNavKey(
     val uriString: String? = null,
 ) : NoSessionNavKey.Optional
+
+/**
+ * NavKey for file link screen
+ * @param uriString the uri string of the file link
+ */
+@Serializable
+data class FileLinkNavKey(
+    val uriString: String? = null,
+) : NoSessionNavKey.Optional

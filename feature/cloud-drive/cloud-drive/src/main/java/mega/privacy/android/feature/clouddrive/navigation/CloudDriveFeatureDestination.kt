@@ -2,10 +2,11 @@ package mega.privacy.android.feature.clouddrive.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.feature.clouddrive.presentation.audio.audioScreen
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.feature.clouddrive.presentation.favourites.favouritesScreen
-import mega.privacy.android.feature.clouddrive.presentation.audio.audioScreen
+import mega.privacy.android.feature.clouddrive.presentation.filelink.fileLinkScreen
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.folderLinkScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
@@ -15,8 +16,8 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.shares
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.FileLinkNavKey
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
-import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -77,7 +78,7 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 onBack = navigationHandler::back,
                 onNavigateToFileLink = { folderLinkUri ->
                     navigationHandler.back() //to dismiss the dialog
-                    navigationHandler.navigate(LegacyFileLinkNavKey(folderLinkUri))
+                    navigationHandler.navigate(FileLinkNavKey(folderLinkUri))
                 },
                 onNavigateToFolderLink = { folderLinkUri ->
                     navigationHandler.back() //to dismiss the dialog
@@ -86,6 +87,11 @@ class CloudDriveFeatureDestination : FeatureDestination {
             )
 
             folderLinkScreen(
+                navigationHandler = navigationHandler,
+                transferHandler = transferHandler
+            )
+
+            fileLinkScreen(
                 navigationHandler = navigationHandler,
                 transferHandler = transferHandler
             )

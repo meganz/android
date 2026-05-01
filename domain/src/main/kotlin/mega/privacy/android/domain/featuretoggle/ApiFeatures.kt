@@ -20,6 +20,15 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * File link revamp
+     */
+    FileLinkRevamp(
+        "aflnk",
+        "Enable file link revamp screen",
+        false,
+    ),
+
+    /**
      * Enabled rewarded ads in public link screens. AND-21960
      */
     RewardedAds(

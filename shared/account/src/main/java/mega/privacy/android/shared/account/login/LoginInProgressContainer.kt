@@ -1,4 +1,4 @@
-package mega.privacy.android.app.components.session
+package mega.privacy.android.shared.account.login
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

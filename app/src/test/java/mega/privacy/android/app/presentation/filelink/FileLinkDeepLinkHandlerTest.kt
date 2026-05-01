@@ -4,7 +4,7 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
+import mega.privacy.android.navigation.destination.FileLinkNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -27,7 +27,7 @@ class FileLinkDeepLinkHandlerTest {
         isLoggedIn: Boolean,
     ) = runTest {
         val uriString = "https://mega.co/file"
-        val expected = LegacyFileLinkNavKey(uriString)
+        val expected = FileLinkNavKey(uriString)
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }

@@ -44,8 +44,8 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.destination.FileLinkNavKey
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
-import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
 import mega.privacy.android.navigation.destination.ViewedLinksScreenNavKey
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
@@ -93,7 +93,7 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget {
                     navigationHandler.navigate(FolderLinkNavKey(link))
                 },
                 onFileLinkClicked = { link ->
-                    navigationHandler.navigate(LegacyFileLinkNavKey(link))
+                    navigationHandler.navigate(FileLinkNavKey(link))
                 },
                 onViewAllClicked = {
                     navigationHandler.navigate(ViewedLinksScreenNavKey)

@@ -14,8 +14,8 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.FileLinkNavKey
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
-import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
 import mega.privacy.android.navigation.destination.ViewedLinksScreenNavKey
 
 /**
@@ -54,7 +54,7 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
                 navigationHandler.navigate(FolderLinkNavKey(link))
             },
             onFileLinkClicked = { link ->
-                navigationHandler.navigate(LegacyFileLinkNavKey(link))
+                navigationHandler.navigate(FileLinkNavKey(link))
             },
             onMenuClicked = { item ->
                 navigationHandler.navigate(

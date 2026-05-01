@@ -5,7 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
+import mega.privacy.android.navigation.destination.FileLinkNavKey
 import javax.inject.Inject
 
 /**
@@ -19,7 +19,7 @@ class FileLinkDeepLinkHandler @Inject constructor(
         uri: Uri,
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? = if (regexPatternType == RegexPatternType.FILE_LINK) {
-        listOf(LegacyFileLinkNavKey(uri.toString()))
+        listOf(FileLinkNavKey(uri.toString()))
     } else {
         null
     }

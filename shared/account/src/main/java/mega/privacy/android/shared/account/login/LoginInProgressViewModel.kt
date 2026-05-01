@@ -1,4 +1,4 @@
-package mega.privacy.android.app.components.session
+package mega.privacy.android.shared.account.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

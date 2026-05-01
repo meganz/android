@@ -58,9 +58,9 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FileLinkViewModelTest {
+class LegacyFileLinkViewModelTest {
 
-    private lateinit var underTest: FileLinkViewModel
+    private lateinit var underTest: LegacyFileLinkViewModel
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
@@ -110,7 +110,7 @@ class FileLinkViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = FileLinkViewModel(
+        underTest = LegacyFileLinkViewModel(
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
             getPublicNodeUseCase = getPublicNodeUseCase,

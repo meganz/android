@@ -52,7 +52,6 @@ import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameC
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
-import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
@@ -67,8 +66,9 @@ import javax.inject.Inject
  *
  * @param monitorMiscLoadedUseCase Use case to monitor when misc data is loaded
  */
+@Deprecated("Use revamp")
 @HiltViewModel
-class FileLinkViewModel @Inject constructor(
+class LegacyFileLinkViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,

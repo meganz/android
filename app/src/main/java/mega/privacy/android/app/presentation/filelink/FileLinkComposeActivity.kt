@@ -60,6 +60,7 @@ import javax.inject.Inject
  * FileLinkActivity with compose view
  */
 @AndroidEntryPoint
+@Deprecated("Use revamp")
 class FileLinkComposeActivity : PasscodeActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
@@ -81,7 +82,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
     @Inject
     lateinit var googleAdsManager: GoogleAdsManager
 
-    private val viewModel: FileLinkViewModel by viewModels()
+    private val viewModel: LegacyFileLinkViewModel by viewModels()
 
     private var mKey: String? = null
 
