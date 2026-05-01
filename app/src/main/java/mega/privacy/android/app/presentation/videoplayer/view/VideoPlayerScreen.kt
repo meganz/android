@@ -304,10 +304,6 @@ internal fun VideoPlayerScreen(
         videoPlayerController?.updateSpeedPlaybackButtonIcon(uiState.currentSpeedPlayback.text)
     }
 
-    LaunchedEffect(uiState.metadata, orientation) {
-        videoPlayerController?.displayMetadata(uiState.metadata)
-    }
-
     LaunchedEffect(uiState.repeatToggleMode) {
         videoPlayerController?.updateRepeatToggleButtonUI(context, uiState.repeatToggleMode)
     }
@@ -481,11 +477,7 @@ internal fun VideoPlayerScreen(
                 }
                 VideoPlayerTopBar(
                     modifier = Modifier.padding(horizontalPadding),
-                    title = if (orientation == ORIENTATION_PORTRAIT) {
-                        ""
-                    } else {
-                        uiState.metadata.title ?: uiState.metadata.nodeName
-                    },
+                    title = uiState.metadata.title ?: uiState.metadata.nodeName,
                     onBackPressed = { backDispatcher?.onBackPressed() },
                     onMoreActionsClicked = onMoreActionsClicked,
                 )

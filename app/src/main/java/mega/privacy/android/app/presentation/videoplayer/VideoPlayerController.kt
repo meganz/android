@@ -29,7 +29,6 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
-import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -50,7 +49,6 @@ class VideoPlayerController(
     private val playerViewClicked: () -> Unit,
     private val onSnapshotSelected: () -> Unit,
 ) {
-    private val trackName = container.findViewById<TextView>(R.id.track_name)
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
     private val playerComposeView = container.findViewById<PlayerView>(R.id.player_compose_view)
     private val moreOptionButton = container.findViewById<ImageButton>(R.id.more_option)
@@ -127,15 +125,6 @@ class VideoPlayerController(
         moreOptionButton.setOnClickListener {
             updateIsVideoOptionPopupShown(true)
         }
-    }
-
-    /**
-     * Display node metadata.
-     *
-     * @param metadata metadata to display
-     */
-    internal fun displayMetadata(metadata: Metadata) {
-        trackName.text = metadata.title ?: metadata.nodeName
     }
 
     internal fun onSnapshotOptionSelected() {
