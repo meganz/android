@@ -11,6 +11,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.EMPT
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.DECRYPTION_KEY_DIALOG_TAG
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.GUEST_BANNER_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -130,6 +131,43 @@ class FolderLinkContentTest {
         composeRule.onNodeWithTag(FOLDER_LINK_UNAVAILABLE_TAG).assertDoesNotExist()
     }
 
+    @Test
+    fun `test that guest banner is not displayed for authenticated user`() {
+        setupComposeContent(
+            uiState = FolderLinkUiState(
+                contentState = FolderLinkContentState.Loaded,
+                hasCredentials = true,
+            )
+        )
+
+        composeRule.onNodeWithTag(GUEST_BANNER_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that guest banner is not displayed when banner has been dismissed`() {
+        setupComposeContent(
+            uiState = FolderLinkUiState(
+                contentState = FolderLinkContentState.Loaded,
+                hasCredentials = false,
+                isGuestBannerDismissed = true,
+            )
+        )
+
+        composeRule.onNodeWithTag(GUEST_BANNER_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that guest banner is not displayed when content is still Loading`() {
+        setupComposeContent(
+            uiState = FolderLinkUiState(
+                contentState = FolderLinkContentState.Loading,
+                hasCredentials = false,
+            )
+        )
+
+        composeRule.onNodeWithTag(GUEST_BANNER_TAG).assertDoesNotExist()
+    }
+
     private fun setupComposeContent(
         uiState: FolderLinkUiState = FolderLinkUiState(),
     ) {
@@ -142,6 +180,8 @@ class FolderLinkContentTest {
                     onNavigate = {},
                     onAction = {},
                     onMediaDiscoveryClicked = {},
+                    onCreateAccountClicked = {},
+                    onLoginClicked = {},
                 )
             }
         }

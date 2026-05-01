@@ -88,6 +88,14 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                 onBack = navigationHandler::back,
                 onNavigate = navigationHandler::navigate,
                 onTransfer = transferHandler::setTransferEvent,
+                onCreateAccountClicked = {
+                    activity.setPendingDeepLink(key.uriString)
+                    navigationHandler.navigate(CreateAccountNavKey())
+                },
+                onLoginClicked = {
+                    activity.setPendingDeepLink(key.uriString)
+                    navigationHandler.navigate(LoginNavKey())
+                },
             )
             HandleNodeOptionsActionResult(
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,

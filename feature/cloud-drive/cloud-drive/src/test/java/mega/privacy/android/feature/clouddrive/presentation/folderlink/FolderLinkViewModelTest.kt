@@ -1162,4 +1162,73 @@ internal class FolderLinkViewModelTest {
 
             verifyNoInteractions(saveViewedLinkUseCase)
         }
+
+    @Test
+    fun `test that showGuestBanner is true when content is Loaded and user has no credentials`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult()
+            )
+            stubNodeUiItemMapper()
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showGuestBanner).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that showGuestBanner is false when user has credentials`() = runTest {
+        val url = "https://mega.nz/folder/abc"
+        whenever(hasCredentialsUseCase()).thenReturn(true)
+        whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
+        stubNodeUiItemMapper()
+        initViewModel(FolderLinkViewModel.Args(uriString = url))
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().showGuestBanner).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that showGuestBanner is false while content is still loading`() = runTest {
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        initViewModel(FolderLinkViewModel.Args(uriString = null))
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().showGuestBanner).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that GuestBannerDismissed hides the banner`() = runTest {
+        val url = "https://mega.nz/folder/abc"
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult()
+        )
+        stubNodeUiItemMapper()
+        initViewModel(FolderLinkViewModel.Args(uriString = url))
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.showGuestBanner).isTrue()
+
+        underTest.processAction(FolderLinkAction.GuestBannerDismissed)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isGuestBannerDismissed).isTrue()
+            assertThat(state.showGuestBanner).isFalse()
+        }
+    }
 }

@@ -1739,14 +1739,12 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
-    is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
-    is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1783,11 +1781,9 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
-    is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
-    is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2782,4 +2778,12 @@
     <string name="home_widget_viewed_links_clear_history_success_message">Viewed links history has been cleared</string>
     <!-- Empty state message for the viewed links home widget -->
     <string name="home_widget_viewed_links_empty_state">Viewed links will appear here</string>
+    <!-- Title of the guest banner shown on the folder link screen prompting unauthenticated users to save the folder to their MEGA cloud -->
+    <string name="folder_link_guest_banner_title">Save to your MEGA cloud</string>
+    <!-- Description of the guest banner shown on the folder link screen, encouraging unauthenticated users to create a free account to save the folder -->
+    <string name="folder_link_guest_banner_description">Don\’t lose this link. Create a free account to save this folder and access it anywhere.</string>
+    <!-- Primary button label on the folder link guest banner that takes unauthenticated users to the create-account screen -->
+    <string name="folder_link_guest_banner_create_account">Create a free account</string>
+    <!-- Content description for the close icon on the folder link guest banner -->
+    <string name="folder_link_guest_banner_dismiss_content_description">Dismiss banner</string>
 </resources>

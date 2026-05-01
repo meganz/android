@@ -60,6 +60,7 @@ import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.Fol
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.startShareIntent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.DecryptionKeyDialog
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.ExpiredLinkView
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.FolderLinkGuestBanner
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.UnavailableLinkView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -91,6 +92,8 @@ internal fun FolderLinkScreen(
     onNavigate: (NavKey) -> Unit,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    onCreateAccountClicked: () -> Unit,
+    onLoginClicked: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
@@ -236,7 +239,9 @@ internal fun FolderLinkScreen(
                     folderName = uiState.title.get(context),
                     isFromFolderLink = true,
                 )
-            }
+            },
+            onCreateAccountClicked = onCreateAccountClicked,
+            onLoginClicked = onLoginClicked,
         )
     }
 
@@ -296,6 +301,8 @@ internal fun FolderLinkContent(
     onNavigate: (NavKey) -> Unit,
     onAction: (FolderLinkAction) -> Unit,
     onMediaDiscoveryClicked: () -> Unit,
+    onCreateAccountClicked: () -> Unit,
+    onLoginClicked: () -> Unit,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 0.dp,
     onShowSortBottomSheet: () -> Unit = {},
@@ -396,6 +403,19 @@ internal fun FolderLinkContent(
                                 showMediaDiscoveryButton = uiState.hasMediaItems,
                                 onEnterMediaDiscoveryClick = onMediaDiscoveryClicked,
                                 inSelectionMode = uiState.isInSelectionMode,
+                                bannerHeader = {
+                                    if (uiState.showGuestBanner) {
+                                        FolderLinkGuestBanner(
+                                            onCreateAccountClicked = onCreateAccountClicked,
+                                            onLoginClicked = onLoginClicked,
+                                            onDismissClicked = { onAction(FolderLinkAction.GuestBannerDismissed) },
+                                            modifier = Modifier.padding(
+                                                horizontal = 16.dp,
+                                                vertical = 8.dp
+                                            ),
+                                        )
+                                    }
+                                }
                             )
                         }
                     }

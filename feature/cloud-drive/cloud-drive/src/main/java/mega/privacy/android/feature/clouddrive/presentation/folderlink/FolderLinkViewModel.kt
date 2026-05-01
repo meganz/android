@@ -104,7 +104,12 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             FolderLinkAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
             is FolderLinkAction.SortOrderChanged -> setSortOrder(action.sortConfiguration)
             FolderLinkAction.ChangeViewTypeClicked -> onChangeViewTypeClicked()
+            FolderLinkAction.GuestBannerDismissed -> onGuestBannerDismissed()
         }
+    }
+
+    private fun onGuestBannerDismissed() {
+        _uiState.update { it.copy(isGuestBannerDismissed = true) }
     }
 
     private fun onNavigateBackEventConsumed() {

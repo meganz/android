@@ -28,7 +28,15 @@ data class FolderLinkUiState(
     val currentFolderNode: TypedFolderNode? = null,
     val openedFileNode: TypedFileNode? = null,
     val hasMediaItems: Boolean = false,
+    val isGuestBannerDismissed: Boolean = false,
 ) {
+    /**
+     * True when the guest banner should be shown: the user is not authenticated,
+     * the folder content has loaded, and the banner has not been dismissed in this session.
+     */
+    val showGuestBanner: Boolean =
+        !hasCredentials && contentState is FolderLinkContentState.Loaded && !isGuestBannerDismissed
+
     /**
      * True if current folder if the root directory of folder link
      */

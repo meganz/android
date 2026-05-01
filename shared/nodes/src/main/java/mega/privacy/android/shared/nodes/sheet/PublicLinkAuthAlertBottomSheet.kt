@@ -37,7 +37,11 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.mobile.analytics.event.SaveToMegaBottomSheetCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SaveToMegaBottomSheetLogInButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SaveToMegaBottomSheetSignUpButtonPressedEvent
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -92,7 +96,10 @@ fun PublicLinkAuthAlertBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             IconButton(
-                onClick = onDismissSheet,
+                onClick = {
+                    Analytics.tracker.trackEvent(SaveToMegaBottomSheetCloseButtonPressedEvent)
+                    onDismissSheet()
+                },
                 modifier = Modifier
                     .align(Alignment.End)
             ) {
@@ -134,14 +141,20 @@ fun PublicLinkAuthAlertBottomSheet(
             PrimaryFilledButton(
                 text = stringResource(sharedR.string.general_label_create_account),
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onSignupClicked
+                onClick = {
+                    Analytics.tracker.trackEvent(SaveToMegaBottomSheetSignUpButtonPressedEvent)
+                    onSignupClicked()
+                }
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             TextOnlyButton(
                 text = stringResource(sharedR.string.login_text),
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onLoginClicked
+                onClick = {
+                    Analytics.tracker.trackEvent(SaveToMegaBottomSheetLogInButtonPressedEvent)
+                    onLoginClicked()
+                }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
