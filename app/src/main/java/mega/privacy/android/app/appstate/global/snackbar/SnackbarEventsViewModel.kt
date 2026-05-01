@@ -33,7 +33,10 @@ class SnackbarEventsViewModel @Inject constructor(
             snackbarEventConsumedSignal
         ).stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Lazily,
+            // Use WhileSubscribed(0) so the channel consumer stops immediately when
+            // the activity goes to background, allowing the foreground activity's VM
+            // to be the sole consumer of the singleton snackbar event channel.
+            started = SharingStarted.WhileSubscribed(),
             initialValue = consumed()
         )
     }

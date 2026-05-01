@@ -14,7 +14,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,12 +44,18 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.model.SnackbarAttributes
+import mega.android.core.ui.model.SnackbarDuration
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
+import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.MediaSessionHelper
@@ -57,6 +66,7 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
@@ -67,11 +77,13 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -82,7 +94,7 @@ import javax.inject.Inject
  * The activity for the revamped video player
  */
 @AndroidEntryPoint
-class VideoPlayerActivity : PasscodeActivity() {
+class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
@@ -91,6 +103,9 @@ class VideoPlayerActivity : PasscodeActivity() {
 
     @Inject
     lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
+
+    @Inject
+    lateinit var snackbarEventQueue: SnackbarEventQueue
 
     /**
      * MediaPlayerGateway for video player
@@ -159,6 +174,9 @@ class VideoPlayerActivity : PasscodeActivity() {
             val uiState by videoPlayerViewModelV2.uiState.collectAsStateWithLifecycle()
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
             val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
+            val snackbarHostState = remember { SnackbarHostState() }
+            val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
+            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
 
             var showBlockedDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -167,6 +185,21 @@ class VideoPlayerActivity : PasscodeActivity() {
                 onConsumed = { videoPlayerViewModelV2.onBlockedErrorConsumed() }) {
                 showBlockedDialog = true
             }
+
+            LaunchedEffect(uiState.snackBarMessage) {
+                uiState.snackBarMessage?.let { message ->
+                    snackbarHostState.showAutoDurationSnackbar(message)
+                    videoPlayerViewModelV2.updateSnackBarMessage(null)
+                }
+            }
+
+            EventEffect(
+                event = snackbarEventsState,
+                onConsumed = snackbarEventsViewModel::consumeEvent,
+                action = { event ->
+                    snackbarHostState.showAutoDurationSnackbar(event.attributes.message.orEmpty())
+                }
+            )
 
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
                 { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
@@ -182,46 +215,50 @@ class VideoPlayerActivity : PasscodeActivity() {
             AppContainer(
                 containers = containers
             ) {
-                NavDisplay(
-                    backStack = backStack,
-                    onBack = { navigationHandler.back() },
-                    sceneStrategy = dialogStrategy chain bottomSheetStrategy,
-                    entryDecorators = listOf(
-                        rememberSaveableStateHolderNavEntryDecorator(),
-                    ),
-                    entryProvider = entryProvider {
-                        videoPlayerEntryProvider(
-                            navigationHandler = navigationHandler,
-                            viewModel = videoPlayerViewModelV2,
-                            player = player,
-                            handleAutoReplayIfPaused = videoPlayerViewModelV2::handleAutoReplayIfPaused,
-                            onTransfer = appTransferViewModel::setTransferEvent,
-                            featureDestinations = featureDestinations,
-                        )
-                    },
-                )
-
-                StartTransferComponent(
-                    event = transferState.transferEvent,
-                    onConsumeEvent = appTransferViewModel::consumedTransferEvent,
-                )
-
-                if (showBlockedDialog) {
-                    MegaAlertDialog(
-                        title = stringResource(R.string.error_file_not_available),
-                        body = stringResource(R.string.error_takendown_file),
-                        confirmButtonText = stringResource(sharedR.string.general_dismiss_dialog),
-                        cancelButtonText = null,
-                        onConfirm = {
-                            if (!isFinishing) {
-                                finish()
-                            }
+                CompositionLocalProvider(
+                    LocalSnackBarHostState provides snackbarHostState
+                ) {
+                    NavDisplay(
+                        backStack = backStack,
+                        onBack = { navigationHandler.back() },
+                        sceneStrategy = dialogStrategy chain bottomSheetStrategy,
+                        entryDecorators = listOf(
+                            rememberSaveableStateHolderNavEntryDecorator(),
+                        ),
+                        entryProvider = entryProvider {
+                            videoPlayerEntryProvider(
+                                navigationHandler = navigationHandler,
+                                viewModel = videoPlayerViewModelV2,
+                                player = player,
+                                handleAutoReplayIfPaused = videoPlayerViewModelV2::handleAutoReplayIfPaused,
+                                onTransfer = appTransferViewModel::setTransferEvent,
+                                featureDestinations = featureDestinations,
+                            )
                         },
-                        onDismiss = {},
-                        dismissOnClickOutside = false,
-                        dismissOnBackPress = false,
-                        cancelEnabled = false,
                     )
+
+                    StartTransferComponent(
+                        event = transferState.transferEvent,
+                        onConsumeEvent = appTransferViewModel::consumedTransferEvent,
+                    )
+
+                    if (showBlockedDialog) {
+                        MegaAlertDialog(
+                            title = stringResource(R.string.error_file_not_available),
+                            body = stringResource(R.string.error_takendown_file),
+                            confirmButtonText = stringResource(sharedR.string.general_dismiss_dialog),
+                            cancelButtonText = null,
+                            onConfirm = {
+                                if (!isFinishing) {
+                                    finish()
+                                }
+                            },
+                            onDismiss = {},
+                            dismissOnClickOutside = false,
+                            dismissOnBackPress = false,
+                            cancelEnabled = false,
+                        )
+                    }
                 }
             }
         }
@@ -355,6 +392,29 @@ class VideoPlayerActivity : PasscodeActivity() {
         mediaSessionHelper.releaseMediaSession()
         super.onDestroy()
     }
+
+    override fun showMegaSnackbar(
+        message: String,
+        actionLabel: String?,
+        duration: MegaSnackbarDuration,
+    ) {
+        lifecycleScope.launch {
+            snackbarEventQueue.queueMessage(
+                SnackbarAttributes(
+                    message = message,
+                    action = actionLabel,
+                    duration = mapMegaSnackbarDuration(duration),
+                )
+            )
+        }
+    }
+
+    private fun mapMegaSnackbarDuration(snackbarDuration: MegaSnackbarDuration): SnackbarDuration =
+        when (snackbarDuration) {
+            MegaSnackbarDuration.Short -> SnackbarDuration.Short
+            MegaSnackbarDuration.Long -> SnackbarDuration.Long
+            MegaSnackbarDuration.Indefinite -> SnackbarDuration.Indefinite
+        }
 
     companion object {
         private const val INTENT_KEY_STATE = "state"
