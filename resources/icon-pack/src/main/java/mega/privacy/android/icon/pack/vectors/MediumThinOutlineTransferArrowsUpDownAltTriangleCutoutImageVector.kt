@@ -18,8 +18,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-public fun createMediumThinOutlineTransferArrowsUpDownAltTriangleCutoutImageVector(): ImageVector =
-        ImageVector.Builder(
+public fun createMediumThinOutlineTransferArrowsUpDownAltTriangleCutoutImageVector(): ImageVector = ImageVector.Builder(
     name = "icon_transfer-arrows-up-down-alt-triangle-cutout_medium_thin_outline",
     defaultWidth = 24.0.dp,
     defaultHeight = 24.0.dp,

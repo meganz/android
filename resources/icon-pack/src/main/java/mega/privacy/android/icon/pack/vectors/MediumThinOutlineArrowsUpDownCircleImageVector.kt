@@ -18,8 +18,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-public fun createMediumThinOutlineArrowsUpDownCircleImageVector(): ImageVector =
-        ImageVector.Builder(
+public fun createMediumThinOutlineArrowsUpDownCircleImageVector(): ImageVector = ImageVector.Builder(
     name = "icon_arrows-up-down-circle_medium_thin_outline",
     defaultWidth = 24.0.dp,
     defaultHeight = 24.0.dp,

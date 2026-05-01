@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -314,11 +313,11 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private fun updateNameWhenNodeUpdates() {
         viewModelScope.launch {
             monitorNodeUpdatesUseCase().filter {
-                it.changes.keys.any { node ->
-                    node is FileNode && node.type is VideoFileTypeInfo
+                it.changes.entries.any { (node, changeList) ->
+                    node is FileNode && node.type is VideoFileTypeInfo &&
+                            NodeChanges.Name in changeList
                 }
             }.map { nodeUpdate -> nodeUpdate.changes }
-                .conflate()
                 .catch {
                     Timber.e(it)
                 }.collectLatest { changes ->
@@ -338,7 +337,6 @@ class VideoPlayerViewModelV2 @Inject constructor(
                         )
                     }
                 }
-
         }
     }
 

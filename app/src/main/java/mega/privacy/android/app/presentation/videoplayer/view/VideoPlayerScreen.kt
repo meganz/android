@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -77,6 +76,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
@@ -88,7 +88,6 @@ import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
-import mega.privacy.android.app.mediaplayer.videoplayer.view.LegacyVideoPlayerTopBar
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
@@ -100,9 +99,8 @@ import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.AddSubtitleDialogEvent
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
@@ -118,10 +116,10 @@ import mega.privacy.mobile.analytics.event.SpeedSelectedDialogEvent
 )
 @Composable
 internal fun VideoPlayerScreen(
-    scaffoldState: ScaffoldState,
     viewModel: VideoPlayerViewModelV2,
     player: ExoPlayer?,
     playQueueButtonClicked: () -> Unit,
+    onMoreActionsClicked: () -> Unit,
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -170,6 +168,8 @@ internal fun VideoPlayerScreen(
     val subtitleSheetState = key(subtitleSheetRows.size) {
         rememberModalBottomSheetState(skipPartiallyExpanded = true)
     }
+
+    val snackBarQueue = rememberSnackBarQueue()
 
     LaunchedEffect(uiState.showSubTitlesOptions) {
         if (uiState.showSubTitlesOptions) {
@@ -265,19 +265,12 @@ internal fun VideoPlayerScreen(
             scale.snapTo(1f)
             scale.animateTo(if (orientation == ORIENTATION_LANDSCAPE) 0.3f else 0.4f, tween(1000))
             coroutineScope.launch {
-                scaffoldState.snackbarHostState.showAutoDurationSnackbar(resource.getString(R.string.media_player_video_snackbar_screenshot_saved))
+                snackBarQueue.queueMessage(resource.getString(R.string.media_player_video_snackbar_screenshot_saved))
             }
             delay(1000)
             resizedBitmap?.recycle()
             resizedBitmap = null
             isScreenshotVisible = false
-        }
-    }
-
-    LaunchedEffect(uiState.snackBarMessage) {
-        uiState.snackBarMessage?.let { message ->
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
-            viewModel.updateSnackBarMessage(null)
         }
     }
 
@@ -332,13 +325,12 @@ internal fun VideoPlayerScreen(
         }
     }
 
-    MegaScaffold(
+    MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
             .semantics {
                 testTagsAsResourceId = true
             },
-        scaffoldState = scaffoldState,
     ) { _ ->
         key(orientation) {
             AndroidViewBinding(
@@ -487,18 +479,15 @@ internal fun VideoPlayerScreen(
 
                     else -> PaddingValues(0.dp)
                 }
-                LegacyVideoPlayerTopBar(
+                VideoPlayerTopBar(
                     modifier = Modifier.padding(horizontalPadding),
                     title = if (orientation == ORIENTATION_PORTRAIT) {
                         ""
                     } else {
                         uiState.metadata.title ?: uiState.metadata.nodeName
                     },
-                    menuActions = uiState.menuActions,
                     onBackPressed = { backDispatcher?.onBackPressed() },
-                    onMenuActionClicked = {
-                        //TODO will implement in another ticket
-                    },
+                    onMoreActionsClicked = onMoreActionsClicked,
                 )
             }
 
@@ -592,9 +581,11 @@ internal fun VideoPlayerScreen(
                         },
                         onAutoMatch = { info ->
                             if (info.url == null) {
-                                viewModel.updateSnackBarMessage(
-                                    resource.getString(R.string.media_player_video_message_adding_subtitle_failed)
-                                )
+                                coroutineScope.launch {
+                                    snackBarQueue.queueMessage(
+                                        resource.getString(R.string.media_player_video_message_adding_subtitle_failed)
+                                    )
+                                }
                             } else {
                                 Analytics.tracker.trackEvent(AutoMatchSubtitleOptionPressedEvent)
                                 viewModel.updateSubtitleSelectedStatus(

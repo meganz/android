@@ -18,8 +18,7 @@ import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-public fun createMediumThinOutlineRectangleStackPlusImageVector(): ImageVector =
-        ImageVector.Builder(
+public fun createMediumThinOutlineRectangleStackPlusImageVector(): ImageVector = ImageVector.Builder(
     name = "icon_rectangle-stack-plus_medium_thin_outline",
     defaultWidth = 24.0.dp,
     defaultHeight = 24.0.dp,

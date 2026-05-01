@@ -14,7 +14,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -46,6 +46,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
+import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.MediaSessionHelper
@@ -56,6 +57,7 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerNavigationHandler
@@ -68,6 +70,7 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -85,6 +88,9 @@ class VideoPlayerActivity : PasscodeActivity() {
 
     @Inject
     lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
 
     /**
      * MediaPlayerGateway for video player
@@ -151,7 +157,8 @@ class VideoPlayerActivity : PasscodeActivity() {
             val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
             val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
             val uiState by videoPlayerViewModelV2.uiState.collectAsStateWithLifecycle()
-            val scaffoldState = rememberScaffoldState()
+            val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
+            val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
 
             var showBlockedDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -185,12 +192,18 @@ class VideoPlayerActivity : PasscodeActivity() {
                     entryProvider = entryProvider {
                         videoPlayerEntryProvider(
                             navigationHandler = navigationHandler,
-                            scaffoldState = scaffoldState,
                             viewModel = videoPlayerViewModelV2,
                             player = player,
                             handleAutoReplayIfPaused = videoPlayerViewModelV2::handleAutoReplayIfPaused,
+                            onTransfer = appTransferViewModel::setTransferEvent,
+                            featureDestinations = featureDestinations,
                         )
                     },
+                )
+
+                StartTransferComponent(
+                    event = transferState.transferEvent,
+                    onConsumeEvent = appTransferViewModel::consumedTransferEvent,
                 )
 
                 if (showBlockedDialog) {

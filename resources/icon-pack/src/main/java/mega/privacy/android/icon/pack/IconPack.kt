@@ -188,437 +188,437 @@ public object IconPack : IconPackInterface {
     public object Medium : IconPackInterface.Medium {
         public object Thin : IconPackInterface.Medium.Thin {
             public object Outline : IconPackInterface.Medium.Thin.Outline {
-                override val AlertCircle: ImageVector by lazy {
-                        createMediumThinOutlineAlertCircleImageVector() }
+                override val AlertCircle: ImageVector by
+                        lazy { createMediumThinOutlineAlertCircleImageVector() }
 
-                override val AlertTriangle: ImageVector by lazy {
-                        createMediumThinOutlineAlertTriangleImageVector() }
+                override val AlertTriangle: ImageVector by
+                        lazy { createMediumThinOutlineAlertTriangleImageVector() }
 
-                override val Archive: ImageVector by lazy {
-                        createMediumThinOutlineArchiveImageVector() }
+                override val Archive: ImageVector by
+                        lazy { createMediumThinOutlineArchiveImageVector() }
 
-                override val ArchiveArrowUp: ImageVector by lazy {
-                        createMediumThinOutlineArchiveArrowUpImageVector() }
+                override val ArchiveArrowUp: ImageVector by
+                        lazy { createMediumThinOutlineArchiveArrowUpImageVector() }
 
-                override val ArrowDownCircle: ImageVector by lazy {
-                        createMediumThinOutlineArrowDownCircleImageVector() }
+                override val ArrowDownCircle: ImageVector by
+                        lazy { createMediumThinOutlineArrowDownCircleImageVector() }
 
-                override val ArrowLeft: ImageVector by lazy {
-                        createMediumThinOutlineArrowLeftImageVector() }
+                override val ArrowLeft: ImageVector by
+                        lazy { createMediumThinOutlineArrowLeftImageVector() }
 
-                override val ArrowRight: ImageVector by lazy {
-                        createMediumThinOutlineArrowRightImageVector() }
+                override val ArrowRight: ImageVector by
+                        lazy { createMediumThinOutlineArrowRightImageVector() }
 
-                override val ArrowUpCircle: ImageVector by lazy {
-                        createMediumThinOutlineArrowUpCircleImageVector() }
+                override val ArrowUpCircle: ImageVector by
+                        lazy { createMediumThinOutlineArrowUpCircleImageVector() }
 
-                override val ArrowUpLeft: ImageVector by lazy {
-                        createMediumThinOutlineArrowUpLeftImageVector() }
+                override val ArrowUpLeft: ImageVector by
+                        lazy { createMediumThinOutlineArrowUpLeftImageVector() }
 
-                override val ArrowsUpDown: ImageVector by lazy {
-                        createMediumThinOutlineArrowsUpDownImageVector() }
+                override val ArrowsUpDown: ImageVector by
+                        lazy { createMediumThinOutlineArrowsUpDownImageVector() }
 
-                override val ArrowsUpDownCircle: ImageVector by lazy {
-                        createMediumThinOutlineArrowsUpDownCircleImageVector() }
+                override val ArrowsUpDownCircle: ImageVector by
+                        lazy { createMediumThinOutlineArrowsUpDownCircleImageVector() }
 
                 override val Bell: ImageVector by lazy { createMediumThinOutlineBellImageVector() }
 
-                override val BellOff: ImageVector by lazy {
-                        createMediumThinOutlineBellOffImageVector() }
+                override val BellOff: ImageVector by
+                        lazy { createMediumThinOutlineBellOffImageVector() }
 
-                override val CalendarArrowRight: ImageVector by lazy {
-                        createMediumThinOutlineCalendarArrowRightImageVector() }
+                override val CalendarArrowRight: ImageVector by
+                        lazy { createMediumThinOutlineCalendarArrowRightImageVector() }
 
-                override val Camera: ImageVector by lazy {
-                        createMediumThinOutlineCameraImageVector() }
+                override val Camera: ImageVector by
+                        lazy { createMediumThinOutlineCameraImageVector() }
 
-                override val Check: ImageVector by lazy { createMediumThinOutlineCheckImageVector()
-                        }
+                override val Check: ImageVector by
+                        lazy { createMediumThinOutlineCheckImageVector() }
 
-                override val CheckCircle: ImageVector by lazy {
-                        createMediumThinOutlineCheckCircleImageVector() }
+                override val CheckCircle: ImageVector by
+                        lazy { createMediumThinOutlineCheckCircleImageVector() }
 
-                override val CheckStack: ImageVector by lazy {
-                        createMediumThinOutlineCheckStackImageVector() }
+                override val CheckStack: ImageVector by
+                        lazy { createMediumThinOutlineCheckStackImageVector() }
 
-                override val ChevronLeft: ImageVector by lazy {
-                        createMediumThinOutlineChevronLeftImageVector() }
+                override val ChevronLeft: ImageVector by
+                        lazy { createMediumThinOutlineChevronLeftImageVector() }
 
-                override val ChevronRight: ImageVector by lazy {
-                        createMediumThinOutlineChevronRightImageVector() }
+                override val ChevronRight: ImageVector by
+                        lazy { createMediumThinOutlineChevronRightImageVector() }
 
-                override val ChevronUpDown: ImageVector by lazy {
-                        createMediumThinOutlineChevronUpDownImageVector() }
+                override val ChevronUpDown: ImageVector by
+                        lazy { createMediumThinOutlineChevronUpDownImageVector() }
 
-                override val CircleSmall: ImageVector by lazy {
-                        createMediumThinOutlineCircleSmallImageVector() }
+                override val CircleSmall: ImageVector by
+                        lazy { createMediumThinOutlineCircleSmallImageVector() }
 
-                override val ClockPlay: ImageVector by lazy {
-                        createMediumThinOutlineClockPlayImageVector() }
+                override val ClockPlay: ImageVector by
+                        lazy { createMediumThinOutlineClockPlayImageVector() }
 
-                override val ClockRotate: ImageVector by lazy {
-                        createMediumThinOutlineClockRotateImageVector() }
+                override val ClockRotate: ImageVector by
+                        lazy { createMediumThinOutlineClockRotateImageVector() }
 
-                override val ClockUser: ImageVector by lazy {
-                        createMediumThinOutlineClockUserImageVector() }
+                override val ClockUser: ImageVector by
+                        lazy { createMediumThinOutlineClockUserImageVector() }
 
-                override val Cloud: ImageVector by lazy { createMediumThinOutlineCloudImageVector()
-                        }
+                override val Cloud: ImageVector by
+                        lazy { createMediumThinOutlineCloudImageVector() }
 
-                override val CloudDownload: ImageVector by lazy {
-                        createMediumThinOutlineCloudDownloadImageVector() }
+                override val CloudDownload: ImageVector by
+                        lazy { createMediumThinOutlineCloudDownloadImageVector() }
 
-                override val CloudOff: ImageVector by lazy {
-                        createMediumThinOutlineCloudOffImageVector() }
+                override val CloudOff: ImageVector by
+                        lazy { createMediumThinOutlineCloudOffImageVector() }
 
-                override val CloudUpload: ImageVector by lazy {
-                        createMediumThinOutlineCloudUploadImageVector() }
+                override val CloudUpload: ImageVector by
+                        lazy { createMediumThinOutlineCloudUploadImageVector() }
 
-                override val Copy01: ImageVector by lazy {
-                        createMediumThinOutlineCopy01ImageVector() }
+                override val Copy01: ImageVector by
+                        lazy { createMediumThinOutlineCopy01ImageVector() }
 
-                override val CornerUpRight: ImageVector by lazy {
-                        createMediumThinOutlineCornerUpRightImageVector() }
+                override val CornerUpRight: ImageVector by
+                        lazy { createMediumThinOutlineCornerUpRightImageVector() }
 
-                override val Database: ImageVector by lazy {
-                        createMediumThinOutlineDatabaseImageVector() }
+                override val Database: ImageVector by
+                        lazy { createMediumThinOutlineDatabaseImageVector() }
 
-                override val Devices: ImageVector by lazy {
-                        createMediumThinOutlineDevicesImageVector() }
+                override val Devices: ImageVector by
+                        lazy { createMediumThinOutlineDevicesImageVector() }
 
-                override val Download: ImageVector by lazy {
-                        createMediumThinOutlineDownloadImageVector() }
+                override val Download: ImageVector by
+                        lazy { createMediumThinOutlineDownloadImageVector() }
 
                 override val Edit: ImageVector by lazy { createMediumThinOutlineEditImageVector() }
 
-                override val EmojiSmile: ImageVector by lazy {
-                        createMediumThinOutlineEmojiSmileImageVector() }
+                override val EmojiSmile: ImageVector by
+                        lazy { createMediumThinOutlineEmojiSmileImageVector() }
 
-                override val Eraser: ImageVector by lazy {
-                        createMediumThinOutlineEraserImageVector() }
+                override val Eraser: ImageVector by
+                        lazy { createMediumThinOutlineEraserImageVector() }
 
-                override val ExternalLink: ImageVector by lazy {
-                        createMediumThinOutlineExternalLinkImageVector() }
+                override val ExternalLink: ImageVector by
+                        lazy { createMediumThinOutlineExternalLinkImageVector() }
 
                 override val Eye: ImageVector by lazy { createMediumThinOutlineEyeImageVector() }
 
-                override val EyeOff: ImageVector by lazy {
-                        createMediumThinOutlineEyeOffImageVector() }
+                override val EyeOff: ImageVector by
+                        lazy { createMediumThinOutlineEyeOffImageVector() }
 
-                override val File02: ImageVector by lazy {
-                        createMediumThinOutlineFile02ImageVector() }
+                override val File02: ImageVector by
+                        lazy { createMediumThinOutlineFile02ImageVector() }
 
-                override val FilePlus02: ImageVector by lazy {
-                        createMediumThinOutlineFilePlus02ImageVector() }
+                override val FilePlus02: ImageVector by
+                        lazy { createMediumThinOutlineFilePlus02ImageVector() }
 
-                override val FileScan: ImageVector by lazy {
-                        createMediumThinOutlineFileScanImageVector() }
+                override val FileScan: ImageVector by
+                        lazy { createMediumThinOutlineFileScanImageVector() }
 
-                override val FileSearch02: ImageVector by lazy {
-                        createMediumThinOutlineFileSearch02ImageVector() }
+                override val FileSearch02: ImageVector by
+                        lazy { createMediumThinOutlineFileSearch02ImageVector() }
 
-                override val FileText: ImageVector by lazy {
-                        createMediumThinOutlineFileTextImageVector() }
+                override val FileText: ImageVector by
+                        lazy { createMediumThinOutlineFileTextImageVector() }
 
-                override val FileUpload: ImageVector by lazy {
-                        createMediumThinOutlineFileUploadImageVector() }
+                override val FileUpload: ImageVector by
+                        lazy { createMediumThinOutlineFileUploadImageVector() }
 
-                override val Filter: ImageVector by lazy {
-                        createMediumThinOutlineFilterImageVector() }
+                override val Filter: ImageVector by
+                        lazy { createMediumThinOutlineFilterImageVector() }
 
-                override val Folder: ImageVector by lazy {
-                        createMediumThinOutlineFolderImageVector() }
+                override val Folder: ImageVector by
+                        lazy { createMediumThinOutlineFolderImageVector() }
 
-                override val FolderArrow: ImageVector by lazy {
-                        createMediumThinOutlineFolderArrowImageVector() }
+                override val FolderArrow: ImageVector by
+                        lazy { createMediumThinOutlineFolderArrowImageVector() }
 
-                override val FolderGear01: ImageVector by lazy {
-                        createMediumThinOutlineFolderGear01ImageVector() }
+                override val FolderGear01: ImageVector by
+                        lazy { createMediumThinOutlineFolderGear01ImageVector() }
 
-                override val FolderIncoming: ImageVector by lazy {
-                        createMediumThinOutlineFolderIncomingImageVector() }
+                override val FolderIncoming: ImageVector by
+                        lazy { createMediumThinOutlineFolderIncomingImageVector() }
 
-                override val FolderOpen: ImageVector by lazy {
-                        createMediumThinOutlineFolderOpenImageVector() }
+                override val FolderOpen: ImageVector by
+                        lazy { createMediumThinOutlineFolderOpenImageVector() }
 
-                override val FolderPlus01: ImageVector by lazy {
-                        createMediumThinOutlineFolderPlus01ImageVector() }
+                override val FolderPlus01: ImageVector by
+                        lazy { createMediumThinOutlineFolderPlus01ImageVector() }
 
-                override val FolderUsers: ImageVector by lazy {
-                        createMediumThinOutlineFolderUsersImageVector() }
+                override val FolderUsers: ImageVector by
+                        lazy { createMediumThinOutlineFolderUsersImageVector() }
 
-                override val GearSix: ImageVector by lazy {
-                        createMediumThinOutlineGearSixImageVector() }
+                override val GearSix: ImageVector by
+                        lazy { createMediumThinOutlineGearSixImageVector() }
 
                 override val Gif: ImageVector by lazy { createMediumThinOutlineGifImageVector() }
 
-                override val HardDrive: ImageVector by lazy {
-                        createMediumThinOutlineHardDriveImageVector() }
+                override val HardDrive: ImageVector by
+                        lazy { createMediumThinOutlineHardDriveImageVector() }
 
-                override val Heart: ImageVector by lazy { createMediumThinOutlineHeartImageVector()
-                        }
+                override val Heart: ImageVector by
+                        lazy { createMediumThinOutlineHeartImageVector() }
 
-                override val HeartBroken: ImageVector by lazy {
-                        createMediumThinOutlineHeartBrokenImageVector() }
+                override val HeartBroken: ImageVector by
+                        lazy { createMediumThinOutlineHeartBrokenImageVector() }
 
-                override val HelpCircle: ImageVector by lazy {
-                        createMediumThinOutlineHelpCircleImageVector() }
+                override val HelpCircle: ImageVector by
+                        lazy { createMediumThinOutlineHelpCircleImageVector() }
 
                 override val Home: ImageVector by lazy { createMediumThinOutlineHomeImageVector() }
 
-                override val Image01: ImageVector by lazy {
-                        createMediumThinOutlineImage01ImageVector() }
+                override val Image01: ImageVector by
+                        lazy { createMediumThinOutlineImage01ImageVector() }
 
-                override val ImageX: ImageVector by lazy {
-                        createMediumThinOutlineImageXImageVector() }
+                override val ImageX: ImageVector by
+                        lazy { createMediumThinOutlineImageXImageVector() }
 
-                override val Images: ImageVector by lazy {
-                        createMediumThinOutlineImagesImageVector() }
+                override val Images: ImageVector by
+                        lazy { createMediumThinOutlineImagesImageVector() }
 
                 override val Info: ImageVector by lazy { createMediumThinOutlineInfoImageVector() }
 
-                override val Key02: ImageVector by lazy { createMediumThinOutlineKey02ImageVector()
-                        }
+                override val Key02: ImageVector by
+                        lazy { createMediumThinOutlineKey02ImageVector() }
 
-                override val Link01: ImageVector by lazy {
-                        createMediumThinOutlineLink01ImageVector() }
+                override val Link01: ImageVector by
+                        lazy { createMediumThinOutlineLink01ImageVector() }
 
-                override val Link02: ImageVector by lazy {
-                        createMediumThinOutlineLink02ImageVector() }
+                override val Link02: ImageVector by
+                        lazy { createMediumThinOutlineLink02ImageVector() }
 
-                override val LinkOff01: ImageVector by lazy {
-                        createMediumThinOutlineLinkOff01ImageVector() }
+                override val LinkOff01: ImageVector by
+                        lazy { createMediumThinOutlineLinkOff01ImageVector() }
 
-                override val LoaderGrad: ImageVector by lazy {
-                        createMediumThinOutlineLoaderGradImageVector() }
+                override val LoaderGrad: ImageVector by
+                        lazy { createMediumThinOutlineLoaderGradImageVector() }
 
                 override val Lock: ImageVector by lazy { createMediumThinOutlineLockImageVector() }
 
-                override val LockKeyholeCircle: ImageVector by lazy {
-                        createMediumThinOutlineLockKeyholeCircleImageVector() }
+                override val LockKeyholeCircle: ImageVector by
+                        lazy { createMediumThinOutlineLockKeyholeCircleImageVector() }
 
-                override val LogOut02: ImageVector by lazy {
-                        createMediumThinOutlineLogOut02ImageVector() }
+                override val LogOut02: ImageVector by
+                        lazy { createMediumThinOutlineLogOut02ImageVector() }
 
-                override val MapPin: ImageVector by lazy {
-                        createMediumThinOutlineMapPinImageVector() }
+                override val MapPin: ImageVector by
+                        lazy { createMediumThinOutlineMapPinImageVector() }
 
-                override val Maximize02: ImageVector by lazy {
-                        createMediumThinOutlineMaximize02ImageVector() }
+                override val Maximize02: ImageVector by
+                        lazy { createMediumThinOutlineMaximize02ImageVector() }
 
                 override val Mega: ImageVector by lazy { createMediumThinOutlineMegaImageVector() }
 
-                override val Menu01: ImageVector by lazy {
-                        createMediumThinOutlineMenu01ImageVector() }
+                override val Menu01: ImageVector by
+                        lazy { createMediumThinOutlineMenu01ImageVector() }
 
-                override val Menu04: ImageVector by lazy {
-                        createMediumThinOutlineMenu04ImageVector() }
+                override val Menu04: ImageVector by
+                        lazy { createMediumThinOutlineMenu04ImageVector() }
 
-                override val MessageArrowUp: ImageVector by lazy {
-                        createMediumThinOutlineMessageArrowUpImageVector() }
+                override val MessageArrowUp: ImageVector by
+                        lazy { createMediumThinOutlineMessageArrowUpImageVector() }
 
-                override val MessageChatCircle: ImageVector by lazy {
-                        createMediumThinOutlineMessageChatCircleImageVector() }
+                override val MessageChatCircle: ImageVector by
+                        lazy { createMediumThinOutlineMessageChatCircleImageVector() }
 
-                override val Minimize02: ImageVector by lazy {
-                        createMediumThinOutlineMinimize02ImageVector() }
+                override val Minimize02: ImageVector by
+                        lazy { createMediumThinOutlineMinimize02ImageVector() }
 
-                override val MinusCircle: ImageVector by lazy {
-                        createMediumThinOutlineMinusCircleImageVector() }
+                override val MinusCircle: ImageVector by
+                        lazy { createMediumThinOutlineMinusCircleImageVector() }
 
-                override val MoreVertical: ImageVector by lazy {
-                        createMediumThinOutlineMoreVerticalImageVector() }
+                override val MoreVertical: ImageVector by
+                        lazy { createMediumThinOutlineMoreVerticalImageVector() }
 
                 override val Move: ImageVector by lazy { createMediumThinOutlineMoveImageVector() }
 
-                override val Pause: ImageVector by lazy { createMediumThinOutlinePauseImageVector()
-                        }
+                override val Pause: ImageVector by
+                        lazy { createMediumThinOutlinePauseImageVector() }
 
                 override val Pen2: ImageVector by lazy { createMediumThinOutlinePen2ImageVector() }
 
-                override val Phone01: ImageVector by lazy {
-                        createMediumThinOutlinePhone01ImageVector() }
+                override val Phone01: ImageVector by
+                        lazy { createMediumThinOutlinePhone01ImageVector() }
 
                 override val Play: ImageVector by lazy { createMediumThinOutlinePlayImageVector() }
 
-                override val PlaySquare: ImageVector by lazy {
-                        createMediumThinOutlinePlaySquareImageVector() }
+                override val PlaySquare: ImageVector by
+                        lazy { createMediumThinOutlinePlaySquareImageVector() }
 
-                override val Playlist: ImageVector by lazy {
-                        createMediumThinOutlinePlaylistImageVector() }
+                override val Playlist: ImageVector by
+                        lazy { createMediumThinOutlinePlaylistImageVector() }
 
                 override val Plus: ImageVector by lazy { createMediumThinOutlinePlusImageVector() }
 
-                override val PlusCircle: ImageVector by lazy {
-                        createMediumThinOutlinePlusCircleImageVector() }
+                override val PlusCircle: ImageVector by
+                        lazy { createMediumThinOutlinePlusCircleImageVector() }
 
-                override val RectangleImageStack: ImageVector by lazy {
-                        createMediumThinOutlineRectangleImageStackImageVector() }
+                override val RectangleImageStack: ImageVector by
+                        lazy { createMediumThinOutlineRectangleImageStackImageVector() }
 
-                override val RectangleStackPlus: ImageVector by lazy {
-                        createMediumThinOutlineRectangleStackPlusImageVector() }
+                override val RectangleStackPlus: ImageVector by
+                        lazy { createMediumThinOutlineRectangleStackPlusImageVector() }
 
-                override val Rocket: ImageVector by lazy {
-                        createMediumThinOutlineRocketImageVector() }
+                override val Rocket: ImageVector by
+                        lazy { createMediumThinOutlineRocketImageVector() }
 
-                override val RotateCcw: ImageVector by lazy {
-                        createMediumThinOutlineRotateCcwImageVector() }
+                override val RotateCcw: ImageVector by
+                        lazy { createMediumThinOutlineRotateCcwImageVector() }
 
-                override val RotateCw: ImageVector by lazy {
-                        createMediumThinOutlineRotateCwImageVector() }
+                override val RotateCw: ImageVector by
+                        lazy { createMediumThinOutlineRotateCwImageVector() }
 
-                override val Screenshot: ImageVector by lazy {
-                        createMediumThinOutlineScreenshotImageVector() }
+                override val Screenshot: ImageVector by
+                        lazy { createMediumThinOutlineScreenshotImageVector() }
 
-                override val SearchLarge: ImageVector by lazy {
-                        createMediumThinOutlineSearchLargeImageVector() }
+                override val SearchLarge: ImageVector by
+                        lazy { createMediumThinOutlineSearchLargeImageVector() }
 
-                override val SearchSmall: ImageVector by lazy {
-                        createMediumThinOutlineSearchSmallImageVector() }
+                override val SearchSmall: ImageVector by
+                        lazy { createMediumThinOutlineSearchSmallImageVector() }
 
-                override val SendHorizontal: ImageVector by lazy {
-                        createMediumThinOutlineSendHorizontalImageVector() }
+                override val SendHorizontal: ImageVector by
+                        lazy { createMediumThinOutlineSendHorizontalImageVector() }
 
-                override val ShareNetwork: ImageVector by lazy {
-                        createMediumThinOutlineShareNetworkImageVector() }
+                override val ShareNetwork: ImageVector by
+                        lazy { createMediumThinOutlineShareNetworkImageVector() }
 
-                override val Shield: ImageVector by lazy {
-                        createMediumThinOutlineShieldImageVector() }
+                override val Shield: ImageVector by
+                        lazy { createMediumThinOutlineShieldImageVector() }
 
-                override val Shield01: ImageVector by lazy {
-                        createMediumThinOutlineShield01ImageVector() }
+                override val Shield01: ImageVector by
+                        lazy { createMediumThinOutlineShield01ImageVector() }
 
-                override val Shield02: ImageVector by lazy {
-                        createMediumThinOutlineShield02ImageVector() }
+                override val Shield02: ImageVector by
+                        lazy { createMediumThinOutlineShield02ImageVector() }
 
-                override val Shield03: ImageVector by lazy {
-                        createMediumThinOutlineShield03ImageVector() }
+                override val Shield03: ImageVector by
+                        lazy { createMediumThinOutlineShield03ImageVector() }
 
-                override val ShieldInfo: ImageVector by lazy {
-                        createMediumThinOutlineShieldInfoImageVector() }
+                override val ShieldInfo: ImageVector by
+                        lazy { createMediumThinOutlineShieldInfoImageVector() }
 
-                override val ShieldLite: ImageVector by lazy {
-                        createMediumThinOutlineShieldLiteImageVector() }
+                override val ShieldLite: ImageVector by
+                        lazy { createMediumThinOutlineShieldLiteImageVector() }
 
-                override val SlashCircle: ImageVector by lazy {
-                        createMediumThinOutlineSlashCircleImageVector() }
+                override val SlashCircle: ImageVector by
+                        lazy { createMediumThinOutlineSlashCircleImageVector() }
 
-                override val SlidersHorizontal01: ImageVector by lazy {
-                        createMediumThinOutlineSlidersHorizontal01ImageVector() }
+                override val SlidersHorizontal01: ImageVector by
+                        lazy { createMediumThinOutlineSlidersHorizontal01ImageVector() }
 
-                override val SlidersVertical02: ImageVector by lazy {
-                        createMediumThinOutlineSlidersVertical02ImageVector() }
+                override val SlidersVertical02: ImageVector by
+                        lazy { createMediumThinOutlineSlidersVertical02ImageVector() }
 
-                override val Square: ImageVector by lazy {
-                        createMediumThinOutlineSquareImageVector() }
+                override val Square: ImageVector by
+                        lazy { createMediumThinOutlineSquareImageVector() }
 
                 override val Star: ImageVector by lazy { createMediumThinOutlineStarImageVector() }
 
-                override val Subtitles02: ImageVector by lazy {
-                        createMediumThinOutlineSubtitles02ImageVector() }
+                override val Subtitles02: ImageVector by
+                        lazy { createMediumThinOutlineSubtitles02ImageVector() }
 
-                override val Sync01: ImageVector by lazy {
-                        createMediumThinOutlineSync01ImageVector() }
+                override val Sync01: ImageVector by
+                        lazy { createMediumThinOutlineSync01ImageVector() }
 
-                override val TagSimple: ImageVector by lazy {
-                        createMediumThinOutlineTagSimpleImageVector() }
+                override val TagSimple: ImageVector by
+                        lazy { createMediumThinOutlineTagSimpleImageVector() }
 
-                override val TransferArrowsUpDownAlt: ImageVector by lazy {
-                        createMediumThinOutlineTransferArrowsUpDownAltImageVector() }
+                override val TransferArrowsUpDownAlt: ImageVector by
+                        lazy { createMediumThinOutlineTransferArrowsUpDownAltImageVector() }
 
-                override val TransferArrowsUpDownAltCircleCutout: ImageVector by lazy {
-                        createMediumThinOutlineTransferArrowsUpDownAltCircleCutoutImageVector() }
+                override val TransferArrowsUpDownAltCircleCutout: ImageVector by
+                        lazy { createMediumThinOutlineTransferArrowsUpDownAltCircleCutoutImageVector() }
 
-                override val TransferArrowsUpDownAltTriangleCutout: ImageVector by lazy {
-                        createMediumThinOutlineTransferArrowsUpDownAltTriangleCutoutImageVector() }
+                override val TransferArrowsUpDownAltTriangleCutout: ImageVector by
+                        lazy { createMediumThinOutlineTransferArrowsUpDownAltTriangleCutoutImageVector() }
 
-                override val Trash: ImageVector by lazy { createMediumThinOutlineTrashImageVector()
-                        }
+                override val Trash: ImageVector by
+                        lazy { createMediumThinOutlineTrashImageVector() }
 
                 override val User: ImageVector by lazy { createMediumThinOutlineUserImageVector() }
 
-                override val UserPlus: ImageVector by lazy {
-                        createMediumThinOutlineUserPlusImageVector() }
+                override val UserPlus: ImageVector by
+                        lazy { createMediumThinOutlineUserPlusImageVector() }
 
-                override val UserRight: ImageVector by lazy {
-                        createMediumThinOutlineUserRightImageVector() }
+                override val UserRight: ImageVector by
+                        lazy { createMediumThinOutlineUserRightImageVector() }
 
-                override val UserSquare: ImageVector by lazy {
-                        createMediumThinOutlineUserSquareImageVector() }
+                override val UserSquare: ImageVector by
+                        lazy { createMediumThinOutlineUserSquareImageVector() }
 
-                override val Users: ImageVector by lazy { createMediumThinOutlineUsersImageVector()
-                        }
+                override val Users: ImageVector by
+                        lazy { createMediumThinOutlineUsersImageVector() }
 
                 override val VPN: ImageVector by lazy { createMediumThinOutlineVPNImageVector() }
 
-                override val Video: ImageVector by lazy { createMediumThinOutlineVideoImageVector()
-                        }
+                override val Video: ImageVector by
+                        lazy { createMediumThinOutlineVideoImageVector() }
 
-                override val VideoJoin: ImageVector by lazy {
-                        createMediumThinOutlineVideoJoinImageVector() }
+                override val VideoJoin: ImageVector by
+                        lazy { createMediumThinOutlineVideoJoinImageVector() }
 
-                override val VideoPlus: ImageVector by lazy {
-                        createMediumThinOutlineVideoPlusImageVector() }
+                override val VideoPlus: ImageVector by
+                        lazy { createMediumThinOutlineVideoPlusImageVector() }
 
                 override val X: ImageVector by lazy { createMediumThinOutlineXImageVector() }
 
-                override val XCircle: ImageVector by lazy {
-                        createMediumThinOutlineXCircleImageVector() }
+                override val XCircle: ImageVector by
+                        lazy { createMediumThinOutlineXCircleImageVector() }
 
                 override val Zap: ImageVector by lazy { createMediumThinOutlineZapImageVector() }
 
-                override val ZapAuto: ImageVector by lazy {
-                        createMediumThinOutlineZapAutoImageVector() }
+                override val ZapAuto: ImageVector by
+                        lazy { createMediumThinOutlineZapAutoImageVector() }
 
-                override val ZapOff: ImageVector by lazy {
-                        createMediumThinOutlineZapOffImageVector() }
+                override val ZapOff: ImageVector by
+                        lazy { createMediumThinOutlineZapOffImageVector() }
 
-                override val ZoomIn: ImageVector by lazy {
-                        createMediumThinOutlineZoomInImageVector() }
+                override val ZoomIn: ImageVector by
+                        lazy { createMediumThinOutlineZoomInImageVector() }
 
-                override val fileQuestion01: ImageVector by lazy {
-                        createMediumThinOutlinefileQuestion01ImageVector() }
+                override val fileQuestion01: ImageVector by
+                        lazy { createMediumThinOutlinefileQuestion01ImageVector() }
             }
 
             public object Solid : IconPackInterface.Medium.Thin.Solid {
-                override val CheckCircle: ImageVector by lazy {
-                        createMediumThinSolidCheckCircleImageVector() }
+                override val CheckCircle: ImageVector by
+                        lazy { createMediumThinSolidCheckCircleImageVector() }
 
-                override val CheckSquare: ImageVector by lazy {
-                        createMediumThinSolidCheckSquareImageVector() }
+                override val CheckSquare: ImageVector by
+                        lazy { createMediumThinSolidCheckSquareImageVector() }
 
-                override val EmojiSmile: ImageVector by lazy {
-                        createMediumThinSolidEmojiSmileImageVector() }
+                override val EmojiSmile: ImageVector by
+                        lazy { createMediumThinSolidEmojiSmileImageVector() }
 
                 override val Eye: ImageVector by lazy { createMediumThinSolidEyeImageVector() }
 
-                override val Folder: ImageVector by lazy { createMediumThinSolidFolderImageVector()
-                        }
+                override val Folder: ImageVector by
+                        lazy { createMediumThinSolidFolderImageVector() }
 
                 override val Heart: ImageVector by lazy { createMediumThinSolidHeartImageVector() }
 
                 override val Home: ImageVector by lazy { createMediumThinSolidHomeImageVector() }
 
-                override val Image01: ImageVector by lazy {
-                        createMediumThinSolidImage01ImageVector() }
+                override val Image01: ImageVector by
+                        lazy { createMediumThinSolidImage01ImageVector() }
 
-                override val Link01: ImageVector by lazy { createMediumThinSolidLink01ImageVector()
-                        }
+                override val Link01: ImageVector by
+                        lazy { createMediumThinSolidLink01ImageVector() }
 
-                override val Menu01: ImageVector by lazy { createMediumThinSolidMenu01ImageVector()
-                        }
+                override val Menu01: ImageVector by
+                        lazy { createMediumThinSolidMenu01ImageVector() }
 
-                override val MessageChatCircle: ImageVector by lazy {
-                        createMediumThinSolidMessageChatCircleImageVector() }
+                override val MessageChatCircle: ImageVector by
+                        lazy { createMediumThinSolidMessageChatCircleImageVector() }
 
-                override val Phone01: ImageVector by lazy {
-                        createMediumThinSolidPhone01ImageVector() }
+                override val Phone01: ImageVector by
+                        lazy { createMediumThinSolidPhone01ImageVector() }
 
-                override val PlayCircle: ImageVector by lazy {
-                        createMediumThinSolidPlayCircleImageVector() }
+                override val PlayCircle: ImageVector by
+                        lazy { createMediumThinSolidPlayCircleImageVector() }
 
-                override val RectangleVideoStack: ImageVector by lazy {
-                        createMediumThinSolidRectangleVideoStackImageVector() }
+                override val RectangleVideoStack: ImageVector by
+                        lazy { createMediumThinSolidRectangleVideoStackImageVector() }
 
                 override val Video: ImageVector by lazy { createMediumThinSolidVideoImageVector() }
             }
@@ -628,25 +628,25 @@ public object IconPack : IconPackInterface {
     public object Small : IconPackInterface.Small {
         public object Thin : IconPackInterface.Small.Thin {
             public object Outline : IconPackInterface.Small.Thin.Outline {
-                override val ArrowDown: ImageVector by lazy {
-                        createSmallThinOutlineArrowDownImageVector() }
+                override val ArrowDown: ImageVector by
+                        lazy { createSmallThinOutlineArrowDownImageVector() }
 
-                override val ArrowDownCircle: ImageVector by lazy {
-                        createSmallThinOutlineArrowDownCircleImageVector() }
+                override val ArrowDownCircle: ImageVector by
+                        lazy { createSmallThinOutlineArrowDownCircleImageVector() }
 
-                override val ArrowUp: ImageVector by lazy {
-                        createSmallThinOutlineArrowUpImageVector() }
+                override val ArrowUp: ImageVector by
+                        lazy { createSmallThinOutlineArrowUpImageVector() }
 
                 override val Check: ImageVector by lazy { createSmallThinOutlineCheckImageVector() }
 
-                override val ChevronDown: ImageVector by lazy {
-                        createSmallThinOutlineChevronDownImageVector() }
+                override val ChevronDown: ImageVector by
+                        lazy { createSmallThinOutlineChevronDownImageVector() }
 
-                override val ChevronUp: ImageVector by lazy {
-                        createSmallThinOutlineChevronUpImageVector() }
+                override val ChevronUp: ImageVector by
+                        lazy { createSmallThinOutlineChevronUpImageVector() }
 
-                override val ClockRotate: ImageVector by lazy {
-                        createSmallThinOutlineClockRotateImageVector() }
+                override val ClockRotate: ImageVector by
+                        lazy { createSmallThinOutlineClockRotateImageVector() }
 
                 override val Film: ImageVector by lazy { createSmallThinOutlineFilmImageVector() }
 
@@ -656,40 +656,40 @@ public object IconPack : IconPackInterface {
 
                 override val Heart: ImageVector by lazy { createSmallThinOutlineHeartImageVector() }
 
-                override val Image01: ImageVector by lazy {
-                        createSmallThinOutlineImage01ImageVector() }
+                override val Image01: ImageVector by
+                        lazy { createSmallThinOutlineImage01ImageVector() }
 
-                override val Image04: ImageVector by lazy {
-                        createSmallThinOutlineImage04ImageVector() }
+                override val Image04: ImageVector by
+                        lazy { createSmallThinOutlineImage04ImageVector() }
 
-                override val ListSmall: ImageVector by lazy {
-                        createSmallThinOutlineListSmallImageVector() }
+                override val ListSmall: ImageVector by
+                        lazy { createSmallThinOutlineListSmallImageVector() }
 
-                override val MessageChatCircle: ImageVector by lazy {
-                        createSmallThinOutlineMessageChatCircleImageVector() }
+                override val MessageChatCircle: ImageVector by
+                        lazy { createSmallThinOutlineMessageChatCircleImageVector() }
 
                 override val Music: ImageVector by lazy { createSmallThinOutlineMusicImageVector() }
 
-                override val QueueLine: ImageVector by lazy {
-                        createSmallThinOutlineQueueLineImageVector() }
+                override val QueueLine: ImageVector by
+                        lazy { createSmallThinOutlineQueueLineImageVector() }
 
-                override val Square: ImageVector by lazy { createSmallThinOutlineSquareImageVector()
-                        }
+                override val Square: ImageVector by
+                        lazy { createSmallThinOutlineSquareImageVector() }
 
-                override val Squares4: ImageVector by lazy {
-                        createSmallThinOutlineSquares4ImageVector() }
+                override val Squares4: ImageVector by
+                        lazy { createSmallThinOutlineSquares4ImageVector() }
 
-                override val TransferCheckCircle: ImageVector by lazy {
-                        createSmallThinOutlineTransferCheckCircleImageVector() }
+                override val TransferCheckCircle: ImageVector by
+                        lazy { createSmallThinOutlineTransferCheckCircleImageVector() }
 
-                override val TransferError: ImageVector by lazy {
-                        createSmallThinOutlineTransferErrorImageVector() }
+                override val TransferError: ImageVector by
+                        lazy { createSmallThinOutlineTransferErrorImageVector() }
 
-                override val TransferPause: ImageVector by lazy {
-                        createSmallThinOutlineTransferPauseImageVector() }
+                override val TransferPause: ImageVector by
+                        lazy { createSmallThinOutlineTransferPauseImageVector() }
 
-                override val TransferWarning: ImageVector by lazy {
-                        createSmallThinOutlineTransferWarningImageVector() }
+                override val TransferWarning: ImageVector by
+                        lazy { createSmallThinOutlineTransferWarningImageVector() }
             }
 
             public object Solid : IconPackInterface.Small.Thin.Solid {
