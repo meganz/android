@@ -72,7 +72,6 @@ data class PdfViewerSearchState(
  * @param currentPassword The current password (if entered)
  * @param error The current error state, if any
  * @param isExternalFile Whether this is an external file (from intent)
- * @param showUploadButton Whether to show the "Upload to MEGA" button
  * @param searchState The state of the search functionality
  * @param isOffline Whether the file is from offline storage
  * @param isFromChat Whether the file is from chat
@@ -92,7 +91,7 @@ internal data class PdfViewerState(
     val currentPassword: String? = null,
     val error: PdfViewerError? = null,
     val isExternalFile: Boolean = false,
-    val showUploadButton: Boolean = false,
+    val isFileExplorerEnabled: Boolean = false,
     val searchState: PdfViewerSearchState = PdfViewerSearchState(),
     val isOffline: Boolean = false,
     val isFromChat: Boolean = false,

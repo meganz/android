@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
+import mega.privacy.android.feature.pdfviewer.presentation.components.ExternalFileBottomBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfPageIndicator
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfSearchResultsBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerContent
@@ -149,6 +150,14 @@ internal fun PdfViewerScreen(
                     }
                 }
             },
+            bottomBar = {
+                // Using the scaffold's bottomBar slot (instead of a floating overlay inside
+                // the content Box) reserves layout space so PdfViewerContent renders above
+                // the button instead of being covered by it.
+                if (uiState.isExternalFile && !searchState.isSearchActive) {
+                    ExternalFileBottomBar(onUploadToCloudDrive = onUploadToCloudDrive)
+                }
+            },
             content = { innerPadding ->
                 Box(
                     modifier = Modifier
@@ -214,11 +223,6 @@ internal fun PdfViewerScreen(
                             onNext = onNavigateToNextMatch,
                             modifier = Modifier.align(Alignment.BottomCenter),
                         )
-                    }
-
-                    // Bottom bar for external files
-                    if (!searchState.isSearchActive) {
-                        // TODO: Show PDFViewer bottom bar for external files with "Upload to Cloud Drive" action
                     }
                 }
             }

@@ -111,7 +111,8 @@ class LegacyCoreActivityFeatureGraph(
             leftMeetingDestination(navigationHandler::remove)
             fileExplorer(
                 removeDestination = navigationHandler::remove,
-                returnResult = navigationHandler::returnResult
+                returnResult = navigationHandler::returnResult,
+                navigationHandler = navigationHandler,
             )
             audioSectionDestination(
                 removeDestination = navigationHandler::back,

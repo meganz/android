@@ -118,6 +118,7 @@ class PdfViewerScreenTest {
         searchState: PdfViewerSearchState = PdfViewerSearchState(),
         currentPage: Int = 1,
         totalPages: Int = 0,
+        isExternalFile: Boolean = false,
     ) = PdfViewerState(
         isLoading = false,
         source = source,
@@ -126,6 +127,7 @@ class PdfViewerScreenTest {
         searchState = searchState,
         currentPage = currentPage,
         totalPages = totalPages,
+        isExternalFile = isExternalFile,
     )
 
     @Test
@@ -357,5 +359,25 @@ class PdfViewerScreenTest {
             .performTextInput("a")
 
         verify(onPasswordInputChanged).invoke()
+    }
+
+    @Test
+    fun `test that onUploadToCloudDrive is invoked when upload button is clicked for external file`() {
+        setContent(
+            defaultState(
+                source = PdfViewerSource.ExternalFile(
+                    contentUri = "content://external/sample.pdf",
+                    fileName = "sample.pdf",
+                ),
+                isExternalFile = true,
+                totalPages = 1,
+            ),
+        )
+
+        val uploadLabel =
+            composeTestRule.activity.getString(sharedR.string.photos_save_to_cloud_drive_button_text)
+        composeTestRule.onNodeWithText(uploadLabel).performClick()
+
+        verify(onUploadToCloudDrive).invoke()
     }
 }

@@ -17,18 +17,20 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
-import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 import mega.privacy.android.feature.pdfviewer.search.FakePdfSearchEngine
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngineFactory
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -39,8 +41,10 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -63,6 +67,7 @@ class PdfViewerViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val context = mock<Context>()
 
     private val defaultArgs = PdfViewerViewModel.Args(
@@ -87,6 +92,7 @@ class PdfViewerViewModelTest {
             monitorConnectivityUseCase,
             saveRecentlyUsedItemUseCase,
             monitorOfflineNodeUpdatesUseCase,
+            getFeatureFlagValueUseCase,
             context,
         )
 
@@ -100,6 +106,7 @@ class PdfViewerViewModelTest {
         whenever(getLastPageViewedInPdfUseCase(12345L)).thenReturn(1)
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }.thenReturn(false)
     }
 
     private fun initViewModel(
@@ -119,8 +126,39 @@ class PdfViewerViewModelTest {
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
             ioDispatcher = testDispatcher,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
+
+    @Test
+    fun `test that isFileExplorerEnabled is true when FileExplorer feature flag is enabled`() =
+        runTest {
+            wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }
+                .thenReturn(true)
+            underTest = initViewModel()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isFileExplorerEnabled).isTrue()
+            }
+            verifyBlocking(getFeatureFlagValueUseCase) {
+                invoke(AppFeatures.FileExplorer)
+            }
+        }
+
+    @Test
+    fun `test that isFileExplorerEnabled is false when FileExplorer feature flag is disabled`() =
+        runTest {
+            wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }
+                .thenReturn(false)
+            underTest = initViewModel()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isFileExplorerEnabled).isFalse()
+            }
+            verifyBlocking(getFeatureFlagValueUseCase) {
+                invoke(AppFeatures.FileExplorer)
+            }
+        }
 
     @Test
     fun `test that initial state has correct title from args`() = runTest {

@@ -400,7 +400,11 @@ data class LeftMeetingNavKey(
 ) : NoSessionNavKey.Optional
 
 @Serializable
-data class FileExplorerNavKey(val action: String) : NavKey {
+data class FileExplorerNavKey(
+    val action: String,
+    val shareUri: String? = null,
+    val mimeType: String? = null,
+) : NavKey {
     companion object {
         const val RESULT_FOLDER_HANDLE = "result_folder_handle"
     }

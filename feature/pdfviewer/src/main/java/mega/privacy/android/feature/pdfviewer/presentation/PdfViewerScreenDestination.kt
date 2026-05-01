@@ -3,6 +3,7 @@ package mega.privacy.android.feature.pdfviewer.presentation
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -15,8 +16,11 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
+import mega.privacy.android.navigation.destination.ShareToMegaNavKey
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
@@ -107,12 +111,26 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             },
             onPasswordInputChanged = viewModel::onPasswordDialogInputChanged,
             onRetry = viewModel::retryLoad,
-            onUploadToCloudDrive = pdfViewerOnBack,
             onActivateSearch = viewModel::activateSearch,
             onDeactivateSearch = viewModel::deactivateSearch,
             onSearchQueryChanged = viewModel::onSearchQueryChanged,
             onNavigateToNextMatch = viewModel::navigateToNextMatch,
             onNavigateToPreviousMatch = viewModel::navigateToPreviousMatch,
+            onUploadToCloudDrive = {
+                if (uiState.isFileExplorerEnabled) {
+                    navigationHandler.navigate(
+                        ShareToMegaNavKey(listOf(UriPath(navKey.contentUri)))
+                    )
+                } else {
+                    navigationHandler.navigate(
+                        FileExplorerNavKey(
+                            action = Intent.ACTION_SEND,
+                            shareUri = navKey.contentUri,
+                            mimeType = navKey.mimeType,
+                        )
+                    )
+                }
+            },
         )
     }
 }

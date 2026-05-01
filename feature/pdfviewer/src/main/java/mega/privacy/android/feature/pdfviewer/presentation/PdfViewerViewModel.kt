@@ -30,20 +30,22 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
-import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngine
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngineFactory
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File
 import java.net.URL
@@ -67,6 +69,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PdfViewerState())
@@ -84,10 +87,19 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private var searchEngine: PdfSearchEngine? = null
 
     init {
+        loadFileExplorerFeatureFlag()
         initializeFromArgs()
         observeSearchPipeline()
         observeConnectivity()
         monitorOfflineNodeAvailability()
+    }
+
+    private fun loadFileExplorerFeatureFlag() {
+        viewModelScope.launch {
+            val enabled =
+                runCatching { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }.getOrElse { false }
+            _state.update { it.copy(isFileExplorerEnabled = enabled) }
+        }
     }
 
     private fun observeConnectivity() {
