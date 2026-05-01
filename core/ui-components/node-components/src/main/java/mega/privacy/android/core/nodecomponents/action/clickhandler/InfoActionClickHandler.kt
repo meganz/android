@@ -6,6 +6,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.InfoMenuAction
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import javax.inject.Inject
 
@@ -19,6 +20,8 @@ class InfoActionClickHandler @Inject constructor(
         if (nodeSourceType == NodeSourceType.OFFLINE) {
             // For offline files, navigate to OfflineInfoNavKey
             provider.navigationHandler?.navigate(OfflineInfoNavKey(handle = node.id.longValue.toString()))
+        } else if (provider.navigationHandler != null) {
+            provider.navigationHandler.navigate(FileInfoNavKey(handle = node.id.longValue))
         } else {
             megaNavigator.openFileInfoActivity(
                 context = provider.context,

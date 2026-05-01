@@ -115,6 +115,8 @@ import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByNo
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
+import mega.privacy.android.navigation.destination.FileInfoNavKey
+import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
@@ -197,6 +199,24 @@ class NodeActionClickHandlerTest {
         postMessage = { },
         megaNavigator = mockMegaNavigator,
         navigationHandler = mockNavigationHandler,
+        moveLauncher = mockMoveLauncher,
+        copyLauncher = mockCopyLauncher,
+        shareFolderLauncher = mockShareFolderLauncher,
+        restoreLauncher = mockRestoreLauncher,
+        sendToChatLauncher = mockSendToChatLauncher,
+        hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
+        versionsLauncher = mockVersionsLauncher,
+        addToAlbumLauncher = mockAddToAlbumLauncher,
+        videoToPlaylistLauncher = mockVideoToPlaylistLauncher
+    )
+
+    private val mockSingleNodeActionProviderNoHandler = SingleNodeActionProvider(
+        viewModel = mockViewModel,
+        context = mockContext,
+        coroutineScope = testScope,
+        postMessage = { },
+        megaNavigator = mockMegaNavigator,
+        navigationHandler = null,
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
         shareFolderLauncher = mockShareFolderLauncher,
@@ -770,16 +790,23 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test ManageLinkAction single node handle calls openGetLinkActivity with single handle`() {
+    fun `test that ManageLinkAction single node handle navigates via GetLinkNavKey when navigationHandler is not null`() {
         val action = ManageLinkActionClickHandler()
         val menuAction = mock<ManageLinkMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openGetLinkActivity(
-            context = mockContext,
-            123L
-        )
+        verify(mockNavigationHandler).navigate(GetLinkNavKey(handles = listOf(123L)))
+    }
+
+    @Test
+    fun `test that ManageLinkAction single node handle calls megaNavigator when navigationHandler is null`() {
+        val action = ManageLinkActionClickHandler()
+        val menuAction = mock<ManageLinkMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockMegaNavigator).openGetLinkActivity(context = mockContext, 123L)
     }
 
     @Test
@@ -929,13 +956,23 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test InfoAction single node handle calls megaNavigator`() {
+    fun `test that InfoAction handle navigates via FileInfoNavKey when navigationHandler is not null`() {
         val action = InfoActionClickHandler(mockMegaNavigator)
         val menuAction = mock<InfoMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openFileInfoActivity(any(), any())
+        verify(mockNavigationHandler).navigate(FileInfoNavKey(handle = 123L))
+    }
+
+    @Test
+    fun `test that InfoAction handle calls megaNavigator when navigationHandler is null`() {
+        val action = InfoActionClickHandler(mockMegaNavigator)
+        val menuAction = mock<InfoMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockMegaNavigator).openFileInfoActivity(mockContext, 123L)
     }
 
     // EditAction Tests
@@ -1289,11 +1326,21 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test GetLinkAction single node handle calls megaNavigator`() {
+    fun `test that GetLinkAction single node handle navigates via GetLinkNavKey when navigationHandler is not null`() {
         val action = GetLinkActionClickHandler(mockMegaNavigator)
         val menuAction = mock<GetLinkMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockNavigationHandler).navigate(GetLinkNavKey(handles = listOf(123L)))
+    }
+
+    @Test
+    fun `test that GetLinkAction single node handle calls megaNavigator when navigationHandler is null`() {
+        val action = GetLinkActionClickHandler(mockMegaNavigator)
+        val menuAction = mock<GetLinkMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
 
         verify(mockMegaNavigator).openGetLinkActivity(any<Context>(), anyLong())
     }

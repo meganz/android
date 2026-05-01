@@ -9,6 +9,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import javax.inject.Inject
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.mobile.analytics.event.LinkShareLinkTapFileMenuItemEvent
 import mega.privacy.mobile.analytics.event.LinkShareLinkTapFolderMenuItemEvent
 import mega.privacy.mobile.analytics.event.LinkShareLinkTapFileMenuToolbarEvent
@@ -23,10 +24,14 @@ class GetLinkActionClickHandler @Inject constructor(
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
         Analytics.tracker.trackEvent(if (node is FolderNode) LinkShareLinkTapFolderMenuItemEvent else LinkShareLinkTapFileMenuItemEvent)
 
-        megaNavigator.openGetLinkActivity(
-            context = provider.context,
-            node.id.longValue
-        )
+        if (provider.navigationHandler != null) {
+            provider.navigationHandler.navigate(GetLinkNavKey(handles = listOf(node.id.longValue)))
+        } else {
+            megaNavigator.openGetLinkActivity(
+                context = provider.context,
+                node.id.longValue
+            )
+        }
         provider.viewModel.dismiss()
     }
 
