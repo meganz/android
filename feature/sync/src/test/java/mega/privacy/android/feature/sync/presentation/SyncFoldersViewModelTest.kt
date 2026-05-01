@@ -628,6 +628,21 @@ internal class SyncFoldersViewModelTest {
         }
     }
 
+    @Test
+    fun `test that sync ui items load with zero stalled issues count when monitor stalled issues use case does not emit`() =
+        runTest {
+            whenever(monitorStalledIssuesUseCase()).thenReturn(flow { awaitCancellation() })
+            initViewModel()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.syncUiItems).hasSize(syncUiItems.size)
+                assertThat(state.stalledIssueCount).isEqualTo(0)
+                assertThat(state.syncUiItems.all { !it.hasStalledIssues }).isTrue()
+            }
+        }
+
 
     private fun getSyncUiItem(status: SyncStatus): SyncUiItem = SyncUiItem(
         id = 3L,

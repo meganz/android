@@ -209,7 +209,9 @@ internal class SyncFoldersViewModel @Inject constructor(
         monitorSyncsUseCase()
             .map(syncUiItemMapper::invoke)
             .distinctUntilChanged(),
-        monitorStalledIssuesUseCase().distinctUntilChanged()
+        monitorStalledIssuesUseCase()
+            .onStart { emit(emptyList()) }
+            .distinctUntilChanged()
     ) { syncs, stalledIssues ->
         val syncUiItems = syncs.map { sync ->
             val folderInfo = getCompleteFolderInfoUseCase(sync.megaStorageNodeId)
