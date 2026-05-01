@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineMediaUseCase
@@ -46,6 +47,7 @@ import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEve
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
 import timber.log.Timber
+import java.time.Instant
 import java.time.Year
 import java.time.YearMonth
 import java.time.ZonedDateTime
@@ -59,6 +61,7 @@ class TimelineTabViewModel @Inject constructor(
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorTimelineMediaUseCase: MonitorTimelineMediaUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val getDeviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase,
 ) : ViewModel() {
 
     private var allMediaInTypedFileNodes: List<TypedFileNode> = emptyList()
@@ -172,7 +175,11 @@ class TimelineTabViewModel @Inject constructor(
             yearCountMap[year] = (yearCountMap[year] ?: 0) + (dayMap[key]?.second ?: 0)
         }
 
-        val nowYear = Year.now()
+        val nowYear = Year.of(
+            Instant.ofEpochMilli(getDeviceCurrentTimeUseCase())
+                .atZone(java.time.ZoneId.systemDefault())
+                .year
+        )
         val dayList = mutableListOf<PhotosNodeListCard>()
         val monthList = mutableListOf<PhotosNodeListCard>()
         val yearList = mutableListOf<PhotosNodeListCard>()

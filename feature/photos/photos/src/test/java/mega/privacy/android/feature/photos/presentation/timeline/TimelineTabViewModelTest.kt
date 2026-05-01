@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineMediaUseCase
@@ -61,6 +62,7 @@ class TimelineTabViewModelTest {
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
+    private val getDeviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase = mock()
     private val analyticsTracker: AnalyticsTracker = mock()
 
     private val isHiddenNodesEnabledFlow = MutableStateFlow(false)
@@ -69,13 +71,15 @@ class TimelineTabViewModelTest {
     fun setup() = runTest {
         Analytics.initialise(analyticsTracker)
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn isHiddenNodesEnabledFlow
+        whenever(getDeviceCurrentTimeUseCase()) doReturn FIXED_NOW.toInstant().toEpochMilli()
         underTest = TimelineTabViewModel(
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorTimelineMediaUseCase = monitorTimelineMediaUseCase,
-            durationInSecondsTextMapper = durationInSecondsTextMapper
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
+            getDeviceCurrentTimeUseCase = getDeviceCurrentTimeUseCase,
         )
     }
 
@@ -89,13 +93,14 @@ class TimelineTabViewModelTest {
             timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase,
             durationInSecondsTextMapper,
+            getDeviceCurrentTimeUseCase,
             analyticsTracker
         )
     }
 
     @Test
     fun `test that photos are fetched successfully`() = runTest {
-        val now = ZonedDateTime.now()
+        val now = FIXED_NOW
         val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
             on { extension } doReturn ".jpg"
         }
@@ -198,7 +203,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when grid size is changed and the camera upload page is displayed and the media source is not cloud drive`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val now = FIXED_NOW
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
@@ -267,7 +272,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is enabled when grid size is changed and the camera upload page is not displayed and the media source is cloud drive`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val now = FIXED_NOW
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
@@ -322,7 +327,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when CU page is enabled and the media source is not cloud drive`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val now = FIXED_NOW
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
@@ -376,7 +381,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when CU page is disabled and the media source is cloud drive`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val now = FIXED_NOW
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
@@ -454,7 +459,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is enabled when CU page is disabled and the camera upload page is not displayed and the media source is cloud drive`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val now = FIXED_NOW
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
@@ -569,7 +574,7 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that the action state is ready when the displayed photos are set`() = runTest {
-        val now = ZonedDateTime.now()
+        val now = FIXED_NOW
         val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
             on { extension } doReturn ".jpg"
         }
@@ -843,7 +848,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that photosInMonth formattedDate shows month only when photo year matches current year`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val now = FIXED_NOW
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
@@ -879,7 +884,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that photosInMonth formattedDate shows month and year when photo year differs from current year`() =
         runTest {
-            val lastYear = ZonedDateTime.now().minusYears(1)
+            val lastYear = FIXED_NOW.minusYears(1)
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
@@ -913,7 +918,7 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that photosInYear contains one entry per distinct year`() = runTest {
-        val now = ZonedDateTime.now()
+        val now = FIXED_NOW
         val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
             on { extension } doReturn ".jpg"
         }
@@ -959,7 +964,7 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that photosInYear groups all photos from the same year into one card`() = runTest {
-        val now = ZonedDateTime.now().withMonth(7)
+        val now = FIXED_NOW.withMonth(7)
         val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
             on { extension } doReturn ".jpg"
         }
@@ -990,7 +995,7 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that photosInYear formattedDate shows the year correctly`() = runTest {
-        val lastYear = ZonedDateTime.now().minusYears(1)
+        val lastYear = FIXED_NOW.minusYears(1)
         val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
             on { extension } doReturn ".jpg"
         }
@@ -1046,7 +1051,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that photosInDay photosInMonth and photosInYear card keys match the node id of the first photo in each group`() =
         runTest {
-            val now = ZonedDateTime.now()
+            val now = FIXED_NOW
             val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
                 on { extension } doReturn ".jpg"
             }
@@ -1086,7 +1091,7 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that sensitive photos are correctly flagged in day month and year cards`() = runTest {
-        val now = ZonedDateTime.now()
+        val now = FIXED_NOW
         val mockImageFileTypeInfo = mock<GifFileTypeInfo> {
             on { extension } doReturn ".jpg"
         }
@@ -1113,5 +1118,10 @@ class TimelineTabViewModelTest {
             assertThat(item.monthsCardPhotos.first().isSensitive).isTrue()
             assertThat(item.yearsCardPhotos.first().isSensitive).isTrue()
         }
+    }
+
+    companion object {
+        private val FIXED_NOW: ZonedDateTime =
+            ZonedDateTime.of(2025, 6, 15, 12, 0, 0, 0, ZoneId.of("UTC"))
     }
 }
