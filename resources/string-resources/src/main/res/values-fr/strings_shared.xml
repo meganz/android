@@ -2155,7 +2155,7 @@
     <string name="logout_offline_content_deletion_warning">La déconnexion entraîne la suppression de votre contenu Hors&#160;ligne.</string>
     <string name="offline_screen_title">Hors ligne</string>
     <string name="offline_screen_remove_from_offline_selection_menu">Supprimer de Hors&#160;ligne</string>
-    <string name="offline_item_deletion_confirmation_title">Supprimer de Hors&#160;ligne ?</string>
+    <string name="offline_item_deletion_confirmation_title">Supprimer de Hors&#160;ligne&#160;?</string>
     <plurals name="num_of_files_with_parameter">
         <item quantity="one">%d fichier</item>
         <item quantity="many">%d fichiers</item>
@@ -2279,7 +2279,7 @@
     <string name="text_editor_fast_scroll_line_tooltip">Ligne %1$d</string>
     <string name="select_videos_search_empty_view_description">Rechercher des vidéos dans votre disque Cloud</string>
     <string name="new_text_file_invalid_extension_error_message">Utilisez une extension de fichier valide (par exemple .txt)</string>
-    <string name="link_decryption_key_dialog_message">Entrez la clé pour ouvrir ce lien.\nVous ne l\’avez pas ? Contactez le propriétaire du lien.</string>
+    <string name="link_decryption_key_dialog_message">Entrez la clé pour ouvrir ce lien.\nVous ne l\’avez pas&#160;? Contactez le propriétaire du lien.</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;Po</string>
     <string name="label_file_size_exabytes">%s&#160;Eo</string>
@@ -2293,7 +2293,7 @@
         <item quantity="many">Partagé avec %d personnes</item>
         <item quantity="other">Partagé avec %d personnes</item>
     </plurals>
-    <string name="link_password_dialog_message">Entrez le mot de passe pour ouvrir ce lien.\nVous ne l\’avez pas ? Contactez le propriétaire du lien.</string>
+    <string name="link_password_dialog_message">Entrez le mot de passe pour ouvrir ce lien.\nVous ne l\’avez pas&#160;? Contactez le propriétaire du lien.</string>
     <plurals name="move_node_general_snackbar_fail">
         <item quantity="one">%d élément n\’a pas pu être déplacé</item>
         <item quantity="many">%d éléments n\’ont pas pu être déplacés</item>
@@ -2427,7 +2427,7 @@
     <string name="rewarded_ad_dialog_perk_storage">Jusqu’à 20 To de stockage chiffré</string>
     <string name="rewarded_ad_dialog_perk_transfer_speed">Vitesses de transfert prioritaires</string>
     <string name="rewarded_ad_dialog_perk_pass_vpn">MEGA Pass et MEGA VPN inclus</string>
-    <string name="rewarded_ad_unavailable_toast">Pub indisponible ! Poursuite en cours&#8230;</string>
+    <string name="rewarded_ad_unavailable_toast">Pub indisponible&#160;! Poursuite en cours&#8230;</string>
     <string name="general_read_only_folder_warning">Ce dossier est en lecture seule</string>
     <string name="sync_error_folder_conflict">Le %2$s « %1$s » fait déjà partie %3$s sur %4$s. Choisissez-en un autre.</string>
     <string name="sync_label_cloud_folder">dossier cloud</string>
@@ -2444,7 +2444,7 @@
     <string name="settings_passcode_lock">Code d’accès</string>
     <string name="pin_lock_alert">Vous serez déconnecté et vos fichiers Hors&#160;ligne seront supprimés après dix tentatives infructueuses</string>
     <string name="action_logout">Me&#160;déconnecter</string>
-    <string name="settings_passcode_forgot_passcode_button">Code d’accès oublié ?</string>
+    <string name="settings_passcode_forgot_passcode_button">Code d’accès oublié&#160;?</string>
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="one">%1$d&#160;tentative d’accès infructueuse</item>
         <item quantity="many">%1$d de tentatives d’accès infructueuses</item>
@@ -2475,4 +2475,8 @@
     <string name="home_widget_viewed_links_section_header">Liens consultés</string>
     <string name="open_link_dialog_description">Collez n\’importe quel lien MEGA pour l\’ouvrir</string>
     <string name="home_cwlo_clear_history">Effacer l\’historique «&#160;Continuez là où vous vous étiez arrêté&#160;»</string>
+    <string name="home_widget_viewed_links_clear_history">Effacer l\’historique des liens consultés</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">Êtes-vous sûr de vouloir effacer tout l\’historique des liens consultés&#160;? Cela ne peut pas être annulé.</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">L\’historique des liens consultés a été effacé</string>
+    <string name="home_widget_viewed_links_empty_state">Les liens consultés apparaîtront ici</string>
 </resources>

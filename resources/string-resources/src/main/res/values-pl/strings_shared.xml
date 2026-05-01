@@ -2574,4 +2574,5 @@
     <string name="home_widget_viewed_links_clear_history">Wyczyść historię odwiedzonych linków</string>
     <string name="home_widget_viewed_links_clear_history_dialog_message">Czy na pewno chcesz usunąć całą historię wyświetlanych linków? Nie da się tego cofnąć.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">Historia odwiedzonych linków została wyczyszczona</string>
+    <string name="home_widget_viewed_links_empty_state">Odwiedzone linki pojawią się tutaj</string>
 </resources>

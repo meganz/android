@@ -2399,4 +2399,6 @@
     <string name="home_widget_viewed_links_clear_history">Wis de geschiedenis van bekeken links</string>
     <string name="home_widget_viewed_links_clear_history_dialog_message">Weet u zeker dat u de geschiedenis van alle bekeken links wilt wissen? Deze actie kan niet ongedaan worden gemaakt.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">De geschiedenis van bekeken links is gewist</string>
+    <string name="home_widget_viewed_links_empty_state">Bekeken links worden hier weergegeven</string>
+    <string name="home_cwlo_empty_state">Items die u niet hebt voltooid, verschijnen hier</string>
 </resources>

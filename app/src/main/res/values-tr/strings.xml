@@ -803,7 +803,7 @@
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
     <string name="notifications_are_already_muted">Sohbet bildirimleri zaten sessize alınmış</string>
     <!-- Message when a chat has been unmuted successfully. -->
-    <string name="success_unmuting_a_chat">Sohbet bildirimleri etkinleştirildi.</string>
+    <string name="success_unmuting_a_chat">Sohbet bildirimleri etkinleştirildi</string>
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
         <item quantity="one">Saat %1$s olana kadar sessiz</item>
@@ -3240,7 +3240,7 @@
     <!-- Button to skip asking permissions. -->
     <string name="permissions_not_now_button">Şimdi değil</string>
     <!-- Title of the screen asking for enabling notifications permission. -->
-    <string name="permissions_notifications_title">Bildirimde kalın</string>
+    <string name="permissions_notifications_title">Bildirim alın</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA size arama, sohbet ve dosya aktarım bildirimleri gönderecektir.</string>
     <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->

@@ -2313,4 +2313,7 @@
     <string name="home_widget_viewed_links_clear_history">リンクの閲覧履歴を消去</string>
     <string name="home_widget_viewed_links_clear_history_dialog_message">リンクの閲覧履歴をすべて消去します。よろしいですか？この操作は取り消せません。</string>
     <string name="home_widget_viewed_links_clear_history_success_message">リンクの閲覧履歴を消去しました</string>
+    <string name="home_widget_viewed_links_empty_state">閲覧済みのリンクはここに表示されます</string>
+    <string name="home_cwlo_empty_state">未完了の項目はここに表示されます</string>
+    <string name="folder_link_guest_banner_title">MEGAクラウドに保存</string>
 </resources>

@@ -927,7 +927,7 @@
     <!-- Message displayed when email address is successfully updated -->
     <string name="email_confirmation_email_address_update_message">E-posta adresi güncellendi</string>
     <!-- Snackbar text to inform the user that download started -->
-    <string name="transfers_download_started_snackbar">İndirme başladı. Ayrıntılar için bildirime bakın.</string>
+    <string name="transfers_download_started_snackbar">İndirme başladı. Ayrıntılar için bildirimlere bakın.</string>
     <!--Sign Up page text field input first name error message when empty-->
     <string name="sign_up_first_name_text_field_error_message">Bir ad girin</string>
     <!--Sign Up page text field input last name error message when empty-->
@@ -2402,4 +2402,6 @@
     <string name="home_widget_viewed_links_clear_history">Görüntülenen bağlantı geçmişini temizle</string>
     <string name="home_widget_viewed_links_clear_history_dialog_message">Görüntülenen tüm bağlantı geçmişini temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">Görüntülenen bağlantı geçmişi temizlendi</string>
+    <string name="home_widget_viewed_links_empty_state">Görüntülenen bağlantılar burada görünecek</string>
+    <string name="home_cwlo_empty_state">Yarım kalan öğeler burada görünecek</string>
 </resources>
