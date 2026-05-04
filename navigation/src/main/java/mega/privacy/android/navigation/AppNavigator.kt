@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
@@ -545,67 +544,6 @@ interface AppNavigator {
      * @param flags The optional intent flags. If null, defaults to FLAG_ACTIVITY_CLEAR_TOP
      */
     fun openMyAccountActivity(context: Context, flags: Int? = null)
-
-    /**
-     * Open Manager Activity
-     *
-     * @param context The context
-     * @param bundle Optional bundle containing extras to be added to the intent
-     */
-    @Deprecated("This function will be removed after SingleActivity flag goes live. Note that any calls to it while the flag is enabled will result in an exception")
-    fun openManagerActivity(
-        context: Context,
-        data: Uri? = null,
-        action: String? = null,
-        bundle: Bundle? = null,
-        flags: Int? = null,
-    )
-
-    /**
-     * Open Manager Activity if Single activity feature flag is false, otherwise it opens the single activity destination in MegaActivity.
-     *
-     * @param context The context
-     * @param data
-     * @param action
-     * @param bundle Optional bundle containing extras to be added to the intent
-     * @param flags
-     * @param singleActivityDestination the destination of Single activity. It can be null, in this case MegaActivity will be opened without any specific destination
-     * @param singleActivityMessage Message that will be displayed as a snackbar message in case single activity is enabled
-     * @param onIntentCreated callback that allows further configuration of the created intent before starting the ManagerActivity
-     */
-    fun openManagerActivity(
-        context: Context,
-        data: Uri? = null,
-        action: String? = null,
-        bundle: Bundle? = null,
-        flags: Int? = null,
-        singleActivityMessage: String? = null,
-        singleActivityDestination: NavKey?,
-        onIntentCreated: (suspend (Intent) -> Unit)? = null,
-    )
-
-    /**
-     * Open Manager Activity if Single activity feature flag is false, otherwise it opens the single activity destination in MegaActivity.
-     *
-     * @param context The context
-     * @param data
-     * @param action
-     * @param bundle Optional bundle containing extras to be added to the intent
-     * @param flags
-     * @param singleActivityDestinations the destination of Single activity. It can be null, in this case MegaActivity will be opened without any specific destination
-     * @param singleActivityMessage Message that will be displayed as a snackbar message in case single activity is enabled
-     * @param onIntentCreated callback that allows further configuration of the created intent before starting the ManagerActivity
-     */
-    fun openManagerActivity(
-        context: Context,
-        data: Uri? = null,
-        action: String? = null,
-        bundle: Bundle? = null,
-        flags: Int? = null,
-        singleActivityMessage: String? = null,
-        singleActivityDestinations: List<NavKey>,
-        onIntentCreated: (suspend (Intent) -> Unit)? = null,
-    )
 
     /**
      * Get a PendingIntent that targets the single activity.

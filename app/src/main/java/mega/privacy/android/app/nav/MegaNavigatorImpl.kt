@@ -1,12 +1,10 @@
 package mega.privacy.android.app.nav
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
-import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.LifecycleOwner
@@ -19,7 +17,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
@@ -43,8 +40,6 @@ import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_DEVICE_CENTER
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_SYNC_MEGA_FOLDER
 import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
@@ -95,8 +90,10 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
@@ -573,29 +570,17 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openSyncMegaFolder(context: Context, handle: Long) {
-        applicationScope.launch {
-            navigateToManagerActivity(
-                context = context,
-                action = ACTION_OPEN_SYNC_MEGA_FOLDER,
-                data = null,
-                bundle = Bundle().apply {
-                    putLong(INTENT_EXTRA_KEY_HANDLE, handle)
-                },
-                flags = FLAG_ACTIVITY_CLEAR_TOP
-            )
-        }
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = CloudDriveNavKey(nodeHandle = handle),
+        )
     }
 
     override fun openDeviceCenter(context: Context) {
-        applicationScope.launch {
-            navigateToManagerActivity(
-                context = context,
-                action = ACTION_OPEN_DEVICE_CENTER,
-                data = null,
-                bundle = null,
-                flags = FLAG_ACTIVITY_CLEAR_TOP
-            )
-        }
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = DeviceCenterNavKey,
+        )
     }
 
     override fun openSelectStopBackupDestinationFromSyncsTab(
@@ -901,51 +886,6 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
-    @Deprecated("This function will be removed after SingleActivity flag goes live. Note that any calls to it while the flag is enabled will result in an exception")
-    override fun openManagerActivity(
-        context: Context,
-        data: Uri?,
-        action: String?,
-        bundle: Bundle?,
-        flags: Int?,
-    ) {
-        throw IllegalStateException("Navigating to ManagerActivity is not allowed when the SingleActivity flag is enabled")
-    }
-
-    override fun openManagerActivity(
-        context: Context,
-        data: Uri?,
-        action: String?,
-        bundle: Bundle?,
-        flags: Int?,
-        singleActivityMessage: String?,
-        singleActivityDestination: NavKey?,
-        onIntentCreated: (suspend (Intent) -> Unit)?,
-    ) {
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestination = singleActivityDestination,
-            singleActivityMessage = singleActivityMessage,
-        )
-    }
-
-    override fun openManagerActivity(
-        context: Context,
-        data: Uri?,
-        action: String?,
-        bundle: Bundle?,
-        flags: Int?,
-        singleActivityMessage: String?,
-        singleActivityDestinations: List<NavKey>,
-        onIntentCreated: (suspend (Intent) -> Unit)?,
-    ) {
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestinations = singleActivityDestinations,
-            singleActivityMessage = singleActivityMessage,
-        )
-    }
-
     override suspend fun getPendingIntentConsideringSingleActivity(
         context: Context,
         singleActivityPendingIntent: () -> PendingIntent,
@@ -956,26 +896,6 @@ internal class MegaNavigatorImpl @Inject constructor(
         singleActivityDestination: () -> T,
     ): PendingIntent where T : NavKey, T : Parcelable =
         MegaActivity.getPendingIntentWithExtraDestination(context, singleActivityDestination())
-
-    @SuppressLint("ManagerActivityIntent")
-    private suspend fun navigateToManagerActivity(
-        context: Context,
-        action: String?,
-        data: Uri?,
-        bundle: Bundle?,
-        flags: Int? = null,
-        onIntentCreated: (suspend (Intent) -> Unit)? = null,
-    ) {
-        withContext(mainDispatcher) {
-            val intent = Intent(context, ManagerActivity::class.java)
-            intent.action = action
-            intent.data = data
-            flags?.let { intent.flags = it }
-            bundle?.let { intent.putExtras(it) }
-            onIntentCreated?.invoke(intent)
-            context.startActivity(intent)
-        }
-    }
 
     override fun openMediaDiscoveryActivity(
         context: Context,
