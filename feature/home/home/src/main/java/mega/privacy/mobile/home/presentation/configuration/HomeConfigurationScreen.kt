@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,10 +22,14 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.MegaReorderableLazyColumn
+import mega.android.core.ui.components.list.OneLineListItem
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -33,13 +41,20 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.configuration.model.HomeConfigurationUiState
 import mega.privacy.mobile.home.presentation.configuration.model.WidgetConfigurationItem
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeConfigurationScreen(
     state: HomeConfigurationUiState,
     onWidgetEnabledChange: (WidgetConfigurationItem, Boolean) -> Unit,
     onWidgetOrderChange: (orderedItems: List<WidgetConfigurationItem>) -> Unit,
     onBack: () -> Unit,
+    onResetToDefault: () -> Unit,
+    onChooseDefaultStartScreen: () -> Unit
 ) {
+    var showMenuBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+
     MegaScaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -47,25 +62,57 @@ fun HomeConfigurationScreen(
                 title = stringResource(sharedR.string.home_configuration_screen_toolbar_title),
                 subtitle = stringResource(sharedR.string.home_configuration_screen_toolbar_subtitle),
                 navigationType = AppBarNavigationType.Back(onBack),
-                actions = listOf(
-                    MenuActionWithClick(CommonMenuAction.More) {
-                        // Todo: show bottom sheet to reset and choose default start screen
+                actions = buildList {
+                    if (state is HomeConfigurationUiState.Data) {
+                        add(
+                            MenuActionWithClick(CommonMenuAction.More) {
+                                showMenuBottomSheet = true
+                            }
+                        )
                     }
-                )
+                }
             )
         }
     ) { paddingValues ->
         when (state) {
             HomeConfigurationUiState.Loading -> {}
-            is HomeConfigurationUiState.Data -> HomeConfigurationContentView(
-                modifier = Modifier.padding(paddingValues),
-                state = state,
-                onWidgetEnabledChange = onWidgetEnabledChange,
-                onWidgetOrderChange = onWidgetOrderChange,
-            )
+            is HomeConfigurationUiState.Data -> {
+                HomeConfigurationContentView(
+                    modifier = Modifier.padding(paddingValues),
+                    state = state,
+                    onWidgetEnabledChange = onWidgetEnabledChange,
+                    onWidgetOrderChange = onWidgetOrderChange,
+                )
+
+                if (showMenuBottomSheet) {
+                    val dismissSheet: (() -> Unit) -> Unit = { callback ->
+                        coroutineScope.launch {
+                            menuSheetState.hide()
+                        }.invokeOnCompletion {
+                            showMenuBottomSheet = false
+                            callback()
+                        }
+                    }
+                    MegaModalBottomSheet(
+                        sheetState = menuSheetState,
+                        bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+                        onDismissRequest = { showMenuBottomSheet = false },
+                    ) {
+                        OneLineListItem(
+                            modifier = Modifier.testTag(TEST_TAG_MENU_RESET_TO_DEFAULT),
+                            text = stringResource(sharedR.string.home_configuration_screen_menu_reset_to_default),
+                            onClickListener = { dismissSheet(onResetToDefault) },
+                        )
+                        OneLineListItem(
+                            modifier = Modifier.testTag(TEST_TAG_MENU_CHOOSE_DEFAULT_START_SCREEN),
+                            text = stringResource(sharedR.string.home_configuration_screen_menu_choose_default_start_screen),
+                            onClickListener = { dismissSheet(onChooseDefaultStartScreen) },
+                        )
+                    }
+                }
+            }
         }
     }
-
 }
 
 @Composable
@@ -130,3 +177,6 @@ fun <T> MutableList<T>.move(fromIndex: Int, toIndex: Int) {
 
 const val TEST_TAG_WIDGET_CONFIGURATION_VIEW = "widget_configuration:list"
 const val TEST_TAG_WIDGET_CONFIGURATION_ITEM = "widget_configuration:item_"
+const val TEST_TAG_MENU_RESET_TO_DEFAULT = "widget_configuration:menu_reset_to_default"
+const val TEST_TAG_MENU_CHOOSE_DEFAULT_START_SCREEN =
+    "widget_configuration:menu_choose_default_start_screen"

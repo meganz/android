@@ -106,4 +106,7 @@ class HomeConfigurationViewModel @Inject constructor(
         }
     }
 
+    fun resetWidgetStateToDefault() {
+        // Todo: Reset widget state to default
+    }
 }

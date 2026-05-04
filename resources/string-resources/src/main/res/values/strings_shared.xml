@@ -2790,4 +2790,8 @@
     <string name="home_configuration_screen_toolbar_title">Customise Home</string>
     <!-- Home configuration feature screen subtitle -->
     <string name="home_configuration_screen_toolbar_subtitle">Drag sections to reorder</string>
+    <!-- Bottom sheet menu item to reset the Home configuration back to its default settings -->
+    <string name="home_configuration_screen_menu_reset_to_default">Reset to default</string>
+    <!-- Bottom sheet menu item to choose the default start screen shown when the app launches -->
+    <string name="home_configuration_screen_menu_choose_default_start_screen">Choose default start screen</string>
 </resources>

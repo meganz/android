@@ -22,7 +22,11 @@ fun EntryProviderScope<NavKey>.homeConfigurationScreen(
             state = state,
             onWidgetEnabledChange = viewmodel::updateEnabledState,
             onWidgetOrderChange = viewmodel::updateWidgetOrder,
-            onBack = navigationHandler::back
+            onBack = navigationHandler::back,
+            onResetToDefault = viewmodel::resetWidgetStateToDefault,
+            onChooseDefaultStartScreen = {
+                // Todo: Navigate to choose default start screen
+            }
         )
     }
 }
