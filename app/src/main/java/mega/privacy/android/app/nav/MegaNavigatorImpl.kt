@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
 import android.os.Parcelable
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +15,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -370,7 +372,18 @@ internal class MegaNavigatorImpl @Inject constructor(
                 },
                 serializedData = serializedData,
             )
-            withContext(mainDispatcher) { context.startActivity(intent) }
+            withContext(mainDispatcher) {
+                runCatching {
+                    context.startActivity(intent)
+                }.onFailure { e ->
+                    Timber.e(e, "Exception when opening media player activity")
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.intent_not_available),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
         }
     }
 
