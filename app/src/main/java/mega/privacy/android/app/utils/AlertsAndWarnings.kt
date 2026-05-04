@@ -15,7 +15,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -44,11 +43,6 @@ object AlertsAndWarnings {
      */
     @JvmStatic
     fun showOverDiskQuotaPaywallWarning(activity: Activity?, loginFinished: Boolean) {
-        // If app is doing login, the ODQ will be displayed at login finish
-        if (activity is LoginActivity && !loginFinished) {
-            return
-        }
-
         if (activity is OverDiskQuotaPaywallActivity) {
             return
         }

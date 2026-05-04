@@ -180,7 +180,6 @@ import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
@@ -1431,10 +1430,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 }
             }
             if (!openLink) {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.TOUR_FRAGMENT)
-                loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                startActivity(loginIntent)
                 finish()
             }
             return true
@@ -1480,7 +1475,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     ): Boolean {
         var selectDrawerItemPending = true
         rootNode = megaApi.rootNode
-        if (rootNode == null || LoginActivity.isBackFromLoginPage) {
+        if (rootNode == null) {
             Timber.d("Action: %s", intent?.action)
             refreshSession()
             return true
@@ -2603,12 +2598,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 if (intent?.action != null) {
                     Timber.d("Intent with ACTION: %s", intent.action)
                     if (intent?.action == Constants.ACTION_EXPORT_MASTER_KEY) {
-                        val exportIntent =
-                            Intent(this, LoginActivity::class.java)
-                        intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                        exportIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        exportIntent.action = intent.action
-                        startActivity(exportIntent)
                         finish()
                         return
                     }
@@ -2648,12 +2637,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
                 Constants.ACTION_IMPORT_LINK_FETCH_NODES -> {
                     Timber.d("ACTION_IMPORT_LINK_FETCH_NODES")
-                    val loginIntent = Intent(this, LoginActivity::class.java)
-                    intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    loginIntent.action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
-                    loginIntent.data = Uri.parse(intent.dataString)
-                    startActivity(loginIntent)
                     finish()
                     return
                 }
@@ -3307,7 +3290,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             )
                             if (isInMainHomePage) moveFromOfflineToOnlineMode()
                         } else {
-                            navigateToLogin()
+                            finish()
                         }
                     }
 
@@ -3316,15 +3299,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         } catch (e: Exception) {
             Timber.w(e)
         }
-    }
-
-    private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java).apply {
-            putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
-        startActivity(intent)
-        finish()
     }
 
     private fun moveFromOfflineToOnlineMode() {

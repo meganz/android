@@ -200,12 +200,6 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".presentation.login.LoginActivity"
-            android:configChanges="screenSize"
-            android:exported="true"
-            android:theme="@style/Theme.Mega.Starting"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
-        <activity
             android:name=".activities.WebViewActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTop" />

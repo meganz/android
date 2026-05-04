@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.privacy.android.analytics.Analytics
@@ -123,7 +122,6 @@ fun LoginScreen(
         onEmailChanged = viewModel::onEmailChanged,
         onPasswordChanged = viewModel::onPasswordChanged,
         onLoginClicked = {
-            LoginActivity.isBackFromLoginPage = false
             viewModel.onLoginClicked(false)
             billingViewModel.loadPurchases()
         },
@@ -209,11 +207,6 @@ fun LoginScreen(
         )
     }
 
-    // Hide splash after UI is rendered, to prevent blinking
-    LaunchedEffect(key1 = Unit) {
-        delay(100)
-        (activity as? LoginActivity)?.stopShowingSplashScreen()
-    }
 }
 
 private fun openLoginIssueHelpdeskPage(context: Context) {

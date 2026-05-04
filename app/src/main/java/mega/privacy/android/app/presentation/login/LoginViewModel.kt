@@ -5,14 +5,11 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +29,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
-import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.extensions.newError
@@ -57,7 +53,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
-import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
@@ -66,8 +61,6 @@ import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.QuerySignupLinkException
-import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
-import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -83,19 +76,16 @@ import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCas
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
-import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
@@ -107,20 +97,15 @@ import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
-import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
-import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
-import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationFailedEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationSuccessEvent
@@ -131,13 +116,12 @@ import timber.log.Timber
  *
  * @property state View state as [LoginState]
  */
-@HiltViewModel(assistedFactory = LoginViewModel.Factory::class)
-class LoginViewModel @AssistedInject constructor(
+@HiltViewModel
+class LoginViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
@@ -150,8 +134,6 @@ class LoginViewModel @AssistedInject constructor(
     private val loginUseCase: LoginUseCase,
     private val loginWith2FAUseCase: LoginWith2FAUseCase,
     private val fastLoginUseCase: FastLoginUseCase,
-    private val fetchNodesUseCase: FetchNodesUseCase,
-    private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
@@ -159,7 +141,6 @@ class LoginViewModel @AssistedInject constructor(
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
-    private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
     private val installReferrerHandler: InstallReferrerHandler,
     @LoginMutex val loginMutex: Mutex,
@@ -167,7 +148,6 @@ class LoginViewModel @AssistedInject constructor(
     private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
     private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
     private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
-    private val checkIfTransfersShouldBePausedUseCase: CheckIfTransfersShouldBePausedUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
@@ -180,8 +160,6 @@ class LoginViewModel @AssistedInject constructor(
     private val shouldShowUpgradeAccountUseCase: ShouldShowUpgradeAccountUseCase,
     private val ephemeralCredentialManager: EphemeralCredentialManager,
     private val resumeTransfersForNotLoggedInInstanceUseCase: ResumeTransfersForNotLoggedInInstanceUseCase,
-    private val updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase,
-    private val getCookieSettingsUseCase: GetCookieSettingsUseCase,
     private val startScreenUtil: StartScreenUtil,
     private val getMiscFlagsUseCase: GetMiscFlagsUseCase,
     private val getDomainNameUseCase: GetDomainNameUseCase,
@@ -190,7 +168,6 @@ class LoginViewModel @AssistedInject constructor(
     private val getSessionLinkUseCase: GetSessionLinkUseCase,
     private val fetchNodeProvider: FetchNodeProvider,
     private val accountBlockedTypeStringMapper: AccountBlockedTypeStringMapper,
-    @Assisted val isInSingleActivity: Boolean,
 ) : ViewModel() {
     private val is2FARequited = savedStateHandle[IS_2FA_REQUIRED] ?: false
 
@@ -222,7 +199,6 @@ class LoginViewModel @AssistedInject constructor(
 
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
 
-    private var performFetchNodesJob: Job? = null
     private val handledLinks = mutableSetOf<HandledLinks>()
 
     init {
@@ -337,20 +313,10 @@ class LoginViewModel @AssistedInject constructor(
                     { state: LoginState -> state.copy(isCUSettingEnabled = isCameraSyncEnabled) }
                 }.catch { Timber.e(it) },
                 monitorFetchNodesFinishUseCase().catch { Timber.e(it) }.map {
-                    with(pendingAction) {
-                        when (this) {
-                            RefreshEvent.SdkReload.name -> {
-                                { state: LoginState -> state.copy(isPendingToFinishActivity = true) }
-                            }
-
-                            ACTION_OPEN_APP -> {
-                                { state: LoginState -> state.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
-                            }
-
-                            else -> {
-                                { state: LoginState -> state }
-                            }
-                        }
+                    if (pendingAction == ACTION_OPEN_APP) {
+                        { state: LoginState -> state.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
+                    } else {
+                        { state: LoginState -> state }
                     }
                 },
                 flow { emit(isFirstLaunchUseCase()) }.catch { Timber.e(it) }.map { isFirstLaunch ->
@@ -390,10 +356,8 @@ class LoginViewModel @AssistedInject constructor(
                 .filter { it.type in blockedTypes }
                 .collectLatest {
                     if (it.type == AccountBlockedType.VERIFICATION_EMAIL) resetLoginState() else stopLogin()
-                    if (isInSingleActivity) {
-                        val mappedText = accountBlockedTypeStringMapper(it)
-                        triggerAccountBlockedEvent(it.copy(text = mappedText))
-                    }
+                    val mappedText = accountBlockedTypeStringMapper(it)
+                    triggerAccountBlockedEvent(it.copy(text = mappedText))
                 }
         }
     }
@@ -437,25 +401,7 @@ class LoginViewModel @AssistedInject constructor(
         _state.update { state -> state.copy(isPendingToShowFragment = consumed()) }
     }
 
-    /**
-     * Sets [ACTION_FORCE_RELOAD_ACCOUNT] as pendingAction.
-     */
-    fun setForceReloadAccountAsPendingAction() {
-        pendingAction = RefreshEvent.SdkReload.name
-        _state.update { state ->
-            state.copy(
-                intentState = LoginIntentState.AlreadySet,
-                isLoginInProgress = false,
-                isLoginRequired = false,
-                is2FARequired = false,
-                isAlreadyLoggedIn = true,
-                fetchNodesUpdate = cleanFetchNodesUpdate
-            )
-        }
-    }
-
     fun resetLoginState() {
-        performFetchNodesJob?.cancel()
         _state.update {
             it.copy(
                 fetchNodesUpdate = null,
@@ -687,8 +633,6 @@ class LoginViewModel @AssistedInject constructor(
             return
         }
 
-        LoginActivity.isBackFromLoginPage = false
-
         _state.update {
             if (typedEmail != null && typedPassword != null) {
                 it.copy(
@@ -905,10 +849,6 @@ class LoginViewModel @AssistedInject constructor(
             if (!isFastLogin) {
                 shouldShowUpgradeAccount()
             }
-            // allow fetching node for legacy activity, in new single activity, fetchNodes called in another screen
-            if (!isInSingleActivity) {
-                fetchNodes()
-            }
             sendAnalyticsEventIfFirstTimeLogin(email)
         }
 
@@ -967,102 +907,6 @@ class LoginViewModel @AssistedInject constructor(
         }.getOrDefault(false)
         _state.update { it.copy(shouldShowUpgradeAccount = shouldShow) }
         Timber.d("Should show upgrade account: ${state.value.shouldShowUpgradeAccount}")
-    }
-
-    /**
-     * Fetch nodes.
-     */
-    fun fetchNodes(isRefreshSession: Boolean = false) {
-        viewModelScope.launch {
-            if (isRefreshSession) {
-                getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
-            }
-
-            checkEnabledCookies()
-
-            if (isRefreshSession) {
-                _state.update { it.copy(fetchNodesUpdate = cleanFetchNodesUpdate) }
-            }
-
-            Timber.d("fetch nodes started")
-            performFetchNodes()
-        }
-    }
-
-    private fun checkEnabledCookies() {
-        applicationScope.launch {
-            runCatching {
-                val enabledCookies = getCookieSettingsUseCase()
-                updateCrashAndPerformanceReportersUseCase(enabledCookies)
-            }.onFailure {
-                Timber.e("Failed to get cookie settings: $it")
-            }
-        }
-    }
-
-    private fun performFetchNodes() {
-        performFetchNodesJob = viewModelScope.launch {
-            runCatching {
-                fetchNodesUseCase().collectLatest { update ->
-                    if (update.progress?.floatValue == 1F) {
-                        Timber.d("fetch nodes finished")
-                        prefetchTimeline()
-                        _state.update {
-                            it.copy(
-                                intentState = LoginIntentState.ReadyForFinalSetup,
-                                fetchNodesUpdate = update
-                            )
-                        }
-                        startWorkers()
-                    } else {
-                        Timber.d("fetch nodes update")
-                        _state.update { it.copy(fetchNodesUpdate = update) }
-                    }
-                }
-            }.onFailure { exception ->
-                Timber.e(exception)
-                if (exception !is FetchNodesException) return@launch
-
-                _state.update { state ->
-                    val messageId =
-                        exception.takeUnless { exception is FetchNodesErrorAccess || state.pressedBackWhileLogin }
-
-                    state.copy(
-                        isLoginInProgress = false,
-                        isLoginRequired = true,
-                        is2FAEnabled = false,
-                        is2FARequired = false,
-                        snackbarMessage = messageId?.let { triggered(exception.error) }
-                            ?: consumed()
-                    )
-                }
-            }
-        }
-    }
-
-    private suspend fun prefetchTimeline() {
-        runCatching {
-            if (!getFeatureFlagValueUseCase(AppFeatures.PrefetchTimeline)) return@runCatching
-            getTimelinePhotosUseCase()
-        }.onFailure {
-            Timber.e(it)
-        }
-    }
-
-    private suspend fun startWorkers() {
-        /* In case the app crash or restarts, we need to sync some tasks */
-        val syncTasks = listOf<suspend () -> Unit>(
-            { establishCameraUploadsSyncHandlesUseCase() },
-            { checkIfTransfersShouldBePausedUseCase() }
-        )
-
-        syncTasks.forEach { task ->
-            runCatching {
-                task()
-            }.onFailure { error ->
-                Timber.e(error, "Task failed")
-            }
-        }
     }
 
     /**
@@ -1392,11 +1236,6 @@ class LoginViewModel @AssistedInject constructor(
 
     fun setPendingToGetLinkWithSession() {
         _state.update { it.copy(isPendingToGetLinkWithSession = true) }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(isInSingleActivity: Boolean): LoginViewModel
     }
 
     companion object {

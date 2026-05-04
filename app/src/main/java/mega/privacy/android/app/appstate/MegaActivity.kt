@@ -275,11 +275,7 @@ class MegaActivity : FragmentActivity() {
             val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
             val requestStatusProgressViewModel = hiltViewModel<RequestStatusProgressViewModel>()
-            val loginViewModel = hiltViewModel<LoginViewModel, LoginViewModel.Factory>(
-                creationCallback = { factory ->
-                    factory.create(isInSingleActivity = true)
-                }
-            )
+            val loginViewModel = hiltViewModel<LoginViewModel>()
 
             val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()
             val globalState by globalStateViewModel.state.collectAsStateWithLifecycle()

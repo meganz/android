@@ -37,7 +37,6 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
-import mega.privacy.android.domain.entity.settings.cookie.CookieType
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.MegaException
@@ -54,18 +53,15 @@ import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCas
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
-import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
@@ -77,18 +73,14 @@ import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
-import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
-import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
-import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.transfers.ResumeTransfersForNotLoggedInInstanceUseCase
-import mega.privacy.android.domain.usecase.transfers.paused.CheckIfTransfersShouldBePausedUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -104,7 +96,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -121,8 +112,6 @@ internal class LoginViewModelTest {
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase =
-        mock { onBlocking { invoke(any()) }.thenReturn(false) }
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase = mock()
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase = mock()
     private val monitorUserCredentialsFlow = MutableSharedFlow<UserCredentials?>()
@@ -136,7 +125,6 @@ internal class LoginViewModelTest {
     private val loginUseCase: LoginUseCase = mock()
     private val loginWith2FAUseCase: LoginWith2FAUseCase = mock()
     private val fastLoginUseCase: FastLoginUseCase = mock()
-    private val fetchNodesUseCase: FetchNodesUseCase = mock()
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase = mock()
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase = mock()
@@ -145,9 +133,6 @@ internal class LoginViewModelTest {
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
     private val accountBlockedTypeStringMapper = mock<AccountBlockedTypeStringMapper>()
-    private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
-    private val establishCameraUploadsSyncHandlesUseCase =
-        mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val getLastRegisteredEmailUseCase = mock<GetLastRegisteredEmailUseCase>()
     private val installReferrerHandler = mock<InstallReferrerHandler>()
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
@@ -157,8 +142,6 @@ internal class LoginViewModelTest {
     private val requestStatusProgressFakeFlow = MutableSharedFlow<Progress>()
     private val monitorRequestStatusProgressEventUseCase =
         mock<MonitorRequestStatusProgressEventUseCase>()
-    private val checkIfTransfersShouldBePausedUseCase =
-        mock<CheckIfTransfersShouldBePausedUseCase>()
     private val isFirstLaunchUseCase = mock<IsFirstLaunchUseCase>()
     private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
     private val resendVerificationEmailUseCase = mock<ResendVerificationEmailUseCase>()
@@ -179,30 +162,26 @@ internal class LoginViewModelTest {
     private val ephemeralCredentialManager = mock<EphemeralCredentialManager>()
     private val resumeTransfersForNotLoggedInInstanceUseCase =
         mock<ResumeTransfersForNotLoggedInInstanceUseCase>()
-    private val updateCrashAndPerformanceReportersUseCase =
-        mock<UpdateCrashAndPerformanceReportersUseCase>()
     private val startScreenUtil = mock<StartScreenUtil>()
     private val getMiscFlagsUseCase = mock<GetMiscFlagsUseCase>()
     private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
     private val monitorMiscLoadedUseCase = mock<MonitorMiscLoadedUseCase>()
     private val monitorMiscLoadedFlow = MutableSharedFlow<Boolean>()
-    private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val getSessionLinkUseCase: GetSessionLinkUseCase = mock()
 
     @BeforeEach
     fun setUp() = runTest {
         stubCommon()
-        initViewModel(isInSingleActivity = false)
+        initViewModel()
     }
 
-    private fun initViewModel(isInSingleActivity: Boolean = false) {
+    private fun initViewModel() {
         underTest = LoginViewModel(
             applicationScope = applicationScope,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
             getAccountCredentialsUseCase = getAccountCredentialsUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
@@ -215,8 +194,6 @@ internal class LoginViewModelTest {
             loginUseCase = loginUseCase,
             loginWith2FAUseCase = loginWith2FAUseCase,
             fastLoginUseCase = fastLoginUseCase,
-            fetchNodesUseCase = fetchNodesUseCase,
-            establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             ongoingTransfersExistUseCase = ongoingTransfersExistUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
@@ -225,7 +202,6 @@ internal class LoginViewModelTest {
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             accountBlockedTypeStringMapper = accountBlockedTypeStringMapper,
-            getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             loginMutex = mock(),
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
             installReferrerHandler = installReferrerHandler,
@@ -233,7 +209,6 @@ internal class LoginViewModelTest {
             getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,
             enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase,
             monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
-            checkIfTransfersShouldBePausedUseCase = checkIfTransfersShouldBePausedUseCase,
             isFirstLaunchUseCase = isFirstLaunchUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             resendVerificationEmailUseCase = resendVerificationEmailUseCase,
@@ -246,25 +221,19 @@ internal class LoginViewModelTest {
             shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase,
             ephemeralCredentialManager = ephemeralCredentialManager,
             resumeTransfersForNotLoggedInInstanceUseCase = resumeTransfersForNotLoggedInInstanceUseCase,
-            updateCrashAndPerformanceReportersUseCase = updateCrashAndPerformanceReportersUseCase,
             startScreenUtil = startScreenUtil,
             getMiscFlagsUseCase = getMiscFlagsUseCase,
             getDomainNameUseCase = getDomainNameUseCase,
             monitorMiscLoadedUseCase = monitorMiscLoadedUseCase,
-            getCookieSettingsUseCase = getCookieSettingsUseCase,
             getUserDataUseCase = getUserDataUseCase,
             getSessionLinkUseCase = getSessionLinkUseCase,
             fetchNodeProvider = mock(),
-            isInSingleActivity = isInSingleActivity
         )
     }
 
     private suspend fun stubCommon() {
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
             requestStatusProgressFakeFlow
-        )
-        whenever(getFeatureFlagValueUseCase(any())).thenReturn(
-            true
         )
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(monitorEphemeralCredentialsUseCase()).thenReturn(emptyFlow())
@@ -296,7 +265,6 @@ internal class LoginViewModelTest {
     fun resetMocks() {
         reset(
             monitorRequestStatusProgressEventUseCase,
-            checkIfTransfersShouldBePausedUseCase,
             isFirstLaunchUseCase,
             resendVerificationEmailUseCase,
             checkRecoveryKeyUseCase,
@@ -306,7 +274,6 @@ internal class LoginViewModelTest {
             shouldShowUpgradeAccountUseCase,
             resumeTransfersForNotLoggedInInstanceUseCase,
             startScreenUtil,
-            updateCrashAndPerformanceReportersUseCase,
             getMiscFlagsUseCase,
             getDomainNameUseCase,
             monitorMiscLoadedUseCase,
@@ -783,18 +750,6 @@ internal class LoginViewModelTest {
     }
 
     @Test
-    fun `test that updateCrashAndPerformanceReportersUseCase is invoked when fetchNodes is`() =
-        runTest {
-            val enabledCookies = setOf(CookieType.ESSENTIAL)
-            getCookieSettingsUseCase.stub {
-                onBlocking { invoke() } doReturn enabledCookies
-            }
-            underTest.fetchNodes()
-            advanceUntilIdle()
-            verify(updateCrashAndPerformanceReportersUseCase).invoke(enabledCookies)
-        }
-
-    @Test
     fun `test that openRecoveryUrlEvent is not triggered until the feature flags are loaded`() =
         runTest {
             underTest.state.test {
@@ -865,35 +820,13 @@ internal class LoginViewModelTest {
     }
 
     @Test
-    fun `test that when not single activity monitorAccountBlockedUseCase emit does not trigger account blocked event in state`() =
-        runTest {
-            val accountBlockedFlow = MutableSharedFlow<AccountBlockedEvent>()
-            whenever(monitorAccountBlockedUseCase()).thenReturn(accountBlockedFlow)
-            initViewModel(isInSingleActivity = false)
-            advanceUntilIdle()
-
-            accountBlockedFlow.emit(
-                AccountBlockedEvent(
-                    handle = -1L,
-                    type = AccountBlockedType.TOS_COPYRIGHT,
-                    text = "server message"
-                )
-            )
-            advanceUntilIdle()
-            assertThat(underTest.state.value.accountBlockedEvent).isInstanceOf(
-                StateEventWithContentConsumed::class.java
-            )
-            verifyNoInteractions(accountBlockedTypeStringMapper)
-        }
-
-    @Test
-    fun `test that when single activity and monitorAccountBlockedUseCase emits then state receives event with text from mapper`() =
+    fun `test that monitorAccountBlockedUseCase emits then state receives event with text from mapper`() =
         runTest {
             val mappedText = "mapped message"
             whenever(accountBlockedTypeStringMapper(any())).thenReturn(mappedText)
             val accountBlockedFlow = MutableSharedFlow<AccountBlockedEvent>()
             whenever(monitorAccountBlockedUseCase()).thenReturn(accountBlockedFlow)
-            initViewModel(isInSingleActivity = true)
+            initViewModel()
             advanceUntilIdle()
 
             val emittedEvent = AccountBlockedEvent(

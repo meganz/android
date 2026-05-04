@@ -20,7 +20,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
@@ -65,7 +64,6 @@ class ActivityAppContainerWrapper @Inject constructor(
 
     private fun onCreate() {
         val activity = context as Activity
-        val isLoginActivity = activity is LoginActivity
         if (activity.findViewById<ComposeView>(R.id.legacy_container) == null
         ) {
             val view = ComposeView(activity)
@@ -78,55 +76,29 @@ class ActivityAppContainerWrapper @Inject constructor(
                         val themeMode by monitorThemeModeUseCase()
                             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-                        if (!isLoginActivity) {
-                            val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> =
-                                listOf(
-                                    {
-                                        BusinessAccountContainer(content = it)
-                                    },
-                                    {
-                                        PasscodeContainer(
-                                            canLock = { passcodeCheck?.canLock() != false },
-                                            content = it,
-                                        )
-                                    },
-                                    {
-                                        OriginalTheme(
-                                            isDark = themeMode.isDarkMode(),
-                                            content = it
-                                        )
-                                    },
-                                )
-
-                            AppContainer(
-                                containers = containers.filterNotNull(),
-                                content = { Box(Modifier.fillMaxSize()) }
+                        val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> =
+                            listOf(
+                                {
+                                    BusinessAccountContainer(content = it)
+                                },
+                                {
+                                    PasscodeContainer(
+                                        canLock = { passcodeCheck?.canLock() != false },
+                                        content = it,
+                                    )
+                                },
+                                {
+                                    OriginalTheme(
+                                        isDark = themeMode.isDarkMode(),
+                                        content = it
+                                    )
+                                },
                             )
-                        } else {
-                            val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> =
-                                listOf(
-                                    {
-                                        BusinessAccountContainer(content = it)
-                                    },
-                                    {
-                                        PasscodeContainer(
-                                            canLock = { passcodeCheck?.canLock() != false },
-                                            content = it,
-                                        )
-                                    },
-                                    {
-                                        OriginalTheme(
-                                            isDark = themeMode.isDarkMode(),
-                                            content = it
-                                        )
-                                    },
-                                )
 
-                            AppContainer(
-                                containers = containers.filterNotNull(),
-                                content = { Box(Modifier.fillMaxSize()) }
-                            )
-                        }
+                        AppContainer(
+                            containers = containers.filterNotNull(),
+                            content = { Box(Modifier.fillMaxSize()) }
+                        )
                     }
 
                 }.apply {

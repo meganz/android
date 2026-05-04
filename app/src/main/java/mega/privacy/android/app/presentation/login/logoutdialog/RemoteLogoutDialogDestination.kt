@@ -10,12 +10,13 @@ import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.login.LOGGED_OUT_DIALOG
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.shared.resources.R as SharedR
+
+internal const val LOGGED_OUT_DIALOG = "logged_out_dialog"
 
 @Serializable
 data object RemoteLogoutDialogNavKey : NoSessionNavKey.Mandatory, DialogNavKey
