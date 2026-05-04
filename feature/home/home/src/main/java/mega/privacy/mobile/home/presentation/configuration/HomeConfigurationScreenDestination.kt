@@ -22,7 +22,7 @@ fun EntryProviderScope<NavKey>.homeConfigurationScreen(
             state = state,
             onWidgetEnabledChange = viewmodel::updateEnabledState,
             onWidgetOrderChange = viewmodel::updateWidgetOrder,
-            onDeleteWidget = viewmodel::deleteWidget,
+            onBack = navigationHandler::back
         )
     }
 }
