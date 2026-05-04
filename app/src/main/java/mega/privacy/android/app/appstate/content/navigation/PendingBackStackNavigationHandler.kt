@@ -120,6 +120,7 @@ class PendingBackStackNavigationHandler(
 
     override fun backTo(destination: NavKey, inclusive: Boolean) {
         removeFromBackStackTo(destination, inclusive)
+        ensureNotEmpty()
     }
 
     override fun navigateAndClearBackStack(destination: NavKey) {
@@ -142,6 +143,7 @@ class PendingBackStackNavigationHandler(
 
         // Navigate back after setting the result
         backstack.removeLastOrNull()
+        ensureNotEmpty()
     }
 
     fun onNetworkChange(isConnected: Boolean) {

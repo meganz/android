@@ -123,6 +123,14 @@ class PendingBackStackNavigationHandlerTest {
     }
 
     @Test
+    fun `test that backTo restores landing screen when inclusive removes the only entry`() {
+        backStack.clear()
+        backStack.add(Destination1)
+        underTest.backTo(Destination1, inclusive = true)
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
     fun `test that navigateAndClearTo clears back to parent and adds new destination`() {
         backStack.addAll(listOf(Destination1, Destination2, Destination3))
 
@@ -141,6 +149,14 @@ class PendingBackStackNavigationHandlerTest {
             assert(awaitItem() == "resultValue")
         }
 
+        assertThat(backStack).containsExactly(DefaultLandingScreen)
+    }
+
+    @Test
+    fun `test that returnResult restores landing screen when popping the only entry`() = runTest {
+        backStack.clear()
+        backStack.add(Destination1)
+        underTest.returnResult("testKey", "resultValue")
         assertThat(backStack).containsExactly(DefaultLandingScreen)
     }
 
