@@ -130,7 +130,7 @@ fun HomeConfigurationContentView(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    var currentItems by remember(state.widgets) { mutableStateOf(state.widgets.sortedBy { it.index }) }
+    var currentItems by remember(state.widgets) { mutableStateOf(state.widgets) }
     var draggedWidget by remember { mutableStateOf<WidgetConfigurationItem?>(null) }
 
     MegaReorderableLazyColumn(

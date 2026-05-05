@@ -43,6 +43,7 @@ class HomeConfigurationViewModel @Inject constructor(
                             )
                         }
                     }
+                    .sortedBy { it.index }
 
                 HomeConfigurationUiState.Data(
                     allowRemoval = items.count { widget -> widget.enabled } > 1,

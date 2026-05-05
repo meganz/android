@@ -188,6 +188,82 @@ class HomeConfigurationViewModelTest {
         }
 
     @Test
+    fun `test that widgets are sorted by index ascending`() = runTest {
+        val secondWidget = stubWidget(identifier = "second", defaultOrder = 5)
+        val thirdWidget = stubWidget(identifier = "third", defaultOrder = 6)
+        val firstWidget = stubWidget(identifier = "first", defaultOrder = 4)
+
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(
+                    listOf(
+                        HomeWidgetConfiguration(
+                            widgetIdentifier = "second",
+                            widgetOrder = 1,
+                            enabled = true,
+                        ),
+                        HomeWidgetConfiguration(
+                            widgetIdentifier = "third",
+                            widgetOrder = 2,
+                            enabled = true,
+                        ),
+                        HomeWidgetConfiguration(
+                            widgetIdentifier = "first",
+                            widgetOrder = 0,
+                            enabled = true,
+                        ),
+                    ),
+                )
+                awaitCancellation()
+            }
+        }
+
+        dynamicWidgetsProvider.stub {
+            onBlocking { getWidgets() } doReturn setOf(secondWidget, thirdWidget)
+        }
+
+        staticWidgetsProvider.stub {
+            onBlocking { getWidgets() } doReturn setOf(firstWidget)
+        }
+
+        underTest.state.test {
+            val actual = awaitItem() as HomeConfigurationUiState.Data
+            assertThat(actual.widgets.map { it.identifier })
+                .containsExactly("first", "second", "third")
+                .inOrder()
+        }
+    }
+
+    @Test
+    fun `test that widgets are sorted by default order when no configuration exists`() = runTest {
+        val thirdWidget = stubWidget(identifier = "third", defaultOrder = 2)
+        val firstWidget = stubWidget(identifier = "first", defaultOrder = 0)
+        val secondWidget = stubWidget(identifier = "second", defaultOrder = 1)
+
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(emptyList())
+                awaitCancellation()
+            }
+        }
+
+        dynamicWidgetsProvider.stub {
+            onBlocking { getWidgets() } doReturn setOf(thirdWidget, firstWidget)
+        }
+
+        staticWidgetsProvider.stub {
+            onBlocking { getWidgets() } doReturn setOf(secondWidget)
+        }
+
+        underTest.state.test {
+            val actual = awaitItem() as HomeConfigurationUiState.Data
+            assertThat(actual.widgets.map { it.identifier })
+                .containsExactly("first", "second", "third")
+                .inOrder()
+        }
+    }
+
+    @Test
     fun `test that allowRemoval is false if only one item is enabled`() = runTest {
         val configurationList = listOf(
             HomeWidgetConfiguration(
