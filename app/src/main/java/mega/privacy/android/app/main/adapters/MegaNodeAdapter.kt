@@ -52,7 +52,6 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ViewHolderBrowser
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
-import mega.privacy.android.app.presentation.backups.BackupsFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
@@ -331,9 +330,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
     fun hideMultipleSelect() {
         if (selectedItems.size() <= 0) {
-            if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
-                (fragment as BackupsFragment).hideMultipleSelect()
-            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
+            if (type == Constants.CONTACT_FILE_ADAPTER) {
                 (fragment as ContactFileListFragment).hideMultipleSelect()
             } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
                 (fragment as ContactSharedFolderFragment).hideMultipleSelect()
@@ -1293,9 +1290,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
     }
 
     private fun fileClicked(currentPosition: Int) {
-        if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
-            (fragment as BackupsFragment).onNodeSelected(currentPosition)
-        } else if (type == Constants.CONTACT_FILE_ADAPTER) {
+        if (type == Constants.CONTACT_FILE_ADAPTER) {
             (fragment as ContactFileListFragment).itemClick(currentPosition)
         } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
             (fragment as ContactSharedFolderFragment).itemClick(currentPosition)
@@ -1309,9 +1304,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         }
 
         if (isMultipleSelect) {
-            if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
-                (fragment as BackupsFragment).onNodeSelected(currentPosition)
-            } else if (type == Constants.CONTACT_FILE_ADAPTER) {
+            if (type == Constants.CONTACT_FILE_ADAPTER) {
                 (fragment as ContactFileListFragment).itemClick(currentPosition)
             } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
                 (fragment as ContactSharedFolderFragment).itemClick(currentPosition)
@@ -1340,10 +1333,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
         val holder = view.tag as ViewHolderBrowser
         val currentPosition = holder.adapterPosition
-        if (type == NodeSourceTypeInt.BACKUPS_ADAPTER) {
-            (fragment as BackupsFragment).activateActionMode()
-            (fragment as BackupsFragment).onNodeSelected(currentPosition)
-        } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
+        if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
             (fragment as ContactSharedFolderFragment).activateActionMode()
             (fragment as ContactSharedFolderFragment).itemClick(currentPosition)
         } else if (type == Constants.CONTACT_FILE_ADAPTER) {
