@@ -73,6 +73,9 @@ allprojects {
             url =
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-ucrop-n-edit")
         }
+        flatDir {
+            dirs("${rootProject.projectDir}/third-party-lib/pdfiumAndroid")
+        }
     }
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")

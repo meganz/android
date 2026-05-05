@@ -10,5 +10,5 @@ android {
 }
 
 dependencies {
-    api(files("pdfiumandroid-1.9.6.aar"))
+    api("com.shockwave:pdfiumandroid:1.9.6@aar")
 }
