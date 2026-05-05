@@ -13,6 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
@@ -70,6 +72,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
     @Assisted private val nodeId: Long,
@@ -100,6 +103,16 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
         getBottomSheetOptions()
         if (nodeSourceType == NodeSourceType.OFFLINE) {
             monitorOfflineNodeAvailability(nodeId)
+        }
+        if (publicLinkUrl.isNullOrBlank()
+            && nodeSourceType != NodeSourceType.FOLDER_LINK
+            && nodeSourceType != NodeSourceType.FILE_LINK
+        ) {
+            viewModelScope.launch {
+                monitorNodeUpdatesById(NodeId(nodeId))
+                    .catch { Timber.e(it) }
+                    .collectLatest { getBottomSheetOptions() }
+            }
         }
     }
 

@@ -2,6 +2,8 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.SnackbarAttributes
@@ -10,14 +12,14 @@ import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
@@ -58,6 +60,7 @@ class NodeOptionsBottomSheetViewModelTest {
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase = mock()
     private val getOfflineFileInformationByIdUseCase = mock<GetOfflineFileInformationByIdUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val monitorNodeUpdatesById = mock<MonitorNodeUpdatesById>()
     private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
 
     private val sampleFileNode = mock<TypedFileNode>().stub {
@@ -74,6 +77,7 @@ class NodeOptionsBottomSheetViewModelTest {
     fun commonStubs() {
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
         whenever(nodeMenuProviderRegistry.getBottomSheetOptions(any())).thenReturn(emptySet())
     }
 
@@ -96,6 +100,7 @@ class NodeOptionsBottomSheetViewModelTest {
             offlineTypedNodeMapper = offlineTypedNodeMapper,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            monitorNodeUpdatesById = monitorNodeUpdatesById,
             snackbarEventQueue = snackbarEventQueue,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
@@ -278,6 +283,107 @@ class NodeOptionsBottomSheetViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertThat(state.node).isEqualTo(expectedNodeUi)
+        }
+    }
+
+    @Test
+    fun `test that init starts monitoring node updates for non folder link non public link source`() =
+        runTest {
+            whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mock()))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+
+            initViewModel(
+                nodeId = sampleFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            )
+
+            verify(monitorNodeUpdatesById).invoke(sampleFileNode.id)
+        }
+
+    @Test
+    fun `test that init does not monitor node updates for FOLDER_LINK source`() = runTest {
+        whenever(getPublicNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+        val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+        whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            .thenReturn(emptyList())
+
+        initViewModel(
+            nodeId = sampleFileNode.id.longValue,
+            nodeSourceType = NodeSourceType.FOLDER_LINK,
+        )
+
+        verify(monitorNodeUpdatesById, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that init does not monitor node updates for FILE_LINK source`() = runTest {
+        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+        val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+        whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            .thenReturn(emptyList())
+
+        initViewModel(
+            nodeId = sampleFileNode.id.longValue,
+            nodeSourceType = NodeSourceType.FILE_LINK,
+        )
+
+        verify(monitorNodeUpdatesById, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that options are refreshed when node update is received`() = runTest {
+        val nodeUpdatesFlow = MutableSharedFlow<List<NodeChanges>>()
+        whenever(monitorNodeUpdatesById(any())).thenReturn(nodeUpdatesFlow)
+        val initialNode = mock<TypedFileNode>().stub {
+            on { id } doReturn NodeId(123)
+            on { name } doReturn "test_file.txt"
+            on { isIncomingShare } doReturn false
+        }
+        val updatedNode = mock<TypedFileNode>().stub {
+            on { id } doReturn NodeId(123)
+            on { name } doReturn "test_file.txt"
+            on { isIncomingShare } doReturn false
+        }
+        val initialNodeUi = mock<NodeUiItem<TypedNode>>()
+        val updatedNodeUi = mock<NodeUiItem<TypedNode>>()
+        whenever(getNodeByIdUseCase(any()))
+            .thenReturn(initialNode)
+            .thenReturn(updatedNode)
+        whenever(nodeUiItemMapper(listOf(initialNode))).thenReturn(listOf(initialNodeUi))
+        whenever(nodeUiItemMapper(listOf(updatedNode))).thenReturn(listOf(updatedNodeUi))
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            .thenReturn(emptyList())
+
+        initViewModel(
+            nodeId = sampleFileNode.id.longValue,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
+
+        viewModel.uiState.test {
+            var state = awaitItem()
+            while (state.node == null) state = awaitItem()
+            assertThat(state.node).isEqualTo(initialNodeUi)
+            nodeUpdatesFlow.emit(listOf(NodeChanges.Sensitive))
+            var updatedState = awaitItem()
+            while (updatedState.node != updatedNodeUi) updatedState = awaitItem()
+            assertThat(updatedState.node).isEqualTo(updatedNodeUi)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
