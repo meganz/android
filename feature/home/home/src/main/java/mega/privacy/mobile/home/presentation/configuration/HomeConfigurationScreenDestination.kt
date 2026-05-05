@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.StartScreenPreferenceNavKey
 
 @Serializable
 data object HomeConfiguration : NavKey
@@ -35,7 +36,7 @@ fun EntryProviderScope<NavKey>.homeConfigurationScreen(
                 }
             },
             onChooseDefaultStartScreen = {
-                // Todo: Navigate to choose default start screen
+                navigationHandler.navigate(StartScreenPreferenceNavKey)
             }
         )
     }
