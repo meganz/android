@@ -125,6 +125,9 @@ internal fun PdfViewerContent(
                 }
                 // Source changed — recycle and reload below
                 Timber.d("PDF source changed, reloading")
+            } else if (currentSignature == lastSourceSignature.value) {
+                // PDF is still loading asynchronously for this source — avoid a second load() call
+                return@AndroidView
             }
             lastSourceSignature.value = currentSignature
 
