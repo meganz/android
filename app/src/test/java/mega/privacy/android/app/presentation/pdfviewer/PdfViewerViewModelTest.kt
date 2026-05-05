@@ -107,6 +107,7 @@ internal class PdfViewerViewModelTest {
 
     @BeforeEach
     fun setUp() {
+        savedStateHandle = mock()
         whenever(monitorNodeUpdatesUseCase.invoke()).thenReturn(flowOf())
         whenever(monitorTransferEventsUseCase.invoke()).thenReturn(flowOf())
         initTest()

@@ -7,7 +7,6 @@ plugins {
     alias(plugin.plugins.mega.android.release)
     alias(plugin.plugins.jfrog.artifactory) apply false
     alias(plugin.plugins.mega.artifactory.publish.convention) apply false
-    alias(plugin.plugins.de.mannodermaus.android.junit5) apply false
 }
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -28,7 +27,6 @@ buildscript {
         classpath(plugin.firebase.app.distribution)
         classpath(plugin.jacoco)
         classpath(plugin.jfrog)
-        classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
         classpath(lib.kotlin.serialisation)
         classpath(plugin.benchmark.baseline.profile)

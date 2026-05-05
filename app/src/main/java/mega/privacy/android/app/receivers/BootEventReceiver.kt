@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.annotation.VisibleForTesting
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -38,6 +39,11 @@ class BootEventReceiver : BroadcastReceiver() {
      * Foreground Services using dataSync Foreground Service Types
      */
     override fun onReceive(context: Context, intent: Intent) {
+        handleIntent(intent)
+    }
+
+    @VisibleForTesting
+    internal fun handleIntent(intent: Intent) {
         if (intent.action.equals(Intent.ACTION_BOOT_COMPLETED) &&
             Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM
         ) {

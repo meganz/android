@@ -10,6 +10,7 @@ import org.gradle.kotlin.dsl.withGroovyBuilder
 import org.gradle.kotlin.dsl.withType
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 /**
  * Plugin to apply Jacoco configuration to Android application projects.
@@ -50,6 +51,13 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
 
             extensions.configure<JacocoPluginExtension> {
                 toolVersion = jacocoVersion
+            }
+
+            tasks.withType<Test> {
+                configure<JacocoTaskExtension> {
+                    isIncludeNoLocationClasses = true
+                    excludes = listOf("jdk.internal.*")
+                }
             }
 
             tasks.register("instrumentClasses") {
@@ -93,6 +101,7 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
                 val jacocoAntConfig = configurations.getByName("jacocoAnt")
                 val buildDirPath = layout.buildDirectory.get()
                 doLast {
+                    val excludesPattern = excludedFiles.joinToString()
                     ant.withGroovyBuilder {
                         "taskdef"(
                             "name" to "report",
@@ -116,7 +125,10 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
                                  * coverage for any class whose ASM transforms changed it.
                                  */
                                 "classfiles" {
-                                    "fileset"("dir" to "${buildDirPath}/intermediates/classes/gmsDebug/transformGmsDebugClassesWithAsm/dirs")
+                                    "fileset"(
+                                        "dir" to "${buildDirPath}/intermediates/classes/gmsDebug/transformGmsDebugClassesWithAsm/dirs",
+                                        "excludes" to excludesPattern,
+                                    )
                                 }
                                 "sourcefiles" {
                                     "fileset"("dir" to "src/main/java")
@@ -146,6 +158,8 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
         "**/android/databinding/*Binding.class",
         "**/android/databinding/*",
         "**/androidx/databinding/*",
+        "**/databinding/**",
+        "**/*Binding.class",
         "**/BR.*",
         // android
         "**/R.class",
@@ -154,6 +168,8 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
         "**/Manifest*.*",
         "**/*Test*.*",
         "android/**/*.*",
+        // compose
+        "**/ComposableSingletons*.*",
         // dagger
         "**/*_MembersInjector.class",
         "**/Dagger*Component.class",
@@ -179,6 +195,7 @@ class AndroidApplicationJacocoConventionPlugin : Plugin<Project> {
         "**/*Module*.*",
         "**/*Dagger*.*",
         "**/*Hilt*.*",
+        "**/hilt_aggregated_deps/**",
         "**/*MembersInjector*.*",
         "**/*_MembersInjector.class",
         "**/*_Factory*.*",

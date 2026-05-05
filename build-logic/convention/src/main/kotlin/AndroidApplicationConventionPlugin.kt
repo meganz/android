@@ -2,9 +2,12 @@
 import com.android.build.api.dsl.ApplicationDefaultConfig
 import com.android.build.api.dsl.ApplicationExtension
 import mega.privacy.android.gradle.configureKotlinAndroid
+import mega.privacy.android.gradle.testlib
+import mega.privacy.android.gradle.useJUnit5
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.provideDelegate
 import java.io.FileInputStream
@@ -28,7 +31,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("mega.android.application.jacoco")
                 apply("mega.android.test")
                 apply("mega.lint")
-                apply("de.mannodermaus.android-junit5")
             }
 
             extensions.configure<ApplicationExtension> {
@@ -55,6 +57,12 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 }
                 setupSourceSet()
                 setupJniLibsPackaging()
+            }
+
+            useJUnit5()
+            dependencies {
+                add("testRuntimeOnly", platform(testlib.findLibrary("junit5-bom").get()))
+                add("testRuntimeOnly", "org.junit.platform:junit-platform-launcher")
             }
         }
     }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.receivers
 
-import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,7 +23,6 @@ import org.mockito.kotlin.verifyNoInteractions
 internal class BootEventReceiverTest {
 
     private lateinit var underTest: BootEventReceiver
-    private val context = mock<Context>()
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
 
@@ -37,10 +35,7 @@ internal class BootEventReceiverTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(
-            context,
-            startCameraUploadUseCase,
-        )
+        reset(startCameraUploadUseCase)
     }
 
     @Test
@@ -50,7 +45,7 @@ internal class BootEventReceiverTest {
                 on { action }.thenReturn("android.intent.action.BATTERY_CHANGED")
             }
 
-            underTest.onReceive(context, intent)
+            underTest.handleIntent(intent)
 
             verifyNoInteractions(underTest.startCameraUploadUseCase)
         }
@@ -62,7 +57,7 @@ internal class BootEventReceiverTest {
                 on { action }.thenReturn("android.intent.action.BOOT_COMPLETED")
             }
 
-            underTest.onReceive(context, intent)
+            underTest.handleIntent(intent)
 
             verify(underTest.startCameraUploadUseCase).invoke()
         }

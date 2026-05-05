@@ -3,7 +3,6 @@ import mega.privacy.android.build.preBuiltSdkDependency
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
-    alias(plugin.plugins.de.mannodermaus.android.junit5)
     id("kotlin-parcelize")
 }
 

@@ -8,12 +8,12 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.test.extension.asHotFlow
-import mega.privacy.android.core.test.extension.withCoroutineExceptions
 import mega.privacy.android.core.passcode.presentation.mapper.PasscodeTypeMapper
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUIType
 import mega.privacy.android.core.passcode.presentation.model.PasscodeUnlockState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.core.test.extension.asHotFlow
+import mega.privacy.android.core.test.extension.withCoroutineExceptions
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.passcode.PasscodeType
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
@@ -106,6 +106,7 @@ internal class PasscodeUnlockViewModelTest {
     internal fun `test that an exception from the unlock use case does not get propagated`() =
         withCoroutineExceptions {
             runTest {
+                initViewModel()
                 unlockPasscodeUseCase.stub {
                     onBlocking { invoke(any()) }.thenAnswer { throw Exception("Unlock threw an exception") }
                 }

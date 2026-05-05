@@ -5,7 +5,6 @@ plugins {
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
-    alias(plugin.plugins.de.mannodermaus.android.junit5)
     alias(plugin.plugins.kotlin.serialisation)
     id("kotlin-parcelize")
 }
