@@ -12,5 +12,8 @@ sealed interface FileLinkContentState {
 
     data object Unavailable : FileLinkContentState
 
-    data object Loaded : FileLinkContentState
+    data class Loaded(
+        val iconRes: Int,
+        val formattedDuration: String? = null,
+    ) : FileLinkContentState
 }

@@ -225,14 +225,14 @@ internal fun FileLinkContent(
                 modifier = Modifier.testTag(FILE_LINK_UNAVAILABLE_TAG),
             )
 
-            FileLinkContentState.Loaded -> {
+            is FileLinkContentState.Loaded -> {
                 val fileNode = uiState.fileNode
-                val iconRes = uiState.iconRes
-                if (fileNode != null && iconRes != null) {
+                if (fileNode != null) {
                     LoadedFileLinkContent(
                         fileName = fileNode.name,
                         fileSize = formattedFileSize,
-                        iconRes = iconRes,
+                        duration = state.formattedDuration,
+                        iconRes = state.iconRes,
                         onOpenClicked = onOpenClicked,
                     )
                 }
@@ -245,6 +245,7 @@ internal fun FileLinkContent(
 private fun LoadedFileLinkContent(
     fileName: String,
     fileSize: String,
+    duration: String?,
     iconRes: Int,
     onOpenClicked: () -> Unit,
 ) {
@@ -265,6 +266,16 @@ private fun LoadedFileLinkContent(
                     .size(120.dp)
                     .testTag(FILE_LINK_THUMBNAIL_TAG),
             )
+
+            if (!duration.isNullOrEmpty()) {
+                DurationBadge(
+                    text = duration,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                        .testTag(FILE_LINK_DURATION_BADGE_TAG),
+                )
+            }
         }
 
         Row(
@@ -287,7 +298,11 @@ private fun LoadedFileLinkContent(
                         .testTag(FILE_LINK_FILE_NAME_TAG),
                 )
                 MegaText(
-                    text = fileSize,
+                    text = if (!duration.isNullOrEmpty()) {
+                        stringResource(sharedR.string.file_info_subtitle_format, duration, fileSize)
+                    } else {
+                        fileSize
+                    },
                     textColor = TextColor.Secondary,
                     style = AppTheme.typography.bodySmall,
                     modifier = Modifier
@@ -305,6 +320,25 @@ private fun LoadedFileLinkContent(
     }
 }
 
+@Composable
+private fun DurationBadge(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    BoxSurface(
+        surfaceColor = SurfaceColor.SurfaceTransparent,
+        modifier = modifier
+            .clip(RoundedCornerShape(3.dp)),
+    ) {
+        MegaText(
+            text = text,
+            textColor = TextColor.OnColor,
+            style = AppTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+        )
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun LoadedFileLinkContentPreview() {
@@ -312,7 +346,22 @@ private fun LoadedFileLinkContentPreview() {
         LoadedFileLinkContent(
             fileName = "Document.pdf",
             fileSize = "12.3 MB",
+            duration = null,
             iconRes = iconPackR.drawable.ic_generic_medium_solid,
+            onOpenClicked = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun LoadedFileLinkContentVideoPreview() {
+    AndroidThemeForPreviews {
+        LoadedFileLinkContent(
+            fileName = "Hobbiton.mp4",
+            fileSize = "647 MB",
+            duration = "2:50",
+            iconRes = iconPackR.drawable.ic_video_medium_solid,
             onOpenClicked = {},
         )
     }
@@ -362,3 +411,4 @@ internal const val FILE_LINK_THUMBNAIL_TAG = "file_link_screen:thumbnail"
 internal const val FILE_LINK_FILE_NAME_TAG = "file_link_screen:file_name"
 internal const val FILE_LINK_FILE_SIZE_TAG = "file_link_screen:file_size"
 internal const val FILE_LINK_OPEN_BUTTON_TAG = "file_link_screen:open_button"
+internal const val FILE_LINK_DURATION_BADGE_TAG = "file_link_screen:duration_badge"

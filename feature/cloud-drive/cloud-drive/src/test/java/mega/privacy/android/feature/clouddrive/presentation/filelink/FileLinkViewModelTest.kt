@@ -6,7 +6,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import kotlin.time.Duration.Companion.seconds
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -19,6 +22,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkContentState
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -44,6 +48,7 @@ internal class FileLinkViewModelTest {
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
+    private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
     private lateinit var underTest: FileLinkViewModel
 
@@ -65,6 +70,7 @@ internal class FileLinkViewModelTest {
             saveViewedLinkUseCase = saveViewedLinkUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
             args = FileLinkViewModel.Args(uriString = uriString),
         )
     }
@@ -112,6 +118,78 @@ internal class FileLinkViewModelTest {
     }
 
     @Test
+    fun `test that formattedDuration is set when fetched node is a video file`() = runTest {
+        val url = "https://mega.nz/file/abc#key"
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(7L)
+            on { name } doReturn "Hobbiton.mp4"
+            on { size } doReturn 647_000_000L
+            on { type } doReturn VideoFileTypeInfo(
+                mimeType = "video/mp4",
+                extension = "mp4",
+                duration = 170.seconds,
+            )
+        }
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(getPublicNodeUseCase(url)).thenReturn(node)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+        initViewModel(uriString = url)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
+            val loaded = state.contentState as FileLinkContentState.Loaded
+            assertThat(loaded.formattedDuration).isEqualTo("2:50")
+        }
+    }
+
+    @Test
+    fun `test that formattedDuration is set when fetched node is an audio file`() = runTest {
+        val url = "https://mega.nz/file/abc#key"
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(8L)
+            on { name } doReturn "Song.mp3"
+            on { size } doReturn 5_000_000L
+            on { type } doReturn AudioFileTypeInfo(
+                mimeType = "audio/mpeg",
+                extension = "mp3",
+                duration = 245.seconds,
+            )
+        }
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(getPublicNodeUseCase(url)).thenReturn(node)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+        initViewModel(uriString = url)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
+            val loaded = state.contentState as FileLinkContentState.Loaded
+            assertThat(loaded.formattedDuration).isEqualTo("4:05")
+        }
+    }
+
+    @Test
+    fun `test that formattedDuration is null when fetched node is not a media file`() = runTest {
+        val url = "https://mega.nz/file/abc#key"
+        val node = mockFileNode()
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(getPublicNodeUseCase(url)).thenReturn(node)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+        initViewModel(uriString = url)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
+            val loaded = state.contentState as FileLinkContentState.Loaded
+            assertThat(loaded.formattedDuration).isNull()
+        }
+    }
+
+    @Test
     fun `test that init emits Loaded with fileNode and iconRes when getPublicNode succeeds`() =
         runTest {
             val url = "https://mega.nz/file/abc#key"
@@ -124,7 +202,7 @@ internal class FileLinkViewModelTest {
 
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.contentState).isEqualTo(FileLinkContentState.Loaded)
+                assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
                 assertThat(state.fileNode).isEqualTo(node)
                 assertThat(state.hasCredentials).isTrue()
             }
@@ -212,7 +290,8 @@ internal class FileLinkViewModelTest {
 
             verify(getPublicNodeUseCase).invoke(combined)
             underTest.uiState.test {
-                assertThat(awaitItem().contentState).isEqualTo(FileLinkContentState.Loaded)
+                assertThat(awaitItem().contentState)
+                    .isInstanceOf(FileLinkContentState.Loaded::class.java)
             }
         }
 

@@ -11,7 +11,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.exception.PublicNodeException
@@ -34,6 +36,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -70,11 +73,16 @@ internal class FileLinkViewModel @AssistedInject constructor(
                         originShares = false,
                         fileTypeIconMapper = fileTypeIconMapper,
                     )
+                    val formattedDuration = node.type.toDuration()?.let { duration ->
+                        durationInSecondsTextMapper(duration)
+                    }
                     _uiState.update {
                         it.copy(
-                            contentState = FileLinkContentState.Loaded,
+                            contentState = FileLinkContentState.Loaded(
+                                iconRes = iconRes,
+                                formattedDuration = formattedDuration,
+                            ),
                             fileNode = node,
-                            iconRes = iconRes,
                         )
                     }
                     saveViewedFileLink(url, node)

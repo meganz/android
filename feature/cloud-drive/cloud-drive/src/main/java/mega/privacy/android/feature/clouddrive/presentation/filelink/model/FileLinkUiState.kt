@@ -8,7 +8,6 @@ data class FileLinkUiState(
     val url: String? = null,
     val contentState: FileLinkContentState = FileLinkContentState.Loading,
     val fileNode: TypedFileNode? = null,
-    val iconRes: Int? = null,
     val hasCredentials: Boolean = false,
 ) {
 

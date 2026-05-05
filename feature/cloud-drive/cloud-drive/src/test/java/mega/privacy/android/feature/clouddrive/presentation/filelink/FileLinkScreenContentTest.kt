@@ -7,12 +7,16 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkUiState
 import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.DECRYPTION_KEY_DIALOG_TAG
+import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -86,12 +90,46 @@ class FileLinkScreenContentTest {
         composeRule.onNodeWithTag(FILE_LINK_UNAVAILABLE_TAG).assertDoesNotExist()
     }
 
+    @Test
+    fun `test that duration badge is displayed when state is Loaded with non-empty formattedDuration`() {
+        setupComposeContent(uiState = loadedUiState(formattedDuration = "2:50"))
+
+        composeRule.onNodeWithTag(FILE_LINK_DURATION_BADGE_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that duration badge is not displayed when state is Loaded with null formattedDuration`() {
+        setupComposeContent(uiState = loadedUiState(formattedDuration = null))
+
+        composeRule.onNodeWithTag(FILE_LINK_DURATION_BADGE_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that duration badge is not displayed when state is Loaded with empty formattedDuration`() {
+        setupComposeContent(uiState = loadedUiState(formattedDuration = ""))
+
+        composeRule.onNodeWithTag(FILE_LINK_DURATION_BADGE_TAG).assertDoesNotExist()
+    }
+
+    private fun loadedUiState(formattedDuration: String?): FileLinkUiState {
+        val fileNode: TypedFileNode = mock {
+            on { name } doReturn "Hobbiton.mp4"
+        }
+        return FileLinkUiState(
+            contentState = FileLinkContentState.Loaded(
+                iconRes = iconPackR.drawable.ic_video_medium_solid,
+                formattedDuration = formattedDuration,
+            ),
+            fileNode = fileNode,
+        )
+    }
+
     private fun setupComposeContent(uiState: FileLinkUiState) {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 FileLinkContent(
                     uiState = uiState,
-                    formattedFileSize = "",
+                    formattedFileSize = "647 MB",
                     onOpenClicked = {},
                     onAction = {},
                     onBack = {},
