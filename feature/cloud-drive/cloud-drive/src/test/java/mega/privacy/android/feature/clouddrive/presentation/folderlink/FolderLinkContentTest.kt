@@ -10,7 +10,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.EMPTY_IMAGE_TAG
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
-import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.DECRYPTION_KEY_DIALOG_TAG
+import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.DECRYPTION_KEY_DIALOG_TAG
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.GUEST_BANNER_TAG
 import org.junit.Rule
 import org.junit.Test

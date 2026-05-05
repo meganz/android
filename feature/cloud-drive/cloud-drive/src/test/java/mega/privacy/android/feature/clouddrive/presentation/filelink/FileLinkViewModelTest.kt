@@ -124,9 +124,8 @@ internal class FileLinkViewModelTest {
 
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
-                val loaded = state.contentState as FileLinkContentState.Loaded
-                assertThat(loaded.fileNode).isEqualTo(node)
+                assertThat(state.contentState).isEqualTo(FileLinkContentState.Loaded)
+                assertThat(state.fileNode).isEqualTo(node)
                 assertThat(state.hasCredentials).isTrue()
             }
         }
@@ -213,8 +212,7 @@ internal class FileLinkViewModelTest {
 
             verify(getPublicNodeUseCase).invoke(combined)
             underTest.uiState.test {
-                assertThat(awaitItem().contentState)
-                    .isInstanceOf(FileLinkContentState.Loaded::class.java)
+                assertThat(awaitItem().contentState).isEqualTo(FileLinkContentState.Loaded)
             }
         }
 

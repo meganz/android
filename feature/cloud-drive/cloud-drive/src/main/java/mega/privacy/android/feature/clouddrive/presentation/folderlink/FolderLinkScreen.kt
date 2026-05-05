@@ -55,13 +55,13 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trackAnalyticsEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
-import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkShareAction
+import mega.privacy.android.feature.clouddrive.presentation.publiclink.model.PublicLinkShareAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
-import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.startShareIntent
-import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.DecryptionKeyDialog
-import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.ExpiredLinkView
+import mega.privacy.android.feature.clouddrive.presentation.publiclink.model.startPublicLinkShareIntent
+import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.DecryptionKeyDialog
+import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.ExpiredLinkView
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.FolderLinkGuestBanner
-import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.UnavailableLinkView
+import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.UnavailableLinkView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.transition.fadeTransition
@@ -151,8 +151,8 @@ internal fun FolderLinkScreen(
                     },
                     actions = buildList {
                         if (isLoaded && uiState.isRootFolder) {
-                            add(MenuActionWithClick(FolderLinkShareAction) {
-                                context.startShareIntent(
+                            add(MenuActionWithClick(PublicLinkShareAction) {
+                                context.startPublicLinkShareIntent(
                                     link = uiState.url,
                                     title = uiState.title.get(context)
                                 )

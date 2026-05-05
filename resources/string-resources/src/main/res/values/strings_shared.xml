@@ -2796,4 +2796,6 @@
     <string name="home_configuration_screen_menu_choose_default_start_screen">Choose default start screen</string>
     <!-- Snackbar message to show when widget removal is not allowed on Home Configuration -->
     <string name="home_configuration_widget_removal_not_allowed_message">At least one option must stay on</string>
+    <!-- Appbar subtitle of file link screen-->
+    <string name="file_link_subtitle">File link</string>
 </resources>

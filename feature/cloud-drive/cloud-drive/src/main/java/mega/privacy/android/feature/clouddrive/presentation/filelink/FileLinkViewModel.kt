@@ -72,10 +72,9 @@ internal class FileLinkViewModel @AssistedInject constructor(
                     )
                     _uiState.update {
                         it.copy(
-                            contentState = FileLinkContentState.Loaded(
-                                fileNode = node,
-                                iconRes = iconRes,
-                            ),
+                            contentState = FileLinkContentState.Loaded,
+                            fileNode = node,
+                            iconRes = iconRes,
                         )
                     }
                     saveViewedFileLink(url, node)

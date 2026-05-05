@@ -1,7 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.filelink.model
 
-import mega.privacy.android.domain.entity.node.TypedFileNode
-
 sealed interface FileLinkContentState {
     data object Loading : FileLinkContentState
 
@@ -14,8 +12,5 @@ sealed interface FileLinkContentState {
 
     data object Unavailable : FileLinkContentState
 
-    data class Loaded(
-        val fileNode: TypedFileNode,
-        val iconRes: Int,
-    ) : FileLinkContentState
+    data object Loaded : FileLinkContentState
 }

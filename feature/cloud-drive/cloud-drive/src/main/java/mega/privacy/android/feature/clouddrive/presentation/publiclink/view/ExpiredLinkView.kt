@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.folderlink.view
+package mega.privacy.android.feature.clouddrive.presentation.publiclink.view
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
