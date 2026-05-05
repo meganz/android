@@ -47,13 +47,16 @@ fun HomeConfigurationScreen(
     state: HomeConfigurationUiState,
     onWidgetEnabledChange: (WidgetConfigurationItem, Boolean) -> Unit,
     onWidgetOrderChange: (orderedItems: List<WidgetConfigurationItem>) -> Unit,
+    showSnackbarMessage: (String) -> Unit,
     onBack: () -> Unit,
     onResetToDefault: () -> Unit,
-    onChooseDefaultStartScreen: () -> Unit
+    onChooseDefaultStartScreen: () -> Unit,
 ) {
     var showMenuBottomSheet by rememberSaveable { mutableStateOf(false) }
     val menuSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+    val minimumWidgetErrorMessage =
+        stringResource(sharedR.string.home_configuration_widget_removal_not_allowed_message)
 
     MegaScaffold(
         modifier = Modifier.fillMaxSize(),
@@ -82,6 +85,9 @@ fun HomeConfigurationScreen(
                     state = state,
                     onWidgetEnabledChange = onWidgetEnabledChange,
                     onWidgetOrderChange = onWidgetOrderChange,
+                    onWidgetStateChangeFailed = {
+                        showSnackbarMessage(minimumWidgetErrorMessage)
+                    }
                 )
 
                 if (showMenuBottomSheet) {
@@ -120,6 +126,7 @@ fun HomeConfigurationContentView(
     state: HomeConfigurationUiState.Data,
     onWidgetEnabledChange: (WidgetConfigurationItem, Boolean) -> Unit,
     onWidgetOrderChange: (List<WidgetConfigurationItem>) -> Unit,
+    onWidgetStateChangeFailed: () -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
@@ -143,10 +150,11 @@ fun HomeConfigurationContentView(
             draggedWidget = null
             onWidgetOrderChange(currentItems)
         },
-        dragEnabled = { true }) { item ->
-
+        dragEnabled = { true }
+    ) { item ->
         Row(
             modifier = Modifier
+                .testTag(TEST_TAG_WIDGET_CONFIGURATION_ITEM + item.identifier)
                 .padding(vertical = 12.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -161,9 +169,15 @@ fun HomeConfigurationContentView(
                 text = item.name.text, modifier = Modifier.weight(1f)
             )
             Toggle(
-                isEnabled = state.allowRemoval || item.enabled.not(),
                 isChecked = item.enabled,
-                onCheckedChange = { onWidgetEnabledChange(item, it) },
+                modifier = Modifier.testTag(TEST_TAG_WIDGET_CONFIGURATION_ITEM_TOGGLE + item.identifier),
+                onCheckedChange = {
+                    if (state.allowRemoval || !item.enabled) {
+                        onWidgetEnabledChange(item, it)
+                    } else {
+                        onWidgetStateChangeFailed()
+                    }
+                },
             )
         }
     }
@@ -177,6 +191,7 @@ fun <T> MutableList<T>.move(fromIndex: Int, toIndex: Int) {
 
 const val TEST_TAG_WIDGET_CONFIGURATION_VIEW = "widget_configuration:list"
 const val TEST_TAG_WIDGET_CONFIGURATION_ITEM = "widget_configuration:item_"
+const val TEST_TAG_WIDGET_CONFIGURATION_ITEM_TOGGLE = "widget_configuration:toggle_"
 const val TEST_TAG_MENU_RESET_TO_DEFAULT = "widget_configuration:menu_reset_to_default"
 const val TEST_TAG_MENU_CHOOSE_DEFAULT_START_SCREEN =
     "widget_configuration:menu_choose_default_start_screen"

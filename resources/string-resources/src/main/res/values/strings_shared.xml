@@ -2794,4 +2794,6 @@
     <string name="home_configuration_screen_menu_reset_to_default">Reset to default</string>
     <!-- Bottom sheet menu item to choose the default start screen shown when the app launches -->
     <string name="home_configuration_screen_menu_choose_default_start_screen">Choose default start screen</string>
+    <!-- Snackbar message to show when widget removal is not allowed on Home Configuration -->
+    <string name="home_configuration_widget_removal_not_allowed_message">At least one option must stay on</string>
 </resources>
