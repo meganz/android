@@ -36,7 +36,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity.Companion.INTENT_KEY_FROM_FOLDER_LINK
@@ -75,7 +74,6 @@ class MediaDiscoveryFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
-    internal var managerActivity: ManagerActivity? = null
     private var menu: Menu? = null
 
     // Action mode
@@ -111,7 +109,6 @@ class MediaDiscoveryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        managerActivity = activity as? ManagerActivity
         actionModeCallback = MediaDiscoveryActionModeCallback(this)
         val folderId = arguments?.getLong(INTENT_KEY_CURRENT_FOLDER_ID) ?: -1
         val errorMessage = arguments?.getInt(PARAM_ERROR_MESSAGE) ?: 0
@@ -191,39 +188,20 @@ class MediaDiscoveryFragment : Fragment() {
         }
     }
 
-    private fun onStartModalSheetShow() {
-        managerActivity?.showHideBottomNavigationView(hide = true)
-    }
+    private fun onStartModalSheetShow() = Unit
 
-    private fun onEndModalSheetHide() {
-        managerActivity?.showHideBottomNavigationView(hide = false)
-    }
+    private fun onEndModalSheetHide() = Unit
 
-    private fun onModalSheetVisibilityChange(isVisible: Boolean) {
-        // When action mode is on, do not show the bottom nav.
-        if (!isVisible && actionMode != null) return
+    private fun onModalSheetVisibilityChange(isVisible: Boolean) = Unit
 
-        managerActivity?.showHideBottomNavigationView(hide = isVisible)
-        if (isVisible) {
-            managerActivity?.hideAdsView()
-        } else {
-            managerActivity?.handleShowingAds()
-        }
-    }
+    private fun onUploadFiles() = Unit
 
-    private fun onUploadFiles() {
-        managerActivity?.uploadFiles()
-    }
-
-    private fun onCapture() {
-        managerActivity?.takePictureAndUpload()
-    }
+    private fun onCapture() = Unit
 
     private fun onSwitchListView() {
         exitActionMode()
         lifecycleScope.launch {
             mediaDiscoveryViewModel.setListViewTypeClicked()
-            managerActivity?.handleCloudDriveBackNavigation(performBackNavigation = false)
         }
     }
 
@@ -244,17 +222,8 @@ class MediaDiscoveryFragment : Fragment() {
         }
     }
 
-    /**
-     * Setup ManagerActivity UI
-     */
     private fun setupParentActivityUI() {
-        managerActivity?.run {
-            setToolbarTitle()
-            invalidateOptionsMenu()
-            hideFabButton()
-        }
-        managerActivity?.invalidateOptionsMenu()
-        managerActivity?.hideFabButton()
+        activity?.invalidateOptionsMenu()
     }
 
     private fun setupFlow() {
@@ -295,7 +264,7 @@ class MediaDiscoveryFragment : Fragment() {
 
     private fun handleGoBackLogic(state: MediaDiscoveryViewState) {
         if (state.shouldGoBack)
-            managerActivity?.onBackPressedDispatcher?.onBackPressed()
+            activity?.onBackPressedDispatcher?.onBackPressed()
     }
 
     private fun onOKButtonClicked() {
@@ -339,18 +308,12 @@ class MediaDiscoveryFragment : Fragment() {
     }
 
     private fun enterActionMode() {
-        actionMode = managerActivity?.startSupportActionMode(
-            actionModeCallback
-        ) ?: (activity as? AppCompatActivity)?.startSupportActionMode(actionModeCallback)
-        managerActivity?.showHideBottomNavigationView(true)
-        managerActivity?.hideAdsView()
+        actionMode = (activity as? AppCompatActivity)?.startSupportActionMode(actionModeCallback)
     }
 
     private fun exitActionMode() {
         actionMode?.finish()
         actionMode = null
-        managerActivity?.showHideBottomNavigationView(false)
-        managerActivity?.handleShowingAds()
     }
 
     private fun handleActionMode(photo: Photo) {
@@ -367,10 +330,6 @@ class MediaDiscoveryFragment : Fragment() {
     private fun setupMenu() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Add menu items here
-                if (managerActivity?.isInMediaDiscovery() == false) {
-                    return
-                }
                 menuInflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)
                 this@MediaDiscoveryFragment.menu = menu
                 handleSlidersMenuIconVisibility()

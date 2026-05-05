@@ -10,17 +10,8 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import timber.log.Timber.Forest.e
 
 fun MediaDiscoveryFragment.actionSaveToDevice() {
-    lifecycleScope.launch {
-        val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
-        // TODO
-        managerActivity?.saveNodesToDevice(
-            selectedNodes,
-            highPriority = false,
-            isFolderLink = false,
-            fromChat = false,
-            withStartMessage = true,
-        )
-    }
+    // ManagerActivity-hosted save-to-device is no longer reachable from this action menu;
+    // replacement wiring will be added in a follow-up MR.
 }
 
 fun MediaDiscoveryFragment.actionShareLink() {
@@ -41,11 +32,8 @@ fun MediaDiscoveryFragment.actionShareLink() {
 }
 
 fun MediaDiscoveryFragment.actionSendToChat() {
-    lifecycleScope.launch {
-        val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
-        // TODO
-        managerActivity?.attachNodesToChats(selectedNodes)
-    }
+    // ManagerActivity-hosted attach-to-chats is no longer reachable from this action menu;
+    // replacement wiring will be added in a follow-up MR.
 }
 
 fun MediaDiscoveryFragment.actionShareOut() {
