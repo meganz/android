@@ -17,3 +17,6 @@ data object CookieSettingsNavKey : NavKey
 @Serializable
 @Parcelize
 data object SettingsCameraUploadsNavKey : NavKey, Parcelable
+
+@Serializable
+data object TransfersSettingsNavKey : NavKey

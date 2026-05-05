@@ -42,6 +42,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CALLS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CAMERA_UPLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_SYNC
+import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_TRANSFERS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_CENTRE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_RATE_APP
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDDEN_ITEMS
@@ -66,6 +67,7 @@ import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRe
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsActivity
+import mega.privacy.android.app.presentation.settings.transfers.TransfersSettingsActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.service.RATE_APP_URL
@@ -156,6 +158,7 @@ class SettingsFragment :
                     findPreference<Preference>(KEY_FEATURES_SYNC)?.isEnabled = true
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
+                    findPreference<Preference>(KEY_FEATURES_TRANSFERS)?.isEnabled = true
                     updatePasscodeLockSummary(state.passcodeLock)
                     updateSubFolderMediaDiscovery(state.subFolderMediaDiscoveryChecked)
                     findPreference<SwitchPreferenceCompat>(KEY_HIDDEN_ITEMS)?.apply {
@@ -257,6 +260,14 @@ class SettingsFragment :
                     Intent(
                         context,
                         SettingsCallsActivity::class.java
+                    )
+                )
+
+            KEY_FEATURES_TRANSFERS ->
+                startActivity(
+                    Intent(
+                        context,
+                        TransfersSettingsActivity::class.java
                     )
                 )
 

@@ -27,6 +27,8 @@ object SettingsConstants {
     const val KEY_CANCEL_ACCOUNT = "settings_about_cancel_account"
     const val KEY_AUDIO_BACKGROUND_PLAY_ENABLED = "settings_audio_background_play_enabled"
     const val KEY_FEATURES_CALLS = "settings_features_calls"
+    const val KEY_FEATURES_TRANSFERS = "settings_features_transfers"
+
 
     /* Chat settings */
     const val KEY_CHAT_NOTIFICATIONS_CHAT = "settings_chat_notification_chat"

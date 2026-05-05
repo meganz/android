@@ -470,6 +470,10 @@
             android:label="@string/download_location"
             android:launchMode="singleTop" />
         <activity
+            android:name=".presentation.settings.transfers.TransfersSettingsActivity"
+            android:label="@string/general_section_transfers"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".activities.settingsActivities.FileManagementPreferencesActivity"
             android:label="@string/settings_file_management_category"
             android:launchMode="singleTop" />
