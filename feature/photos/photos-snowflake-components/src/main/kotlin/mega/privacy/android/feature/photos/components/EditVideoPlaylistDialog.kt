@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.privacy.android.shared.resources.R as sharedR
@@ -56,6 +57,7 @@ fun EditVideoPlaylistDialog(
             resetErrorMessage()
             onDismiss()
         },
-        errorText = errorText
+        errorText = errorText,
+        capitalization = KeyboardCapitalization.None,
     )
 }
