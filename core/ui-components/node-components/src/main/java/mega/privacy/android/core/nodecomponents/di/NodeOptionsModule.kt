@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.core.nodecomponents.menu.provider.BackupsMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.ChatMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.CloudDriveMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.FavouritesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.FolderLinkMenuOptionsProvider
@@ -119,5 +120,11 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindOfflineOptionsProvider(
         provider: OfflineMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindChatOptionsProvider(
+        provider: ChatMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 }

@@ -46,6 +46,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.VersionsBottomShee
 import mega.privacy.android.core.nodecomponents.menu.menuitem.ViewInFolderBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.qualifier.features.Backups
+import mega.privacy.android.domain.qualifier.features.Chat
 import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
@@ -385,6 +386,27 @@ abstract class NodeActionsBottomSheetModule {
                 shareMenuAction,
                 downloadMenuAction,
                 removeOfflineMenuAction,
+            )
+        }
+
+        /**
+         * Provide chat bottom sheet options
+         */
+        @Provides
+        @ElementsIntoSet
+        @Chat
+        @Singleton
+        fun provideChatBottomSheetOptions(
+            infoMenuAction: InfoBottomSheetMenuItem,
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            saveToMegaBottomSheetMenuItem: SaveToMegaBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
+            return setOf(
+                infoMenuAction,
+                downloadMenuAction,
+                availableOfflineMenuAction,
+                saveToMegaBottomSheetMenuItem
             )
         }
     }

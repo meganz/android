@@ -63,6 +63,7 @@ import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -307,6 +308,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
             VIDEO_BROWSE_ADAPTER -> NodeSourceType.VIDEOS
             RECENTS_BUCKET_ADAPTER -> NodeSourceType.RECENTS_BUCKET
             FAVOURITES_ADAPTER -> NodeSourceType.FAVOURITES
+            FROM_CHAT -> NodeSourceType.CHAT
             else -> NodeSourceType.CLOUD_DRIVE
         }
 
