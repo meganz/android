@@ -47,19 +47,22 @@ internal class CreateNewFolderViewModel @Inject constructor(
         parentNode: Node,
     ) = viewModelScope.launch {
         runCatching {
-            checkForValidNameUseCase(newName = newFolderName, node = parentNode)
-                .let { invalidNameType ->
-                    nodeNameErrorMessageMapper(invalidNameType, true)?.let {
-                        _state.update { state -> state.copy(errorMessage = it) }
-                    } ?: run {
-                        _state.update {
-                            it.copy(
-                                errorMessage = null,
-                                validNameConfirmed = triggered(newFolderName)
-                            )
-                        }
+            checkForValidNameUseCase(
+                newName = newFolderName,
+                node = parentNode,
+                isRenameAction = false
+            ).let { invalidNameType ->
+                nodeNameErrorMessageMapper(invalidNameType, true)?.let {
+                    _state.update { state -> state.copy(errorMessage = it) }
+                } ?: run {
+                    _state.update {
+                        it.copy(
+                            errorMessage = null,
+                            validNameConfirmed = triggered(newFolderName)
+                        )
                     }
                 }
+            }
         }.onFailure { Timber.e(it) }
     }
 

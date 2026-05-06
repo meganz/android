@@ -77,7 +77,8 @@ internal class CreateNewFolderViewModelTest {
             whenever(
                 checkForValidNameUseCase(
                     newName = newFolderName,
-                    node = currentFolderMock
+                    node = currentFolderMock,
+                    isRenameAction = false
                 )
             ).thenReturn(InvalidNameType.BLANK_NAME)
             whenever(nodeNameErrorMessageMapper(InvalidNameType.BLANK_NAME, true))
@@ -106,7 +107,8 @@ internal class CreateNewFolderViewModelTest {
         whenever(
             checkForValidNameUseCase(
                 newName = newFolderName,
-                node = currentFolderMock
+                node = currentFolderMock,
+                isRenameAction = false
             )
         ).thenReturn(InvalidNameType.INVALID_NAME)
         whenever(nodeNameErrorMessageMapper(InvalidNameType.INVALID_NAME, true))
@@ -130,7 +132,8 @@ internal class CreateNewFolderViewModelTest {
             whenever(
                 checkForValidNameUseCase(
                     newName = newFolderName,
-                    node = currentFolderMock
+                    node = currentFolderMock,
+                    isRenameAction = false
                 )
             ).thenReturn(InvalidNameType.NAME_ALREADY_EXISTS)
             whenever(nodeNameErrorMessageMapper(InvalidNameType.NAME_ALREADY_EXISTS, true))

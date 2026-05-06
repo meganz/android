@@ -41,8 +41,10 @@ class CheckForValidNameUseCaseTest {
         on { type } doReturn PdfFileTypeInfo
     }
     private val nodeId = NodeId(1234L)
+    private val parentNodeId = NodeId(5678L)
     private val folderNode = mock<FolderNode> {
         on { id } doReturn nodeId
+        on { parentId } doReturn parentNodeId
     }
 
     @BeforeAll
@@ -72,18 +74,70 @@ class CheckForValidNameUseCaseTest {
     ) = runTest {
         whenever(nodeExistsInCurrentLocationUseCase(node.id, providedName)).thenReturn(false)
 
-        assertThat(expected).isEqualTo(underTest(providedName, node))
+        assertThat(expected).isEqualTo(
+            underTest(newName = providedName, node = node, isRenameAction = false)
+        )
     }
 
     @Test
-    fun `test that if same name found in node list for folder returns NAME_ALREADY_EXISTS error type`() =
+    fun `test that if same name found in current folder during creation returns NAME_ALREADY_EXISTS error type`() =
         runTest {
             val providedName = "Folder name"
 
             whenever(nodeExistsInCurrentLocationUseCase(nodeId, providedName)).thenReturn(true)
 
-            assertThat(underTest(providedName, folderNode))
+            assertThat(underTest(newName = providedName, node = folderNode, isRenameAction = false))
                 .isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
+        }
+
+    @Test
+    fun `test that if same name found in parent folder during rename returns NAME_ALREADY_EXISTS error type`() =
+        runTest {
+            val providedName = "Folder name"
+
+            whenever(
+                nodeExistsInCurrentLocationUseCase(
+                    parentNodeId,
+                    providedName
+                )
+            ).thenReturn(true)
+
+            assertThat(underTest(newName = providedName, node = folderNode, isRenameAction = true))
+                .isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
+        }
+
+    @Test
+    fun `test that during rename folder name existence is checked against parent id`() =
+        runTest {
+            val providedName = "Folder name"
+
+            whenever(nodeExistsInCurrentLocationUseCase(nodeId, providedName)).thenReturn(true)
+            whenever(
+                nodeExistsInCurrentLocationUseCase(
+                    parentNodeId,
+                    providedName
+                )
+            ).thenReturn(false)
+
+            assertThat(underTest(newName = providedName, node = folderNode, isRenameAction = true))
+                .isEqualTo(InvalidNameType.VALID)
+        }
+
+    @Test
+    fun `test that during creation folder name existence is checked against node id`() =
+        runTest {
+            val providedName = "Folder name"
+
+            whenever(nodeExistsInCurrentLocationUseCase(nodeId, providedName)).thenReturn(false)
+            whenever(
+                nodeExistsInCurrentLocationUseCase(
+                    parentNodeId,
+                    providedName
+                )
+            ).thenReturn(true)
+
+            assertThat(underTest(newName = providedName, node = folderNode, isRenameAction = false))
+                .isEqualTo(InvalidNameType.VALID)
         }
 
     @Test
@@ -104,8 +158,9 @@ class CheckForValidNameUseCaseTest {
 
             assertThat(
                 underTest(
-                    providedName,
-                    fileNode
+                    newName = providedName,
+                    node = fileNode,
+                    isRenameAction = true
                 )
             ).isEqualTo(InvalidNameType.VALID)
 

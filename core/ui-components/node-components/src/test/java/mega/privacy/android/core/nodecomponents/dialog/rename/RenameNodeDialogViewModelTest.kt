@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeNameErrorMessageMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -20,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -94,8 +94,13 @@ class RenameNodeDialogViewModelTest {
             val node: FileNode = mock()
             whenever(node.name).thenReturn(newNodeName)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
-            whenever(checkForValidNameUseCase(newNodeName, node))
-                .thenReturn(InvalidNameType.VALID)
+            whenever(
+                checkForValidNameUseCase(
+                    newName = newNodeName,
+                    node = node,
+                    isRenameAction = true
+                )
+            ).thenReturn(InvalidNameType.VALID)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
             whenever(nodeNameErrorMessageMapper(InvalidNameType.VALID, false))
                 .thenReturn(null)
@@ -121,7 +126,13 @@ class RenameNodeDialogViewModelTest {
             val node: FileNode = mock()
             whenever(node.name).thenReturn(newNodeName)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
-            whenever(checkForValidNameUseCase(newNodeName, node)).thenReturn(validationTexts.first)
+            whenever(
+                checkForValidNameUseCase(
+                    newName = newNodeName,
+                    node = node,
+                    isRenameAction = true
+                )
+            ).thenReturn(validationTexts.first)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
             whenever(nodeNameErrorMessageMapper(validationTexts.first, false))
                 .thenReturn(validationTexts.second)
@@ -155,8 +166,9 @@ class RenameNodeDialogViewModelTest {
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
             whenever(
                 checkForValidNameUseCase(
-                    newNodeName,
-                    node
+                    newName = newNodeName,
+                    node = node,
+                    isRenameAction = true
                 )
             ).thenReturn(InvalidNameType.DIFFERENT_EXTENSION)
             whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)

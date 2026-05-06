@@ -22,9 +22,14 @@ class CheckForValidNameUseCase @Inject constructor(
      * Invoke
      * @param newName New Name for node
      * @param node Node on which rename operation is performed
+     * @param isRenameAction True if it is a rename action, false if it is new creation.
      * @return [InvalidNameType]
      */
-    suspend operator fun invoke(newName: String, node: Node): InvalidNameType {
+    suspend operator fun invoke(
+        newName: String,
+        node: Node,
+        isRenameAction: Boolean,
+    ): InvalidNameType {
         return when {
             newName.isBlank() -> InvalidNameType.BLANK_NAME
             newName.isInvalidDotName() -> InvalidNameType.DOT_NAME
@@ -32,8 +37,10 @@ class CheckForValidNameUseCase @Inject constructor(
             regexRepository.invalidNamePattern.matcher(newName)
                 .find() -> InvalidNameType.INVALID_NAME
 
-            node is FolderNode && nodeExistsInCurrentLocationUseCase(node.id, newName)
-                -> InvalidNameType.NAME_ALREADY_EXISTS
+            node is FolderNode && nodeExistsInCurrentLocationUseCase(
+                if (isRenameAction) node.parentId else node.id,
+                newName
+            ) -> InvalidNameType.NAME_ALREADY_EXISTS
 
             node is FileNode -> {
                 val extension = newName.substringAfterLast('.', "")

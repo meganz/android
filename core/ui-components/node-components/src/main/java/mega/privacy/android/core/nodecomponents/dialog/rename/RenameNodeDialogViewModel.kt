@@ -88,7 +88,11 @@ class RenameNodeDialogViewModel @Inject constructor(
         action: OnRenameConfirmed,
         currentNode: UnTypedNode,
     ) {
-        when (val invalidNameType = checkForValidNameUseCase(action.newNodeName, currentNode)) {
+        when (val invalidNameType = checkForValidNameUseCase(
+            newName = action.newNodeName,
+            node = currentNode,
+            isRenameAction = true
+        )) {
             InvalidNameType.DIFFERENT_EXTENSION -> {
                 _state.update { it.copy(showChangeNodeExtensionDialogEvent = triggered(action.newNodeName)) }
             }
