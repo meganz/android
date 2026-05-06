@@ -1213,14 +1213,14 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 saveAudioPlaybackInfoUseCase()
             }.onFailure { Timber.e(it, "Failed to save audio playback info") }
         }
-        val playingItem = playlistItems.firstOrNull { it.nodeHandle == handle }
-        if (playingItem != null) {
+        if (handle != INVALID_HANDLE) {
+            val playingItem = playlistItems.firstOrNull { it.nodeHandle == handle }
             sharingScope.launch {
                 runCatching {
                     saveRecentlyUsedItemUseCase(
                         nodeHandle = handle,
                         type = RecentlyUsedType.Audio,
-                        fileName = playingItem.nodeName,
+                        fileName = playingItem?.nodeName.orEmpty(),
                     )
                 }.onFailure { Timber.e(it, "Failed to save recently used audio item") }
             }

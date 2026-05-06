@@ -43,6 +43,8 @@ import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -72,6 +74,7 @@ class PdfViewerViewModel @Inject constructor(
     private val setOrUpdateLastPageViewedInPdfUseCase: SetOrUpdateLastPageViewedInPdfUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
+    private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
 ) : ViewModel() {
 
     private val handle: Long
@@ -112,6 +115,22 @@ class PdfViewerViewModel @Inject constructor(
             }
         } else {
             _state.update { it.copy(lastPageViewed = 1) }
+        }
+    }
+
+    /**
+     * Saves the current PDF as a recently used item for the CWLO widget.
+     */
+    fun saveRecentlyUsed(fileName: String) {
+        if (handle == INVALID_HANDLE || isOffline) return
+        viewModelScope.launch {
+            runCatching {
+                saveRecentlyUsedItemUseCase(
+                    nodeHandle = handle,
+                    type = RecentlyUsedType.PDF,
+                    fileName = fileName,
+                )
+            }.onFailure { Timber.e(it, "Failed to save recently used PDF item") }
         }
     }
 
@@ -434,7 +453,7 @@ class PdfViewerViewModel @Inject constructor(
     private fun monitorTransferEvents() {
         monitorTransferEventsUseCase()
             .filter { it is TransferEvent.TransferTemporaryErrorEvent }
-            .filter { 
+            .filter {
                 // Filter out when offline or ZIP adapter
                 !isOffline && adapterType != ZIP_ADAPTER
             }

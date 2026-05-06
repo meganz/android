@@ -1742,6 +1742,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         // Hide progress bar when loading is complete
         loading = false
         binding.pdfViewerProgressBar.isVisible = false
+        viewModel.saveRecentlyUsed(pdfFileName.orEmpty())
 
         handler?.postDelayed({ if (isToolbarVisible) setToolbarVisibilityHide(200L) }, 2000)
     }

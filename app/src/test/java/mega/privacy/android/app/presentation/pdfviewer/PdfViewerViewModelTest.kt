@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -104,6 +105,7 @@ internal class PdfViewerViewModelTest {
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
+    private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -132,6 +134,7 @@ internal class PdfViewerViewModelTest {
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+            saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
         )
     }
 
