@@ -200,6 +200,16 @@ enum class ApiFeatures(
     ),
 
     /**
+     * Home configuration feature flag for Home Revamp Phase 2
+     * Enable home configuration to reorder widgets
+     */
+    HomeConfiguration(
+        experimentName = "hconf",
+        description = "Home configuration and reordering of home widgets",
+        defaultValue = false
+    ),
+
+    /**
      * Google Sign-In on the login screen (AND-23415).
      * When enabled, shows a "Sign in with Google" button on the login screen.
      * Resolved pre-login via getMiscFlags() (unauthenticated SDK call).

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -77,6 +78,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun monitorHomeCustomizationFeatureFlag() = flow {
-        emit(getFeatureFlagValueUseCase(AppFeatures.HomeCustomization))
+        emit(getFeatureFlagValueUseCase(ApiFeatures.HomeConfiguration))
     }
 }

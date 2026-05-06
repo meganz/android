@@ -152,16 +152,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     FileExplorer(
         "Enable file explorer revamp with ComposeUI and single activity",
         false
-    ),
-
-    /**
-     * Home customization toggle.
-     */
-    HomeCustomization(
-        "Enable home customization feature",
-        false
-    ),
-    ;
+    );
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

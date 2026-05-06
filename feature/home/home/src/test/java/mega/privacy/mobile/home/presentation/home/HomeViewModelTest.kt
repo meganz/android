@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -304,7 +305,7 @@ class HomeViewModelTest {
 
     private fun stubFeatureFlag(enabled: Boolean = false) {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.HomeCustomization) } doReturn enabled
+            onBlocking { invoke(ApiFeatures.HomeConfiguration) } doReturn enabled
         }
     }
 }
