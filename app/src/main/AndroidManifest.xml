@@ -124,8 +124,7 @@
             android:name=".presentation.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/action_settings"
-            android:launchMode="singleTop"
-            android:parentActivityName=".main.ManagerActivity" />
+            android:launchMode="singleTop" />
 
         <meta-data
             android:name="fontProviderRequests"
