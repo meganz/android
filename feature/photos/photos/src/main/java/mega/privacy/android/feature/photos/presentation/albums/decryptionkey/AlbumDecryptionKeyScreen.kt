@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.state.EmptyStateView
@@ -39,7 +40,7 @@ fun AlbumDecryptionKeyScreen(
                     .verticalScroll(rememberScrollState()),
                 title = stringResource(id = sharedR.string.album_decryption_key_title),
                 description = SpannableText(stringResource(id = sharedR.string.album_decryption_key_description)),
-                illustration = R.drawable.ic_decrypted_key
+                imagePainter = painterResource(id = R.drawable.ic_decrypted_key),
             )
         }
     )

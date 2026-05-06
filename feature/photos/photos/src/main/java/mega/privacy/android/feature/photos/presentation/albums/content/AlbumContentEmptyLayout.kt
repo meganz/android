@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.state.EmptyStateView
-import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.photos.R
@@ -24,12 +24,10 @@ fun AlbumContentEmptyLayout(
 
     EmptyStateView(
         modifier = modifier,
-        illustration = R.drawable.il_album_image,
-        description = SpannableText(
-            text = stringResource(sharedR.string.album_content_empty_album_title)
-        ),
-        actions = {
-            if (isActionVisible) {
+        imagePainter = painterResource(id = R.drawable.il_album_image),
+        title = stringResource(sharedR.string.album_content_empty_album_title),
+        primaryAction = if (isActionVisible) {
+            @Composable {
                 PrimaryFilledButton(
                     modifier = Modifier.wrapContentSize(),
                     text = action.getDescription(),
@@ -37,7 +35,9 @@ fun AlbumContentEmptyLayout(
                     onClick = onAddPhotosClicked
                 )
             }
-        }
+        } else {
+            null
+        },
     )
 }
 

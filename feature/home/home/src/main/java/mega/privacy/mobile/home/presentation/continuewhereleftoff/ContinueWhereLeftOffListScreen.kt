@@ -49,7 +49,6 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
-import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
@@ -62,7 +61,6 @@ import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
-import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -129,10 +127,8 @@ internal fun ContinueWhereLeftOffListScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    illustration = R.drawable.ic_cwlo_empty_state,
-                    description = SpannableText(
-                        text = stringResource(sharedR.string.home_cwlo_empty_state),
-                    ),
+                    imagePainter = painterResource(id = R.drawable.ic_cwlo_empty_state),
+                    title = stringResource(sharedR.string.home_cwlo_empty_state),
                 )
             }
 

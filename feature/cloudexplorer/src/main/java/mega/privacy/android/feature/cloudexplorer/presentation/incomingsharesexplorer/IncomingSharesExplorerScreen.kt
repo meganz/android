@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -127,8 +127,8 @@ internal fun IncomingSharesExplorerContent(
 
 @Composable
 private fun EmptyFolder() {
-    MegaEmptyView(
-        text = stringResource(sharedR.string.shares_screen_incoming_empty),
+    EmptyStateView(
+        title = stringResource(sharedR.string.shares_screen_incoming_empty),
         imagePainter = painterResource(iconPackR.drawable.ic_folder_arrow_up_glass),
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
     )

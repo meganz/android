@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -248,10 +249,8 @@ private fun AlbumPhotosSelectionContent(
     if (state.photos.isEmpty() && !state.isLoading) {
         EmptyStateView(
             modifier = Modifier.fillMaxSize(),
-            illustration = featurePhotosR.drawable.il_glass_image,
-            description = SpannableText(
-                stringResource(sharedR.string.album_photos_selection_empty_state_no_media_found)
-            )
+            imagePainter = painterResource(id = featurePhotosR.drawable.il_glass_image),
+            title = stringResource(sharedR.string.album_photos_selection_empty_state_no_media_found),
         )
     } else {
         var selectedGridSizeOrdinal by rememberSaveable {

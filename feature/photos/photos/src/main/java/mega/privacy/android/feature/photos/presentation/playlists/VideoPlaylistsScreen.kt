@@ -22,8 +22,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
@@ -36,13 +36,13 @@ import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPla
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistBottomSheet
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistRenameMenuAction
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
-import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -207,9 +207,9 @@ internal fun VideoPlaylistsTabScreen(
             }
 
             if (uiState.videoPlaylistEntities.isEmpty()) {
-                MegaEmptyView(
+                EmptyStateView(
                     modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_EMPTY_VIEW_TEST_TAG),
-                    text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
+                    title = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
                     imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
                 )
             } else {

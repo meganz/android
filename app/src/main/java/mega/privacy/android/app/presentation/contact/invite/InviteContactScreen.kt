@@ -65,7 +65,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -82,6 +81,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.fab.MegaFab
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -117,11 +117,8 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.TransparentChi
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericTextField
-import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
-import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
@@ -502,10 +499,7 @@ internal fun InviteContactScreen(
 
                 uiState.areContactsInitialized -> {
                     if (uiState.filteredContacts.isEmpty()) {
-                        EmptyContactResultBody(
-                            modifier = Modifier.fillMaxWidth(),
-                            isDarkMode = isDarkMode
-                        )
+                        EmptyContactResultBody()
                     } else {
                         ContactListBody(
                             modifier = Modifier.fillMaxSize(),
@@ -630,28 +624,12 @@ private fun ContactListLoadingBody(
 }
 
 @Composable
-private fun EmptyContactResultBody(
-    isDarkMode: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        EmptyContactsImage(isDarkMode)
-
-        val emptySpan = MegaSpanStyle(spanStyle = SpanStyle())
-        MegaSpannedText(
-            modifier = Modifier.testTag(NO_CONTACTS_TEXT_TAG),
-            value = stringResource(id = R.string.context_empty_contacts),
-            baseStyle = MaterialTheme.typography.subtitle2,
-            styles = mapOf(
-                SpanIndicator('A') to emptySpan,
-                SpanIndicator('B') to emptySpan,
-            ),
-            color = TextColor.Disabled
-        )
-    }
+private fun EmptyContactResultBody() {
+    EmptyStateView(
+        modifier = Modifier.testTag(NO_CONTACTS_EMPTY_VIEW_TAG),
+        imagePainter = painterResource(id = iconPackR.drawable.ic_user_glass),
+        title = stringResource(id = R.string.context_empty_contacts),
+    )
 }
 
 @Composable
@@ -970,7 +948,7 @@ internal const val EMPTY_CONTACTS_IMAGE_TAG = "empty_contacts_image:image_empty_
 internal const val CONTACT_LIST_LOADING_TEXT_TAG = "default_contact_list_loading_body:text_loading"
 internal const val CIRCULAR_LOADING_INDICATOR_TAG =
     "default_contact_list_loading_body:circular_loading_indicator"
-internal const val NO_CONTACTS_TEXT_TAG = "empty_contact_result_body:text_no_contacts"
+internal const val NO_CONTACTS_EMPTY_VIEW_TAG = "empty_contact_result_body"
 internal const val PHONE_CONTACTS_HEADER_TEXT_TAG = "phone_contacts_header:text_phone_contacts"
 internal const val HIGHLIGHTED_CONTACT_AVATAR_TAG = "contact_avatar:image_highlighted_avatar"
 internal const val CONTACT_AVATAR_WITH_URI_TAG = "contact_avatar:image_with_uri"

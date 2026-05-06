@@ -38,6 +38,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.shimmerEffect
@@ -49,7 +50,6 @@ import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationItemType
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.presentation.notification.view.notificationviewtype.PromoNotificationItemViewM3
-import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.feature.notifications.snowflakes.NotificationItemViewM3
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -245,11 +245,11 @@ private fun NotificationListViewM3(
 fun NotificationEmptyViewM3() {
     val imageDrawable = iconPackR.drawable.ic_bell_glass
     val textId = R.string.context_empty_notifications
-    MegaEmptyView(
+    EmptyStateView(
         modifier = Modifier
             .testTag(NOTIFICATION_EMPTY_VIEW_M3_TEST_TAG),
         imagePainter = painterResource(id = imageDrawable),
-        text = stringResource(id = textId)
+        title = stringResource(id = textId)
     )
 }
 

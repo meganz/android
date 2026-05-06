@@ -30,7 +30,7 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
-import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
@@ -44,12 +44,12 @@ import mega.privacy.android.feature.photos.presentation.playlists.videoselect.vi
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoListView
 import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.navigation.destination.SelectVideosSearchNavKey
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -209,11 +209,11 @@ fun SelectVideosForPlaylistScreen(
             )
 
             is SelectVideosForPlaylistUiState.Data -> if (uiState.items.isEmpty()) {
-                MegaEmptyView(
+                EmptyStateView(
                     modifier = Modifier
                         .padding(innerPadding)
                         .testTag(SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG),
-                    text = stringResource(id = sharedR.string.videos_tab_empty_hint_video),
+                    title = stringResource(id = sharedR.string.videos_tab_empty_hint_video),
                     imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
                 )
             } else {

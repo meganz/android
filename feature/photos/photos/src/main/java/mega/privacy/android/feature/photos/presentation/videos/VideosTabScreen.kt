@@ -23,8 +23,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
-import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.VideoItemView
 import mega.privacy.android.feature.photos.components.VideosFilterButtonView
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.FilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
@@ -44,7 +45,6 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeLabelCircle
-import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.TagsRow
@@ -177,9 +177,9 @@ internal fun VideosTabScreen(
 
             is VideosTabUiState.Data -> {
                 if (uiState.allVideoEntities.isEmpty()) {
-                    MegaEmptyView(
+                    EmptyStateView(
                         modifier = Modifier.testTag(VIDEO_TAB_EMPTY_VIEW_TEST_TAG),
-                        text = stringResource(id = sharedR.string.videos_tab_empty_hint_video),
+                        title = stringResource(id = sharedR.string.videos_tab_empty_hint_video),
                         imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
                     )
                 } else {

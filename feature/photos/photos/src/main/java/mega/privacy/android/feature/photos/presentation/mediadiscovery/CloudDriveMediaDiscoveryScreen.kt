@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,7 +50,6 @@ import mega.android.core.ui.components.dropdown.DropDownItem
 import mega.android.core.ui.components.dropdown.MegaDropDownMenu
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.components.state.EmptyStateView
-import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -453,10 +453,8 @@ internal fun CloudDriveMediaDiscoveryScreen(
                 uiState.mediaListItemList.isEmpty() -> {
                     EmptyStateView(
                         modifier = Modifier.fillMaxSize(),
-                        illustration = R.drawable.il_glass_image,
-                        description = SpannableText(
-                            text = stringResource(sharedR.string.timeline_tab_empty_body_no_media_found)
-                        )
+                        imagePainter = painterResource(id = R.drawable.il_glass_image),
+                        title = stringResource(sharedR.string.timeline_tab_empty_body_no_media_found),
                     )
                 }
 

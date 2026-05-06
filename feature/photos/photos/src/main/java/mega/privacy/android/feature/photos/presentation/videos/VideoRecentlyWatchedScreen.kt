@@ -30,13 +30,12 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.surface.ThemedSurface
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -48,6 +47,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
+import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
 import java.time.LocalDate
@@ -158,9 +158,9 @@ internal fun VideoRecentlyWatchedScreen(
                 is VideoRecentlyWatchedUiState.Data -> {
                     val group = uiState.groupedVideoRecentlyWatchedItems
                     if (group.isEmpty()) {
-                        MegaEmptyView(
+                        EmptyStateView(
                             modifier = Modifier.testTag(RECENTLY_WATCHED_EMPTY_VIEW_TEST_TAG),
-                            text = stringResource(id = sharedR.string.video_section_empty_hint_no_recently_activity),
+                            title = stringResource(id = sharedR.string.video_section_empty_hint_no_recently_activity),
                             imagePainter = painterResource(id = iconPackR.drawable.ic_clock_glass)
                         )
                     } else {

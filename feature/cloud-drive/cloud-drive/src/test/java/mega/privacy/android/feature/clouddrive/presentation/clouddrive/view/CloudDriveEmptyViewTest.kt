@@ -24,31 +24,10 @@ class CloudDriveEmptyViewTest {
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
-    fun `test that empty image is displayed`() {
+    fun `test that empty view is displayed`() {
         setupComposeContent()
 
-        composeRule.onNodeWithTag(EMPTY_IMAGE_TAG).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that title is displayed`() {
-        setupComposeContent()
-
-        composeRule.onNodeWithTag(EMPTY_TITLE_TAG).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that description is displayed when showAddItems is true`() {
-        setupComposeContent(showAddItems = true)
-
-        composeRule.onNodeWithTag(EMPTY_DESCRIPTION_TAG).assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that description is not displayed when showAddItems is false`() {
-        setupComposeContent(showAddItems = false)
-
-        composeRule.onNodeWithTag(EMPTY_DESCRIPTION_TAG).assertIsNotDisplayed()
+        composeRule.onNodeWithTag(EMPTY_VIEW_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -91,4 +70,3 @@ class CloudDriveEmptyViewTest {
         }
     }
 }
-

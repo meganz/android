@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
@@ -108,9 +108,9 @@ internal fun AudioContent(
 
             is AudioUiState.Data -> when {
                 uiState.items.isEmpty() -> {
-                    MegaEmptyView(
+                    EmptyStateView(
                         imagePainter = painterResource(id = iconPackR.drawable.ic_audio_glass),
-                        text = stringResource(id = sharedR.string.homepage_empty_hint_audio)
+                        title = stringResource(id = sharedR.string.homepage_empty_hint_audio)
                     )
                 }
 

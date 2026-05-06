@@ -9,7 +9,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import de.palm.composestateevents.EventEffect
-import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -104,8 +104,8 @@ internal fun FavouritesExplorerContent(
 
 @Composable
 private fun EmptyFolder() {
-    MegaEmptyView(
-        text = stringResource(sharedR.string.homepage_favourites_empty_hint),
+    EmptyStateView(
+        title = stringResource(sharedR.string.homepage_favourites_empty_hint),
         imagePainter = painterResource(iconPackR.drawable.ic_hearts_glass),
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
     )

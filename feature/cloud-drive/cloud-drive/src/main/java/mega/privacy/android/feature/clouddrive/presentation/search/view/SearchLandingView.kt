@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.state.EmptyStateView
@@ -37,7 +38,7 @@ fun SearchLandingView(
             },
         title = stringResource(id = sharedR.string.search_landing_title),
         description = SpannableText(text = stringResource(id = sharedR.string.search_landing_subtitle)),
-        illustration = IconPackR.drawable.ic_search_02
+        imagePainter = painterResource(id = IconPackR.drawable.ic_search_02),
     )
 }
 

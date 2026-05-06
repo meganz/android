@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
-import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -185,8 +185,8 @@ internal fun NodesExplorerScreenContent(
 
 @Composable
 private fun EmptyFolder() {
-    MegaEmptyView(
-        text = stringResource(sharedR.string.context_empty_folder_title),
+    EmptyStateView(
+        title = stringResource(sharedR.string.context_empty_folder_title),
         imagePainter = painterResource(iconPackR.drawable.ic_empty_folder),
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
     )
@@ -194,8 +194,8 @@ private fun EmptyFolder() {
 
 @Composable
 private fun EmptyRoot() {
-    MegaEmptyView(
-        text = stringResource(sharedR.string.context_empty_cloud_drive_title),
+    EmptyStateView(
+        title = stringResource(sharedR.string.context_empty_cloud_drive_title),
         imagePainter = painterResource(iconPackR.drawable.ic_usp_2),
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
     )

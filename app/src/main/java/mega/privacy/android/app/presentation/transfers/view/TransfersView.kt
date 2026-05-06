@@ -24,10 +24,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.SpanStyle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -36,15 +36,10 @@ import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.MegaSpanStyle
-import mega.android.core.ui.model.SpanIndicator
-import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
-import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
@@ -57,7 +52,6 @@ import mega.privacy.android.app.presentation.transfers.view.completed.CompletedT
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelAllTransfersDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelTransfersConfirmationDialog
 import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfersView
-import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
 import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
@@ -65,6 +59,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransferDragAndDropToChangePriorityEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersCancelSelectedMenuItemEvent
@@ -438,17 +433,8 @@ internal fun EmptyTransfersView(
 ) {
     EmptyStateView(
         modifier = modifier.fillMaxSize(),
-        illustration = iconPackR.drawable.ic_arrow_up_down_glass,
-        description = stringResource(id = emptyStringId),
-        descriptionSpanStyles = mapOf(
-            SpanIndicator('A') to SpanStyleWithAnnotation(
-                megaSpanStyle = MegaSpanStyle.TextColorStyle(
-                    SpanStyle().copy(fontWeight = AppTheme.typography.titleMedium.fontWeight),
-                    TextColor.Primary
-                ),
-                annotation = null
-            )
-        ),
+        imagePainter = painterResource(id = iconPackR.drawable.ic_arrow_up_down_glass),
+        title = stringResource(id = emptyStringId),
     )
 }
 

@@ -37,9 +37,9 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -48,13 +48,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.offline.HandleOfflineNodeAction3
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
-import mega.privacy.android.shared.nodes.components.NodeGridViewItem
-import mega.privacy.android.shared.nodes.components.NodeHeaderItem
-import mega.privacy.android.shared.nodes.components.NodeListViewItem
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -68,7 +61,14 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.shared.nodes.components.NodeGridViewItem
+import mega.privacy.android.shared.nodes.components.NodeHeaderItem
+import mega.privacy.android.shared.nodes.components.NodeListViewItem
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
@@ -343,11 +343,11 @@ internal fun OfflineScreen(
                     }
 
                     uiState.offlineNodes.isEmpty() -> {
-                        MegaEmptyView(
+                        EmptyStateView(
                             modifier = Modifier
                                 .testTag(OFFLINE_SCREEN_EMPTY_TAG)
                                 .align(Alignment.Center),
-                            text = stringResource(sharedR.string.offline_screen_empty_state_description),
+                            title = stringResource(sharedR.string.offline_screen_empty_state_description),
                             imagePainter = painterResource(iconPackR.drawable.ic_arrow_circle_down_glass)
                         )
                     }

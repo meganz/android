@@ -203,7 +203,7 @@ class InviteContactScreenTest {
         with(composeRule) {
             setScreen(uiState = InviteContactUiState(areContactsInitialized = true))
 
-            onNodeWithTag(NO_CONTACTS_TEXT_TAG).assertIsDisplayed()
+            onNodeWithTag(NO_CONTACTS_EMPTY_VIEW_TAG).assertIsDisplayed()
         }
     }
 

@@ -34,8 +34,8 @@ import de.palm.composestateevents.NavigationEventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -68,12 +68,12 @@ import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlay
 import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -572,8 +572,8 @@ internal fun VideoPlaylistDetailEmptyView(
             onPlayAllClicked = {}
         )
 
-        MegaEmptyView(
-            text = stringResource(id = sharedR.string.videos_tab_empty_hint_video),
+        EmptyStateView(
+            title = stringResource(id = sharedR.string.videos_tab_empty_hint_video),
             imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
         )
     }

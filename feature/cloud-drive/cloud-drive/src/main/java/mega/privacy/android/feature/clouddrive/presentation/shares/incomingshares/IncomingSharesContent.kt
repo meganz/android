@@ -14,11 +14,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
-import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
-import mega.privacy.android.shared.nodes.components.NodesView
-import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -28,7 +26,9 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
+import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.resources.R as SharedR
 
 
@@ -62,9 +62,9 @@ fun IncomingSharesContent(
             }
 
             uiState.isEmpty -> {
-                MegaEmptyView(
+                EmptyStateView(
                     imagePainter = painterResource(iconPackR.drawable.ic_folder_arrow_up_glass),
-                    text = stringResource(SharedR.string.shares_screen_incoming_empty)
+                    title = stringResource(SharedR.string.shares_screen_incoming_empty)
                 )
             }
 

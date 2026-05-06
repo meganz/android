@@ -7,11 +7,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.EMPTY_IMAGE_TAG
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
-import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.DECRYPTION_KEY_DIALOG_TAG
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.GUEST_BANNER_TAG
+import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.DECRYPTION_KEY_DIALOG_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -95,7 +94,7 @@ class FolderLinkContentTest {
             )
         )
 
-        composeRule.onNodeWithTag(EMPTY_IMAGE_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(FOLDER_LINK_EMPTY_TAG).assertIsDisplayed()
     }
 
     @Test

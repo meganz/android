@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -53,7 +54,6 @@ import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.surface.RowSurface
 import mega.android.core.ui.components.surface.SurfaceColor
-import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
@@ -412,10 +412,8 @@ private fun AlbumImportContent(
         photos.isEmpty() -> {
             EmptyStateView(
                 modifier = modifier,
-                illustration = R.drawable.il_album_image,
-                description = SpannableText(
-                    text = stringResource(sharedResR.string.album_content_empty_album_title)
-                )
+                imagePainter = painterResource(id = R.drawable.il_album_image),
+                title = stringResource(sharedResR.string.album_content_empty_album_title),
             )
         }
 

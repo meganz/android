@@ -255,7 +255,7 @@ private fun MediaSearchEmptyState(
         modifier = modifier,
         title = title,
         description = SpannableText(text = description),
-        illustration = iconPackR.drawable.ic_search_02
+        imagePainter = painterResource(id = iconPackR.drawable.ic_search_02),
     )
 }
 

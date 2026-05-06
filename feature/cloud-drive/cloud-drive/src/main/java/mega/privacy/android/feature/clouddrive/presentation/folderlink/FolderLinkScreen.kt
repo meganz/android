@@ -55,12 +55,12 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trackAnalyticsEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
-import mega.privacy.android.feature.clouddrive.presentation.publiclink.model.PublicLinkShareAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.FolderLinkGuestBanner
+import mega.privacy.android.feature.clouddrive.presentation.publiclink.model.PublicLinkShareAction
 import mega.privacy.android.feature.clouddrive.presentation.publiclink.model.startPublicLinkShareIntent
 import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.DecryptionKeyDialog
 import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.ExpiredLinkView
-import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.FolderLinkGuestBanner
 import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.UnavailableLinkView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -362,6 +362,7 @@ internal fun FolderLinkContent(
                         if (uiState.items.isEmpty()) {
                             CloudDriveEmptyView(
                                 modifier = Modifier
+                                    .testTag(FOLDER_LINK_EMPTY_TAG)
                                     .fillMaxSize()
                                     .padding(bottom = 56.dp),
                                 isRootCloudDrive = false,
@@ -430,3 +431,4 @@ internal const val FOLDER_LINK_BOTTOM_BAR_TAG = "folder_link_screen:bottom_bar"
 internal const val FOLDER_LINK_LOADING_TAG = "folder_link_screen:loading"
 internal const val FOLDER_LINK_EXPIRED_TAG = "folder_link_screen:expired"
 internal const val FOLDER_LINK_UNAVAILABLE_TAG = "folder_link_screen:unavailable"
+internal const val FOLDER_LINK_EMPTY_TAG = "folder_link_screen:empty"

@@ -26,7 +26,7 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
@@ -209,7 +209,7 @@ internal fun RubbishBinScreen(
             }
 
             uiState.items.isEmpty() && uiState.nodesLoadingState == NodesLoadingState.FullyLoaded -> {
-                MegaEmptyView(
+                EmptyStateView(
                     modifier = Modifier
                         .testTag(NODES_EMPTY_VIEW_VISIBLE),
                     imagePainter = painterResource(
@@ -219,7 +219,7 @@ internal fun RubbishBinScreen(
                             iconPackR.drawable.ic_empty_folder_glass
                         }
                     ),
-                    text = stringResource(
+                    title = stringResource(
                         if (isRootDirectory) {
                             sharedR.string.annotated_empty_rubbish_bin_menu
                         } else {
