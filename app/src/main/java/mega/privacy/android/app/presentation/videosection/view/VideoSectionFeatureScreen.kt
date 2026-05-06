@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videosection.view
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.navigation.BottomSheetNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -12,12 +13,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material.navigation.BottomSheetNavigator
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_PLAYLIST_DETAIL
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_RECENTLY_WATCHED_MODE
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_SECTION_MODE
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
@@ -48,10 +45,10 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPla
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VideoRecentlyWatchedView
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.mobile.analytics.event.RecentlyWatchedOpenedButtonPressedEvent
 
@@ -133,7 +130,7 @@ internal fun VideoSectionNavHost(
                 videoSectionViewModel = viewModel,
                 onClick = viewModel::onItemClicked,
                 onSortOrderClick = onSortOrderClick,
-                onMenuClick = { onMenuClick(it, VIDEO_SECTION_MODE) },
+                onMenuClick = { onMenuClick(it, /* VIDEO_SECTION_MODE */ 10) },
                 onLongClick = viewModel::onItemLongClicked,
                 onPlaylistItemClick = { playlist, index ->
                     if (state.isInSelection) {
@@ -182,7 +179,7 @@ internal fun VideoSectionNavHost(
                         viewModel.onVideoItemOfPlaylistClicked(item, index)
                     }
                 },
-                onMenuClick = { onMenuClick(it, VIDEO_PLAYLIST_DETAIL) },
+                onMenuClick = { onMenuClick(it, /* VIDEO_PLAYLIST_DETAIL */ 11) },
                 onLongClick = viewModel::onVideoItemOfPlaylistLongClicked,
                 onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                 onPlayAllClicked = viewModel::playAllButtonClicked,
@@ -230,7 +227,7 @@ internal fun VideoSectionNavHost(
                         viewModel.clearRecentlyWatchedVideos()
                     }
                 },
-                onMenuClick = { onMenuClick(it, VIDEO_RECENTLY_WATCHED_MODE) },
+                onMenuClick = { onMenuClick(it, /* VIDEO_RECENTLY_WATCHED_MODE */ 9) },
                 clearRecentlyWatchedVideosMessageShown = viewModel::resetClearRecentlyWatchedVideosSuccess,
                 removedRecentlyWatchedItemMessageShown = viewModel::resetRemoveRecentlyWatchedItemSuccess
             )

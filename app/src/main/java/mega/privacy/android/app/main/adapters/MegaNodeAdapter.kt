@@ -37,11 +37,9 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -52,7 +50,6 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ViewHolderBrowser
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
@@ -72,6 +69,8 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest.Companion.fromHandle
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as SharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -1314,12 +1313,6 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 (fragment as ContactFileListFragment).showOptionsPanel(n)
             } else if (type == Constants.CONTACT_SHARED_FOLDER_ADAPTER) {
                 (fragment as ContactSharedFolderFragment).showOptionsPanel(n)
-            } else {
-                (context as ManagerActivity).showNodeOptionsPanel(
-                    n,
-                    NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
-                    sd
-                )
             }
         }
     }
