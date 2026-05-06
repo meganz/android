@@ -12,7 +12,6 @@ import mega.privacy.android.app.main.share.SharesViewModel
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeDeviceCenterInformation
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
-import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.LegacyRubbishBinViewModel
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesComposeViewModel
 import mega.privacy.android.app.utils.Constants
@@ -179,10 +178,6 @@ class ManagerActivity : PasscodeActivity(), NotificationNavigationHandler {
     fun closeSearchView() = Unit
     suspend fun getCurrentParentNode(parentHandle: Long, error: Int): MegaNode? = null
     fun destroyPermissionsFragment(isCameraUploadsEnabled: Boolean) = Unit
-    fun fullscreenOfflineFragmentComposeOpened(fragment: OfflineComposeFragment?) = Unit
-    fun fullscreenOfflineFragmentComposeClosed(fragment: OfflineComposeFragment) = Unit
-    fun pagerOfflineComposeFragmentOpened(fragment: OfflineComposeFragment?) = Unit
-    fun pagerOfflineComposeFragmentClosed(fragment: OfflineComposeFragment) = Unit
     fun handleCloudDriveBackNavigation(performBackNavigation: Boolean) = Unit
     fun handleFileUris(uris: List<Uri>, pitagTrigger: PitagTrigger) = Unit
     fun handleVideoSectionAddAction() = Unit
