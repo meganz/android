@@ -13,9 +13,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
-import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
+import mega.privacy.android.domain.entity.toDuration
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
@@ -28,6 +30,7 @@ import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileL
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
+import java.io.File
 
 @HiltViewModel(assistedFactory = FileLinkViewModel.Factory::class)
 internal class FileLinkViewModel @AssistedInject constructor(
@@ -76,10 +79,14 @@ internal class FileLinkViewModel @AssistedInject constructor(
                     val formattedDuration = node.type.toDuration()?.let { duration ->
                         durationInSecondsTextMapper(duration)
                     }
+                    val thumbnailData = node.previewPath?.let { path ->
+                        runCatching { ThumbnailUriRequest(UriPath.fromFile(File(path))) }.getOrNull()
+                    }
                     _uiState.update {
                         it.copy(
                             contentState = FileLinkContentState.Loaded(
                                 iconRes = iconRes,
+                                thumbnailData = thumbnailData,
                                 formattedDuration = formattedDuration,
                             ),
                             fileNode = node,

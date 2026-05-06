@@ -118,6 +118,7 @@ class FileLinkScreenContentTest {
         return FileLinkUiState(
             contentState = FileLinkContentState.Loaded(
                 iconRes = iconPackR.drawable.ic_video_medium_solid,
+                thumbnailData = null,
                 formattedDuration = formattedDuration,
             ),
             fileNode = fileNode,

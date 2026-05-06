@@ -50,10 +50,10 @@ import mega.privacy.android.domain.entity.uri.UriPath
 @Composable
 fun NodeThumbnailView(
     data: ThumbnailData?,
+    contentDescription: String?,
     @DrawableRes defaultImage: Int,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
-    contentDescription: String?,
     blurImage: Boolean = false,
     layoutType: ThumbnailLayoutType = ThumbnailLayoutType.Grid,
 ) {
@@ -80,7 +80,7 @@ fun NodeThumbnailView(
 
     } else {
         val context = LocalContext.current
-        val imageRequest = remember(data, context) {
+        val imageRequest = remember(data, context, layoutType) {
             ImageRequest.Builder(context)
                 .data(data)
                 .crossfade(true)
@@ -107,7 +107,9 @@ fun NodeThumbnailView(
                         .testTag(NODE_THUMBNAIL_IMAGE_TAG)
                 }
 
-                state is AsyncImagePainter.State.Loading && layoutType == ThumbnailLayoutType.MediaGrid -> {
+                state is AsyncImagePainter.State.Loading
+                        && (layoutType == ThumbnailLayoutType.MediaGrid
+                        || layoutType == ThumbnailLayoutType.FullSize) -> {
                     modifier
                         .background(shimmerColor)
                         .fillMaxSize()
@@ -149,6 +151,10 @@ sealed class ThumbnailLayoutType(
     object Grid : ThumbnailLayoutType(72.dp, 4.dp)
 
     object List : ThumbnailLayoutType(32.dp, 4.dp)
+
+    /** Full-size thumbnail (e.g. file-link screen): success image fills the parent;
+     *  every other state renders the default image centered at 120.dp. */
+    object FullSize : ThumbnailLayoutType(120.dp, 0.dp)
 }
 
 /**

@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.clouddrive.presentation.filelink.model
 
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
+
 sealed interface FileLinkContentState {
     data object Loading : FileLinkContentState
 
@@ -14,6 +16,7 @@ sealed interface FileLinkContentState {
 
     data class Loaded(
         val iconRes: Int,
+        val thumbnailData: ThumbnailData? = null,
         val formattedDuration: String? = null,
     ) : FileLinkContentState
 }

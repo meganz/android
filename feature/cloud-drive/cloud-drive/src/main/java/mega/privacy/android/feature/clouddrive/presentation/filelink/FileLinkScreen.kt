@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.filelink
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,9 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,6 +50,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuActi
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SaveToMegaMenuAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkContentState
@@ -65,6 +64,8 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.ads.NewAdsContainer
+import mega.privacy.android.shared.nodes.components.NodeThumbnailView
+import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -233,6 +234,7 @@ internal fun FileLinkContent(
                         fileSize = formattedFileSize,
                         duration = state.formattedDuration,
                         iconRes = state.iconRes,
+                        thumbnailData = state.thumbnailData,
                         onOpenClicked = onOpenClicked,
                     )
                 }
@@ -247,6 +249,7 @@ private fun LoadedFileLinkContent(
     fileSize: String,
     duration: String?,
     iconRes: Int,
+    thumbnailData: ThumbnailData?,
     onOpenClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -258,12 +261,14 @@ private fun LoadedFileLinkContent(
                 .clip(RoundedCornerShape(6.dp)),
             surfaceColor = SurfaceColor.Surface1,
         ) {
-            Image(
-                painter = painterResource(id = iconRes),
-                contentDescription = null,
+            NodeThumbnailView(
+                data = thumbnailData,
+                defaultImage = iconRes,
+                contentDescription = fileName,
+                contentScale = ContentScale.Crop,
+                layoutType = ThumbnailLayoutType.FullSize,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .size(120.dp)
                     .testTag(FILE_LINK_THUMBNAIL_TAG),
             )
 
@@ -348,6 +353,7 @@ private fun LoadedFileLinkContentPreview() {
             fileSize = "12.3 MB",
             duration = null,
             iconRes = iconPackR.drawable.ic_generic_medium_solid,
+            thumbnailData = null,
             onOpenClicked = {},
         )
     }
@@ -362,6 +368,7 @@ private fun LoadedFileLinkContentVideoPreview() {
             fileSize = "647 MB",
             duration = "2:50",
             iconRes = iconPackR.drawable.ic_video_medium_solid,
+            thumbnailData = null,
             onOpenClicked = {},
         )
     }
