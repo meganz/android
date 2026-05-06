@@ -2,6 +2,8 @@ package mega.privacy.android.feature.pdfviewer.presentation.components
 
 import android.content.Context
 import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.net.Uri
 import android.view.ViewGroup
@@ -13,6 +15,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -71,8 +75,9 @@ internal fun PdfViewerContent(
     val allMatchRectsByPageRef: MutableState<Map<Int, List<RectF>>> =
         remember { mutableStateOf(allMatchRectsByPage) }
 
-    val currentMatchColor = supportColor(SupportColor.Warning).copy(alpha = 0.5f)
-    val allMatchColor = supportColor(SupportColor.Warning).copy(alpha = 0.15f)
+    val warningColor = supportColor(SupportColor.Warning)
+    // Use lerp instead of alpha: MULTIPLY xfermode requires fully opaque color on hardware Canvas.
+    val allMatchColor = lerp(Color.White, warningColor, 0.30f)
 
     // Track highlight identity to trigger redraws without using the generic View.tag
     val lastHighlightIdentity = remember { mutableStateOf<Any?>(null) }
@@ -83,16 +88,18 @@ internal fun PdfViewerContent(
 
     // Paint for the currently-selected match (brighter) and all other matches (lighter).
     // Keyed on their respective colors so they update on theme changes.
-    val highlightPaint = remember(currentMatchColor) {
+    val highlightPaint = remember(warningColor) {
         Paint().apply {
-            color = currentMatchColor.toArgb()
+            color = warningColor.toArgb()
             style = Paint.Style.FILL
+            xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
         }
     }
-    val allMatchPaint = remember(allMatchColor) {
+    val allMatchPaint = remember(warningColor) {
         Paint().apply {
             color = allMatchColor.toArgb()
             style = Paint.Style.FILL
+            xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
         }
     }
 
@@ -191,10 +198,19 @@ internal fun PdfViewerContent(
                     true // consume the tap
                 }
                 .onDrawAll { canvas, pageWidth, pageHeight, displayedPage ->
-                    // Draw all match rects for this page in light yellow.
+                    val currentHighlightPage = highlightPageIndexRef.intValue
+                    val currentHighlightRects = highlightRectsRef.value
+
+                    // Draw all match rects, skipping the current match so it is drawn
+                    // exactly once below with brighter paint.
                     val allRects = allMatchRectsByPageRef.value[displayedPage]
                     if (!allRects.isNullOrEmpty()) {
                         allRects.forEach { pdfRect ->
+                            // RectF.equals() uses float ==, safe here because both lists share
+                            // coordinates from the same source with no intermediate calculation.
+                            if (displayedPage == currentHighlightPage &&
+                                currentHighlightRects?.contains(pdfRect) == true
+                            ) return@forEach
                             val canvasRect = pdfView.mapRectToCanvas(
                                 displayedPage, pdfRect, pageWidth, pageHeight
                             )
@@ -206,9 +222,7 @@ internal fun PdfViewerContent(
                         }
                     }
 
-                    // Draw the currently-selected match on top in bright yellow.
-                    val currentHighlightPage = highlightPageIndexRef.intValue
-                    val currentHighlightRects = highlightRectsRef.value
+                    // Draw the currently-selected match on top with brighter paint.
                     if (displayedPage == currentHighlightPage && !currentHighlightRects.isNullOrEmpty()) {
                         currentHighlightRects.forEach { pdfRect ->
                             val canvasRect = pdfView.mapRectToCanvas(
