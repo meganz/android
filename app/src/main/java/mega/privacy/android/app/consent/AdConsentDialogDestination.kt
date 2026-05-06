@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.NavKey
 import com.google.android.ump.UserMessagingPlatform
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.consent.model.AdsConsentState
+import mega.privacy.android.app.presentation.extensions.isAlive
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.AdConsentDialogNavKey
@@ -21,14 +22,14 @@ fun EntryProviderScope<in DialogNavKey>.adConsentDialogDestination(
 ) {
     entry<AdConsentDialogNavKey>(
         metadata = transparentMetadata()
-    ) {
+    ) { navKey ->
         val viewModel = hiltViewModel<AdsConsentViewModel>()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val activity = LocalActivity.current
 
         DisposableEffect(activity) {
-            if (activity != null) {
-                viewModel.onLoaded(activity)
+            activity?.takeIf { it.isAlive }?.let {
+                viewModel.onLoaded(it)
             }
 
             onDispose { viewModel.onUnLoaded() }
@@ -37,12 +38,11 @@ fun EntryProviderScope<in DialogNavKey>.adConsentDialogDestination(
         when (val state = uiState) {
             AdsConsentState.Loading -> {}
             is AdsConsentState.Data -> {
-                val activity = LocalActivity.current
                 EventEffect(
                     event = state.showConsentFormEvent,
                     onConsumed = viewModel::onConsentFormDisplayed,
                 ) {
-                    activity?.let {
+                    activity?.takeIf { it.isAlive }?.let {
                         UserMessagingPlatform.loadAndShowConsentFormIfRequired(it) { error ->
                             viewModel.onConsentSelected(error)
                         }
@@ -51,7 +51,7 @@ fun EntryProviderScope<in DialogNavKey>.adConsentDialogDestination(
 
                 EventEffect(
                     event = state.adConsentHandledEvent,
-                    onConsumed = { remove(it) },
+                    onConsumed = { remove(navKey) },
                 ) {
                     viewModel.onAdConsentHandled()
                     onDialogHandled()
@@ -59,7 +59,7 @@ fun EntryProviderScope<in DialogNavKey>.adConsentDialogDestination(
 
                 EventEffect(
                     event = state.adFeatureDisabled,
-                    onConsumed = { remove(it) }
+                    onConsumed = { remove(navKey) }
                 ) {
                     onDialogHandled()
                 }

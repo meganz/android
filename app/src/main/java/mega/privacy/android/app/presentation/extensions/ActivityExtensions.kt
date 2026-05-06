@@ -29,3 +29,9 @@ fun Activity.uploadFolderManually() {
         ), Constants.REQUEST_CODE_GET_FOLDER
     )
 }
+
+/**
+ * Whether the activity is in a state safe to interact with (not finishing or destroyed).
+ */
+val Activity.isAlive: Boolean
+    get() = !this.isDestroyed && !this.isFinishing

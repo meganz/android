@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.extensions.isAlive
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.advertisements.SetGoogleConsentLoadedUseCase
@@ -30,7 +31,7 @@ class AdConsentWrapper @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
 ) {
     fun getCanRequestConsentFlow(activity: Activity) = callbackFlow {
-        if (activity.isFinishing || activity.isDestroyed) {
+        if (!activity.isAlive) {
             Timber.w("Skip consent request: activity finishing or destroyed")
             trySend(false)
             close()
