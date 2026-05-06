@@ -214,7 +214,7 @@ pipeline {
                 }
             }
         }
-        stage("Build, Test and Lint") {
+        stage("Build, Test, Lint and Code Review") {
             when {
                 expression { !shouldSkipBuild() }
             }
@@ -380,63 +380,63 @@ pipeline {
                         }
                     }
                 }  //stage('Lint Check')
-            }
-        }
 
-        stage('Code Review') {
-            agent { label NODE_LABELS }
-            when {
-                expression { shouldRunCodeReview() }
-            }
-            steps {
-                gitlabCommitStatus(name: 'Code Review') {
-                    script {
-                        def skillFile = "${WORKSPACE}/.claude/skills/android-code-review/SKILL.md"
-                        def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: 'develop'
+                stage('Code Review') {
+                    agent { label NODE_LABELS }
+                    when {
+                        expression { shouldRunCodeReview() }
+                    }
+                    steps {
+                        gitlabCommitStatus(name: 'Code Review') {
+                            script {
+                                def skillFile = "${WORKSPACE}/.claude/skills/android-code-review/SKILL.md"
+                                def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: 'develop'
 
-                        util.useGitLab() {
-                            withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
-                                try {
-                                    sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --model 'claude-opus-4-6' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
-                                    def summary = "Code Review Report"
-                                    if (fileExists(CODE_REVIEW_SUMMARY_FILE)) {
-                                        summary = readFile(CODE_REVIEW_SUMMARY_FILE).trim()
-                                    }
-                                    common.sendFileToMRComment(CODE_REVIEW_OUTPUT_FILE, summary)
-                                } catch (Exception e) {
-                                    String errorMessage = e.message ?: 'Unknown error'
-                                    try {
-                                        if (fileExists(CODE_REVIEW_ERROR_REPORT_FILE)) {
-                                            errorMessage = readFile(CODE_REVIEW_ERROR_REPORT_FILE).trim()
+                                util.useGitLab() {
+                                    withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
+                                        try {
+                                            sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}' --model 'claude-opus-4-6' --summary '${CODE_REVIEW_SUMMARY_FILE}' --error-report '${CODE_REVIEW_ERROR_REPORT_FILE}'"
+                                            def summary = "Code Review Report"
+                                            if (fileExists(CODE_REVIEW_SUMMARY_FILE)) {
+                                                summary = readFile(CODE_REVIEW_SUMMARY_FILE).trim()
+                                            }
+                                            common.sendFileToMRComment(CODE_REVIEW_OUTPUT_FILE, summary)
+                                        } catch (Exception e) {
+                                            String errorMessage = e.message ?: 'Unknown error'
+                                            try {
+                                                if (fileExists(CODE_REVIEW_ERROR_REPORT_FILE)) {
+                                                    errorMessage = readFile(CODE_REVIEW_ERROR_REPORT_FILE).trim()
+                                                }
+                                            } catch (ignored) {
+                                            }
+
+                                            common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
+                                            String mrNumber = common.getMrNumber()
+                                            String folder = "android-build/MR-${mrNumber}"
+                                            String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
+
+                                            String failMsg = ":x: **Code Review Failed** (Build: ${env.BUILD_NUMBER})<br/>" +
+                                                    "Error: ${errorMessage}<br/>" +
+                                                    "Please check the [build log](${jenkinsLog}) for details."
+
+                                            common.sendToMR(failMsg)
                                         }
-                                    } catch (ignored) {
                                     }
-
-                                    common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
-                                    String mrNumber = common.getMrNumber()
-                                    String folder = "android-build/MR-${mrNumber}"
-                                    String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
-
-                                    String failMsg = ":x: **Code Review Failed** (Build: ${env.BUILD_NUMBER})<br/>" +
-                                            "Error: ${errorMessage}<br/>" +
-                                            "Please check the [build log](${jenkinsLog}) for details."
-
-                                    common.sendToMR(failMsg)
                                 }
                             }
                         }
                     }
-                }
+                    post {
+                        always {
+                            archiveArtifacts artifacts: "${CODE_REVIEW_OUTPUT_FILE},${CODE_REVIEW_SUMMARY_FILE},${CODE_REVIEW_ERROR_REPORT_FILE}", allowEmptyArchive: true
+                        }
+                        cleanup {
+                            cleanWs(cleanWhenFailure: true)
+                        }
+                    }
+                } //stage('Code Review')
             }
-            post {
-                always {
-                    archiveArtifacts artifacts: "${CODE_REVIEW_OUTPUT_FILE},${CODE_REVIEW_SUMMARY_FILE},${CODE_REVIEW_ERROR_REPORT_FILE}", allowEmptyArchive: true
-                }
-                cleanup {
-                    cleanWs(cleanWhenFailure: true)
-                }
-            }
-        } //stage('Code Review')
+        }
     }
 }
 
