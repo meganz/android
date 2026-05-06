@@ -283,7 +283,7 @@ fun getSdkGitHash(version: String, project: Project): String {
         )
     } else {
         commit = runCommand(
-            workingDir = File("../sdk/src/main/jni/mega/sdk"),
+            workingDir = File("./sdk/src/main/jni/mega/sdk"),
             command = listOf("git", "rev-parse", "--short", "HEAD"),
         ).trim()
     }
@@ -307,7 +307,7 @@ fun getChatGitHash(version: String, project: Project): String {
         commit = queryPrebuiltSdkProperty("chat-commit", version, project)
     } else {
         commit = runCommand(
-            workingDir = File("../sdk/src/main/jni/megachat/sdk"),
+            workingDir = File("./sdk/src/main/jni/megachat/sdk"),
             command = listOf("git", "rev-parse", "--short", "HEAD"),
         ).trim()
     }
