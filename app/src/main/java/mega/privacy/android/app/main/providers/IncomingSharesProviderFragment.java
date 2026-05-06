@@ -52,7 +52,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
 
     Context context;
     MegaApiAndroid megaApi;
-    ArrayList<MegaNode> nodes;
+    ArrayList<MegaNode> nodes = new ArrayList<>();
     long parentHandle = -1;
 
     long[] hashes;
