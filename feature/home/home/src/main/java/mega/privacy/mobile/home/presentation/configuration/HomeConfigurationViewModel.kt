@@ -108,6 +108,22 @@ class HomeConfigurationViewModel @Inject constructor(
     }
 
     fun resetWidgetStateToDefault() {
-        // Todo: Reset widget state to default
+        viewModelScope.launch {
+            runCatching {
+                val defaultConfigurations = widgetProviders
+                    .flatMap { provider ->
+                        provider.getWidgets().map { widget ->
+                            HomeWidgetConfiguration(
+                                widgetIdentifier = widget.identifier,
+                                widgetOrder = widget.defaultOrder,
+                                enabled = true,
+                            )
+                        }
+                    }
+                updateWidgetConfigurationsUseCase(defaultConfigurations)
+            }.onFailure {
+                Timber.e(it, "Failed to reset widget configurations to default")
+            }
+        }
     }
 }

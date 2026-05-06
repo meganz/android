@@ -305,6 +305,32 @@ class HomeConfigurationViewModelTest {
     }
 
 
+    @Test
+    fun `test that reset widget state to default updates all widgets to default order and enabled`() =
+        runTest {
+            val firstWidget = stubWidget(identifier = "first", defaultOrder = 2)
+            val secondWidget = stubWidget(identifier = "second", defaultOrder = 0)
+            val thirdWidget = stubWidget(identifier = "third", defaultOrder = 1)
+
+            dynamicWidgetsProvider.stub {
+                onBlocking { getWidgets() } doReturn setOf(firstWidget, secondWidget)
+            }
+            staticWidgetsProvider.stub {
+                onBlocking { getWidgets() } doReturn setOf(thirdWidget)
+            }
+
+            underTest.resetWidgetStateToDefault()
+
+            val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
+            verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
+            val actual = captor.firstValue.associateBy { it.widgetIdentifier }
+            assertThat(actual).hasSize(3)
+            assertThat(actual["first"]?.widgetOrder).isEqualTo(2)
+            assertThat(actual["second"]?.widgetOrder).isEqualTo(0)
+            assertThat(actual["third"]?.widgetOrder).isEqualTo(1)
+            assertThat(actual.values.all { it.enabled }).isTrue()
+        }
+
     private fun stubWidget(
         identifier: String,
         defaultOrder: Int,
