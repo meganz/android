@@ -92,6 +92,8 @@ replay_pid*
 .claude/*
 
 !/.claude/skills/
+!/.claude/hooks/
+!/.claude/settings.json
 .claude/settings.local.json
 ./review.md
 review.md
