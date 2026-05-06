@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,6 +39,7 @@ import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -131,8 +133,8 @@ internal fun FileLinkScreenContent(
         topBar = {
             MegaTopAppBar(
                 modifier = Modifier.testTag(FILE_LINK_APP_BAR_TAG),
-                title = uiState.title,
-                subtitle = stringResource(sharedR.string.file_link_subtitle),
+                title = uiState.title.text,
+                subtitle = uiState.subTitle?.text,
                 navigationType = AppBarNavigationType.Close(onBack),
                 trailingIcons = {
                     TransfersToolbarWidget(onClick = onTransfersClicked)
@@ -142,7 +144,7 @@ internal fun FileLinkScreenContent(
                         add(MenuActionWithClick(PublicLinkShareAction) {
                             context.startPublicLinkShareIntent(
                                 link = uiState.url,
-                                title = uiState.title
+                                title = uiState.title.get(context)
                             )
                         })
                     }
@@ -198,7 +200,10 @@ internal fun FileLinkContent(
 ) {
     Box(modifier = modifier) {
         when (val state = uiState.contentState) {
-            FileLinkContentState.Loading -> Unit // TODO shimmer
+            FileLinkContentState.Loading -> LoadingFileLinkContent(
+                modifier = Modifier.testTag(FILE_LINK_LOADING_TAG),
+            )
+
             is FileLinkContentState.DecryptionKeyRequired -> DecryptionKeyDialog(
                 isKeyIncorrect = state.isKeyIncorrect,
                 onDecryptionKeyEntered = { key ->
@@ -344,6 +349,52 @@ private fun DurationBadge(
     }
 }
 
+@Composable
+private fun LoadingFileLinkContent(modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(5f / 4f)
+                .padding(16.dp)
+                .shimmerEffect(shape = RoundedCornerShape(6.dp)),
+        )
+
+        Spacer(Modifier.height(2.dp))
+
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            Spacer(
+                modifier = Modifier
+                    .width(177.dp)
+                    .height(22.dp)
+                    .shimmerEffect(),
+            )
+
+            Spacer(Modifier.height(2.dp))
+
+            Spacer(
+                modifier = Modifier
+                    .width(96.dp)
+                    .height(14.dp)
+                    .shimmerEffect(),
+            )
+        }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun LoadingFileLinkContentPreview() {
+    AndroidThemeForPreviews {
+        LoadingFileLinkContent()
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun LoadedFileLinkContentPreview() {
@@ -412,6 +463,7 @@ private fun FileLinkScreenContentUnavailablePreview() {
 
 internal const val FILE_LINK_APP_BAR_TAG = "file_link_screen:main_app_bar"
 internal const val FILE_LINK_BOTTOM_BAR_TAG = "file_link_screen:bottom_bar"
+internal const val FILE_LINK_LOADING_TAG = "file_link_screen:loading"
 internal const val FILE_LINK_EXPIRED_TAG = "file_link_screen:expired"
 internal const val FILE_LINK_UNAVAILABLE_TAG = "file_link_screen:unavailable"
 internal const val FILE_LINK_THUMBNAIL_TAG = "file_link_screen:thumbnail"

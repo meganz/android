@@ -73,6 +73,22 @@ class FileLinkScreenContentTest {
     }
 
     @Test
+    fun `test that loading skeleton is displayed when state is Loading`() {
+        setupComposeContent(
+            uiState = FileLinkUiState(contentState = FileLinkContentState.Loading)
+        )
+
+        composeRule.onNodeWithTag(FILE_LINK_LOADING_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that loading skeleton is not displayed when state is Loaded`() {
+        setupComposeContent(uiState = loadedUiState(formattedDuration = null))
+
+        composeRule.onNodeWithTag(FILE_LINK_LOADING_TAG).assertDoesNotExist()
+    }
+
+    @Test
     fun `test that expired tag is not displayed when state is Loading`() {
         setupComposeContent(
             uiState = FileLinkUiState(contentState = FileLinkContentState.Loading)
