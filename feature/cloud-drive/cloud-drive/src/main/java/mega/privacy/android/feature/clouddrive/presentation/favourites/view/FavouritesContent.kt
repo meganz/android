@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
@@ -105,7 +106,8 @@ internal fun FavouritesContent(
             uiState.isEmpty -> {
                 EmptyStateView(
                     imagePainter = painterResource(id = iconPackR.drawable.ic_hearts_glass),
-                    title = stringResource(id = sharedR.string.homepage_favourites_empty_hint)
+                    title = stringResource(id = sharedR.string.homepage_favourites_empty_hint),
+                    description = SpannableText(stringResource(sharedR.string.favourites_empty_screen_description)),
                 )
             }
 

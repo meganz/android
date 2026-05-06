@@ -10,6 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -108,6 +109,7 @@ private fun EmptyFolder() {
         title = stringResource(sharedR.string.homepage_favourites_empty_hint),
         imagePainter = painterResource(iconPackR.drawable.ic_hearts_glass),
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
+        description = SpannableText(stringResource(sharedR.string.favourites_empty_screen_description)),
     )
 }
 

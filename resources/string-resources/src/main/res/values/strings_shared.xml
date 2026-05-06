@@ -2798,4 +2798,6 @@
     <string name="home_configuration_widget_removal_not_allowed_message">At least one option must stay on</string>
     <!-- Appbar subtitle of file link screen-->
     <string name="file_link_subtitle">File link</string>
+    <!-- Description for the empty view in Favourites sections. -->
+    <string name="favourites_empty_screen_description">Mark folders as favourites to see them here</string>
 </resources>
