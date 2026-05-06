@@ -41,16 +41,16 @@ class GoogleSignInUseCase @Inject constructor(
     /**
      * Invoke.
      *
+     * @param idToken The raw Google ID token JWT obtained from Credential Manager.
      * @param disableChatApiUseCase [DisableChatApiUseCase]
      * @return Flow of [LoginStatus].
      */
     operator fun invoke(
+        idToken: String,
         disableChatApiUseCase: DisableChatApiUseCase,
     ) = callbackFlow {
         runCatching {
-            // Google Sign-In is user-interactive (account picker) — do it before
-            // acquiring the mutex so we don't block other login attempts while waiting.
-            val googleResult = googleSignInRepository.signIn()
+            val googleResult = googleSignInRepository.signIn(idToken)
             val email = googleResult.email
             val password = googleResult.sub
             val firstName = googleResult.firstName.orEmpty()

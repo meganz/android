@@ -42,6 +42,8 @@ class GoogleSignInUseCaseTest {
     private val loginMutex = mock<Mutex>()
     private val disableChatApiUseCase = mock<DisableChatApiUseCase>()
 
+    private val idToken = "header.payload.sig"
+
     private val googleSignInResult = GoogleSignInResult(
         email = "test@gmail.com",
         sub = "google-sub-12345",
@@ -88,7 +90,7 @@ class GoogleSignInUseCaseTest {
     @Test
     fun `test that invoke emits LoginSucceed when Google sign-in and login succeed`() =
         runTest {
-            whenever(googleSignInRepository.signIn()).thenReturn(googleSignInResult)
+            whenever(googleSignInRepository.signIn(idToken)).thenReturn(googleSignInResult)
             whenever(
                 loginRepository.login(
                     googleSignInResult.email,
@@ -96,7 +98,7 @@ class GoogleSignInUseCaseTest {
                 )
             ).thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest(disableChatApiUseCase).test {
+            underTest(idToken, disableChatApiUseCase).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 awaitComplete()
             }
@@ -105,7 +107,7 @@ class GoogleSignInUseCaseTest {
     @Test
     fun `test that invoke creates account and retries login when account not found`() =
         runTest {
-            whenever(googleSignInRepository.signIn()).thenReturn(googleSignInResult)
+            whenever(googleSignInRepository.signIn(idToken)).thenReturn(googleSignInResult)
             whenever(
                 loginRepository.login(
                     googleSignInResult.email,
@@ -124,7 +126,7 @@ class GoogleSignInUseCaseTest {
                 )
             ).thenReturn(ephemeralCredentials)
 
-            underTest(disableChatApiUseCase).test {
+            underTest(idToken, disableChatApiUseCase).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 awaitComplete()
             }
@@ -140,7 +142,7 @@ class GoogleSignInUseCaseTest {
     @Test
     fun `test that invoke throws CreateAccountException AccountAlreadyExists when account exists with different password`() =
         runTest {
-            whenever(googleSignInRepository.signIn()).thenReturn(googleSignInResult)
+            whenever(googleSignInRepository.signIn(idToken)).thenReturn(googleSignInResult)
             whenever(
                 loginRepository.login(
                     googleSignInResult.email,
@@ -156,7 +158,7 @@ class GoogleSignInUseCaseTest {
                 )
             ).thenAnswer { throw CreateAccountException.AccountAlreadyExists }
 
-            underTest(disableChatApiUseCase).test {
+            underTest(idToken, disableChatApiUseCase).test {
                 assertThat(awaitError())
                     .isInstanceOf(CreateAccountException.AccountAlreadyExists::class.java)
             }
@@ -165,7 +167,7 @@ class GoogleSignInUseCaseTest {
     @Test
     fun `test that invoke throws LoginMultiFactorAuthRequired when 2FA required`() =
         runTest {
-            whenever(googleSignInRepository.signIn()).thenReturn(googleSignInResult)
+            whenever(googleSignInRepository.signIn(idToken)).thenReturn(googleSignInResult)
             whenever(
                 loginRepository.login(
                     googleSignInResult.email,
@@ -173,30 +175,19 @@ class GoogleSignInUseCaseTest {
                 )
             ).thenReturn(flow { throw LoginMultiFactorAuthRequired() })
 
-            underTest(disableChatApiUseCase).test {
+            underTest(idToken, disableChatApiUseCase).test {
                 assertThat(awaitError())
                     .isInstanceOf(LoginMultiFactorAuthRequired::class.java)
             }
         }
 
     @Test
-    fun `test that invoke throws GoogleSignInException Cancelled when user cancels`() =
+    fun `test that invoke throws GoogleSignInException Unknown when token is invalid`() =
         runTest {
-            whenever(googleSignInRepository.signIn()).thenThrow(GoogleSignInException.Cancelled)
+            whenever(googleSignInRepository.signIn(idToken))
+                .thenThrow(GoogleSignInException.Unknown("invalid token"))
 
-            underTest(disableChatApiUseCase).test {
-                assertThat(awaitError())
-                    .isInstanceOf(GoogleSignInException.Cancelled::class.java)
-            }
-        }
-
-    @Test
-    fun `test that invoke throws GoogleSignInException Unknown on Google failure`() =
-        runTest {
-            whenever(googleSignInRepository.signIn())
-                .thenThrow(GoogleSignInException.Unknown("test error"))
-
-            underTest(disableChatApiUseCase).test {
+            underTest(idToken, disableChatApiUseCase).test {
                 assertThat(awaitError())
                     .isInstanceOf(GoogleSignInException.Unknown::class.java)
             }
@@ -205,7 +196,7 @@ class GoogleSignInUseCaseTest {
     @Test
     fun `test that invoke calls saveAccountCredentialsUseCase on login success`() =
         runTest {
-            whenever(googleSignInRepository.signIn()).thenReturn(googleSignInResult)
+            whenever(googleSignInRepository.signIn(idToken)).thenReturn(googleSignInResult)
             whenever(
                 loginRepository.login(
                     googleSignInResult.email,
@@ -213,7 +204,7 @@ class GoogleSignInUseCaseTest {
                 )
             ).thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest(disableChatApiUseCase).test {
+            underTest(idToken, disableChatApiUseCase).test {
                 awaitItem()
                 awaitComplete()
             }
@@ -224,7 +215,7 @@ class GoogleSignInUseCaseTest {
     @Test
     fun `test that invoke acquires and releases loginMutex`() =
         runTest {
-            whenever(googleSignInRepository.signIn()).thenReturn(googleSignInResult)
+            whenever(googleSignInRepository.signIn(idToken)).thenReturn(googleSignInResult)
             whenever(
                 loginRepository.login(
                     googleSignInResult.email,
@@ -232,7 +223,7 @@ class GoogleSignInUseCaseTest {
                 )
             ).thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest(disableChatApiUseCase).test {
+            underTest(idToken, disableChatApiUseCase).test {
                 awaitItem()
                 awaitComplete()
             }

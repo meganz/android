@@ -7,10 +7,11 @@ import mega.privacy.android.domain.entity.login.GoogleSignInResult
  */
 interface GoogleSignInRepository {
     /**
-     * Launch Google Sign-In via Credential Manager and return the result.
+     * Parse the Google ID token and return the sign-in result.
      *
+     * @param idToken The raw Google ID token JWT obtained from Credential Manager.
      * @return [GoogleSignInResult] with email, sub, and profile info.
      * @throws [mega.privacy.android.domain.exception.login.GoogleSignInException] on failure.
      */
-    suspend fun signIn(): GoogleSignInResult
+    suspend fun signIn(idToken: String): GoogleSignInResult
 }

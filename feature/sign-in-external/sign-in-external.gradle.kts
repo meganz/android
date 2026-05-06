@@ -2,6 +2,7 @@ plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
     alias(convention.plugins.mega.android.hilt)
+    alias(plugin.plugins.kotlin.serialisation)
 }
 
 android {
@@ -43,6 +44,7 @@ dependencies {
     // Common
     implementation(lib.logging.timber)
     implementation(lib.compose.state.events)
+    implementation(lib.kotlin.serialisation)
 
     // Testing
     testImplementation(project(":core-test"))
