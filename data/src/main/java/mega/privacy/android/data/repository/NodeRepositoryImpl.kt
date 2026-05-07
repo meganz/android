@@ -3,15 +3,20 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.SortOrderSource
@@ -75,6 +80,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.extension.ConcurrencyStrategy
 import mega.privacy.android.domain.extension.getNodeMappingStrategy
 import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
@@ -140,7 +146,24 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeLabelMapper: NodeLabelMapper,
     private val typedNodeMapper: TypedNodeMapper,
     private val nodePathMapper: NodePathMapper,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : NodeRepository {
+
+    private val sharedNodeUpdates: SharedFlow<NodeUpdate> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
+        .mapNotNull {
+            it.nodeList?.map { megaNode ->
+                convertToUnTypedNode(megaNode) to nodeUpdateMapper(megaNode)
+            }
+        }
+        .map { nodes -> NodeUpdate(nodes.toMap()) }
+        .flowOn(ioDispatcher)
+        .catch { Timber.e(it, "monitorNodeUpdates failed") }
+        .shareIn(
+            scope = applicationScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000L),
+            replay = 0,
+        )
 
     override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
         withContext(ioDispatcher) {
@@ -406,19 +429,7 @@ internal class NodeRepositoryImpl @Inject constructor(
             } ?: throw SynchronisationException("Non null node found be null when fetched from api")
         }
 
-    override fun monitorNodeUpdates(): Flow<NodeUpdate> {
-        return megaApiGateway.globalUpdates
-            .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
-            .mapNotNull {
-                it.nodeList?.map { megaNode ->
-                    convertToUnTypedNode(megaNode) to nodeUpdateMapper(megaNode)
-                }
-            }
-            .map { nodes ->
-                NodeUpdate(nodes.toMap())
-            }
-            .flowOn(ioDispatcher)
-    }
+    override fun monitorNodeUpdates(): Flow<NodeUpdate> = sharedNodeUpdates
 
     override fun monitorOfflineNodeUpdates(): Flow<List<Offline>> =
         megaLocalRoomGateway.monitorOfflineUpdates()
