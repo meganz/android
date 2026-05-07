@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import dagger.multibindings.IntoSet
 import mega.privacy.android.domain.usecase.logout.ClearChatDataLogoutTask
+import mega.privacy.android.domain.usecase.logout.ClearContinueWhereLeftOffDataLogoutTask
 import mega.privacy.android.domain.usecase.logout.ClearPasscodeDataLogoutTask
 import mega.privacy.android.domain.usecase.logout.ClearVideoPlaybackDataLogoutTask
 import mega.privacy.android.domain.usecase.logout.LoadMiscFlagsTask
@@ -38,6 +39,11 @@ internal abstract class InternalLogoutModule {
         @Provides
         @IntoSet
         fun provideLoadMiscFlagsTask(task: LoadMiscFlagsTask): LogoutTask =
+            task
+
+        @Provides
+        @IntoSet
+        fun provideClearContinueWhereLeftOffDataLogoutTask(task: ClearContinueWhereLeftOffDataLogoutTask): LogoutTask =
             task
     }
 }
