@@ -9,8 +9,6 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -55,16 +53,6 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
             },
             onFileLinkClicked = { link ->
                 navigationHandler.navigate(FileLinkNavKey(link))
-            },
-            onMenuClicked = { item ->
-                navigationHandler.navigate(
-                    NodeOptionsBottomSheetNavKey(
-                        nodeHandle = item.viewedLink.nodeHandle,
-                        nodeSourceType = NodeSourceType.FOLDER_LINK,
-                        publicLinkUrl = item.viewedLink.linkUrl
-                            .takeIf { item.viewedLink.type == RecentlyUsedType.FileLink },
-                    )
-                )
             },
             onClearAllLinks = viewModel::clearAllLinks,
             onBack = navigationHandler::back,

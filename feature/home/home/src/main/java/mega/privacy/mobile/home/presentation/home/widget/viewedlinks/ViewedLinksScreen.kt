@@ -1,6 +1,5 @@
 package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.OneLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
@@ -30,7 +28,6 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.ViewedLink
@@ -51,7 +48,6 @@ import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.Viewed
  * @param uiState The UI state containing the list of viewed link items.
  * @param onFolderLinkClicked Callback when a folder link is tapped.
  * @param onFileLinkClicked Callback when a file link is tapped.
- * @param onMenuClicked Callback when the per-item more-options icon is tapped.
  * @param onClearAllLinks Callback when the user confirms clearing the viewed links history.
  * @param onBack Callback when the back button is pressed.
  */
@@ -61,7 +57,6 @@ internal fun ViewedLinksScreen(
     uiState: ViewedLinksUiState,
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
-    onMenuClicked: (ViewedLinkUiItem) -> Unit,
     onClearAllLinks: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -114,16 +109,6 @@ internal fun ViewedLinksScreen(
                                 },
                                 defaultImage = item.iconRes,
                                 contentDescription = "Thumbnail",
-                            )
-                        },
-                        trailingElement = {
-                            MegaIcon(
-                                painter = rememberVectorPainter(
-                                    IconPack.Medium.Thin.Outline.MoreVertical
-                                ),
-                                contentDescription = null,
-                                modifier = Modifier.clickable { onMenuClicked(item) },
-                                tint = IconColor.Primary,
                             )
                         },
                         onClickListener = {
@@ -263,7 +248,6 @@ private fun ViewedLinksScreenPreview() {
             ),
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
-            onMenuClicked = {},
             onClearAllLinks = {},
             onBack = {},
         )
@@ -278,7 +262,6 @@ private fun ViewedLinksScreenLoadingPreview() {
             uiState = ViewedLinksUiState.Loading,
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
-            onMenuClicked = {},
             onClearAllLinks = {},
             onBack = {},
         )

@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,7 +31,6 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
@@ -98,16 +96,6 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget {
                 onViewAllClicked = {
                     navigationHandler.navigate(ViewedLinksScreenNavKey)
                 },
-                onMenuClicked = { item ->
-                    navigationHandler.navigate(
-                        NodeOptionsBottomSheetNavKey(
-                            nodeHandle = item.viewedLink.nodeHandle,
-                            nodeSourceType = NodeSourceType.FOLDER_LINK,
-                            publicLinkUrl = item.viewedLink.linkUrl
-                                .takeIf { item.viewedLink.type == RecentlyUsedType.FileLink },
-                        )
-                    )
-                },
             )
         }
     }
@@ -123,7 +111,6 @@ internal fun ViewedLinksView(
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
     onViewAllClicked: () -> Unit,
-    onMenuClicked: (ViewedLinkUiItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -163,15 +150,6 @@ internal fun ViewedLinksView(
                                     data = item.previewPath?.let { ThumbnailUriRequest(UriPath(it)) },
                                     defaultImage = item.iconRes,
                                     contentDescription = "Thumbnail",
-                                )
-                            },
-                            trailingElement = {
-                                MegaIcon(
-                                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .clickable { onMenuClicked(item) },
-                                    tint = IconColor.Primary,
                                 )
                             },
                             onClickListener = {
