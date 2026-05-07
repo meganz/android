@@ -50,6 +50,8 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                 transfer.isVoiceClip()
                         || transfer.isBackgroundTransfer()
                         || transfer.isStreamingTransfer
+                        || transfer.isSyncTransfer
+                        || transfer.isBackupTransfer
             }
 
         //update transferred bytes for each transfer

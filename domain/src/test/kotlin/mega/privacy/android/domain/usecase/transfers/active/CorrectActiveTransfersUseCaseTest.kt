@@ -543,6 +543,94 @@ internal class CorrectActiveTransfersUseCaseTest {
             verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
         }
 
+    @Test
+    fun `test that sync transfers are filtered`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+                on { this.isSyncTransfer } doReturn true
+            }
+            val transfers = subSetTransfers()
+            val inProgress = buildList {
+                addAll(transfers)
+                add(transfer)
+            }
+
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest.invoke(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
+        }
+
+    @Test
+    fun `test that sync transfers not in active transfers are not added`() =
+        runTest {
+            stubTransfers()
+            val syncTransfer = mock<Transfer> {
+                on { this.uniqueId } doReturn 100L
+                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+                on { this.isSyncTransfer } doReturn true
+            }
+            val inProgress = buildList {
+                addAll(mockedTransfers)
+                add(syncTransfer)
+            }
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).putActiveTransfers(argThat { transfers ->
+                transfers.none { it.uniqueId == 100L }
+            })
+        }
+
+    @Test
+    fun `test that backup transfers are filtered`() =
+        runTest {
+            val transfer = mock<Transfer> {
+                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+                on { this.isBackupTransfer } doReturn true
+            }
+            val transfers = subSetTransfers()
+            val inProgress = buildList {
+                addAll(transfers)
+                add(transfer)
+            }
+
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest.invoke(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
+        }
+
+    @Test
+    fun `test that backup transfers not in active transfers are not added`() =
+        runTest {
+            stubTransfers()
+            val backupTransfer = mock<Transfer> {
+                on { this.uniqueId } doReturn 100L
+                on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+                on { this.isBackupTransfer } doReturn true
+            }
+            val inProgress = buildList {
+                addAll(mockedTransfers)
+                add(backupTransfer)
+            }
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).putActiveTransfers(argThat { transfers ->
+                transfers.none { it.uniqueId == 100L }
+            })
+        }
+
     @ParameterizedTest
     @EnumSource(TransferType::class)
     @NullSource
