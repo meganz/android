@@ -228,8 +228,11 @@ class NameCollisionActivity : PasscodeActivity() {
             .toSpannedHtmlText()
 
         binding.selectText.text = getString(
-            if (isFile) R.string.choose_file
-            else R.string.choose_folder
+            when {
+                isFile -> R.string.choose_file
+                collision is NameCollisionUiEntity.Upload -> sharedR.string.name_collision_choose_folder_header
+                else -> R.string.choose_folder
+            }
         )
 
         binding.replaceUpdateMergeView.apply {
@@ -282,7 +285,9 @@ class NameCollisionActivity : PasscodeActivity() {
         when (collision) {
             is NameCollisionUiEntity.Upload -> {
                 cancelButtonId = R.string.do_not_upload
-                renameInfoId = R.string.warning_upload_and_rename
+                renameInfoId =
+                    if (isFile) R.string.warning_upload_and_rename
+                    else sharedR.string.name_collision_folder_warning_upload_and_rename
                 renameButtonId = R.string.upload_and_rename
             }
 
@@ -337,15 +342,17 @@ class NameCollisionActivity : PasscodeActivity() {
 
         binding.cancelButton.text = getString(cancelButtonId)
 
-        binding.renameSeparator.isVisible = isFile
-        binding.renameInfo.isVisible = isFile
-        binding.renameView.optionView.isVisible = isFile
-        binding.renameButton.isVisible = isFile
+        val showRename = isFile || collision is NameCollisionUiEntity.Upload
 
-        if (isFile) {
+        binding.renameSeparator.isVisible = showRename
+        binding.renameInfo.isVisible = showRename
+        binding.renameView.optionView.isVisible = showRename
+        binding.renameButton.isVisible = showRename
+
+        if (showRename) {
             binding.renameInfo.text = getString(renameInfoId)
             binding.renameView.apply {
-                val hasThumbnail = collisionResult.thumbnail != null
+                val hasThumbnail = isFile && collisionResult.thumbnail != null
                 thumbnail.isVisible = hasThumbnail
                 thumbnailIcon.isVisible = !hasThumbnail
                 when {
@@ -356,9 +363,12 @@ class NameCollisionActivity : PasscodeActivity() {
                     }
 
                     else -> {
-                        thumbnailIcon.setImageResource(MimeTypeList.typeForName(name).iconResourceId)
+                        thumbnailIcon.setImageResource(
+                            if (isFile) MimeTypeList.typeForName(name).iconResourceId
+                            else IconPackR.drawable.ic_folder_medium_solid
+                        )
 
-                        if (collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
+                        if (isFile && collisionResult.nameCollision is NameCollisionUiEntity.Upload) {
                             requestFileThumbnail(collisionResult.nameCollision.absolutePath)
                         }
                     }

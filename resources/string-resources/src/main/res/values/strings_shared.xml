@@ -2800,4 +2800,8 @@
     <string name="file_link_subtitle">File link</string>
     <!-- Description for the empty view in Favourites sections. -->
     <string name="favourites_empty_screen_description">Mark folders as favourites to see them here</string>
+    <!-- Header giving more context about a folder name collision, informing there are different option to choose. -->
+    <string name="name_collision_choose_folder_header">Select the folder you want to keep</string>
+    <!-- Informs about what is expected after choose the option upload and rename for a folder name collision. -->
+    <string name="name_collision_folder_warning_upload_and_rename">The folder you are uploading will be renamed as:</string>
 </resources>
