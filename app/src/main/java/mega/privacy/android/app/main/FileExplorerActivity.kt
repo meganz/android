@@ -278,6 +278,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var currentAction: String? = null
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var parentHandle: Long = 0
+    private var shouldLeaveApp = false
 
     private val nameCollisionActivityLauncher = registerForActivityResult(
         NameCollisionActivityContract()
@@ -447,11 +448,27 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             else -> super.onKeyDown(keyCode, event)
         }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Timber.d("onNewIntent: action=%s", intent.action)
+        shouldLeaveApp =
+            intent.action == Intent.ACTION_SEND || intent.action == Intent.ACTION_SEND_MULTIPLE
+        setIntent(intent)
+        importFileFragment = null
+        chatExplorer = null
+        importFragmentSelected = -1
+        viewModel.resetForNewIntent()
+        observeAsyncDocuments()
+        viewModel.ownFilePrepareTask(this, intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         Timber.d("onCreate first")
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        shouldLeaveApp =
+            intent?.action == Intent.ACTION_SEND || intent?.action == Intent.ACTION_SEND_MULTIPLE
         globalInitialiser.onAppStart()
         binding = ActivityFileExplorerBinding.inflate(layoutInflater)
         consumeInsetsWithToolbar(
@@ -549,6 +566,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         setupObservers(savedInstanceState)
     }
 
+    override fun onStop() {
+        super.onStop()
+        shouldLeaveApp = false
+    }
+
     private fun proceedWithInitialization(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             with(savedInstanceState) {
@@ -598,8 +620,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             pendingToAttach = 0
             totalAttached = 0
             totalErrors = 0
-            // Initialize activity start time in ViewModel
-            viewModel.initActivityStartTime()
         }
 
         prefs = dbH.preferences
@@ -736,9 +756,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    @SuppressLint("UnsafeIntentLaunch")
-    private fun setupObservers(savedInstanceState: Bundle?) {
-        this.lifecycleScope.launch {
+    /**
+     * Wait for the next non-empty `documents` emission and forward it to
+     * [onProcessAsyncInfo]. Re-launched on each new intent because it terminates after
+     * the first emission via `firstOrNull`.
+     */
+    private fun observeAsyncDocuments() {
+        lifecycleScope.launch {
             val documents = viewModel.uiState
                 .mapNotNull { it.documents.takeIf { it.isNotEmpty() } }
                 .flowWithLifecycle(this@FileExplorerActivity.lifecycle, Lifecycle.State.STARTED)
@@ -747,6 +771,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }.firstOrNull()
             onProcessAsyncInfo(documents)
         }
+    }
+
+    @SuppressLint("UnsafeIntentLaunch")
+    private fun setupObservers(savedInstanceState: Bundle?) {
+        observeAsyncDocuments()
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
 
         collectFlow(viewModel.uiState) { fileExplorerState ->
@@ -774,6 +803,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 } else {
                     proceedWithInitialization(savedInstanceState)
                 }
+                viewModel.consumeFeatureFlag()
             }
         }
 
@@ -2061,8 +2091,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             delay(3000)
         }
 
-        // Delegate business logic to ViewModel
-        viewModel.finishShareAndBack(handle, null)
+        viewModel.finishShareAndBack(handle, null, shouldLeaveApp)
     }
 
     private fun navigateToCloud(

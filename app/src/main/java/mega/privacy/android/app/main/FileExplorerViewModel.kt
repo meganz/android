@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.utils.Constants
@@ -84,7 +83,6 @@ class FileExplorerViewModel @Inject constructor(
     private val getFolderTypeByHandleUseCase: GetFolderTypeByHandleUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getNodeLocationUseCase: GetNodeLocationUseCase,
-    private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
@@ -100,21 +98,6 @@ class FileExplorerViewModel @Inject constructor(
     var latestMoveTargetPath: Long? = null
     var latestMoveTargetPathTab: Int = 0
     private val _textInfo = MutableLiveData<ShareTextInfo>()
-
-    /**
-     * Used to determine if app moved to background during share process
-     */
-    val activityStartTime: Long get() = savedStateHandle.get<Long>(KEY_ACTIVITY_START_TIME) ?: 0L
-
-    /**
-     * Initialize activity start time
-     * Should be called in onCreate when savedInstanceState is null
-     */
-    fun initActivityStartTime() {
-        if (!savedStateHandle.contains(KEY_ACTIVITY_START_TIME)) {
-            savedStateHandle[KEY_ACTIVITY_START_TIME] = System.currentTimeMillis()
-        }
-    }
 
     /**
      * Storage state
@@ -235,7 +218,8 @@ class FileExplorerViewModel @Inject constructor(
             val allAncestors = getAncestorsIdsUseCase(node)
             val rootIndex = allAncestors.indexOfFirst { it.longValue == rootHandle }
             // Defensive: truncate from parent up to and including the cloud root.
-            val ancestors = if (rootIndex >= 0) allAncestors.subList(0, rootIndex + 1) else allAncestors
+            val ancestors =
+                if (rootIndex >= 0) allAncestors.subList(0, rootIndex + 1) else allAncestors
             ancestors.reversed().map { it.longValue } + folderHandle
         }
         _uiState.update { it.copy(cloudDriveFolderPath = path) }
@@ -277,6 +261,10 @@ class FileExplorerViewModel @Inject constructor(
         }
     }
 
+    fun consumeFeatureFlag() {
+        _uiState.update { it.copy(isFeatureFlagEnabled = null) }
+    }
+
     /**
      * Sets up the Cloud Drive Explorer content
      */
@@ -300,6 +288,15 @@ class FileExplorerViewModel @Inject constructor(
         textInfoContent?.let {
             _textInfo.postValue(it.copy(subject = fileNames.values.firstOrNull() ?: ""))
         }
+    }
+
+    /**
+     * Reset the cached share data so a new incoming intent (e.g. a second share while
+     * the activity is alive) is reprocessed from scratch.
+     */
+    fun resetForNewIntent() {
+        dataAlreadyRequested = false
+        _uiState.update { it.copy(documents = emptyList()) }
     }
 
     /**
@@ -821,13 +818,11 @@ class FileExplorerViewModel @Inject constructor(
      *
      * @param handle Parent handle of the folder to open (if staying in app)
      * @param message Message to show in snackbar
+     * @param shouldLeaveApp
      */
-    fun finishShareAndBack(handle: Long, message: String?) {
+    fun finishShareAndBack(handle: Long, message: String?, shouldLeaveApp: Boolean) {
         viewModelScope.launch {
-            // Check if app has moved to background during the share process
-            // Get the last background time from ActivityLifecycleHandler and compare with activity start time
-            val lastBackgroundTime = activityLifecycleHandler.getLastBackgroundTime()
-            val needStayInApp = lastBackgroundTime > 0 && lastBackgroundTime > activityStartTime
+            val needStayInApp = !shouldLeaveApp
 
             if (needStayInApp) {
                 // If app moved to the background during share, stay in App and navigate to cloud drive
@@ -839,7 +834,4 @@ class FileExplorerViewModel @Inject constructor(
         }
     }
 
-    companion object {
-        internal const val KEY_ACTIVITY_START_TIME = "activityStartTime"
-    }
 }
