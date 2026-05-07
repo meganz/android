@@ -56,8 +56,6 @@ class ManagerActivity : PasscodeActivity(), NotificationNavigationHandler {
     var drawerItem: DrawerItem? = null
     @JvmField
     var openFolderRefresh: Boolean = false
-    @JvmField
-    var turnOnNotifications: Boolean = false
     var comesFromNotifications: Boolean = false
     var comesFromNotificationHandle: Long = Constants.INVALID_VALUE.toLong()
     var parentHandleBrowser: Long = -1L
@@ -173,11 +171,8 @@ class ManagerActivity : PasscodeActivity(), NotificationNavigationHandler {
         isFromSyncFolders: Boolean = false,
     ) = Unit
 
-    fun deleteTurnOnNotificationsFragment() = Unit
-
     fun closeSearchView() = Unit
     suspend fun getCurrentParentNode(parentHandle: Long, error: Int): MegaNode? = null
-    fun destroyPermissionsFragment(isCameraUploadsEnabled: Boolean) = Unit
     fun handleCloudDriveBackNavigation(performBackNavigation: Boolean) = Unit
     fun handleFileUris(uris: List<Uri>, pitagTrigger: PitagTrigger) = Unit
     fun handleVideoSectionAddAction() = Unit

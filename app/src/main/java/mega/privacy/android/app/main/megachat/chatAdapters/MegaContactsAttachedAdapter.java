@@ -41,7 +41,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiAndroid;
@@ -486,9 +485,6 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
     @Override
     public void onClick(View v) {
         if (!isOnline(context)) {
-            if (context instanceof ManagerActivity) {
-                ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-            }
             return;
         }
 

@@ -9,10 +9,7 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import timber.log.Timber.Forest.e
 
-fun MediaDiscoveryFragment.actionSaveToDevice() {
-    // ManagerActivity-hosted save-to-device is no longer reachable from this action menu;
-    // replacement wiring will be added in a follow-up MR.
-}
+fun MediaDiscoveryFragment.actionSaveToDevice() = Unit
 
 fun MediaDiscoveryFragment.actionShareLink() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
@@ -31,10 +28,7 @@ fun MediaDiscoveryFragment.actionShareLink() {
     }
 }
 
-fun MediaDiscoveryFragment.actionSendToChat() {
-    // ManagerActivity-hosted attach-to-chats is no longer reachable from this action menu;
-    // replacement wiring will be added in a follow-up MR.
-}
+fun MediaDiscoveryFragment.actionSendToChat() = Unit
 
 fun MediaDiscoveryFragment.actionShareOut() {
     lifecycleScope.launch {
@@ -57,7 +51,6 @@ fun MediaDiscoveryFragment.actionMove() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
         addAll(mediaDiscoveryViewModel.getSelectedIds())
     }
-    // TODO
     NodeController(requireActivity()).chooseLocationToMoveNodes(selectedPhotosIds)
 }
 
@@ -66,7 +59,6 @@ fun MediaDiscoveryFragment.actionCopy() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
         addAll(mediaDiscoveryViewModel.getSelectedIds())
     }
-    // TODO
     NodeController(requireActivity()).chooseLocationToCopyNodes(selectedPhotosIds)
 }
 

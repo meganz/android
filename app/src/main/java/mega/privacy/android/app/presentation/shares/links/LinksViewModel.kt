@@ -178,8 +178,8 @@ class LinksViewModel @Inject constructor(
     }
 
     /**
-     * Open the folder by node handle with retry after 200ms, max 3 times
-     * Note: retry was added as a failsafe in case the method is called from ManagerActivity before nodeList is updated
+     * Open the folder by node handle with retry after 200ms, max 3 times.
+     * Note: retry was added as a failsafe in case the method is called before nodeList is updated.
      */
     fun openFolderByHandleWithRetry(handle: Long) {
         viewModelScope.launch {

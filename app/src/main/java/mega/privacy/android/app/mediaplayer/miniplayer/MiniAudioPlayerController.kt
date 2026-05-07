@@ -34,11 +34,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
- * A helper class containing UI logic of mini player, it help us keep ManagerActivity clean.
- *
- * Reminder: Once ManagerActivity is removed, add [CoroutineScope] to the constructor and remove
- * [setCoroutineScope] / [sharingScope] from [onResume]; all call sites will be Compose or
- * Fragment and can pass lifecycleScope.
+ * A helper class containing the mini-player UI logic.
  *
  * @param playerView the ExoPlayer view
  * @param onPlayerVisibilityChanged a callback for mini player view visibility change

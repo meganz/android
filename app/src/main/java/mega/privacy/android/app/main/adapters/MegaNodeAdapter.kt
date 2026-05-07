@@ -47,7 +47,6 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel.Compani
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.ContactFileListFragment
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ViewHolderBrowser
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.utils.ColorUtils
@@ -178,13 +177,8 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         fun bind() {
             var orderType = sortByViewModel?.order?.cloudSortOrder
 
-            // Root of incoming shares tab, display sort options OTHERS
             if (type == NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
-                && (context as ManagerActivity).deepBrowserTreeIncoming == 0
-            ) {
-                orderType = sortByViewModel?.order?.othersSortOrder
-            } else if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
-                && (context as ManagerActivity).deepBrowserTreeOutgoing == 0
+                || type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
             ) {
                 orderType = sortByViewModel?.order?.othersSortOrder
             }
@@ -512,11 +506,6 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
 
             Constants.FOLDER_LINK_ADAPTER -> {
                 megaApi = ((context as Activity).application as MegaApplication).megaApiFolder
-            }
-
-            NodeSourceTypeInt.BACKUPS_ADAPTER -> {
-                Timber.d("onCreate BACKUPS_ADAPTER")
-                (context as ManagerActivity).setParentHandleBackups(parentHandle)
             }
 
             else -> {}
@@ -1064,24 +1053,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                         }
                     }
                 }
-                if ((context as ManagerActivity).deepBrowserTreeIncoming == 0) {
-                    val accessLevel = megaApi?.getAccess(node)
-
-                    if (accessLevel == MegaShare.ACCESS_FULL) {
-                        holder.permissionsIcon?.setImageResource(R.drawable.ic_shared_fullaccess)
-                    } else if (accessLevel == MegaShare.ACCESS_READWRITE) {
-                        holder.permissionsIcon?.setImageResource(R.drawable.ic_shared_read_write)
-                    } else {
-                        holder.permissionsIcon?.setImageResource(R.drawable.ic_shared_read)
-                    }
-                    val hasUnverifiedNodes = shareData != null && shareData?.get(position) != null
-                    if (hasUnverifiedNodes) {
-                        showUnverifiedNodeUi(holder, true, node, null)
-                    }
-                    holder.permissionsIcon?.visibility = View.VISIBLE
-                } else {
-                    holder.permissionsIcon?.visibility = View.GONE
-                }
+                holder.permissionsIcon?.visibility = View.GONE
             } else if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) {
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize?.apply {
@@ -1096,8 +1068,7 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             }
         } else {
             Timber.d("Node is file")
-            val isLinksRoot =
-                type == NodeSourceTypeInt.LINKS_ADAPTER && (context as ManagerActivity).getHandleFromLinksViewModel() == -1L
+            val isLinksRoot = false
             holder.textViewFileSize?.text = TextUtil.getFileInfo(
                 Util.getSizeString(node.size, context),
                 TimeUtils.formatLongDateTime(if (isLinksRoot) node.publicLinkCreationTime else node.modificationTime)
