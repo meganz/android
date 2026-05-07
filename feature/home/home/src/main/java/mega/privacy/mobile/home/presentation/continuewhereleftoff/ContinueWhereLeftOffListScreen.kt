@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -42,7 +41,6 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
@@ -55,12 +53,10 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -156,14 +152,6 @@ internal fun ContinueWhereLeftOffListScreen(
                             title = item.title,
                             icon = iconForType(item.type),
                             onItemClicked = { viewModel.onItemClicked(item.nodeHandle) },
-                            onMenuClicked = {
-                                onNavigate(
-                                    NodeOptionsBottomSheetNavKey(
-                                        nodeHandle = item.nodeHandle,
-                                        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                                    )
-                                )
-                            },
                         )
                     }
                 }
@@ -200,14 +188,6 @@ internal fun ContinueWhereLeftOffListScreen(
                             title = item.title,
                             icon = iconForType(item.type),
                             onItemClicked = { viewModel.onItemClicked(item.nodeHandle) },
-                            onMenuClicked = {
-                                onNavigate(
-                                    NodeOptionsBottomSheetNavKey(
-                                        nodeHandle = item.nodeHandle,
-                                        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                                    )
-                                )
-                            },
                         )
                     }
                 }
@@ -271,7 +251,6 @@ private fun ContinueWhereLeftOffListItem(
     title: String,
     @DrawableRes icon: Int,
     onItemClicked: () -> Unit,
-    onMenuClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -298,21 +277,6 @@ private fun ContinueWhereLeftOffListItem(
                 .weight(1f)
                 .padding(horizontal = 12.dp),
         )
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .wrapContentSize(unbounded = true, align = Alignment.Center)
-                .size(48.dp)
-                .clickable { onMenuClicked() },
-            contentAlignment = Alignment.Center,
-        ) {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
-                contentDescription = null,
-                tint = IconColor.Secondary,
-                modifier = Modifier.size(24.dp),
-            )
-        }
     }
 }
 
@@ -321,7 +285,6 @@ private fun ContinueWhereLeftOffGridItem(
     title: String,
     @DrawableRes icon: Int,
     onItemClicked: () -> Unit,
-    onMenuClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -343,36 +306,15 @@ private fun ContinueWhereLeftOffGridItem(
                 modifier = Modifier.size(48.dp),
             )
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            MegaText(
-                text = title,
-                textColor = TextColor.Primary,
-                style = AppTheme.typography.bodySmall,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp, top = 6.dp, bottom = 6.dp),
-            )
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .wrapContentSize(unbounded = true, align = Alignment.Center)
-                    .size(36.dp)
-                    .clickable { onMenuClicked() },
-                contentAlignment = Alignment.Center,
-            ) {
-                MegaIcon(
-                    imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
-                    contentDescription = null,
-                    tint = IconColor.Secondary,
-                    modifier = Modifier.size(16.dp),
-                )
-            }
-        }
+        MegaText(
+            text = title,
+            textColor = TextColor.Primary,
+            style = AppTheme.typography.bodySmall,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            modifier = Modifier
+                .padding(start = 8.dp, top = 6.dp, bottom = 6.dp),
+        )
     }
 }
 
@@ -387,13 +329,11 @@ private fun ContinueWhereLeftOffListItemPreview() {
                 title = "Falastin36_press_trailer.mov",
                 icon = IconPackR.drawable.ic_video_medium_solid,
                 onItemClicked = {},
-                onMenuClicked = {},
             )
             ContinueWhereLeftOffListItem(
                 title = "Interview Agnes Varda.pdf",
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
                 onItemClicked = {},
-                onMenuClicked = {},
             )
         }
     }
@@ -408,14 +348,12 @@ private fun ContinueWhereLeftOffGridItemPreview() {
                 title = "Falastin36_press_trailer.mov",
                 icon = IconPackR.drawable.ic_video_medium_solid,
                 onItemClicked = {},
-                onMenuClicked = {},
                 modifier = Modifier.width(140.dp),
             )
             ContinueWhereLeftOffGridItem(
                 title = "Interview Agnes Varda.pdf",
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
                 onItemClicked = {},
-                onMenuClicked = {},
                 modifier = Modifier.width(140.dp),
             )
         }
