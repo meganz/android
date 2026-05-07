@@ -560,9 +560,12 @@ internal class DefaultPhotosRepository @Inject constructor(
         imageNodesFlow.value = imageNodesCache.values.toList()
     }
 
-    override fun monitorImageNodes(): Flow<List<ImageNode>> = imageNodesFlow
-        .filterNotNull()
-        .map { nodes -> nodes.distinctBy { it.id } }
+    override fun monitorImageNodes(): Flow<List<ImageNode>> {
+        return imageNodesFlow
+            .filterNotNull()
+            .map { nodes -> nodes.distinctBy { it.id } }
+            .onStart { initialize() }
+    }
 
     private suspend fun checkMediaNode(node: Node): Boolean {
         return node is FileNode && (node.type is ImageFileTypeInfo || node.type is VideoFileTypeInfo)
