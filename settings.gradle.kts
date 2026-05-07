@@ -84,7 +84,6 @@ include(":third-party-lib:twemoji")
 include(":feature:photos:photos")
 include(":feature:photos:photos-snowflake-components")
 include(":feature:contact:contact")
-include(":feature:contact:contact-snowflake-components")
 include(":feature:pdfviewer")
 include(":feature:sign-in-external")
 include(":core:ui-components:shared-components")
@@ -93,6 +92,7 @@ include(":shared:chats")
 include(":shared:account")
 include(":shared:ads")
 include(":shared:transfers")
+include(":shared:contact")
 
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts

@@ -34,7 +34,6 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
-    implementation(project(":feature:contact:contact-snowflake-components"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
