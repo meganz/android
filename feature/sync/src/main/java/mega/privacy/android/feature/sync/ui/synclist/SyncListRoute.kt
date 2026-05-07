@@ -194,21 +194,26 @@ internal fun SyncListRoute(
     val resources = LocalResources.current
     EventEffect(
         stalledIssueState.snackbarMessageContent,
-        onConsumed = {
+        onConsumed = {}
+    ) { content ->
+        try {
+            snackBarHostState.showAutoDurationSnackbar(
+                resources.getString(content)
+            )
+        } finally {
             syncStalledIssuesViewModel.handleAction(SyncListAction.SnackBarShown)
         }
-    ) {
-        snackBarHostState.showAutoDurationSnackbar(
-            resources.getString(it)
-        )
     }
 
     LaunchedEffect(key1 = syncSettingsState.snackbarMessage) {
         syncSettingsState.snackbarMessage?.let { message ->
-            snackBarHostState.showAutoDurationSnackbar(
-                message.joinToString(separator = " ") { resources.getString(it) }
-            )
-            settingsSyncViewModel.handleAction(SettingsSyncAction.SnackbarShown)
+            try {
+                snackBarHostState.showAutoDurationSnackbar(
+                    message.joinToString(separator = " ") { resources.getString(it) }
+                )
+            } finally {
+                settingsSyncViewModel.handleAction(SettingsSyncAction.SnackbarShown)
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -8,6 +9,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.test.AnalyticsTestRule
@@ -18,14 +20,17 @@ import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.feature.sync.ui.settings.SettingsSyncAction
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncUiState
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncViewModel
 import mega.privacy.android.feature.sync.ui.synclist.SOLVED_ISSUES_CHIP_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.STALLED_ISSUES_CHIP_TEST_TAG
 import mega.privacy.android.feature.sync.ui.synclist.SYNC_FOLDERS_CHIP_TEST_TAG
+import mega.privacy.android.feature.sync.ui.synclist.SyncListAction
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.feature.sync.ui.synclist.SyncListState
 import mega.privacy.android.feature.sync.ui.synclist.SyncListViewModel
+import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersAction
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersUiState
 import mega.privacy.android.feature.sync.ui.synclist.folders.SyncFoldersViewModel
 import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssuesState
@@ -47,6 +52,7 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -208,6 +214,73 @@ internal class SyncListRouteTest {
 
         // Verify the device name is displayed as title
         composeTestRule.onNodeWithText(expectedDeviceName).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that sync folders SnackBarShown is dispatched when route leaves composition mid snackbar`() {
+        whenever(syncFoldersUiState.value).thenReturn(
+            SyncFoldersUiState(
+                syncUiItems = synUiItems,
+                snackbarMessage = sharedR.string.sync_snackbar_message_confirm_sync_stopped,
+            )
+        )
+
+        setComposeContentWithDisposeSwitch().value = false
+        composeTestRule.waitForIdle()
+
+        verify(syncFoldersViewModel).handleAction(SyncFoldersAction.SnackBarShown)
+    }
+
+    @Test
+    fun `test that stalled issues SnackBarShown is dispatched when route leaves composition mid snackbar`() {
+        whenever(syncStalledIssuesState.value).thenReturn(
+            SyncStalledIssuesState(
+                stalledIssues = emptyList(),
+                snackbarMessageContent = triggered(sharedR.string.sync_stalled_issue_resolved),
+            )
+        )
+
+        setComposeContentWithDisposeSwitch().value = false
+        composeTestRule.waitForIdle()
+
+        verify(syncStalledIssuesViewModel).handleAction(SyncListAction.SnackBarShown)
+    }
+
+    @Test
+    fun `test that settings sync SnackbarShown is dispatched when route leaves composition mid snackbar`() {
+        whenever(syncSettingsState.value).thenReturn(
+            SettingsSyncUiState(
+                snackbarMessage = listOf(sharedR.string.settings_sync_debris_cleared_message),
+            )
+        )
+
+        setComposeContentWithDisposeSwitch().value = false
+        composeTestRule.waitForIdle()
+
+        verify(settingsSyncViewModel).handleAction(SettingsSyncAction.SnackbarShown)
+    }
+
+    private fun setComposeContentWithDisposeSwitch() = mutableStateOf(true).also { switch ->
+        composeTestRule.setContent {
+            if (switch.value) {
+                SyncListRoute(
+                    viewModel = viewModel,
+                    syncPermissionsManager = syncPermissionsManager,
+                    onSyncFolderClicked = {},
+                    onBackupFolderClicked = {},
+                    onSelectStopBackupDestinationClicked = {},
+                    onOpenUpgradeAccountClicked = {},
+                    syncFoldersViewModel = syncFoldersViewModel,
+                    syncStalledIssuesViewModel = syncStalledIssuesViewModel,
+                    syncSolvedIssuesViewModel = syncSolvedIssuesViewModel,
+                    syncIssueNotificationViewModel = syncIssueNotificationViewModel,
+                    settingsSyncViewModel = settingsSyncViewModel,
+                    onOpenMegaFolderClicked = {},
+                    onCameraUploadsSettingsClicked = {},
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
     }
 
 }

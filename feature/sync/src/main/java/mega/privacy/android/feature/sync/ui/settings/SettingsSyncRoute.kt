@@ -171,10 +171,13 @@ internal fun SettingSyncScreen(
     val resources = LocalResources.current
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                message.joinToString(separator = " ") { resources.getString(it) }
-            )
-            snackbarShown()
+            try {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    message.joinToString(separator = " ") { resources.getString(it) }
+                )
+            } finally {
+                snackbarShown()
+            }
         }
     }
 }
