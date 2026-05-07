@@ -54,6 +54,10 @@ extensions.configure<com.android.build.api.dsl.LibraryExtension> {
         "src/main/jni/mega/sdk/bindings/java",
         "src/main/jni/megachat/sdk/bindings/java",
     )
+    sourceSets.getByName("main").kotlin.srcDirs(
+        "src/main/jni/mega/sdk/bindings/java",
+        "src/main/jni/megachat/sdk/bindings/java",
+    )
 }
 
 // AGP 9 removed PatternFilterable from AndroidSourceDirectorySet, so the previous
