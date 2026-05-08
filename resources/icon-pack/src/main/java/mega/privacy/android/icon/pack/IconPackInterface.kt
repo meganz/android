@@ -98,7 +98,9 @@ interface IconPackInterface {
             /**
              * medium_regular_solid
              */
-            interface Solid {}
+            interface Solid {
+                val Play: ImageVector
+            }
         }
 
         /**

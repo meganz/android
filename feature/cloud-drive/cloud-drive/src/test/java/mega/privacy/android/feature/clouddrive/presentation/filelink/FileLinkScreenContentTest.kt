@@ -127,7 +127,24 @@ class FileLinkScreenContentTest {
         composeRule.onNodeWithTag(FILE_LINK_DURATION_BADGE_TAG).assertDoesNotExist()
     }
 
-    private fun loadedUiState(formattedDuration: String?): FileLinkUiState {
+    @Test
+    fun `test that play button is displayed when state is Loaded with isVideo true`() {
+        setupComposeContent(uiState = loadedUiState(formattedDuration = "2:50", isVideo = true))
+
+        composeRule.onNodeWithTag(FILE_LINK_PLAY_BUTTON_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that play button is not displayed when state is Loaded with isVideo false`() {
+        setupComposeContent(uiState = loadedUiState(formattedDuration = "2:50", isVideo = false))
+
+        composeRule.onNodeWithTag(FILE_LINK_PLAY_BUTTON_TAG).assertDoesNotExist()
+    }
+
+    private fun loadedUiState(
+        formattedDuration: String?,
+        isVideo: Boolean = false,
+    ): FileLinkUiState {
         val fileNode: TypedFileNode = mock {
             on { name } doReturn "Hobbiton.mp4"
         }
@@ -136,6 +153,7 @@ class FileLinkScreenContentTest {
                 iconRes = iconPackR.drawable.ic_video_medium_solid,
                 thumbnailData = null,
                 formattedDuration = formattedDuration,
+                isVideo = isVideo,
             ),
             fileNode = fileNode,
         )

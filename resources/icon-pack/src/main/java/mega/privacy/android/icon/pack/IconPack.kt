@@ -8,6 +8,7 @@
 package mega.privacy.android.icon.pack
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidPlayImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineAlertCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineAlertTriangleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArchiveArrowUpImageVector
@@ -186,6 +187,12 @@ import mega.privacy.android.icon.pack.vectors.createSmallThinSolidHeartImageVect
 
 public object IconPack : IconPackInterface {
     public object Medium : IconPackInterface.Medium {
+        public object Regular : IconPackInterface.Medium.Regular {
+            public object Solid : IconPackInterface.Medium.Regular.Solid {
+                override val Play: ImageVector by lazy { createMediumRegularSolidPlayImageVector() }
+            }
+        }
+
         public object Thin : IconPackInterface.Medium.Thin {
             public object Outline : IconPackInterface.Medium.Thin.Outline {
                 override val AlertCircle: ImageVector by

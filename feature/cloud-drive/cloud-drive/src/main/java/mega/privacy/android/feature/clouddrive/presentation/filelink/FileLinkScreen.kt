@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.button.CircularLightIconButton
 import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
 import mega.android.core.ui.components.button.SecondaryFilledButtonM3
 import mega.android.core.ui.components.surface.BoxSurface
@@ -240,6 +243,7 @@ internal fun FileLinkContent(
                         duration = state.formattedDuration,
                         iconRes = state.iconRes,
                         thumbnailData = state.thumbnailData,
+                        isVideo = state.isVideo,
                         onOpenClicked = onOpenClicked,
                     )
                 }
@@ -255,6 +259,7 @@ private fun LoadedFileLinkContent(
     duration: String?,
     iconRes: Int,
     thumbnailData: ThumbnailData?,
+    isVideo: Boolean,
     onOpenClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -276,6 +281,21 @@ private fun LoadedFileLinkContent(
                     .align(Alignment.Center)
                     .testTag(FILE_LINK_THUMBNAIL_TAG),
             )
+
+            if (isVideo) {
+                CircularLightIconButton(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = MaterialTheme.shapes.large,
+                            clip = false
+                        )
+                        .testTag(FILE_LINK_PLAY_BUTTON_TAG),
+                    icon = rememberVectorPainter(IconPack.Medium.Regular.Solid.Play),
+                    onClick = onOpenClicked
+                )
+            }
 
             if (!duration.isNullOrEmpty()) {
                 DurationBadge(
@@ -405,6 +425,7 @@ private fun LoadedFileLinkContentPreview() {
             duration = null,
             iconRes = iconPackR.drawable.ic_generic_medium_solid,
             thumbnailData = null,
+            isVideo = false,
             onOpenClicked = {},
         )
     }
@@ -420,6 +441,7 @@ private fun LoadedFileLinkContentVideoPreview() {
             duration = "2:50",
             iconRes = iconPackR.drawable.ic_video_medium_solid,
             thumbnailData = null,
+            isVideo = true,
             onOpenClicked = {},
         )
     }
@@ -471,3 +493,4 @@ internal const val FILE_LINK_FILE_NAME_TAG = "file_link_screen:file_name"
 internal const val FILE_LINK_FILE_SIZE_TAG = "file_link_screen:file_size"
 internal const val FILE_LINK_OPEN_BUTTON_TAG = "file_link_screen:open_button"
 internal const val FILE_LINK_DURATION_BADGE_TAG = "file_link_screen:duration_badge"
+internal const val FILE_LINK_PLAY_BUTTON_TAG = "file_link_screen:play_button"

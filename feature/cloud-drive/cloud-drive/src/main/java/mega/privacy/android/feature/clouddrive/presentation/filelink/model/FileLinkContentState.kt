@@ -18,5 +18,6 @@ sealed interface FileLinkContentState {
         val iconRes: Int,
         val thumbnailData: ThumbnailData? = null,
         val formattedDuration: String? = null,
+        val isVideo: Boolean = false,
     ) : FileLinkContentState
 }

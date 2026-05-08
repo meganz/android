@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
@@ -88,6 +89,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
                                 iconRes = iconRes,
                                 thumbnailData = thumbnailData,
                                 formattedDuration = formattedDuration,
+                                isVideo = node.type is VideoFileTypeInfo,
                             ),
                             fileNode = node,
                         )

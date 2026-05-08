@@ -141,6 +141,7 @@ internal class FileLinkViewModelTest {
             assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
             val loaded = state.contentState as FileLinkContentState.Loaded
             assertThat(loaded.formattedDuration).isEqualTo("2:50")
+            assertThat(loaded.isVideo).isTrue()
         }
     }
 
@@ -168,6 +169,7 @@ internal class FileLinkViewModelTest {
             assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
             val loaded = state.contentState as FileLinkContentState.Loaded
             assertThat(loaded.formattedDuration).isEqualTo("4:05")
+            assertThat(loaded.isVideo).isFalse()
         }
     }
 
