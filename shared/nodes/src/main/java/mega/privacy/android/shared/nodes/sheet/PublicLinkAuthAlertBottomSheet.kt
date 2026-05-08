@@ -87,7 +87,6 @@ fun PublicLinkAuthAlertBottomSheet(
             .statusBarsPadding()
             .semantics { testTagsAsResourceId = true },
         sheetState = sheetState,
-        windowInsets = WindowInsets.navigationBars
     ) {
         Column(
             modifier = Modifier
