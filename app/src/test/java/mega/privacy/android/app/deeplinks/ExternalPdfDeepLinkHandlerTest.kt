@@ -4,9 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -81,7 +81,7 @@ class ExternalPdfDeepLinkHandlerTest {
                 on { type }.thenReturn("application/pdf")
                 on { data }.thenReturn(uri)
             }
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("doc.pdf")
             var receivedNavKey: PdfViewerNavKey? = null
 
@@ -113,7 +113,7 @@ class ExternalPdfDeepLinkHandlerTest {
             on { type }.thenReturn("application/pdf")
             on { data }.thenReturn(uri)
         }
-        whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(false)
         var legacyCalled = false
         var callbackCalled = false
 

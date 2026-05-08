@@ -24,13 +24,13 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.nodes.R as NodesR
 import timber.log.Timber
 import java.io.File
@@ -61,7 +61,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
     private fun loadPdfViewerFeatureFlag() {
         viewModelScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)
+                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
             }.onSuccess { enabled ->
                 _uiState.update { it.copy(isPdfViewerComposeEnabled = enabled) }
             }.onFailure {

@@ -3,9 +3,9 @@ package mega.privacy.android.app.deeplinks
 import android.content.Intent
 import mega.privacy.android.app.extensions.isHttpScheme
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,7 +41,7 @@ class ExternalPdfDeepLinkHandler @Inject constructor(
         }
 
         val isPdfViewerComposeEnabled = runCatching {
-            getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)
+            getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
         }.getOrDefault(false)
 
         if (isPdfViewerComposeEnabled) {

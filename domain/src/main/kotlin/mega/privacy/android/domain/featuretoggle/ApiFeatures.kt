@@ -113,6 +113,18 @@ enum class ApiFeatures(
     ),
 
     /**
+     * PDF Viewer Compose UI.
+     * When enabled, PDF files are displayed using the new Compose-based
+     * PdfViewerScreen. When disabled, the legacy PdfViewerActivity is used.
+     */
+    PdfViewerComposeUI(
+        experimentName = "pdfs",
+        description = "Enable PDF Viewer with ComposeUI and single activity",
+        singleCheckPerRun = true,
+        defaultValue = false
+    ),
+
+    /**
      * Enable DCIM folder to be selected as Sync/Backup and detect cross device Sync/CU cloud folder conflicts
      */
     DCIMSelectionAsSyncBackup(

@@ -13,9 +13,9 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMappe
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -45,7 +45,7 @@ class NodeActionHandlerViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)
+                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
             }.onSuccess { value ->
                 Timber.d("PDF Viewer Compose UI feature flag value: $value")
                 _state.update { it.copy(isPDFViewerEnabled = value) }

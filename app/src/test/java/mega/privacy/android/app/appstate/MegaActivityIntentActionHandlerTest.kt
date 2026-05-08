@@ -11,16 +11,15 @@ import mega.privacy.android.app.deeplinks.ExternalPdfDeepLinkHandler
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
+import mega.privacy.android.domain.entity.ConnectivityState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.entity.ConnectivityState
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
@@ -245,7 +244,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("file.pdf")
 
             underTest.handleAction(
@@ -281,7 +280,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpsUriString)).thenReturn("sample.pdf")
 
             underTest.handleAction(
@@ -317,7 +316,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpUriString)).thenReturn("sample.pdf")
 
             underTest.handleAction(
@@ -350,7 +349,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(false)
             var legacyLaunched = false
 
             underTest.handleAction(
@@ -375,7 +374,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn(null)
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(fileUriString)).thenReturn("document.pdf")
 
             underTest.handleAction(
@@ -409,7 +408,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn(null)
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(false)
             var legacyLaunched = false
 
             underTest.handleAction(
@@ -433,7 +432,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             // Resolver returns base name without extension; production adds ".pdf" via FileUtil.addPdfFileExtension
             whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("file")
 
@@ -491,7 +490,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI))
                 .thenThrow(RuntimeException("Feature flag service unavailable"))
             var legacyLaunched = false
 
@@ -522,7 +521,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpsUriString)).thenReturn(null)
 
             underTest.handleAction(

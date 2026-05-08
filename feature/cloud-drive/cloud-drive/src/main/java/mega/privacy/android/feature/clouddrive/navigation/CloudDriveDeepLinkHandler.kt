@@ -10,13 +10,13 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -73,7 +73,7 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                                 nodeSourceData = NodeSourceData.Default(nodeSourceType),
                                 isPDFViewerEnabled = runCatching {
                                     getFeatureFlagValueUseCase(
-                                        AppFeatures.PdfViewerComposeUI
+                                        ApiFeatures.PdfViewerComposeUI
                                     )
                                 }.getOrElse { false },
                             )

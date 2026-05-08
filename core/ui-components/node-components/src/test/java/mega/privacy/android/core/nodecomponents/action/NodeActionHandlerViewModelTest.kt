@@ -12,9 +12,9 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -86,7 +86,7 @@ class NodeActionHandlerViewModelTest {
     @Test
     fun `test that state isPDFViewerEnabled emits when flag is loaded`() = runTest {
         reset(getFeatureFlagValueUseCase)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
 
         val viewModelUnderTest = NodeActionHandlerViewModel(
             getFileNodeContentForFileNodeUseCase = getFileNodeContentForFileNodeUseCase,
@@ -99,7 +99,7 @@ class NodeActionHandlerViewModelTest {
             .first { it != null }
 
         assertThat(result).isTrue()
-        verify(getFeatureFlagValueUseCase).invoke(AppFeatures.PdfViewerComposeUI)
+        verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.PdfViewerComposeUI)
     }
 
     @Test
