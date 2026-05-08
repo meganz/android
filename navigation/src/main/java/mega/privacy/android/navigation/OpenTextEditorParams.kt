@@ -26,7 +26,7 @@ sealed class OpenTextEditorParams {
     /**
      * Open text editor for a local file (offline or zip entry).
      *
-     * @param nodeSourceType [mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OFFLINE_ADAPTER]
+     * @param nodeSourceType [mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OFFLINE_ADAPTER]
      *   or the zip adapter constant (2008).
      */
     data class LocalFile(

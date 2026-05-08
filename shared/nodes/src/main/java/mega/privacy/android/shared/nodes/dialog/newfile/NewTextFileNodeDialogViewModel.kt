@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.dialog.textfile
+package mega.privacy.android.shared.nodes.dialog.newfile
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

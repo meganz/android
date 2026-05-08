@@ -1,8 +1,8 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

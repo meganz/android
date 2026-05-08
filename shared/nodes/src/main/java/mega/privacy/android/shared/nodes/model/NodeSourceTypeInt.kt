@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.model
+package mega.privacy.android.shared.nodes.model
 
 /**
  * Constants for Node Source Types represented as Int

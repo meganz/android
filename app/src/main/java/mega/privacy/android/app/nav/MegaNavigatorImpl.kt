@@ -60,7 +60,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HAN
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -114,6 +113,7 @@ import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject

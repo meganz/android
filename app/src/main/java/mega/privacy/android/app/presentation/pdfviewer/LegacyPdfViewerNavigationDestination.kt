@@ -6,9 +6,9 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 
 fun EntryProviderScope<NavKey>.legacyPdfViewerScreen(
     removeDestination: () -> Unit,

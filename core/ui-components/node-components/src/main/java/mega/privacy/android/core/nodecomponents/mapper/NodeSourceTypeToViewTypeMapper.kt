@@ -1,7 +1,7 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import javax.inject.Inject
 
 /**

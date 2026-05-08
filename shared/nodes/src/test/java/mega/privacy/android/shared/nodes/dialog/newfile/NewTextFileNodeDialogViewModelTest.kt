@@ -1,17 +1,16 @@
-package mega.privacy.android.core.nodecomponents.dialog
+package mega.privacy.android.shared.nodes.dialog.newfile
 
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialogViewModel
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.EmptyNodeNameException
-import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeExtensionException
+import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
@@ -233,4 +232,4 @@ class NewTextFileNodeDialogViewModelTest {
 
     fun <T> StateEventWithContent<T>.triggeredContent(): T? =
         (this as? StateEventWithContentTriggered<T>)?.content
-} 
+}

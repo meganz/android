@@ -9,10 +9,10 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImag
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 
 fun EntryProviderScope<NavKey>.legacyImageViewerScreen(
     removeDestination: () -> Unit,

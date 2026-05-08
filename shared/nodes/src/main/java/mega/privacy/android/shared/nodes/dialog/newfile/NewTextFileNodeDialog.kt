@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.dialog.textfile
+package mega.privacy.android.shared.nodes.dialog.newfile
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.dialogs.BasicInputDialog
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.DotNameException
@@ -33,6 +32,7 @@ import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.nodes.dialog.newfolder.INVALID_CHARACTERS
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
