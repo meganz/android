@@ -15,14 +15,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.barteksc.pdfviewer.PDFView
+import mega.android.core.ui.theme.notificationsColor
 import mega.android.core.ui.theme.supportColor
+import mega.android.core.ui.theme.values.NotificationsColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
@@ -75,9 +75,8 @@ internal fun PdfViewerContent(
     val allMatchRectsByPageRef: MutableState<Map<Int, List<RectF>>> =
         remember { mutableStateOf(allMatchRectsByPage) }
 
-    val warningColor = supportColor(SupportColor.Warning)
-    // Use lerp instead of alpha: MULTIPLY xfermode requires fully opaque color on hardware Canvas.
-    val allMatchColor = lerp(Color.White, warningColor, 0.30f)
+    val highLightColor = supportColor(SupportColor.Warning)
+    val allMatchColor = notificationsColor(NotificationsColor.NotificationWarning)
 
     // Track highlight identity to trigger redraws without using the generic View.tag
     val lastHighlightIdentity = remember { mutableStateOf<Any?>(null) }
@@ -88,14 +87,14 @@ internal fun PdfViewerContent(
 
     // Paint for the currently-selected match (brighter) and all other matches (lighter).
     // Keyed on their respective colors so they update on theme changes.
-    val highlightPaint = remember(warningColor) {
+    val highlightPaint = remember(highLightColor) {
         Paint().apply {
-            color = warningColor.toArgb()
+            color = highLightColor.toArgb()
             style = Paint.Style.FILL
             xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
         }
     }
-    val allMatchPaint = remember(warningColor) {
+    val allMatchPaint = remember(allMatchColor) {
         Paint().apply {
             color = allMatchColor.toArgb()
             style = Paint.Style.FILL
