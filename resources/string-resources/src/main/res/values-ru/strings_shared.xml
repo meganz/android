@@ -2570,4 +2570,11 @@
     <string name="public_link_auth_alert_description_default">Доступ к нему в любое время с любого устройства.\nНе нужно сохранять ссылку или снова загружать файлы.</string>
     <string name="public_link_auth_alert_description_album">Храните эти фотографии в безопасности и получайте к ним доступ в любое время</string>
     <string name="public_link_auth_alert_title_file">Сохранить этот файл в ваш аккаунт MEGA</string>
+    <string name="offline_status">Локальные</string>
+    <string name="online_status">В сети</string>
+    <string name="away_status">Отсутствует</string>
+    <string name="busy_status">Занят</string>
+    <string name="last_seen_today">[A]Появлялся[/A] сегодня в %1$s</string>
+    <string name="last_seen_long_time_ago">[A]Появлялся[/A] давно</string>
+    <string name="last_seen_general">[A]Появлялся[/A] %1$s в %2$s</string>
 </resources>

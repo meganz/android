@@ -39,7 +39,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Carregando</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Adicionando</string>
+    <string name="general_importing">Adicionando&#8230;</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Encaminhando</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -87,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">A assinatura foi cancelada</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Não foi possível cancelar a sua assinatura. Por favor, entre em contato com support&#64;mega.io</string>
+    <string name="cancel_subscription_error">Não foi possível cancelar a sua assinatura. Por favor, entre em contato com support&#64;mega.io para obter ajuda.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Fechar outras sessões</string>
     <!-- Message after kill all opened sessions -->
@@ -3129,7 +3129,7 @@
     <!-- Don’t upload action button for a name collision. -->
     <string name="do_not_upload">Não fazer o upload</string>
     <!-- Informs about what is expected after choose the option upload and rename for a name collision. -->
-    <string name="warning_upload_and_rename">O arquivo que você está enviando será renomeado como:</string>
+    <string name="warning_upload_and_rename">O arquivo que você está fazendo upload será renomeado como:</string>
     <!-- Upload and rename action button for a name collision. -->
     <string name="upload_and_rename">Fazer upload e renomear</string>
     <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->

@@ -7,7 +7,7 @@
     <!-- Sync text of sync-->
     <string name="sync">Sincronizar</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">O MEGA precisa acessar o armazenamento do seu dispositivo para sincronizar a sua pasta local. Toque aqui para permitir o acesso</string>
+    <string name="sync_storage_permission_banner">O MEGA precisa acessar o armazenamento do seu dispositivo para sincronizar a sua pasta local. Pressione para permitir o acesso.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">Para a sincronização contínua dos seus arquivos e das suas pastas, permita que o MEGA seja executado em segundo plano</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -129,7 +129,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Não foi possível acessar a pasta de destino</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Houve um problema ao fazer o download do arquivo ou ao mover o arquivo temporário para a sua localização final</string>
+    <string name="sync_stalled_issue_download_issue_detail">Houve um problema ao fazer o download do arquivo ou ao mover o arquivo temporário para a sua localização final.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Um erro local está impedindo o acesso à pasta</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
@@ -143,7 +143,7 @@
     <!-- Sync stalled issue reason is Local and remote not synced detailed description-->
     <string name="sync_stalled_issue_local_and_remote_not_synced_detail">Este arquivo tem cópias conflitantes</string>
     <!-- Sync stalled issue reason is Name clash detailed description-->
-    <string name="sync_stalled_issue_name_clash_detail">Há vários itens com o mesmo nome em um lado da sincronização que se tornariam todos o mesmo item no outro lado da sincronização.</string>
+    <string name="sync_stalled_issue_name_clash_detail">Há vários itens com o mesmo nome em um lado da sincronização que se tornariam todos o mesmo item no outro lado da sincronização</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_mega">Foi detectada no MEGA uma ação para mover ou renomear, mas não foi possível replicá-la no dispositivo local.</string>
     <!-- Sync notification title description sync monitoring-->

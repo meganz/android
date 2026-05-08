@@ -45,5 +45,5 @@
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">Corrija o nome do arquivo antes de continuar</string>
     <!-- Dialog message showing file progress -->
-    <string name="scan_dialog_progress">Preparando %1$s. Por favor, espere...</string>
+    <string name="scan_dialog_progress">Preparando %1$s. Por favor, espere&#8230;</string>
 </resources>

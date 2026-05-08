@@ -2269,4 +2269,11 @@
     <string name="public_link_auth_alert_title_file">Simpan file ini ke akun MEGA Anda</string>
     <string name="open_link_dialog_description">Tempelkan tautan MEGA apa pun untuk membukanya</string>
     <string name="home_cwlo_clear_history">Hapus riwayat \’Lanjutkan dari tempat terakhir Anda\’</string>
+    <string name="offline_status">Offline</string>
+    <string name="online_status">Aktif</string>
+    <string name="busy_status">Sibuk</string>
+    <string name="last_seen_today">[A]Terakhir dilihat [/A]hari ini %1$s</string>
+    <string name="away_status">Sedang Pergi</string>
+    <string name="last_seen_long_time_ago">[A]Terakhir terlihat [/A]sejak lama</string>
+    <string name="last_seen_general">[A]Terakhir dilihat [/A]%1$s %2$s</string>
 </resources>

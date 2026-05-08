@@ -15,7 +15,7 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="general_sync_account_expired">Não foi possível sincronizar ou fazer backup dessa pasta porque o seu plano expirou</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="general_sync_foreign_target_overshare">Não é possível sincronizar esta pasta porque a conta do usuário que a compartilhou alcançou o limite de armazenamento.</string>
+    <string name="general_sync_foreign_target_overshare">Não é possível sincronizar esta pasta porque a conta do usuário que a compartilhou atingiu o limite de armazenamento</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
     <string name="general_sync_share_non_full_access">Não é possível sincronizar esta pasta porque é uma pasta compartilhada à qual você não tem acesso total</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
@@ -2449,7 +2449,7 @@
     <string name="home_widget_continue_where_left_off">Continue de onde você parou</string>
     <string name="general_skip">Pular</string>
     <string name="settings_transfer_connections_title">Conexões de transferência</string>
-    <string name="settings_transfer_connections_text">Define o número de conexões paralelas por transferência de arquivo. Valores mais altos podem melhorar a velocidade, mas aumentam o consumo de bateria e de dados.</string>
+    <string name="settings_transfer_connections_text">Define o número máximo de conexões paralelas usadas para transferências ativas. Valores mais altos podem acelerar transferências de arquivos grandes, mas aumentam o consumo de bateria e memória.</string>
     <string name="settings_transfer_download_connections">Conexões de download</string>
     <string name="settings_transfer_upload_connections">Conexões de upload</string>
     <string name="settings_transfer_connections_slow_networs">%1$d (melhor opção para redes lentas)</string>
@@ -2487,4 +2487,25 @@
     <string name="home_widget_viewed_links_clear_history_dialog_message">Você tem certeza de que quer deletar todo o histórico de links visualizados? Esta ação não pode ser desfeita.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">O histórico de links visualizados foi deletado</string>
     <string name="home_widget_viewed_links_empty_state">Os links visualizados aparecerão aqui</string>
+    <string name="home_cwlo_empty_state">Os itens que você deixou incompletos vão aparecer aqui</string>
+    <string name="folder_link_guest_banner_title">Salvar na sua nuvem do MEGA</string>
+    <string name="folder_link_guest_banner_description">Não perca este link. Crie uma conta gratuita para salvar esta pasta e acessá-la a qualquer momento.</string>
+    <string name="folder_link_guest_banner_create_account">Criar uma conta gratuita</string>
+    <string name="folder_link_guest_banner_dismiss_content_description">Fechar o banner</string>
+    <string name="home_configuration_screen_toolbar_title">Personalizar a página inicial</string>
+    <string name="home_configuration_screen_toolbar_subtitle">Arraste as seções para reordenar</string>
+    <string name="home_configuration_screen_menu_reset_to_default">Restaurar configurações predeterminadas</string>
+    <string name="home_configuration_screen_menu_choose_default_start_screen">Escolher a tela inicial predeterminada</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">Pelo menos uma opção deve estar ativa</string>
+    <string name="file_link_subtitle">Link de arquivo</string>
+    <string name="favourites_empty_screen_description">Marque as pastas como favoritas para que sejam mostradas aqui</string>
+    <string name="offline_status">Offline</string>
+    <string name="online_status">Online</string>
+    <string name="away_status">Ausente</string>
+    <string name="busy_status">Ocupado</string>
+    <string name="last_seen_today">[A]Último acesso [/A]hoje às %1$s</string>
+    <string name="last_seen_long_time_ago">[A]Último acesso [/A]há muito tempo atrás</string>
+    <string name="last_seen_general">[A]Último acesso [/A]em %1$s %2$s</string>
+    <string name="name_collision_choose_folder_header">Selecione a pasta que você quer manter</string>
+    <string name="name_collision_folder_warning_upload_and_rename">A pasta que você está fazendo upload será renomeada como:</string>
 </resources>

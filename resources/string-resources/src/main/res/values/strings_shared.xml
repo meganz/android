@@ -1739,13 +1739,13 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months.
     is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years.
     is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
@@ -1783,10 +1783,10 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
     is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
     is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
@@ -2710,7 +2710,7 @@
     <!-- Title for the Transfer connections setting -->
     <string name="settings_transfer_connections_title">Transfer connections</string>
     <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
-    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
+    <string name="settings_transfer_connections_text">Sets the maximum number of parallel connections used for active transfers. Higher values may speed up large file transfers but increase battery and memory usage.</string>
     <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
     <string name="settings_transfer_download_connections">Download connections</string>
     <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
@@ -2790,4 +2790,36 @@
     <string name="folder_link_guest_banner_create_account">Create a free account</string>
     <!-- Content description for the close icon on the folder link guest banner -->
     <string name="folder_link_guest_banner_dismiss_content_description">Dismiss banner</string>
+    <!-- Home configuration feature screen title -->
+    <string name="home_configuration_screen_toolbar_title">Customise Home</string>
+    <!-- Home configuration feature screen subtitle -->
+    <string name="home_configuration_screen_toolbar_subtitle">Drag sections to reorder</string>
+    <!-- Bottom sheet menu item to reset the Home configuration back to its default settings -->
+    <string name="home_configuration_screen_menu_reset_to_default">Reset to default</string>
+    <!-- Bottom sheet menu item to choose the default start screen shown when the app launches -->
+    <string name="home_configuration_screen_menu_choose_default_start_screen">Choose default start screen</string>
+    <!-- Snackbar message to show when widget removal is not allowed on Home Configuration -->
+    <string name="home_configuration_widget_removal_not_allowed_message">At least one home section is required</string>
+    <!-- Appbar subtitle of file link screen-->
+    <string name="file_link_subtitle">File link</string>
+    <!-- Description for the empty view in Favourites sections. -->
+    <string name="favourites_empty_screen_description">Add folders to Favourites to see them here</string>
+    <!-- Header giving more context about a folder name collision, informing there are different option to choose. -->
+    <string name="name_collision_choose_folder_header">Select the folder you want to keep</string>
+    <!-- Informs about what is expected after choose the option upload and rename for a folder name collision. -->
+    <string name="name_collision_folder_warning_upload_and_rename">The folder you are uploading will be renamed as:</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="offline_status">Offline</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="online_status">Online</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="away_status">Away</string>
+    <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
+    <string name="busy_status">Busy</string>
+    <!-- String that appears when we show the last activity of a contact, when the last activity was today. For example: Last seen today 11:34a.m. -->
+    <string name="last_seen_today">[A]Last seen [/A]today %1$s</string>
+    <!-- String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user -->
+    <string name="last_seen_long_time_ago">[A]Last seen [/A]a long time ago</string>
+    <!-- String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. -->
+    <string name="last_seen_general">[A]Last seen [/A]%1$s %2$s</string>
 </resources>

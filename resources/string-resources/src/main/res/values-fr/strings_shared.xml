@@ -2479,4 +2479,11 @@
     <string name="home_widget_viewed_links_clear_history_dialog_message">Êtes-vous sûr de vouloir effacer tout l\’historique des liens consultés&#160;? Cela ne peut pas être annulé.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">L\’historique des liens consultés a été effacé</string>
     <string name="home_widget_viewed_links_empty_state">Les liens consultés apparaîtront ici</string>
+    <string name="offline_status">Hors&#160;ligne</string>
+    <string name="online_status">En ligne</string>
+    <string name="busy_status">Occupé</string>
+    <string name="last_seen_today">[A]Vu pour la dernière fois [/A]aujourd’hui à %1$s</string>
+    <string name="away_status">Absent</string>
+    <string name="last_seen_long_time_ago">[A]Vu pour la dernière fois [/A]il y a longtemps</string>
+    <string name="last_seen_general">[A]Vu pour la dernière fois le [/A]%1$s à %2$s</string>
 </resources>

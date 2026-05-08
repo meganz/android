@@ -2309,4 +2309,11 @@
     <string name="home_widget_viewed_links_section_header">已檢視的連結</string>
     <string name="open_link_dialog_description">貼上任何MEGA連結即可開啟</string>
     <string name="home_cwlo_clear_history">清除「繼續上次進度」的歷史紀錄</string>
+    <string name="offline_status">離線</string>
+    <string name="online_status">在線</string>
+    <string name="away_status">離開</string>
+    <string name="busy_status">忙碌</string>
+    <string name="last_seen_today">今天[A]最後上線時間 [/A]%1$s</string>
+    <string name="last_seen_long_time_ago">[A]最後上線時間 [/A]很久以前</string>
+    <string name="last_seen_general">[A]最後上線時間 [/A]%1$s %2$s</string>
 </resources>

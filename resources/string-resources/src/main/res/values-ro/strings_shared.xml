@@ -2475,4 +2475,11 @@
     <string name="home_widget_viewed_links_section_header">Linkuri vizualizate</string>
     <string name="open_link_dialog_description">Lipește orice link MEGA pentru a-l deschide</string>
     <string name="home_cwlo_clear_history">Șterge istoricul „Continuă de unde ai rămas”</string>
+    <string name="offline_status">Offline</string>
+    <string name="online_status">Online</string>
+    <string name="away_status">Plecat</string>
+    <string name="busy_status">Ocupat</string>
+    <string name="last_seen_today">[A]Văzut(ă) ultima dată [/A]astăzi, %1$s</string>
+    <string name="last_seen_long_time_ago">[A]Văzut(ă) ultima dată [/A]cu mult timp în urmă</string>
+    <string name="last_seen_general">[A]Văzut(ă) ultima dată [/A]%1$s %2$s</string>
 </resources>

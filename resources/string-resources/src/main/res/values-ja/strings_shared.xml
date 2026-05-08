@@ -2278,7 +2278,7 @@
     <string name="home_widget_continue_where_left_off">続きから再開する</string>
     <string name="general_skip">スキップ</string>
     <string name="settings_transfer_connections_title">転送接続数</string>
-    <string name="settings_transfer_connections_text">ファイル転送ごとの並列接続数を設定します。値を大きくすると速度が向上する可能性がありますが、バッテリーとデータ通信量の消費も増加します。</string>
+    <string name="settings_transfer_connections_text">アクティブな転送に使用される並列接続の最大数を設定します。値を大きくすると、大容量ファイルの転送速度が向上する可能性がありますが、バッテリーとメモリの使用量が増加します。</string>
     <string name="settings_transfer_download_connections">ダウンロード接続数</string>
     <string name="settings_transfer_upload_connections">アップロード接続数</string>
     <string name="settings_transfer_connections_slow_networs">%1$d（低速ネットワークに最適）</string>
@@ -2316,4 +2316,23 @@
     <string name="home_widget_viewed_links_empty_state">閲覧済みのリンクはここに表示されます</string>
     <string name="home_cwlo_empty_state">未完了の項目はここに表示されます</string>
     <string name="folder_link_guest_banner_title">MEGAクラウドに保存</string>
+    <string name="folder_link_guest_banner_description">このリンクをなくさないでください。無料アカウントを作成してこのフォルダを保存すると、いつでもアクセスできます。</string>
+    <string name="folder_link_guest_banner_create_account">無料アカウントを作成する</string>
+    <string name="folder_link_guest_banner_dismiss_content_description">バナーを閉じる</string>
+    <string name="home_configuration_screen_toolbar_title">ホームのカスタマイズ</string>
+    <string name="home_configuration_screen_toolbar_subtitle">セクションをドラッグして並べ替える</string>
+    <string name="home_configuration_screen_menu_reset_to_default">デフォルトに戻す</string>
+    <string name="home_configuration_screen_menu_choose_default_start_screen">デフォルトのスタート画面を選択する</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">ホームセクションには少なくとも1つ項目が必要です</string>
+    <string name="file_link_subtitle">ファイルリンク</string>
+    <string name="favourites_empty_screen_description">フォルダをお気に入りに追加すると、ここに表示されます</string>
+    <string name="name_collision_choose_folder_header">残すフォルダを選択してください</string>
+    <string name="name_collision_folder_warning_upload_and_rename">アップロードするフォルダは、以下のように名前が変更されます。</string>
+    <string name="offline_status">オフライン</string>
+    <string name="online_status">オンライン</string>
+    <string name="away_status">不在</string>
+    <string name="busy_status">取り込み中</string>
+    <string name="last_seen_today">[A]最終ログイン[/A]今日 %1$s</string>
+    <string name="last_seen_long_time_ago">[A]最終ログイン[/A]はだいぶ前</string>
+    <string name="last_seen_general">[A]最終ログイン[/A]%1$s %2$s</string>
 </resources>
