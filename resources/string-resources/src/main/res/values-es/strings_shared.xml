@@ -1915,7 +1915,7 @@
     <string name="contact_found_dialog_title">Contacto encontrado</string>
     <string name="album_content_action_remove_favourites">Quitar de favoritos</string>
     <string name="context_empty_folder_title">Esta carpeta está vacía</string>
-    <string name="context_empty_cloud_drive_title">Aún no hay nada en tu espacio privado</string>
+    <string name="context_empty_cloud_drive_title">Aún no hay nada en tu bóveda privada</string>
     <string name="context_empty_cloud_drive_description">Protege tus datos de forma segura con el cifrado de conocimiento cero</string>
     <string name="open_link_account_confirmation_error">Estás conectado a una cuenta de MEGA diferente. Cierra sesión y vuelve a abrir el enlace de confirmación de la cuenta.</string>
     <string name="general_invalid_link">Enlace inválido. Inténtalo de nuevo o solicita uno nuevo.</string>
@@ -2451,4 +2451,11 @@
     <string name="home_widget_viewed_links_clear_history_dialog_message">¿Estás seguro de que quieres borrar el historial de enlaces visualizados? Esta operación no se puede deshacer.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">El historial de enlaces visualizados ha sido borrado</string>
     <string name="home_widget_viewed_links_empty_state">Los enlaces visualizados aparecerán aquí</string>
+    <string name="offline_status">Sin conexión</string>
+    <string name="online_status">Conectado</string>
+    <string name="busy_status">Ocupado</string>
+    <string name="last_seen_today">[A]Último acceso [/A]hoy %1$s</string>
+    <string name="away_status">Ausente</string>
+    <string name="last_seen_long_time_ago">[A]Último acceso [/A]hace mucho tiempo</string>
+    <string name="last_seen_general">[A]Último acceso [/A]%1$s %2$s</string>
 </resources>

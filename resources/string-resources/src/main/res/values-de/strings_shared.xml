@@ -2386,4 +2386,11 @@
     <string name="home_widget_viewed_links_clear_history">Verlauf der angesehenen Links löschen</string>
     <string name="home_widget_viewed_links_clear_history_dialog_message">Verlauf der angesehenen Links wirklich löschen? Dies kann nicht rückgängig gemacht werden.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">Der Verlauf der angesehenen Links wurde gelöscht</string>
+    <string name="offline_status">Offline</string>
+    <string name="online_status">Online</string>
+    <string name="busy_status">Beschäftigt</string>
+    <string name="last_seen_today">[A]Zuletzt online:[/A]heute %1$s</string>
+    <string name="away_status">Abwesend</string>
+    <string name="last_seen_long_time_ago">[A]Zuletzt online [/A]vor sehr langer Zeit</string>
+    <string name="last_seen_general">[A]Zuletzt online: [/A]%1$s %2$s</string>
 </resources>

@@ -1739,12 +1739,14 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1781,9 +1783,11 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2706,7 +2710,7 @@
     <!-- Title for the Transfer connections setting -->
     <string name="settings_transfer_connections_title">Transfer connections</string>
     <!-- Text for the Transfer connections settings explaining the purpose of the setting -->
-    <string name="settings_transfer_connections_text">Defines the number of parallel connections per file transfer. Higher values may improve speed but increase battery and data usage.</string>
+    <string name="settings_transfer_connections_text">Sets the maximum number of parallel connections used for active transfers. Higher values may speed up large file transfers but increase battery and memory usage.</string>
     <!-- Title for the Transfer connections - Downloads setting. This setting allows to update the number of connections for downloads. -->
     <string name="settings_transfer_download_connections">Download connections</string>
     <!-- Title for the Transfer connections - Uploads setting. This setting allows to update the number of connections for uploads. -->
@@ -2795,11 +2799,11 @@
     <!-- Bottom sheet menu item to choose the default start screen shown when the app launches -->
     <string name="home_configuration_screen_menu_choose_default_start_screen">Choose default start screen</string>
     <!-- Snackbar message to show when widget removal is not allowed on Home Configuration -->
-    <string name="home_configuration_widget_removal_not_allowed_message">At least one option must stay on</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">At least one home section is required</string>
     <!-- Appbar subtitle of file link screen-->
     <string name="file_link_subtitle">File link</string>
     <!-- Description for the empty view in Favourites sections. -->
-    <string name="favourites_empty_screen_description">Mark folders as favourites to see them here</string>
+    <string name="favourites_empty_screen_description">Add folders to Favourites to see them here</string>
     <!-- Header giving more context about a folder name collision, informing there are different option to choose. -->
     <string name="name_collision_choose_folder_header">Select the folder you want to keep</string>
     <!-- Informs about what is expected after choose the option upload and rename for a folder name collision. -->

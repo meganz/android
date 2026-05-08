@@ -2280,4 +2280,11 @@
     <string name="title_unlock_biometric">Mở khóa bằng thông tin sinh trắc học của bạn</string>
     <string name="open_link_dialog_description">Dán bất kỳ liên kết MEGA nào để mở nó</string>
     <string name="home_cwlo_clear_history">Xóa lịch sử “Tiếp tục từ nơi bạn đã dừng”</string>
+    <string name="offline_status">Ngoại Tuyến</string>
+    <string name="online_status">Trực tuyến</string>
+    <string name="away_status">Vắng mặt</string>
+    <string name="busy_status">Đang bận</string>
+    <string name="last_seen_today">[A]Lần thấy cuối [/A]hôm nay lúc %1$s</string>
+    <string name="last_seen_long_time_ago">[A]Lần thấy cuối [/A]đã một thời gian rất lâu</string>
+    <string name="last_seen_general">[A]Lần thấy cuối [/A] vào lúc %2$s lúc %1$s</string>
 </resources>

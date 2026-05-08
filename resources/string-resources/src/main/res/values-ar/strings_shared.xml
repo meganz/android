@@ -2723,4 +2723,20 @@
     <string name="public_link_auth_alert_description_default">يمكنك الوصول إليه في أي وقت، من أي جهاز.\nلا حاجة إلى إبقاء الرابط أو تنزيل الملفات مرة أخرى.</string>
     <string name="public_link_auth_alert_description_album">احفظ هذه الصور آمنة ويمكنك الوصول إليها في أي وقت.</string>
     <string name="public_link_auth_alert_title_file">احفظ هذا الملف في حساب MEGA الخاص بك</string>
+    <string name="home_widget_viewed_links_clear_history">امسح سجل الروابط التي تمت مشاهدتها</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">هل أنت متأكد أنك تريد مسح سجل جميع الروابط التي تم عرضها؟ لا يمكن التراجع عن ذلك.</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">تم مسح سجل الروابط التي تم عرضها</string>
+    <string name="home_widget_viewed_links_empty_state">ستظهر الروابط التي تم عرضها هنا</string>
+    <string name="home_cwlo_empty_state">العناصر التي تركتها غير مكتملة ستظهر هنا</string>
+    <string name="folder_link_guest_banner_title">احفظه في سحابة ميغا MEGA</string>
+    <string name="folder_link_guest_banner_description">لا تفقد هذا الرابط. أنشئ حساباً مجانياً لحفظ هذا المجلد والوصول إليه في أي وقت.</string>
+    <string name="folder_link_guest_banner_create_account">إنشاء حساب مجاني</string>
+    <string name="folder_link_guest_banner_dismiss_content_description">إغلاق الشريط</string>
+    <string name="offline_status">غير متصل بالانترنت</string>
+    <string name="online_status">متصل بالانترنت</string>
+    <string name="busy_status">مشغول</string>
+    <string name="last_seen_today">[A]آخر ظهور [/A]اليوم %1$s</string>
+    <string name="away_status">بعيد</string>
+    <string name="last_seen_long_time_ago">[A]آخر ظهور [/A]منذ وقت طويل</string>
+    <string name="last_seen_general">[A]آخر ظهور [/A]%1$s %2$s</string>
 </resources>

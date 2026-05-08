@@ -41,7 +41,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="device_center_list_view_item_sub_state_insufficient_disk_space">Não há espaço suficiente para fazer o download.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits an empty Device Name -->
-    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Digite o nome do dispositivo</string>
+    <string name="device_center_rename_device_dialog_error_message_empty_device_name">Digite o nome do dispositivo.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
     <string name="device_center_rename_device_dialog_error_message_name_already_exists">Já existe um dispositivo com este nome. Digite outro nome.</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->

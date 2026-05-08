@@ -2301,4 +2301,11 @@
     <string name="home_widget_viewed_links_section_header">ลิงก์ที่ดูแล้ว</string>
     <string name="open_link_dialog_description">วางลิงก์ MEGA ใดๆ ก็ได้เพื่อเปิดมัน</string>
     <string name="home_cwlo_clear_history">ลบประวัติ “Continue where you left”</string>
+    <string name="offline_status">ออฟไลน์</string>
+    <string name="online_status">ออนไลน์</string>
+    <string name="away_status">ว่าง</string>
+    <string name="busy_status">ไม่ว่าง</string>
+    <string name="last_seen_today">[A]ดูครั้งล่าสุด[/A]วันนี้ เวลา %1$s</string>
+    <string name="last_seen_long_time_ago">[A]ดูครั้งล่าสุด[/A]เมื่อนานมาแล้ว</string>
+    <string name="last_seen_general">[A]ดูครั้งล่าสุดเมื่อ[/A] %1$s เวลา %2$s</string>
 </resources>

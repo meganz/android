@@ -2464,4 +2464,11 @@
     <string name="public_link_auth_alert_description_default">Accedi in qualsiasi momento, da qualsiasi dispositivo.\nNon è necessario conservare nuovamente il link o scaricare i file.</string>
     <string name="public_link_auth_alert_description_album">Mantieni queste foto al sicuro e accedile in qualsiasi momento</string>
     <string name="public_link_auth_alert_title_file">Salva questo file nel tuo account MEGA</string>
+    <string name="offline_status">Offline</string>
+    <string name="online_status">Online</string>
+    <string name="away_status">Assente</string>
+    <string name="busy_status">Occupato</string>
+    <string name="last_seen_today">[A]Ultima visita[/A] oggi %1$s</string>
+    <string name="last_seen_long_time_ago">[A]Ultima visita[/A] molto tempo fa</string>
+    <string name="last_seen_general">[A]Ultima visita[/A] %1$s %2$s</string>
 </resources>

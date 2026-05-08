@@ -2536,7 +2536,7 @@
     <string name="home_widget_continue_where_left_off">Kontynuuj tam, gdzie skończyłeś</string>
     <string name="general_skip">Pomiń</string>
     <string name="settings_transfer_connections_title">Połączenia transferowe</string>
-    <string name="settings_transfer_connections_text">Określa liczbę równoległych połączeń podczas transferu pliku. Wyższe wartości mogą przyspieszyć transfer, ale zwiększą zużycie baterii i danych.</string>
+    <string name="settings_transfer_connections_text">Ustawia maksymalną liczbę połączeń równoległych używanych do aktywnych transferów. Wyższe wartości mogą przyspieszyć transfer dużych plików, ale mogą zwiększyć zużycie baterii i pamięci.</string>
     <string name="settings_transfer_download_connections">Pobieranie połączeń</string>
     <string name="settings_transfer_upload_connections">Prześlij połączenia</string>
     <string name="settings_transfer_connections_slow_networs">%1$d (Najlepsze dla wolnych sieci)</string>
@@ -2575,4 +2575,23 @@
     <string name="home_widget_viewed_links_clear_history_dialog_message">Czy na pewno chcesz usunąć całą historię wyświetlanych linków? Nie da się tego cofnąć.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">Historia odwiedzonych linków została wyczyszczona</string>
     <string name="home_widget_viewed_links_empty_state">Odwiedzone linki pojawią się tutaj</string>
+    <string name="home_cwlo_empty_state">Elementy, które pozostawiłeś niedokończone, pojawią się tutaj</string>
+    <string name="folder_link_guest_banner_title">Zapisz w swojej chmurze MEGA</string>
+    <string name="folder_link_guest_banner_description">Nie trać tego linku. Załóż darmowe konto, aby zapisać ten folder i mieć do niego dostęp w dowolnym momencie.</string>
+    <string name="folder_link_guest_banner_create_account">Utwórz darmowe konto</string>
+    <string name="folder_link_guest_banner_dismiss_content_description">Zamknij baner</string>
+    <string name="home_configuration_screen_toolbar_title">Dostosuj stronę główną</string>
+    <string name="home_configuration_screen_toolbar_subtitle">Przeciągnij sekcje, aby zmienić ich kolejność</string>
+    <string name="home_configuration_screen_menu_reset_to_default">Przywróć ustawienia domyślne</string>
+    <string name="home_configuration_screen_menu_choose_default_start_screen">Wybierz domyślny ekran startowy</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">Co najmniej jedna opcja musi być włączona</string>
+    <string name="file_link_subtitle">Link do pliku</string>
+    <string name="favourites_empty_screen_description">Oznacz foldery jako ulubione, aby zobaczyć je tutaj</string>
+    <string name="offline_status">Lokalne</string>
+    <string name="online_status">Online</string>
+    <string name="away_status">Nieaktywny</string>
+    <string name="busy_status">Zajęty</string>
+    <string name="last_seen_today">[A]Ostatnio widziany [/A]dzisiaj %1$s</string>
+    <string name="last_seen_long_time_ago">[A]Ostatnio widziany [/A]dawno temu</string>
+    <string name="last_seen_general">[A]Ostatnio widziany [/A]%1$s %2$s</string>
 </resources>
