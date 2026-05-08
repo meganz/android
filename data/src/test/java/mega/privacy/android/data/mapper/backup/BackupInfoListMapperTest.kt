@@ -244,6 +244,27 @@ internal class BackupInfoListMapperTest {
     }
 
     @Test
+    fun `test that entries throwing from mapper are filtered out`() = runTest {
+        val backupSize = 2L
+        val megaBackupInfoList = mock<MegaBackupInfoList> { on { size() }.thenReturn(backupSize) }
+
+        val megaBackupInfo1 = mock<MegaBackupInfo> { on { id() }.thenReturn(1L) }
+        val megaBackupInfo2 = mock<MegaBackupInfo> { on { id() }.thenReturn(2L) }
+
+        whenever(megaBackupInfoList.get(0)).thenReturn(megaBackupInfo1)
+        whenever(megaBackupInfoList.get(1)).thenReturn(megaBackupInfo2)
+
+        whenever(backupInfoMapper(megaBackupInfo1)).thenThrow(IllegalArgumentException("bad type"))
+        val validBackup = createBackupInfo(id = 2L, name = "Valid Backup", timestamp = 2000L)
+        whenever(backupInfoMapper(megaBackupInfo2)).thenReturn(validBackup)
+
+        val result = underTest(megaBackupInfoList)
+
+        assertThat(result).hasSize(1)
+        assertThat(result[0]).isEqualTo(validBackup)
+    }
+
+    @Test
     fun `test that null backups from mapper are filtered out`() = runTest {
         val backupSize = 2L
         val megaBackupInfoList = mock<MegaBackupInfoList> { on { size() }.thenReturn(backupSize) }

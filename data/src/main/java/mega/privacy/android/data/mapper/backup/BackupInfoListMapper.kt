@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper.backup
 
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import nz.mega.sdk.MegaBackupInfoList
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -23,9 +24,10 @@ internal class BackupInfoListMapper @Inject constructor(
             val backupSize = backupInfoList.size()
             if (backupSize <= 0) emptyList()
             else (0 until backupSize).mapNotNull { index ->
-                backupInfoMapper(backupInfoList.get(index))
-            }
-                .sortedByDescending { it.timestamp }
+                runCatching { backupInfoMapper(backupInfoList.get(index)) }
+                    .onFailure { Timber.e(it, "Failed to map backup info at index $index") }
+                    .getOrNull()
+            }.sortedByDescending { it.timestamp }
                 .distinctBy { "${it.deviceId}:${it.rootHandle.longValue}" }
         } ?: emptyList()
     }
