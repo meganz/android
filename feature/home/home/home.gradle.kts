@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":core:feature-flags"))
+    implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))

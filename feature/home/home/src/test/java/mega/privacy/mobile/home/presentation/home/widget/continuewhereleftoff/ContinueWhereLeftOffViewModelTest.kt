@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeft
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.ContinueWhereLeftOffNameResolver
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
@@ -43,7 +43,7 @@ class ContinueWhereLeftOffViewModelTest {
         underTest = ContinueWhereLeftOffViewModel(
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase),
+            nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, DurationInSecondsTextMapper()),
         )
     }
 
@@ -137,7 +137,6 @@ class ContinueWhereLeftOffViewModelTest {
             val state = awaitItem()
             assertThat(state.items).hasSize(1)
             assertThat(state.items[0].title).isEqualTo("stored_name.mp4")
-            verify(getNodeByIdUseCase, never()).invoke(NodeId(20L))
             cancelAndIgnoreRemainingEvents()
         }
     }

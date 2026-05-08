@@ -1,34 +1,49 @@
 package mega.privacy.mobile.home.presentation.continuewhereleftoff
 
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import javax.inject.Inject
 
 /**
- * Resolves blank titles in [ContinueWhereLeftOffItem] lists by fetching node
- * names from [GetNodeByIdUseCase]. Results are cached by nodeHandle so each
- * node is resolved at most once per instance lifetime.
+ * Resolves blank titles and audio/video durations in [ContinueWhereLeftOffItem] lists
+ * by fetching node data from [GetNodeByIdUseCase]. Results are cached by nodeHandle
+ * so each node is resolved at most once per instance lifetime.
  */
 internal class ContinueWhereLeftOffNameResolver @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) {
-    private val cache = mutableMapOf<Long, String>()
+    private data class ResolvedData(val name: String, val duration: String?)
+
+    private val cache = mutableMapOf<Long, ResolvedData>()
 
     fun applyCachedNames(items: List<ContinueWhereLeftOffItem>) = items.map { item ->
-        cache[item.nodeHandle]?.let { item.copy(title = it) } ?: item
+        cache[item.nodeHandle]?.let { resolved ->
+            item.copy(
+                title = resolved.name.ifBlank { item.title },
+                duration = resolved.duration ?: item.duration,
+            )
+        } ?: item
     }
 
     suspend fun resolveBlankNames(items: List<ContinueWhereLeftOffItem>): Boolean {
-        val blanks = items.filter { it.title.isBlank() && it.nodeHandle !in cache }
-        if (blanks.isEmpty()) return false
+        val unresolved = items.filter { it.nodeHandle !in cache && (it.title.isBlank() || it.duration == null) }
+        if (unresolved.isEmpty()) return false
         val sizeBefore = cache.size
-        blanks.forEach { item ->
+        unresolved.forEach { item ->
             val node = runCatching {
                 getNodeByIdUseCase(NodeId(item.nodeHandle))
             }.getOrNull()
             if (node != null) {
-                cache[item.nodeHandle] = node.name
+                val duration = (node as? TypedFileNode)?.type?.toDuration()
+                cache[item.nodeHandle] = ResolvedData(
+                    name = node.name,
+                    duration = duration?.let { durationInSecondsTextMapper(it) },
+                )
             }
         }
         return cache.size > sizeBefore

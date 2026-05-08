@@ -14,4 +14,5 @@ data class ContinueWhereLeftOffItem(
     val type: RecentlyUsedType,
     val title: String,
     val lastAccessedTimestamp: Long,
+    val duration: String? = null,
 )

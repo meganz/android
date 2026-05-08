@@ -1,7 +1,6 @@
 package mega.privacy.mobile.home.presentation.continuewhereleftoff
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,9 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -57,13 +56,17 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.shared.nodes.components.NodeThumbnailView
+import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
@@ -147,9 +150,14 @@ internal fun ContinueWhereLeftOffListScreen(
                                 .padding(bottom = 16.dp),
                         )
                     }
-                    items(uiState.items, key = { it.nodeHandle }) { item ->
+                    items(
+                        items = uiState.items,
+                        key = { it.nodeHandle },
+                        contentType = { it.type },
+                    ) { item ->
                         ContinueWhereLeftOffListItem(
                             title = item.title,
+                            nodeHandle = item.nodeHandle,
                             icon = iconForType(item.type),
                             onItemClicked = { viewModel.onItemClicked(item.nodeHandle) },
                         )
@@ -183,9 +191,12 @@ internal fun ContinueWhereLeftOffListScreen(
                     items(
                         items = uiState.items,
                         key = { it.nodeHandle },
+                        contentType = { it.type },
                     ) { item ->
                         ContinueWhereLeftOffGridItem(
                             title = item.title,
+                            nodeHandle = item.nodeHandle,
+                            duration = item.duration,
                             icon = iconForType(item.type),
                             onItemClicked = { viewModel.onItemClicked(item.nodeHandle) },
                         )
@@ -249,6 +260,7 @@ internal fun ContinueWhereLeftOffListScreen(
 @Composable
 private fun ContinueWhereLeftOffListItem(
     title: String,
+    nodeHandle: Long,
     @DrawableRes icon: Int,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -260,12 +272,14 @@ private fun ContinueWhereLeftOffListItem(
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
+        NodeThumbnailView(
+            data = ThumbnailRequest(NodeId(nodeHandle)),
+            defaultImage = icon,
+            contentDescription = title,
+            layoutType = ThumbnailLayoutType.List,
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(8.dp)),
-            painter = painterResource(icon),
-            contentDescription = title,
         )
         MegaText(
             text = title,
@@ -283,6 +297,8 @@ private fun ContinueWhereLeftOffListItem(
 @Composable
 private fun ContinueWhereLeftOffGridItem(
     title: String,
+    nodeHandle: Long,
+    duration: String?,
     @DrawableRes icon: Int,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
@@ -300,11 +316,21 @@ private fun ContinueWhereLeftOffGridItem(
                 .clip(RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center,
         ) {
-            Image(
-                painter = painterResource(icon),
+            NodeThumbnailView(
+                data = ThumbnailRequest(NodeId(nodeHandle)),
+                defaultImage = icon,
                 contentDescription = title,
-                modifier = Modifier.size(48.dp),
+                layoutType = ThumbnailLayoutType.Grid,
+                modifier = Modifier.matchParentSize(),
             )
+            if (!duration.isNullOrEmpty()) {
+                DurationBadge(
+                    duration = duration,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(4.dp),
+                )
+            }
         }
         MegaText(
             text = title,
@@ -327,11 +353,13 @@ private fun ContinueWhereLeftOffListItemPreview() {
         Column {
             ContinueWhereLeftOffListItem(
                 title = "Falastin36_press_trailer.mov",
+                nodeHandle = 1L,
                 icon = IconPackR.drawable.ic_video_medium_solid,
                 onItemClicked = {},
             )
             ContinueWhereLeftOffListItem(
                 title = "Interview Agnes Varda.pdf",
+                nodeHandle = 2L,
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
                 onItemClicked = {},
             )
@@ -346,12 +374,16 @@ private fun ContinueWhereLeftOffGridItemPreview() {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ContinueWhereLeftOffGridItem(
                 title = "Falastin36_press_trailer.mov",
+                nodeHandle = 1L,
+                duration = "1:34",
                 icon = IconPackR.drawable.ic_video_medium_solid,
                 onItemClicked = {},
                 modifier = Modifier.width(140.dp),
             )
             ContinueWhereLeftOffGridItem(
                 title = "Interview Agnes Varda.pdf",
+                nodeHandle = 2L,
+                duration = null,
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
                 onItemClicked = {},
                 modifier = Modifier.width(140.dp),

@@ -1,6 +1,5 @@
 package mega.privacy.mobile.home.presentation.home.widget.continuewhereleftoff
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -36,9 +34,14 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.components.NodeThumbnailView
+import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.home.presentation.continuewhereleftoff.DurationBadge
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.iconForType
 
 @Composable
@@ -57,7 +60,11 @@ internal fun ContinueWhereLeftOffCarousel(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            items(items, key = { it.nodeHandle }) { item ->
+            items(
+                items = items,
+                key = { it.nodeHandle },
+                contentType = { it.type },
+            ) { item ->
                 ContinueWhereLeftOffCard(
                     item = item,
                     onClick = { onItemClick(item) },
@@ -121,11 +128,21 @@ private fun ContinueWhereLeftOffCard(
                 .clip(RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center,
         ) {
-            Image(
-                painter = painterResource(id = iconForType(item.type)),
+            NodeThumbnailView(
+                data = ThumbnailRequest(NodeId(item.nodeHandle)),
+                defaultImage = iconForType(item.type),
                 contentDescription = item.title,
-                modifier = Modifier.size(48.dp),
+                layoutType = ThumbnailLayoutType.Grid,
+                modifier = Modifier.matchParentSize(),
             )
+            item.duration?.takeIf { it.isNotEmpty() }?.let { duration ->
+                DurationBadge(
+                    duration = duration,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(4.dp),
+                )
+            }
         }
         MegaText(
             text = item.title,

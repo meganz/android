@@ -2,6 +2,9 @@ package mega.privacy.mobile.home.presentation.continuewhereleftoff
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
@@ -13,15 +16,17 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 class ContinueWhereLeftOffNameResolverTest {
 
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
     private lateinit var underTest: ContinueWhereLeftOffNameResolver
 
     @BeforeEach
     fun setUp() {
-        underTest = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase)
+        underTest = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, durationInSecondsTextMapper)
     }
 
     @AfterEach
@@ -98,9 +103,43 @@ class ContinueWhereLeftOffNameResolverTest {
         assertThat(resolved[1].title).isEqualTo("resolved.mp4")
     }
 
-    private fun item(handle: Long, title: String) = ContinueWhereLeftOffItem(
+    @Test
+    fun `test that duration is resolved for audio node`() = runTest {
+        val items = listOf(item(1L, "", type = RecentlyUsedType.Audio))
+        val node = mock<TypedFileNode> {
+            on { name }.thenReturn("song.mp3")
+            on { type }.thenReturn(AudioFileTypeInfo("audio/mpeg", "mp3", 94.seconds))
+        }
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(node)
+
+        underTest.resolveBlankNames(items)
+
+        val resolved = underTest.applyCachedNames(items)
+        assertThat(resolved[0].duration).isEqualTo("1:34")
+    }
+
+    @Test
+    fun `test that duration is null for non-media node`() = runTest {
+        val items = listOf(item(1L, ""))
+        val node = mock<TypedFileNode> {
+            on { name }.thenReturn("doc.pdf")
+            on { type }.thenReturn(PdfFileTypeInfo)
+        }
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(node)
+
+        underTest.resolveBlankNames(items)
+
+        val resolved = underTest.applyCachedNames(items)
+        assertThat(resolved[0].duration).isNull()
+    }
+
+    private fun item(
+        handle: Long,
+        title: String,
+        type: RecentlyUsedType = RecentlyUsedType.PDF,
+    ) = ContinueWhereLeftOffItem(
         nodeHandle = handle,
-        type = RecentlyUsedType.PDF,
+        type = type,
         title = title,
         lastAccessedTimestamp = 1000L,
     )
