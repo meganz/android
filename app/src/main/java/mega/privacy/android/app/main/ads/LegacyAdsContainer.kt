@@ -14,7 +14,7 @@ import mega.privacy.android.shared.ads.adsfreeintro.AdsFreeIntroView
 
 /**
  * Legacy ads container that shows AdsFreeIntroView dialog when close button is tapped.
- * Used by legacy callers (ManagerActivity, FileLinkView, FolderLinkView).
+ * Used by legacy callers (FileLinkView, FolderLinkView).
  */
 @Composable
 fun LegacyAdsContainer(

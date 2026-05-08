@@ -21,7 +21,6 @@ class CustomLintRegistry : IssueRegistry() {
             SnackbarDetector.ISSUE,
             ShowSnackbarDetector.ISSUE,
             ScaffoldDetector.ISSUE,
-            ManagerActivityIntentDetector.ISSUE,
             ComposableFunctionVisibilityDetector.ISSUE,
             ExternalLauncherPasscodeDetector.ISSUE,
         )

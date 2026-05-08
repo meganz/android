@@ -30,11 +30,6 @@ import timber.log.Timber
 @Serializable
 data class SyncNewFolder(
     val syncType: SyncType = SyncType.TYPE_TWOWAY,
-    @Deprecated(
-        "Kept for binary compatibility with call sites scheduled for removal in later " +
-                "ManagerActivity deletion phases. Do not reference from new code."
-    )
-    val isFromManagerActivity: Boolean = false,
     val remoteFolderHandle: Long? = null,
     val remoteFolderName: String? = null,
 ) : Parcelable

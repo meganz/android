@@ -537,7 +537,6 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openNewSync(
         context: Context,
         syncType: SyncType,
-        isFromManagerActivity: Boolean,
         isFromCloudDrive: Boolean,
         remoteFolderHandle: Long?,
         remoteFolderName: String?,
@@ -547,7 +546,6 @@ internal class MegaNavigatorImpl @Inject constructor(
                 SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,
                 SyncNewFolder(
                     syncType = syncType,
-                    isFromManagerActivity = isFromManagerActivity,
                     remoteFolderHandle = remoteFolderHandle,
                     remoteFolderName = remoteFolderName,
                 )

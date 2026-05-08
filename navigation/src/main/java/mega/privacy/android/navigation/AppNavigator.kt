@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import java.io.File
 
@@ -132,7 +131,6 @@ interface AppNavigator {
      *
      * @param context       Context
      * @param syncType      The sync type from [SyncType]
-     * @param isFromManagerActivity Indicates if the sync is from Manager Activity. False by default.
      * @param isFromCloudDrive Indicates if the sync is from Cloud Drive. False by default.
      * @param remoteFolderHandle The remote folder handle
      * @param remoteFolderName The remote folder name
@@ -140,7 +138,6 @@ interface AppNavigator {
     fun openNewSync(
         context: Context,
         syncType: SyncType,
-        isFromManagerActivity: Boolean = false,
         isFromCloudDrive: Boolean = false,
         remoteFolderHandle: Long? = null,
         remoteFolderName: String? = null,
