@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -13,11 +14,13 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
@@ -81,9 +84,28 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
                 creationCallback = { it.create(navKey.nodeSourceType) }
             )
 
+        val singleNodeActionHandler = rememberSingleNodeActionHandler(
+            viewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+        )
+
+        val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+
+        // Push the current PDF node into the action ViewModel so it can compute the
+        // floating-toolbar actions through the same selection-mode pipeline that Cloud
+        // Drive uses. Re-run whenever the node or its source type changes.
+        LaunchedEffect(uiState.currentNode, uiState.nodeSourceType) {
+            val node = uiState.currentNode ?: return@LaunchedEffect
+            nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+                selectedNodes = setOf(node),
+                nodeSourceType = uiState.nodeSourceType,
+            )
+        }
+
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
+            nodeActionHandler = singleNodeActionHandler,
             onTransfer = onTransfer,
         )
 
@@ -131,6 +153,12 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
                     )
                 }
             },
+            // The top bar's overflow already opens the full NodeOptionsBottomSheet, so
+            // dropping the floating toolbar's More entry keeps the bar to the same 4 most
+            // common actions matching the design.
+            bottomBarActions = nodeActionState.visibleActions
+                .filterNot { it is CommonMenuAction.More },
+            singleNodeActionHandler = singleNodeActionHandler,
         )
     }
 }

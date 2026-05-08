@@ -5,6 +5,7 @@ import com.shockwave.pdfium.PdfTextMatch
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 
@@ -83,6 +84,9 @@ data class PdfViewerSearchState(
  * @param isFromFileLink Whether the file is from a file link
  * @param nodeHandle The handle of the node being viewed
  * @param nodeSourceType The source type of the node (for node options)
+ * @param currentNode Resolved typed node for the PDF (null for external files or until fetched).
+ *  The destination feeds this to NodeOptionsActionViewModel.updateSelectionModeAvailableActions
+ *  to populate the floating-toolbar action list.
  */
 internal data class PdfViewerState(
     val isLoading: Boolean = true,
@@ -103,6 +107,7 @@ internal data class PdfViewerState(
     val isFromFileLink: Boolean = false,
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    val currentNode: TypedNode? = null,
     val pdfBytes: PdfBytes? = null,
     val dismissEvent: StateEvent = consumed,
 ) {

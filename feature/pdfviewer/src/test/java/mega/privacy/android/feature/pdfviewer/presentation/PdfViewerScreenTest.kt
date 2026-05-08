@@ -12,7 +12,17 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_PAGE_INDICATOR_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_ERROR_DIALOG_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_PASSWORD_DIALOG_TAG
@@ -82,7 +92,17 @@ class PdfViewerScreenTest {
         )
     }
 
-    private fun setContent(uiState: PdfViewerState = defaultState()) {
+    // Captured (action, node) pairs from the floating-toolbar handler in toolbar tests.
+    private val capturedToolbarActions = mutableListOf<Pair<MenuAction, TypedNode>>()
+    private val capturingActionHandler = SingleNodeActionHandler { action, node ->
+        capturedToolbarActions += action to node
+    }
+
+    private fun setContent(
+        uiState: PdfViewerState = defaultState(),
+        bottomBarActions: List<MenuActionWithIcon> = emptyList(),
+        singleNodeActionHandler: SingleNodeActionHandler = SingleNodeActionHandler { _, _ -> },
+    ) {
         composeTestRule.setContent {
             PdfViewerScreen(
                 uiState = uiState,
@@ -102,6 +122,8 @@ class PdfViewerScreenTest {
                 onSearchQueryChanged = onSearchQueryChanged,
                 onNavigateToNextMatch = onNavigateToNextMatch,
                 onNavigateToPreviousMatch = onNavigateToPreviousMatch,
+                bottomBarActions = bottomBarActions,
+                singleNodeActionHandler = singleNodeActionHandler,
             )
         }
     }
@@ -119,6 +141,7 @@ class PdfViewerScreenTest {
         currentPage: Int = 1,
         totalPages: Int = 0,
         isExternalFile: Boolean = false,
+        currentNode: TypedNode? = null,
     ) = PdfViewerState(
         isLoading = false,
         source = source,
@@ -128,6 +151,7 @@ class PdfViewerScreenTest {
         currentPage = currentPage,
         totalPages = totalPages,
         isExternalFile = isExternalFile,
+        currentNode = currentNode,
     )
 
     @Test
@@ -380,4 +404,120 @@ class PdfViewerScreenTest {
 
         verify(onUploadToCloudDrive).invoke()
     }
+
+    // region floating bottom toolbar
+    private val downloadAction = DownloadMenuAction()
+    private val getLinkAction = GetLinkMenuAction()
+    private val shareAction = ShareMenuAction()
+    private val trashAction = TrashMenuAction()
+    private val toolbarActions: List<MenuActionWithIcon> =
+        listOf(downloadAction, getLinkAction, shareAction, trashAction)
+
+    @Test
+    fun `test that floating toolbar is displayed when actions are not empty and currentNode is set`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(currentNode = node),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(getLinkAction.testTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(shareAction.testTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(trashAction.testTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when bottomBarActions is empty`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(currentNode = node),
+            bottomBarActions = emptyList(),
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when currentNode is null`() {
+        setContent(
+            uiState = defaultState(currentNode = null),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when isExternalFile is true`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(isExternalFile = true, currentNode = node),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when search is active`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(
+                currentNode = node,
+                searchState = PdfViewerSearchState(isSearchActive = true),
+            ),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when error is non-null`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(
+                currentNode = node,
+                error = PdfViewerError.FileNotFound,
+            ),
+            bottomBarActions = toolbarActions,
+        )
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that floating toolbar is not displayed when password error`() {
+        val node = mock(TypedFileNode::class.java)
+        setContent(
+            uiState = defaultState(
+                currentNode = node,
+                error = PdfViewerError.PasswordProtected,
+            ),
+            bottomBarActions = toolbarActions,
+        )
+        composeTestRule.mainClock.advanceTimeBy(600)
+
+        composeTestRule.onNodeWithTag(downloadAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that singleNodeActionHandler is invoked with the current node when a toolbar action is clicked`() {
+        val node = mock(TypedFileNode::class.java)
+        capturedToolbarActions.clear()
+        setContent(
+            uiState = defaultState(currentNode = node),
+            bottomBarActions = toolbarActions,
+            singleNodeActionHandler = capturingActionHandler,
+        )
+
+        composeTestRule.onNodeWithTag(trashAction.testTag).performClick()
+
+        assertThat(capturedToolbarActions).hasSize(1)
+        val (action, capturedNode) = capturedToolbarActions.single()
+        assertThat(action).isSameInstanceAs(trashAction)
+        assertThat(capturedNode).isSameInstanceAs(node)
+    }
+    // endregion floating bottom toolbar
 }

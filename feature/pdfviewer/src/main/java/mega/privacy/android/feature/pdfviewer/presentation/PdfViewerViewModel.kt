@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.pdfviewer.presentation
 
 import android.content.Context
-import android.graphics.RectF
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -16,7 +15,6 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,19 +28,26 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
+import mega.privacy.android.feature.pdfviewer.presentation.PdfViewerViewModel.Companion.PREFETCH_RADIUS
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngine
@@ -72,6 +77,9 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
+    private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PdfViewerState())
@@ -107,6 +115,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         observeSearchPipeline()
         observeConnectivity()
         monitorOfflineNodeAvailability()
+        loadCurrentNode()
     }
 
     private fun loadFileExplorerFeatureFlag() {
@@ -661,6 +670,42 @@ internal class PdfViewerViewModel @AssistedInject constructor(
             val lastPage = getLastPageViewedInPdfUseCase(args.nodeHandle)
             _state.update { it.copy(currentPage = lastPage?.toInt() ?: 1) }
         }
+    }
+
+    /**
+     * Resolves the current [TypedNode] and stores it on state.
+     *
+     * The destination feeds this node into [NodeOptionsActionViewModel.updateSelectionModeAvailableActions]
+     * to populate the floating-toolbar action list — the same path used by Cloud Drive's
+     * selection-mode toolbar.
+     *
+     * For OFFLINE sources whose original cloud node is gone, falls back to the offline file
+     * information so the toolbar still works on orphan offline copies (mirrors
+     * `NodeOptionsBottomSheetViewModel.loadOfflineFallbackNode`).
+     *
+     * No-op for external files (no MEGA node).
+     */
+    private fun loadCurrentNode() {
+        if (args.isExternalFile || args.nodeHandle == -1L) return
+        viewModelScope.launch {
+            val nodeId = NodeId(args.nodeHandle)
+            val node: TypedNode? =
+                runCatching { getNodeByIdUseCase(nodeId) }
+                    .getOrElse {
+                        Timber.e(it, "Failed to resolve node for floating toolbar")
+                        null
+                    } ?: loadOfflineFallbackNode(nodeId)
+            node ?: return@launch
+            _state.update { it.copy(currentNode = node) }
+        }
+    }
+
+    private suspend fun loadOfflineFallbackNode(nodeId: NodeId): TypedNode? {
+        if (args.nodeSourceType != NodeSourceType.OFFLINE) return null
+        return runCatching { getOfflineFileInformationByIdUseCase(nodeId) }
+            .onFailure { Timber.e(it, "Failed to load offline file information for $nodeId") }
+            .getOrNull()
+            ?.let(offlineTypedNodeMapper::invoke)
     }
 
     /**

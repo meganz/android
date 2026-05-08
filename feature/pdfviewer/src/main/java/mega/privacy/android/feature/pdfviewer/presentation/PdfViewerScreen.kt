@@ -21,6 +21,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.ExternalFileBottomBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfPageIndicator
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfSearchResultsBar
@@ -53,6 +56,9 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onSearchQueryChanged Callback when search query changes
  * @param onNavigateToNextMatch Callback to navigate to next search match
  * @param onNavigateToPreviousMatch Callback to navigate to previous search match
+ * @param bottomBarActions Actions to render in the floating toolbar. Sourced from
+ *  [NodeOptionsActionViewModel] in the destination — pass an empty list to hide the toolbar.
+ * @param singleNodeActionHandler Dispatcher for floating-toolbar actions on the current node
  * @param modifier Modifier for the composable
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +81,8 @@ internal fun PdfViewerScreen(
     onSearchQueryChanged: (String) -> Unit,
     onNavigateToNextMatch: () -> Unit,
     onNavigateToPreviousMatch: () -> Unit,
+    bottomBarActions: List<MenuActionWithIcon>,
+    singleNodeActionHandler: SingleNodeActionHandler,
     modifier: Modifier = Modifier,
 ) {
     val searchState = uiState.searchState
@@ -126,6 +134,14 @@ internal fun PdfViewerScreen(
     // For local content, render PdfViewerContent immediately and let PDFView handle its own loading
     val showLoading = uiState.source?.isRemote == true && uiState.pdfBytes == null
 
+    val showFloatingToolbar = !showLoading
+            && !uiState.isExternalFile
+            && !searchState.isSearchActive
+            && !uiState.isPasswordError
+            && uiState.error == null
+            && bottomBarActions.isNotEmpty()
+            && uiState.currentNode != null
+
     Box(modifier = modifier.fillMaxSize()) {
         MegaScaffoldWithTopAppBarScrollBehavior(
             modifier = Modifier.fillMaxSize(),
@@ -156,6 +172,19 @@ internal fun PdfViewerScreen(
                 // the button instead of being covered by it.
                 if (uiState.isExternalFile && !searchState.isSearchActive) {
                     ExternalFileBottomBar(onUploadToCloudDrive = onUploadToCloudDrive)
+                } else {
+                    // Floating toolbar (Download / Get Link / Share / Trash). Mirrors how
+                    // Cloud Drive hosts NodeSelectionModeBottomBar in the Scaffold's
+                    // bottomBar slot so AnimatedVisibility can slide it from the bottom.
+                    SelectionModeBottomBar(
+                        visible = showFloatingToolbar,
+                        actions = bottomBarActions,
+                        onActionPressed = { action ->
+                            uiState.currentNode?.let { node ->
+                                singleNodeActionHandler(action, node)
+                            }
+                        },
+                    )
                 }
             },
             content = { innerPadding ->

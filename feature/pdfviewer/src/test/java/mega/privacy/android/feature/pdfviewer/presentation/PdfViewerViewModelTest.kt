@@ -17,14 +17,21 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
+import mega.privacy.android.core.nodecomponents.model.OfflineTypedFileNode
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
@@ -70,6 +77,10 @@ class PdfViewerViewModelTest {
     private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getOfflineFileInformationByIdUseCase =
+        mock<GetOfflineFileInformationByIdUseCase>()
+    private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
     private val context = mock<Context>()
 
     private val defaultArgs = PdfViewerViewModel.Args(
@@ -95,6 +106,9 @@ class PdfViewerViewModelTest {
             saveRecentlyUsedItemUseCase,
             monitorOfflineNodeUpdatesUseCase,
             getFeatureFlagValueUseCase,
+            getNodeByIdUseCase,
+            getOfflineFileInformationByIdUseCase,
+            offlineTypedNodeMapper,
             context,
         )
 
@@ -129,6 +143,9 @@ class PdfViewerViewModelTest {
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
             ioDispatcher = testDispatcher,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
+            offlineTypedNodeMapper = offlineTypedNodeMapper,
         )
     }
 
@@ -913,4 +930,88 @@ class PdfViewerViewModelTest {
 
             verifyNoInteractions(saveRecentlyUsedItemUseCase)
         }
+
+    @Test
+    fun `test that currentNode stays null and node lookup is skipped when isExternalFile is true`() =
+        runTest {
+            underTest = initViewModel(args = externalFileArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isNull()
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that currentNode stays null when node cannot be resolved`() = runTest {
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+    }
+
+    @Test
+    fun `test that currentNode is populated when GetNodeByIdUseCase returns a node`() = runTest {
+        val node = mock<TypedFileNode>()
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(node)
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isEqualTo(node)
+        }
+    }
+
+    @Test
+    fun `test that currentNode falls back to offline information for OFFLINE source when cloud node is gone`() =
+        runTest {
+            val offlineArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.OFFLINE)
+            val offlineInfo = mock<OfflineFileInformation>()
+            val offlineNode = mock<OfflineTypedFileNode>()
+            wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+            wheneverBlocking { getOfflineFileInformationByIdUseCase(NodeId(12345L)) }
+                .thenReturn(offlineInfo)
+            whenever(offlineTypedNodeMapper(offlineInfo)).thenReturn(offlineNode)
+
+            underTest = initViewModel(args = offlineArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isEqualTo(offlineNode)
+            }
+        }
+
+    @Test
+    fun `test that offline fallback is not used for non-OFFLINE source types`() = runTest {
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+        verifyNoInteractions(getOfflineFileInformationByIdUseCase, offlineTypedNodeMapper)
+    }
+
+    @Test
+    fun `test that currentNode stays null when offline fallback also returns null`() = runTest {
+        val offlineArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.OFFLINE)
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+        wheneverBlocking { getOfflineFileInformationByIdUseCase(NodeId(12345L)) }
+            .thenReturn(null)
+
+        underTest = initViewModel(args = offlineArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+        verifyNoInteractions(offlineTypedNodeMapper)
+    }
 }
