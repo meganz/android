@@ -1146,7 +1146,9 @@ class DefaultContactsRepositoryTest {
     @Test
     fun `test that api gateway is called when get incoming contact requests is triggered`() =
         runTest {
-            val contactRequest = mock<MegaContactRequest>()
+            val contactRequest = mock<MegaContactRequest> {
+                on { sourceEmail }.thenReturn("sourceEmail")
+            }
             whenever(megaApiGateway.getIncomingContactRequests()).thenReturn(
                 arrayListOf(contactRequest)
             )

@@ -131,7 +131,9 @@ internal class DefaultContactsRepository @Inject constructor(
     override fun monitorContactRequestUpdates(): Flow<List<ContactRequest>> =
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnContactRequestsUpdate>()
-            .mapNotNull { it.requests?.map(contactRequestMapper) }
+            .mapNotNull {
+                it.requests?.filter { request -> !request.sourceEmail.isNullOrEmpty() }?.map(contactRequestMapper)
+            }
             .flowOn(ioDispatcher)
 
     override fun monitorChatPresenceLastGreenUpdates() = megaChatApiGateway.chatUpdates
@@ -829,7 +831,10 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getIncomingContactRequests(): List<ContactRequest> =
         withContext(ioDispatcher) {
-            megaApiGateway.getIncomingContactRequests()?.map(contactRequestMapper).orEmpty()
+            megaApiGateway.getIncomingContactRequests()
+                ?.filter { !it.sourceEmail.isNullOrEmpty() }
+                ?.map(contactRequestMapper)
+                .orEmpty()
         }
 
     override suspend fun manageReceivedContactRequest(
@@ -1055,7 +1060,9 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getOutgoingContactRequests(): List<ContactRequest> =
         withContext(ioDispatcher) {
-            megaApiGateway.getOutgoingContactRequests().map(contactRequestMapper)
+            megaApiGateway.getOutgoingContactRequests()
+                .filter { !it.sourceEmail.isNullOrEmpty() }
+                .map(contactRequestMapper)
         }
 
     override fun monitorContactByHandle(contactId: Long): Flow<Contact> =

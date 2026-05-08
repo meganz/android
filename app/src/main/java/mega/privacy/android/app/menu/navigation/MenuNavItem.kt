@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.app.menu.presentation.MenuHomeScreen
@@ -22,6 +23,7 @@ import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.MenuBottomNavigationItemEvent
+import timber.log.Timber
 
 
 class MenuNavItem(
@@ -36,10 +38,11 @@ class MenuNavItem(
     override val badge: Flow<MainNavItemBadge?> =
         combine(
             menuItems.mapNotNull { (it.value as? NavDrawerItem.Account)?.badge }
+                .map { flow -> flow.catch { Timber.e(it, "Menu badge flow error") } }
                     +
                     monitorNotSeenUserAlertsCountUseCase().map { total ->
                         if (total > 0) DefaultNumberBadge(total) else null
-                    }
+                    }.catch { Timber.e(it, "Menu alerts badge flow error") }
 
         ) { badges ->
             badges.filter { it?.priority != null }.maxByOrNull { it?.priority ?: -1 }
