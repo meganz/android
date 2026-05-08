@@ -48,6 +48,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.qualifier.features.Backups
 import mega.privacy.android.domain.qualifier.features.Chat
 import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.FileLink
 import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
@@ -357,6 +358,23 @@ abstract class NodeActionsBottomSheetModule {
         @FolderLink
         @Singleton
         fun provideFolderLinkOptions(
+            saveToMegaBottomSheetMenuItem: SaveToMegaBottomSheetMenuItem,
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
+            return setOf(
+                saveToMegaBottomSheetMenuItem,
+                downloadMenuAction,
+            )
+        }
+
+        /**
+         * Provide file link toolbar options
+         */
+        @Provides
+        @ElementsIntoSet
+        @FileLink
+        @Singleton
+        fun provideFileLinkOptions(
             saveToMegaBottomSheetMenuItem: SaveToMegaBottomSheetMenuItem,
             downloadMenuAction: DownloadBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {

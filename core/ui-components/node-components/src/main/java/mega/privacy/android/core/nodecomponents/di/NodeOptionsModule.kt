@@ -9,6 +9,7 @@ import mega.privacy.android.core.nodecomponents.menu.provider.BackupsMenuOptions
 import mega.privacy.android.core.nodecomponents.menu.provider.ChatMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.CloudDriveMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.FavouritesMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.FileLinkMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.FolderLinkMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.IncomingSharesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.LinksMenuOptionsProvider
@@ -114,6 +115,12 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindFolderLinkOptionsProvider(
         provider: FolderLinkMenuOptionsProvider
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindFileLinkOptionsProvider(
+        provider: FileLinkMenuOptionsProvider
     ): NodeMenuOptionsProvider
 
     @Binds

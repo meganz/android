@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -39,6 +40,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveOfflin
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SaveToMegaActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
@@ -72,6 +74,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveFavouriteMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SaveToMegaMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RenameMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RestoreMenuAction
@@ -84,6 +87,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ViewInFolderMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
@@ -95,6 +99,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -184,6 +189,7 @@ class NodeActionClickHandlerTest {
     private val mockVersionsLauncher = mock<ActivityResultLauncher<Long>>()
     private val mockMoveLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
+    private val mockPublicCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockShareFolderLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockRestoreLauncher = mock<ActivityResultLauncher<ArrayList<NameCollision>>>()
     private val mockSendToChatLauncher = mock<ActivityResultLauncher<LongArray>>()
@@ -201,6 +207,7 @@ class NodeActionClickHandlerTest {
         navigationHandler = mockNavigationHandler,
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
+        publicCopyLauncher = mockPublicCopyLauncher,
         shareFolderLauncher = mockShareFolderLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
@@ -219,6 +226,7 @@ class NodeActionClickHandlerTest {
         navigationHandler = null,
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
+        publicCopyLauncher = mockPublicCopyLauncher,
         shareFolderLauncher = mockShareFolderLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
@@ -237,6 +245,7 @@ class NodeActionClickHandlerTest {
         navigationHandler = mockNavigationHandler,
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
+        publicCopyLauncher = mockPublicCopyLauncher,
         shareFolderLauncher = mockShareFolderLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
@@ -292,6 +301,7 @@ class NodeActionClickHandlerTest {
             mockVersionsLauncher,
             mockMoveLauncher,
             mockCopyLauncher,
+            mockPublicCopyLauncher,
             mockShareFolderLauncher,
             mockRestoreLauncher,
             mockSendToChatLauncher,
@@ -386,6 +396,113 @@ class NodeActionClickHandlerTest {
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
         verify(mockCopyLauncher).launch(longArrayOf(123L, 456L))
+    }
+
+    // SaveToMegaAction Tests
+    @Test
+    fun `test SaveToMegaAction canHandle returns true for SaveToMegaMenuAction`() {
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isTrue()
+    }
+
+    @Test
+    fun `test SaveToMegaAction launches copyLauncher when logged in`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = true))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockCopyLauncher).launch(longArrayOf(123L))
+        verify(mockViewModel, never()).triggerLoginRequiredEvent()
+    }
+
+    @Test
+    fun `test SaveToMegaAction triggers login required when not logged in`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = false))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockViewModel).triggerLoginRequiredEvent()
+        verify(mockCopyLauncher, never()).launch(any())
+        verify(mockPublicCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test SaveToMegaAction routes a PublicLinkFile through publicCopyLauncher`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = true))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+        val publicNode = mock<PublicLinkFile> {
+            on { id } doReturn NodeId(789L)
+        }
+
+        action.handle(menuAction, publicNode, mockSingleNodeActionProvider)
+
+        verify(mockPublicCopyLauncher).launch(longArrayOf(789L))
+        verify(mockCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test SaveToMegaAction multi-node always uses copyLauncher even with PublicLinkFile in the list`() {
+        // Multi-select is not exposed for public-link sources (their menus are
+        // single-item only), but defensively confirm that the multi-node path
+        // never routes to publicCopyLauncher even if a PublicLinkFile somehow
+        // ends up in the list.
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isLoggedIn = true))
+        )
+        val action = SaveToMegaActionClickHandler()
+        val menuAction = mock<SaveToMegaMenuAction>()
+        val publicNode = mock<PublicLinkFile> {
+            on { id } doReturn NodeId(789L)
+        }
+        val nodes = listOf(publicNode, mockFileNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockCopyLauncher).launch(longArrayOf(789L, 123L))
+        verify(mockPublicCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test CopyAction does not branch on PublicLinkFile and uses copyLauncher`() {
+        // Copy is exposed only for owned-node source types (no FILE_LINK menu entry)
+        // so the handler intentionally does not differentiate. PublicLinkFile is
+        // routed through the regular copyLauncher just like an owned file would
+        // be — the public-link copy path lives on SaveToMegaActionClickHandler
+        // / publicCopyLauncher instead.
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+        val publicNode = mock<PublicLinkFile> {
+            on { id } doReturn NodeId(789L)
+        }
+
+        action.handle(menuAction, publicNode, mockSingleNodeActionProvider)
+
+        verify(mockCopyLauncher).launch(longArrayOf(789L))
+        verify(mockPublicCopyLauncher, never()).launch(any())
+    }
+
+    @Test
+    fun `test CopyAction routes an owned node through copyLauncher`() {
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockCopyLauncher).launch(longArrayOf(123L))
+        verify(mockPublicCopyLauncher, never()).launch(any())
     }
 
     // ShareFolderAction Tests

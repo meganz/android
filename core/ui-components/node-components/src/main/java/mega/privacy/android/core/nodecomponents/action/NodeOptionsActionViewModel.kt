@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.FileNodeContent
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -58,6 +59,8 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
+import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionResult
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
@@ -86,6 +89,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -161,6 +166,8 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val navigationEventQueue: NavigationEventQueue,
     private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
     private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
+    private val copyPublicNodeUseCase: CopyPublicNodeUseCase,
+    private val checkPublicNodesNameCollisionUseCase: CheckPublicNodesNameCollisionUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     @ApplicationContext private val applicationContext: Context,
     @Assisted private val nodeSourceType: NodeSourceType?,
@@ -232,6 +239,77 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
             }
         }
     }
+
+    /**
+     * Public-link copy counterpart of [checkNodesNameCollision]. Runs
+     * [CheckPublicNodesNameCollisionUseCase] on the single [PublicLinkFile] in
+     * `selectedNodes` and surfaces the result through
+     * [NodeActionState.publicCopyCollisionsResult] for the host to dispatch.
+     * No-op for empty, multi-node, or non-public selections.
+     */
+    fun checkPublicCopyCollision(targetHandle: Long) {
+        val publicNode = selectedPublicLinkFile() ?: return
+        viewModelScope.launch {
+            runCatching {
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            }.onSuccess { result ->
+                uiState.update {
+                    it.copy(
+                        publicCopyCollisionsResult = triggered(
+                            PublicCopyCollisionResult(
+                                result = result,
+                                targetHandle = targetHandle,
+                            )
+                        )
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Copies the single [PublicLinkFile] in `selectedNodes` into the user's account
+     * at [targetHandle] via [CopyPublicNodeUseCase]. SDK auto-renames on conflict.
+     * No-op for empty, multi-node, or non-public selections.
+     */
+    fun copyPublicLinkFile(targetHandle: Long) {
+        val publicNode = selectedPublicLinkFile() ?: return
+        val target = NodeId(targetHandle)
+        applicationScope.launch {
+            runCatching { copyPublicNodeUseCase(publicNode, target, null) }
+                .onSuccess {
+                    setCopyTargetPath(targetHandle)
+                    val message = moveRequestMessageMapper(
+                        MoveRequestResult.Copy(count = 1, errorCount = 0)
+                    )
+                    uiState.update {
+                        it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
+                    }
+                }
+                .onFailure {
+                    Timber.e(it)
+                    val message = moveRequestMessageMapper(
+                        MoveRequestResult.Copy(count = 0, errorCount = 1)
+                    )
+                    uiState.update {
+                        it.copy(infoToShowEvent = triggered(LocalizedText.Literal(message)))
+                    }
+                }
+        }
+    }
+
+    fun markHandlePublicCopyCollisionResult() {
+        uiState.update { it.copy(publicCopyCollisionsResult = consumed()) }
+    }
+
+    private fun selectedPublicLinkFile(): PublicLinkFile? =
+        uiState.value.selectedNodes.singleOrNull() as? PublicLinkFile
 
     /**
      * Move nodes

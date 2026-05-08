@@ -56,8 +56,10 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeLocation
+import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -88,6 +90,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -108,6 +112,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.never
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
@@ -177,6 +182,9 @@ class NodeOptionsActionViewModelTest {
     private val navigationEventQueue = mock<NavigationEventQueue>()
     private val removeRecentlyWatchedItemUseCase = mock<RemoveRecentlyWatchedItemUseCase>()
     private val mapTypedNodeToPublicLinkUseCase = mock<MapTypedNodeToPublicLinkUseCase>()
+    private val copyPublicNodeUseCase = mock<CopyPublicNodeUseCase>()
+    private val checkPublicNodesNameCollisionUseCase =
+        mock<CheckPublicNodesNameCollisionUseCase>()
     private val mockRubbishNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(999L)
     }
@@ -237,6 +245,8 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
             applicationContext = mockContext,
             nodeSourceType = nodeSourceType
@@ -319,6 +329,8 @@ class NodeOptionsActionViewModelTest {
             nodeDestinationMapper,
             navigationEventQueue,
             removeRecentlyWatchedItemUseCase,
+            copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase,
         )
     }
 
@@ -371,6 +383,212 @@ class NodeOptionsActionViewModelTest {
             )
         }
     }
+
+    @Test
+    fun `test that checkPublicCopyCollision surfaces a no-conflict result through publicCopyCollisionsResult`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> {
+                on { id } doReturn NodeId(789L)
+            }
+            val targetHandle = sampleNode.id.longValue
+            whenever(
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                PublicNodeNameCollisionResult(
+                    noConflictNodes = listOf(publicNode),
+                    conflictNodes = emptyList(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            viewModel.checkPublicCopyCollision(targetHandle)
+
+            verify(checkPublicNodesNameCollisionUseCase).invoke(
+                listOf(publicNode),
+                targetHandle,
+                NodeNameCollisionType.COPY,
+            )
+            // checkPublicCopyCollision never copies directly; it always emits the
+            // event and the host's handlePublicCopyCollisionResult dispatches.
+            verify(copyPublicNodeUseCase, never()).invoke(any(), any(), anyOrNull())
+            verify(checkNodesNameCollisionUseCase, never()).invoke(any(), any())
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.publicCopyCollisionsResult)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that checkPublicCopyCollision surfaces conflicts via publicCopyCollisionsResult`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> {
+                on { id } doReturn NodeId(789L)
+            }
+            val targetHandle = sampleNode.id.longValue
+            val collision = NodeNameCollision.Default(
+                collisionHandle = 1L,
+                nodeHandle = 789L,
+                name = "name",
+                size = 0L,
+                childFolderCount = 0,
+                childFileCount = 0,
+                lastModified = 0L,
+                parentHandle = 0L,
+                isFile = true,
+            )
+            whenever(
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                PublicNodeNameCollisionResult(
+                    noConflictNodes = emptyList(),
+                    conflictNodes = listOf(collision),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            viewModel.checkPublicCopyCollision(targetHandle)
+
+            verify(checkPublicNodesNameCollisionUseCase).invoke(
+                listOf(publicNode),
+                targetHandle,
+                NodeNameCollisionType.COPY,
+            )
+            verify(copyPublicNodeUseCase, never()).invoke(any(), any(), anyOrNull())
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.publicCopyCollisionsResult)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat(state.nodeNameCollisionsResult)
+                    .isNotInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that copyPublicLinkFiles copies the single selected PublicLinkFile via copyPublicNodeUseCase`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(101L) }
+            val targetHandle = sampleNode.id.longValue
+            whenever(copyPublicNodeUseCase(publicNode, NodeId(targetHandle), null))
+                .thenReturn(NodeId(9001L))
+            whenever(moveRequestMessageMapper(any())).thenReturn("Item copied")
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            viewModel.copyPublicLinkFile(targetHandle)
+
+            verify(copyPublicNodeUseCase).invoke(publicNode, NodeId(targetHandle), null)
+            verify(copyNodesUseCase, never()).invoke(any())
+            verify(setCopyLatestTargetPathUseCase).invoke(targetHandle)
+        }
+
+    @Test
+    fun `test that copyPublicLinkFiles is a no-op for a multi-node selection`() = runTest {
+        // Public-link copy is single-node only by design. A multi-node selection
+        // (even all-PublicLinkFile) must no-op so the click-handler-level
+        // invariant has a defensive backstop here in the VM.
+        val first = mock<PublicLinkFile> { on { id } doReturn NodeId(101L) }
+        val second = mock<PublicLinkFile> { on { id } doReturn NodeId(202L) }
+        val targetHandle = sampleNode.id.longValue
+        initViewModel()
+        viewModel.updateSelectedNodes(listOf(first, second))
+
+        viewModel.copyPublicLinkFile(targetHandle)
+
+        verify(copyPublicNodeUseCase, never()).invoke(any(), any(), anyOrNull())
+        verify(copyNodesUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that markHandlePublicCopyCollisionResult clears the public collision event`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(789L) }
+            val targetHandle = sampleNode.id.longValue
+            val collision = NodeNameCollision.Default(
+                collisionHandle = 1L,
+                nodeHandle = 789L,
+                name = "name",
+                size = 0L,
+                childFolderCount = 0,
+                childFileCount = 0,
+                lastModified = 0L,
+                parentHandle = 0L,
+                isFile = true,
+            )
+            whenever(
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                PublicNodeNameCollisionResult(
+                    noConflictNodes = emptyList(),
+                    conflictNodes = listOf(collision),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+            viewModel.checkPublicCopyCollision(targetHandle)
+
+            viewModel.markHandlePublicCopyCollisionResult()
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.publicCopyCollisionsResult)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that checkNodesNameCollision still uses the regular handle-based flow when selection contains PublicLinkFile`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(789L) }
+            val targetHandle = sampleNode.id.longValue
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    mapOf(789L to targetHandle),
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            // Regular checkNodesNameCollision is NOT supposed to be invoked for public-link
+            // selections — but if someone routes a public-link selection through it anyway,
+            // the method must remain unbranched and call the handle-based use case.
+            viewModel.checkNodesNameCollision(
+                nodes = listOf(789L),
+                targetNode = targetHandle,
+                type = NodeNameCollisionType.COPY,
+            )
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                mapOf(789L to targetHandle),
+                NodeNameCollisionType.COPY,
+            )
+            verify(checkPublicNodesNameCollisionUseCase, never()).invoke(any(), any(), any())
+            verify(copyPublicNodeUseCase, never()).invoke(any(), any(), anyOrNull())
+        }
 
     @Test
     fun `test that setMoveTargetPath is called when move node is success`() = runTest {
@@ -693,6 +911,8 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
         )
 
@@ -762,6 +982,8 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
         )
 
@@ -825,6 +1047,8 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
         )
 
@@ -880,6 +1104,8 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            copyPublicNodeUseCase = copyPublicNodeUseCase,
+            checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
         )
 

@@ -76,6 +76,14 @@ fun rememberSingleNodeActionHandler(
         }
     }
 
+    val publicCopyLauncher = rememberLauncherForActivityResult(
+        contract = megaActivityResultContract.selectFolderToCopyActivityResultContract
+    ) { result ->
+        result?.let { (_, targetHandle) ->
+            viewModel.checkPublicCopyCollision(targetHandle)
+        }
+    }
+
     val shareFolderLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.shareFolderActivityResultContract
     ) { result ->
@@ -135,6 +143,7 @@ fun rememberSingleNodeActionHandler(
         versionsLauncher,
         moveLauncher,
         copyLauncher,
+        publicCopyLauncher,
         shareFolderLauncher,
         restoreLauncher,
         sendToChatLauncher,
@@ -158,6 +167,7 @@ fun rememberSingleNodeActionHandler(
                 versionsLauncher = versionsLauncher,
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
+                publicCopyLauncher = publicCopyLauncher,
                 shareFolderLauncher = shareFolderLauncher,
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
@@ -242,6 +252,14 @@ fun rememberMultiNodeActionHandler(
         }
     }
 
+    val publicCopyLauncher = rememberLauncherForActivityResult(
+        contract = megaActivityResultContract.selectFolderToCopyActivityResultContract
+    ) { result ->
+        result?.let { (_, targetHandle) ->
+            viewModel.checkPublicCopyCollision(targetHandle)
+        }
+    }
+
     val shareFolderLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.shareFolderActivityResultContract
     ) { result ->
@@ -292,6 +310,7 @@ fun rememberMultiNodeActionHandler(
         viewModel,
         moveLauncher,
         copyLauncher,
+        publicCopyLauncher,
         shareFolderLauncher,
         restoreLauncher,
         sendToChatLauncher,
@@ -313,6 +332,7 @@ fun rememberMultiNodeActionHandler(
                 megaNavigator = megaNavigator,
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
+                publicCopyLauncher = publicCopyLauncher,
                 shareFolderLauncher = shareFolderLauncher,
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,

@@ -28,11 +28,14 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionResult
+import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
+import timber.log.Timber
 
 /**
  * Handles node option events and triggers appropriate actions based on the event.
@@ -41,7 +44,10 @@ import mega.privacy.android.shared.resources.R as sharedResR
  * @param onCopyNodes Callback to handle copying nodes.
  * @param onMoveNodes Callback to handle moving nodes.
  * @param onRestoreNodes Callback to handle restoring nodes (e.g. from rubbish bin).
+ * @param onCopyPublicLinkFiles Callback to copy public-link nodes (Save to MEGA),
+ *   invoked with the target folder handle picked by the user.
  * @param consumeNameCollisionResult Callback to consume the name collision result.
+ * @param consumePublicCopyCollisionResult Callback to consume the public-link copy collision result.
  * @param consumeInfoToShow Callback to consume the info to show event.
  * @param consumeForeignNodeDialog Callback to consume the foreign node dialog event.
  * @param consumeQuotaDialog Callback to consume the quota dialog event.
@@ -52,11 +58,13 @@ internal fun HandleNodeOptionsActionEvent(
     onCopyNodes: (nodes: Map<Long, Long>) -> Unit,
     onMoveNodes: (nodes: Map<Long, Long>) -> Unit,
     onRestoreNodes: (nodes: Map<Long, Long>) -> Unit,
+    onCopyPublicLinkFiles: (targetHandle: Long) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onRestoreSuccess: (RestoreData) -> Unit,
     onShareContactSelected: (List<String>, List<Long>) -> Unit,
     consumeNameCollisionResult: () -> Unit,
+    consumePublicCopyCollisionResult: () -> Unit,
     consumeInfoToShow: () -> Unit,
     consumeForeignNodeDialog: () -> Unit,
     consumeQuotaDialog: () -> Unit,
@@ -110,6 +118,19 @@ internal fun HandleNodeOptionsActionEvent(
                         NodeNameCollisionType.RESTORE -> onRestoreNodes(nodes)
                     }
                 }
+            )
+        }
+    )
+
+    EventEffect(
+        event = nodeActionState.publicCopyCollisionsResult,
+        onConsumed = consumePublicCopyCollisionResult,
+        action = { resultWithTarget ->
+            onActionTriggered()
+            handlePublicCopyCollisionResult(
+                nameCollisionActivityLauncher = nameCollisionLauncher,
+                result = resultWithTarget,
+                onHandleNodesWithoutConflict = onCopyPublicLinkFiles,
             )
         }
     )
@@ -266,6 +287,26 @@ fun handleNodesNameCollisionResult(
     }
     if (result.noConflictNodes.isNotEmpty()) {
         onHandleNodesWithoutConflict(result.type, result.noConflictNodes)
+    }
+}
+
+/**
+ * Public-link counterpart of [handleNodesNameCollisionResult]. Sends conflicts
+ * to `NameCollisionActivity` and forwards no-conflict resumption (with the
+ * picked target handle) to [onHandleNodesWithoutConflict]. Public-link
+ * operations are always copy.
+ */
+fun handlePublicCopyCollisionResult(
+    nameCollisionActivityLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
+    result: PublicCopyCollisionResult,
+    onHandleNodesWithoutConflict: (targetHandle: Long) -> Unit,
+) {
+    if (result.result.conflictNodes.isNotEmpty()) {
+        nameCollisionActivityLauncher
+            .launch(result.result.conflictNodes.toCollection(ArrayList()))
+    }
+    if (result.result.noConflictNodes.isNotEmpty()) {
+        onHandleNodesWithoutConflict(result.targetHandle)
     }
 }
 

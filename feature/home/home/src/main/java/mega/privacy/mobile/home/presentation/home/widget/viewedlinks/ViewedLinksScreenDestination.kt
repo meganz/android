@@ -31,7 +31,7 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
-                creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
+                creationCallback = { vm -> vm.create(NodeSourceType.FOLDER_LINK) },
             )
 
         HandleNodeOptionsActionResult(

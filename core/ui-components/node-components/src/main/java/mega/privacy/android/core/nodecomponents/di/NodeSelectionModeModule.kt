@@ -34,6 +34,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Shar
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.UnhideSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.FileLink
 import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
@@ -257,6 +258,18 @@ abstract class NodeSelectionModeModule {
         @FolderLink
         @Singleton
         fun provideFolderLinkToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem: SaveToMegaSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem,
+        )
+
+        @Provides
+        @ElementsIntoSet
+        @FileLink
+        @Singleton
+        fun provideFileLinkToolbarItems(
             downloadSelectionMenuItem: DownloadSelectionMenuItem,
             saveToMegaSelectionMenuItem: SaveToMegaSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(

@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
 /**
@@ -18,7 +19,10 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  *
  * @property selectedNodes Selected nodes
  * @property error Error
- * @property nodeNameCollisionsResult Node name collision result
+ * @property nodeNameCollisionsResult Owned-node copy / move / restore collision result
+ * @property publicCopyCollisionsResult Public-link copy collision result (Save to
+ *   MEGA on a public file). Separate channel because the resumption path uses
+ *   [NodeOptionsActionViewModel.copyPublicLinkFiles] instead of `copyNodes`.
  * @property showForeignNodeDialog Show foreign node dialog
  * @property showQuotaDialog Show quota dialog
  * @property accessPermissionIcon Access permission icon
@@ -41,6 +45,7 @@ data class NodeActionState(
     val selectedNodes: List<TypedNode> = emptyList(),
     val error: StateEventWithContent<Throwable> = consumed(),
     val nodeNameCollisionsResult: StateEventWithContent<NodeNameCollisionsResult> = consumed(),
+    val publicCopyCollisionsResult: StateEventWithContent<PublicCopyCollisionResult> = consumed(),
     val showForeignNodeDialog: StateEvent = consumed,
     val showQuotaDialog: StateEventWithContent<Boolean> = consumed(),
     val accessPermissionIcon: Int? = null,

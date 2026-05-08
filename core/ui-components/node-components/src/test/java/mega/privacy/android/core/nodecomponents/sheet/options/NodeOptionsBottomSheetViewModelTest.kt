@@ -20,7 +20,11 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
+import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
@@ -39,6 +43,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -55,6 +60,7 @@ class NodeOptionsBottomSheetViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicNodeByIdUseCase = mock<GetPublicNodeByIdUseCase>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
+    private val mapTypedNodeToPublicLinkUseCase = mock<MapTypedNodeToPublicLinkUseCase>()
     private val nodeBottomSheetActionMapper = mock<NodeBottomSheetActionMapper>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase = mock()
@@ -96,6 +102,7 @@ class NodeOptionsBottomSheetViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getPublicNodeByIdUseCase = getPublicNodeByIdUseCase,
             getPublicNodeUseCase = getPublicNodeUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             offlineTypedNodeMapper = offlineTypedNodeMapper,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
@@ -257,34 +264,89 @@ class NodeOptionsBottomSheetViewModelTest {
         }
 
     @Test
-    fun `test that state contains public node when publicLinkUrl is provided`() = runTest {
-        val publicLink = "https://mega.nz/file/abc#xyz"
-        val publicFileNode = mock<TypedFileNode>().stub {
-            on { id } doReturn NodeId(456)
-            on { name } doReturn "public_file.txt"
-            on { isIncomingShare } doReturn false
-            on { previewPath } doReturn null
-        }
-        val expectedNodeUi = mock<NodeUiItem<TypedNode>>()
-        whenever(getPublicNodeUseCase(publicLink)).thenReturn(publicFileNode)
-        whenever(nodeUiItemMapper(listOf(publicFileNode))).thenReturn(listOf(expectedNodeUi))
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
-            .thenReturn(emptyList())
+    fun `test that FILE_LINK source fetches via getPublicNodeUseCase and wraps as PublicLinkFile`() =
+        runTest {
+            val publicLink = "https://mega.nz/file/abc#xyz"
+            val publicFileNode = mock<TypedFileNode>().stub {
+                on { id } doReturn NodeId(456)
+                on { name } doReturn "public_file.txt"
+                on { isIncomingShare } doReturn false
+                on { previewPath } doReturn null
+            }
+            val wrappedPublicNode = mock<PublicLinkFile>().stub {
+                on { id } doReturn NodeId(456)
+                on { name } doReturn "public_file.txt"
+                on { isIncomingShare } doReturn false
+                on { previewPath } doReturn null
+            }
+            val expectedNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(getPublicNodeUseCase(publicLink)).thenReturn(publicFileNode)
+            whenever(mapTypedNodeToPublicLinkUseCase(publicFileNode)).thenReturn(wrappedPublicNode)
+            whenever(nodeUiItemMapper(listOf(wrappedPublicNode))).thenReturn(listOf(expectedNodeUi))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
 
-        initViewModel(
-            nodeId = publicFileNode.id.longValue,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-            publicLinkUrl = publicLink,
-        )
+            initViewModel(
+                nodeId = publicFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.FILE_LINK,
+                publicLinkUrl = publicLink,
+            )
 
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertThat(state.node).isEqualTo(expectedNodeUi)
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.node).isEqualTo(expectedNodeUi)
+                verify(mapTypedNodeToPublicLinkUseCase).invoke(publicFileNode)
+            }
         }
-    }
+
+    @Test
+    fun `test that FILE_LINK source falls back to getNodeByIdUseCase when publicLinkUrl is null`() =
+        runTest {
+            whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+
+            initViewModel(
+                nodeId = sampleFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.FILE_LINK,
+                publicLinkUrl = null,
+            )
+
+            verify(getNodeByIdUseCase).invoke(sampleFileNode.id)
+            verify(getPublicNodeUseCase, never()).invoke(any())
+            verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that FILE_LINK source falls back to getNodeByIdUseCase when publicLinkUrl is blank`() =
+        runTest {
+            whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+
+            initViewModel(
+                nodeId = sampleFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.FILE_LINK,
+                publicLinkUrl = "   ",
+            )
+
+            verify(getNodeByIdUseCase).invoke(sampleFileNode.id)
+            verify(getPublicNodeUseCase, never()).invoke(any())
+            verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any(), anyOrNull())
+        }
 
     @Test
     fun `test that init starts monitoring node updates for non folder link non public link source`() =

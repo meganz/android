@@ -33,11 +33,14 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
+import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -68,6 +71,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicNodeByIdUseCase: GetPublicNodeByIdUseCase,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
+    private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
@@ -162,19 +166,26 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     }
 
     /**
-     * The lookup branches in priority order:
-     *  1. Public file link — when [publicLinkUrl] is not blank, fetch the node directly from
-     *     the link via [getPublicNodeUseCase]. Used for items that are not in the user's account
-     *     (e.g. a `FileLink` entry in Viewed Links).
-     *  2. Folder link — when [nodeSourceType] is [NodeSourceType.FOLDER_LINK], the node lives
-     *     inside a public folder link, so [getPublicNodeByIdUseCase] is used with [nodeId].
-     *  3. Account node — otherwise the node belongs to the user's own cloud / rubbish /
-     *     shares, fetched by id via [getNodeByIdUseCase].
+     * Lookup branches in priority order:
+     *  1. [NodeSourceType.FILE_LINK] — fetch via [getPublicNodeUseCase] and
+     *     wrap as a `PublicLinkFile` so click handlers can route through
+     *     `CopyPublicNodeUseCase`. Falls back to [getNodeByIdUseCase] when no
+     *     [publicLinkUrl] is provided (the file may still be in the user's
+     *     account).
+     *  2. [NodeSourceType.FOLDER_LINK] — fetch by id via [getPublicNodeByIdUseCase].
+     *  3. Otherwise fetch their own nodes by [getNodeByIdUseCase].
      */
     private suspend fun loadPrimaryNode(nodeId: NodeId): TypedNode? = runCatching {
-        when {
-            !publicLinkUrl.isNullOrBlank() -> getPublicNodeUseCase(publicLinkUrl)
-            nodeSourceType == NodeSourceType.FOLDER_LINK -> getPublicNodeByIdUseCase(nodeId)
+        when (nodeSourceType) {
+            NodeSourceType.FILE_LINK -> {
+                if (!publicLinkUrl.isNullOrBlank()) {
+                    mapTypedNodeToPublicLinkUseCase(getPublicNodeUseCase(publicLinkUrl))
+                } else {
+                    getNodeByIdUseCase(nodeId)
+                }
+            }
+
+            NodeSourceType.FOLDER_LINK -> getPublicNodeByIdUseCase(nodeId)
             else -> getNodeByIdUseCase(nodeId)
         }
     }.getOrNull()
