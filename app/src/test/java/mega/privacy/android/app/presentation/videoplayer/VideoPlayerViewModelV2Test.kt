@@ -54,6 +54,7 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
@@ -2531,6 +2532,9 @@ class VideoPlayerViewModelV2Test {
         Arguments.of(RECENTS_BUCKET_ADAPTER, NodeSourceType.RECENTS_BUCKET),
         Arguments.of(FAVOURITES_ADAPTER, NodeSourceType.FAVOURITES),
         Arguments.of(INVALID_VALUE, NodeSourceType.CLOUD_DRIVE),
+        Arguments.of(FOLDER_LINK_ADAPTER, NodeSourceType.FOLDER_LINK),
+        Arguments.of(FROM_ALBUM_SHARING, NodeSourceType.FOLDER_LINK),
+        Arguments.of(VERSIONS_ADAPTER, NodeSourceType.CLOUD_DRIVE),
     )
 
     @Test

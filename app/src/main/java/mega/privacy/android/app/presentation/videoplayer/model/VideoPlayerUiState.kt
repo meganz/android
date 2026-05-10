@@ -58,6 +58,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property navigateToSelectSubtitleScreen whether to navigate to select subtitle screen
  * @property blockedError the blocked error event
  * @property isClosedAfterHidingNode whether to close the video player after hiding node.
+ * @property nodeSourceType the source type of the current playing node
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
