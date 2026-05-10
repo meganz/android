@@ -455,7 +455,6 @@ class CompletedTransferActionsViewModelTest {
                 assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
                     ViewInFolderEvent.Download::class.java
                 )
-                assertThat(((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content as? ViewInFolderEvent.Found)?.singleActivity).isTrue()
             }
         }
 
@@ -469,7 +468,6 @@ class CompletedTransferActionsViewModelTest {
                     on { this.name } doReturn "parent"
                 }
                 val expected = ViewInFolderEvent.DownloadToOffline(
-                    singleActivity = true,
                     fileName = completedOffline.fileName,
                     parentNodeOfflineId = offlineInfo.id,
                     title = offlineInfo.name,
@@ -491,7 +489,6 @@ class CompletedTransferActionsViewModelTest {
             assertThat((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content).isInstanceOf(
                 ViewInFolderEvent.Upload::class.java
             )
-            assertThat(((underTest.uiState.value.viewInFolderEvent as? StateEventWithContentTriggered)?.content as? ViewInFolderEvent.Found)?.singleActivity).isTrue()
         }
 
     @Test

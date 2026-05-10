@@ -34,9 +34,7 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.getLink.GetLinkActivity
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsViewModel
 import mega.privacy.android.app.presentation.transfers.model.completed.OpenWithEvent
@@ -235,12 +233,8 @@ fun CompletedTransferActionsBottomSheet(
     ) { viewInFolderEvent ->
         if (viewInFolderEvent !is ViewInFolderEvent.Found) {
             snackbarHostState?.showSnackbar(context.getString(R.string.corrupt_video_dialog_text))
-        } else if (viewInFolderEvent.singleActivity) {
-            onViewInFolderSingleActivity(viewInFolderEvent, navigationHandler)
         } else {
-            activity?.let { activity ->
-                onViewInFolderLegacy(viewInFolderEvent, activity)
-            }
+            onViewInFolderSingleActivity(viewInFolderEvent, navigationHandler)
         }
         onDismissSheet()
     }
@@ -308,46 +302,6 @@ private fun onOpenWith(
             snackbarHostState?.showSnackbar(activity.getString(R.string.corrupt_video_dialog_text))
         }
     }
-}
-
-private fun onViewInFolderLegacy(
-    viewInFolderEvent: ViewInFolderEvent.Found,
-    activity: Activity,
-) {
-    when (viewInFolderEvent) {
-        is ViewInFolderEvent.Download -> {
-            FileStorageActivity.getBrowseFilesIntent(
-                activity,
-                viewInFolderEvent.uriPath.value,
-                viewInFolderEvent.fileName
-            )
-        }
-
-        is ViewInFolderEvent.DownloadToOffline -> {
-            MegaActivity.getIntentWithExtraDestinations(
-                activity,
-                listOf(
-                    OfflineNavKey(
-                        nodeId = viewInFolderEvent.parentNodeOfflineId,
-                        highlightedFiles = viewInFolderEvent.fileName,
-                        title = viewInFolderEvent.title,
-                    )
-                )
-            )
-        }
-
-        is ViewInFolderEvent.Upload -> {
-            MegaActivity.getIntentWithExtraDestinations(
-                activity,
-                listOf(
-                    CloudDriveNavKey(
-                        nodeHandle = viewInFolderEvent.parentNodeId.longValue,
-                        highlightedNodeNames = listOf(viewInFolderEvent.fileName),
-                    )
-                )
-            )
-        }
-    }.let { activity.startActivity(it) }
 }
 
 private fun onViewInFolderSingleActivity(

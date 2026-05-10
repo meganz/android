@@ -176,7 +176,7 @@ class SettingsFragment :
                         isChecked = state.showHiddenItems
                     }
                     findPreference<SwitchPreferenceCompat>(KEY_MEDIA_DISCOVERY_VIEW)?.isVisible =
-                        !state.isSingleActivityEnabled
+                        false
                 }
             }
         }

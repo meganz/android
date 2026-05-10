@@ -118,7 +118,6 @@ class SettingsViewModel @Inject constructor(
             subFolderMediaDiscoveryChecked = true,
             showHiddenItems = false,
             accountDetail = null,
-            isSingleActivityEnabled = true,
         )
     }
 

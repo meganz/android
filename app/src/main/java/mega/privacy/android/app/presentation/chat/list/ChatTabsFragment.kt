@@ -65,7 +65,6 @@ import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementV
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
 import mega.privacy.android.app.presentation.meeting.model.ShareLinkOption
-import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_JOIN_MEETING
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_NEW_CHAT_ID
@@ -305,28 +304,13 @@ class ChatTabsFragment : Fragment() {
                     ConstraintLayout(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        val (audioPlayer, videoSectionFeatureScreen) = createRefs()
-                        val isSingleActivityEnabled = chatsTabState.isSingleActivityEnabled
-
-                        if (!isSingleActivityEnabled) {
-                            MiniAudioPlayerView(
-                                modifier = Modifier
-                                    .constrainAs(audioPlayer) {
-                                        bottom.linkTo(parent.bottom)
-                                    }
-                                    .fillMaxWidth(),
-                                lifecycle = lifecycle,
-                            )
-                        }
+                        val (videoSectionFeatureScreen) = createRefs()
 
                         Box(
                             modifier = Modifier
                                 .constrainAs(videoSectionFeatureScreen) {
                                     top.linkTo(parent.top)
-                                    bottom.linkTo(
-                                        if (isSingleActivityEnabled) parent.bottom
-                                        else audioPlayer.top
-                                    )
+                                    bottom.linkTo(parent.bottom)
                                     height = Dimension.fillToConstraints
                                 }
                         ) {

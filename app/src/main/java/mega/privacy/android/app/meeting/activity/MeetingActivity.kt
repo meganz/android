@@ -357,29 +357,14 @@ class MeetingActivity : PasscodeActivity() {
         collectFlow(meetingViewModel.state) { state: MeetingState ->
 
             if (state.shouldLaunchLeftMeetingActivity) {
-                if (state.isSingleActivityEnabled) {
-                    lifecycleScope.launch {
-                        navigationEventQueue.emit(
-                            LeftMeetingNavKey(
-                                callEndedDueToFreePlanLimits = state.callEndedDueToFreePlanLimits,
-                                callEndedDueToTooManyParticipants = state.callEndedDueToTooManyParticipants,
-                            )
+                lifecycleScope.launch {
+                    navigationEventQueue.emit(
+                        LeftMeetingNavKey(
+                            callEndedDueToFreePlanLimits = state.callEndedDueToFreePlanLimits,
+                            callEndedDueToTooManyParticipants = state.callEndedDueToTooManyParticipants,
                         )
-                        finish()
-                    }
-                } else {
-                    startActivity(
-                        Intent(this, LeftMeetingActivity::class.java)
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                            .putExtra(
-                                MEETING_FREE_PLAN_USERS_LIMIT,
-                                state.callEndedDueToFreePlanLimits
-                            )
-                            .putExtra(
-                                MEETING_PARTICIPANTS_LIMIT,
-                                state.callEndedDueToTooManyParticipants
-                            )
                     )
+                    finish()
                 }
             }
 

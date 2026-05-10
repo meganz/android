@@ -191,7 +191,6 @@ class CompletedTransferActionsViewModel @Inject constructor(
                 if (completedTransfer.isOffline == true) {
                     getOfflineNodeInformationByNodeIdUseCase(NodeId(completedTransfer.parentHandle))?.let { offlineInfo ->
                         ViewInFolderEvent.DownloadToOffline(
-                            singleActivity = true,
                             fileName = completedTransfer.fileName,
                             parentNodeOfflineId = offlineInfo.id,
                             title = offlineInfo.name,
@@ -200,7 +199,6 @@ class CompletedTransferActionsViewModel @Inject constructor(
                     }
                 } else {
                     ViewInFolderEvent.Download(
-                        singleActivity = true,
                         fileName = completedTransfer.fileName,
                         uriPath = _uiState.value.parentUri
                             ?.takeUnless { it.toString().isBlank() }
@@ -210,7 +208,6 @@ class CompletedTransferActionsViewModel @Inject constructor(
                 }
             } else {
                 ViewInFolderEvent.Upload(
-                    true,
                     completedTransfer.fileName,
                     NodeId(
                         uiState.value.node?.parentId?.longValue

@@ -103,11 +103,6 @@ sealed interface ViewInFolderEvent {
     sealed interface Found : ViewInFolderEvent {
 
         /**
-         * The action should be performed with single activity navigation
-         */
-        val singleActivity: Boolean
-
-        /**
          * The file name to be displayed in the folder
          */
         val fileName: String
@@ -118,7 +113,6 @@ sealed interface ViewInFolderEvent {
      * @property uriPath the path of the transfer
      */
     data class Download(
-        override val singleActivity: Boolean,
         override val fileName: String,
         val uriPath: UriPath,
     ) : Found
@@ -130,7 +124,6 @@ sealed interface ViewInFolderEvent {
      * @property path the relative path of the file in offline files
      */
     data class DownloadToOffline(
-        override val singleActivity: Boolean,
         override val fileName: String,
         val parentNodeOfflineId: Int,
         val title: String?,
@@ -142,7 +135,6 @@ sealed interface ViewInFolderEvent {
      * @property parentNodeId
      */
     data class Upload(
-        override val singleActivity: Boolean,
         override val fileName: String,
         val parentNodeId: NodeId,
     ) : Found
