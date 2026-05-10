@@ -66,7 +66,6 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 onCameraUploadsSettingsClicked = {
                     navigationHandler.navigate(SettingsCameraUploadsNavKey)
                 },
-                isSingleActivity = true,
             )
         }
     }
@@ -120,7 +119,6 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 onSelectFolder = {
                     launcher.launch(null)
                 },
-                isSingleActivity = true,
             )
         }
     }
@@ -138,7 +136,6 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 folderSelected = { navigationHandler.back() },
                 backClicked = { navigationHandler.back() },
                 fileTypeIconMapper = fileTypeIconMapper,
-                isSingleActivity = true,
             )
         }
     }
@@ -157,7 +154,6 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 backClicked = { navigationHandler.back() },
                 fileTypeIconMapper = fileTypeIconMapper,
                 isStopBackupMegaPicker = true,
-                isSingleActivity = true,
             )
         }
     }

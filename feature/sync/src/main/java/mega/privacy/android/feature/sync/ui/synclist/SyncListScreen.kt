@@ -106,7 +106,6 @@ internal fun SyncListScreen(
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    isSingleActivity: Boolean = false,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -196,13 +195,7 @@ internal fun SyncListScreen(
             onDispose { }
         }
 
-        val appBarWindowInsets = if (isSingleActivity) {
-            // In Nav3 context (MegaActivity), use status bar insets for proper top padding
-            WindowInsets.statusBars
-        } else {
-            // In Fragment context, FragmentActivity handles window insets, so use 0.dp
-            WindowInsets(0.dp)
-        }
+        val appBarWindowInsets = WindowInsets.statusBars
 
         MegaScaffold(
             scaffoldState = scaffoldState,
@@ -258,7 +251,7 @@ internal fun SyncListScreen(
                             onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
                             multiFabState.value = state
                         },
-                        isCircular = !isSingleActivity,
+                        isCircular = false,
                     )
                 }
             },

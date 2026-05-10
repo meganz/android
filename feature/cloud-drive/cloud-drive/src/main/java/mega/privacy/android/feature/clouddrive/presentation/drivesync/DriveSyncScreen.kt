@@ -284,7 +284,6 @@ internal fun DriveSyncScreen(
                     ),
                 ) {
                     SyncListRoute(
-                        isSingleActivity = true,
                         isInCloudDrive = true,
                         syncPermissionsManager = viewModel.syncPermissionsManager,
                         onSyncFolderClicked = {

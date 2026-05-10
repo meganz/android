@@ -57,7 +57,6 @@ internal fun MegaPickerScreen(
     isSelectEnabled: Boolean,
     onCreateNewFolderDialogSuccess: (String) -> Unit = {},
     isStopBackupMegaPicker: Boolean = false,
-    isSingleActivity: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -69,13 +68,7 @@ internal fun MegaPickerScreen(
                 currentFolder.parentId != NodeId(MegaApiJava.INVALID_HANDLE)
 
     var showCreateNewFolderDialog by rememberSaveable { mutableStateOf(false) }
-    val appBarWindowInsets = if (isSingleActivity) {
-        // In Nav3 context (MegaActivity), use status bar insets for proper top padding
-        WindowInsets.statusBars
-    } else {
-        // In Fragment context, FragmentActivity handles window insets, so use 0.dp
-        WindowInsets(0.dp)
-    }
+    val appBarWindowInsets = WindowInsets.statusBars
 
     MegaScaffold(
         topBar = {

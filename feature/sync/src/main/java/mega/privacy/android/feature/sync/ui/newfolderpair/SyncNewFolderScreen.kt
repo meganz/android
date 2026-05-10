@@ -87,7 +87,6 @@ internal fun SyncNewFolderScreen(
     onDismissStorageOverQuota: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
     viewModel: SyncNewFolderViewModel = hiltViewModel(),
-    isSingleActivity: Boolean = false,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -107,7 +106,6 @@ internal fun SyncNewFolderScreen(
         onRenameAndCreateBackupSucceeded = { viewModel.openSyncListScreen() },
         onOpenUpgradeAccount = onOpenUpgradeAccount,
         onShowSnackbarConsumed = { viewModel.onShowSnackbarConsumed() },
-        isSingleActivity = isSingleActivity
     )
 }
 
@@ -128,18 +126,11 @@ private fun SyncNewFolderScreenScaffold(
     onRenameAndCreateBackupSucceeded: () -> Unit,
     onOpenUpgradeAccount: () -> Unit,
     onShowSnackbarConsumed: () -> Unit,
-    isSingleActivity: Boolean = false,
 ) {
     val scaffoldState = rememberScaffoldState()
     val syncType = state.syncType
     var isWarningBannerDisplayed by rememberSaveable { mutableStateOf(false) }
-    val appBarWindowInsets = if (isSingleActivity) {
-        // In Nav3 context (MegaActivity), use status bar insets for proper top padding
-        WindowInsets.statusBars
-    } else {
-        // In Fragment context, FragmentActivity handles window insets, so use 0.dp
-        WindowInsets(0.dp)
-    }
+    val appBarWindowInsets = WindowInsets.statusBars
 
     MegaScaffold(
         scaffoldState = scaffoldState,

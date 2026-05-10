@@ -32,7 +32,6 @@ internal fun MegaPickerRoute(
     backClicked: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     isStopBackupMegaPicker: Boolean = false,
-    isSingleActivity: Boolean = false,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -62,8 +61,7 @@ internal fun MegaPickerRoute(
         },
         isLoading = state.value.isLoading,
         isSelectEnabled = state.value.isSelectEnabled,
-        isStopBackupMegaPicker = isStopBackupMegaPicker,
-        isSingleActivity = isSingleActivity
+        isStopBackupMegaPicker = isStopBackupMegaPicker
     )
 
     val onBack = {
