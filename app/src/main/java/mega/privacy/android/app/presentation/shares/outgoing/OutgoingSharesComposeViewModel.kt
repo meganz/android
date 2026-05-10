@@ -300,7 +300,6 @@ class OutgoingSharesComposeViewModel @Inject constructor(
 
         val childrenNodes = getOutgoingSharesChildrenNodeUseCase(
             parentHandle = currentHandle,
-            isSingleActivity = false
         )
         val nodeUIItems = getNodeUiItems(childrenNodes)
         val sortOrder = getCloudSortOrder()

@@ -79,7 +79,6 @@ class OutgoingSharesViewModel @Inject constructor(
             }.getOrDefault(false)
             val nodes = getOutgoingSharesChildrenNodeUseCase(
                 parentHandle = folderId.longValue,
-                isSingleActivity = true
             )
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,

@@ -110,7 +110,7 @@ class OutgoingSharesViewModelTest {
                 NodeSourceType.OUTGOING_SHARES
             )
         ).thenReturn(NodeSortConfiguration.Companion.default)
-        whenever(getOutgoingSharesChildrenNodeUseCase(-1L, true)).thenReturn(items)
+        whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(items)
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
@@ -724,7 +724,7 @@ class OutgoingSharesViewModelTest {
             ).thenReturn(
                 NodeSortConfiguration.default
             )
-            whenever(getOutgoingSharesChildrenNodeUseCase(-1L, true)).thenReturn(listOf(node1))
+            whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
 
             val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
             whenever(
@@ -771,7 +771,7 @@ class OutgoingSharesViewModelTest {
             ).thenReturn(
                 NodeSortConfiguration.default
             )
-            whenever(getOutgoingSharesChildrenNodeUseCase(-1L, true)).thenReturn(listOf(node1))
+            whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
 
             val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
             whenever(
@@ -815,7 +815,7 @@ class OutgoingSharesViewModelTest {
                 NodeSourceType.OUTGOING_SHARES
             )
         ).thenReturn(NodeSortConfiguration.default)
-        whenever(getOutgoingSharesChildrenNodeUseCase(-1L, true)).thenReturn(listOf(node1))
+        whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
 
         val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
         whenever(

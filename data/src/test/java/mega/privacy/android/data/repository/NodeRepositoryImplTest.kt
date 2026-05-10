@@ -526,7 +526,7 @@ internal class NodeRepositoryImplTest {
             whenever(shareDataMapper(megaShare3, 1)).thenReturn(share3)
 
             val expected = listOf(share1, share2, share3)
-            val actual = underTest.getAllOutgoingShares(sortOrder, false)
+            val actual = underTest.getAllOutgoingShares(sortOrder)
 
             assertThat(actual).isEqualTo(expected)
         }
