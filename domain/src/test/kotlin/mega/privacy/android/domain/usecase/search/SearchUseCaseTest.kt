@@ -48,7 +48,7 @@ class SearchUseCaseTest {
                     searchCategory = SearchCategory.FAVOURITES,
                     description = null,
                     tag = null,
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(favouritesRepository).getAllFavorites()
         }
@@ -66,7 +66,7 @@ class SearchUseCaseTest {
                     searchCategory = SearchCategory.ALL,
                     description = null,
                     tag = null,
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).getInShares()
         }
@@ -84,7 +84,7 @@ class SearchUseCaseTest {
                     searchCategory = SearchCategory.ALL,
                     description = "description",
                     tag = "tag",
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).getInShares()
         }
@@ -102,7 +102,7 @@ class SearchUseCaseTest {
                     searchCategory = SearchCategory.ALL,
                     description = null,
                     tag = null,
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).getOutShares()
         }
@@ -120,7 +120,7 @@ class SearchUseCaseTest {
                     searchCategory = SearchCategory.ALL,
                     description = "description",
                     tag = "tag",
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository, times(0)).getOutShares()
         }
@@ -138,9 +138,9 @@ class SearchUseCaseTest {
                     searchCategory = SearchCategory.ALL,
                     description = null,
                     tag = null,
-                ), isSingleActivityEnabled = false
+                ),
             )
-            verify(searchRepository).getPublicLinks(false)
+            verify(searchRepository).getPublicLinks()
         }
 
     @Test
@@ -156,9 +156,9 @@ class SearchUseCaseTest {
                     searchCategory = SearchCategory.ALL,
                     description = "description",
                     tag = "tag",
-                ), isSingleActivityEnabled = false
+                ),
             )
-            verify(searchRepository, times(0)).getPublicLinks(false)
+            verify(searchRepository, times(0)).getPublicLinks()
         }
 
     @Test
@@ -178,7 +178,6 @@ class SearchUseCaseTest {
                 parentHandle = NodeId(-1),
                 nodeSourceType = NodeSourceType.OUTGOING_SHARES,
                 searchParameters = searchParameters,
-                isSingleActivityEnabled = false,
             )
             verify(searchRepository).search(
                 nodeId = null,
@@ -205,7 +204,6 @@ class SearchUseCaseTest {
                 parentHandle = NodeId(-1),
                 nodeSourceType = NodeSourceType.LINKS,
                 searchParameters = searchParameters,
-                isSingleActivityEnabled = false
             )
             verify(searchRepository).search(
                 nodeId = null,
@@ -227,7 +225,7 @@ class SearchUseCaseTest {
                 searchParameters = SearchParameters(
                     query = "",
                     searchCategory = SearchCategory.ALL
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(-1),
@@ -252,7 +250,7 @@ class SearchUseCaseTest {
                 searchParameters = SearchParameters(
                     query = "",
                     searchCategory = SearchCategory.ALL
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(-1),
@@ -277,7 +275,7 @@ class SearchUseCaseTest {
                 searchParameters = SearchParameters(
                     query = "",
                     searchCategory = SearchCategory.ALL
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(-1),
@@ -302,7 +300,7 @@ class SearchUseCaseTest {
                 searchParameters = SearchParameters(
                     query = "",
                     searchCategory = SearchCategory.ALL
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(123456),
@@ -328,7 +326,7 @@ class SearchUseCaseTest {
                     query = "test",
                     searchCategory = SearchCategory.ALL,
                     modificationDate = DateFilterOption.Today,
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).search(
                 nodeId = NodeId(123456),
@@ -357,7 +355,7 @@ class SearchUseCaseTest {
                     query = "",
                     searchCategory = SearchCategory.ALL,
                     tag = "tag"
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).search(
                 nodeId = NodeId(123456),
@@ -384,7 +382,7 @@ class SearchUseCaseTest {
                 searchParameters = SearchParameters(
                     query = "",
                     searchCategory = SearchCategory.ALL,
-                ), isSingleActivityEnabled = false
+                ),
             )
             verify(searchRepository).getChildren(
                 nodeId = NodeId(123456),

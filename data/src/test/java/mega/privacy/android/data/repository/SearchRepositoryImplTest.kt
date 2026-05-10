@@ -30,8 +30,6 @@ import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
@@ -171,15 +169,14 @@ class SearchRepositoryImplTest {
         assertThat(actual.first().id).isEqualTo(nodeId)
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that getPublicLinks returns list of untyped nodes`(isSingleActivityEnabled: Boolean) =
+    @Test
+    fun `test that getPublicLinks returns list of untyped nodes`() =
         runTest {
-            whenever(getLinksSortOrderUseCase(isSingleActivityEnabled)).thenReturn(SortOrder.ORDER_NONE)
+            whenever(getLinksSortOrderUseCase(true)).thenReturn(SortOrder.ORDER_NONE)
             whenever(megaApiGateway.getPublicLinks(sortOrderIntMapper(SortOrder.ORDER_NONE)))
                 .thenReturn(listOf(megaNode))
             whenever(nodeMapper(megaNode)).thenReturn(typedNode)
-            val actual = underTest.getPublicLinks(isSingleActivityEnabled)
+            val actual = underTest.getPublicLinks()
             assertThat(actual.first().id).isEqualTo(nodeId)
         }
 

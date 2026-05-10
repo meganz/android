@@ -49,7 +49,7 @@ interface SearchRepository {
     /**
      * get links node list
      */
-    suspend fun getPublicLinks(isSingleActivityEnabled: Boolean): List<UnTypedNode>
+    suspend fun getPublicLinks(): List<UnTypedNode>
 
     /**
      * get root node id

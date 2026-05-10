@@ -182,7 +182,6 @@ class LegacySearchViewModel @Inject constructor(
             parentHandle = NodeId(getCurrentParentHandle()),
             nodeSourceType = nodeSourceType,
             searchParameters = getSearchParameters(),
-            isSingleActivityEnabled = true,
         )
     }
 

@@ -348,7 +348,6 @@ class LegacySearchViewModelTest {
                     parentHandle = any(),
                     nodeSourceType = any(),
                     searchParameters = any(),
-                    isSingleActivityEnabled = any(),
                 )
             ).thenReturn(nodeList)
             underTest.updateSearchQuery(query)
@@ -375,7 +374,6 @@ class LegacySearchViewModelTest {
                     parentHandle = any(),
                     nodeSourceType = any(),
                     searchParameters = any(),
-                    isSingleActivityEnabled = any(),
                 )
             ).thenReturn(nodeList)
             whenever(getSortOrderByNodeSourceTypeUseCase(nodeSourceType, true)).thenReturn(
@@ -493,7 +491,6 @@ class LegacySearchViewModelTest {
                     parentHandle = any(),
                     nodeSourceType = any(),
                     searchParameters = any(),
-                    isSingleActivityEnabled = any(),
                 )
             ).thenReturn(listOf(typedFileNode, typedFolderNode))
             underTest.updateSearchQuery(query)
@@ -551,7 +548,6 @@ class LegacySearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode, typedFolderNode))
 
@@ -604,7 +600,6 @@ class LegacySearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode, typedFolderNode))
 

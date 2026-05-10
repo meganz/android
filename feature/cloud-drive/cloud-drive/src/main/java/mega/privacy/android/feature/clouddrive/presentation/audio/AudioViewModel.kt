@@ -85,7 +85,6 @@ class AudioViewModel @Inject constructor(
                 parentHandle = NodeId(-1),
                 nodeSourceType = NodeSourceType.AUDIO,
                 searchParameters = audioSearchParameters,
-                isSingleActivityEnabled = true
             )
         }.onFailure { Timber.e(it) }
             .getOrDefault(emptyList())

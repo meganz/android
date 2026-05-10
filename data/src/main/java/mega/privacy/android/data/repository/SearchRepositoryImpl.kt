@@ -143,13 +143,11 @@ internal class SearchRepositoryImpl @Inject constructor(
         searchNodes.map { nodeMapper(it) }
     }
 
-    override suspend fun getPublicLinks(isSingleActivityEnabled: Boolean) =
+    override suspend fun getPublicLinks() =
         withContext(ioDispatcher) {
             megaApiGateway.getPublicLinks(
                 sortOrderIntMapper(
-                    getLinksSOrtOrderUseCase(
-                        isSingleActivityEnabled
-                    )
+                    getLinksSOrtOrderUseCase(true)
                 )
             )
                 .let { list ->

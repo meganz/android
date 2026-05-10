@@ -147,7 +147,6 @@ class AudioViewModelTest {
                     parentHandle = any(),
                     nodeSourceType = any(),
                     searchParameters = any(),
-                    isSingleActivityEnabled = any(),
                 )
             } doReturn domainNodes
         }
@@ -347,7 +346,6 @@ class AudioViewModelTest {
                             searchTarget = SearchTarget.ROOT_NODES,
                             searchCategory = SearchCategory.AUDIO,
                         ),
-                        true
                     )
                     cancelAndIgnoreRemainingEvents()
                 }
@@ -383,7 +381,6 @@ class AudioViewModelTest {
                             searchTarget = SearchTarget.ROOT_NODES,
                             searchCategory = SearchCategory.AUDIO,
                         ),
-                        true
                     )
                     cancelAndIgnoreRemainingEvents()
                 }

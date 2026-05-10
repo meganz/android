@@ -156,7 +156,7 @@ class SearchViewModelTest {
                     isContactVerificationOn = any(),
                 )
             ).thenReturn(nodeUiItems)
-            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(items)
+            whenever(searchUseCase(any(), any(), any())).thenReturn(items)
         }
 
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
@@ -221,7 +221,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
         setupTestData(listOf(typedFileNode))
@@ -251,7 +250,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
         setupTestData(listOf(typedFileNode))
@@ -265,7 +263,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
         whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
@@ -308,7 +305,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
         setupTestData(emptyList())
@@ -329,7 +325,6 @@ class SearchViewModelTest {
                     parentHandle = any(),
                     nodeSourceType = any(),
                     searchParameters = any(),
-                    isSingleActivityEnabled = any(),
                 )
             ).thenThrow(RuntimeException("Search failed"))
 
@@ -356,7 +351,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
         setupTestData(listOf(typedFileNode))
@@ -477,7 +471,6 @@ class SearchViewModelTest {
                         params.modificationDate == null &&
                         params.creationDate == null
             },
-            isSingleActivityEnabled = any()
         )
     }
 
@@ -507,7 +500,6 @@ class SearchViewModelTest {
                             params.modificationDate == dateModifiedFilter &&
                             params.creationDate == null
                 },
-                isSingleActivityEnabled = any()
             )
         }
 
@@ -537,7 +529,6 @@ class SearchViewModelTest {
                             params.modificationDate == null &&
                             params.creationDate == dateAddedFilter
                 },
-                isSingleActivityEnabled = any()
             )
         }
 
@@ -577,7 +568,6 @@ class SearchViewModelTest {
                         params.modificationDate == dateModifiedFilter &&
                         params.creationDate == dateAddedFilter
             },
-            isSingleActivityEnabled = any()
         )
     }
 
@@ -613,7 +603,6 @@ class SearchViewModelTest {
                 searchParameters = argThat { params ->
                     params.searchCategory == expectedSearchCategory
                 },
-                isSingleActivityEnabled = any()
             )
         }
 
@@ -649,7 +638,6 @@ class SearchViewModelTest {
                 searchParameters = argThat { params ->
                     params.searchCategory == expectedSearchCategory
                 },
-                isSingleActivityEnabled = any()
             )
         }
 
@@ -716,7 +704,6 @@ class SearchViewModelTest {
             searchParameters = argThat { params ->
                 params.searchCategory == updatedSearchCategory
             },
-            isSingleActivityEnabled = any()
         )
     }
 
@@ -1117,7 +1104,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any()
             )
         }
 
@@ -1199,7 +1185,6 @@ class SearchViewModelTest {
                 searchParameters = argThat { params ->
                     params.description == query && params.tag == "test"
                 },
-                isSingleActivityEnabled = any()
             )
         }
 
@@ -1235,7 +1220,6 @@ class SearchViewModelTest {
                 searchParameters = argThat { params ->
                     params.description == query && params.tag == null
                 },
-                isSingleActivityEnabled = any()
             )
         }
 
@@ -1260,7 +1244,6 @@ class SearchViewModelTest {
             searchParameters = argThat { params ->
                 params.description == query && params.tag == query
             },
-            isSingleActivityEnabled = any()
         )
     }
 
@@ -1308,7 +1291,6 @@ class SearchViewModelTest {
                 searchParameters = argThat { params ->
                     params.searchTarget == expectedSearchTarget
                 },
-                isSingleActivityEnabled = any()
             )
         }
 
@@ -1441,7 +1423,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
         setupTestData(listOf(typedFileNode))
@@ -1464,7 +1445,6 @@ class SearchViewModelTest {
             parentHandle = any(),
             nodeSourceType = any(),
             searchParameters = any(),
-            isSingleActivityEnabled = any()
         )
     }
 
@@ -1493,7 +1473,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
         setupTestData(listOf(typedFileNode))
@@ -1516,7 +1495,6 @@ class SearchViewModelTest {
                 parentHandle = any(),
                 nodeSourceType = any(),
                 searchParameters = any(),
-                isSingleActivityEnabled = any(),
             )
         ).thenThrow(RuntimeException("Search failed"))
 

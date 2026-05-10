@@ -173,7 +173,6 @@ class SearchViewModel @AssistedInject constructor(
                 parentHandle = NodeId(args.parentHandle),
                 nodeSourceType = args.nodeSourceType,
                 searchParameters = getSearchParameters(query),
-                isSingleActivityEnabled = true
             )
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
