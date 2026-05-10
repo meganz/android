@@ -101,7 +101,7 @@ class LinksViewModel @Inject constructor(
         }
     }
 
-    private fun publicLinks() = monitorPublicLinksUseCase(false).map { list ->
+    private fun publicLinks() = monitorPublicLinksUseCase().map { list ->
         _state.value.copy(
             nodesList = getNodeUiItems(list),
             sortOrder = getSortOrder(),

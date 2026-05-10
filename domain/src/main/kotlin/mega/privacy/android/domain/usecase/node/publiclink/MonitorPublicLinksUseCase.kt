@@ -38,16 +38,16 @@ class MonitorPublicLinksUseCase @Inject constructor(
      *
      * @return
      */
-    operator fun invoke(isSingleActivityEnabled: Boolean) =
+    operator fun invoke() =
         nodeRepository.monitorNodeUpdates()
             .filter { update ->
                 isPublicLinkUpdate(update) || update.changes.keys.map { it.id }.intersect(
                     nodeIds
                 ).isNotEmpty()
             }.map {
-                getPublicLinks(isSingleActivityEnabled)
+                getPublicLinks()
             }.onStart {
-                emit(getPublicLinks(isSingleActivityEnabled))
+                emit(getPublicLinks())
             }
 
     private fun isPublicLinkUpdate(update: NodeUpdate) =
@@ -55,9 +55,9 @@ class MonitorPublicLinksUseCase @Inject constructor(
             it.contains(NodeChanges.Public_link)
         }
 
-    private suspend fun getPublicLinks(isSingleActivityEnabled: Boolean): List<PublicLinkNode> {
+    private suspend fun getPublicLinks(): List<PublicLinkNode> {
         val publicLinks =
-            shareRepository.getPublicLinks(getLinksSortOrderUseCase(isSingleActivityEnabled))
+            shareRepository.getPublicLinks(getLinksSortOrderUseCase(true))
         nodeIds = publicLinks.mapTo(mutableSetOf()) { it.id }
         return publicLinks
             .mapNotNull {

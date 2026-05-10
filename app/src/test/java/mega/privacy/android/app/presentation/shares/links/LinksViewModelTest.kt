@@ -59,7 +59,7 @@ internal class LinksViewModelTest {
     private lateinit var monitorLinksChannel: Channel<List<PublicLinkNode>>
     private val monitorPublicLinksUseCase =
         mock<MonitorPublicLinksUseCase> {
-            on { invoke(any()) }.thenAnswer {
+            on { invoke() }.thenAnswer {
                 monitorLinksChannel = Channel()
                 monitorLinksChannel.consumeAsFlow()
             }

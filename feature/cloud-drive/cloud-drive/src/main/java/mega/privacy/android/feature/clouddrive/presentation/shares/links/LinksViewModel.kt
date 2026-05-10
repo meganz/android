@@ -71,7 +71,7 @@ class LinksViewModel @Inject constructor(
 
     private fun monitorLinks() {
         viewModelScope.launch {
-            monitorLinksUseCase(true)
+            monitorLinksUseCase()
                 .catch { Timber.e(it) }
                 .collectLatest { nodes ->
                     val nodeUiItems = nodeUiItemMapper(
@@ -90,7 +90,7 @@ class LinksViewModel @Inject constructor(
 
     private suspend fun loadLinks() {
         runCatching {
-            val nodes = monitorLinksUseCase(true).first()
+            val nodes = monitorLinksUseCase().first()
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = uiState.value.items,

@@ -24,8 +24,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -80,107 +78,99 @@ internal class MonitorLinksUseCaseTest {
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    internal fun `test that folder link nodes are returned`(isSingleActivityEnabled: Boolean) =
+    @Test
+    internal fun `test that folder link nodes are returned`() = runTest {
+        val untypedNodes = listOf<FolderNode>(mock(), mock())
+        shareRepository.stub {
+            onBlocking { getPublicLinks(any()) }.thenReturn(untypedNodes)
+        }
+        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+
+        underTest().test {
+            assertThat(awaitItem()).hasSize(untypedNodes.size)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    internal fun `test that new items are emitted if a node update of type PublicLink is emitted`() =
         runTest {
             val untypedNodes = listOf<FolderNode>(mock(), mock())
             shareRepository.stub {
-                onBlocking { getPublicLinks(any()) }.thenReturn(untypedNodes)
+                onBlocking { getPublicLinks(any()) }.thenReturn(
+                    emptyList(),
+                    untypedNodes
+                )
+            }
+            val nodeUpdateChannel = Channel<NodeUpdate>()
+            nodeRepository.stub {
+                on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
             }
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
 
-            underTest(isSingleActivityEnabled).test {
+            underTest().test {
+                assertThat(awaitItem()).isEmpty()
+                nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
                 assertThat(awaitItem()).hasSize(untypedNodes.size)
-                cancelAndConsumeRemainingEvents()
+                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
             }
         }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    internal fun `test that new items are emitted if a node update of type PublicLink is emitted`(
-        isSingleActivityEnabled: Boolean,
-    ) = runTest {
-        val untypedNodes = listOf<FolderNode>(mock(), mock())
-        shareRepository.stub {
-            onBlocking { getPublicLinks(any()) }.thenReturn(
-                emptyList(),
-                untypedNodes
+    @Test
+    internal fun `test that no new items are emitted if a node update of type not of PublicLink is emitted`() =
+        runTest {
+            val untypedNodes = listOf<FolderNode>(mock(), mock())
+            shareRepository.stub {
+                onBlocking { getPublicLinks(any()) }.thenReturn(
+                    emptyList(),
+                    untypedNodes
+                )
+            }
+            val nodeUpdateChannel = Channel<NodeUpdate>()
+            nodeRepository.stub {
+                on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
+            }
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+
+            underTest().test {
+                assertThat(awaitItem()).isEmpty()
+                nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Favourite))))
+                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+            }
+        }
+
+    @Test
+    internal fun `test that new items are emitted if a non PublicLink update for an existing public node is emitted`() =
+        runTest {
+            val nodeId = NodeId(42)
+            val untypedNodes = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
+            shareRepository.stub {
+                onBlocking { getPublicLinks(any()) }.thenReturn(
+                    untypedNodes,
+                    emptyList(),
+                )
+            }
+            val nodeUpdateChannel = Channel<NodeUpdate>()
+            nodeRepository.stub {
+                on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
+            }
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+
+            val update = NodeUpdate(
+                mapOf(
+                    mock<Node> {
+                        on { id }.thenReturn(nodeId)
+                    } to listOf(NodeChanges.Favourite)
+                )
             )
-        }
-        val nodeUpdateChannel = Channel<NodeUpdate>()
-        nodeRepository.stub {
-            on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
-        }
-        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
 
-        underTest(isSingleActivityEnabled).test {
-            assertThat(awaitItem()).isEmpty()
-            nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
-            assertThat(awaitItem()).hasSize(untypedNodes.size)
-            assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+            underTest().test {
+                assertThat(awaitItem()).hasSize(untypedNodes.size)
+                nodeUpdateChannel.send(update)
+                assertThat(awaitItem()).isEmpty()
+                assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+            }
         }
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    internal fun `test that no new items are emitted if a node update of type not of PublicLink is emitted`(
-        isSingleActivityEnabled: Boolean,
-    ) = runTest {
-        val untypedNodes = listOf<FolderNode>(mock(), mock())
-        shareRepository.stub {
-            onBlocking { getPublicLinks(any()) }.thenReturn(
-                emptyList(),
-                untypedNodes
-            )
-        }
-        val nodeUpdateChannel = Channel<NodeUpdate>()
-        nodeRepository.stub {
-            on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
-        }
-        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-
-        underTest(isSingleActivityEnabled).test {
-            assertThat(awaitItem()).isEmpty()
-            nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Favourite))))
-            assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
-        }
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    internal fun `test that new items are emitted if a non PublicLink update for an existing public node is emitted`(
-        isSingleActivityEnabled: Boolean,
-    ) = runTest {
-        val nodeId = NodeId(42)
-        val untypedNodes = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
-        shareRepository.stub {
-            onBlocking { getPublicLinks(any()) }.thenReturn(
-                untypedNodes,
-                emptyList(),
-            )
-        }
-        val nodeUpdateChannel = Channel<NodeUpdate>()
-        nodeRepository.stub {
-            on { monitorNodeUpdates() }.thenReturn(nodeUpdateChannel.consumeAsFlow())
-        }
-        whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-
-        val update = NodeUpdate(
-            mapOf(
-                mock<Node> {
-                    on { id }.thenReturn(nodeId)
-                } to listOf(NodeChanges.Favourite)
-            )
-        )
-
-        underTest(isSingleActivityEnabled).test {
-            assertThat(awaitItem()).hasSize(untypedNodes.size)
-            nodeUpdateChannel.send(update)
-            assertThat(awaitItem()).isEmpty()
-            assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
-        }
-    }
 
     @Test
     internal fun `test that public links are refreshed when offline node matching public link is added`() =
@@ -211,7 +201,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest(true).test {
+            underTest().test {
                 assertThat(awaitItem()).hasSize(1)
                 assertThat(awaitItem()).hasSize(1)
                 cancelAndConsumeRemainingEvents()
@@ -248,7 +238,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest(true).test {
+            underTest().test {
                 assertThat(awaitItem()).hasSize(1)
                 assertThat(awaitItem()).hasSize(1) // After offline node added
                 assertThat(awaitItem()).hasSize(1) // After offline node removed
@@ -282,7 +272,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest(true).test {
+            underTest().test {
                 assertThat(awaitItem()).hasSize(1)
                 // Should not emit again because offline node doesn't match
                 assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
@@ -313,7 +303,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest(true).test {
+            underTest().test {
                 assertThat(awaitItem()).isEmpty()
                 // Should not emit again because nodeIds is empty
                 assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
@@ -345,7 +335,7 @@ internal class MonitorLinksUseCaseTest {
             )
         )
 
-        underTest(true).test {
+        underTest().test {
             assertThat(awaitItem()).hasSize(1)
             assertThat(awaitItem()).hasSize(1)
             cancelAndConsumeRemainingEvents()
@@ -378,7 +368,7 @@ internal class MonitorLinksUseCaseTest {
             )
         )
 
-        underTest(true).test {
+        underTest().test {
             assertThat(awaitItem()).hasSize(1)
             assertThat(awaitItem()).hasSize(1)
             // Should not emit again because the set hasn't changed
@@ -419,7 +409,7 @@ internal class MonitorLinksUseCaseTest {
             )
         )
 
-        underTest(true).test {
+        underTest().test {
             assertThat(awaitItem()).hasSize(1)
             // Send online update
             nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
@@ -430,4 +420,3 @@ internal class MonitorLinksUseCaseTest {
         }
     }
 }
-

@@ -40,16 +40,16 @@ class MonitorLinksUseCase @Inject constructor(
      *
      * @return
      */
-    operator fun invoke(isSingleActivityEnabled: Boolean) =
+    operator fun invoke() =
         merge(
             monitorOnlineNodeUpdates(),
             monitorOfflineNodeUpdates()
         )
             .map {
-                getPublicLinks(isSingleActivityEnabled)
+                getPublicLinks()
             }
             .onStart {
-                emit(getPublicLinks(isSingleActivityEnabled))
+                emit(getPublicLinks())
             }
 
     private fun monitorOnlineNodeUpdates() =
@@ -85,9 +85,9 @@ class MonitorLinksUseCase @Inject constructor(
             it.contains(NodeChanges.Public_link)
         }
 
-    private suspend fun getPublicLinks(isSingleActivityEnabled: Boolean): List<PublicLinkNode> {
+    private suspend fun getPublicLinks(): List<PublicLinkNode> {
         val publicLinks =
-            shareRepository.getPublicLinks(getLinksSortOrderUseCase(isSingleActivityEnabled))
+            shareRepository.getPublicLinks(getLinksSortOrderUseCase(true))
         nodeIds = publicLinks.mapTo(mutableSetOf()) { it.id }
         return publicLinks
             .mapNotNull {

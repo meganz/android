@@ -94,7 +94,7 @@ class LinksViewModelTest {
     private suspend fun setupTestData(items: List<PublicLinkNode>) {
         whenever(getLinksSortOrderUseCase(true)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
-        whenever(monitorLinksUseCase(true)).thenReturn(flowOf(items))
+        whenever(monitorLinksUseCase()).thenReturn(flowOf(items))
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
