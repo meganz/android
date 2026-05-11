@@ -209,7 +209,7 @@ internal fun ContinueWhereLeftOffListScreen(
     if (uiState.showSortSheet) {
         SortBottomSheet(
             title = stringResource(sharedR.string.action_sort_by_header),
-            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
+            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CONTINUE_WHERE_LEFT_OFF),
             sheetState = sortSheetState,
             selectedSort = SortBottomSheetResult(
                 sortOptionItem = uiState.sortConfiguration.sortOption,

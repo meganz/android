@@ -111,7 +111,12 @@ enum class NodeSourceType {
     /**
      * When node source is Chat
      */
-    CHAT
+    CHAT,
+
+    /**
+     * When node source is Continue Where Left Off
+     */
+    CONTINUE_WHERE_LEFT_OFF
 }
 
 /**

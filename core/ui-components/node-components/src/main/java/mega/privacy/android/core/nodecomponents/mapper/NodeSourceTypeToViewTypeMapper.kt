@@ -33,6 +33,7 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
         NodeSourceType.OTHER,
         NodeSourceType.OFFLINE,
         NodeSourceType.TIMELINE,
+        NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
             -> null
 
         NodeSourceType.RECENTS_BUCKET -> NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER

@@ -83,6 +83,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     NodeSourceType.OUTGOING_SHARES -> ORDER_OUTGOING_SHARES
                     NodeSourceType.INCOMING_SHARES,
                     NodeSourceType.OTHER, NodeSourceType.OFFLINE, NodeSourceType.TIMELINE,
+                    NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
                         -> ORDER_OTHERS
                 }
             )

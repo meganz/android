@@ -100,6 +100,11 @@ enum class NodeSortOption(
                 Modified
             )
 
+            NodeSourceType.CONTINUE_WHERE_LEFT_OFF -> listOf(
+                Name,
+                Created,
+            )
+
             else -> listOf(
                 Name,
                 Favourite,

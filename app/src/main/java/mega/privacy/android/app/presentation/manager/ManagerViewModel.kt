@@ -1147,7 +1147,9 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.CHAT
             -> MegaApiJava.INVALID_HANDLE
 
-        NodeSourceType.HOME, NodeSourceType.OTHER, NodeSourceType.OFFLINE -> getRootNodeUseCase()?.id?.longValue
+        NodeSourceType.HOME, NodeSourceType.OTHER, NodeSourceType.OFFLINE,
+        NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
+            -> getRootNodeUseCase()?.id?.longValue
             ?: MegaApiJava.INVALID_HANDLE
     }
 
