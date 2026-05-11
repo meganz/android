@@ -185,18 +185,6 @@ private fun ContinueWhereLeftOffCarouselPreview() {
                     type = RecentlyUsedType.Audio,
                     lastAccessedTimestamp = 1712707200L,
                 ),
-                ContinueWhereLeftOffItem(
-                    nodeHandle = 5L,
-                    title = "Shared File Link",
-                    type = RecentlyUsedType.FileLink,
-                    lastAccessedTimestamp = 1712620800L,
-                ),
-                ContinueWhereLeftOffItem(
-                    nodeHandle = 6L,
-                    title = "Shared Folder",
-                    type = RecentlyUsedType.FolderLink,
-                    lastAccessedTimestamp = 1712534400L,
-                ),
             ),
             onItemClick = {},
             onViewAllClick = {},

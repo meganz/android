@@ -29,7 +29,7 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -113,7 +113,7 @@ internal fun ViewedLinksScreen(
                         },
                         onClickListener = {
                             when (item.viewedLink.type) {
-                                RecentlyUsedType.FolderLink ->
+                                RecentlyViewedLinkType.FolderLink ->
                                     onFolderLinkClicked(item.viewedLink.linkUrl)
 
                                 else ->
@@ -179,7 +179,7 @@ private fun ViewedLinksScreenPreview() {
                             nodeHandle = 1L,
                             name = "Galicia 004.mov",
                             linkUrl = "https://mega.nz/file/abc",
-                            type = RecentlyUsedType.FileLink,
+                            type = RecentlyViewedLinkType.FileLink,
                         ),
                         iconRes = iconPackR.drawable.ic_video_medium_solid,
                         previewPath = null,
@@ -189,7 +189,7 @@ private fun ViewedLinksScreenPreview() {
                             nodeHandle = 2L,
                             name = "Galicia 005.mov",
                             linkUrl = "https://mega.nz/file/def",
-                            type = RecentlyUsedType.FileLink,
+                            type = RecentlyViewedLinkType.FileLink,
                         ),
                         iconRes = iconPackR.drawable.ic_video_medium_solid,
                         previewPath = null,
@@ -199,7 +199,7 @@ private fun ViewedLinksScreenPreview() {
                             nodeHandle = 3L,
                             name = "Susan Abulhawa notes.txt",
                             linkUrl = "https://mega.nz/file/ghi",
-                            type = RecentlyUsedType.FileLink,
+                            type = RecentlyViewedLinkType.FileLink,
                         ),
                         iconRes = iconPackR.drawable.ic_text_medium_solid,
                         previewPath = null,
@@ -209,7 +209,7 @@ private fun ViewedLinksScreenPreview() {
                             nodeHandle = 4L,
                             name = "Anne Carson - Gloves on article.pdf",
                             linkUrl = "https://mega.nz/file/jkl",
-                            type = RecentlyUsedType.FileLink,
+                            type = RecentlyViewedLinkType.FileLink,
                         ),
                         iconRes = iconPackR.drawable.ic_pdf_medium_solid,
                         previewPath = null,
@@ -219,7 +219,7 @@ private fun ViewedLinksScreenPreview() {
                             nodeHandle = 5L,
                             name = "Annemarie_Jacir",
                             linkUrl = "https://mega.nz/folder/mno",
-                            type = RecentlyUsedType.FolderLink,
+                            type = RecentlyViewedLinkType.FolderLink,
                         ),
                         iconRes = iconPackR.drawable.ic_folder_users_small_solid,
                         previewPath = null,
@@ -229,7 +229,7 @@ private fun ViewedLinksScreenPreview() {
                             nodeHandle = 6L,
                             name = "Recipes",
                             linkUrl = "https://mega.nz/folder/pqr",
-                            type = RecentlyUsedType.FolderLink,
+                            type = RecentlyViewedLinkType.FolderLink,
                         ),
                         iconRes = iconPackR.drawable.ic_folder_users_small_solid,
                         previewPath = null,
@@ -239,7 +239,7 @@ private fun ViewedLinksScreenPreview() {
                             nodeHandle = 7L,
                             name = "Nabulus_soap_company_products.pdf",
                             linkUrl = "https://mega.nz/file/stu",
-                            type = RecentlyUsedType.FileLink,
+                            type = RecentlyViewedLinkType.FileLink,
                         ),
                         iconRes = iconPackR.drawable.ic_pdf_medium_solid,
                         previewPath = null,

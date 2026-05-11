@@ -1,18 +1,17 @@
 package mega.privacy.android.data.mapper.viewedlinks
 
 import mega.privacy.android.data.database.entity.ViewedLinkRawItem
-import mega.privacy.android.data.mapper.continuewhereleftoff.RecentlyUsedTypeIdMapper
 import mega.privacy.android.domain.entity.node.ViewedLink
 import javax.inject.Inject
 
 /**
- * Maps [ViewedLinkRawItem] (Room POJO from the multi-join query) to the
- * domain entity [ViewedLink].
+ * Maps [ViewedLinkRawItem] (Room POJO from the recently_viewed_link query) to
+ * the domain entity [ViewedLink].
  *
- * @property recentlyUsedTypeIdMapper
+ * @property recentlyViewedLinkTypeIdMapper
  */
 internal class ViewedLinkRawItemMapper @Inject constructor(
-    private val recentlyUsedTypeIdMapper: RecentlyUsedTypeIdMapper,
+    private val recentlyViewedLinkTypeIdMapper: RecentlyViewedLinkTypeIdMapper,
 ) {
 
     /**
@@ -22,9 +21,9 @@ internal class ViewedLinkRawItemMapper @Inject constructor(
      */
     operator fun invoke(raw: ViewedLinkRawItem) = ViewedLink(
         nodeHandle = raw.nodeHandle,
-        name = raw.fileName,
+        name = raw.nodeName,
         linkUrl = raw.linkUrl,
-        type = recentlyUsedTypeIdMapper(raw.typeId),
+        type = recentlyViewedLinkTypeIdMapper(raw.typeId),
         accessedTimestamp = raw.lastAccessedTimestamp,
     )
 

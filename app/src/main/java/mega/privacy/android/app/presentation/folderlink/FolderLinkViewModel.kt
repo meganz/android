@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.billing.Pricing
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -507,7 +507,7 @@ class FolderLinkViewModel @Inject constructor(
                         nodeHandle = rootNode.id.longValue,
                         name = rootNode.name,
                         linkUrl = link,
-                        type = RecentlyUsedType.FolderLink,
+                        type = RecentlyViewedLinkType.FolderLink,
                         accessedTimestamp = null
                     )
                 )

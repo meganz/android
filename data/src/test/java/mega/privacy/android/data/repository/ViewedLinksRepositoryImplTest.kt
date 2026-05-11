@@ -7,13 +7,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
-import mega.privacy.android.data.database.entity.RecentlyUsedEntity
 import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
 import mega.privacy.android.data.database.entity.ViewedLinkRawItem
 import mega.privacy.android.data.gateway.DeviceGateway
-import mega.privacy.android.data.mapper.continuewhereleftoff.RecentlyUsedTypeIdMapper
+import mega.privacy.android.data.mapper.viewedlinks.RecentlyViewedLinkTypeIdMapper
 import mega.privacy.android.data.mapper.viewedlinks.ViewedLinkRawItemMapper
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -33,7 +32,7 @@ internal class ViewedLinksRepositoryImplTest {
 
     private val recentlyViewedLinkDao: RecentlyViewedLinkDao = mock()
     private val viewedLinkRawItemMapper: ViewedLinkRawItemMapper = mock()
-    private val recentlyUsedTypeIdMapper = RecentlyUsedTypeIdMapper()
+    private val recentlyViewedLinkTypeIdMapper = RecentlyViewedLinkTypeIdMapper()
     private val deviceGateway: DeviceGateway = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -42,7 +41,7 @@ internal class ViewedLinksRepositoryImplTest {
         underTest = ViewedLinksRepositoryImpl(
             recentlyViewedLinkDao = recentlyViewedLinkDao,
             viewedLinkRawItemMapper = viewedLinkRawItemMapper,
-            recentlyUsedTypeIdMapper = recentlyUsedTypeIdMapper,
+            recentlyViewedLinkTypeIdMapper = recentlyViewedLinkTypeIdMapper,
             deviceGateway = deviceGateway,
             ioDispatcher = testDispatcher,
         )
@@ -62,15 +61,15 @@ internal class ViewedLinksRepositoryImplTest {
         val rawItems = listOf(
             ViewedLinkRawItem(
                 nodeHandle = 1L,
-                typeId = 5,
-                fileName = "test.pdf",
+                typeId = 1,
+                nodeName = "test.pdf",
                 lastAccessedTimestamp = 1000L,
                 linkUrl = "https://mega.nz/file/abc",
             ),
             ViewedLinkRawItem(
                 nodeHandle = 2L,
-                typeId = 6,
-                fileName = "my-folder",
+                typeId = 2,
+                nodeName = "my-folder",
                 lastAccessedTimestamp = 2000L,
                 linkUrl = "https://mega.nz/folder/def",
             ),
@@ -80,14 +79,14 @@ internal class ViewedLinksRepositoryImplTest {
                 nodeHandle = 1L,
                 name = "test.pdf",
                 linkUrl = "https://mega.nz/file/abc",
-                type = RecentlyUsedType.FileLink,
+                type = RecentlyViewedLinkType.FileLink,
                 accessedTimestamp = 1000L,
             ),
             ViewedLink(
                 nodeHandle = 2L,
                 name = "my-folder",
                 linkUrl = "https://mega.nz/folder/def",
-                type = RecentlyUsedType.FolderLink,
+                type = RecentlyViewedLinkType.FolderLink,
                 accessedTimestamp = 2000L,
             ),
         )
@@ -106,8 +105,8 @@ internal class ViewedLinksRepositoryImplTest {
         val rawItems = listOf(
             ViewedLinkRawItem(
                 nodeHandle = 1L,
-                typeId = 5,
-                fileName = "test.pdf",
+                typeId = 1,
+                nodeName = "test.pdf",
                 lastAccessedTimestamp = 1000L,
                 linkUrl = "https://mega.nz/file/abc",
             ),
@@ -136,55 +135,49 @@ internal class ViewedLinksRepositoryImplTest {
     }
 
     @Test
-    fun `test that saveLink calls saveViewedLink with correct entities for file link`() =
+    fun `test that saveLink calls saveViewedLink with correct entity for file link`() =
         runTest {
             val viewedLink = ViewedLink(
                 nodeHandle = 123L,
                 name = "document.pdf",
                 linkUrl = "https://mega.nz/file/abc123",
-                type = RecentlyUsedType.FileLink,
+                type = RecentlyViewedLinkType.FileLink,
                 accessedTimestamp = 5000L,
             )
 
             underTest.saveLink(viewedLink)
 
-            verify(recentlyViewedLinkDao).saveViewedLink(
-                recentlyUsedEntity = RecentlyUsedEntity(
+            verify(recentlyViewedLinkDao).insertOrUpdateLink(
+                RecentlyViewedLinkEntity(
                     nodeHandle = 123L,
-                    typeId = 5,
-                    fileName = "document.pdf",
-                    lastAccessedTimestamp = 5000L,
-                ),
-                recentlyViewedLinkEntity = RecentlyViewedLinkEntity(
-                    nodeHandle = 123L,
+                    typeId = 1,
+                    nodeName = "document.pdf",
                     linkUrl = "https://mega.nz/file/abc123",
+                    lastAccessedTimestamp = 5000L,
                 ),
             )
         }
 
     @Test
-    fun `test that saveLink calls saveViewedLink with correct entities for folder link`() =
+    fun `test that saveLink calls saveViewedLink with correct entity for folder link`() =
         runTest {
             val viewedLink = ViewedLink(
                 nodeHandle = 456L,
                 name = "shared-folder",
                 linkUrl = "https://mega.nz/folder/def456",
-                type = RecentlyUsedType.FolderLink,
+                type = RecentlyViewedLinkType.FolderLink,
                 accessedTimestamp = 9000L,
             )
 
             underTest.saveLink(viewedLink)
 
-            verify(recentlyViewedLinkDao).saveViewedLink(
-                recentlyUsedEntity = RecentlyUsedEntity(
+            verify(recentlyViewedLinkDao).insertOrUpdateLink(
+                RecentlyViewedLinkEntity(
                     nodeHandle = 456L,
-                    typeId = 6,
-                    fileName = "shared-folder",
-                    lastAccessedTimestamp = 9000L,
-                ),
-                recentlyViewedLinkEntity = RecentlyViewedLinkEntity(
-                    nodeHandle = 456L,
+                    typeId = 2,
+                    nodeName = "shared-folder",
                     linkUrl = "https://mega.nz/folder/def456",
+                    lastAccessedTimestamp = 9000L,
                 ),
             )
         }

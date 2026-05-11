@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
@@ -255,7 +255,7 @@ class LegacyFileLinkViewModelTest {
                     nodeHandle = 1234567890L,
                     name = title,
                     linkUrl = url,
-                    type = RecentlyUsedType.FileLink,
+                    type = RecentlyViewedLinkType.FileLink,
                     accessedTimestamp = null
                 )
             )

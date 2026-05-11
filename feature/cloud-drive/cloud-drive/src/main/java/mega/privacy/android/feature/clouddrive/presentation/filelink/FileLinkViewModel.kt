@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
@@ -158,7 +158,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
                         nodeHandle = node.id.longValue,
                         name = node.name,
                         linkUrl = link,
-                        type = RecentlyUsedType.FileLink,
+                        type = RecentlyViewedLinkType.FileLink,
                         accessedTimestamp = null,
                     )
                 )

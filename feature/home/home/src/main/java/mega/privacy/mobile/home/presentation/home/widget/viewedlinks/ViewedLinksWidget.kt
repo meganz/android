@@ -31,7 +31,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -154,8 +154,8 @@ internal fun ViewedLinksView(
                             },
                             onClickListener = {
                                 when (item.viewedLink.type) {
-                                    RecentlyUsedType.FolderLink -> onFolderLinkClicked(item.viewedLink.linkUrl)
-                                    else -> onFileLinkClicked(item.viewedLink.linkUrl)
+                                    RecentlyViewedLinkType.FolderLink -> onFolderLinkClicked(item.viewedLink.linkUrl)
+                                    RecentlyViewedLinkType.FileLink -> onFileLinkClicked(item.viewedLink.linkUrl)
                                 }
                             },
                         )

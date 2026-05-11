@@ -18,8 +18,6 @@ internal class RecentlyUsedTypeIdMapper @Inject constructor() {
         RecentlyUsedType.Video -> 2
         RecentlyUsedType.Audio -> 3
         RecentlyUsedType.TextEditor -> 4
-        RecentlyUsedType.FileLink -> 5
-        RecentlyUsedType.FolderLink -> 6
     }
 
     /**
@@ -32,8 +30,6 @@ internal class RecentlyUsedTypeIdMapper @Inject constructor() {
         2 -> RecentlyUsedType.Video
         3 -> RecentlyUsedType.Audio
         4 -> RecentlyUsedType.TextEditor
-        5 -> RecentlyUsedType.FileLink
-        6 -> RecentlyUsedType.FolderLink
         else -> error("Unknown type ID: $typeId")
     }
 }

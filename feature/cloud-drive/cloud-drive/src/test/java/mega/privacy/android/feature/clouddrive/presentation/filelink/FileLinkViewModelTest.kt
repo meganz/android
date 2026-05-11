@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import kotlin.time.Duration.Companion.seconds
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
@@ -392,7 +392,7 @@ internal class FileLinkViewModelTest {
                 nodeHandle = 42L,
                 name = "doc.pdf",
                 linkUrl = url,
-                type = RecentlyUsedType.FileLink,
+                type = RecentlyViewedLinkType.FileLink,
                 accessedTimestamp = null,
             )
         )

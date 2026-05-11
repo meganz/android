@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -1118,7 +1118,7 @@ internal class FolderLinkViewModelTest {
                     nodeHandle = 10L,
                     name = "Shared Folder",
                     linkUrl = url,
-                    type = RecentlyUsedType.FolderLink,
+                    type = RecentlyViewedLinkType.FolderLink,
                     accessedTimestamp = null,
                 )
             )

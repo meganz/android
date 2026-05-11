@@ -12,7 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
@@ -37,7 +37,7 @@ class ViewedLinksScreenTest {
             nodeHandle = 1L,
             name = "Document.pdf",
             linkUrl = "https://mega.nz/file/abc",
-            type = RecentlyUsedType.FileLink,
+            type = RecentlyViewedLinkType.FileLink,
         ),
         iconRes = iconPackR.drawable.ic_pdf_medium_solid,
         previewPath = null,
@@ -48,7 +48,7 @@ class ViewedLinksScreenTest {
             nodeHandle = 2L,
             name = "Recipes",
             linkUrl = "https://mega.nz/folder/def",
-            type = RecentlyUsedType.FolderLink,
+            type = RecentlyViewedLinkType.FolderLink,
         ),
         iconRes = iconPackR.drawable.ic_folder_users_small_solid,
         previewPath = null,

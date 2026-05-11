@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -81,16 +81,14 @@ internal class ViewedLinksViewModel @Inject constructor(
     private suspend fun List<ViewedLink>.toUiItems() =
         mapAsync { link ->
             when (link.type) {
-                RecentlyUsedType.FileLink -> resolveFileLink(link)
-                RecentlyUsedType.FolderLink -> ViewedLinkUiItem(
+                RecentlyViewedLinkType.FileLink -> resolveFileLink(link)
+                RecentlyViewedLinkType.FolderLink -> ViewedLinkUiItem(
                     viewedLink = link,
                     iconRes = iconPackR.drawable.ic_folder_users_small_solid,
                     previewPath = null
                 )
-
-                else -> null
             }
-        }.filterNotNull()
+        }
 
     /**
      * Resolves a file link to a [ViewedLinkUiItem] by fetching the public node.

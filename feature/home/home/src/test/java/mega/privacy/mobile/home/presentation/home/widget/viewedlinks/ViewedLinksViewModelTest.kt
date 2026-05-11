@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -74,7 +74,7 @@ class ViewedLinksViewModelTest {
             nodeHandle = 1L,
             name = "test.pdf",
             linkUrl = "https://mega.nz/file/abc",
-            type = RecentlyUsedType.FileLink,
+            type = RecentlyViewedLinkType.FileLink,
             accessedTimestamp = 1000L,
         )
         val typedFileNode = mock<TypedFileNode> {
@@ -108,7 +108,7 @@ class ViewedLinksViewModelTest {
             nodeHandle = 2L,
             name = "My Folder",
             linkUrl = "https://mega.nz/folder/def",
-            type = RecentlyUsedType.FolderLink,
+            type = RecentlyViewedLinkType.FolderLink,
             accessedTimestamp = 2000L,
         )
 
@@ -133,7 +133,7 @@ class ViewedLinksViewModelTest {
             nodeHandle = 1L,
             name = "video.mp4",
             linkUrl = "https://mega.nz/file/xyz",
-            type = RecentlyUsedType.FileLink,
+            type = RecentlyViewedLinkType.FileLink,
             accessedTimestamp = 1000L,
         )
 

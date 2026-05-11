@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -332,7 +332,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                         nodeHandle = rootNode.id.longValue,
                         name = rootNode.name,
                         linkUrl = link,
-                        type = RecentlyUsedType.FolderLink,
+                        type = RecentlyViewedLinkType.FolderLink,
                     )
                 )
             }.onFailure {

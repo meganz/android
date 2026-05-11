@@ -24,7 +24,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -195,7 +195,7 @@ class LegacyFileLinkViewModel @Inject constructor(
                         nodeHandle = node.id.longValue,
                         name = node.name,
                         linkUrl = link,
-                        type = RecentlyUsedType.FileLink,
+                        type = RecentlyViewedLinkType.FileLink,
                         accessedTimestamp = null
                     )
                 )

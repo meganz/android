@@ -410,6 +410,52 @@ internal abstract class MegaDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_120_121 = object : Migration(120, 121) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Decouple Recently Viewed Links from Recently Used (CWLO) by creating a same table
+                // suffixed with _new
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}_new` (" +
+                            "`node_handle` INTEGER NOT NULL, " +
+                            "`type_id` INTEGER NOT NULL, " +
+                            "`node_name` TEXT NOT NULL, " +
+                            "`link_url` TEXT NOT NULL, " +
+                            "`last_accessed_timestamp` INTEGER NOT NULL, " +
+                            "PRIMARY KEY(`node_handle`)" +
+                            ")"
+                )
+                db.execSQL(
+                    "INSERT INTO `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}_new` " +
+                            "(`node_handle`, `type_id`, `node_name`, `link_url`, `last_accessed_timestamp`) " +
+                            "SELECT rvl.`node_handle`, " +
+                            "CASE ru.`type_id` WHEN 5 THEN 1 WHEN 6 THEN 2 ELSE 1 END, " +
+                            "COALESCE(ru.`file_name`, ''), " +
+                            "rvl.`link_url`, " +
+                            "COALESCE(ru.`last_accessed_timestamp`, 0) " +
+                            "FROM `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}` rvl " +
+                            "LEFT JOIN `${MegaDatabaseConstant.TABLE_RECENTLY_USED}` ru " +
+                            "ON rvl.`node_handle` = ru.`node_handle`"
+                )
+                db.execSQL("DROP TABLE `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}`")
+                // Rename it to the same name after dropping the old table
+                db.execSQL(
+                    "ALTER TABLE `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}_new` " +
+                            "RENAME TO `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}`"
+                )
+                db.execSQL(
+                    "CREATE INDEX IF NOT EXISTS `index_recently_viewed_link_last_accessed` " +
+                            "ON `${MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK}` (`last_accessed_timestamp`)"
+                )
+                // Viewed links are no longer mirrored in recently_used; drop the
+                // FileLink/FolderLink rows so the "Continue Where You Left Off"
+                // feature doesn't surface them anymore.
+                db.execSQL(
+                    "DELETE FROM `${MegaDatabaseConstant.TABLE_RECENTLY_USED}` " +
+                            "WHERE `type_id` IN (5, 6)"
+                )
+            }
+        }
+
         val MIGRATIONS = arrayOf(
             MIGRATION_67_68,
             MIGRATION_68_69,
@@ -424,6 +470,7 @@ internal abstract class MegaDatabase : RoomDatabase() {
             MIGRATION_110_111,
             MIGRATION_111_112,
             MIGRATION_119_120,
+            MIGRATION_120_121,
         )
     }
 }
