@@ -14,6 +14,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -91,6 +92,8 @@ fun NewLoginView(
     onResendVerificationEmail: () -> Unit,
     onResetResendVerificationEmailEvent: () -> Unit,
     stopLogin: () -> Unit,
+    onGoogleSignInClicked: () -> Unit = {},
+    onGoogleSignInErrorShown: () -> Unit = {},
     modifier: Modifier = Modifier,
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
@@ -192,6 +195,7 @@ fun NewLoginView(
                     onResetAccountBlockedEvent = onResetAccountBlockedEvent,
                     onResetResendVerificationEmailEvent = onResetResendVerificationEmailEvent,
                     stopLogin = stopLogin,
+                    onGoogleSignInClicked = onGoogleSignInClicked,
                 )
 
                 is2FARequired || multiFactorAuthState != null -> NewTwoFactorAuthentication(
@@ -214,6 +218,15 @@ fun NewLoginView(
             snackbarHostState.showSnackbar(
                 message = context.getString(it),
                 duration = SnackbarDuration.Short
+            )
+        }
+
+        EventEffect(
+            event = state.googleSignInError,
+            onConsumed = onGoogleSignInErrorShown,
+        ) { messageRes ->
+            snackbarHostState.showAutoDurationSnackbar(
+                message = context.getString(messageRes),
             )
         }
 

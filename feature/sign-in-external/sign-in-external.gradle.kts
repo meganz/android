@@ -31,6 +31,8 @@ dependencies {
     implementation(project(":core:feature-flags"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))
+    implementation(project(":core:ui-components:shared-components"))
+    implementation(lib.mega.core.ui)
 
     // Google Sign-In / Credential Manager
     implementation(androidx.credentials)
@@ -39,6 +41,7 @@ dependencies {
 
     // Compose
     implementation(androidx.bundles.compose.bom)
+    implementation(androidx.compose.activity)
     implementation(androidx.material3)
 
     // Common

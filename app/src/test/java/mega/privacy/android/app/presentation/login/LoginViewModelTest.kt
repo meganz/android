@@ -37,8 +37,10 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -63,6 +65,7 @@ import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.GoogleSignInUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
@@ -169,6 +172,7 @@ internal class LoginViewModelTest {
     private val monitorMiscLoadedFlow = MutableSharedFlow<Boolean>()
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val getSessionLinkUseCase: GetSessionLinkUseCase = mock()
+    private val googleSignInUseCase: GoogleSignInUseCase = mock()
 
     @BeforeEach
     fun setUp() = runTest {
@@ -228,6 +232,7 @@ internal class LoginViewModelTest {
             getUserDataUseCase = getUserDataUseCase,
             getSessionLinkUseCase = getSessionLinkUseCase,
             fetchNodeProvider = mock(),
+            googleSignInUseCase = googleSignInUseCase,
         )
     }
 
@@ -278,6 +283,7 @@ internal class LoginViewModelTest {
             getDomainNameUseCase,
             monitorMiscLoadedUseCase,
             getSessionLinkUseCase,
+            googleSignInUseCase,
         )
     }
 
@@ -877,6 +883,64 @@ internal class LoginViewModelTest {
                 assertThat(actual).isEqualTo(link)
             }
         }
+
+    // region Google Sign-In tests
+
+    @Test
+    fun `test that onGoogleSignIn updates state on successful login`() = runTest {
+        whenever(googleSignInUseCase(eq("fake.jwt.token"), any()))
+            .thenReturn(flowOf(LoginStatus.LoginSucceed))
+
+        underTest.onGoogleSignIn("fake.jwt.token")
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isGoogleSignInInProgress).isFalse()
+            assertThat(state.googleSignInError).isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+    }
+
+    @Test
+    fun `test that onGoogleSignIn shows error on account exists`() = runTest {
+        whenever(googleSignInUseCase(eq("fake.jwt.token"), any()))
+            .thenReturn(flow { throw CreateAccountException.AccountAlreadyExists })
+
+        underTest.onGoogleSignIn("fake.jwt.token")
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.googleSignInError).isInstanceOf(StateEventWithContentTriggered::class.java)
+        }
+    }
+
+    @Test
+    fun `test that onGoogleSignIn shows error on generic failure`() = runTest {
+        whenever(googleSignInUseCase(eq("fake.jwt.token"), any()))
+            .thenReturn(flow { throw RuntimeException("test error") })
+
+        underTest.onGoogleSignIn("fake.jwt.token")
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.googleSignInError).isInstanceOf(StateEventWithContentTriggered::class.java)
+        }
+    }
+
+    @Test
+    fun `test that onGoogleSignInError triggers error event`() = runTest {
+        underTest.onGoogleSignInError(RuntimeException("boom"))
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.googleSignInError).isInstanceOf(StateEventWithContentTriggered::class.java)
+        }
+    }
+
+    // endregion
 
     companion object {
         private val scheduler = TestCoroutineScheduler()

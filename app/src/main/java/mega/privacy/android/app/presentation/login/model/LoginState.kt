@@ -112,6 +112,8 @@ data class LoginState(
     val shouldShowNotificationPermission: Boolean = false,
     val initialEmail: String? = null,
     val isPendingToGetLinkWithSession: Boolean = false,
+    val isGoogleSignInInProgress: Boolean = false,
+    val googleSignInError: StateEventWithContent<Int> = consumed(),
 ) {
 
     /**

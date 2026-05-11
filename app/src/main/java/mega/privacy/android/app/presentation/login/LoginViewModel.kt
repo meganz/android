@@ -56,6 +56,7 @@ import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
@@ -86,6 +87,7 @@ import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
+import mega.privacy.android.domain.usecase.login.GoogleSignInUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
@@ -109,6 +111,7 @@ import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationFailedEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationSuccessEvent
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /**
@@ -168,6 +171,7 @@ class LoginViewModel @Inject constructor(
     private val getSessionLinkUseCase: GetSessionLinkUseCase,
     private val fetchNodeProvider: FetchNodeProvider,
     private val accountBlockedTypeStringMapper: AccountBlockedTypeStringMapper,
+    private val googleSignInUseCase: GoogleSignInUseCase,
 ) : ViewModel() {
     private val is2FARequited = savedStateHandle[IS_2FA_REQUIRED] ?: false
 
@@ -456,6 +460,58 @@ class LoginViewModel @Inject constructor(
                 _state.update { it.copy(isLocalLogoutInProgress = false) }
             }
         }
+    }
+
+    /**
+     * Starts MEGA login with a Google ID token obtained from Credential Manager.
+     *
+     * @param idToken The raw Google ID token JWT.
+     */
+    fun onGoogleSignIn(idToken: String) {
+        if (loginMutex.isLocked || _state.value.isGoogleSignInInProgress) return
+        _state.update { it.copy(isGoogleSignInInProgress = true) }
+
+        viewModelScope.launch {
+            fetchNodeProvider.setLoginByAccount()
+            runCatching {
+                googleSignInUseCase(
+                    idToken,
+                    DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
+                ).collectLatest { status ->
+                    status.checkStatus(email = _state.value.accountSession?.email)
+                }
+            }.onFailure { exception ->
+                when (exception) {
+                    is CreateAccountException.AccountAlreadyExists -> {
+                        _state.update {
+                            it.copy(googleSignInError = triggered(sharedR.string.google_sign_in_email_exists))
+                        }
+                    }
+
+                    else -> {
+                        Timber.e(exception, "Google Sign-In failed")
+                        _state.update {
+                            it.copy(googleSignInError = triggered(sharedR.string.google_sign_in_failed))
+                        }
+                    }
+                }
+            }
+            _state.update { it.copy(isGoogleSignInInProgress = false) }
+        }
+    }
+
+    /**
+     * Handles non-cancellation errors from the Google Sign-In launcher.
+     */
+    fun onGoogleSignInError(throwable: Throwable) {
+        Timber.e(throwable, "Google Sign-In launcher failed")
+        _state.update {
+            it.copy(googleSignInError = triggered(sharedR.string.google_sign_in_failed))
+        }
+    }
+
+    fun onGoogleSignInErrorShown() {
+        _state.update { it.copy(googleSignInError = consumed()) }
     }
 
     /**

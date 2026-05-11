@@ -2822,4 +2822,12 @@
     <string name="last_seen_long_time_ago">[A]Last seen [/A]a long time ago</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. -->
     <string name="last_seen_general">[A]Last seen [/A]%1$s %2$s</string>
+    <!-- Google Sign-In button text on login screen -->
+    <string name="google_sign_in">Sign in with Google</string>
+    <!-- Error message when Google Sign-In fails -->
+    <string name="google_sign_in_failed">Google sign-in failed. Please try again.</string>
+    <!-- Error when Google Sign-In email is already registered with a password -->
+    <string name="google_sign_in_email_exists">This email is already registered. Please sign in with your password first.</string>
+    <!-- Divider text between login button and Google Sign-In button -->
+    <string name="or_divider">or</string>
 </resources>

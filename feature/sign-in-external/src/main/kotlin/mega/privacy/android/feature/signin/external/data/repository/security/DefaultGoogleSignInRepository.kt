@@ -15,9 +15,6 @@ internal class DefaultGoogleSignInRepository @Inject constructor(
     private val googleIdTokenMapper: GoogleIdTokenMapper,
 ) : GoogleSignInRepository {
 
-    /**
-     * @param idToken The raw Google ID token JWT obtained from Credential Manager.
-     */
     override suspend fun signIn(idToken: String): GoogleSignInResult =
         runCatching { googleIdTokenMapper(idToken) }
             .getOrElse { throw GoogleSignInException.Unknown(it.message) }

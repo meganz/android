@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import mega.privacy.android.feature.signin.external.ui.rememberGoogleSignInLauncher
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.privacy.android.analytics.Analytics
@@ -52,6 +54,11 @@ fun LoginScreen(
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val googleSignInLauncher = rememberGoogleSignInLauncher(
+        onIdToken = viewModel::onGoogleSignIn,
+        onError = viewModel::onGoogleSignInError,
+    )
+    val onGoogleSignInClicked = remember(googleSignInLauncher) { googleSignInLauncher::invoke }
     val keyboardController = LocalSoftwareKeyboardController.current
     var showIncorrectRkDialog by rememberSaveable { mutableStateOf(false) }
     var recoveryKeyInput by rememberSaveable(uiState.recoveryKeyLink) { mutableStateOf("") }
@@ -143,6 +150,8 @@ fun LoginScreen(
         onResendVerificationEmail = viewModel::resendVerificationEmail,
         onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
         stopLogin = viewModel::stopLogin,
+        onGoogleSignInClicked = onGoogleSignInClicked,
+        onGoogleSignInErrorShown = viewModel::onGoogleSignInErrorShown,
     )
 
     if (uiState.ongoingTransfersExist == true) {
