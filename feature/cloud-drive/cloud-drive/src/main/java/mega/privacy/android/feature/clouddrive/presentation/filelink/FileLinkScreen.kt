@@ -94,7 +94,6 @@ internal fun FileLinkScreen(
             uiState.fileNode?.let { singleNodeActionHandler(SaveToMegaMenuAction(), it) }
         },
         onDownloadClicked = {
-            // TODO
             uiState.fileNode?.let { singleNodeActionHandler(DownloadMenuAction(), it) }
         },
         onOpenClicked = { uiState.fileNode?.let { openedFileNode = it } },

@@ -597,7 +597,9 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
      */
     fun downloadNode(withStartMessage: Boolean) {
         val nodes = uiState.value.selectedNodes
-        val downloadNodes = if (nodeSourceType == NodeSourceType.FOLDER_LINK) {
+        val downloadNodes = if (nodeSourceType == NodeSourceType.FOLDER_LINK
+            || nodeSourceType == NodeSourceType.FILE_LINK
+        ) {
             runCatching {
                 nodes.map { mapTypedNodeToPublicLinkUseCase(it) }
             }.getOrDefault(nodes)

@@ -331,6 +331,7 @@ class NodeOptionsActionViewModelTest {
             removeRecentlyWatchedItemUseCase,
             copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase,
+            mapTypedNodeToPublicLinkUseCase,
         )
     }
 
@@ -1873,7 +1874,7 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
-    fun `test that downloadNode triggers StartDownloadNode with original nodes when source type is not FOLDER_LINK`() =
+    fun `test that downloadNode triggers StartDownloadNode with original nodes when source type is neither FOLDER_LINK nor FILE_LINK`() =
         runTest {
             initViewModel(nodeSourceType = NodeSourceType.CLOUD_DRIVE)
             viewModel.updateSelectedNodes(listOf(mockFileNode))
@@ -1907,6 +1908,46 @@ class NodeOptionsActionViewModelTest {
                 val trigger =
                     (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
                 assertThat(trigger.nodes).containsExactly(publicLinkFile)
+            }
+        }
+
+    @Test
+    fun `test that downloadNode maps nodes to public link types when source type is FILE_LINK`() =
+        runTest {
+            initViewModel(nodeSourceType = NodeSourceType.FILE_LINK)
+            val publicLinkFile = mock<PublicLinkFile>()
+            whenever(mapTypedNodeToPublicLinkUseCase(mockFileNode)).thenReturn(publicLinkFile)
+            viewModel.updateSelectedNodes(listOf(mockFileNode))
+
+            viewModel.downloadNode(withStartMessage = false)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+                assertThat(trigger.nodes).containsExactly(publicLinkFile)
+            }
+        }
+
+    @Test
+    fun `test that downloadNode falls back to original nodes when mapTypedNodeToPublicLinkUseCase throws for FILE_LINK`() =
+        runTest {
+            initViewModel(nodeSourceType = NodeSourceType.FILE_LINK)
+            whenever(mapTypedNodeToPublicLinkUseCase(mockFileNode))
+                .thenThrow(RuntimeException("mapping failed"))
+            viewModel.updateSelectedNodes(listOf(mockFileNode))
+
+            viewModel.downloadNode(withStartMessage = false)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+                assertThat(trigger.nodes).containsExactly(mockFileNode)
             }
         }
 } 
