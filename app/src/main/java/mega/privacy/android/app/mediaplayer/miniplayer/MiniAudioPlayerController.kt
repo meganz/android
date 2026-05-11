@@ -4,13 +4,14 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.res.ColorStateList
 import android.os.IBinder
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.ImageViewCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -31,7 +32,6 @@ import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
-import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * A helper class containing UI logic of mini player, it help us keep ManagerActivity clean.
@@ -48,6 +48,10 @@ class MiniAudioPlayerController(
     private val onPlayerVisibilityChanged: (() -> Unit)? = null,
 ) : LifecycleEventObserver {
     private val context = playerView.context
+
+    private val iconTintColor by lazy {
+        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.black_white))
+    }
 
     private val trackName = playerView.findViewById<TextView>(R.id.track_name)
     private val artistName = playerView.findViewById<TextView>(R.id.artist_name)
@@ -130,10 +134,7 @@ class MiniAudioPlayerController(
         audioPlayerPlaying.observeForever(audioPlayerPlayingObserver)
 
         playerView.findViewById<ImageButton>(R.id.close)?.let {
-            val tintedIcon = DrawableCompat.wrap(it.drawable).mutate()
-            val tintColor = ContextCompat.getColor(context, R.color.black_white)
-            DrawableCompat.setTint(tintedIcon, tintColor)
-            it.setImageDrawable(tintedIcon)
+            ImageViewCompat.setImageTintList(it, iconTintColor)
             it.setOnClickListener {
                 serviceGateway?.stopPlayer()
             }
@@ -250,16 +251,8 @@ class MiniAudioPlayerController(
     }
 
     private fun applyTintToPlayPauseButton() {
-        playerView.post {
-            playerView.findViewById<ImageButton>(R.id.exo_play_pause).let { playPauseButton ->
-                playPauseButton.drawable?.let {
-                    val tintedIcon = DrawableCompat.wrap(it).mutate()
-                    val tintColor = ContextCompat.getColor(context, R.color.black_white)
-                    DrawableCompat.setTint(tintedIcon, tintColor)
-                    playPauseButton.setImageDrawable(tintedIcon)
-                }
-            }
-        }
+        val playPauseButton = playerView.findViewById<ImageButton>(R.id.exo_play_pause) ?: return
+        ImageViewCompat.setImageTintList(playPauseButton, iconTintColor)
     }
 
     companion object {
