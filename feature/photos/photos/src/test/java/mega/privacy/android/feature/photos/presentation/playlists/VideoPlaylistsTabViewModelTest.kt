@@ -643,6 +643,48 @@ class VideoPlaylistsTabViewModelTest {
         }
 
     @Test
+    fun `test that getPresetNewVideoPlaylistTitle excludes deleted playlists when OnSetsUpdate has not yet fired`() =
+        runTest {
+            val placeholderTitle = "New Playlist"
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L, name = "New Playlist (1)")
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L, name = "New Playlist (2)")
+
+            stubInitialValues(
+                nodesAndEntities = mapOf(
+                    createVideoPlaylist(playlist1) to playlist1,
+                    createVideoPlaylist(playlist2) to playlist2
+                )
+            )
+
+            whenever(removeVideoPlaylistsUseCase(any()))
+                .thenReturn(listOf(playlist1.id.longValue, playlist2.id.longValue))
+
+            whenever(
+                getNextDefaultAlbumNameUseCase(
+                    defaultName = placeholderTitle,
+                    currentNames = emptyList()
+                )
+            ).thenReturn(placeholderTitle)
+
+            underTest.uiState.filterIsInstance<VideoPlaylistsTabUiState.Data>().test {
+                awaitItem()
+
+                underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
+                advanceUntilIdle()
+
+                val result = underTest.getPresetNewVideoPlaylistTitle(placeholderTitle)
+
+                assertThat(result).isEqualTo(placeholderTitle)
+                verify(getNextDefaultAlbumNameUseCase).invoke(
+                    defaultName = placeholderTitle,
+                    currentNames = emptyList()
+                )
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that getPresetNewVideoPlaylistTitle passes empty currentNames when no playlists exist`() =
         runTest {
             val placeholderTitle = "New playlist"

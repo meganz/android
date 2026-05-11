@@ -62,6 +62,7 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     private val selectedVideoPlaylistsFlow =
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
     private val queryFlow = MutableStateFlow<String?>(null)
+    private val optimisticallyRemovedIds = MutableStateFlow<Set<NodeId>>(emptySet())
 
     internal val videoPlaylistEditState: StateFlow<VideoPlaylistEditState>
         field: MutableStateFlow<VideoPlaylistEditState> = MutableStateFlow(VideoPlaylistEditState())
@@ -101,10 +102,20 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             getVideoPlaylistsFlow(),
             sortOrder,
             selectedVideoPlaylistsFlow,
-        ) { (videoPlaylists, query), sortOrder, selectedItems ->
-            val videoPlaylistEntities = videoPlaylists.map {
-                videoPlaylistUiEntityMapper(it)
-            }.map { it.copy(isSelected = it.id in selectedItems.map { item -> item.id }) }
+            optimisticallyRemovedIds,
+        ) { (videoPlaylists, query), sortOrder, selectedItems, removedIds ->
+            if (removedIds.isNotEmpty()) {
+                val backendIds = videoPlaylists.filterIsInstance<UserVideoPlaylist>()
+                    .mapTo(mutableSetOf()) { it.id }
+                val pendingIds = removedIds.intersect(backendIds)
+                if (pendingIds != removedIds) {
+                    optimisticallyRemovedIds.value = pendingIds
+                }
+            }
+            val videoPlaylistEntities = videoPlaylists
+                .filter { it !is UserVideoPlaylist || it.id !in removedIds }
+                .map { videoPlaylistUiEntityMapper(it) }
+                .map { it.copy(isSelected = it.id in selectedItems.map { item -> item.id }) }
             val convertedSortOrder = sortOrder.convertPlaylistSortOrder()
             val sortOrderPair = nodeSortConfigurationUiMapper(convertedSortOrder)
 
@@ -183,6 +194,9 @@ class VideoPlaylistsTabViewModel @Inject constructor(
                 val ids = deletedItems.map { it.id }
                 removeVideoPlaylistsUseCase(ids)
             }.onSuccess { deletedPlaylistIDs ->
+                optimisticallyRemovedIds.update { current ->
+                    current + deletedPlaylistIDs.map { NodeId(it) }.toSet()
+                }
                 val deletedTitlesById = deletedItems.associate {
                     it.id.longValue to it.title
                 }
