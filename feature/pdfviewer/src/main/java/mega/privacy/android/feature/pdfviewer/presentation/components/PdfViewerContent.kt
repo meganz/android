@@ -21,8 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.barteksc.pdfviewer.PDFView
 import mega.android.core.ui.theme.notificationsColor
+import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.theme.supportColor
 import mega.android.core.ui.theme.values.NotificationsColor
+import mega.android.core.ui.theme.surfaceColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
@@ -104,6 +106,9 @@ internal fun PdfViewerContent(
 
     // Padding to add around small highlight rects (in pixels)
     val highlightPadding = 4f
+
+    // Divider drawn between pages
+    val dividerColorArgb = surfaceColor(SurfaceColor.Surface2).toArgb()
 
     AndroidView(
         modifier = modifier,
@@ -236,10 +241,12 @@ internal fun PdfViewerContent(
                     }
                 }
                 .enableAnnotationRendering(true)
-                .spacing(10.dp.toPx(pdfView.context).toInt())
                 .password(password)
                 // Compose owns the page indicator; do not attach the legacy Java DefaultScrollHandle.
                 .scrollHandle(null)
+                .spacing(10.dp.toPx(pdfView.context).toInt())
+                .dividerColor(dividerColorArgb)
+                .dividerThicknessPx(8.dp.toPx(pdfView.context))
                 .load()
         },
         onReset = { pdfView ->

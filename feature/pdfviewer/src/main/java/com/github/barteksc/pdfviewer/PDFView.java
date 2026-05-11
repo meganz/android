@@ -218,6 +218,21 @@ public class PDFView extends RelativeLayout {
     /** Spacing between pages, in px */
     private int spacingPx = 0;
 
+    /**
+     * Paint for the page divider drawn in the gap between consecutive pages
+     */
+    private Paint dividerPaint;
+
+    /**
+     * Divider color (ARGB). Transparent disables divider rendering.
+     */
+    private int dividerColor = Color.TRANSPARENT;
+
+    /**
+     * Divider thickness in pixels. 0 disables divider rendering.
+     */
+    private float dividerThicknessPx = 0f;
+
     /** pages numbers used when calling onDrawAllListener */
     private List<Integer> onDrawPagesNums = new ArrayList<>(10);
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -240,6 +255,10 @@ public class PDFView extends RelativeLayout {
         paint = new Paint();
         debugPaint = new Paint();
         debugPaint.setStyle(Style.STROKE);
+
+        dividerPaint = new Paint();
+        dividerPaint.setStyle(Style.FILL);
+        dividerPaint.setColor(dividerColor);
 
         pdfiumCore = new PdfiumCore(context);
         setWillNotDraw(false);
@@ -607,6 +626,10 @@ public class PDFView extends RelativeLayout {
             }
         }
 
+        // Dividers go after page parts (so they sit on top of the background gap)
+        // but before per-page onDrawAll listeners, which draw in page-local coords.
+        drawDividers(canvas);
+
         for (Integer page : onDrawPagesNums) {
             drawWithListener(canvas, page, callbacks.getOnDrawAll());
         }
@@ -700,6 +723,56 @@ public class PDFView extends RelativeLayout {
         // Restore the canvas position
         canvas.translate(-localTranslationX, -localTranslationY);
 
+    }
+
+    /**
+     * Draw divider lines in the spacing gap between consecutive pages.
+     * <p>
+     * Called from {@link #onDraw(Canvas)} while the canvas is still translated by
+     * the current X/Y offsets, so coordinates here are in "big strip" space —
+     * the same space as {@link PdfFile#getPageOffset(int, float)}.
+     * <p>
+     * No-op unless both a non-transparent {@link #dividerColor} and a positive
+     * {@link #dividerThicknessPx} are set. Also a no-op when there is no
+     * spacing between pages, since there would be no gap to draw into.
+     */
+    private void drawDividers(Canvas canvas) {
+        if (pdfFile == null
+                || dividerThicknessPx <= 0f
+                || Color.alpha(dividerColor) == 0
+                || spacingPx <= 0) {
+            return;
+        }
+
+        int pageCount = pdfFile.getPagesCount();
+        if (pageCount < 2) {
+            return;
+        }
+
+        float thickness = dividerThicknessPx;
+        float spacingScaled = toCurrentScale(spacingPx);
+
+        if (swipeVertical) {
+            float stripWidth = toCurrentScale(pdfFile.getMaxPageWidth());
+            for (int i = 0; i < pageCount - 1; i++) {
+                float pageBottom = pdfFile.getPageOffset(i, zoom)
+                        + toCurrentScale(pdfFile.getPageSize(i).getHeight());
+                float centerY = pageBottom + spacingScaled / 2f;
+                float top = centerY - thickness / 2f;
+                float bottom = top + thickness;
+                canvas.drawRect(0f, top, stripWidth, bottom, dividerPaint);
+            }
+        } else {
+            float stripHeight = toCurrentScale(pdfFile.getMaxPageHeight());
+            for (int i = 0; i < pageCount - 1; i++) {
+                float pageRight = pdfFile.getPageOffset(i, zoom)
+                        + toCurrentScale(pdfFile.getPageSize(i).getWidth());
+                float centerX = pageRight + spacingScaled / 2f;
+                float left = centerX - thickness / 2f;
+                float right = left + thickness;
+                canvas.drawRect(left, 0f, right, stripHeight, dividerPaint);
+            }
+        }
     }
 
     /**
@@ -1144,6 +1217,25 @@ public class PDFView extends RelativeLayout {
         this.spacingPx = Util.getDP(getContext(), spacing);
     }
 
+    public void setDividerColor(int color) {
+        this.dividerColor = color;
+        if (dividerPaint != null) {
+            dividerPaint.setColor(color);
+        }
+    }
+
+    public int getDividerColor() {
+        return dividerColor;
+    }
+
+    public void setDividerThicknessPx(float thicknessPx) {
+        this.dividerThicknessPx = thicknessPx;
+    }
+
+    public float getDividerThicknessPx() {
+        return dividerThicknessPx;
+    }
+
     private void setPageFitPolicy(FitPolicy pageFitPolicy) {
         this.pageFitPolicy = pageFitPolicy;
     }
@@ -1256,6 +1348,10 @@ public class PDFView extends RelativeLayout {
 
         private int spacing = 0;
 
+        private int dividerColor = Color.TRANSPARENT;
+
+        private float dividerThicknessPx = 0f;
+
         private FitPolicy pageFitPolicy = FitPolicy.WIDTH;
 
         private Configurator(DocumentSource documentSource) {
@@ -1362,6 +1458,25 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        /**
+         * Color (ARGB) of the divider drawn between consecutive pages.
+         * Defaults to {@link Color#TRANSPARENT} (no divider).
+         * Has no effect unless {@link #dividerThicknessPx(float)} is also set
+         * and {@link #spacing(int)} is greater than 0.
+         */
+        public Configurator dividerColor(int color) {
+            this.dividerColor = color;
+            return this;
+        }
+
+        /**
+         * Divider thickness in pixels. Set to 0 (default) to disable.
+         */
+        public Configurator dividerThicknessPx(float thicknessPx) {
+            this.dividerThicknessPx = thicknessPx;
+            return this;
+        }
+
         public Configurator pageFitPolicy(FitPolicy pageFitPolicy) {
             this.pageFitPolicy = pageFitPolicy;
             return this;
@@ -1387,6 +1502,8 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setScrollHandle(scrollHandle);
             PDFView.this.enableAntialiasing(antialiasing);
             PDFView.this.setSpacing(spacing);
+            PDFView.this.setDividerColor(dividerColor);
+            PDFView.this.setDividerThicknessPx(dividerThicknessPx);
             PDFView.this.setPageFitPolicy(pageFitPolicy);
 
             PDFView.this.removeCallbacks(loadRunnable);
