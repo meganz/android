@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -12,37 +13,49 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentProviderUiState
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.GetOpenableLocalFileForCloudDriveSafUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -51,6 +64,7 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import dagger.Lazy as DaggerLazy
 
 /**
@@ -77,6 +91,11 @@ class CloudDriveDocumentDataProviderTest {
     private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase = mock()
     private val getOpenableLocalFileForCloudDriveSafUseCase: GetOpenableLocalFileForCloudDriveSafUseCase =
         mock()
+    private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
+    private val renameNodeUseCase: RenameNodeUseCase = mock()
+    private val getChildNodeUseCase: GetChildNodeUseCase = mock()
+    private val startUploadUseCase: StartUploadUseCase = mock()
+    private val getCacheFileUseCase: GetCacheFileUseCase = mock()
     private val mockedCredentials: UserCredentials = mock()
 
     private lateinit var underTest: CloudDriveDocumentDataProvider
@@ -108,6 +127,11 @@ class CloudDriveDocumentDataProviderTest {
             documentIdToNodeIdMapper,
             monitorPasscodeLockPreferenceUseCase,
             getOpenableLocalFileForCloudDriveSafUseCase,
+            createFolderNodeUseCase,
+            renameNodeUseCase,
+            getChildNodeUseCase,
+            startUploadUseCase,
+            getCacheFileUseCase,
             mockedCredentials,
         )
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
@@ -144,6 +168,11 @@ class CloudDriveDocumentDataProviderTest {
             documentIdToNodeIdMapper = lazyOf(documentIdToNodeIdMapper),
             monitorPasscodeLockPreferenceUseCase = lazyOf(monitorPasscodeLockPreferenceUseCase),
             getOpenableLocalFileForCloudDriveSafUseCase = lazyOf(getOpenableLocalFileForCloudDriveSafUseCase),
+            createFolderNodeUseCase = lazyOf(createFolderNodeUseCase),
+            renameNodeUseCase = lazyOf(renameNodeUseCase),
+            getChildNodeUseCase = lazyOf(getChildNodeUseCase),
+            startUploadUseCase = lazyOf(startUploadUseCase),
+            getCacheFileUseCase = lazyOf(getCacheFileUseCase),
         )
     }
 
@@ -238,11 +267,9 @@ class CloudDriveDocumentDataProviderTest {
 
         underTest.state.test {
             skipItems(1) // skip Initialising (StateFlow initial value)
-            awaitItem() // consume LoadingDocument(root) from initial Root request
-            underTest.loadDocumentInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
-            advanceUntilIdle()
-            val state =
-                awaitItem() // DocumentData(root) from loadDocumentInBackground(CLOUD_DRIVE_ROOT_ID)
+            // getDocumentFlow no longer emits an upfront LoadingDocument; the initial Document(root)
+            // request resolves directly to DocumentData(root) when the root node is mocked.
+            val state = awaitItem()
             assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
             val documentData = state as CloudDriveDocumentProviderUiState.DocumentData
             assertThat(documentData.accountName).isEqualTo("test@mega.co.nz")
@@ -275,14 +302,10 @@ class CloudDriveDocumentDataProviderTest {
 
             underTest.state.test {
                 skipItems(1) // skip Initialising (StateFlow initial value)
-                awaitItem() // consume LoadingDocument(root) from initial Root request
-                awaitItem() // consume DocumentData(root) from initial Root request
+                // Initial Document(root) request resolves to DocumentData(root) (no upfront Loading).
+                awaitItem()
                 underTest.loadDocumentInBackground(documentId)
                 advanceUntilIdle()
-                val loadingDoc = awaitItem() // LoadingDocument(documentId)
-                assertThat(loadingDoc).isInstanceOf(CloudDriveDocumentProviderUiState.LoadingDocument::class.java)
-                assertThat((loadingDoc as CloudDriveDocumentProviderUiState.LoadingDocument).currentDocumentId)
-                    .isEqualTo(documentId)
                 val documentData = awaitItem() // DocumentData(documentId)
                 assertThat(documentData).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
                 assertThat((documentData as CloudDriveDocumentProviderUiState.DocumentData).document)
@@ -303,12 +326,11 @@ class CloudDriveDocumentDataProviderTest {
 
             underTest.state.test {
                 skipItems(1) // skip Initialising (StateFlow initial value)
-                awaitItem() // consume LoadingDocument(root) from initial Root request
-                awaitItem() // consume DocumentData(root) from initial Root request
+                // Root node is unmocked → initial Document(root) resolves to FileNotFound(root)
+                // (no upfront LoadingDocument).
+                awaitItem()
                 underTest.loadDocumentInBackground(documentId)
                 advanceUntilIdle()
-                val loadingDoc = awaitItem() // LoadingDocument(documentId)
-                assertThat(loadingDoc).isInstanceOf(CloudDriveDocumentProviderUiState.LoadingDocument::class.java)
                 val state = awaitItem() // FileNotFound(documentId)
                 assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.FileNotFound::class.java)
                 assertThat((state as CloudDriveDocumentProviderUiState.FileNotFound).documentId)
@@ -338,14 +360,10 @@ class CloudDriveDocumentDataProviderTest {
 
             underTest.state.test {
                 skipItems(1) // skip Initialising (StateFlow initial value)
-                awaitItem() // consume LoadingDocument(root) from initial Root request
-                awaitItem() // consume DocumentData(root) from initial Root request
+                // Root unmocked → initial Document(root) emits FileNotFound (no upfront Loading).
+                awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                val loadingChildren = awaitItem() // LoadingChildren(CLOUD_DRIVE_ROOT_ID)
-                assertThat(loadingChildren).isInstanceOf(CloudDriveDocumentProviderUiState.LoadingChildren::class.java)
-                assertThat((loadingChildren as CloudDriveDocumentProviderUiState.LoadingChildren).currentParentDocumentId)
-                    .isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 val childData = awaitItem() // ChildData(children=..., hasMore=false)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
@@ -366,11 +384,10 @@ class CloudDriveDocumentDataProviderTest {
 
             underTest.state.test {
                 skipItems(1) // skip Initialising (StateFlow initial value)
-                awaitItem() // consume LoadingDocument(root) from initial Root request
-                awaitItem() // consume DocumentData(root) from initial Root request
+                // Root unmocked → initial Document(root) emits FileNotFound (no upfront Loading).
+                awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem() // consume LoadingChildren(CLOUD_DRIVE_ROOT_ID)
                 val childData = awaitItem() // ChildData(children=empty, hasMore=false)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 assertThat((childData as CloudDriveDocumentProviderUiState.ChildData).children).isEmpty()
@@ -422,11 +439,10 @@ class CloudDriveDocumentDataProviderTest {
 
             underTest.state.test {
                 skipItems(1)
-                awaitItem()
+                // Root unmocked → FileNotFound, then ChildData after loadChildrenInBackground.
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem()
                 val childData = awaitItem()
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
@@ -467,10 +483,8 @@ class CloudDriveDocumentDataProviderTest {
             underTest.state.test {
                 skipItems(1)
                 awaitItem()
-                awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem()
                 val childData = awaitItem()
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 assertThat((childData as CloudDriveDocumentProviderUiState.ChildData).children).hasSize(
@@ -512,10 +526,8 @@ class CloudDriveDocumentDataProviderTest {
             underTest.state.test {
                 skipItems(1)
                 awaitItem()
-                awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem() // LoadingChildren
                 val childData = awaitItem() // ChildData (filtered from first combine emission)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
@@ -557,10 +569,8 @@ class CloudDriveDocumentDataProviderTest {
             underTest.state.test {
                 skipItems(1)
                 awaitItem()
-                awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem() // LoadingChildren
                 val childData = awaitItem() // ChildData (filtered from first combine emission)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
@@ -605,10 +615,8 @@ class CloudDriveDocumentDataProviderTest {
             underTest.state.test {
                 skipItems(1)
                 awaitItem()
-                awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem() // LoadingChildren
                 val childData = awaitItem() // ChildData (filtered from first combine emission)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
@@ -661,10 +669,8 @@ class CloudDriveDocumentDataProviderTest {
             underTest.state.test {
                 skipItems(1)
                 awaitItem()
-                awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem()
                 val childData = awaitItem()
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
@@ -694,10 +700,8 @@ class CloudDriveDocumentDataProviderTest {
             underTest.state.test {
                 skipItems(1)
                 awaitItem()
-                awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem() // LoadingChildren
                 val childData =
                     awaitItem() // ChildData (filtered from first combine emission, empty)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
@@ -737,11 +741,10 @@ class CloudDriveDocumentDataProviderTest {
 
             underTest.state.test {
                 skipItems(1)
-                awaitItem()
+                // Initial Document(root) emits DocumentData(root) (root node mocked).
                 awaitItem()
                 underTest.loadDocumentInBackground(documentId)
                 advanceUntilIdle()
-                awaitItem() // LoadingDocument(documentId)
                 val state = awaitItem()
                 assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
                 assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
@@ -780,11 +783,10 @@ class CloudDriveDocumentDataProviderTest {
 
             underTest.state.test {
                 skipItems(1)
-                awaitItem()
+                // Initial Document(root) emits DocumentData(root) (root node mocked).
                 awaitItem()
                 underTest.loadDocumentInBackground(documentId)
                 advanceUntilIdle()
-                awaitItem() // LoadingDocument(documentId)
                 val state = awaitItem()
                 assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
                 assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
@@ -823,11 +825,10 @@ class CloudDriveDocumentDataProviderTest {
 
             underTest.state.test {
                 skipItems(1)
-                awaitItem()
+                // Initial Document(root) emits DocumentData(root) (root node mocked).
                 awaitItem()
                 underTest.loadDocumentInBackground(documentId)
                 advanceUntilIdle()
-                awaitItem() // LoadingDocument(documentId)
                 val state = awaitItem()
                 assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
                 assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
@@ -927,5 +928,442 @@ class CloudDriveDocumentDataProviderTest {
                 underTest.openDocumentFile(documentId)
             }
             assertThat(error).hasMessageThat().contains("Unable to open document: $documentId")
+        }
+
+    @Test
+    fun `test that registerPendingFolder returns id with PENDING_PREFIX`() = runTest {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        val parentNodeId = NodeId(99L)
+        val parentDocumentId = "$DOCUMENT_ID_PREFIX:99"
+        whenever(getChildNodeUseCase(parentNodeId, "NewFolder")).thenReturn(null)
+
+        val result = underTest.registerPendingFolder(parentDocumentId, "NewFolder")
+
+        assertThat(result).startsWith("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:")
+    }
+
+    @Test
+    fun `test that registerPendingFolder resolves root document id to root node id`() = runTest {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getChildNodeUseCase(ROOT_NODE_ID, "Top")).thenReturn(null)
+
+        val result = underTest.registerPendingFolder(
+            CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+            "Top",
+        )
+
+        assertThat(result).startsWith("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:")
+    }
+
+    @Test
+    fun `test that registerPendingFolder rejects duplicate name with FileNotFoundException`() =
+        runTest {
+            val parentNodeId = NodeId(7L)
+            // UnTypedNode is a sealed interface; mockito can't mock it directly. Use FileNode,
+            // a concrete sub-interface, so the duplicate-name path receives a non-null hit.
+            whenever(getChildNodeUseCase(parentNodeId, "Dup")).thenReturn(mock<FileNode>())
+
+            assertThrows<FileNotFoundException> {
+                underTest.registerPendingFolder("$DOCUMENT_ID_PREFIX:7", "Dup")
+            }
+        }
+
+    @Test
+    fun `test that registerPendingFolder throws FileNotFoundException when parent cannot be resolved`() =
+        runTest {
+            assertThrows<FileNotFoundException> {
+                underTest.registerPendingFolder("invalid_doc_id", "X")
+            }
+        }
+
+    @Test
+    fun `test that completeFolderCreation calls createFolderNodeUseCase and keeps placeholder row queryable`() =
+        runTest {
+            val parentNodeId = NodeId(42L)
+            val createdNodeId = NodeId(420L)
+            whenever(getChildNodeUseCase(parentNodeId, "F")).thenReturn(null)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            wheneverBlocking { createFolderNodeUseCase("F", parentNodeId) }
+                .thenReturn(createdNodeId)
+            val pendingId = underTest.registerPendingFolder("$DOCUMENT_ID_PREFIX:42", "F")
+
+            underTest.completeFolderCreation(pendingId)
+
+            verifyBlocking(createFolderNodeUseCase) { invoke("F", parentNodeId) }
+            // Placeholder row stays queryable so SAF can keep using it as a destination during
+            // a recursive folder copy.
+            val row = underTest.getPendingDocumentRow(pendingId)
+            assertThat(row).isNotNull()
+            assertThat(row!!.documentId).isEqualTo(pendingId)
+            assertThat(row.mimeType).isEqualTo(Document.MIME_TYPE_DIR)
+        }
+
+    @Test
+    fun `test that completeFolderCreation clears pending entry when SDK throws`() = runTest {
+        val parentNodeId = NodeId(43L)
+        whenever(getChildNodeUseCase(parentNodeId, "F")).thenReturn(null)
+        wheneverBlocking { createFolderNodeUseCase(any(), any()) }
+            .thenAnswer { throw IllegalStateException("sdk") }
+        val pendingId = underTest.registerPendingFolder("$DOCUMENT_ID_PREFIX:43", "F")
+
+        // Don't constrain the exception type: Mockito's suspend-fun-returning-value-class stubs
+        // can surface either the answer's throw or an NPE from Kotlin's null check. Either way
+        // the placeholder must be cleaned up.
+        val result = runCatching { underTest.completeFolderCreation(pendingId) }
+        assertThat(result.isFailure).isTrue()
+        assertThat(underTest.getPendingDocumentRow(pendingId)).isNull()
+    }
+
+    @Test
+    fun `test that completeFolderCreation throws when pending id is unknown`() = runTest {
+        assertThrows<IllegalStateException> {
+            underTest.completeFolderCreation("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:nope")
+        }
+    }
+
+    @Test
+    fun `test that registerPendingFile resolves placeholder folder parent to its real node id`() =
+        runTest {
+            // Simulate SAF folder upload: createDocument(root, DIR) -> placeholder; then
+            // completeFolderCreation publishes the real NodeId; then a child createDocument
+            // arrives with the placeholder as parent.
+            val outerParentNodeId = NodeId(50L)
+            val createdFolderNodeId = NodeId(500L)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getChildNodeUseCase(outerParentNodeId, "MyFolder")).thenReturn(null)
+            wheneverBlocking { createFolderNodeUseCase("MyFolder", outerParentNodeId) }
+                .thenReturn(createdFolderNodeId)
+            val folderPlaceholderId = underTest.registerPendingFolder(
+                "$DOCUMENT_ID_PREFIX:50",
+                "MyFolder",
+            )
+            underTest.completeFolderCreation(folderPlaceholderId)
+            whenever(getChildNodeUseCase(createdFolderNodeId, "child.txt")).thenReturn(null)
+
+            val filePlaceholderId = underTest.registerPendingFile(
+                folderPlaceholderId,
+                "child.txt",
+                "text/plain",
+            )
+
+            assertThat(filePlaceholderId)
+                .startsWith("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:")
+            // Collision check ran against the new folder's real NodeId, not the placeholder.
+            verifyBlocking(getChildNodeUseCase) { invoke(createdFolderNodeId, "child.txt") }
+        }
+
+    @Test
+    fun `test that registerPendingFile awaits placeholder folder still being created`() = runTest {
+        // Concurrent path: a child createDocument arrives BEFORE completeFolderCreation has
+        // resolved the placeholder folder. Should suspend until the real NodeId is published.
+        val outerParentNodeId = NodeId(60L)
+        val createdFolderNodeId = NodeId(600L)
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getChildNodeUseCase(outerParentNodeId, "Outer")).thenReturn(null)
+        whenever(getChildNodeUseCase(createdFolderNodeId, "child.bin")).thenReturn(null)
+        wheneverBlocking { createFolderNodeUseCase("Outer", outerParentNodeId) }
+            .thenReturn(createdFolderNodeId)
+        val folderPlaceholderId = underTest.registerPendingFolder(
+            "$DOCUMENT_ID_PREFIX:60",
+            "Outer",
+        )
+
+        val deferredChild = async {
+            underTest.registerPendingFile(
+                folderPlaceholderId,
+                "child.bin",
+                "application/octet-stream",
+            )
+        }
+        // runCurrent runs the launched task until it suspends on the folder signal without
+        // skipping the 30s withTimeoutOrNull delay (advanceUntilIdle would skip it and the
+        // child would fail with FileNotFoundException before completeFolderCreation runs).
+        runCurrent()
+        assertThat(deferredChild.isCompleted).isFalse()
+
+        underTest.completeFolderCreation(folderPlaceholderId)
+
+        val filePlaceholderId = deferredChild.await()
+        assertThat(filePlaceholderId)
+            .startsWith("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:")
+        verifyBlocking(getChildNodeUseCase) { invoke(createdFolderNodeId, "child.bin") }
+    }
+
+    @Test
+    fun `test that registerPendingFile fails fast when placeholder folder creation fails`() =
+        runTest {
+            val outerParentNodeId = NodeId(70L)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getChildNodeUseCase(outerParentNodeId, "Bad")).thenReturn(null)
+            wheneverBlocking { createFolderNodeUseCase("Bad", outerParentNodeId) }
+                .thenAnswer { throw IllegalStateException("sdk down") }
+            val folderPlaceholderId = underTest.registerPendingFolder(
+                "$DOCUMENT_ID_PREFIX:70",
+                "Bad",
+            )
+
+            val deferredChild = async {
+                runCatching {
+                    underTest.registerPendingFile(folderPlaceholderId, "x.txt", "text/plain")
+                }
+            }
+            runCurrent()
+            assertThat(deferredChild.isCompleted).isFalse()
+
+            runCatching { underTest.completeFolderCreation(folderPlaceholderId) }
+
+            val result = deferredChild.await()
+            assertThat(result.isFailure).isTrue()
+            assertThat(result.exceptionOrNull())
+                .isInstanceOf(FileNotFoundException::class.java)
+        }
+
+    @Test
+    fun `test that registerPendingFile returns id with PENDING_PREFIX`() = runTest {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getChildNodeUseCase(ROOT_NODE_ID, "doc.txt")).thenReturn(null)
+
+        val result = underTest.registerPendingFile(
+            CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+            "doc.txt",
+            "text/plain",
+        )
+
+        assertThat(result).startsWith("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:")
+    }
+
+    @Test
+    fun `test that registerPendingFile rejects duplicate name`() = runTest {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        // UnTypedNode is a sealed interface; mockito can't mock it directly. Use FileNode,
+        // a concrete sub-interface, so the duplicate-name path receives a non-null hit.
+        whenever(getChildNodeUseCase(ROOT_NODE_ID, "doc.txt")).thenReturn(mock<FileNode>())
+
+        assertThrows<FileNotFoundException> {
+            underTest.registerPendingFile(
+                CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+                "doc.txt",
+                "text/plain",
+            )
+        }
+    }
+
+    @Test
+    fun `test that isPendingDocumentId is true only for pending prefix`() {
+        assertThat(underTest.isPendingDocumentId("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:abc"))
+            .isTrue()
+        assertThat(underTest.isPendingDocumentId("$DOCUMENT_ID_PREFIX:1")).isFalse()
+        assertThat(underTest.isPendingDocumentId(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID))
+            .isFalse()
+    }
+
+    @Test
+    fun `test that getPendingDocumentRow returns row matching the registered pending file`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getChildNodeUseCase(ROOT_NODE_ID, "a.bin")).thenReturn(null)
+
+            val pendingId = underTest.registerPendingFile(
+                CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+                "a.bin",
+                "application/octet-stream",
+            )
+            val row = underTest.getPendingDocumentRow(pendingId)
+
+            assertThat(row).isNotNull()
+            assertThat(row!!.documentId).isEqualTo(pendingId)
+            assertThat(row.displayName).isEqualTo("a.bin")
+            assertThat(row.mimeType).isEqualTo("application/octet-stream")
+        }
+
+    @Test
+    fun `test that getPendingDocumentRow advertises FLAG_DIR_SUPPORTS_CREATE for placeholder folders`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getChildNodeUseCase(ROOT_NODE_ID, "Sub")).thenReturn(null)
+
+            val pendingId = underTest.registerPendingFolder(
+                CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+                "Sub",
+            )
+            val row = underTest.getPendingDocumentRow(pendingId)
+
+            assertThat(row).isNotNull()
+            assertThat(row!!.mimeType).isEqualTo(Document.MIME_TYPE_DIR)
+            assertThat(row.flags and Document.FLAG_DIR_SUPPORTS_CREATE)
+                .isEqualTo(Document.FLAG_DIR_SUPPORTS_CREATE)
+        }
+
+    @Test
+    fun `test that getPendingDocumentRow returns null for unknown id`() {
+        assertThat(underTest.getPendingDocumentRow("$DOCUMENT_ID_PREFIX:1")).isNull()
+        assertThat(
+            underTest.getPendingDocumentRow("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:unknown")
+        ).isNull()
+    }
+
+    @Test
+    fun `test that prepareWriteScratchFile returns existing file from cache`() = runTest {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getChildNodeUseCase(ROOT_NODE_ID, "scratch.txt")).thenReturn(null)
+        val tempFile = File.createTempFile("saf_test_", ".tmp").apply { deleteOnExit() }
+        whenever(
+            getCacheFileUseCase(
+                eq(CloudDriveDocumentDataProvider.SAF_UPLOADS_CACHE_FOLDER),
+                any(),
+            )
+        ).thenReturn(tempFile)
+
+        val pendingId = underTest.registerPendingFile(
+            CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+            "scratch.txt",
+            "text/plain",
+        )
+
+        val result = underTest.prepareWriteScratchFile(pendingId)
+
+        assertThat(result).isEqualTo(tempFile)
+        assertThat(result.exists()).isTrue()
+    }
+
+    @Test
+    fun `test that prepareWriteScratchFile throws when documentId is unknown`() = runTest {
+        assertThrows<FileNotFoundException> {
+            underTest.prepareWriteScratchFile("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:nope")
+        }
+    }
+
+    @Test
+    fun `test that onWriteScratchClosed kicks off upload via startUploadUseCase on success`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getChildNodeUseCase(ROOT_NODE_ID, "f.bin")).thenReturn(null)
+            val tempFile = File.createTempFile("saf_close_", ".tmp").apply { deleteOnExit() }
+            whenever(
+                getCacheFileUseCase(
+                    eq(CloudDriveDocumentDataProvider.SAF_UPLOADS_CACHE_FOLDER),
+                    any(),
+                )
+            ).thenReturn(tempFile)
+            whenever(
+                startUploadUseCase(
+                    localPath = any(),
+                    parentNodeId = any(),
+                    fileName = any(),
+                    modificationTime = any(),
+                    appData = anyOrNull(),
+                    isSourceTemporary = any(),
+                    shouldStartFirst = any(),
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
+                )
+            ).thenReturn(emptyFlow())
+            val pendingId = underTest.registerPendingFile(
+                CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+                "f.bin",
+                "application/octet-stream",
+            )
+            underTest.prepareWriteScratchFile(pendingId)
+
+            underTest.onWriteScratchClosed(pendingId, tempFile, err = null)
+            advanceUntilIdle()
+
+            verify(startUploadUseCase).invoke(
+                localPath = tempFile.absolutePath,
+                parentNodeId = ROOT_NODE_ID,
+                fileName = "f.bin",
+                modificationTime = tempFile.lastModified() / 1000,
+                appData = null,
+                isSourceTemporary = true,
+                shouldStartFirst = false,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.CloudDrive,
+            )
+        }
+
+    @Test
+    fun `test that onWriteScratchClosed deletes file and skips upload when err is non null`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getChildNodeUseCase(ROOT_NODE_ID, "f.bin")).thenReturn(null)
+            val tempFile = File.createTempFile("saf_err_", ".tmp")
+            whenever(
+                getCacheFileUseCase(
+                    eq(CloudDriveDocumentDataProvider.SAF_UPLOADS_CACHE_FOLDER),
+                    any(),
+                )
+            ).thenReturn(tempFile)
+            val pendingId = underTest.registerPendingFile(
+                CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+                "f.bin",
+                "application/octet-stream",
+            )
+
+            underTest.onWriteScratchClosed(pendingId, tempFile, err = IOException("disk full"))
+            advanceUntilIdle()
+
+            assertThat(tempFile.exists()).isFalse()
+            verify(startUploadUseCase, never()).invoke(
+                localPath = any(),
+                parentNodeId = any(),
+                fileName = any(),
+                modificationTime = any(),
+                appData = anyOrNull(),
+                isSourceTemporary = any(),
+                shouldStartFirst = any(),
+                pitagTrigger = any(),
+                pitagTarget = any(),
+            )
+        }
+
+    @Test
+    fun `test that renameDocument calls renameNodeUseCase and returns root document id when parent is root`() =
+        runTest {
+            val handle = 9999L
+            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+            val mockNode: FolderNode = mock()
+            whenever(mockNode.parentId).thenReturn(ROOT_NODE_ID)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getNodeByHandleUseCase.invoke(handle, false)).thenReturn(mockNode)
+
+            val result = underTest.renameDocument(documentId, "new.txt")
+
+            assertThat(result).isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+            verifyBlocking(renameNodeUseCase) { invoke(handle, "new.txt") }
+        }
+
+    @Test
+    fun `test that renameDocument returns parent document id when parent is not root`() = runTest {
+        val handle = 9999L
+        val parentHandle = 5000L
+        val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+        val mockNode: FolderNode = mock()
+        whenever(mockNode.parentId).thenReturn(NodeId(parentHandle))
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getNodeByHandleUseCase.invoke(handle, false)).thenReturn(mockNode)
+
+        val result = underTest.renameDocument(documentId, "new.txt")
+
+        assertThat(result).isEqualTo("$DOCUMENT_ID_PREFIX:$parentHandle")
+        verifyBlocking(renameNodeUseCase) { invoke(handle, "new.txt") }
+    }
+
+    @Test
+    fun `test that renameDocument throws FileNotFoundException for invalid id`() = runTest {
+        assertThrows<FileNotFoundException> {
+            underTest.renameDocument("not_a_valid_id", "x")
+        }
+    }
+
+    @Test
+    fun `test that renameDocument throws FileNotFoundException when parent cannot be resolved`() =
+        runTest {
+            val handle = 9999L
+            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+            whenever(getNodeByHandleUseCase.invoke(handle, false)).thenReturn(null)
+
+            assertThrows<FileNotFoundException> {
+                underTest.renameDocument(documentId, "x")
+            }
         }
 }

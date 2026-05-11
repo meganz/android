@@ -51,7 +51,9 @@ class CloudDriveDocumentRowMapperTest {
         assertThat(row.mimeType).isEqualTo(Document.MIME_TYPE_DIR)
         assertThat(row.size).isEqualTo(0L)
         assertThat(row.lastModified).isEqualTo(2000L)
-        assertThat(row.flags).isEqualTo(0)
+        assertThat(row.flags).isEqualTo(
+            Document.FLAG_DIR_SUPPORTS_CREATE or Document.FLAG_SUPPORTS_RENAME
+        )
     }
 
     @Test
@@ -76,6 +78,6 @@ class CloudDriveDocumentRowMapperTest {
         assertThat(row.mimeType).isEqualTo("application/pdf")
         assertThat(row.size).isEqualTo(4096L)
         assertThat(row.lastModified).isEqualTo(3000L)
-        assertThat(row.flags).isEqualTo(0)
+        assertThat(row.flags).isEqualTo(Document.FLAG_SUPPORTS_RENAME)
     }
 }

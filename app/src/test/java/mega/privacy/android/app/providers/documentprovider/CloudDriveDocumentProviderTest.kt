@@ -604,17 +604,6 @@ class CloudDriveDocumentProviderTest {
     }
 
     @Test
-    fun `test that openDocument throws FileNotFoundException when mode is write`() = runTest {
-        setStateWithCredentials()
-        createProvider()
-
-        val e = assertThrows<FileNotFoundException> {
-            underTest.openDocument("$CLOUD_DRIVE_ROOT_ID:123", "w", null)
-        }
-        assertThat(e).hasMessageThat().contains("Write mode not supported")
-    }
-
-    @Test
     fun `test that openDocument throws AuthenticationRequiredException when state is NotLoggedIn`() =
         runTest {
             dataProviderState.value = CloudDriveDocumentProviderUiState.NotLoggedIn
@@ -681,4 +670,100 @@ class CloudDriveDocumentProviderTest {
             assertThat(e).hasMessageThat().contains("Node not found")
             verifyBlocking(mockDataProvider) { openDocumentFile("$CLOUD_DRIVE_ROOT_ID:123") }
         }
+
+    @Test
+    fun `test that openDocument returns writable PFD for pending placeholder id`() = runTest {
+        setStateWithCredentials()
+        val pendingId = "mega_cloud_drive_pending:abc"
+        val tempFile = File.createTempFile("scratch_", ".tmp").apply { deleteOnExit() }
+        whenever(mockDataProvider.isPendingDocumentId(pendingId)).thenReturn(true)
+        wheneverBlocking { mockDataProvider.prepareWriteScratchFile(pendingId) }
+            .thenReturn(tempFile)
+        createProvider()
+
+        val pfd = underTest.openDocument(pendingId, "w", null)
+
+        assertThat(pfd).isNotNull()
+        pfd.close()
+    }
+
+    @Test
+    fun `test that createDocument with MIME_TYPE_DIR returns placeholder id from registerPendingFolder`() =
+        runTest {
+            setStateWithCredentials()
+            val pendingId = "mega_cloud_drive_pending:folder-uuid"
+            wheneverBlocking { mockDataProvider.registerPendingFolder(any(), any()) }
+                .thenReturn(pendingId)
+            createProvider()
+
+            val result = underTest.createDocument(
+                CLOUD_DRIVE_ROOT_ID,
+                Document.MIME_TYPE_DIR,
+                "MyFolder",
+            )
+
+            assertThat(result).isEqualTo(pendingId)
+            verifyBlocking(mockDataProvider) {
+                registerPendingFolder(CLOUD_DRIVE_ROOT_ID, "MyFolder")
+            }
+        }
+
+    @Test
+    fun `test that createDocument with file mime delegates to registerPendingFile`() = runTest {
+        setStateWithCredentials()
+        val pendingId = "mega_cloud_drive_pending:xyz"
+        wheneverBlocking { mockDataProvider.registerPendingFile(any(), any(), any()) }
+            .thenReturn(pendingId)
+        createProvider()
+
+        val result = underTest.createDocument(
+            CLOUD_DRIVE_ROOT_ID,
+            "text/plain",
+            "note.txt",
+        )
+
+        assertThat(result).isEqualTo(pendingId)
+        verifyBlocking(mockDataProvider) {
+            registerPendingFile(CLOUD_DRIVE_ROOT_ID, "note.txt", "text/plain")
+        }
+    }
+
+    @Test
+    fun `test that renameDocument delegates to dataProvider and returns document id`() = runTest {
+        setStateWithCredentials()
+        val documentId = "$CLOUD_DRIVE_ROOT_ID:123"
+        wheneverBlocking { mockDataProvider.renameDocument(any(), any()) }
+            .thenReturn(CLOUD_DRIVE_ROOT_ID)
+        createProvider()
+
+        val result = underTest.renameDocument(documentId, "renamed.txt")
+
+        assertThat(result).isEqualTo(documentId)
+        verifyBlocking(mockDataProvider) { renameDocument(documentId, "renamed.txt") }
+    }
+
+    @Test
+    fun `test that queryDocument returns synthesized row for pending placeholder id`() = runTest {
+        setStateWithCredentials()
+        val pendingId = "mega_cloud_drive_pending:abc"
+        val pendingRow = CloudDriveDocumentRow(
+            documentId = pendingId,
+            displayName = "draft.txt",
+            mimeType = "text/plain",
+            size = 0L,
+            lastModified = 1L,
+            flags = 0,
+        )
+        whenever(mockDataProvider.isPendingDocumentId(pendingId)).thenReturn(true)
+        whenever(mockDataProvider.getPendingDocumentRow(pendingId)).thenReturn(pendingRow)
+        createProvider()
+
+        val cursor: Cursor = underTest.queryDocument(pendingId, null)
+
+        assertThat(cursor.moveToFirst()).isTrue()
+        assertThat(cursor.getString(cursor.getColumnIndex(Document.COLUMN_DISPLAY_NAME)))
+            .isEqualTo("draft.txt")
+        assertThat(cursor.getString(cursor.getColumnIndex(Document.COLUMN_DOCUMENT_ID)))
+            .isEqualTo(pendingId)
+    }
 }

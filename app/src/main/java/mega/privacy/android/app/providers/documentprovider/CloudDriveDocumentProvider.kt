@@ -7,6 +7,8 @@ import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.os.Handler
+import android.os.HandlerThread
 import android.os.OperationCanceledException
 import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
@@ -25,6 +27,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
@@ -37,12 +40,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
 
 
 /**
@@ -75,8 +73,6 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
         private const val LOGIN_PENDING_INTENT_REQUEST_CODE = 1001
 
-        private const val OPEN_POLL_MS = 250L
-
         /** Delay before notifying SAF so it has time to register its ContentObserver on the cursor's notification URI. */
         private const val NOTIFY_DELAY_MS = 100L
 
@@ -85,6 +81,14 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             Executors.newCachedThreadPool { r ->
                 Thread(r, "CloudDriveDocOpen").apply { isDaemon = true }
             }.asCoroutineDispatcher()
+
+        /** Background handler used to deliver ParcelFileDescriptor close callbacks for write opens. */
+        private val writeCloseHandler: Handler by lazy {
+            HandlerThread("CloudDriveDocWriteClose").apply {
+                isDaemon = true
+                start()
+            }.let { Handler(it.looper) }
+        }
     }
 
     private val dependencyContainer: CloudDriveDocumentProviderEntryPoint by lazy {
@@ -115,7 +119,6 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     }
 
     override fun queryRoots(projection: Array<String>?): Cursor {
-        Timber.d("CloudDriveDocumentProvider queryRoots projection=$projection,")
         val summary = when (val state = dataProvider.state.value) {
             is HasCredentials -> state.accountName
             CloudDriveDocumentProviderUiState.NotLoggedIn -> getLoginToMEGAString()
@@ -158,19 +161,23 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             add(Root.COLUMN_SUMMARY, summary)
             add(Root.COLUMN_DOCUMENT_ID, CLOUD_DRIVE_ROOT_ID)
             add(Root.COLUMN_ICON, R.mipmap.ic_launcher)
-            add(Root.COLUMN_FLAGS, 0)
+            add(Root.COLUMN_FLAGS, Root.FLAG_SUPPORTS_CREATE)
         }
     }
 
     override fun queryDocument(documentId: String?, projection: Array<String>?): Cursor {
-        Timber.d("CloudDriveDocumentProvider queryDocument documentId=$documentId")
-
         if (documentId.isNullOrEmpty()) {
             throw FileNotFoundException("Invalid document id: $documentId")
         }
 
         if (documentId == CLOUD_DRIVE_ROOT_ID) {
             return documentCursorForRootDocument(projection)
+        }
+
+        if (dataProvider.isPendingDocumentId(documentId)) {
+            val pendingRow = dataProvider.getPendingDocumentRow(documentId)
+                ?: throw FileNotFoundException("Pending document not found: $documentId")
+            return documentCursor(row = pendingRow, projection = projection)
         }
 
         val result = documentQueryCursor(documentId, projection)
@@ -212,7 +219,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             mimeType = Document.MIME_TYPE_DIR,
             size = 0L,
             lastModified = 0L,
-            flags = 0
+            flags = Document.FLAG_DIR_SUPPORTS_CREATE,
         )
         return documentCursor(row = row, projection = projection)
     }
@@ -255,8 +262,8 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             projection
         )
 
-            CloudDriveDocumentProviderUiState.NotLoggedIn ->
-                throwAuthenticationRequired()
+        CloudDriveDocumentProviderUiState.NotLoggedIn ->
+            throwAuthenticationRequired()
 
         is CloudDriveDocumentProviderUiState.ChildData -> loadDocumentAsync(
             documentId,
@@ -284,7 +291,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         return getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
     }
 
-    /** Read-only open; not the root. @throws FileNotFoundException, AuthenticationRequiredException, OperationCanceledException */
+    /** Read or write open; not the root. @throws FileNotFoundException, AuthenticationRequiredException, OperationCanceledException */
     override fun openDocument(
         documentId: String?,
         mode: String?,
@@ -296,9 +303,8 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         if (documentId == CLOUD_DRIVE_ROOT_ID) {
             throw FileNotFoundException("Cannot open root as document")
         }
-        if (mode != null && mode != "r") {
-            throw FileNotFoundException("Write mode not supported")
-        }
+
+        val isWrite = dataProvider.isPendingDocumentId(documentId)
 
         when (dataProvider.state.value) {
             is CloudDriveDocumentProviderUiState.NotLoggedIn -> throwAuthenticationRequired()
@@ -306,77 +312,141 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                 throw FileNotFoundException(getPasscodeLockEnabledString())
 
             is CloudDriveDocumentProviderUiState.Offline ->
-                throw FileNotFoundException(getOfflineString())
+                if (!isWrite) throw FileNotFoundException(getOfflineString())
+
+            is CloudDriveDocumentProviderUiState.RootNodeNotLoaded ->
+                dataProvider.refreshRootNode()
 
             else -> Unit
         }
 
-        if (signal?.isCanceled == true) {
-            throw OperationCanceledException("Cancelled before resolve")
+        if (isWrite) {
+            val parcelMode = ParcelFileDescriptor.parseMode(mode ?: "w")
+            val scratchFile = resolveScratchFile(documentId, signal)
+            return ParcelFileDescriptor.open(
+                scratchFile,
+                parcelMode,
+                writeCloseHandler,
+            ) { err ->
+                dataProvider.onWriteScratchClosed(documentId, scratchFile, err)
+            }
         }
 
-        val file = openLocalFileOffViewerThread(documentId, signal)
+        val file = resolveLocalFile(documentId, signal)
         return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
     }
 
-    private fun openLocalFileOffViewerThread(
-        documentId: String,
-        signal: CancellationSignal?,
-    ): File {
-        // Launch on the dispatcher (not the Binder thread) so the Binder thread stays alive
-        // and responsive while polling the future — required for correct ParcelFileDescriptor handoff.
-        val future = CompletableFuture<File>()
-        applicationScope.launch(openDocumentDispatcher) {
+    private fun resolveScratchFile(documentId: String, signal: CancellationSignal?): File = try {
+        runBlocking(openDocumentDispatcher) {
+            val job = coroutineContext[Job]
+            signal?.setOnCancelListener { job?.cancel() }
             try {
-                future.complete(dataProvider.openDocumentFile(documentId))
-            } catch (e: CancellationException) {
-                future.cancel(true)
-                throw e
-            } catch (e: Throwable) {
-                future.completeExceptionally(e)
+                dataProvider.prepareWriteScratchFile(documentId)
+            } finally {
+                signal?.setOnCancelListener(null)
             }
         }
-        return awaitOpenFutureResult(future, signal)
-    }
-
-    /** [Future.get] with short timeout to poll [signal]. */
-    private fun <T> awaitOpenFutureResult(future: Future<T>, signal: CancellationSignal?): T {
-        var restoreInterrupt = false
-        try {
-            while (true) {
-                if (signal?.isCanceled == true) {
-                    future.cancel(true)
-                    throw OperationCanceledException("Cancelled while resolving document")
-                }
-                try {
-                    return future.get(OPEN_POLL_MS, TimeUnit.MILLISECONDS)
-                } catch (e: ExecutionException) {
-                    mapOpenFailure(e.cause ?: e)
-                } catch (_: TimeoutException) {
-                } catch (_: InterruptedException) {
-                    restoreInterrupt = true
-                } catch (e: java.util.concurrent.CancellationException) {
-                    throw OperationCanceledException(e.message)
-                }
-            }
-        } finally {
-            if (restoreInterrupt) {
-                Thread.currentThread().interrupt()
-            }
+    } catch (e: CancellationException) {
+        throw OperationCanceledException(e.message)
+    } catch (e: FileNotFoundException) {
+        throw e
+    } catch (e: Throwable) {
+        throw FileNotFoundException("Failed to prepare scratch file: ${e.message}").also {
+            it.initCause(e)
         }
     }
 
-    /**
-     * Rethrows the async failure from [Future.get] with types SAF callers expect.
-     */
-    private fun mapOpenFailure(t: Throwable): Nothing {
-        when (t) {
-            is CancellationException -> throw OperationCanceledException(t.message)
-            is OperationCanceledException -> throw t
-            is FileNotFoundException -> throw t
-            is AuthenticationRequiredException -> throw t
-            else -> throw FileNotFoundException("Failed to open document: ${t.message}")
-                .also { it.initCause(t) }
+    override fun createDocument(
+        parentDocumentId: String,
+        mimeType: String,
+        displayName: String,
+    ): String {
+        Timber.d("CloudDriveDocumentProvider createDocument parent=$parentDocumentId mime=$mimeType name=$displayName")
+        val pendingId = try {
+            runBlocking(openDocumentDispatcher) {
+                if (mimeType == Document.MIME_TYPE_DIR) {
+                    dataProvider.registerPendingFolder(parentDocumentId, displayName)
+                } else {
+                    dataProvider.registerPendingFile(parentDocumentId, displayName, mimeType)
+                }
+            }
+        } catch (e: FileNotFoundException) {
+            throw e
+        } catch (e: AuthenticationRequiredException) {
+            throw e
+        } catch (e: Throwable) {
+            throw FileNotFoundException("Failed to create document: ${e.message}").also {
+                it.initCause(e)
+            }
+        }
+        if (mimeType == Document.MIME_TYPE_DIR) {
+            applicationScope.launch {
+                runCatching { dataProvider.completeFolderCreation(pendingId) }
+                    .onFailure {
+                        Timber.e(
+                            it,
+                            "CloudDriveDocumentProvider completeFolderCreation failed for $pendingId"
+                        )
+                    }
+                notifyDocumentChanged(pendingId)
+                notifyChildDocumentsChanged(parentDocumentId)
+            }
+        } else {
+            // Surface the placeholder in the listing immediately, then wait for the data provider
+            // to finalize the pending entry (upload completed/failed/timed out) and re-notify so
+            // SAF re-queries with the real node in place of the placeholder.
+            notifyChildDocumentsChanged(parentDocumentId)
+            applicationScope.launch {
+                dataProvider.awaitFileFinalized(pendingId)
+                notifyChildDocumentsChanged(parentDocumentId)
+            }
+        }
+        return pendingId
+    }
+
+    override fun renameDocument(documentId: String, displayName: String): String? {
+        Timber.d("CloudDriveDocumentProvider renameDocument documentId=$documentId name=$displayName")
+        return try {
+            val parentDocumentId = runBlocking(openDocumentDispatcher) {
+                dataProvider.renameDocument(documentId, displayName)
+            }
+            notifyChildDocumentsChanged(parentDocumentId)
+            // DocumentsUI re-queries via DocumentInfo.fromUri using the URI returned here. Returning
+            // null surfaces a null URI, which DocumentInfo.fromUri throws NPE on; that is caught
+            // upstream and shown as "Failed to rename" even though the rename succeeded. Returning
+            // the (unchanged) document id keeps the URI valid so the rename completes cleanly.
+            documentId
+        } catch (e: FileNotFoundException) {
+            throw e
+        } catch (e: AuthenticationRequiredException) {
+            throw e
+        } catch (e: Throwable) {
+            Timber.e(e, "CloudDriveDocumentProvider renameDocument failed for $documentId")
+            throw FileNotFoundException("Failed to rename document: ${e.message}").also {
+                it.initCause(e)
+            }
+        }
+    }
+
+    private fun resolveLocalFile(documentId: String, signal: CancellationSignal?): File = try {
+        runBlocking(openDocumentDispatcher) {
+            val job = coroutineContext[Job]
+            signal?.setOnCancelListener { job?.cancel() }
+            try {
+                dataProvider.openDocumentFile(documentId)
+            } finally {
+                signal?.setOnCancelListener(null)
+            }
+        }
+    } catch (e: CancellationException) {
+        throw OperationCanceledException(e.message)
+    } catch (e: FileNotFoundException) {
+        throw e
+    } catch (e: AuthenticationRequiredException) {
+        throw e
+    } catch (e: Throwable) {
+        throw FileNotFoundException("Failed to open document: ${e.message}").also {
+            it.initCause(e)
         }
     }
 
@@ -385,7 +455,6 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         projection: Array<String>?,
         sortOrder: String?,
     ): Cursor {
-        Timber.d("CloudDriveDocumentProvider queryChildDocuments parent=$parentDocumentId sortOrder=$sortOrder")
         if (parentDocumentId.isEmpty()) {
             throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
         }
@@ -403,7 +472,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         childDocumentsNotifyJob = applicationScope.launch {
             dataProvider.state.first { state ->
                 when (state) {
-                    is CloudDriveDocumentProviderUiState.ChildData,  ->
+                    is CloudDriveDocumentProviderUiState.ChildData ->
                         state.parentId == parentDocumentId
 
                     is CloudDriveDocumentProviderUiState.FileNotFound,
@@ -439,7 +508,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         is CloudDriveDocumentProviderUiState.ChildData -> {
             if (parentDocumentId == state.parentId) {
                 documentCursor(
-                    rows = state.children,
+                    rows = state.children + dataProvider.getPendingChildrenForParent(parentDocumentId),
                     projection = projection,
                     isLoading = state.hasMore
                 )
@@ -448,39 +517,39 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             }
         }
 
-            is CloudDriveDocumentProviderUiState.DocumentData -> loadChildrenAsync(
-                parentDocumentId,
-                projection
-            )
+        is CloudDriveDocumentProviderUiState.DocumentData -> loadChildrenAsync(
+            parentDocumentId,
+            projection
+        )
 
-            is CloudDriveDocumentProviderUiState.LoadingChildren -> {
-                if (parentDocumentId != state.currentParentDocumentId) {
-                    dataProvider.loadChildrenInBackground(parentDocumentId)
-                }
-                getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
+        is CloudDriveDocumentProviderUiState.LoadingChildren -> {
+            if (parentDocumentId != state.currentParentDocumentId) {
+                dataProvider.loadChildrenInBackground(parentDocumentId)
             }
+            getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
+        }
 
-            is CloudDriveDocumentProviderUiState.LoadingDocument -> loadChildrenAsync(
-                parentDocumentId,
-                projection
-            )
+        is CloudDriveDocumentProviderUiState.LoadingDocument -> loadChildrenAsync(
+            parentDocumentId,
+            projection
+        )
 
-            CloudDriveDocumentProviderUiState.Initialising -> loadChildrenAsync(
-                parentDocumentId,
-                projection
-            )
+        CloudDriveDocumentProviderUiState.Initialising -> loadChildrenAsync(
+            parentDocumentId,
+            projection
+        )
 
         CloudDriveDocumentProviderUiState.NotLoggedIn ->
             throwAuthenticationRequired()
 
-            is CloudDriveDocumentProviderUiState.FileNotFound ->
-                throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
+        is CloudDriveDocumentProviderUiState.FileNotFound ->
+            throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
 
-            is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
-                dataProvider.refreshRootNode()
-                loadChildrenAsync(parentDocumentId, projection)
-            }
+        is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
+            dataProvider.refreshRootNode()
+            loadChildrenAsync(parentDocumentId, projection)
         }
+    }
 
     private fun loadChildrenAsync(
         parentId: String,
@@ -583,7 +652,6 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     }
 
     private fun notifyRootChanged(rootDocumentId: String? = null) {
-        Timber.d("CloudDriveDocumentProvider notifyRootChanged rootDocumentId=$rootDocumentId")
         context?.let { context ->
             val rootsUri = DocumentsContract.buildRootsUri(authority)
             context.contentResolver?.notifyChange(rootsUri, null)

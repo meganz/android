@@ -42,7 +42,7 @@ class CloudDriveDocumentRowMapper @Inject constructor(
                 mimeType = node.type.mimeType,
                 size = node.size,
                 lastModified = node.modificationTime,
-                flags = 0,
+                flags = Document.FLAG_SUPPORTS_RENAME,
             )
 
             is TypedFolderNode -> CloudDriveDocumentRow(
@@ -51,7 +51,7 @@ class CloudDriveDocumentRowMapper @Inject constructor(
                 mimeType = Document.MIME_TYPE_DIR,
                 size = 0L,
                 lastModified = node.creationTime,
-                flags = 0,
+                flags = Document.FLAG_DIR_SUPPORTS_CREATE or Document.FLAG_SUPPORTS_RENAME,
             )
 
             else -> CloudDriveDocumentRow(
