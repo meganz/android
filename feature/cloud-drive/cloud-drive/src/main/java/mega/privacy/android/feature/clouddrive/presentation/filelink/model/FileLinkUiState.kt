@@ -2,14 +2,14 @@ package mega.privacy.android.feature.clouddrive.presentation.filelink.model
 
 import androidx.compose.runtime.Immutable
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Immutable
 data class FileLinkUiState(
     val url: String? = null,
     val contentState: FileLinkContentState = FileLinkContentState.Loading,
-    val fileNode: TypedFileNode? = null,
+    val fileNode: PublicLinkFile? = null,
     val hasCredentials: Boolean = false,
 ) {
 

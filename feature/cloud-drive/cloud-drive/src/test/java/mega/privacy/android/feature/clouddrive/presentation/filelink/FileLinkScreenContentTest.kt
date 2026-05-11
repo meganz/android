@@ -7,7 +7,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkUiState
 import mega.privacy.android.feature.clouddrive.presentation.publiclink.view.DECRYPTION_KEY_DIALOG_TAG
@@ -145,7 +145,7 @@ class FileLinkScreenContentTest {
         formattedDuration: String?,
         isVideo: Boolean = false,
     ): FileLinkUiState {
-        val fileNode: TypedFileNode = mock {
+        val fileNode: PublicLinkFile = mock {
             on { name } doReturn "Hobbiton.mp4"
         }
         return FileLinkUiState(

@@ -90,7 +90,6 @@ internal fun FileLinkScreen(
         uiState = uiState,
         formattedFileSize = uiState.fileNode?.let { formatFileSize(it.size, context) }.orEmpty(),
         onSaveToMegaClicked = {
-            // TODO
             uiState.fileNode?.let { singleNodeActionHandler(SaveToMegaMenuAction(), it) }
         },
         onDownloadClicked = {

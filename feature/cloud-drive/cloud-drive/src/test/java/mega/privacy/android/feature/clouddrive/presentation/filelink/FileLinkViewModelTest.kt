@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
@@ -192,7 +193,7 @@ internal class FileLinkViewModelTest {
     }
 
     @Test
-    fun `test that init emits Loaded with fileNode and iconRes when getPublicNode succeeds`() =
+    fun `test that init emits Loaded with fileNode wrapped in PublicLinkFile and iconRes when getPublicNode succeeds`() =
         runTest {
             val url = "https://mega.nz/file/abc#key"
             val node = mockFileNode()
@@ -205,7 +206,9 @@ internal class FileLinkViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.contentState).isInstanceOf(FileLinkContentState.Loaded::class.java)
-                assertThat(state.fileNode).isEqualTo(node)
+                assertThat(state.fileNode).isInstanceOf(PublicLinkFile::class.java)
+                assertThat(state.fileNode?.node).isEqualTo(node)
+                assertThat(state.fileNode?.parent).isNull()
                 assertThat(state.hasCredentials).isTrue()
             }
         }

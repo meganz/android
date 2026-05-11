@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -91,7 +92,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
                                 formattedDuration = formattedDuration,
                                 isVideo = node.type is VideoFileTypeInfo,
                             ),
-                            fileNode = node,
+                            fileNode = PublicLinkFile(node, null),
                         )
                     }
                     saveViewedFileLink(url, node)
