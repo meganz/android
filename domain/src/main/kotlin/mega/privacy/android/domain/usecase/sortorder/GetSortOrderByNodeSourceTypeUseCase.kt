@@ -24,12 +24,13 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
      * @param nodeSource The source of the node.
      * @return The sort order for the specified node source.
      */
+    @Suppress("UNUSED_PARAMETER")
     suspend operator fun invoke(
         nodeSource: NodeSourceType,
-        isSingleActivityEnabled: Boolean,
+        isSingleActivityEnabled: Boolean = true,
     ): SortOrder =
         when (nodeSource) {
-            NodeSourceType.LINKS -> getLinksSortOrderUseCase(isSingleActivityEnabled)
+            NodeSourceType.LINKS -> getLinksSortOrderUseCase()
             NodeSourceType.INCOMING_SHARES -> getOthersSortOrder()
             NodeSourceType.CLOUD_DRIVE,
             NodeSourceType.HOME,

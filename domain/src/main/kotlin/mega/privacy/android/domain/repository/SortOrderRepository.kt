@@ -30,7 +30,7 @@ interface SortOrderRepository {
      * Get links cloud sort order
      * @return links cloud sort order
      */
-    suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): SortOrder?
+    suspend fun getLinksSortOrder(): SortOrder?
 
     /**
      * Get others sort order

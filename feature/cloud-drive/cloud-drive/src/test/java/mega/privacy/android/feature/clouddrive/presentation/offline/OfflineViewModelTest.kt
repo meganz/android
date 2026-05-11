@@ -520,7 +520,7 @@ class OfflineViewModelTest {
                 sortOption = NodeSortOption.Name,
                 sortDirection = SortDirection.Ascending
             )
-            whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
+            whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
                 expectedSortOrder
             )
             whenever(nodeSortConfigurationUiMapper.invoke(expectedSortOrder)).thenReturn(
@@ -538,7 +538,7 @@ class OfflineViewModelTest {
             }
 
             // Then
-            verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE, true)
+            verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE)
         }
 
     @Test
@@ -549,7 +549,7 @@ class OfflineViewModelTest {
             sortOption = NodeSortOption.Size,
             sortDirection = SortDirection.Descending
         )
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
             sizeDescOrder
         )
         whenever(nodeSortConfigurationUiMapper.invoke(sizeDescOrder)).thenReturn(sizeDescConfig)
@@ -563,7 +563,7 @@ class OfflineViewModelTest {
             assertThat(state.selectedSortConfiguration).isEqualTo(sizeDescConfig)
         }
 
-        verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE, true)
+        verify(getSortOrderByNodeSourceTypeUseCase).invoke(NodeSourceType.OFFLINE)
     }
 
     @Test
@@ -582,7 +582,7 @@ class OfflineViewModelTest {
         whenever(nodeSortConfigurationUiMapper.invoke(sortConfiguration)).thenReturn(
             expectedSortOrder
         )
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
             expectedSortOrder
         )
         whenever(nodeSortConfigurationUiMapper.invoke(expectedSortOrder)).thenReturn(
@@ -595,7 +595,7 @@ class OfflineViewModelTest {
 
         verify(setOfflineSortOrder).invoke(expectedSortOrder)
         // Times(2) because initViewModel also calls getSortOrder
-        verify(getSortOrderByNodeSourceTypeUseCase, times(2)).invoke(NodeSourceType.OFFLINE, true)
+        verify(getSortOrderByNodeSourceTypeUseCase, times(2)).invoke(NodeSourceType.OFFLINE)
     }
 
     private suspend fun stubCommon() {
@@ -605,7 +605,7 @@ class OfflineViewModelTest {
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)).thenReturn(
             SortOrder.ORDER_DEFAULT_ASC
         )
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(

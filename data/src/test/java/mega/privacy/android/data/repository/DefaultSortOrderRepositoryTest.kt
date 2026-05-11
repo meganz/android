@@ -14,8 +14,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -97,42 +95,29 @@ internal class DefaultSortOrderRepositoryTest {
         verify(sortOrderMapper).invoke(order)
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that get links sort order return type is sort order`(isSingleActivityEnabled: Boolean) =
-        runTest {
-            val order = MegaApiJava.ORDER_SIZE_ASC
-            whenever(megaLocalStorageGateway.getLinksSortOrder(isSingleActivityEnabled)).thenReturn(
-                order
-            )
-            whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_SIZE_ASC)
-            assertThat(underTest.getLinksSortOrder(isSingleActivityEnabled)).isInstanceOf(SortOrder::class.java)
-        }
-
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that get links sort order invokes get links sort order of gateway`(
-        isSingleActivityEnabled: Boolean,
-    ) = runTest {
+    @Test
+    fun `test that get links sort order return type is sort order`() = runTest {
         val order = MegaApiJava.ORDER_SIZE_ASC
-        whenever(megaLocalStorageGateway.getLinksSortOrder(isSingleActivityEnabled)).thenReturn(
-            order
-        )
-        underTest.getLinksSortOrder(isSingleActivityEnabled)
-        verify(megaLocalStorageGateway).getLinksSortOrder(isSingleActivityEnabled)
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
+        whenever(sortOrderMapper.invoke(order)).thenReturn(SortOrder.ORDER_SIZE_ASC)
+        assertThat(underTest.getLinksSortOrder()).isInstanceOf(SortOrder::class.java)
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    fun `test that get links sort order invokes sort order mapper`(isSingleActivityEnabled: Boolean) =
-        runTest {
-            val order = MegaApiJava.ORDER_SIZE_ASC
-            whenever(megaLocalStorageGateway.getLinksSortOrder(isSingleActivityEnabled)).thenReturn(
-                order
-            )
-            underTest.getLinksSortOrder(isSingleActivityEnabled)
-            verify(sortOrderMapper).invoke(order)
-        }
+    @Test
+    fun `test that get links sort order invokes get links sort order of gateway`() = runTest {
+        val order = MegaApiJava.ORDER_SIZE_ASC
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
+        underTest.getLinksSortOrder()
+        verify(megaLocalStorageGateway).getLinksSortOrder()
+    }
+
+    @Test
+    fun `test that get links sort order invokes sort order mapper`() = runTest {
+        val order = MegaApiJava.ORDER_SIZE_ASC
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
+        underTest.getLinksSortOrder()
+        verify(sortOrderMapper).invoke(order)
+    }
 
     @Test
     fun `test that get others sort order return type is sort order`() = runTest {

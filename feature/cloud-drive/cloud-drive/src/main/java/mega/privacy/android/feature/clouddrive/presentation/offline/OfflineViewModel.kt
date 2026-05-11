@@ -369,7 +369,7 @@ class OfflineViewModel @AssistedInject constructor(
     private fun getSortOrder() {
         viewModelScope.launch {
             runCatching {
-                getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)
+                getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE)
             }.onSuccess { sortOrder ->
                 val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
                 _uiState.update {

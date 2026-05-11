@@ -45,19 +45,11 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().preferences?.preferredSortOthers?.toInt() ?: ORDER_DEFAULT_ASC
     }
 
-    override suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): Int =
-        if (isSingleActivityEnabled) {
-            when (val order = getCloudSortOrder()) {
-                ORDER_CREATION_ASC -> ORDER_LINK_CREATION_ASC
-                ORDER_CREATION_DESC -> ORDER_LINK_CREATION_DESC
-                else -> order
-            }
-        } else {
-            when (val order = getCloudSortOrder()) {
-                ORDER_MODIFICATION_ASC -> ORDER_LINK_CREATION_ASC
-                ORDER_MODIFICATION_DESC -> ORDER_LINK_CREATION_DESC
-                else -> order
-            }
+    override suspend fun getLinksSortOrder(): Int =
+        when (val order = getCloudSortOrder()) {
+            ORDER_CREATION_ASC -> ORDER_LINK_CREATION_ASC
+            ORDER_CREATION_DESC -> ORDER_LINK_CREATION_DESC
+            else -> order
         }
 
     /**

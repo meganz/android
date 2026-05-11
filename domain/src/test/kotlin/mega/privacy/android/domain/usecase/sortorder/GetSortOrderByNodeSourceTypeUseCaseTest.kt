@@ -14,7 +14,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -34,7 +33,7 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
     fun setUp() {
         runBlocking {
             whenever(getCloudSortOrder()).thenReturn(mockCloudSortOrder)
-            whenever(getLinksSortOrderUseCase(any())).thenReturn(mockLinksSortOrder)
+            whenever(getLinksSortOrderUseCase()).thenReturn(mockLinksSortOrder)
             whenever(getOthersSortOrder()).thenReturn(mockOthersSortOrder)
             whenever(getOfflineSortOrder()).thenReturn(mockOfflineSortOrder)
         }
@@ -53,21 +52,11 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
 
     @ParameterizedTest
     @MethodSource("provideNodeSourceTypeAndExpectedSortOrder")
-    fun `test sort order by node source type for legacy implementation`(
+    fun `test that sort order is returned for node source type`(
         nodeSourceType: NodeSourceType,
         expectedSortOrder: SortOrder,
     ) = runBlocking {
-        val result = underTest(nodeSourceType, false)
-        assertEquals(expectedSortOrder, result)
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideNodeSourceTypeAndExpectedSortOrder")
-    fun `test sort order by node source type for revamp`(
-        nodeSourceType: NodeSourceType,
-        expectedSortOrder: SortOrder,
-    ) = runBlocking {
-        val result = underTest(nodeSourceType, true)
+        val result = underTest(nodeSourceType)
         assertEquals(expectedSortOrder, result)
     }
 
