@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
@@ -66,6 +67,7 @@ import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.shared.resources.R as sharedResR
+import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -127,6 +129,9 @@ class ImagePreviewViewModelTest {
         mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
 
+    @Suppress("DEPRECATION")
+    private val getNodeByHandle: GetNodeByHandle = mock()
+
     private val accountLevelDetail = mock<AccountLevelDetail> {
         on { accountType }.thenReturn(AccountType.PRO_III)
     }
@@ -171,6 +176,7 @@ class ImagePreviewViewModelTest {
         monitorConnectivityUseCase,
         getNodeNameCollisionRenameNameUseCase,
         getNodeAccessPermission,
+        getNodeByHandle,
     ).also {
         imageNodeFetchers.clear()
         underTest.consumeTransferEvent()
@@ -210,6 +216,7 @@ class ImagePreviewViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
+            getNodeByHandle = getNodeByHandle,
             context = mock()
         )
     }
@@ -772,6 +779,35 @@ class ImagePreviewViewModelTest {
                 val state = expectMostRecentItem()
                 assertThat(state.transferEvent.triggeredContent()).isInstanceOf(TransferTriggerEvent.CopyOfflineNode::class.java)
             }
+        }
+
+    @Test
+    internal fun `test that resolveMegaNode falls back to getNodeByHandle when serializedData is null`() =
+        runTest {
+            val expected = mock<MegaNode>()
+            val imageNode = mock<ImageNode> {
+                on { id } doReturn NodeId(123L)
+                on { serializedData } doReturn null
+            }
+            wheneverBlocking { getNodeByHandle(123L) } doReturn expected
+
+            val result = underTest.resolveMegaNode(imageNode)
+
+            assertThat(result).isSameInstanceAs(expected)
+        }
+
+    @Test
+    internal fun `test that resolveMegaNode returns null when serializedData is null and getNodeByHandle returns null`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { id } doReturn NodeId(123L)
+                on { serializedData } doReturn null
+            }
+            wheneverBlocking { getNodeByHandle(123L) } doReturn null
+
+            val result = underTest.resolveMegaNode(imageNode)
+
+            assertThat(result).isNull()
         }
 
     @Test

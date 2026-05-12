@@ -100,7 +100,6 @@ import mega.privacy.mobile.analytics.event.PhotoPreviewScreenEvent
 import mega.privacy.mobile.analytics.event.PlaySlideshowMenuToolbarEvent
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -348,13 +347,19 @@ class ImagePreviewActivity : BaseActivity() {
     private fun handleOpenWith(imageNode: ImageNode) {
         if (viewModel.isInOfflineMode()) {
             offlineNodeActionsViewModel.handleOpenWithIntentById(imageNode.id)
-        } else {
+            return
+        }
+        lifecycleScope.launch {
+            val node = viewModel.resolveMegaNode(imageNode) ?: run {
+                Timber.w("handleOpenWith: cannot resolve MegaNode for ${imageNode.id}")
+                return@launch
+            }
             onNodeTapped(
-                this,
-                MegaNode.unserialize(imageNode.serializedData),
-                { this.saveNodeByOpenWith() },
-                this,
-                this,
+                this@ImagePreviewActivity,
+                node,
+                { saveNodeByOpenWith() },
+                this@ImagePreviewActivity,
+                this@ImagePreviewActivity,
                 true
             )
         }
@@ -401,22 +406,38 @@ class ImagePreviewActivity : BaseActivity() {
                     }
             }
 
-            else -> MegaNodeUtil.shareNode(this, MegaNode.unserialize(imageNode.serializedData))
+            else -> lifecycleScope.launch {
+                val node = viewModel.resolveMegaNode(imageNode) ?: run {
+                    Timber.w("shareNode: cannot resolve MegaNode for ${imageNode.id}")
+                    return@launch
+                }
+                MegaNodeUtil.shareNode(this@ImagePreviewActivity, node)
+            }
         }
     }
 
     private fun renameNode(imageNode: ImageNode) {
-        val node = MegaNode.unserialize(imageNode.serializedData)
-        val snackbarShower = object : SnackbarShower {
-            override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-                content?.let { viewModel.setResultMessage(it) }
+        lifecycleScope.launch {
+            val node = viewModel.resolveMegaNode(imageNode) ?: run {
+                Timber.w("renameNode: cannot resolve MegaNode for ${imageNode.id}")
+                return@launch
             }
+            val snackbarShower = object : SnackbarShower {
+                override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+                    content?.let { viewModel.setResultMessage(it) }
+                }
 
-            override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
-                viewModel.setResultMessage(content)
+                override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
+                    viewModel.setResultMessage(content)
+                }
             }
+            MegaNodeDialogUtil.showRenameNodeDialog(
+                this@ImagePreviewActivity,
+                node,
+                snackbarShower,
+                null,
+            )
         }
-        MegaNodeDialogUtil.showRenameNodeDialog(this, node, snackbarShower, null)
     }
 
     private fun hideNode(
