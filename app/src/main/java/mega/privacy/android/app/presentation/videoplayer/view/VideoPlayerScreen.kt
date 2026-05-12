@@ -10,6 +10,7 @@ import android.os.Environment.DIRECTORY_DCIM
 import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.Animatable
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.graphics.scale
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -200,10 +202,15 @@ internal fun VideoPlayerScreen(
     }
 
     var playbackState by rememberSaveable { mutableIntStateOf(STATE_IDLE) }
+    var isPlaying by rememberSaveable { mutableStateOf(false) }
     val playerEventListener = remember {
         object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
                 playbackState = state
+            }
+
+            override fun onIsPlayingChanged(playing: Boolean) {
+                isPlaying = playing
             }
         }
     }
@@ -314,6 +321,7 @@ internal fun VideoPlayerScreen(
 
     DisposableEffect(Unit) {
         playbackState = player?.playbackState ?: STATE_IDLE
+        isPlaying = player?.isPlaying ?: false
 
         player?.addListener(playerEventListener)
         onDispose {
@@ -341,6 +349,16 @@ internal fun VideoPlayerScreen(
                                 } else {
                                     RESIZE_MODE_FIT
                                 }
+                            }
+
+                            fun applyPlayPauseIcon() {
+                                playerComposeView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_play_pause)
+                                    ?.setImageDrawable(
+                                        ContextCompat.getDrawable(
+                                            context,
+                                            if (isPlaying) R.drawable.ic_player_pause else R.drawable.ic_player_play
+                                        )
+                                    )
                             }
 
                             videoPlayerController = VideoPlayerController(
@@ -407,6 +425,9 @@ internal fun VideoPlayerScreen(
 
                             playerComposeView.setControllerVisibilityListener(
                                 PlayerView.ControllerVisibilityListener { visibility ->
+                                    if (visibility == View.VISIBLE) {
+                                        applyPlayPauseIcon()
+                                    }
                                     if (visibility == View.VISIBLE && !isControllerViewVisible) {
                                         autoHideJob?.cancel()
                                         autoHideJob = coroutineScope.launch {
@@ -463,6 +484,13 @@ internal fun VideoPlayerScreen(
 
                 root.findViewById<View>(R.id.exo_play_pause).isVisible =
                     playbackState > STATE_BUFFERING
+                root.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_play_pause)
+                    ?.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            context,
+                            if (isPlaying) R.drawable.ic_player_pause else R.drawable.ic_player_play
+                        )
+                    )
             }
 
             if (isControllerViewVisible && !uiState.isLocked) {
