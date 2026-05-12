@@ -138,7 +138,7 @@ private fun EmptyFolderPreview() {
 
 @Composable
 @CombinedThemePreviews
-fun FavouritesExplorerFolderDestinationScreenPreview(
+private fun FavouritesExplorerFolderDestinationScreenPreview(
     @PreviewParameter(BooleanProvider::class) isList: Boolean,
 ) {
     AndroidThemeForPreviews {

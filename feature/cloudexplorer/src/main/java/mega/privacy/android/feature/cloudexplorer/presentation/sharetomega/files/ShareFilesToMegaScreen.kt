@@ -4,6 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation3.runtime.NavKey
@@ -19,7 +20,7 @@ import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventS
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShareFilesToMegaScreen(
+internal fun ShareFilesToMegaScreen(
     uiState: ShareFilesToMegaUiState,
     startNavKey: ExplorerNavKey,
     onStartUpload: (TransferTriggerEvent) -> Unit,
@@ -33,6 +34,7 @@ fun ShareFilesToMegaScreen(
         val uploadUrisEventState = rememberUploadUrisEventState()
         var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
         val folderPickedId = NodeId(folderPickedIdLong)
+        var isProcessingAction by rememberSaveable { mutableStateOf(false) }
 
         ExplorerScreen(
             explorerMode = ExplorerMode.ShareFilesToMega,
@@ -44,7 +46,9 @@ fun ShareFilesToMegaScreen(
             onCloseExplorerScreen = onNavigateBack,
             onNavigateBack = onNavigateBack,
             onNavigate = onNavigate,
+            isProcessingAction = isProcessingAction,
             onFolderPicked = { nodeId ->
+                isProcessingAction = true
                 folderPickedIdLong = nodeId.longValue
                 uploadUrisEventState.trigger(dataUiState.shareUris.map { it.toUri() })
             },

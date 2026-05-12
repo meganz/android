@@ -2828,4 +2828,8 @@
     <string name="or_divider">or</string>
     <!-- General new link text. In can be used for any screen or dialog in which a new URL link file is being created. -->
     <string name="general_new_link">New link</string>
+    <!-- Label for the subject line when uploading a shared text/url to MEGA as a file. -->
+    <string name="new_file_subject_when_uploading">Subject</string>
+    <!-- Label for the email address line when uploading a shared text/url to MEGA as a file. -->
+    <string name="new_file_email_when_uploading">Email address</string>
 </resources>

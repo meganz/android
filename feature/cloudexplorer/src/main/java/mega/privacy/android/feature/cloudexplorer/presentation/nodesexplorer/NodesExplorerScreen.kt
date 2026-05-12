@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContent
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -35,6 +36,8 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.Explorer
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
+import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
+import mega.privacy.android.navigation.destination.NewURLFileDialogNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
@@ -48,20 +51,33 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 
 @Composable
-fun NodesExplorerScreen(
+internal fun NodesExplorerScreen(
     explorerMode: ExplorerMode,
     startNavKey: ExplorerNavKey,
     nodeExplorerId: NodeId,
     nodeSourceType: NodeSourceType,
+    isProcessingAction: Boolean,
     onCloseExplorerScreen: () -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     shareUris: List<UriPath>? = null,
+    fileUriEvent: StateEventWithContent<UriPath>,
     onStartUpload: (TransferTriggerEvent) -> Unit = {},
+    onFileUriConsumed: () -> Unit = {},
 ) {
     val uploadUrisEventState = rememberUploadUrisEventState()
     var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
     val folderPickedId = NodeId(folderPickedIdLong)
+    val isShareToMega = explorerMode == ExplorerMode.ShareFilesToMega
+            || explorerMode == ExplorerMode.ShareTextToMega
+            || explorerMode == ExplorerMode.ShareURLToMega
+
+    EventEffect(
+        event = fileUriEvent,
+        onConsumed = onFileUriConsumed,
+    ) { uri ->
+        uploadUrisEventState.trigger(listOf(uri.toUri()))
+    }
 
     ExplorerScreen(
         explorerMode = explorerMode,
@@ -71,12 +87,31 @@ fun NodesExplorerScreen(
         nodeSourceType = nodeSourceType,
         shareUris = shareUris,
         onCloseExplorerScreen = onCloseExplorerScreen,
+        isProcessingAction = isProcessingAction,
         onFolderPicked = { nodeId ->
-            if (explorerMode == ExplorerMode.ShareFilesToMega && shareUris != null) {
-                folderPickedIdLong = nodeId.longValue
-                uploadUrisEventState.trigger(
-                    shareUris.map { it.toUri() }
-                )
+            when (explorerMode) {
+                ExplorerMode.ShareFilesToMega if shareUris != null -> {
+                    folderPickedIdLong = nodeId.longValue
+                    uploadUrisEventState.trigger(
+                        shareUris.map { it.toUri() }
+                    )
+                }
+
+                ExplorerMode.ShareTextToMega, ExplorerMode.ShareURLToMega -> {
+                    folderPickedIdLong = nodeId.longValue
+                    onNavigate(
+                        if (explorerMode == ExplorerMode.ShareURLToMega) {
+                            NewURLFileDialogNavKey(parentNodeId = nodeId)
+                        } else {
+                            NewTextFileDialogNavKey(
+                                parentNodeId = nodeId,
+                                returnFileName = true,
+                            )
+                        }
+                    )
+                }
+
+                else -> {}
             }
         },
         onFilesPicked = {},
@@ -84,7 +119,7 @@ fun NodesExplorerScreen(
         onNavigate = onNavigate,
     )
 
-    if (explorerMode == ExplorerMode.ShareFilesToMega) {
+    if (isShareToMega) {
         ShareToMegaUpload(
             parentNodeId = folderPickedId,
             uploadUrisEventState = uploadUrisEventState,
@@ -203,7 +238,7 @@ private fun EmptyRoot() {
 
 @Composable
 @CombinedThemePreviews
-fun NodesExplorerScreenContentEmptyPreview() {
+private fun NodesExplorerScreenContentEmptyPreview() {
     AndroidThemeForPreviews {
         CompositionLocalProvider(
             LocalNodeHeaderPreviewData provides NodeHeaderItemUiState.Data(
@@ -227,7 +262,7 @@ fun NodesExplorerScreenContentEmptyPreview() {
 
 @Composable
 @CombinedThemePreviews
-fun NodesExplorerScreenContentPreview(
+private fun NodesExplorerScreenContentPreview(
     @PreviewParameter(BooleanProvider::class) isList: Boolean,
 ) {
     AndroidThemeForPreviews {

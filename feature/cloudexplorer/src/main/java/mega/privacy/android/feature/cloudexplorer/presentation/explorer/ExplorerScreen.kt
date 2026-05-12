@@ -50,7 +50,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExplorerScreen(
+internal fun ExplorerScreen(
     explorerMode: ExplorerMode,
     startNavKey: ExplorerNavKey,
     isInnerNavigation: Boolean,
@@ -59,6 +59,7 @@ fun ExplorerScreen(
     onCloseExplorerScreen: () -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
+    isProcessingAction: Boolean,
     modifier: Modifier = Modifier,
     shareUris: List<UriPath>? = null,
     tabIndex: Int = CLOUD_TAB_INDEX,
@@ -68,7 +69,6 @@ fun ExplorerScreen(
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
-    var isProcessingAction by rememberSaveable { mutableStateOf(false) }
     val protectedUserTap: (() -> Unit) -> Unit = { action -> if (!isProcessingAction) action() }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
@@ -159,7 +159,6 @@ fun ExplorerScreen(
                 primaryButtonText = stringResource(explorerMode.actionStringId),
                 onPrimaryButtonClick = {
                     protectedUserTap {
-                        isProcessingAction = true
                         when {
                             explorerMode.isFolderPicker && selectedTabIndex != CHAT_TAB_INDEX -> {
                                 onFolderPicked(nodesExplorerUiStateShared.currentFolderId)

@@ -5,13 +5,13 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 
 @Composable
-fun ChatExplorerScreen() {
+internal fun ChatExplorerScreen() {
 
 }
 
 @Composable
 @CombinedThemePreviews
-fun ChatExplorerScrenPreview() {
+private fun ChatExplorerScrenPreview() {
     AndroidThemeForPreviews {
         ChatExplorerScreen()
     }

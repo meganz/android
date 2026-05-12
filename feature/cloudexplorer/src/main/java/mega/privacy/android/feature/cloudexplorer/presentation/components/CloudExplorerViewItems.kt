@@ -15,7 +15,7 @@ import mega.privacy.android.shared.nodes.components.NodeListViewItem
  * Cloud explorer list row: forwards to [NodeListViewItem] with cloud explorer defaults
  */
 @Composable
-fun CloudExplorerListViewItem(
+internal fun CloudExplorerListViewItem(
     title: String,
     subtitle: String,
     @DrawableRes icon: Int,
@@ -73,7 +73,7 @@ fun CloudExplorerListViewItem(
  * Cloud explorer grid cell: forwards to [mega.privacy.android.shared.nodes.components.NodeGridViewItem] with cloud explorer defaults
  */
 @Composable
-fun CloudExplorerGridViewItem(
+internal fun CloudExplorerGridViewItem(
     name: String,
     @DrawableRes iconRes: Int,
     thumbnailData: ThumbnailData?,

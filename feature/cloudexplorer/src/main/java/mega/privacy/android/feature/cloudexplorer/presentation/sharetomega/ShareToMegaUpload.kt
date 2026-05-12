@@ -26,7 +26,7 @@ import mega.privacy.android.shared.transfers.components.UploadingFiles
  * @param onCloseExplorerScreen Callback to close/navigate back from the current screen.
  */
 @Composable
-fun ShareToMegaUpload(
+internal fun ShareToMegaUpload(
     parentNodeId: NodeId,
     uploadUrisEventState: UploadUrisEventState,
     onStartUpload: (TransferTriggerEvent) -> Unit,
