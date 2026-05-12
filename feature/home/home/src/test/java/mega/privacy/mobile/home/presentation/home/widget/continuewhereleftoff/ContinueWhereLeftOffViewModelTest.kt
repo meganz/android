@@ -21,6 +21,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -73,7 +74,7 @@ class ContinueWhereLeftOffViewModelTest {
             )
         )
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(10) } doReturn flow {
+            on { invoke(any()) } doReturn flow {
                 emit(items)
                 awaitCancellation()
             }
@@ -101,7 +102,7 @@ class ContinueWhereLeftOffViewModelTest {
         }
         whenever(getNodeByIdUseCase(NodeId(10L))).thenReturn(typedNode)
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(10) } doReturn flow {
+            on { invoke(any()) } doReturn flow {
                 emit(items)
                 awaitCancellation()
             }
@@ -127,7 +128,7 @@ class ContinueWhereLeftOffViewModelTest {
             )
         )
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(10) } doReturn flow {
+            on { invoke(any()) } doReturn flow {
                 emit(items)
                 awaitCancellation()
             }
@@ -145,7 +146,7 @@ class ContinueWhereLeftOffViewModelTest {
     fun `test that resolved name is cached and not fetched again`() = runTest {
         val fakeFlow = MutableSharedFlow<List<ContinueWhereLeftOffItem>>()
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(10) } doReturn fakeFlow
+            on { invoke(any()) } doReturn fakeFlow
         }
         val items = listOf(
             ContinueWhereLeftOffItem(
@@ -228,7 +229,7 @@ class ContinueWhereLeftOffViewModelTest {
 
     private fun stubEmptyItems() {
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(10) } doReturn flow {
+            on { invoke(any()) } doReturn flow {
                 emit(emptyList<ContinueWhereLeftOffItem>())
                 awaitCancellation()
             }

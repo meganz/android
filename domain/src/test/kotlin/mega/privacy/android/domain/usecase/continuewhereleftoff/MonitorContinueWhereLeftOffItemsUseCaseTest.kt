@@ -61,4 +61,15 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that invoke forwards limit to repository`() = runTest {
+        whenever(repository.monitorContinueWhereLeftOffItems(20)).thenReturn(flowOf(emptyList()))
+
+        underTest(20).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(repository).monitorContinueWhereLeftOffItems(20)
+    }
 }

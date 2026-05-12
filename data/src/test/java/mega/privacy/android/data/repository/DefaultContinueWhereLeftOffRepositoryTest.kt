@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import androidx.sqlite.db.SupportSQLiteQuery
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,13 +13,17 @@ import mega.privacy.android.data.database.entity.RecentlyUsedEntity
 import mega.privacy.android.data.database.entity.TextEditorScrollEntity
 import mega.privacy.android.data.mapper.continuewhereleftoff.ContinueWhereLeftOffItemMapper
 import mega.privacy.android.data.mapper.continuewhereleftoff.RecentlyUsedTypeIdMapper
+import mega.privacy.android.data.preferences.ContinueWhereLeftOffSortPreferenceDataStore
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
+import mega.privacy.android.domain.entity.node.SortDirection
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -31,6 +36,7 @@ class DefaultContinueWhereLeftOffRepositoryTest {
 
     private val recentlyUsedDao = mock<RecentlyUsedDao>()
     private val textEditorScrollDao = mock<TextEditorScrollDao>()
+    private val sortPreferenceDataStore = mock<ContinueWhereLeftOffSortPreferenceDataStore>()
     private val typeIdMapper = RecentlyUsedTypeIdMapper()
     private val mapper = ContinueWhereLeftOffItemMapper(typeIdMapper)
 
@@ -41,13 +47,22 @@ class DefaultContinueWhereLeftOffRepositoryTest {
             textEditorScrollDao = textEditorScrollDao,
             continueWhereLeftOffItemMapper = mapper,
             recentlyUsedTypeIdMapper = typeIdMapper,
+            sortPreferenceDataStore = sortPreferenceDataStore,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(recentlyUsedDao, textEditorScrollDao)
+        reset(recentlyUsedDao, textEditorScrollDao, sortPreferenceDataStore)
+    }
+
+    private fun stubSortPreference(
+        sortField: ContinueWhereLeftOffSortField = ContinueWhereLeftOffSortField.Timestamp,
+        sortDirection: SortDirection = SortDirection.Descending,
+    ) {
+        whenever(sortPreferenceDataStore.monitorSortPreference())
+            .thenReturn(flowOf(sortField to sortDirection))
     }
 
     @Test
@@ -58,10 +73,11 @@ class DefaultContinueWhereLeftOffRepositoryTest {
             fileName = "test.pdf",
             lastAccessedTimestamp = 1000L,
         )
-        whenever(recentlyUsedDao.monitorRecentlyUsedItems(10))
+        stubSortPreference()
+        whenever(recentlyUsedDao.monitorItems(any()))
             .thenReturn(flowOf(listOf(entity)))
 
-        underTest.monitorContinueWhereLeftOffItems(10).test {
+        underTest.monitorContinueWhereLeftOffItems(limit = 10).test {
             val items = awaitItem()
             assertThat(items).hasSize(1)
             assertThat(items.first().nodeHandle).isEqualTo(1L)
@@ -70,6 +86,120 @@ class DefaultContinueWhereLeftOffRepositoryTest {
             assertThat(items.first().lastAccessedTimestamp).isEqualTo(1000L)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that monitorContinueWhereLeftOffItems builds name asc query when sort by name ascending`() =
+        runTest {
+            stubSortPreference(
+                sortField = ContinueWhereLeftOffSortField.Name,
+                sortDirection = SortDirection.Ascending,
+            )
+            whenever(recentlyUsedDao.monitorItems(any()))
+                .thenReturn(flowOf(emptyList()))
+
+            underTest.monitorContinueWhereLeftOffItems(limit = 10).test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(capturedQuery().sql).isEqualTo(
+                "SELECT * FROM recently_used ORDER BY file_name COLLATE NOCASE ASC LIMIT ?"
+            )
+        }
+
+    @Test
+    fun `test that monitorContinueWhereLeftOffItems builds name desc query when sort by name descending`() =
+        runTest {
+            stubSortPreference(
+                sortField = ContinueWhereLeftOffSortField.Name,
+                sortDirection = SortDirection.Descending,
+            )
+            whenever(recentlyUsedDao.monitorItems(any()))
+                .thenReturn(flowOf(emptyList()))
+
+            underTest.monitorContinueWhereLeftOffItems(limit = 10).test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(capturedQuery().sql).isEqualTo(
+                "SELECT * FROM recently_used ORDER BY file_name COLLATE NOCASE DESC LIMIT ?"
+            )
+        }
+
+    @Test
+    fun `test that monitorContinueWhereLeftOffItems builds timestamp asc query when sort by timestamp ascending`() =
+        runTest {
+            stubSortPreference(
+                sortField = ContinueWhereLeftOffSortField.Timestamp,
+                sortDirection = SortDirection.Ascending,
+            )
+            whenever(recentlyUsedDao.monitorItems(any()))
+                .thenReturn(flowOf(emptyList()))
+
+            underTest.monitorContinueWhereLeftOffItems(limit = 10).test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(capturedQuery().sql).isEqualTo(
+                "SELECT * FROM recently_used ORDER BY last_accessed_timestamp ASC LIMIT ?"
+            )
+        }
+
+    @Test
+    fun `test that monitorContinueWhereLeftOffItems builds timestamp desc query when sort by timestamp descending`() =
+        runTest {
+            stubSortPreference(
+                sortField = ContinueWhereLeftOffSortField.Timestamp,
+                sortDirection = SortDirection.Descending,
+            )
+            whenever(recentlyUsedDao.monitorItems(any()))
+                .thenReturn(flowOf(emptyList()))
+
+            underTest.monitorContinueWhereLeftOffItems(limit = 10).test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(capturedQuery().sql).isEqualTo(
+                "SELECT * FROM recently_used ORDER BY last_accessed_timestamp DESC LIMIT ?"
+            )
+        }
+
+    @Test
+    fun `test that monitorSortPreference delegates to datastore`() = runTest {
+        stubSortPreference(
+            sortField = ContinueWhereLeftOffSortField.Name,
+            sortDirection = SortDirection.Descending,
+        )
+
+        underTest.monitorSortPreference().test {
+            val (field, direction) = awaitItem()
+            assertThat(field).isEqualTo(ContinueWhereLeftOffSortField.Name)
+            assertThat(direction).isEqualTo(SortDirection.Descending)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that setSortPreference delegates to datastore`() = runTest {
+        underTest.setSortPreference(
+            sortField = ContinueWhereLeftOffSortField.Name,
+            sortDirection = SortDirection.Ascending,
+        )
+
+        verify(sortPreferenceDataStore).setSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+    }
+
+    private fun capturedQuery(): SupportSQLiteQuery {
+        val captor = argumentCaptor<SupportSQLiteQuery>()
+        verify(recentlyUsedDao).monitorItems(captor.capture())
+        return captor.firstValue
     }
 
     @Test

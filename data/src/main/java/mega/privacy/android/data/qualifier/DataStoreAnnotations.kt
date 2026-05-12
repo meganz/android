@@ -8,3 +8,10 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier
 internal annotation class RequestPhoneNumberPreference
+
+/**
+ * Annotation for ContinueWhereLeftOffSortPreferenceDataStore
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+internal annotation class ContinueWhereLeftOffSortPreference

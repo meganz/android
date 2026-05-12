@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.room.Transaction
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_RECENTLY_USED
 import mega.privacy.android.data.database.entity.RecentlyUsedEntity
@@ -72,16 +74,10 @@ internal interface RecentlyUsedDao {
     }
 
     /**
-     * Monitor recently used items sorted by last accessed timestamp descending.
+     * Monitor recently used items using a caller-supplied sort query.
      */
-    @Query(
-        """
-        SELECT * FROM $TABLE_RECENTLY_USED
-        ORDER BY last_accessed_timestamp DESC
-        LIMIT :limit
-        """
-    )
-    fun monitorRecentlyUsedItems(limit: Int): Flow<List<RecentlyUsedEntity>>
+    @RawQuery(observedEntities = [RecentlyUsedEntity::class])
+    fun monitorItems(query: SupportSQLiteQuery): Flow<List<RecentlyUsedEntity>>
 
     companion object {
         /**

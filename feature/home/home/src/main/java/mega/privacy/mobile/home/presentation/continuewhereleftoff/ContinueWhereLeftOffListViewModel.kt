@@ -11,12 +11,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -24,6 +25,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.ClearRecentlyUsedItemsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffSortPreferenceUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SetContinueWhereLeftOffSortUseCase
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
@@ -33,35 +36,37 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     private val monitorContinueWhereLeftOffItemsUseCase: MonitorContinueWhereLeftOffItemsUseCase,
+    private val monitorContinueWhereLeftOffSortPreferenceUseCase: MonitorContinueWhereLeftOffSortPreferenceUseCase,
+    private val setContinueWhereLeftOffSortUseCase: SetContinueWhereLeftOffSortUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val clearRecentlyUsedItemsUseCase: ClearRecentlyUsedItemsUseCase,
     private val nameResolver: ContinueWhereLeftOffNameResolver,
 ) : ViewModel() {
 
-    private val sortConfig = MutableStateFlow(NodeSortConfiguration.default)
     private val uiAction = MutableStateFlow(UiAction())
     private val openNodeEventChannel =
         Channel<StateEventWithContent<TypedFileNode>>(Channel.BUFFERED)
 
     val uiState: StateFlow<ContinueWhereLeftOffListUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            monitorContinueWhereLeftOffItemsUseCase(limit = MAX_LIST_ITEMS)
+            monitorContinueWhereLeftOffItemsUseCase(MAX_LIST_ITEMS)
                 .transformLatest { items ->
                     emit(nameResolver.applyCachedNames(items))
                     if (nameResolver.resolveBlankNames(items)) {
                         emit(nameResolver.applyCachedNames(items))
                     }
                 },
-            sortConfig,
+            monitorContinueWhereLeftOffSortPreferenceUseCase()
+                .map { (field, direction) -> field.toNodeSortConfiguration(direction) },
             openNodeEventChannel.receiveAsFlow()
                 .onStart { emit(consumed()) },
             uiAction,
-        ) { items, sort, openNodeEvent, action ->
+        ) { items, sortConfiguration, openNodeEvent, action ->
             ContinueWhereLeftOffListUiState(
-                items = items.sortedWith(sort.comparator()),
+                items = items,
                 isLoading = false,
                 openNodeEvent = openNodeEvent,
-                sortConfiguration = sort,
+                sortConfiguration = sortConfiguration,
                 showSortSheet = action.showSortSheet,
                 showOptionsSheet = action.showOptionsSheet,
                 currentViewType = action.currentViewType,
@@ -91,8 +96,15 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     }
 
     fun updateSortConfiguration(configuration: NodeSortConfiguration) {
-        sortConfig.value = configuration
         uiAction.update { it.copy(showSortSheet = false) }
+        viewModelScope.launch {
+            runCatching {
+                setContinueWhereLeftOffSortUseCase(
+                    sortField = configuration.sortOption.toCwloSortField(),
+                    sortDirection = configuration.sortDirection,
+                )
+            }.onFailure { Timber.e(it, "Failed to persist CWLO sort preference") }
+        }
     }
 
     fun onChangeViewTypeClicked() {
@@ -139,15 +151,20 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     companion object {
         private const val MAX_LIST_ITEMS = 50
 
-        private fun NodeSortConfiguration.comparator(): Comparator<ContinueWhereLeftOffItem> {
-            val base: Comparator<ContinueWhereLeftOffItem> = when (sortOption) {
-                NodeSortOption.Name ->
-                    compareBy(String.CASE_INSENSITIVE_ORDER) { it.title }
-
-                else ->
-                    compareBy { it.lastAccessedTimestamp }
+        private fun NodeSortOption.toCwloSortField(): ContinueWhereLeftOffSortField =
+            when (this) {
+                NodeSortOption.Name -> ContinueWhereLeftOffSortField.Name
+                else -> ContinueWhereLeftOffSortField.Timestamp
             }
-            return if (sortDirection == SortDirection.Descending) base.reversed() else base
-        }
+
+        private fun ContinueWhereLeftOffSortField.toNodeSortConfiguration(
+            direction: SortDirection,
+        ): NodeSortConfiguration = NodeSortConfiguration(
+            sortOption = when (this) {
+                ContinueWhereLeftOffSortField.Name -> NodeSortOption.Name
+                ContinueWhereLeftOffSortField.Timestamp -> NodeSortOption.Created
+            },
+            sortDirection = direction,
+        )
     }
 }

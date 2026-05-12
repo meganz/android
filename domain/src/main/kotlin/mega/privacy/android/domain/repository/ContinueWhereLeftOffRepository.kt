@@ -2,8 +2,10 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
+import mega.privacy.android.domain.entity.node.SortDirection
 
 /**
  * Repository for continue-where-you-left-off state and the recently-used index.
@@ -23,9 +25,23 @@ interface ContinueWhereLeftOffRepository {
 
     /**
      * Monitor recently used items for the widget carousel.
-     * Items are sorted by [ContinueWhereLeftOffItem.lastAccessedTimestamp] descending.
+     * Items are sorted according to the persisted sort preference; the returned flow
+     * re-emits whenever the preference changes.
      */
     fun monitorContinueWhereLeftOffItems(limit: Int): Flow<List<ContinueWhereLeftOffItem>>
+
+    /**
+     * Monitor the persisted sort preference (field and direction).
+     */
+    fun monitorSortPreference(): Flow<Pair<ContinueWhereLeftOffSortField, SortDirection>>
+
+    /**
+     * Persist the sort preference used by [monitorContinueWhereLeftOffItems].
+     */
+    suspend fun setSortPreference(
+        sortField: ContinueWhereLeftOffSortField,
+        sortDirection: SortDirection,
+    )
 
     /**
      * Record that a file was opened or interacted with.

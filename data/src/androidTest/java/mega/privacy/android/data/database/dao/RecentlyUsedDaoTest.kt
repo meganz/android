@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.dao
 
 import android.content.Context
 import androidx.room.Room
+import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -111,19 +112,21 @@ class RecentlyUsedDaoTest {
         }
 
     @Test
-    fun test_that_monitorRecentlyUsedItems_returns_items_ordered_by_timestamp_desc() =
+    fun test_that_monitorItems_returns_items_ordered_by_timestamp_desc() =
         runTest {
             underTest.insertOrUpdate(createEntity(nodeHandle = 1L, lastAccessedTimestamp = 100L))
             underTest.insertOrUpdate(createEntity(nodeHandle = 2L, lastAccessedTimestamp = 300L))
             underTest.insertOrUpdate(createEntity(nodeHandle = 3L, lastAccessedTimestamp = 200L))
 
-            val items = underTest.monitorRecentlyUsedItems(10).first()
+            val items = underTest.monitorItems(
+                buildQuery(orderBy = "last_accessed_timestamp DESC", limit = 10)
+            ).first()
 
             assertThat(items.map { it.nodeHandle }).isEqualTo(listOf(2L, 3L, 1L))
         }
 
     @Test
-    fun test_that_monitorRecentlyUsedItems_respects_limit() =
+    fun test_that_monitorItems_respects_limit() =
         runTest {
             repeat(5) { i ->
                 underTest.insertOrUpdate(
@@ -131,9 +134,53 @@ class RecentlyUsedDaoTest {
                 )
             }
 
-            val items = underTest.monitorRecentlyUsedItems(2).first()
+            val items = underTest.monitorItems(
+                buildQuery(orderBy = "last_accessed_timestamp DESC", limit = 2)
+            ).first()
 
             assertThat(items).hasSize(2)
+        }
+
+    @Test
+    fun test_that_monitorItems_returns_items_ordered_by_name_ascending() =
+        runTest {
+            underTest.insertOrUpdate(createEntity(nodeHandle = 1L, fileName = "Charlie.pdf"))
+            underTest.insertOrUpdate(createEntity(nodeHandle = 2L, fileName = "alpha.mp3"))
+            underTest.insertOrUpdate(createEntity(nodeHandle = 3L, fileName = "Bravo.mp4"))
+
+            val items = underTest.monitorItems(
+                buildQuery(orderBy = "file_name COLLATE NOCASE ASC", limit = 10)
+            ).first()
+
+            assertThat(items.map { it.nodeHandle }).isEqualTo(listOf(2L, 3L, 1L))
+        }
+
+    @Test
+    fun test_that_monitorItems_returns_items_ordered_by_name_descending() =
+        runTest {
+            underTest.insertOrUpdate(createEntity(nodeHandle = 1L, fileName = "Charlie.pdf"))
+            underTest.insertOrUpdate(createEntity(nodeHandle = 2L, fileName = "alpha.mp3"))
+            underTest.insertOrUpdate(createEntity(nodeHandle = 3L, fileName = "Bravo.mp4"))
+
+            val items = underTest.monitorItems(
+                buildQuery(orderBy = "file_name COLLATE NOCASE DESC", limit = 10)
+            ).first()
+
+            assertThat(items.map { it.nodeHandle }).isEqualTo(listOf(1L, 3L, 2L))
+        }
+
+    @Test
+    fun test_that_monitorItems_returns_items_ordered_by_timestamp_ascending() =
+        runTest {
+            underTest.insertOrUpdate(createEntity(nodeHandle = 1L, lastAccessedTimestamp = 100L))
+            underTest.insertOrUpdate(createEntity(nodeHandle = 2L, lastAccessedTimestamp = 300L))
+            underTest.insertOrUpdate(createEntity(nodeHandle = 3L, lastAccessedTimestamp = 200L))
+
+            val items = underTest.monitorItems(
+                buildQuery(orderBy = "last_accessed_timestamp ASC", limit = 10)
+            ).first()
+
+            assertThat(items.map { it.nodeHandle }).isEqualTo(listOf(1L, 3L, 2L))
         }
 
     @Test
@@ -152,5 +199,10 @@ class RecentlyUsedDaoTest {
         typeId = typeId,
         fileName = fileName,
         lastAccessedTimestamp = lastAccessedTimestamp
+    )
+
+    private fun buildQuery(orderBy: String, limit: Int) = SimpleSQLiteQuery(
+        "SELECT * FROM recently_used ORDER BY $orderBy LIMIT ?",
+        arrayOf(limit)
     )
 }

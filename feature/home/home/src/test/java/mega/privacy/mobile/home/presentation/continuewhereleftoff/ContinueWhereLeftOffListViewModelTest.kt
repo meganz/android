@@ -7,25 +7,31 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.ClearRecentlyUsedItemsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffSortPreferenceUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SetContinueWhereLeftOffSortUseCase
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -40,6 +46,10 @@ class ContinueWhereLeftOffListViewModelTest {
 
     private val monitorContinueWhereLeftOffItemsUseCase =
         mock<MonitorContinueWhereLeftOffItemsUseCase>()
+    private val monitorContinueWhereLeftOffSortPreferenceUseCase =
+        mock<MonitorContinueWhereLeftOffSortPreferenceUseCase>()
+    private val setContinueWhereLeftOffSortUseCase =
+        mock<SetContinueWhereLeftOffSortUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val clearRecentlyUsedItemsUseCase = mock<ClearRecentlyUsedItemsUseCase>()
 
@@ -66,11 +76,17 @@ class ContinueWhereLeftOffListViewModelTest {
 
     @BeforeEach
     fun setUp() {
+        stubDefaultSortPreference()
         underTest = ContinueWhereLeftOffListViewModel(
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
+            monitorContinueWhereLeftOffSortPreferenceUseCase = monitorContinueWhereLeftOffSortPreferenceUseCase,
+            setContinueWhereLeftOffSortUseCase = setContinueWhereLeftOffSortUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             clearRecentlyUsedItemsUseCase = clearRecentlyUsedItemsUseCase,
-            nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, DurationInSecondsTextMapper()),
+            nameResolver = ContinueWhereLeftOffNameResolver(
+                getNodeByIdUseCase,
+                DurationInSecondsTextMapper(),
+            ),
         )
     }
 
@@ -78,6 +94,8 @@ class ContinueWhereLeftOffListViewModelTest {
     fun tearDown() {
         reset(
             monitorContinueWhereLeftOffItemsUseCase,
+            monitorContinueWhereLeftOffSortPreferenceUseCase,
+            setContinueWhereLeftOffSortUseCase,
             getNodeByIdUseCase,
             clearRecentlyUsedItemsUseCase,
         )
@@ -128,83 +146,76 @@ class ContinueWhereLeftOffListViewModelTest {
     }
 
     @Test
-    fun `test that items are sorted by name ascending by default`() = runTest {
+    fun `test that sort configuration reflects timestamp descending preference`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Timestamp,
+            SortDirection.Descending,
+        )
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.sortConfiguration.sortOption).isEqualTo(NodeSortOption.Created)
+            assertThat(state.sortConfiguration.sortDirection).isEqualTo(SortDirection.Descending)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that items are displayed in the order returned by use case`() = runTest {
         stubItems(sampleItems)
 
         underTest.uiState.test {
             val state = awaitItem()
-            // Name ASC: Alpha(2), Bravo(3), Charlie(1)
-            assertThat(state.items.map { it.nodeHandle }).containsExactly(2L, 3L, 1L).inOrder()
+            assertThat(state.items.map { it.nodeHandle })
+                .containsExactly(1L, 2L, 3L).inOrder()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that items are sorted by name descending when updated`() = runTest {
-        val fakeFlow = stubFakeFlow()
+    fun `test that items use case is called with list limit`() = runTest {
+        stubEmptyItems()
 
         underTest.uiState.test {
-            awaitItem() // initial
-            fakeFlow.emit(sampleItems)
-            awaitItem() // default sort
-            underTest.updateSortConfiguration(
-                NodeSortConfiguration(NodeSortOption.Name, SortDirection.Descending)
-            )
-            val state = awaitItem()
-            // Name DESC: Charlie(1), Bravo(3), Alpha(2)
-            assertThat(state.items.map { it.title })
-                .containsExactly("Charlie.pdf", "Bravo.mp4", "Alpha.mp3").inOrder()
+            awaitItem()
+            verify(monitorContinueWhereLeftOffItemsUseCase).invoke(eq(50))
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that items are sorted by created descending`() = runTest {
-        val fakeFlow = stubFakeFlow()
+    fun `test that updateSortConfiguration persists Created descending via use case`() = runTest {
+        stubEmptyItems()
 
         underTest.uiState.test {
             awaitItem() // initial
-            fakeFlow.emit(sampleItems)
-            awaitItem() // default sort
             underTest.updateSortConfiguration(
                 NodeSortConfiguration(NodeSortOption.Created, SortDirection.Descending)
             )
-            val state = awaitItem()
-            // Created DESC: 3→3000, 1→2000, 2→1000
-            assertThat(state.items.map { it.nodeHandle }).containsExactly(3L, 1L, 2L).inOrder()
             cancelAndIgnoreRemainingEvents()
         }
+        verify(setContinueWhereLeftOffSortUseCase).invoke(
+            ContinueWhereLeftOffSortField.Timestamp,
+            SortDirection.Descending,
+        )
     }
 
     @Test
-    fun `test that items are sorted by created ascending`() = runTest {
-        val fakeFlow = stubFakeFlow()
-
-        underTest.uiState.test {
-            awaitItem() // initial
-            fakeFlow.emit(sampleItems)
-            awaitItem() // default sort
-            underTest.updateSortConfiguration(
-                NodeSortConfiguration(NodeSortOption.Created, SortDirection.Ascending)
-            )
-            val state = awaitItem()
-            // Created ASC: 2→1000, 1→2000, 3→3000
-            assertThat(state.items.map { it.nodeHandle }).containsExactly(2L, 1L, 3L).inOrder()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that sort configuration updates when updateSortConfiguration is called`() = runTest {
+    fun `test that updateSortConfiguration persists Name descending via use case`() = runTest {
         stubEmptyItems()
-        val newConfig = NodeSortConfiguration(NodeSortOption.Created, SortDirection.Descending)
 
         underTest.uiState.test {
             awaitItem() // initial
-            underTest.updateSortConfiguration(newConfig)
-            assertThat(awaitItem().sortConfiguration).isEqualTo(newConfig)
+            underTest.updateSortConfiguration(
+                NodeSortConfiguration(NodeSortOption.Name, SortDirection.Descending)
+            )
             cancelAndIgnoreRemainingEvents()
         }
+        verify(setContinueWhereLeftOffSortUseCase).invoke(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Descending,
+        )
     }
 
     @Test
@@ -411,29 +422,38 @@ class ContinueWhereLeftOffListViewModelTest {
         }
     }
 
+    private fun stubDefaultSortPreference() {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+    }
+
+    private fun stubSortPreference(
+        sortField: ContinueWhereLeftOffSortField,
+        sortDirection: SortDirection,
+    ) {
+        whenever(monitorContinueWhereLeftOffSortPreferenceUseCase())
+            .thenReturn(flowOf(sortField to sortDirection))
+    }
+
     private fun stubEmptyItems() {
-        monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(50) } doReturn flow {
-                emit(emptyList<ContinueWhereLeftOffItem>())
-                awaitCancellation()
-            }
+        whenever(monitorContinueWhereLeftOffItemsUseCase(any())) doReturn flow {
+            emit(emptyList<ContinueWhereLeftOffItem>())
+            awaitCancellation()
         }
     }
 
     private fun stubItems(items: List<ContinueWhereLeftOffItem>) {
-        monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(50) } doReturn flow {
-                emit(items)
-                awaitCancellation()
-            }
+        whenever(monitorContinueWhereLeftOffItemsUseCase(any())) doReturn flow {
+            emit(items)
+            awaitCancellation()
         }
     }
 
     private fun stubFakeFlow(): MutableSharedFlow<List<ContinueWhereLeftOffItem>> {
         val fakeFlow = MutableSharedFlow<List<ContinueWhereLeftOffItem>>()
-        monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(50) } doReturn fakeFlow
-        }
+        whenever(monitorContinueWhereLeftOffItemsUseCase(any())) doReturn fakeFlow
         return fakeFlow
     }
 }

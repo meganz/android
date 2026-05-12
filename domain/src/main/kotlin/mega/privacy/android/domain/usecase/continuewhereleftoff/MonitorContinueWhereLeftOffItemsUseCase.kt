@@ -7,6 +7,7 @@ import javax.inject.Inject
 
 /**
  * Monitors recently used items for the widget carousel.
+ * Items are sorted according to the persisted sort preference.
  */
 class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
     private val repository: ContinueWhereLeftOffRepository,

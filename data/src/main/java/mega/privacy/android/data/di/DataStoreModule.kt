@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore.Companion.REQUEST_PHONE_NUMBER_FILE
 import mega.privacy.android.data.preferences.base.createEncrypted
 import mega.privacy.android.data.preferences.cameraUploadsSettingsPreferenceDataStoreName
+import mega.privacy.android.data.preferences.continueWhereLeftOffSortPreferenceFileName
 import mega.privacy.android.data.preferences.credentialDataStoreName
 import mega.privacy.android.data.preferences.mediaTimelinePreferenceFileName
 import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPreferenceDataStoreMigration
@@ -26,6 +27,7 @@ import mega.privacy.android.data.preferences.migration.CredentialsPreferencesMig
 import mega.privacy.android.data.preferences.qaAccountCacheDataStoreName
 import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
+import mega.privacy.android.data.qualifier.ContinueWhereLeftOffSortPreference
 import mega.privacy.android.data.qualifier.MediaTimelinePreferenceDataStore
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -160,5 +162,19 @@ internal object DataStoreModule {
         ),
         scope = CoroutineScope(ioDispatcher),
         produceFile = { context.preferencesDataStoreFile(mediaTimelinePreferenceFileName) }
+    )
+
+    @Provides
+    @Singleton
+    @ContinueWhereLeftOffSortPreference
+    internal fun provideContinueWhereLeftOffSortPreferenceDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        scope = CoroutineScope(ioDispatcher),
+        produceFile = { context.preferencesDataStoreFile(continueWhereLeftOffSortPreferenceFileName) }
     )
 }
