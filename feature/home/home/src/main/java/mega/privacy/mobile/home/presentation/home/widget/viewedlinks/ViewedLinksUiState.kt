@@ -6,26 +6,16 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.node.ViewedLink
 
 /**
- * UI state for the Viewed Links widget on the Home page.
+ * UI state for the Viewed Links screen and widget.
+ *
+ * Item loading is driven by `LazyPagingItems.loadState` in the UI layer, so this state
+ * only carries one-shot events.
+ *
+ * @property clearAllLinksEvent Event triggered when the viewed links history has been cleared.
  */
-sealed interface ViewedLinksUiState {
-
-    /**
-     * Initial state while viewed links are being loaded.
-     */
-    data object Loading : ViewedLinksUiState
-
-    /**
-     * Loaded state containing the resolved viewed link items.
-     *
-     * @property items The list of viewed link items to display.
-     * @property clearAllLinksEvent Event triggered when the viewed links history has been cleared.
-     */
-    data class Ready(
-        val items: List<ViewedLinkUiItem>,
-        val clearAllLinksEvent: StateEvent = consumed,
-    ) : ViewedLinksUiState
-}
+data class ViewedLinksUiState(
+    val clearAllLinksEvent: StateEvent = consumed,
+)
 
 /**
  * A viewed link with resolved icon and optional preview path for thumbnail display.

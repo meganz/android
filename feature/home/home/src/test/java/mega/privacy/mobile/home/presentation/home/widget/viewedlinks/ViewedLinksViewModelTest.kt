@@ -1,9 +1,10 @@
 package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 
-import app.cash.turbine.test
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.testing.asSnapshot
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -17,7 +18,6 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.resources.R as sharedR
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -47,25 +47,29 @@ class ViewedLinksViewModelTest {
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val clearViewedLinksUseCase = mock<ClearViewedLinksUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
-    private val fakeFlow = MutableSharedFlow<List<ViewedLink>>()
 
     private lateinit var underTest: ViewedLinksViewModel
 
-    @BeforeAll
-    fun setUp() {
-        whenever(monitorViewedLinksUseCase()).thenReturn(fakeFlow)
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            monitorViewedLinksUseCase,
+            getPublicNodeUseCase,
+            fileTypeIconMapper,
+            clearViewedLinksUseCase,
+            snackbarEventQueue,
+        )
+    }
+
+    private fun initViewModel(links: List<ViewedLink>) {
+        whenever(monitorViewedLinksUseCase()).thenAnswer { fakePagingSource(links) }
         underTest = ViewedLinksViewModel(
             monitorViewedLinksUseCase = monitorViewedLinksUseCase,
             getPublicNodeUseCase = getPublicNodeUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             clearViewedLinksUseCase = clearViewedLinksUseCase,
-            snackbarEventQueue = snackbarEventQueue
+            snackbarEventQueue = snackbarEventQueue,
         )
-    }
-
-    @BeforeEach
-    fun resetMocks() {
-        reset(getPublicNodeUseCase, fileTypeIconMapper, clearViewedLinksUseCase, snackbarEventQueue)
     }
 
     @Test
@@ -83,23 +87,16 @@ class ViewedLinksViewModelTest {
         }
 
         whenever(getPublicNodeUseCase("https://mega.nz/file/abc")).thenReturn(typedFileNode)
-        whenever(
-            fileTypeIconMapper(
-                any(),
-                any()
-            )
-        ).thenReturn(iconPackR.drawable.ic_pdf_medium_solid)
+        whenever(fileTypeIconMapper(any(), any()))
+            .thenReturn(iconPackR.drawable.ic_pdf_medium_solid)
 
-        underTest.uiState.test {
-            awaitItem()
-            fakeFlow.emit(listOf(viewedLink))
-            val state = awaitItem() as ViewedLinksUiState.Ready
-            assertThat(state.items).hasSize(1)
-            assertThat(state.items[0].previewPath).isEqualTo("/cache/preview.jpg")
-            assertThat(state.items[0].iconRes).isEqualTo(iconPackR.drawable.ic_pdf_medium_solid)
-            verify(fileTypeIconMapper).invoke(eq("pdf"), any())
-            cancelAndIgnoreRemainingEvents()
-        }
+        initViewModel(listOf(viewedLink))
+
+        val items = underTest.pagedItems.asSnapshot()
+        assertThat(items).hasSize(1)
+        assertThat(items[0].previewPath).isEqualTo("/cache/preview.jpg")
+        assertThat(items[0].iconRes).isEqualTo(iconPackR.drawable.ic_pdf_medium_solid)
+        verify(fileTypeIconMapper).invoke(eq("pdf"), any())
     }
 
     @Test
@@ -112,18 +109,15 @@ class ViewedLinksViewModelTest {
             accessedTimestamp = 2000L,
         )
 
-        underTest.uiState.test {
-            awaitItem()
-            fakeFlow.emit(listOf(folderLink))
-            val state = awaitItem() as ViewedLinksUiState.Ready
-            assertThat(state.items).hasSize(1)
-            assertThat(state.items[0].previewPath).isNull()
-            assertThat(state.items[0].iconRes)
-                .isEqualTo(iconPackR.drawable.ic_folder_users_small_solid)
-            verifyNoMoreInteractions(getPublicNodeUseCase)
-            verifyNoMoreInteractions(fileTypeIconMapper)
-            cancelAndIgnoreRemainingEvents()
-        }
+        initViewModel(listOf(folderLink))
+
+        val items = underTest.pagedItems.asSnapshot()
+        assertThat(items).hasSize(1)
+        assertThat(items[0].previewPath).isNull()
+        assertThat(items[0].iconRes)
+            .isEqualTo(iconPackR.drawable.ic_folder_users_small_solid)
+        verifyNoMoreInteractions(getPublicNodeUseCase)
+        verifyNoMoreInteractions(fileTypeIconMapper)
     }
 
     @Test
@@ -137,46 +131,32 @@ class ViewedLinksViewModelTest {
             accessedTimestamp = 1000L,
         )
 
-        whenever(
-            getPublicNodeUseCase("https://mega.nz/file/xyz")
-        ).thenThrow(RuntimeException("Not found"))
+        whenever(getPublicNodeUseCase("https://mega.nz/file/xyz"))
+            .thenThrow(RuntimeException("Not found"))
         whenever(fileTypeIconMapper(any(), any())).thenReturn(expectedIcon)
 
-        underTest.uiState.test {
-            awaitItem() // consume current/stale StateFlow value
-            fakeFlow.emit(listOf(viewedLink))
-            val state = awaitItem() as ViewedLinksUiState.Ready
-            assertThat(state.items).hasSize(1)
-            assertThat(state.items[0].previewPath).isNull()
-            assertThat(state.items[0].iconRes).isEqualTo(expectedIcon)
-            verify(fileTypeIconMapper).invoke(eq("mp4"), any())
-            cancelAndIgnoreRemainingEvents()
-        }
+        initViewModel(listOf(viewedLink))
+
+        val items = underTest.pagedItems.asSnapshot()
+        assertThat(items).hasSize(1)
+        assertThat(items[0].previewPath).isNull()
+        assertThat(items[0].iconRes).isEqualTo(expectedIcon)
+        verify(fileTypeIconMapper).invoke(eq("mp4"), any())
     }
 
     @Test
-    fun `test that empty list emits empty state`() = runTest {
-        underTest.uiState.test {
-            awaitItem()
-            fakeFlow.emit(emptyList())
-            val state = awaitItem() as ViewedLinksUiState.Ready
-            assertThat(state.items).isEmpty()
-            verifyNoMoreInteractions(getPublicNodeUseCase)
-            verifyNoMoreInteractions(fileTypeIconMapper)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
+    fun `test that empty paging data emits empty snapshot`() = runTest {
+        initViewModel(emptyList())
 
-    @Test
-    fun `test that clearing all viewed links invokes use case and snackbar `() = runTest {
-        underTest.clearAllLinks()
-
-        verify(clearViewedLinksUseCase).invoke()
-        verify(snackbarEventQueue).queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
+        val items = underTest.pagedItems.asSnapshot()
+        assertThat(items).isEmpty()
+        verifyNoMoreInteractions(getPublicNodeUseCase)
+        verifyNoMoreInteractions(fileTypeIconMapper)
     }
 
     @Test
     fun `test that clearing all viewed links invokes clearViewedLinksUseCase`() = runTest {
+        initViewModel(emptyList())
         underTest.clearAllLinks()
         verify(clearViewedLinksUseCase).invoke()
     }
@@ -184,8 +164,16 @@ class ViewedLinksViewModelTest {
     @Test
     fun `test that clearing all viewed links queues snackbar message when use case succeeds`() =
         runTest {
+            initViewModel(emptyList())
             underTest.clearAllLinks()
-            verify(snackbarEventQueue).queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
+            verify(snackbarEventQueue)
+                .queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
         }
 
+    private fun fakePagingSource(items: List<ViewedLink>): PagingSource<Int, ViewedLink> =
+        object : PagingSource<Int, ViewedLink>() {
+            override fun getRefreshKey(state: PagingState<Int, ViewedLink>): Int? = null
+            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ViewedLink> =
+                LoadResult.Page(data = items, prevKey = null, nextKey = null)
+        }
 }

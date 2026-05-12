@@ -38,6 +38,8 @@ dependencies {
     implementation(androidx.hilt.navigation)
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.paging)
+    implementation(androidx.paging.compose)
     implementation(lib.compose.state.events)
     implementation(lib.kotlin.serialisation)
     implementation(lib.mega.analytics)
@@ -52,5 +54,6 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testImplementation(testlib.bundles.ui.test)
+    testImplementation(androidx.paging.testing)
     testRuntimeOnly(testlib.junit.jupiter.engine)
 }

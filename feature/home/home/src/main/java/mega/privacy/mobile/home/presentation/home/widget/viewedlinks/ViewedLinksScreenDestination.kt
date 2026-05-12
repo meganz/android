@@ -5,8 +5,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import androidx.paging.compose.collectAsLazyPagingItems
 import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.consumed
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -29,6 +29,7 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
     entry<ViewedLinksScreenNavKey> {
         val viewModel = hiltViewModel<ViewedLinksViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val lazyItems = viewModel.pagedItems.collectAsLazyPagingItems()
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                 creationCallback = { vm -> vm.create(NodeSourceType.FOLDER_LINK) },
@@ -41,13 +42,13 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
         )
 
         EventEffect(
-            event = (uiState as? ViewedLinksUiState.Ready)?.clearAllLinksEvent ?: consumed,
+            event = uiState.clearAllLinksEvent,
             onConsumed = viewModel::onClearAllLinksEventConsumed,
             action = { navigationHandler.remove(it) }
         )
 
         ViewedLinksScreen(
-            uiState = uiState,
+            lazyItems = lazyItems,
             onFolderLinkClicked = { link ->
                 navigationHandler.navigate(FolderLinkNavKey(link))
             },

@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.usecase.viewedlinks
 
-import kotlinx.coroutines.flow.Flow
+import androidx.paging.PagingSource
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.repository.ViewedLinksRepository
 import javax.inject.Inject
@@ -8,13 +8,18 @@ import javax.inject.Inject
 /**
  * Observes all viewed links (file and folder links), sorted by most recently accessed.
  *
+ * Returns a fresh [PagingSource] on each invocation, suitable for use as the
+ * `pagingSourceFactory` of an [androidx.paging.Pager]. The source is invalidated
+ * automatically whenever the underlying table changes.
+ *
  * @property viewedLinksRepository
  */
 class MonitorViewedLinksUseCase @Inject constructor(
     private val viewedLinksRepository: ViewedLinksRepository,
 ) {
     /**
-     * @return a [Flow] emitting the current list of [ViewedLink] items whenever the data changes.
+     * @return a [PagingSource] over [ViewedLink] items.
      */
-    operator fun invoke() = viewedLinksRepository.monitorLinks()
+    operator fun invoke(): PagingSource<Int, ViewedLink> =
+        viewedLinksRepository.getViewedLinksPagingSource()
 }

@@ -1,6 +1,6 @@
 package mega.privacy.android.domain.repository
 
-import kotlinx.coroutines.flow.Flow
+import androidx.paging.PagingSource
 import mega.privacy.android.domain.entity.node.ViewedLink
 
 /**
@@ -13,11 +13,11 @@ import mega.privacy.android.domain.entity.node.ViewedLink
 interface ViewedLinksRepository {
 
     /**
-     * Observes all viewed links (file and folder links), sorted by most recently accessed.
-     *
-     * @return a [Flow] emitting the current list of [ViewedLink] items whenever the data changes.
+     * Returns a [PagingSource] over all viewed links (file and folder links), sorted by
+     * most recently accessed. The source is invalidated automatically whenever the
+     * underlying table changes.
      */
-    fun monitorLinks(): Flow<List<ViewedLink>>
+    fun getViewedLinksPagingSource(): PagingSource<Int, ViewedLink>
 
     /**
      * Saves or updates a viewed link entry. If a link with the same node handle already exists,

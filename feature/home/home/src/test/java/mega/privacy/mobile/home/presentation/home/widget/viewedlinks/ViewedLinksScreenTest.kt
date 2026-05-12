@@ -1,5 +1,7 @@
 package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -8,9 +10,14 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
@@ -56,24 +63,25 @@ class ViewedLinksScreenTest {
 
     @Test
     fun `test that title is displayed`() {
-        setContent(uiState = ViewedLinksUiState.Loading)
+        setContent(items = null)
 
         val title = context.getString(sharedR.string.home_widget_viewed_links_section_header)
         composeRule.onNodeWithText(title).assertIsDisplayed()
     }
 
     @Test
-    fun `test that loading items are displayed when state is Loading`() {
-        setContent(uiState = ViewedLinksUiState.Loading)
+    fun `test that loading items are displayed while refresh is loading`() {
+        setContent(items = null)
 
         composeRule.onAllNodesWithTag(VIEWED_LINK_LOADING_ITEM_TEST_TAG)
             .assertCountEquals(6)
     }
 
     @Test
-    fun `test that no items are displayed when Ready state has empty list`() {
-        setContent(uiState = ViewedLinksUiState.Ready(items = emptyList()))
+    fun `test that no items are displayed when the paged list is empty`() {
+        setContent(items = emptyList())
 
+        composeRule.waitForIdle()
         composeRule.onAllNodesWithTag(VIEWED_LINKS_ITEM_TEST_TAG)
             .assertCountEquals(0)
         composeRule.onAllNodesWithTag(VIEWED_LINK_LOADING_ITEM_TEST_TAG)
@@ -81,12 +89,8 @@ class ViewedLinksScreenTest {
     }
 
     @Test
-    fun `test that items are displayed when Ready state has items`() {
-        setContent(
-            uiState = ViewedLinksUiState.Ready(
-                items = listOf(fileLinkItem, folderLinkItem),
-            ),
-        )
+    fun `test that items are displayed when the paged list has items`() {
+        setContent(items = listOf(fileLinkItem, folderLinkItem))
 
         composeRule.waitForIdle()
         composeRule.onAllNodesWithTag(VIEWED_LINKS_ITEM_TEST_TAG)
@@ -94,11 +98,10 @@ class ViewedLinksScreenTest {
     }
 
     @Test
-    fun `test that loading items are not displayed when state is Ready`() {
-        setContent(
-            uiState = ViewedLinksUiState.Ready(items = listOf(fileLinkItem)),
-        )
+    fun `test that loading items are not displayed when items are loaded`() {
+        setContent(items = listOf(fileLinkItem))
 
+        composeRule.waitForIdle()
         composeRule.onAllNodesWithTag(VIEWED_LINK_LOADING_ITEM_TEST_TAG)
             .assertCountEquals(0)
     }
@@ -108,7 +111,7 @@ class ViewedLinksScreenTest {
         var clickedUrl: String? = null
 
         setContent(
-            uiState = ViewedLinksUiState.Ready(items = listOf(fileLinkItem)),
+            items = listOf(fileLinkItem),
             onFileLinkClicked = { clickedUrl = it },
         )
 
@@ -123,7 +126,7 @@ class ViewedLinksScreenTest {
         var clickedUrl: String? = null
 
         setContent(
-            uiState = ViewedLinksUiState.Ready(items = listOf(folderLinkItem)),
+            items = listOf(folderLinkItem),
             onFolderLinkClicked = { clickedUrl = it },
         )
 
@@ -138,7 +141,7 @@ class ViewedLinksScreenTest {
         var folderClicked = false
 
         setContent(
-            uiState = ViewedLinksUiState.Ready(items = listOf(fileLinkItem)),
+            items = listOf(fileLinkItem),
             onFolderLinkClicked = { folderClicked = true },
         )
 
@@ -153,7 +156,7 @@ class ViewedLinksScreenTest {
         var fileClicked = false
 
         setContent(
-            uiState = ViewedLinksUiState.Ready(items = listOf(folderLinkItem)),
+            items = listOf(folderLinkItem),
             onFileLinkClicked = { fileClicked = true },
         )
 
@@ -167,7 +170,7 @@ class ViewedLinksScreenTest {
     fun `test that onBack is invoked when navigation icon is clicked`() {
         var backClicked = false
         setContent(
-            uiState = ViewedLinksUiState.Ready(items = listOf(fileLinkItem)),
+            items = listOf(fileLinkItem),
             onBack = { backClicked = true },
         )
 
@@ -179,7 +182,7 @@ class ViewedLinksScreenTest {
 
     @Test
     fun `test that options sheet is not displayed by default`() {
-        setContent(uiState = ViewedLinksUiState.Ready(items = listOf(fileLinkItem)))
+        setContent(items = listOf(fileLinkItem))
 
         composeRule.onAllNodesWithTag(CLEAR_HISTORY_TAG, useUnmergedTree = true)
             .assertCountEquals(0)
@@ -187,7 +190,7 @@ class ViewedLinksScreenTest {
 
     @Test
     fun `test that clear history option is displayed when more menu is clicked`() {
-        setContent(uiState = ViewedLinksUiState.Ready(items = listOf(fileLinkItem)))
+        setContent(items = listOf(fileLinkItem))
 
         composeRule.onNodeWithTag(CommonMenuAction.More.testTag).performClick()
         composeRule.waitForIdle()
@@ -198,14 +201,18 @@ class ViewedLinksScreenTest {
 
     @Test
     fun `test that clear confirmation dialog is not displayed by default`() {
-        setContent(uiState = ViewedLinksUiState.Ready(items = listOf(fileLinkItem)))
+        setContent(items = listOf(fileLinkItem))
 
         composeRule.onAllNodesWithTag(CLEAR_HISTORY_DIALOG_TAG, useUnmergedTree = true)
             .assertCountEquals(0)
     }
 
+    /**
+     * @param items List of items to render; `null` keeps the refresh state in `Loading`
+     *   (no PagingData ever emitted), which is how the loading skeleton is exercised.
+     */
     private fun setContent(
-        uiState: ViewedLinksUiState,
+        items: List<ViewedLinkUiItem>?,
         onFolderLinkClicked: (String) -> Unit = {},
         onFileLinkClicked: (String) -> Unit = {},
         onClearAllLinks: () -> Unit = {},
@@ -213,8 +220,9 @@ class ViewedLinksScreenTest {
     ) {
         composeRule.setContent {
             AndroidThemeForPreviews {
+                val lazyItems = lazyItemsOf(items)
                 ViewedLinksScreen(
-                    uiState = uiState,
+                    lazyItems = lazyItems,
                     onFolderLinkClicked = onFolderLinkClicked,
                     onFileLinkClicked = onFileLinkClicked,
                     onClearAllLinks = onClearAllLinks,
@@ -222,5 +230,16 @@ class ViewedLinksScreenTest {
                 )
             }
         }
+    }
+
+    @Composable
+    private fun lazyItemsOf(items: List<ViewedLinkUiItem>?): LazyPagingItems<ViewedLinkUiItem> {
+        val flow = remember(items) {
+            when (items) {
+                null -> emptyFlow()
+                else -> MutableStateFlow(PagingData.from(items))
+            }
+        }
+        return flow.collectAsLazyPagingItems()
     }
 }

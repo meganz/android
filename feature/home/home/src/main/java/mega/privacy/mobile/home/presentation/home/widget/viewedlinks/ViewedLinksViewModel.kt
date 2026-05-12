@@ -2,25 +2,27 @@ package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
-import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.resources.R as sharedR
@@ -28,18 +30,17 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel for the Viewed Links widget on the Home page.
+ * ViewModel for the Viewed Links widget and full-screen list.
  *
- * Monitors viewed links (file and folder links the user has previously opened) and maps
- * them to UI items with resolved icons and preview thumbnails.
- *
- * For file links, [GetPublicNodeUseCase] is called to fetch the public node, which provides
- * the correct file type icon and a local preview path for thumbnail display.
- * If resolution fails, the icon falls back to [FileTypeIconMapper] based on file extension.
+ * Exposes viewed links as paginated UI items so consumers (the home widget and the
+ * full-screen list) only resolve the rows they actually render. For file links,
+ * [GetPublicNodeUseCase] is invoked per item — with paging in place, this only fires
+ * for rows in loaded pages.
  *
  * Folder links are displayed with a static folder icon and no thumbnail.
  *
- * @property uiState The UI state containing the list of [ViewedLinkUiItem]s.
+ * @property pagedItems The paginated stream of [ViewedLinkUiItem]s, cached for the
+ *   ViewModel scope so configuration changes do not refetch.
  * @param monitorViewedLinksUseCase
  * @param getPublicNodeUseCase
  * @param fileTypeIconMapper
@@ -54,41 +55,34 @@ internal class ViewedLinksViewModel @Inject constructor(
     private val clearViewedLinksUseCase: ClearViewedLinksUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
-
-    private val clearAllLinksEvent = MutableStateFlow<StateEvent>(consumed)
     private val resolvedLinkCache = mutableMapOf<String, ViewedLinkUiItem>()
+    private val _uiState = MutableStateFlow(ViewedLinksUiState())
+    val uiState = _uiState.asStateFlow()
 
-    val uiState: StateFlow<ViewedLinksUiState> by lazy {
-        combine(
-            monitorViewedLinksUseCase(),
-            clearAllLinksEvent,
-        ) { viewedLinks, clearEvent ->
-            ViewedLinksUiState.Ready(
-                items = viewedLinks.toUiItems(),
-                clearAllLinksEvent = clearEvent,
-            )
-        }.catch { Timber.e(it) }
-            .asUiStateFlow(
-                scope = viewModelScope,
-                initialValue = ViewedLinksUiState.Loading,
-            )
-    }
+    val pagedItems: Flow<PagingData<ViewedLinkUiItem>> = Pager(
+        config = PagingConfig(
+            pageSize = PAGE_SIZE,
+            initialLoadSize = PAGE_SIZE,
+            enablePlaceholders = false,
+        ),
+        pagingSourceFactory = { monitorViewedLinksUseCase() }
+    ).flow
+        .map { pagingData -> pagingData.map { it.toUiItem() } }
+        .cachedIn(viewModelScope)
 
     /**
-     * Maps a list of [ViewedLink]s to [ViewedLinkUiItem]s in parallel.
-     * File links are resolved via the public API; folder links use a static icon.
+     * Resolves a single [ViewedLink] to its UI item.
+     * File links go through the public-node API to fetch icon + preview path;
+     * folder links use a static icon.
      */
-    private suspend fun List<ViewedLink>.toUiItems() =
-        mapAsync { link ->
-            when (link.type) {
-                RecentlyViewedLinkType.FileLink -> resolveFileLink(link)
-                RecentlyViewedLinkType.FolderLink -> ViewedLinkUiItem(
-                    viewedLink = link,
-                    iconRes = iconPackR.drawable.ic_folder_users_small_solid,
-                    previewPath = null
-                )
-            }
-        }
+    private suspend fun ViewedLink.toUiItem(): ViewedLinkUiItem = when (type) {
+        RecentlyViewedLinkType.FileLink -> resolveFileLink(this)
+        RecentlyViewedLinkType.FolderLink -> ViewedLinkUiItem(
+            viewedLink = this,
+            iconRes = iconPackR.drawable.ic_folder_users_small_solid,
+            previewPath = null,
+        )
+    }
 
     /**
      * Resolves a file link to a [ViewedLinkUiItem] by fetching the public node.
@@ -113,12 +107,16 @@ internal class ViewedLinksViewModel @Inject constructor(
                 .onFailure { Timber.e(it, "Failed to clear viewed links history") }
                 .onSuccess {
                     snackbarEventQueue.queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
-                    clearAllLinksEvent.update { triggered }
+                    _uiState.update { it.copy(clearAllLinksEvent = triggered) }
                 }
         }
     }
 
     internal fun onClearAllLinksEventConsumed() {
-        clearAllLinksEvent.update { consumed }
+        _uiState.update { it.copy(clearAllLinksEvent = consumed) }
+    }
+
+    private companion object {
+        private const val PAGE_SIZE = 10
     }
 }

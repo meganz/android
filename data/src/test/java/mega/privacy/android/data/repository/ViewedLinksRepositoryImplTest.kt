@@ -1,9 +1,9 @@
 package mega.privacy.android.data.repository
 
-import app.cash.turbine.test
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -57,7 +56,7 @@ internal class ViewedLinksRepositoryImplTest {
     }
 
     @Test
-    fun `test that monitorLinks returns mapped domain entities`() = runTest {
+    fun `test that getViewedLinksPagingSource returns mapped domain entities`() = runTest {
         val rawItems = listOf(
             ViewedLinkRawItem(
                 nodeHandle = 1L,
@@ -90,48 +89,55 @@ internal class ViewedLinksRepositoryImplTest {
                 accessedTimestamp = 2000L,
             ),
         )
-        whenever(recentlyViewedLinkDao.monitorViewedLinks()).thenReturn(flowOf(rawItems))
-        whenever(viewedLinkRawItemMapper(rawItems)).thenReturn(expectedLinks)
+        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource())
+            .thenReturn(fakeRawPagingSource(rawItems))
+        whenever(viewedLinkRawItemMapper(rawItems[0])).thenReturn(expectedLinks[0])
+        whenever(viewedLinkRawItemMapper(rawItems[1])).thenReturn(expectedLinks[1])
 
-        underTest.monitorLinks().test {
-            val result = awaitItem()
-            assertThat(result).isEqualTo(expectedLinks)
-            awaitComplete()
-        }
+        val result = underTest.getViewedLinksPagingSource()
+            .load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
+
+        assertThat(result).isInstanceOf(PagingSource.LoadResult.Page::class.java)
+        assertThat((result as PagingSource.LoadResult.Page).data).isEqualTo(expectedLinks)
     }
 
     @Test
-    fun `test that monitorLinks delegates to viewedLinkRawItemMapper`() = runTest {
-        val rawItems = listOf(
-            ViewedLinkRawItem(
-                nodeHandle = 1L,
-                typeId = 1,
-                nodeName = "test.pdf",
-                lastAccessedTimestamp = 1000L,
-                linkUrl = "https://mega.nz/file/abc",
-            ),
+    fun `test that getViewedLinksPagingSource delegates to viewedLinkRawItemMapper`() = runTest {
+        val rawItem = ViewedLinkRawItem(
+            nodeHandle = 1L,
+            typeId = 1,
+            nodeName = "test.pdf",
+            lastAccessedTimestamp = 1000L,
+            linkUrl = "https://mega.nz/file/abc",
         )
-        whenever(recentlyViewedLinkDao.monitorViewedLinks()).thenReturn(flowOf(rawItems))
-        whenever(viewedLinkRawItemMapper(any<List<ViewedLinkRawItem>>())).thenReturn(emptyList())
+        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource())
+            .thenReturn(fakeRawPagingSource(listOf(rawItem)))
+        whenever(viewedLinkRawItemMapper(rawItem)).thenReturn(
+            ViewedLink(
+                nodeHandle = 1L,
+                name = "test.pdf",
+                linkUrl = "https://mega.nz/file/abc",
+                type = RecentlyViewedLinkType.FileLink,
+                accessedTimestamp = 1000L,
+            )
+        )
 
-        underTest.monitorLinks().test {
-            awaitItem()
-            awaitComplete()
-        }
+        underTest.getViewedLinksPagingSource()
+            .load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
 
-        verify(viewedLinkRawItemMapper).invoke(rawItems)
+        verify(viewedLinkRawItemMapper).invoke(rawItem)
     }
 
     @Test
-    fun `test that monitorLinks returns empty list when no links`() = runTest {
-        whenever(recentlyViewedLinkDao.monitorViewedLinks()).thenReturn(flowOf(emptyList()))
-        whenever(viewedLinkRawItemMapper(any<List<ViewedLinkRawItem>>())).thenReturn(emptyList())
+    fun `test that getViewedLinksPagingSource returns empty page when no links`() = runTest {
+        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource())
+            .thenReturn(fakeRawPagingSource(emptyList()))
 
-        underTest.monitorLinks().test {
-            val result = awaitItem()
-            assertThat(result).isEmpty()
-            awaitComplete()
-        }
+        val result = underTest.getViewedLinksPagingSource()
+            .load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
+
+        assertThat(result).isInstanceOf(PagingSource.LoadResult.Page::class.java)
+        assertThat((result as PagingSource.LoadResult.Page).data).isEmpty()
     }
 
     @Test
@@ -195,4 +201,11 @@ internal class ViewedLinksRepositoryImplTest {
 
         verify(recentlyViewedLinkDao).deleteAll()
     }
+
+    private fun fakeRawPagingSource(items: List<ViewedLinkRawItem>): PagingSource<Int, ViewedLinkRawItem> =
+        object : PagingSource<Int, ViewedLinkRawItem>() {
+            override fun getRefreshKey(state: PagingState<Int, ViewedLinkRawItem>): Int? = null
+            override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ViewedLinkRawItem> =
+                LoadResult.Page(data = items, prevKey = null, nextKey = null)
+        }
 }

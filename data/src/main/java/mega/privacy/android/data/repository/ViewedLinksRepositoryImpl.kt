@@ -1,12 +1,12 @@
 package mega.privacy.android.data.repository
 
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
+import mega.privacy.android.data.database.entity.ViewedLinkRawItem
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.viewedlinks.RecentlyViewedLinkTypeIdMapper
 import mega.privacy.android.data.mapper.viewedlinks.ViewedLinkRawItemMapper
@@ -33,11 +33,12 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewedLinksRepository {
 
-    override fun monitorLinks(): Flow<List<ViewedLink>> =
-        recentlyViewedLinkDao
-            .monitorViewedLinks()
-            .map(viewedLinkRawItemMapper::invoke)
-            .flowOn(ioDispatcher)
+    override fun getViewedLinksPagingSource(): PagingSource<Int, ViewedLink> =
+        MappingPagingSource(
+            source = recentlyViewedLinkDao.getViewedLinksPagingSource(),
+            mapper = viewedLinkRawItemMapper,
+            ioDispatcher = ioDispatcher,
+        )
 
     override suspend fun saveLink(viewedLink: ViewedLink) = withContext(ioDispatcher) {
         val accessedTimestamp = viewedLink.accessedTimestamp
@@ -58,5 +59,38 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
 
     override suspend fun clearLinks() = withContext(ioDispatcher) {
         recentlyViewedLinkDao.deleteAll()
+    }
+
+    private class MappingPagingSource(
+        private val source: PagingSource<Int, ViewedLinkRawItem>,
+        private val mapper: ViewedLinkRawItemMapper,
+        private val ioDispatcher: CoroutineDispatcher,
+    ) : PagingSource<Int, ViewedLink>() {
+
+        init {
+            source.registerInvalidatedCallback { invalidate() }
+        }
+
+        override val jumpingSupported: Boolean
+            get() = source.jumpingSupported
+
+        override fun getRefreshKey(state: PagingState<Int, ViewedLink>): Int? =
+            state.anchorPosition?.let { anchor ->
+                state.closestPageToPosition(anchor)?.prevKey?.plus(1)
+                    ?: state.closestPageToPosition(anchor)?.nextKey?.minus(1)
+            }
+
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ViewedLink> =
+            when (val result = source.load(params)) {
+                is LoadResult.Error -> LoadResult.Error(result.throwable)
+                is LoadResult.Invalid -> LoadResult.Invalid()
+                is LoadResult.Page -> LoadResult.Page(
+                    data = withContext(ioDispatcher) {
+                        result.data.map(mapper::invoke)
+                    },
+                    prevKey = result.prevKey,
+                    nextKey = result.nextKey,
+                )
+            }
     }
 }

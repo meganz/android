@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -21,7 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.OneLineListItem
@@ -33,12 +34,11 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.navigation.Flagged
-import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -75,7 +75,7 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget, Flagged {
     ) {
         FeatureFlagGate(feature = feature) {
             val viewModel: ViewedLinksViewModel = hiltViewModel()
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val lazyItems = viewModel.pagedItems.collectAsLazyPagingItems()
             val nodeOptionsActionViewModel =
                 hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                     creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
@@ -88,7 +88,7 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget, Flagged {
             )
 
             ViewedLinksView(
-                uiState = uiState,
+                lazyItems = lazyItems,
                 modifier = modifier,
                 onFolderLinkClicked = { link ->
                     navigationHandler.navigate(FolderLinkNavKey(link))
@@ -110,59 +110,58 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget, Flagged {
 
 @Composable
 internal fun ViewedLinksView(
-    uiState: ViewedLinksUiState,
+    lazyItems: LazyPagingItems<ViewedLinkUiItem>,
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
     onViewAllClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isLoading = lazyItems.loadState.refresh is LoadState.Loading
     Column(modifier = modifier) {
         ViewedLinksWidgetHeader(
             onViewAllClicked = onViewAllClicked,
-            showMoreButton = uiState is ViewedLinksUiState.Ready
-                    && uiState.items.size > MAX_VISIBLE_VIEWED_LINK,
+            showMoreButton = !isLoading && lazyItems.itemCount > MAX_VISIBLE_VIEWED_LINK,
         )
 
-        when (uiState) {
-            is ViewedLinksUiState.Loading -> {
+        when {
+            isLoading -> {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onViewAllClicked() }
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .clickable { onViewAllClicked() },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     ViewedLinkLoadingItem()
                 }
             }
 
-            is ViewedLinksUiState.Ready -> {
-                if (uiState.items.isEmpty()) {
-                    ViewedLinksEmptyView()
-                } else {
-                    uiState.items.take(MAX_VISIBLE_VIEWED_LINK).forEach { item ->
-                        OneLineListItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag(VIEWED_LINKS_ITEM_TEST_TAG),
-                            text = item.viewedLink.name,
-                            leadingElement = {
-                                NodeThumbnailView(
-                                    modifier = Modifier.size(32.dp),
-                                    layoutType = ThumbnailLayoutType.List,
-                                    data = item.previewPath?.let { ThumbnailUriRequest(UriPath(it)) },
-                                    defaultImage = item.iconRes,
-                                    contentDescription = "Thumbnail",
-                                )
-                            },
-                            onClickListener = {
-                                when (item.viewedLink.type) {
-                                    RecentlyViewedLinkType.FolderLink -> onFolderLinkClicked(item.viewedLink.linkUrl)
-                                    RecentlyViewedLinkType.FileLink -> onFileLinkClicked(item.viewedLink.linkUrl)
-                                }
-                            },
-                        )
-                    }
+            lazyItems.itemCount == 0 -> ViewedLinksEmptyView()
+
+            else -> {
+                val visibleCount = minOf(lazyItems.itemCount, MAX_VISIBLE_VIEWED_LINK)
+                for (index in 0 until visibleCount) {
+                    val item = lazyItems[index] ?: continue
+                    OneLineListItem(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag(VIEWED_LINKS_ITEM_TEST_TAG),
+                        text = item.viewedLink.name,
+                        leadingElement = {
+                            NodeThumbnailView(
+                                modifier = Modifier.size(32.dp),
+                                layoutType = ThumbnailLayoutType.List,
+                                data = item.previewPath?.let { ThumbnailUriRequest(UriPath(it)) },
+                                defaultImage = item.iconRes,
+                                contentDescription = "Thumbnail",
+                            )
+                        },
+                        onClickListener = {
+                            when (item.viewedLink.type) {
+                                RecentlyViewedLinkType.FolderLink -> onFolderLinkClicked(item.viewedLink.linkUrl)
+                                RecentlyViewedLinkType.FileLink -> onFileLinkClicked(item.viewedLink.linkUrl)
+                            }
+                        },
+                    )
                 }
             }
         }
