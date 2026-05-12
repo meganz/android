@@ -5,7 +5,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersProgressNotificationSummaryBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.PROGRESS_SUMMARY_GROUP
@@ -31,10 +30,9 @@ class DefaultTransfersProgressNotificationSummaryBuilder @Inject constructor(
             .setGroupSummary(true)
             .setContentTitle(context.getString(R.string.download_preparing_files))
             .setContentIntent(
-                TransfersActivity.getPendingIntentForTransfersSection(
-                    megaNavigator = megaNavigator,
+                megaNavigator.getPendingIntentWithDestination(
                     context = context,
-                    tab = TransfersNavKey.Tab.Active,
+                    singleActivityDestination = { TransfersNavKey(TransfersNavKey.Tab.Active) }
                 )
             )
             .build()

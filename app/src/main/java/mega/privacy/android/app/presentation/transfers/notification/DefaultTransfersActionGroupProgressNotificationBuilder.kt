@@ -11,7 +11,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity
 import mega.privacy.android.app.presentation.transfers.preview.LoadingPreviewActivity.Companion.EXTRA_TRANSFER_TAG
 import mega.privacy.android.app.utils.Constants
@@ -98,10 +97,9 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
             actionGroup = actionGroup,
         )
         val actionPendingIntent = if (!isPreviewDownload) {
-            TransfersActivity.getPendingIntentForTransfersSection(
-                megaNavigator,
-                context,
-                TransfersNavKey.Tab.Active,
+            megaNavigator.getPendingIntentWithDestination(
+                context = context,
+                singleActivityDestination = { TransfersNavKey(TransfersNavKey.Tab.Active) }
             )
         } else {
             PendingIntent.getActivity(

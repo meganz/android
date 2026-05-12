@@ -549,7 +549,7 @@ class ChatAdvancedNotificationBuilder(
         val notificationCallId = MegaApiJava.userHandleToBase64(chatCallId)
         val notificationId = (notificationCallId).hashCode() + Constants.NOTIFICATION_MISSED_CALL
         val pendingIntent =
-            context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+            context.megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = { ChatNavKey(chatId = chatId) }
             )

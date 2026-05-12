@@ -6,18 +6,17 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.navigation.destination.LoginNavKey
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -48,21 +47,20 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         var isFreeAccount = false
         val actionPendingIntent = if (isLoggedIn) {
             isFreeAccount = getAccountTypeUseCase() == AccountType.FREE
-            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+            megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = { UpgradeAccountNavKey(source = UpgradeAccountSource.UNKNOWN) }
             )
         } else {
             clearEphemeralCredentialsUseCase()
-            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+            megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = { LoginNavKey(action = Constants.ACTION_LOG_IN) }
             )
         }
-        val clickPendingIntent = TransfersActivity.getPendingIntentForTransfersSection(
-            megaNavigator,
-            context,
-            TransfersNavKey.Tab.Active,
+        val clickPendingIntent = megaNavigator.getPendingIntentWithDestination(
+            context = context,
+            singleActivityDestination = { TransfersNavKey(TransfersNavKey.Tab.Active) }
         )
         val upgradeButtonText =
             context.getString(if (!isLoggedIn) sharedR.string.login_text else if (isFreeAccount) sharedR.string.general_upgrade_button else R.string.plans_depleted_transfer_overquota)
@@ -93,7 +91,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
         val contentText = getString(R.string.download_show_info)
         val message = getString(R.string.overquota_alert_title)
         val pendingIntent =
-            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+            megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = { OverQuotaDialogNavKey(isOverQuota = true) }
             )

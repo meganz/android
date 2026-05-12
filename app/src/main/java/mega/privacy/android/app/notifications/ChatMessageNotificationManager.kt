@@ -91,16 +91,10 @@ class ChatMessageNotificationManager @Inject constructor(
             }
         }
 
-        val pendingIntent =
-            megaNavigator.getPendingIntentConsideringSingleActivity(
-                context = context,
-                singleActivityPendingIntent = {
-                    MegaActivity.getPendingIntentWithExtraDestinations(
-                        context,
-                        listOf(ChatListNavKey(), ChatNavKey(chat.chatId, null))
-                    )
-                }
-            )
+        val pendingIntent = MegaActivity.getPendingIntentWithExtraDestinations(
+            context,
+            listOf(ChatListNavKey(), ChatNavKey(chat.chatId, null))
+        )
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)
         val title = EmojiUtilsShortcodes.emojify(chat.title)

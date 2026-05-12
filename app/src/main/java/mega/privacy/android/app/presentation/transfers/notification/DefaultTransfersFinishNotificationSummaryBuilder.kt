@@ -5,7 +5,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.TransfersFinishNotificationSummaryBuilder
 import mega.privacy.android.data.worker.AbstractTransfersWorker.Companion.finalSummaryGroup
@@ -37,10 +36,9 @@ class DefaultTransfersFinishNotificationSummaryBuilder @Inject constructor(
             .setGroup(finalSummaryGroup(type))
             .setGroupSummary(true)
             .setContentIntent(
-                TransfersActivity.getPendingIntentForTransfersSection(
-                    megaNavigator,
-                    context,
-                    TransfersNavKey.Tab.Completed
+                megaNavigator.getPendingIntentWithDestination(
+                    context = context,
+                    singleActivityDestination = { TransfersNavKey(TransfersNavKey.Tab.Completed) }
                 )
             )
             .build()

@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.widgets.TransfersWidgetViewAnimated
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -31,7 +31,7 @@ fun TransfersWidget(
         event = state.openTransfersSectionEvent,
         onConsumed = viewModel::onConsumeOpenTransfersSectionEvent
     ) {
-        context.startActivity(TransfersActivity.getIntent(context))
+        context.megaNavigator.openTransfers(context)
     }
     TransfersWidgetViewAnimated(
         transfersInfo = state.transfersInfo,

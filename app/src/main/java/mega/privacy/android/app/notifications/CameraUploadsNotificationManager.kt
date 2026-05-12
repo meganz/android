@@ -196,13 +196,13 @@ class CameraUploadsNotificationManager @Inject constructor(
     }
 
     private suspend fun getDefaultPendingIntent() = megaNavigator
-        .getPendingIntentConsideringSingleActivityWithDestination(
+        .getPendingIntentWithDestination(
             context = context,
             singleActivityDestination = { CameraUploadsProgressNavKey }
         )
 
     private suspend fun getCUSettingsPendingIntent() = megaNavigator
-        .getPendingIntentConsideringSingleActivityWithDestination(
+        .getPendingIntentWithDestination(
             context = context,
             singleActivityDestination = { SettingsCameraUploadsNavKey }
         )
@@ -316,7 +316,7 @@ class CameraUploadsNotificationManager @Inject constructor(
      */
     private suspend fun showStorageOverQuotaNotification() {
         val pendingIntent =
-            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+            megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = { OverQuotaDialogNavKey(isOverQuota = true) }
             )

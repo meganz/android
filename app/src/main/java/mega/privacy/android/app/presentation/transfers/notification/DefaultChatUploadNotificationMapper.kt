@@ -6,7 +6,6 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.transfer.ChatUploadNotificationMapper
 import mega.privacy.android.domain.entity.Progress
@@ -30,11 +29,11 @@ class DefaultChatUploadNotificationMapper @Inject constructor(
         chatCompressionProgress: ChatCompressionProgress?,
         paused: Boolean,
     ): Notification {
-        val pendingIntent: PendingIntent = TransfersActivity.getPendingIntentForTransfersSection(
-            megaNavigator,
-            context,
-            TransfersNavKey.Tab.Active,
-        )
+        val pendingIntent: PendingIntent =
+            megaNavigator.getPendingIntentWithDestination(
+                context = context,
+                singleActivityDestination = { TransfersNavKey(TransfersNavKey.Tab.Active) }
+            )
         val content = context.getString(R.string.chat_upload_title_notification)
         val progress: Progress?
 

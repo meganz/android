@@ -91,7 +91,7 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
             val notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY)
             val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID
             val pendingIntent = megaNavigator
-                .getPendingIntentConsideringSingleActivityWithDestination(
+                .getPendingIntentWithDestination(
                     context = appContext,
                     singleActivityDestination = { SharesNavKey }
                 )

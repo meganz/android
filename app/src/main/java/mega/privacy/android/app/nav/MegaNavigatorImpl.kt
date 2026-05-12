@@ -949,12 +949,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
-    override suspend fun getPendingIntentConsideringSingleActivity(
-        context: Context,
-        singleActivityPendingIntent: () -> PendingIntent,
-    ): PendingIntent = singleActivityPendingIntent()
-
-    override suspend fun <T> getPendingIntentConsideringSingleActivityWithDestination(
+    override suspend fun <T> getPendingIntentWithDestination(
         context: Context,
         singleActivityDestination: () -> T,
     ): PendingIntent where T : NavKey, T : Parcelable =

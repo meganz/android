@@ -11,7 +11,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
@@ -111,10 +110,9 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             if (isPreviewDownload || actionGroup.groupId < 0) { //not a real transfer, will not appear on transfer section -> content intent same as action intent
                 actionPendingIntent
             } else {
-                TransfersActivity.getPendingIntentForTransfersSection(
-                    megaNavigator,
-                    context,
-                    TransfersNavKey.Tab.Completed
+                megaNavigator.getPendingIntentWithDestination(
+                    context = context,
+                    singleActivityDestination = { TransfersNavKey(TransfersNavKey.Tab.Completed) }
                 )
             }
 
@@ -265,7 +263,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         } else null
         return when {
             previewFile?.exists() == true && isZipFile -> {
-                megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+                megaNavigator.getPendingIntentWithDestination(
                     context = context,
                     singleActivityDestination = {
                         LegacyZipBrowserNavKey(previewFile.absolutePath)
@@ -287,14 +285,9 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 
             else -> {
                 val warningMessage = context.getString(R.string.intent_not_available)
-                megaNavigator.getPendingIntentConsideringSingleActivity(
-                    context = context,
-                    singleActivityPendingIntent = {
-                        MegaActivity.getPendingIntentForWarningMessage(
-                            context,
-                            warningMessage
-                        )
-                    }
+                MegaActivity.getPendingIntentForWarningMessage(
+                    context,
+                    warningMessage
                 )
             }
         }
@@ -308,7 +301,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         actionGroup: ActiveTransferTotals.ActionGroup,
     ): PendingIntent? = when {
         isDownload -> {
-            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+            megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = {
                     FileStorageNavKey(actionGroup.destination, actionGroup.selectedNames)
@@ -319,7 +312,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         !uploadLocationExists -> null
 
         else -> { // is not download
-            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+            megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = {
                     CloudDriveNavKey(

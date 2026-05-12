@@ -326,7 +326,7 @@ class ContactsAdvancedNotificationBuilder(
     }
 
     private suspend fun getIPCPendingIntent(requestCode: Int) =
-        context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+        context.megaNavigator.getPendingIntentWithDestination(
             context = context,
             singleActivityDestination = { ContactRequestsNavKey(navType = ContactRequestsNavKey.NavType.ReceivedRequests) }
         )
@@ -357,7 +357,7 @@ class ContactsAdvancedNotificationBuilder(
     }
 
     private suspend fun getAPCPendingIntent(requestCode: Int) =
-        context.megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+        context.megaNavigator.getPendingIntentWithDestination(
             context = context,
             singleActivityDestination = { ContactsNavKey }
         )

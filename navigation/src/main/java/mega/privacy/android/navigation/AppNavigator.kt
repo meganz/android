@@ -167,7 +167,7 @@ interface AppNavigator {
     fun openInviteContactActivity(context: Context, isFromAchievement: Boolean)
 
     /**
-     * Navigate to [TransfersActivity]
+     * Navigate to the transfers section.
      */
     fun openTransfers(context: Context)
 
@@ -565,18 +565,6 @@ interface AppNavigator {
     fun openMyAccountActivity(context: Context, flags: Int? = null)
 
     /**
-     * Get a PendingIntent that targets the single activity.
-     *
-     * @param context The Context
-     * @param singleActivityPendingIntent A lambda that creates the PendingIntent to use
-     * @return The PendingIntent produced by [singleActivityPendingIntent]
-     */
-    suspend fun getPendingIntentConsideringSingleActivity(
-        context: Context,
-        singleActivityPendingIntent: () -> PendingIntent,
-    ): PendingIntent
-
-    /**
      * Get a PendingIntent that targets the single activity with the provided destination.
      *
      * If more than one destination is needed, please consider using getPendingIntentConsideringSingleActivity and create the intent with MegaActivity companion helper functions
@@ -585,7 +573,7 @@ interface AppNavigator {
      * @param singleActivityDestination A lambda that creates the NavKey destination to use
      * @return The PendingIntent targeting the single activity with the provided destination
      */
-    suspend fun <T> getPendingIntentConsideringSingleActivityWithDestination(
+    suspend fun <T> getPendingIntentWithDestination(
         context: Context,
         singleActivityDestination: () -> T,
     ): PendingIntent where T : NavKey, T : Parcelable

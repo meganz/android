@@ -1,10 +1,8 @@
 package mega.privacy.android.app.nav
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.navigation3.runtime.NavKey
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -18,10 +16,10 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -94,20 +92,6 @@ class MegaNavigatorImplTest {
             snackbarEventQueue,
         )
     }
-
-    @Test
-    fun `test that getPendingIntentConsideringSingleActivity returns singleActivityPendingIntent`() =
-        runTest {
-            val expectedPendingIntent = mock<PendingIntent>()
-            val singleActivityPendingIntent: () -> PendingIntent = { expectedPendingIntent }
-
-            val result = underTest.getPendingIntentConsideringSingleActivity(
-                context = context,
-                singleActivityPendingIntent = singleActivityPendingIntent,
-            )
-
-            assertThat(result).isEqualTo(expectedPendingIntent)
-        }
 
     @Test
     fun `test that sendMessageConsideringSingleActivity queues message to snackbarEventQueue`() =
