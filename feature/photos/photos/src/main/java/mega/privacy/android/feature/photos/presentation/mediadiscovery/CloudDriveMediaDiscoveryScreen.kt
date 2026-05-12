@@ -96,13 +96,13 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
+import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
-import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialog
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -145,7 +145,6 @@ fun CloudDriveMediaDiscoveryRoute(
 
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
-    var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     val uploadUrisEventState = rememberUploadUrisEventState()
     val parentId = NodeId(viewModel.folderId)
@@ -232,7 +231,9 @@ fun CloudDriveMediaDiscoveryRoute(
         onScanDocumentClicked = { scanDocumentViewModel.prepareDocumentScanner() },
         onCaptureClicked = { captureHandler.onCaptureClicked() },
         onNewFolderClicked = { showNewFolderDialog = true },
-        onNewTextFileClicked = { showNewTextFileDialog = true },
+        onNewTextFileClicked = {
+            navigationHandler.navigate(NewTextFileDialogNavKey(parentNodeId = parentId))
+        },
         onOpenLinkClicked = {
             navigationHandler.navigate(OpenLinkDialogNavKey)
         },
@@ -280,12 +281,6 @@ fun CloudDriveMediaDiscoveryRoute(
         )
     }
 
-    if (showNewTextFileDialog) {
-        NewTextFileNodeDialog(
-            parentNode = parentId,
-            onDismiss = { showNewTextFileDialog = false }
-        )
-    }
 
     @SuppressLint("ComposeViewModelForwarding")
     ScanDocumentHandler(

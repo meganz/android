@@ -50,13 +50,13 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
-import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialog
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.UploadingFiles
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
@@ -80,7 +80,6 @@ internal fun HomeScreen(
     val rootFolderId = NodeId(-1L)
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     val uploadUrisEventState = rememberUploadUrisEventState()
-    var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
     val uploadHandler = rememberUploadHandler(
@@ -123,7 +122,10 @@ internal fun HomeScreen(
                 HomeFabOption.UploadFolder -> uploadHandler.onUploadFolderClicked()
                 HomeFabOption.ScanDocument -> scanDocumentViewModel.prepareDocumentScanner()
                 HomeFabOption.Capture -> captureHandler.onCaptureClicked()
-                HomeFabOption.CreateNewTextFile -> showNewTextFileDialog = true
+                HomeFabOption.CreateNewTextFile -> navigationHandler.navigate(
+                    NewTextFileDialogNavKey(parentNodeId = rootFolderId)
+                )
+
                 HomeFabOption.AddNewSync -> navigationHandler.navigate(SyncNewFolderNavKey())
                 HomeFabOption.AddNewBackup -> navigationHandler.navigate(
                     SyncNewFolderNavKey(
@@ -252,17 +254,7 @@ internal fun HomeScreen(
         viewModel = scanDocumentViewModel
     )
 
-    if (showNewTextFileDialog) {
-        NewTextFileNodeDialog(
-            modifier = Modifier.testTag(HOME_SCREEN_NEW_TEXT_FILE_DIALOG_TAG),
-            parentNode = rootFolderId,
-            onDismiss = {
-                showNewTextFileDialog = false
-            }
-        )
-    }
 }
 
 internal const val HOME_FAB_TAG = "home_screen:add_content_fab"
 internal const val HOME_MAIN_APP_BAR_TAG = "home_screen:main_app_bar"
-internal const val HOME_SCREEN_NEW_TEXT_FILE_DIALOG_TAG = "home_screen:dialog_new_text_file"

@@ -1,7 +1,9 @@
 package mega.privacy.android.shared.nodes.dialog.newfile
 
+import app.cash.turbine.ReceiveTurbine
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -16,7 +18,6 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -31,20 +32,17 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NewTextFileNodeDialogViewModelTest {
 
-    private lateinit var viewModel: NewTextFileNodeDialogViewModel
-
     private val validateNodeNameUseCase = mock<ValidateNodeNameUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val isValidTextFileUseCase = mock<IsValidTextFileUseCase>()
 
-    @BeforeEach
-    fun setUp() {
-        viewModel = NewTextFileNodeDialogViewModel(
+    private fun newViewModel(parentNodeId: NodeId = NodeId(123L)) =
+        NewTextFileNodeDialogViewModel(
             validateNodeNameUseCase = validateNodeNameUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
             isValidTextFileUseCase = isValidTextFileUseCase,
+            args = NewTextFileNodeDialogViewModel.Args(parentNodeId),
         )
-    }
 
     @AfterEach
     fun resetMocks() {
@@ -56,117 +54,191 @@ class NewTextFileNodeDialogViewModelTest {
     }
 
     @Test
-    fun `test that createTextFile with empty name triggers EmptyNodeNameException`() = runTest {
-        val parentNodeId = NodeId(123L)
+    fun `test that initial state has default file name and no exception`() = runTest {
+        val underTest = newViewModel()
 
-        whenever(validateNodeNameUseCase(eq(""), eq(parentNodeId))).thenThrow(
-            EmptyNodeNameException()
-        )
-
-        val result = viewModel.createTextFile("", parentNodeId)
-
-        assertThat(result.isFailure).isTrue()
-        assertThat(result.exceptionOrNull()).isInstanceOf(EmptyNodeNameException::class.java)
+        underTest.uiState.test {
+            val state = awaitData()
+            assertThat(state.fileName).isEqualTo(".txt")
+            assertThat(state.fileNameException).isNull()
+            assertThat(state.validationSuccessEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
     }
 
     @Test
-    fun `test that createTextFile with whitespace name triggers EmptyNodeNameException`() =
-        runTest {
-            val parentNodeId = NodeId(123L)
+    fun `test that onFileNameChanged updates file name and clears previous exception`() = runTest {
+        val parentNodeId = NodeId(123L)
+        val underTest = newViewModel(parentNodeId)
+        whenever(validateNodeNameUseCase(eq(""), eq(parentNodeId)))
+            .thenThrow(EmptyNodeNameException())
 
-            whenever(validateNodeNameUseCase(eq(""), eq(parentNodeId))).thenThrow(
-                EmptyNodeNameException()
-            )
+        underTest.uiState.test {
+            assertThat(awaitData().fileName).isEqualTo(".txt")
 
-            val result = viewModel.createTextFile("   ", parentNodeId)
+            underTest.onFileNameChanged("")
+            assertThat(awaitData().fileName).isEmpty()
 
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isInstanceOf(EmptyNodeNameException::class.java)
+            underTest.validateFileName()
+            assertThat(awaitData().fileNameException)
+                .isInstanceOf(EmptyNodeNameException::class.java)
+
+            underTest.onFileNameChanged("hello.txt")
+            val state = awaitStateMatching { it.fileNameException == null }
+            assertThat(state.fileName).isEqualTo("hello.txt")
         }
+    }
+
+    private suspend fun ReceiveTurbine<NewTextFileNodeDialogUiState>.awaitData(): NewTextFileNodeDialogUiState.Data {
+        var item = awaitItem()
+        while (item !is NewTextFileNodeDialogUiState.Data) {
+            item = awaitItem()
+        }
+        return item
+    }
+
+    private suspend fun ReceiveTurbine<NewTextFileNodeDialogUiState>.awaitStateMatching(
+        predicate: (NewTextFileNodeDialogUiState.Data) -> Boolean,
+    ): NewTextFileNodeDialogUiState.Data {
+        var item = awaitData()
+        while (!predicate(item)) {
+            item = awaitData()
+        }
+        return item
+    }
 
     @Test
-    fun `test that createTextFile with invalid characters triggers InvalidNodeNameException`() =
+    fun `test that validateFileName sets EmptyNodeNameException when name is empty`() = runTest {
+        val parentNodeId = NodeId(123L)
+        val underTest = newViewModel(parentNodeId)
+        whenever(validateNodeNameUseCase(eq(""), eq(parentNodeId)))
+            .thenThrow(EmptyNodeNameException())
+
+        underTest.uiState.test {
+            assertThat(awaitData().fileName).isEqualTo(".txt")
+
+            underTest.onFileNameChanged("")
+            assertThat(awaitData().fileName).isEmpty()
+
+            underTest.validateFileName()
+            val state = awaitData()
+            assertThat(state.fileNameException)
+                .isInstanceOf(EmptyNodeNameException::class.java)
+            assertThat(state.validationSuccessEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+    }
+
+    @Test
+    fun `test that validateFileName trims whitespace before validating`() = runTest {
+        val parentNodeId = NodeId(123L)
+        val underTest = newViewModel(parentNodeId)
+        whenever(validateNodeNameUseCase(eq(""), eq(parentNodeId)))
+            .thenThrow(EmptyNodeNameException())
+
+        underTest.uiState.test {
+            assertThat(awaitData().fileName).isEqualTo(".txt")
+
+            underTest.onFileNameChanged("   ")
+            assertThat(awaitData().fileName).isEqualTo("   ")
+
+            underTest.validateFileName()
+            awaitData()
+        }
+        verify(validateNodeNameUseCase).invoke(eq(""), eq(parentNodeId))
+    }
+
+    @Test
+    fun `test that validateFileName sets InvalidNodeNameException for invalid characters`() =
         runTest {
             val parentNodeId = NodeId(123L)
-            val fileNameWithInvalidChars = "test*folder"
-
-            whenever(validateNodeNameUseCase(eq(fileNameWithInvalidChars), eq(parentNodeId)))
+            val underTest = newViewModel(parentNodeId)
+            val fileName = "test*folder"
+            whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId)))
                 .thenThrow(InvalidNodeNameException())
 
-            val result = viewModel.createTextFile(fileNameWithInvalidChars, parentNodeId)
+            underTest.uiState.test {
+                assertThat(awaitData().fileName).isEqualTo(".txt")
 
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isInstanceOf(InvalidNodeNameException::class.java)
+                underTest.onFileNameChanged(fileName)
+                assertThat(awaitData().fileName).isEqualTo(fileName)
+
+                underTest.validateFileName()
+                assertThat(awaitData().fileNameException)
+                    .isInstanceOf(InvalidNodeNameException::class.java)
+            }
         }
 
     @Test
-    fun `test that createTextFile with existing file name triggers NodeNameAlreadyExistsException`() =
+    fun `test that validateFileName sets NodeNameAlreadyExistsException for existing names`() =
         runTest {
             val parentNodeId = NodeId(123L)
+            val underTest = newViewModel(parentNodeId)
             val fileName = "existingFile.txt"
-
             whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId)))
                 .thenThrow(NodeNameAlreadyExistsException())
 
-            val result = viewModel.createTextFile(fileName, parentNodeId)
+            underTest.uiState.test {
+                assertThat(awaitData().fileName).isEqualTo(".txt")
 
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isInstanceOf(NodeNameAlreadyExistsException::class.java)
+                underTest.onFileNameChanged(fileName)
+                assertThat(awaitData().fileName).isEqualTo(fileName)
+
+                underTest.validateFileName()
+                assertThat(awaitData().fileNameException)
+                    .isInstanceOf(NodeNameAlreadyExistsException::class.java)
+            }
         }
 
     @Test
-    fun `test that createTextFile with valid name creates text file successfully`() = runTest {
-        val parentNodeId = NodeId(123L)
-        val fileName = "newFile.txt"
-
-        whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
-
-        val result = viewModel.createTextFile(fileName, parentNodeId)
-
-        assertThat(result.isSuccess).isTrue()
-        val (actualParentNodeId, actualFileName) = result.getOrThrow()
-        assertThat(actualFileName).isEqualTo(fileName)
-        assertThat(actualParentNodeId).isEqualTo(parentNodeId)
-        verify(validateNodeNameUseCase).invoke(eq(fileName), eq(parentNodeId))
-    }
-
-    @Test
-    fun `test that createTextFile with valid name and md format creates text file successfully`() =
+    fun `test that validateFileName sets InvalidNodeExtensionException for invalid extension`() =
         runTest {
             val parentNodeId = NodeId(123L)
-            val fileName = "newFile.md"
+            val underTest = newViewModel(parentNodeId)
+            val fileName = "newFile.exe"
+            whenever(isValidTextFileUseCase(eq(fileName)))
+                .thenThrow(InvalidNodeExtensionException())
 
-            whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
+            underTest.uiState.test {
+                assertThat(awaitData().fileName).isEqualTo(".txt")
 
-            val result = viewModel.createTextFile(fileName, parentNodeId)
+                underTest.onFileNameChanged(fileName)
+                assertThat(awaitData().fileName).isEqualTo(fileName)
 
-            assertThat(result.isSuccess).isTrue()
-            val (actualParentNodeId, actualFileName) = result.getOrThrow()
-            assertThat(actualFileName).isEqualTo(fileName)
-            assertThat(actualParentNodeId).isEqualTo(parentNodeId)
-            verify(validateNodeNameUseCase).invoke(eq(fileName), eq(parentNodeId))
+                underTest.validateFileName()
+                assertThat(awaitData().fileNameException)
+                    .isInstanceOf(InvalidNodeExtensionException::class.java)
+            }
         }
 
     @Test
-    fun `test that createTextFile with valid name trims whitespace`() = runTest {
+    fun `test that validateFileName triggers validation success event when valid`() = runTest {
         val parentNodeId = NodeId(123L)
-        val fileNameWithSpaces = "  newFile.txt  "
-        val trimmedFileName = "newFile.txt"
+        val underTest = newViewModel(parentNodeId)
+        val fileName = "newFile.txt"
+        whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
 
-        whenever(validateNodeNameUseCase(eq(trimmedFileName), eq(parentNodeId))).thenReturn(Unit)
+        underTest.uiState.test {
+            assertThat(awaitData().fileName).isEqualTo(".txt")
 
-        val result = viewModel.createTextFile(fileNameWithSpaces, parentNodeId)
+            underTest.onFileNameChanged(fileName)
+            assertThat(awaitData().fileName).isEqualTo(fileName)
 
-        assertThat(result.isSuccess).isTrue()
-        val (actualParentNodeId, actualFileName) = result.getOrThrow()
-        assertThat(actualFileName).isEqualTo(trimmedFileName)
-        assertThat(actualParentNodeId).isEqualTo(parentNodeId)
-        verify(validateNodeNameUseCase).invoke(eq(trimmedFileName), eq(parentNodeId))
+            underTest.validateFileName()
+            val state = awaitData()
+            assertThat(state.fileNameException).isNull()
+            val triggered = state.validationSuccessEvent
+                    as StateEventWithContentTriggered<String>
+            assertThat(triggered.content).isEqualTo(fileName)
+        }
+        verify(validateNodeNameUseCase).invoke(eq(fileName), eq(parentNodeId))
+        verify(isValidTextFileUseCase).invoke(eq(fileName))
     }
 
     @Test
-    fun `test that createTextFile uses root node when parentNodeId is -1`() = runTest {
+    fun `test that validateFileName uses root node when parentNodeId is -1`() = runTest {
         val parentNodeId = NodeId(-1L)
+        val underTest = newViewModel(parentNodeId)
         val fileName = "newFile.txt"
         val rootNodeId = NodeId(789L)
         val rootNode = mock<TypedNode>()
@@ -175,61 +247,72 @@ class NewTextFileNodeDialogViewModelTest {
         whenever(getRootNodeUseCase()).thenReturn(rootNode)
         whenever(validateNodeNameUseCase(eq(fileName), eq(rootNodeId))).thenReturn(Unit)
 
-        val result = viewModel.createTextFile(fileName, parentNodeId)
+        underTest.uiState.test {
+            assertThat(awaitData().fileName).isEqualTo(".txt")
 
-        assertThat(result.isSuccess).isTrue()
-        val (actualParentNodeId, actualFileName) = result.getOrThrow()
-        assertThat(actualParentNodeId).isEqualTo(rootNodeId)
-        assertThat(actualFileName).isEqualTo(fileName)
+            underTest.onFileNameChanged(fileName)
+            assertThat(awaitData().fileName).isEqualTo(fileName)
+
+            underTest.validateFileName()
+            val state = awaitData()
+            val triggered = state.validationSuccessEvent
+                    as StateEventWithContentTriggered<String>
+            assertThat(triggered.content).isEqualTo(fileName)
+        }
         verify(getRootNodeUseCase).invoke()
         verify(validateNodeNameUseCase).invoke(eq(fileName), eq(rootNodeId))
     }
 
     @Test
-    fun `test that createTextFile throws when root node is null`() = runTest {
-        val parentNodeId = NodeId(-1L)
-        val fileName = "newFile.txt"
+    fun `test that initial state contains parent node id from args`() = runTest {
+        val parentNodeId = NodeId(456L)
+        val underTest = newViewModel(parentNodeId)
 
-        whenever(getRootNodeUseCase()).thenReturn(null)
-
-        val result = viewModel.createTextFile(fileName, parentNodeId)
-
-        assertThat(result.isFailure).isTrue()
-        assertThat(result.exceptionOrNull()).isInstanceOf(IllegalStateException::class.java)
-        verify(getRootNodeUseCase).invoke()
+        underTest.uiState.test {
+            assertThat(awaitData().parentNodeId).isEqualTo(parentNodeId)
+        }
     }
 
     @Test
-    fun `test that createTextFile with invalid extension triggers InvalidNodeExtensionException`() =
+    fun `test that validateFileName does not trigger success or set exception when root node is null`() =
         runTest {
-            val parentNodeId = NodeId(123L)
-            val fileName = "newFile.exe"
+            val parentNodeId = NodeId(-1L)
+            val underTest = newViewModel(parentNodeId)
+            val fileName = "newFile.txt"
+            whenever(getRootNodeUseCase()).thenReturn(null)
 
-            whenever(isValidTextFileUseCase(eq(fileName))).thenThrow(
-                InvalidNodeExtensionException()
-            )
+            underTest.uiState.test {
+                assertThat(awaitData().fileName).isEqualTo(".txt")
 
-            val result = viewModel.createTextFile(fileName, parentNodeId)
+                underTest.onFileNameChanged(fileName)
+                assertThat(awaitData().fileName).isEqualTo(fileName)
 
-            assertThat(result.isFailure).isTrue()
-            assertThat(result.exceptionOrNull()).isInstanceOf(InvalidNodeExtensionException::class.java)
+                underTest.validateFileName()
+                expectNoEvents()
+            }
+            verify(getRootNodeUseCase).invoke()
         }
 
     @Test
-    fun `test that createTextFile handles ValidateNodeNameUseCase failure`() = runTest {
+    fun `test that onValidationSuccessEventConsumed clears the success event`() = runTest {
         val parentNodeId = NodeId(123L)
+        val underTest = newViewModel(parentNodeId)
         val fileName = "newFile.txt"
+        whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
 
-        whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId)))
-            .thenThrow(RuntimeException("Validation failed"))
+        underTest.uiState.test {
+            assertThat(awaitData().fileName).isEqualTo(".txt")
 
-        val result = viewModel.createTextFile(fileName, parentNodeId)
+            underTest.onFileNameChanged(fileName)
+            assertThat(awaitData().fileName).isEqualTo(fileName)
 
-        assertThat(result.isFailure).isTrue()
-        assertThat(result.exceptionOrNull()).isInstanceOf(RuntimeException::class.java)
-        verify(validateNodeNameUseCase).invoke(eq(fileName), eq(parentNodeId))
+            underTest.validateFileName()
+            assertThat(awaitData().validationSuccessEvent)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
+
+            underTest.onValidationSuccessEventConsumed()
+            assertThat(awaitData().validationSuccessEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
     }
-
-    fun <T> StateEventWithContent<T>.triggeredContent(): T? =
-        (this as? StateEventWithContentTriggered<T>)?.content
 }

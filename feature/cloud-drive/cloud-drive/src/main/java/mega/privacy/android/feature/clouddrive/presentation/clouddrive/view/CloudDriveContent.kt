@@ -59,6 +59,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -72,7 +73,6 @@ import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
-import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialog
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
@@ -121,7 +121,6 @@ internal fun CloudDriveContent(
 ) {
     val overQuotaUiState by overQuotaStatusViewModel.uiState.collectAsStateWithLifecycle()
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
-    var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -372,7 +371,9 @@ internal fun CloudDriveContent(
                             showNewFolderDialog = true
                         },
                         onNewTextFileClicked = {
-                            showNewTextFileDialog = true
+                            navigationHandler.navigate(
+                                NewTextFileDialogNavKey(parentNodeId = uiState.currentFolderId)
+                            )
                         },
                         onOpenLinkClicked = {
                     navigationHandler.navigate(OpenLinkDialogNavKey)
@@ -410,14 +411,6 @@ internal fun CloudDriveContent(
                     )
                 }
 
-                if (showNewTextFileDialog) {
-                    NewTextFileNodeDialog(
-                        parentNode = uiState.currentFolderId,
-                        onDismiss = {
-                            showNewTextFileDialog = false
-                        }
-                    )
-                }
 
                 if (showSortBottomSheet) {
                     SortBottomSheet(
