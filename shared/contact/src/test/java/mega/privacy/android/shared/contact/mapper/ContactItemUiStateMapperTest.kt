@@ -17,7 +17,9 @@ class ContactItemUiStateMapperTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = ContactItemUiStateMapper()
+        underTest = ContactItemUiStateMapper(
+            contactItemStatusMapper = ContactItemStatusMapper(),
+        )
     }
 
     @Test

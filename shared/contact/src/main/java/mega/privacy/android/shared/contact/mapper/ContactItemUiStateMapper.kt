@@ -2,9 +2,7 @@ package mega.privacy.android.shared.contact.mapper
 
 import androidx.compose.ui.graphics.Color
 import com.vdurmont.emoji.EmojiParser
-import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtils
@@ -21,8 +19,12 @@ import javax.inject.Inject
  * free of Android `Context` and string-resource resolution. Callers resolve the
  * subtitle (e.g. "Online", "Last seen today at HH:mm", a permission label) and
  * pass it in.
+ *
+ * @property contactItemStatusMapper
  */
-class ContactItemUiStateMapper @Inject constructor() {
+class ContactItemUiStateMapper @Inject constructor(
+    private val contactItemStatusMapper: ContactItemStatusMapper
+) {
 
     /**
      * @param contactItem Domain contact.
@@ -32,7 +34,7 @@ class ContactItemUiStateMapper @Inject constructor() {
     ): ContactItemUiState = ContactItemUiState(
         handle = contactItem.handle,
         displayName = resolveDisplayName(contactItem),
-        status = mapStatus(contactItem.status),
+        status = contactItemStatusMapper(contactItem.status),
         lastSeen = contactItem.lastSeen,
         avatar = mapAvatar(contactItem),
         isVerified = contactItem.areCredentialsVerified,
@@ -46,14 +48,6 @@ class ContactItemUiStateMapper @Inject constructor() {
             !fullName.isNullOrBlank() -> fullName
             else -> contactItem.email
         }
-    }
-
-    private fun mapStatus(status: UserChatStatus): ContactItemStatus = when (status) {
-        UserChatStatus.Online -> ContactItemStatus.Online
-        UserChatStatus.Away -> ContactItemStatus.Away
-        UserChatStatus.Busy -> ContactItemStatus.Busy
-        UserChatStatus.Offline -> ContactItemStatus.Offline
-        UserChatStatus.Invalid -> ContactItemStatus.Unknown
     }
 
     private fun mapAvatar(contactItem: ContactItem): AvatarData {

@@ -51,6 +51,7 @@ fun ContactItemView(
     contactItemUiState: ContactItemUiState,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     selected: Boolean = false,
     showDivider: Boolean = true,
 ) {
@@ -70,6 +71,7 @@ fun ContactItemView(
         isVerified = contactItemUiState.isVerified,
         modifier = modifier,
         onClick = onClick,
+        onLongClick = onLongClick,
         selected = selected,
         showDivider = showDivider,
     )
@@ -101,6 +103,7 @@ fun ContactItemView(
     isVerified: Boolean,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
     selected: Boolean = false,
     showDivider: Boolean = true,
 ) {
@@ -111,8 +114,9 @@ fun ContactItemView(
             subtitle = statusText,
             titleMaxLines = 1,
             subtitleMaxLines = 1,
-            enableClick = onClick != null,
+            enableClick = onClick != null || onLongClick != null,
             onClickListener = onClick ?: {},
+            onLongClickListener = onLongClick ?: {},
             leadingElement = {
                 ContactAvatar(
                     avatar = avatar,
