@@ -1,5 +1,7 @@
 package mega.privacy.android.app.appstate
 
+import android.app.Activity
+import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
@@ -22,7 +24,8 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
-import mega.privacy.android.navigation.destination.ShareToMegaNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
+import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,6 +34,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.check
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -63,6 +67,7 @@ class MegaActivityIntentActionHandlerTest {
     @BeforeAll
     fun setUp() {
         underTest = MegaActivityIntentActionHandler(
+            activity = mock<Activity>(),
             navigationEventQueue = navigationEventQueue,
             navigationResultManager = navigationResultManager,
             snackbarEventQueue = snackbarEventQueue,
@@ -133,15 +138,135 @@ class MegaActivityIntentActionHandlerTest {
         }
 
     @Test
-    fun `test that handleAction emits ShareToMegaNavKey when action is ACTION_SEND`() =
+    fun `test that handleAction emits ShareFilesToMegaNavKey with single uri when action is ACTION_SEND with non-text type`() =
+        runTest {
+            val uriString = "content://test"
+            val uri = mock<Uri> {
+                on { toString() } doReturn uriString
+            }
+            val intent = mock<Intent>()
+            whenever(intent.action).thenReturn(Intent.ACTION_SEND)
+            whenever(intent.type).thenReturn("image/png")
+            whenever(intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)).thenReturn(uri)
+
+            underTest.handleAction(intent, {})
+
+            verify(navigationEventQueue)
+                .emit(ShareFilesToMegaNavKey(listOf(UriPath(uriString))))
+        }
+
+    @Test
+    fun `test that handleAction emits ShareFilesToMegaNavKey with multiple uris when action is ACTION_SEND_MULTIPLE`() =
+        runTest {
+            val firstUri = mock<Uri> { on { toString() } doReturn "content://first" }
+            val secondUri = mock<Uri> { on { toString() } doReturn "content://second" }
+            val intent = mock<Intent>()
+            whenever(intent.action).thenReturn(Intent.ACTION_SEND_MULTIPLE)
+            whenever(intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM))
+                .thenReturn(arrayListOf(firstUri, secondUri))
+
+            underTest.handleAction(intent, {})
+
+            verify(navigationEventQueue).emit(
+                ShareFilesToMegaNavKey(
+                    listOf(UriPath("content://first"), UriPath("content://second"))
+                )
+            )
+        }
+
+    @Test
+    fun `test that handleAction does not emit when action is ACTION_SEND with no extra stream`() =
         runTest {
             val intent = mock<Intent>()
             whenever(intent.action).thenReturn(Intent.ACTION_SEND)
-            val shareUris = listOf(UriPath("content://test"))
+            whenever(intent.type).thenReturn("image/png")
 
-            underTest.handleAction(intent, {}, { shareUris })
+            underTest.handleAction(intent, {})
 
-            verify(navigationEventQueue).emit(ShareToMegaNavKey(shareUris))
+            verify(navigationEventQueue, never()).emit(
+                navKey = any(),
+                priority = any(),
+                navOptions = anyOrNull(),
+            )
+        }
+
+    @Test
+    fun `test that handleAction does not emit when action is ACTION_SEND_MULTIPLE with empty extra stream`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(intent.action).thenReturn(Intent.ACTION_SEND_MULTIPLE)
+            whenever(intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM))
+                .thenReturn(arrayListOf())
+
+            underTest.handleAction(intent, {})
+
+            verify(navigationEventQueue, never()).emit(
+                navKey = any(),
+                priority = any(),
+                navOptions = anyOrNull(),
+            )
+        }
+
+    @Test
+    fun `test that handleAction emits ShareTextToMegaNavKey when action is ACTION_SEND with text plain type and EXTRA_TEXT`() =
+        runTest {
+            val sharedText = "shared text"
+            val subject = "subject"
+            val email = "user@example.com"
+            val intent = mock<Intent>()
+            whenever(intent.action).thenReturn(Intent.ACTION_SEND)
+            whenever(intent.type).thenReturn(Constants.TYPE_TEXT_PLAIN)
+            whenever(intent.getStringExtra(Intent.EXTRA_TEXT)).thenReturn(sharedText)
+            whenever(intent.getStringExtra(Intent.EXTRA_SUBJECT)).thenReturn(subject)
+            whenever(intent.getStringExtra(Intent.EXTRA_EMAIL)).thenReturn(email)
+
+            underTest.handleAction(intent, {})
+
+            verify(navigationEventQueue).emit(
+                ShareTextToMegaNavKey(text = sharedText, subject = subject, email = email)
+            )
+        }
+
+    @Test
+    fun `test that handleAction emits ShareTextToMegaNavKey from clipData when EXTRA_TEXT is missing`() =
+        runTest {
+            val sharedText = "clipboard text"
+            val item = mock<ClipData.Item> {
+                on { text } doReturn sharedText
+            }
+            val clipData = mock<ClipData> {
+                on { itemCount } doReturn 1
+                on { getItemAt(0) } doReturn item
+            }
+            val intent = mock<Intent>()
+            whenever(intent.action).thenReturn(Intent.ACTION_SEND)
+            whenever(intent.type).thenReturn(Constants.TYPE_TEXT_PLAIN)
+            whenever(intent.getStringExtra(Intent.EXTRA_TEXT)).thenReturn(null)
+            whenever(intent.clipData).thenReturn(clipData)
+
+            underTest.handleAction(intent, {})
+
+            verify(navigationEventQueue).emit(
+                ShareTextToMegaNavKey(text = sharedText, subject = null, email = null)
+            )
+        }
+
+    @Test
+    fun `test that handleAction does not emit when action is ACTION_SEND with text plain type but no text payload`() =
+        runTest {
+            val intent = mock<Intent>()
+            whenever(intent.action).thenReturn(Intent.ACTION_SEND)
+            whenever(intent.type).thenReturn(Constants.TYPE_TEXT_PLAIN)
+            whenever(intent.getStringExtra(Intent.EXTRA_TEXT)).thenReturn(null)
+            whenever(intent.clipData).thenReturn(null)
+
+            underTest.handleAction(intent, {})
+
+            verify(navigationEventQueue, never()).emit(
+                navKey = any(),
+                priority = any(),
+                navOptions = anyOrNull(),
+            )
         }
 
     @Test
@@ -250,7 +375,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
             )
 
             verify(navigationEventQueue).emit(
@@ -286,7 +410,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
             )
 
             verify(navigationEventQueue).emit(
@@ -322,7 +445,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
             )
 
             verify(navigationEventQueue).emit(
@@ -355,7 +477,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
                 launchLegacyPdfViewer = { legacyLaunched = true },
             )
 
@@ -380,7 +501,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
             )
 
             verify(navigationEventQueue).emit(
@@ -414,7 +534,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
                 launchLegacyPdfViewer = { legacyLaunched = true },
             )
 
@@ -439,7 +558,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
             )
 
             verify(navigationEventQueue).emit(
@@ -470,7 +588,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
                 launchLegacyPdfViewer = { legacyLaunched = true },
             )
 
@@ -497,7 +614,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
                 launchLegacyPdfViewer = { legacyLaunched = true },
             )
 
@@ -527,7 +643,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
             )
 
             verify(navigationEventQueue).emit(
@@ -558,7 +673,6 @@ class MegaActivityIntentActionHandlerTest {
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                getShareUris = { null },
             )
 
             verify(getFeatureFlagValueUseCase, never()).invoke(any())

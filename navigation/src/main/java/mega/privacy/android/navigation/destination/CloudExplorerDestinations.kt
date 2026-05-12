@@ -10,7 +10,14 @@ import mega.privacy.android.domain.entity.uri.UriPath
 interface ExplorerNavKey : NavKey
 
 @Serializable
-data class ShareToMegaNavKey(val shareUris: List<UriPath>) : ExplorerNavKey
+data class ShareFilesToMegaNavKey(val shareUris: List<UriPath>) : ExplorerNavKey
+
+@Serializable
+data class ShareTextToMegaNavKey(
+    val text: String,
+    val subject: String?,
+    val email: String?,
+) : ExplorerNavKey
 
 @Serializable
 data class NodesExplorerNavKey(

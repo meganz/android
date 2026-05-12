@@ -1,31 +1,40 @@
 package mega.privacy.android.app.appstate
 
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
+import dagger.hilt.android.scopes.ActivityScoped
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.deeplinks.ExternalPdfDeepLinkHandler
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
-import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
+import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
+import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
-import mega.privacy.android.navigation.destination.ShareToMegaNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
+import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.mobile.analytics.event.ShortcutActionChatButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ShortcutActionScanDocumentButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ShortcutActionUploadButtonPressedEvent
 import timber.log.Timber
 import javax.inject.Inject
 
+@ActivityScoped
 class MegaActivityIntentActionHandler @Inject constructor(
+    private val activity: Activity,
     private val navigationEventQueue: NavigationEventQueue,
     private val navigationResultManager: NavigationResultManager,
     private val snackbarEventQueue: SnackbarEventQueue,
@@ -79,7 +88,6 @@ class MegaActivityIntentActionHandler @Inject constructor(
     suspend fun handleAction(
         intent: Intent,
         refreshSession: suspend (RefreshEvent) -> Unit,
-        getShareUris: () -> List<UriPath>?,
         launchLegacyPdfViewer: () -> Unit = {},
     ) {
         when (intent.action) {
@@ -125,9 +133,17 @@ class MegaActivityIntentActionHandler @Inject constructor(
             }
 
             Intent.ACTION_SEND_MULTIPLE, Intent.ACTION_SEND -> {
-                getShareUris()?.let { shareUris ->
-                    navigationEventQueue.emit(ShareToMegaNavKey(shareUris))
-                } ?: Timber.w("Action send multiple but nothing to share")
+                if (intent.action == Intent.ACTION_SEND
+                    && intent.type == Constants.TYPE_TEXT_PLAIN
+                ) {
+                    buildShareTextNavKey(intent)?.let { navKey ->
+                        navigationEventQueue.emit(navKey)
+                    } ?: Timber.w("Action send text but nothing to share")
+                } else {
+                    getShareUris(intent)?.let { shareUris ->
+                        navigationEventQueue.emit(ShareFilesToMegaNavKey(shareUris))
+                    } ?: Timber.w("Action send or send multiple but nothing to share")
+                }
                 intent.action = null
                 intent.removeExtra(Intent.EXTRA_STREAM)
             }
@@ -163,6 +179,46 @@ class MegaActivityIntentActionHandler @Inject constructor(
                     navigationEventQueue.emit(ChatListNavKey())
                 }
                 intent.action = null
+            }
+        }
+    }
+
+    private fun buildShareTextNavKey(intent: Intent) =
+        (intent.getStringExtra(Intent.EXTRA_TEXT)
+            ?: intent.clipData?.takeIf { it.itemCount > 0 }
+                ?.getItemAt(0)?.text?.toString())?.let { text ->
+            ShareTextToMegaNavKey(
+                text = text,
+                subject = intent.getStringExtra(Intent.EXTRA_SUBJECT),
+                email = intent.getStringExtra(Intent.EXTRA_EMAIL),
+            )
+        }
+
+    private fun getShareUris(intent: Intent) = with(intent) {
+        parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
+            it.mapNotNull { item -> item as? Uri }.let { uris ->
+                Timber.d("Multiple files")
+                grantUriPermission(uris)
+                uris.map { uri -> UriPath(uri.toString()) }.ifEmpty { null }
+            }
+        } ?: (parcelable<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+            ?.let { uri ->
+                Timber.d("Single file")
+                grantUriPermission(listOf(uri))
+                listOf(UriPath(uri.toString()))
+            }
+    }
+
+    private fun grantUriPermission(uris: List<Uri>) {
+        uris.forEach { uri ->
+            runCatching {
+                activity.grantUriPermission(
+                    activity.packageName,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }.onFailure {
+                Timber.e(it, "Error granting uri permission")
             }
         }
     }

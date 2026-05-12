@@ -9,6 +9,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -20,9 +22,9 @@ import org.mockito.kotlin.stub
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ShareToMegaViewModelTest {
+class ShareFilesToMegaViewModelTest {
 
-    private lateinit var viewModel: ShareToMegaViewModel
+    private lateinit var viewModel: ShareFilesToMegaViewModel
 
     private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
     private val shareUri = UriPath("content://test/uri")
@@ -33,9 +35,9 @@ class ShareToMegaViewModelTest {
         getRootNodeIdUseCase.stub {
             onBlocking { invoke() } doReturn NodeId(100L)
         }
-        viewModel = ShareToMegaViewModel(
+        viewModel = ShareFilesToMegaViewModel(
             getRootNodeIdUseCase = getRootNodeIdUseCase,
-            args = ShareToMegaViewModel.Args(listOf(shareUri)),
+            args = ShareFilesToMegaViewModel.Args(listOf(shareUri)),
         )
     }
 
@@ -50,17 +52,17 @@ class ShareToMegaViewModelTest {
         getRootNodeIdUseCase.stub {
             onBlocking { invoke() } doReturn expectedRoot
         }
-        viewModel = ShareToMegaViewModel(
+        viewModel = ShareFilesToMegaViewModel(
             getRootNodeIdUseCase = getRootNodeIdUseCase,
-            args = ShareToMegaViewModel.Args(listOf(shareUri)),
+            args = ShareFilesToMegaViewModel.Args(listOf(shareUri)),
         )
 
         viewModel.uiState.test {
-            var state: ShareToMegaUiState = awaitItem()
-            if (state is ShareToMegaUiState.Loading) {
+            var state: ShareFilesToMegaUiState = awaitItem()
+            if (state is ShareFilesToMegaUiState.Loading) {
                 state = awaitItem()
             }
-            val data = state as ShareToMegaUiState.Data
+            val data = state as ShareFilesToMegaUiState.Data
             assertThat(data.rootNodeId).isEqualTo(expectedRoot)
         }
     }
@@ -71,17 +73,17 @@ class ShareToMegaViewModelTest {
             getRootNodeIdUseCase.stub {
                 onBlocking { invoke() } doReturn null
             }
-            viewModel = ShareToMegaViewModel(
+            viewModel = ShareFilesToMegaViewModel(
                 getRootNodeIdUseCase = getRootNodeIdUseCase,
-                args = ShareToMegaViewModel.Args(listOf(shareUri)),
+                args = ShareFilesToMegaViewModel.Args(listOf(shareUri)),
             )
 
             viewModel.uiState.test {
-                var state: ShareToMegaUiState = awaitItem()
-                if (state is ShareToMegaUiState.Loading) {
+                var state: ShareFilesToMegaUiState = awaitItem()
+                if (state is ShareFilesToMegaUiState.Loading) {
                     state = awaitItem()
                 }
-                val data = state as ShareToMegaUiState.Data
+                val data = state as ShareFilesToMegaUiState.Data
                 assertThat(data.rootNodeId).isEqualTo(NodeId(-1))
             }
         }

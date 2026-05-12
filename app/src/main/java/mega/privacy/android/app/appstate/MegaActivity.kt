@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
@@ -70,10 +69,8 @@ import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.core.passcode.presentation.navigation.PasscodeNavKey
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
-import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
@@ -152,7 +149,6 @@ class MegaActivity : FragmentActivity() {
         intentActionHandler.handleAction(
             intent = intent,
             refreshSession = globalStateViewModel::refreshSession,
-            getShareUris = ::getShareUris,
             launchLegacyPdfViewer = {
                 startActivity(
                     Intent(intent).setClass(this, PdfViewerActivity::class.java)
@@ -160,35 +156,6 @@ class MegaActivity : FragmentActivity() {
                 finish()
             },
         )
-    }
-
-    private fun getShareUris() = with(intent) {
-        parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
-            it.mapNotNull { item -> item as? Uri }.let { uris ->
-                Timber.d("Multiple files")
-                grantUriPermission(uris)
-                uris.map { uri -> UriPath(uri.toString()) }.ifEmpty { null }
-            }
-        } ?: (intent.parcelable<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
-            ?.let { uri ->
-                Timber.d("Single file")
-                grantUriPermission(listOf(uri))
-                listOf(UriPath(uri.toString()))
-            }
-    }
-
-    private fun grantUriPermission(uris: List<Uri>) {
-        uris.forEach { uri ->
-            runCatching {
-                this@MegaActivity.grantUriPermission(
-                    this@MegaActivity.packageName,
-                    uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-            }.onFailure {
-                Timber.e(it, "Error granting uri permission")
-            }
-        }
     }
 
     private fun consumeWarningMessage() {

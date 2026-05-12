@@ -18,7 +18,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
-import mega.privacy.android.navigation.destination.ShareToMegaNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
 
 fun EntryProviderScope<NavKey>.fileExplorer(
     removeDestination: (NavKey) -> Unit,
@@ -67,7 +67,7 @@ private fun EntryProviderScope<NavKey>.FileExplorerShareGate(
         LaunchedEffect(Unit) {
             removeDestination(key)
             navigationHandler.navigate(
-                ShareToMegaNavKey(listOf(UriPath(key.shareUri!!)))
+                ShareFilesToMegaNavKey(listOf(UriPath(key.shareUri!!)))
             )
         }
     }

@@ -23,7 +23,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
-import mega.privacy.android.navigation.destination.ShareToMegaNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
@@ -141,7 +141,7 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             onUploadToCloudDrive = {
                 if (uiState.isFileExplorerEnabled) {
                     navigationHandler.navigate(
-                        ShareToMegaNavKey(listOf(UriPath(navKey.contentUri)))
+                        ShareFilesToMegaNavKey(listOf(UriPath(navKey.contentUri)))
                     )
                 } else {
                     navigationHandler.navigate(

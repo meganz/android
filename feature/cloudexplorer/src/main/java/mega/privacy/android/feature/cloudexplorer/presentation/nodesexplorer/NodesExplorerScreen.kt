@@ -32,7 +32,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareFilesToMegaUpload
+import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
@@ -85,7 +85,7 @@ fun NodesExplorerScreen(
     )
 
     if (explorerMode == ExplorerMode.ShareFilesToMega) {
-        ShareFilesToMegaUpload(
+        ShareToMegaUpload(
             parentNodeId = folderPickedId,
             uploadUrisEventState = uploadUrisEventState,
             onStartUpload = onStartUpload,

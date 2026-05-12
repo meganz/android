@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega
+package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,13 +16,13 @@ import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 
-@HiltViewModel(assistedFactory = ShareToMegaViewModel.Factory::class)
-class ShareToMegaViewModel @AssistedInject constructor(
+@HiltViewModel(assistedFactory = ShareFilesToMegaViewModel.Factory::class)
+class ShareFilesToMegaViewModel @AssistedInject constructor(
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     @Assisted val args: Args,
 ) : ViewModel() {
 
-    val uiState: StateFlow<ShareToMegaUiState> by lazy {
+    val uiState: StateFlow<ShareFilesToMegaUiState> by lazy {
         flow {
             emit(
                 runCatching { getRootNodeIdUseCase() }
@@ -30,17 +30,17 @@ class ShareToMegaViewModel @AssistedInject constructor(
                     .getOrNull() ?: NodeId(-1)
             )
         }.map { rootNodeId ->
-            ShareToMegaUiState.Data(
+            ShareFilesToMegaUiState.Data(
                 rootNodeId = rootNodeId,
                 shareUris = args.shareUris,
             )
         }.catch { Timber.e(it) }
-            .asUiStateFlow(viewModelScope, ShareToMegaUiState.Loading)
+            .asUiStateFlow(viewModelScope, ShareFilesToMegaUiState.Loading)
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(args: Args): ShareToMegaViewModel
+        fun create(args: Args): ShareFilesToMegaViewModel
     }
 
     data class Args(

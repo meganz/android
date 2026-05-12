@@ -1,19 +1,19 @@
-package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega
+package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files
 
 import androidx.compose.runtime.Stable
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
- * UI state for share to mega.
+ * UI state for sharing files to mega.
  */
 @Stable
-sealed interface ShareToMegaUiState {
+sealed interface ShareFilesToMegaUiState {
 
     /**
      * Initial loading state.
      */
-    data object Loading : ShareToMegaUiState
+    data object Loading : ShareFilesToMegaUiState
 
     /**
      * Data state.
@@ -24,5 +24,5 @@ sealed interface ShareToMegaUiState {
     data class Data(
         val rootNodeId: NodeId,
         val shareUris: List<UriPath>,
-    ) : ShareToMegaUiState
+    ) : ShareFilesToMegaUiState
 }
