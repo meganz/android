@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.menu.ImagePreviewMenu
@@ -75,6 +76,7 @@ import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.shared.resources.R as sharedR
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -115,6 +117,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val getNodeByHandle: GetNodeByHandle,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -563,6 +566,16 @@ class ImagePreviewViewModel @Inject constructor(
             Timber.e("Current Image node not found")
         }
     }
+
+    /**
+     * Resolve the underlying [MegaNode] for an [imageNode]. Prefers the cached
+     * `serializedData`; falls back to a handle lookup when the serialized blob is
+     * missing or fails to deserialize.
+     */
+    @Suppress("DEPRECATION")
+    suspend fun resolveMegaNode(imageNode: ImageNode): MegaNode? =
+        imageNode.serializedData?.let { MegaNode.unserialize(it) }
+            ?: getNodeByHandle(imageNode.id.longValue)
 
     /**
      * Consume transfer event
