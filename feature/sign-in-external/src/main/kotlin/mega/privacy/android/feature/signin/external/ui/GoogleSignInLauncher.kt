@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.exception.login.GoogleSignInException
+import timber.log.Timber
 
 /**
  * Stable handle that triggers Google Sign-In when invoked.
@@ -49,12 +50,22 @@ fun rememberGoogleSignInLauncher(
     val currentOnError by rememberUpdatedState(onError)
     return remember(activity) {
         GoogleSignInLauncher {
-            activity ?: return@GoogleSignInLauncher
+            Timber.d("[GSIGN] GoogleSignInLauncher invoked")
+            if (activity == null) {
+                Timber.w("[GSIGN] GoogleSignInLauncher invoked but Activity is null - no-op")
+                return@GoogleSignInLauncher
+            }
             scope.launch {
                 runCatching { activity.getGoogleIdToken() }
-                    .onSuccess { token -> currentOnIdToken(token) }
+                    .onSuccess { token ->
+                        Timber.d("[GSIGN] Token obtained, forwarding to onIdToken")
+                        currentOnIdToken(token)
+                    }
                     .onFailure { error ->
-                        if (error !is GoogleSignInException.Cancelled) {
+                        if (error is GoogleSignInException.Cancelled) {
+                            Timber.d("[GSIGN] Cancelled by user")
+                        } else {
+                            Timber.e(error, "[GSIGN] Launcher error")
                             currentOnError(error)
                         }
                     }

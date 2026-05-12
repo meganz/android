@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
@@ -13,10 +15,21 @@ android {
     }
 
     defaultConfig {
+        // Read the OAuth Web Client ID from local.properties so it never gets
+        // committed. Set `googleServerClientId=...apps.googleusercontent.com`
+        // in your local.properties to enable Google Sign-In. Falls back to a
+        // placeholder so unconfigured builds still compile.
+        val googleServerClientId = rootProject.file("local.properties")
+            .takeIf { it.exists() }
+            ?.let { file ->
+                Properties().apply { load(file.inputStream()) }
+                    .getProperty("googleServerClientId")
+            }
+            ?: "placeholder.apps.googleusercontent.com"
         buildConfigField(
             "String",
             "GOOGLE_SERVER_CLIENT_ID",
-            "\"placeholder.apps.googleusercontent.com\""
+            "\"$googleServerClientId\""
         )
     }
 }
