@@ -75,7 +75,8 @@ class SettingsActivity : BaseActivity(),
         if (supportFragmentManager.popBackStackImmediate()) {
             return true
         }
-        return super.onSupportNavigateUp()
+        onBackPressedDispatcher.onBackPressed()
+        return true
     }
 
     override fun onPreferenceStartFragment(
