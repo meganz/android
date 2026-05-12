@@ -105,6 +105,7 @@ import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsActivityNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
@@ -647,6 +648,57 @@ internal class MegaNavigatorImpl @Inject constructor(
             mimeType = mimeType,
         )
         context.startActivity(pdfIntent)
+    }
+
+    override fun openPdfViewerFromChat(
+        context: Context,
+        content: NodeContentUri,
+        nodeHandle: Long,
+        chatId: Long,
+        messageId: Long,
+        mimeType: String,
+        title: String,
+    ) {
+        applicationScope.launch {
+            val isPdfViewerEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
+            }.getOrDefault(false)
+            val legacyNavigation: suspend () -> Unit = {
+                withContext(mainDispatcher) {
+                    val pdfIntent = Intent(context, PdfViewerActivity::class.java).apply {
+                        putExtra(INTENT_EXTRA_KEY_INSIDE, true)
+                        putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
+                        putExtra(INTENT_EXTRA_KEY_MSG_ID, messageId)
+                        putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                        putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+                    }
+                    nodeContentUriIntentMapper(pdfIntent, content, mimeType)
+                    context.startActivity(pdfIntent)
+                }
+            }
+            if (isPdfViewerEnabled) {
+                val (contentUri, isLocal, shouldStop) = when (content) {
+                    is NodeContentUri.LocalContentUri -> Triple(content.file.path, true, false)
+                    is NodeContentUri.RemoteContentUri -> Triple(content.url, false, content.shouldStopHttpSever)
+                }
+                navigateIfInSingleActivity(
+                    singleActivityDestination = PdfViewerNavKey(
+                        nodeHandle = nodeHandle,
+                        contentUri = contentUri,
+                        isLocalContent = isLocal,
+                        shouldStopHttpServer = shouldStop,
+                        nodeSourceType = NodeSourceType.CHAT,
+                        mimeType = mimeType,
+                        chatId = chatId,
+                        messageId = messageId,
+                        title = title,
+                    ),
+                    legacyNavigation = legacyNavigation,
+                )
+            } else {
+                legacyNavigation()
+            }
+        }
     }
 
     override fun openImageViewerActivity(
