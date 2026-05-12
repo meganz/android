@@ -27,7 +27,8 @@ import mega.privacy.android.shared.nodes.dialog.newfolder.INVALID_CHARACTERS
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Stateless dialog for creating a new text file. The caller (typically a destination wired to
+ * Stateless dialog for creating a new text-like file (e.g. a `.txt` text file or a `.url`
+ * Internet Shortcut). The caller (typically a destination wired to
  * [NewTextFileNodeDialogViewModel]) owns the state and provides the callbacks.
  *
  * When the validation flow in the caller succeeds, the caller emits a triggered
@@ -36,6 +37,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * so the caller can perform the positive action (open the text editor, upload, etc.).
  *
  * @param uiState Current state: file name input, validation error, and the one-shot success event.
+ * @param title Dialog title. Defaults to "New text file".
  * @param onConfirm Invoked with the trimmed file name when the success event fires.
  * @param onFileNameChanged Invoked with the new text whenever the user edits the input.
  * @param validateFileName Invoked when the user presses the positive button.
@@ -47,6 +49,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 fun NewTextFileNodeDialog(
     uiState: NewTextFileNodeDialogUiState,
+    title: String,
     onConfirm: (fileName: String) -> Unit,
     onFileNameChanged: (fileName: String) -> Unit,
     validateFileName: () -> Unit,
@@ -68,7 +71,7 @@ fun NewTextFileNodeDialog(
             }
 
             BasicInputDialog(
-                title = stringResource(id = sharedR.string.general_new_text_file),
+                title = title,
                 modifier = modifier.testTag(NEW_TEXT_FILE_NODE_DIALOG_TAG),
                 inputValue = fileNameInput,
                 onValueChange = { newValue ->

@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_LINK_FILE_EXTENSION
 import timber.log.Timber
 
 /**
@@ -43,7 +44,7 @@ class NewTextFileNodeDialogViewModel @AssistedInject constructor(
     val uiState: StateFlow<NewTextFileNodeDialogUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             fileNameChannel.receiveAsFlow()
-                .onStart { emit(NewTextFileNodeDialogUiState.DEFAULT_TEXT_FILE_EXTENSION) },
+                .onStart { emit(args.defaultExtension) },
             fileNameExceptionChannel.receiveAsFlow()
                 .onStart { emit(null) },
             validationSuccessEventChannel.receiveAsFlow()
@@ -86,7 +87,9 @@ class NewTextFileNodeDialogViewModel @AssistedInject constructor(
                             ?: throw IllegalStateException("Root node not found")
                     }
                     validateNodeNameUseCase(trimmedFileName, parentOrRootNodeId)
-                    isValidTextFileUseCase(trimmedFileName)
+                    if (!trimmedFileName.endsWith(DEFAULT_LINK_FILE_EXTENSION)) {
+                        isValidTextFileUseCase(trimmedFileName)
+                    }
                     trimmedFileName
                 }.onSuccess { fileName ->
                     validationSuccessEventChannel.send(triggered(fileName))
@@ -112,5 +115,13 @@ class NewTextFileNodeDialogViewModel @AssistedInject constructor(
         fun create(args: Args): NewTextFileNodeDialogViewModel
     }
 
-    data class Args(val parentNodeId: NodeId)
+    /**
+     * @property parentNodeId Parent folder where the new file will live, or `NodeId(-1L)` to
+     *  fall back to the user's root cloud node at validation time.
+     * @property defaultExtension Pre-filled extension shown in the input. Defaults to `.txt`.
+     */
+    data class Args(
+        val parentNodeId: NodeId,
+        val defaultExtension: String,
+    )
 }

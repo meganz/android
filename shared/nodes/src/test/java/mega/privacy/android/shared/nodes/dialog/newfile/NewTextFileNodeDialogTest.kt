@@ -17,6 +17,7 @@ import mega.privacy.android.domain.exception.InvalidNodeExtensionException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.exception.NodeNameException
 import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_TEXT_FILE_EXTENSION
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -32,9 +33,12 @@ class NewTextFileNodeDialogTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
+    private val title: String
+        get() = context.getString(sharedR.string.general_new_text_file)
+
     private fun defaultState(
         parentNodeId: NodeId = NodeId(123L),
-        fileName: String = NewTextFileNodeDialogUiState.DEFAULT_TEXT_FILE_EXTENSION,
+        fileName: String = DEFAULT_TEXT_FILE_EXTENSION,
         fileNameException: NodeNameException? = null,
         validationSuccessEvent: StateEventWithContent<String> = consumed(),
     ) = NewTextFileNodeDialogUiState.Data(
@@ -49,6 +53,7 @@ class NewTextFileNodeDialogTest {
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState(),
+                title = title,
                 onConfirm = {},
                 onFileNameChanged = {},
                 validateFileName = {},
@@ -57,7 +62,7 @@ class NewTextFileNodeDialogTest {
         }
 
         composeTestRule.onNodeWithTag(NEW_TEXT_FILE_NODE_DIALOG_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithText(".txt").assertIsDisplayed()
+        composeTestRule.onNodeWithText(DEFAULT_TEXT_FILE_EXTENSION).assertIsDisplayed()
     }
 
     @Test
@@ -65,6 +70,7 @@ class NewTextFileNodeDialogTest {
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState(),
+                title = title,
                 onConfirm = {},
                 onFileNameChanged = {},
                 validateFileName = {},
@@ -72,9 +78,7 @@ class NewTextFileNodeDialogTest {
             )
         }
 
-        composeTestRule.onNodeWithText(
-            context.getString(sharedR.string.general_new_text_file)
-        ).assertIsDisplayed()
+        composeTestRule.onNodeWithText(title).assertIsDisplayed()
         composeTestRule.onNodeWithText(
             context.getString(sharedR.string.general_create_label)
         ).assertIsDisplayed()
@@ -90,6 +94,7 @@ class NewTextFileNodeDialogTest {
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState(),
+                title = title,
                 onConfirm = {},
                 onFileNameChanged = {},
                 validateFileName = {},
@@ -108,11 +113,12 @@ class NewTextFileNodeDialogTest {
     @Test
     fun `test that onFileNameChanged is called when text is edited`() {
         val onFileNameChanged = mock<(String) -> Unit>()
-        val fileName = "hello.txt"
+        val fileName = "hello$DEFAULT_TEXT_FILE_EXTENSION"
 
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState(),
+                title = title,
                 onConfirm = {},
                 onFileNameChanged = onFileNameChanged,
                 validateFileName = {},
@@ -120,7 +126,8 @@ class NewTextFileNodeDialogTest {
             )
         }
 
-        composeTestRule.onNodeWithText(".txt").performTextReplacement(fileName)
+        composeTestRule.onNodeWithText(DEFAULT_TEXT_FILE_EXTENSION)
+            .performTextReplacement(fileName)
         composeTestRule.waitForIdle()
 
         verify(onFileNameChanged).invoke(fileName)
@@ -133,6 +140,7 @@ class NewTextFileNodeDialogTest {
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState(),
+                title = title,
                 onConfirm = {},
                 onFileNameChanged = {},
                 validateFileName = validateFileName,
@@ -151,11 +159,12 @@ class NewTextFileNodeDialogTest {
     @Test
     fun `test that onConfirm is called when validation success event is triggered`() {
         val onConfirm = mock<(String) -> Unit>()
-        val fileName = "hello.txt"
+        val fileName = "hello$DEFAULT_TEXT_FILE_EXTENSION"
 
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState().copy(validationSuccessEvent = triggered(fileName)),
+                title = title,
                 onConfirm = onConfirm,
                 onFileNameChanged = {},
                 validateFileName = {},
@@ -172,6 +181,7 @@ class NewTextFileNodeDialogTest {
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState().copy(fileNameException = EmptyNodeNameException()),
+                title = title,
                 onConfirm = {},
                 onFileNameChanged = {},
                 validateFileName = {},
@@ -189,6 +199,7 @@ class NewTextFileNodeDialogTest {
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState().copy(fileNameException = NodeNameAlreadyExistsException()),
+                title = title,
                 onConfirm = {},
                 onFileNameChanged = {},
                 validateFileName = {},
@@ -206,6 +217,7 @@ class NewTextFileNodeDialogTest {
         composeTestRule.setContent {
             NewTextFileNodeDialog(
                 uiState = defaultState().copy(fileNameException = InvalidNodeExtensionException()),
+                title = title,
                 onConfirm = {},
                 onFileNameChanged = {},
                 validateFileName = {},

@@ -17,6 +17,8 @@ import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
+import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_LINK_FILE_EXTENSION
+import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_TEXT_FILE_EXTENSION
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -25,6 +27,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -36,13 +39,18 @@ class NewTextFileNodeDialogViewModelTest {
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
     private val isValidTextFileUseCase = mock<IsValidTextFileUseCase>()
 
-    private fun newViewModel(parentNodeId: NodeId = NodeId(123L)) =
-        NewTextFileNodeDialogViewModel(
-            validateNodeNameUseCase = validateNodeNameUseCase,
-            getRootNodeUseCase = getRootNodeUseCase,
-            isValidTextFileUseCase = isValidTextFileUseCase,
-            args = NewTextFileNodeDialogViewModel.Args(parentNodeId),
-        )
+    private fun newViewModel(
+        parentNodeId: NodeId = NodeId(123L),
+        defaultExtension: String = DEFAULT_TEXT_FILE_EXTENSION,
+    ) = NewTextFileNodeDialogViewModel(
+        validateNodeNameUseCase = validateNodeNameUseCase,
+        getRootNodeUseCase = getRootNodeUseCase,
+        isValidTextFileUseCase = isValidTextFileUseCase,
+        args = NewTextFileNodeDialogViewModel.Args(
+            parentNodeId = parentNodeId,
+            defaultExtension = defaultExtension,
+        ),
+    )
 
     @AfterEach
     fun resetMocks() {
@@ -59,7 +67,7 @@ class NewTextFileNodeDialogViewModelTest {
 
         underTest.uiState.test {
             val state = awaitData()
-            assertThat(state.fileName).isEqualTo(".txt")
+            assertThat(state.fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
             assertThat(state.fileNameException).isNull()
             assertThat(state.validationSuccessEvent)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
@@ -74,7 +82,7 @@ class NewTextFileNodeDialogViewModelTest {
             .thenThrow(EmptyNodeNameException())
 
         underTest.uiState.test {
-            assertThat(awaitData().fileName).isEqualTo(".txt")
+            assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
             underTest.onFileNameChanged("")
             assertThat(awaitData().fileName).isEmpty()
@@ -83,9 +91,9 @@ class NewTextFileNodeDialogViewModelTest {
             assertThat(awaitData().fileNameException)
                 .isInstanceOf(EmptyNodeNameException::class.java)
 
-            underTest.onFileNameChanged("hello.txt")
+            underTest.onFileNameChanged("hello$DEFAULT_TEXT_FILE_EXTENSION")
             val state = awaitStateMatching { it.fileNameException == null }
-            assertThat(state.fileName).isEqualTo("hello.txt")
+            assertThat(state.fileName).isEqualTo("hello$DEFAULT_TEXT_FILE_EXTENSION")
         }
     }
 
@@ -115,7 +123,7 @@ class NewTextFileNodeDialogViewModelTest {
             .thenThrow(EmptyNodeNameException())
 
         underTest.uiState.test {
-            assertThat(awaitData().fileName).isEqualTo(".txt")
+            assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
             underTest.onFileNameChanged("")
             assertThat(awaitData().fileName).isEmpty()
@@ -137,7 +145,7 @@ class NewTextFileNodeDialogViewModelTest {
             .thenThrow(EmptyNodeNameException())
 
         underTest.uiState.test {
-            assertThat(awaitData().fileName).isEqualTo(".txt")
+            assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
             underTest.onFileNameChanged("   ")
             assertThat(awaitData().fileName).isEqualTo("   ")
@@ -158,7 +166,7 @@ class NewTextFileNodeDialogViewModelTest {
                 .thenThrow(InvalidNodeNameException())
 
             underTest.uiState.test {
-                assertThat(awaitData().fileName).isEqualTo(".txt")
+                assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
                 underTest.onFileNameChanged(fileName)
                 assertThat(awaitData().fileName).isEqualTo(fileName)
@@ -174,12 +182,12 @@ class NewTextFileNodeDialogViewModelTest {
         runTest {
             val parentNodeId = NodeId(123L)
             val underTest = newViewModel(parentNodeId)
-            val fileName = "existingFile.txt"
+            val fileName = "existingFile$DEFAULT_TEXT_FILE_EXTENSION"
             whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId)))
                 .thenThrow(NodeNameAlreadyExistsException())
 
             underTest.uiState.test {
-                assertThat(awaitData().fileName).isEqualTo(".txt")
+                assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
                 underTest.onFileNameChanged(fileName)
                 assertThat(awaitData().fileName).isEqualTo(fileName)
@@ -200,7 +208,7 @@ class NewTextFileNodeDialogViewModelTest {
                 .thenThrow(InvalidNodeExtensionException())
 
             underTest.uiState.test {
-                assertThat(awaitData().fileName).isEqualTo(".txt")
+                assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
                 underTest.onFileNameChanged(fileName)
                 assertThat(awaitData().fileName).isEqualTo(fileName)
@@ -215,11 +223,11 @@ class NewTextFileNodeDialogViewModelTest {
     fun `test that validateFileName triggers validation success event when valid`() = runTest {
         val parentNodeId = NodeId(123L)
         val underTest = newViewModel(parentNodeId)
-        val fileName = "newFile.txt"
+        val fileName = "newFile$DEFAULT_TEXT_FILE_EXTENSION"
         whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
 
         underTest.uiState.test {
-            assertThat(awaitData().fileName).isEqualTo(".txt")
+            assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
             underTest.onFileNameChanged(fileName)
             assertThat(awaitData().fileName).isEqualTo(fileName)
@@ -239,7 +247,7 @@ class NewTextFileNodeDialogViewModelTest {
     fun `test that validateFileName uses root node when parentNodeId is -1`() = runTest {
         val parentNodeId = NodeId(-1L)
         val underTest = newViewModel(parentNodeId)
-        val fileName = "newFile.txt"
+        val fileName = "newFile$DEFAULT_TEXT_FILE_EXTENSION"
         val rootNodeId = NodeId(789L)
         val rootNode = mock<TypedNode>()
 
@@ -248,7 +256,7 @@ class NewTextFileNodeDialogViewModelTest {
         whenever(validateNodeNameUseCase(eq(fileName), eq(rootNodeId))).thenReturn(Unit)
 
         underTest.uiState.test {
-            assertThat(awaitData().fileName).isEqualTo(".txt")
+            assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
             underTest.onFileNameChanged(fileName)
             assertThat(awaitData().fileName).isEqualTo(fileName)
@@ -278,11 +286,11 @@ class NewTextFileNodeDialogViewModelTest {
         runTest {
             val parentNodeId = NodeId(-1L)
             val underTest = newViewModel(parentNodeId)
-            val fileName = "newFile.txt"
+            val fileName = "newFile$DEFAULT_TEXT_FILE_EXTENSION"
             whenever(getRootNodeUseCase()).thenReturn(null)
 
             underTest.uiState.test {
-                assertThat(awaitData().fileName).isEqualTo(".txt")
+                assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
                 underTest.onFileNameChanged(fileName)
                 assertThat(awaitData().fileName).isEqualTo(fileName)
@@ -294,14 +302,50 @@ class NewTextFileNodeDialogViewModelTest {
         }
 
     @Test
+    fun `test that initial file name uses the configured default extension`() = runTest {
+        val underTest = newViewModel(defaultExtension = DEFAULT_LINK_FILE_EXTENSION)
+
+        underTest.uiState.test {
+            assertThat(awaitData().fileName).isEqualTo(DEFAULT_LINK_FILE_EXTENSION)
+        }
+    }
+
+    @Test
+    fun `test that validateFileName skips isValidTextFileUseCase when name ends with the link extension`() =
+        runTest {
+            val parentNodeId = NodeId(123L)
+            val underTest = newViewModel(
+                parentNodeId = parentNodeId,
+                defaultExtension = DEFAULT_LINK_FILE_EXTENSION,
+            )
+            val fileName = "myShortcut$DEFAULT_LINK_FILE_EXTENSION"
+            whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
+
+            underTest.uiState.test {
+                assertThat(awaitData().fileName).isEqualTo(DEFAULT_LINK_FILE_EXTENSION)
+
+                underTest.onFileNameChanged(fileName)
+                assertThat(awaitData().fileName).isEqualTo(fileName)
+
+                underTest.validateFileName()
+                val state = awaitData()
+                val triggered = state.validationSuccessEvent
+                        as StateEventWithContentTriggered<String>
+                assertThat(triggered.content).isEqualTo(fileName)
+            }
+            verify(validateNodeNameUseCase).invoke(eq(fileName), eq(parentNodeId))
+            verifyNoInteractions(isValidTextFileUseCase)
+        }
+
+    @Test
     fun `test that onValidationSuccessEventConsumed clears the success event`() = runTest {
         val parentNodeId = NodeId(123L)
         val underTest = newViewModel(parentNodeId)
-        val fileName = "newFile.txt"
+        val fileName = "newFile$DEFAULT_TEXT_FILE_EXTENSION"
         whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
 
         underTest.uiState.test {
-            assertThat(awaitData().fileName).isEqualTo(".txt")
+            assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
 
             underTest.onFileNameChanged(fileName)
             assertThat(awaitData().fileName).isEqualTo(fileName)

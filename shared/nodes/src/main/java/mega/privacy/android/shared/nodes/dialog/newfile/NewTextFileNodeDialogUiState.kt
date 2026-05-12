@@ -34,7 +34,8 @@ sealed interface NewTextFileNodeDialogUiState {
     ) : NewTextFileNodeDialogUiState
 
     companion object {
-        internal const val DEFAULT_TEXT_FILE_EXTENSION = ".txt"
+        const val DEFAULT_TEXT_FILE_EXTENSION = ".txt"
+        const val DEFAULT_LINK_FILE_EXTENSION = ".url"
     }
 }
 
