@@ -79,6 +79,9 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
         Arguments.of(NodeSourceType.VIDEO_RECENTLY_WATCHED, mockCloudSortOrder),
         Arguments.of(NodeSourceType.TIMELINE, mockTimelineSortOrder),
         Arguments.of(NodeSourceType.CHAT, mockCloudSortOrder),
+        Arguments.of(NodeSourceType.VIDEO_PLAYER_DEFAULT, mockCloudSortOrder),
+        Arguments.of(NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER, mockCloudSortOrder),
+        Arguments.of(NodeSourceType.VIDEO_PLAYER_VERSIONS, mockCloudSortOrder),
     )
 
     companion object {

@@ -1144,7 +1144,10 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.FOLDER_LINK,
         NodeSourceType.FILE_LINK,
         NodeSourceType.VIDEO_RECENTLY_WATCHED,
-        NodeSourceType.CHAT
+        NodeSourceType.CHAT,
+        NodeSourceType.VIDEO_PLAYER_DEFAULT,
+        NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER,
+        NodeSourceType.VIDEO_PLAYER_VERSIONS,
             -> MegaApiJava.INVALID_HANDLE
 
         NodeSourceType.HOME, NodeSourceType.OTHER, NodeSourceType.OFFLINE,

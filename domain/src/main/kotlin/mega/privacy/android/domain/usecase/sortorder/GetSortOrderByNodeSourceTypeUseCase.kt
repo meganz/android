@@ -49,6 +49,9 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
             NodeSourceType.FILE_LINK,
             NodeSourceType.VIDEO_RECENTLY_WATCHED,
             NodeSourceType.CHAT,
+            NodeSourceType.VIDEO_PLAYER_DEFAULT,
+            NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER,
+            NodeSourceType.VIDEO_PLAYER_VERSIONS,
             NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
                 -> getCloudSortOrder()
 
