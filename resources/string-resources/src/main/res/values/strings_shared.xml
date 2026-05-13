@@ -2823,7 +2823,7 @@
     <!-- Error message when Google Sign-In fails -->
     <string name="google_sign_in_failed">Google sign-in failed. Please try again.</string>
     <!-- Error when Google Sign-In email is already registered with a password -->
-    <string name="google_sign_in_email_exists">This email is already registered. Please sign in with your password first.</string>
+    <string name="google_sign_in_email_exists">You already have an account with this email. Sign in with your password.</string>
     <!-- Divider text between login button and Google Sign-In button -->
     <string name="or_divider">or</string>
     <!-- General new link text. In can be used for any screen or dialog in which a new URL link file is being created. -->
@@ -2832,4 +2832,8 @@
     <string name="new_file_subject_when_uploading">Subject</string>
     <!-- Label for the email address line when uploading a shared text/url to MEGA as a file. -->
     <string name="new_file_email_when_uploading">Email address</string>
+    <!-- Description of the onboarding tooltip pointing at the Home configuration button -->
+    <string name="home_configuration_tooltip_description">Choose what you see and organise it to fit your needs</string>
+    <!-- Action button label inside the Home configuration onboarding tooltip that opens the Customise Home screen -->
+    <string name="home_configuration_tooltip_action">Explore</string>
 </resources>

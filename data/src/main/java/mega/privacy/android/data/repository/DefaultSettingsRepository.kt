@@ -663,6 +663,16 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
+    override fun monitorHomeConfigurationTooltipShown(): Flow<Boolean> =
+        appPreferencesGateway.monitorBoolean(HOME_CONFIGURATION_TOOLTIP_SHOWN_KEY, false)
+            .flowOn(ioDispatcher)
+
+    override suspend fun setHomeConfigurationTooltipShown(shown: Boolean) {
+        withContext(ioDispatcher) {
+            appPreferencesGateway.putBoolean(HOME_CONFIGURATION_TOOLTIP_SHOWN_KEY, shown)
+        }
+    }
+
     override fun monitorHomeScreenWidgetConfiguration(): Flow<List<HomeWidgetConfiguration>> =
         megaLocalRoomGateway.monitorHomeScreenWidgetConfigurations()
             .flowOn(ioDispatcher)
@@ -694,6 +704,7 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     companion object {
         private const val COLORED_FOLDERS_ONBOARDING_SHOWN_KEY = "colored_folders_onboarding_shown"
+        private const val HOME_CONFIGURATION_TOOLTIP_SHOWN_KEY = "home_configuration_tooltip_shown"
         private const val DAYS_USER_FREE = 30
         private const val DAYS_USER_PRO = 90
     }

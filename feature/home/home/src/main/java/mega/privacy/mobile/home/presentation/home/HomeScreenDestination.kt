@@ -31,6 +31,7 @@ fun EntryProviderScope<NavKey>.homeScreen(
             state = state,
             navigationHandler = navigationHandler,
             transferHandler = transferHandler,
+            onHomeConfigurationTooltipDismissed = viewmodel::onHomeConfigurationTooltipDismissed,
         )
     }
 }

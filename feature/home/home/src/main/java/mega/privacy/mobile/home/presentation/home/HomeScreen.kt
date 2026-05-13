@@ -5,32 +5,44 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.currentStateAsState
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.components.tooltip.direction.TooltipDirection
+import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTooltipButtonProperties
+import mega.android.core.ui.components.tooltip.popup.interactive.InteractiveTopDirectionTooltipPopup
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
@@ -73,6 +85,7 @@ internal fun HomeScreen(
     state: HomeUiState,
     navigationHandler: NavigationHandler,
     transferHandler: TransferHandler,
+    onHomeConfigurationTooltipDismissed: () -> Unit = {},
     scanDocumentViewModel: ScanDocumentViewModel = hiltViewModel(),
 ) {
     val megaNavigator = rememberMegaNavigator()
@@ -143,6 +156,8 @@ internal fun HomeScreen(
         }
     }
 
+    var homeConfigurationIconCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
@@ -156,26 +171,48 @@ internal fun HomeScreen(
                     TransfersToolbarWidget {
                         navigationHandler.navigate(TransfersNavKey())
                     }
-                },
-                actions = buildList {
+
                     if (state is HomeUiState.Data) {
-                        add(MenuActionWithClick(CommonMenuAction.Search) {
-                            Analytics.tracker.trackEvent(HomeSearchBarPressedEvent)
-                            navigationHandler.navigate(
-                                SearchNavKey(
-                                    parentHandle = -1L,
-                                    nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                        IconButton(
+                            modifier = Modifier
+                                .testTag(CommonMenuAction.Search.testTag)
+                                .align(Alignment.CenterVertically),
+                            onClick = {
+                                Analytics.tracker.trackEvent(HomeSearchBarPressedEvent)
+                                navigationHandler.navigate(
+                                    SearchNavKey(
+                                        parentHandle = -1L,
+                                        nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                                    )
                                 )
+                            },
+                        ) {
+                            MegaIcon(
+                                painter = CommonMenuAction.Search.getIconPainter(),
+                                contentDescription = CommonMenuAction.Search.getDescription(),
                             )
-                        })
+                        }
 
                         if (state.isHomeCustomizationEnabled) {
-                            add(MenuActionWithClick(HomeScreenAction.Customize) {
-                                navigationHandler.navigate(HomeConfiguration)
-                            })
+                            IconButton(
+                                modifier = Modifier
+                                    .testTag(HomeScreenAction.Customize.testTag)
+                                    .align(Alignment.CenterVertically)
+                                    .onGloballyPositioned { coordinates ->
+                                        homeConfigurationIconCoordinates = coordinates
+                                    },
+                                onClick = {
+                                    navigationHandler.navigate(HomeConfiguration)
+                                },
+                            ) {
+                                MegaIcon(
+                                    painter = HomeScreenAction.Customize.getIconPainter(),
+                                    contentDescription = HomeScreenAction.Customize.getDescription(),
+                                )
+                            }
                         }
                     }
-                }
+                },
             )
         },
         floatingActionButton = {
@@ -233,6 +270,40 @@ internal fun HomeScreen(
                     // Blank screen
                 }
             }
+        }
+    }
+
+    // Tooltip is a separate window, that's why listening to lifecycle state is required in order
+    // to determine its visibility
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
+    val isHomeResumed = lifecycleState.isAtLeast(Lifecycle.State.RESUMED)
+
+    homeConfigurationIconCoordinates?.let {
+        val showTooltip = isHomeResumed
+                && state is HomeUiState.Data
+                && state.showHomeConfigurationTooltip
+        if (showTooltip) {
+            InteractiveTopDirectionTooltipPopup(
+                modifier = Modifier.widthIn(max = 280.dp),
+                direction = TooltipDirection.Top.Right,
+                properties = PopupProperties(
+                    focusable = false,
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+                title = stringResource(sharedR.string.home_configuration_screen_toolbar_title),
+                body = stringResource(sharedR.string.home_configuration_tooltip_description),
+                primaryButton = InteractiveTooltipButtonProperties(
+                    text = stringResource(sharedR.string.home_configuration_tooltip_action),
+                    onClick = {
+                        onHomeConfigurationTooltipDismissed()
+                        navigationHandler.navigate(HomeConfiguration)
+                    }
+                ),
+                needCloseIcon = true,
+                needDivider = true,
+                anchorViewCoordinates = it,
+            )
         }
     }
 

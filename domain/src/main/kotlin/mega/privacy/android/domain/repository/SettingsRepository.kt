@@ -552,6 +552,20 @@ interface SettingsRepository {
     suspend fun setColoredFoldersOnboardingShown(shown: Boolean)
 
     /**
+     * Monitor home configuration tooltip shown preference
+     *
+     * @return home configuration tooltip shown status as a flow
+     */
+    fun monitorHomeConfigurationTooltipShown(): Flow<Boolean>
+
+    /**
+     * Set home configuration tooltip shown
+     *
+     * @param shown true if the tooltip has been shown, false otherwise
+     */
+    suspend fun setHomeConfigurationTooltipShown(shown: Boolean)
+
+    /**
      * Monitor enabled home screen widget configuration
      *
      * @return latest widget configuration
