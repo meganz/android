@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ProgressBar
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -221,6 +222,10 @@ internal fun VideoPlayerScreen(
     var autoHideJob by remember { mutableStateOf<Job?>(null) }
 
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+
+    // Consume back presses while the player is locked to prevent accidental navigation
+    BackHandler(enabled = uiState.isLocked) {}
+
     var resizedBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var isScreenshotVisible by remember { mutableStateOf(false) }
     val scale = remember { Animatable(1f) }
@@ -393,23 +398,45 @@ internal fun VideoPlayerScreen(
                                     viewModel.updateFullscreen(isFullscreen)
                                     updateResizeMode(isFullscreen)
                                 },
-                                lockStateChanged = {
+                                lockStateChanged = { isLock ->
                                     autoHideJob?.cancel()
-                                    autoHideJob = coroutineScope.launch {
-                                        systemUiController.isSystemBarsVisible = true
-                                        playerComposeView.showController()
-                                        delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                    if (isLock) {
+                                        isControllerViewVisible = true
                                         systemUiController.isSystemBarsVisible = false
-                                        playerComposeView.hideController()
+                                        playerComposeView.showController()
+                                        autoHideJob = coroutineScope.launch {
+                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                            isControllerViewVisible = false
+                                            playerComposeView.hideController()
+                                        }
+                                    } else {
+                                        autoHideJob = coroutineScope.launch {
+                                            isControllerViewVisible = true
+                                            systemUiController.isSystemBarsVisible = true
+                                            playerComposeView.showController()
+                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                            isControllerViewVisible = false
+                                            systemUiController.isSystemBarsVisible = false
+                                            playerComposeView.hideController()
+                                        }
                                     }
                                 },
                                 playerViewClicked = {
                                     val visible = !isControllerViewVisible
                                     autoHideJob?.cancel()
                                     isControllerViewVisible = visible
-                                    systemUiController.isSystemBarsVisible = visible
+                                    if (!uiState.isLocked) {
+                                        systemUiController.isSystemBarsVisible = visible
+                                    }
                                     if (visible) {
                                         playerComposeView.showController()
+                                        if (uiState.isLocked) {
+                                            autoHideJob = coroutineScope.launch {
+                                                delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                                                isControllerViewVisible = false
+                                                playerComposeView.hideController()
+                                            }
+                                        }
                                     } else {
                                         playerComposeView.hideController()
                                     }
@@ -428,7 +455,7 @@ internal fun VideoPlayerScreen(
                                     if (visibility == View.VISIBLE) {
                                         applyPlayPauseIcon()
                                     }
-                                    if (visibility == View.VISIBLE && !isControllerViewVisible) {
+                                    if (visibility == View.VISIBLE && !isControllerViewVisible && !uiState.isLocked) {
                                         autoHideJob?.cancel()
                                         autoHideJob = coroutineScope.launch {
                                             delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
