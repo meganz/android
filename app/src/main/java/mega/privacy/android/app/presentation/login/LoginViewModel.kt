@@ -49,6 +49,7 @@ import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlWithEmail
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.login.GoogleSignInResult
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
+import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
@@ -68,6 +70,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
@@ -85,9 +88,9 @@ import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitR
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
-import mega.privacy.android.domain.usecase.login.GoogleSignInUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
@@ -113,6 +116,8 @@ import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationFailedEven
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationSuccessEvent
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
+
+internal const val GOOGLE_SIGN_IN_PENDING_SESSION = "google-sign-in-pending-verification"
 
 /**
  * View Model for Login and registration flows
@@ -171,7 +176,8 @@ class LoginViewModel @Inject constructor(
     private val getSessionLinkUseCase: GetSessionLinkUseCase,
     private val fetchNodeProvider: FetchNodeProvider,
     private val accountBlockedTypeStringMapper: AccountBlockedTypeStringMapper,
-    private val googleSignInUseCase: GoogleSignInUseCase,
+    private val decodeGoogleIdTokenUseCase: DecodeGoogleIdTokenUseCase,
+    private val createAccountUseCase: CreateAccountUseCase,
 ) : ViewModel() {
     private val is2FARequited = savedStateHandle[IS_2FA_REQUIRED] ?: false
 
@@ -230,10 +236,17 @@ class LoginViewModel @Inject constructor(
         runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }
             .onSuccess { ephemeral ->
                 if (ephemeral != null && !ephemeral.session.isNullOrEmpty()) {
-                    setPendingFragmentToShow(LoginScreen.ConfirmEmail)
-                    _state.update { it.copy(temporalEmail = ephemeral.email) }
-                    resumeCreateAccount(ephemeral.session.orEmpty())
-                    return@launch
+                    if (ephemeral.session == GOOGLE_SIGN_IN_PENDING_SESSION) {
+                        runCatching { clearEphemeralCredentialsUseCase() }
+                            .onFailure { Timber.e(it, "[GSIGN] Failed to clear Google ephemeral credentials") }
+                        setPendingFragmentToShow(LoginScreen.LoginScreen)
+                        return@launch
+                    } else {
+                        setPendingFragmentToShow(LoginScreen.ConfirmEmail)
+                        _state.update { it.copy(temporalEmail = ephemeral.email) }
+                        resumeCreateAccount(ephemeral.session.orEmpty())
+                        return@launch
+                    }
                 }
             }
 
@@ -464,54 +477,157 @@ class LoginViewModel @Inject constructor(
 
     /**
      * Starts MEGA login with a Google ID token obtained from Credential Manager.
+     * Reuses the regular login flow; if the account doesn't exist yet, it's
+     * auto-created with the Google sub as the password and login is retried.
      *
      * @param idToken The raw Google ID token JWT.
      */
     fun onGoogleSignIn(idToken: String) {
-        if (loginMutex.isLocked || _state.value.isGoogleSignInInProgress) return
-        _state.update { it.copy(isGoogleSignInInProgress = true) }
+        if (loginMutex.isLocked) return
 
         viewModelScope.launch {
-            fetchNodeProvider.setLoginByAccount()
-            runCatching {
-                googleSignInUseCase(
-                    idToken,
-                    DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
-                ).collectLatest { status ->
-                    status.checkStatus(email = _state.value.accountSession?.email)
+            val result = runCatching { decodeGoogleIdTokenUseCase(idToken) }
+                .onFailure {
+                    Timber.e(it, "[GSIGN] JWT decode failed")
+                    setSnackbarMessageId(sharedR.string.google_sign_in_failed)
                 }
-            }.onFailure { exception ->
-                when (exception) {
-                    is CreateAccountException.AccountAlreadyExists -> {
-                        _state.update {
-                            it.copy(googleSignInError = triggered(sharedR.string.google_sign_in_email_exists))
-                        }
-                    }
+                .getOrNull() ?: return@launch
 
-                    else -> {
-                        Timber.e(exception, "Google Sign-In failed")
-                        _state.update {
-                            it.copy(googleSignInError = triggered(sharedR.string.google_sign_in_failed))
-                        }
+            _state.update {
+                it.copy(
+                    isLoginInProgress = true,
+                    is2FARequired = false,
+                    accountSession = it.accountSession?.copy(email = result.email)
+                        ?: AccountSession(email = result.email),
+                    password = result.sub,
+                    ongoingTransfersExist = null,
+                    pressedBackWhileLogin = false,
+                )
+            }
+
+            performGoogleSignInLogin(result)
+        }
+    }
+
+    private suspend fun performGoogleSignInLogin(result: GoogleSignInResult) {
+        fetchNodeProvider.setLoginByAccount()
+        runCatching {
+            loginUseCase(
+                result.email,
+                result.sub,
+                DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+            ).collectLatest { status -> status.checkStatus(email = result.email) }
+        }.onFailure { exception ->
+            if (exception !is LoginException) return@onFailure
+
+            when {
+                exception is LoginMultiFactorAuthRequired -> handleGoogleSignIn2FA(result)
+
+                exception is LoginRequireValidation -> {
+                    Timber.d("[GSIGN] Account exists but not validated - navigating to ConfirmEmail")
+                    sendToConfirmEmailScreen(result.toEphemeralCredentials())
+                }
+
+                exception is LoginWrongEmailOrPassword -> autoCreateGoogleAccount(result)
+
+                else -> {
+                    _state.update {
+                        it.copy(
+                            password = null,
+                            accountSession = it.accountSession?.copy(email = null),
+                        )
                     }
+                    exception.loginFailed()
                 }
             }
-            _state.update { it.copy(isGoogleSignInInProgress = false) }
         }
     }
+
+    private fun handleGoogleSignIn2FA(result: GoogleSignInResult) {
+        savedStateHandle[IS_2FA_REQUIRED] = true
+        savedStateHandle[PENDING_2FA_EMAIL] = result.email
+        savedStateHandle[PENDING_2FA_PASSWORD] = result.sub
+        _state.update {
+            it.copy(
+                isLoginInProgress = false,
+                is2FAEnabled = true,
+                isLoginRequired = false,
+                is2FARequired = true,
+                isFirstTime2FA = triggered,
+            )
+        }
+    }
+
+    private suspend fun autoCreateGoogleAccount(result: GoogleSignInResult) {
+        Timber.d("[GSIGN] Account doesn't exist - auto-creating")
+        runCatching {
+            createAccountUseCase(
+                email = result.email,
+                password = result.sub,
+                firstName = result.firstName.orEmpty(),
+                lastName = result.lastName.orEmpty(),
+            )
+        }.onSuccess { credentials ->
+            sendToConfirmEmailScreen(credentials)
+        }.onFailure { ce ->
+            when (ce) {
+                is CreateAccountException.AccountAlreadyExists -> {
+                    Timber.w(ce, "[GSIGN] Email registered with different password")
+                    showGoogleSignInError(sharedR.string.google_sign_in_email_exists)
+                }
+
+                else -> {
+                    Timber.e(ce, "[GSIGN] createAccount failed")
+                    showGoogleSignInError(sharedR.string.google_sign_in_failed)
+                }
+            }
+        }
+    }
+
+    private suspend fun sendToConfirmEmailScreen(credentials: EphemeralCredentials) {
+        setTemporalCredentials(credentials)
+        runCatching {
+            clearEphemeralCredentialsUseCase()
+            saveEphemeralCredentialsUseCase(
+                credentials.copy(session = GOOGLE_SIGN_IN_PENDING_SESSION)
+            )
+        }.onFailure { Timber.e(it, "[GSIGN] Failed to persist ephemeral credentials") }
+        _state.update {
+            it.copy(
+                isLoginInProgress = false,
+                password = null,
+                accountSession = it.accountSession?.copy(email = null),
+            )
+        }
+        setIsWaitingForConfirmAccount()
+    }
+
+    private fun showGoogleSignInError(@StringRes messageId: Int) {
+        _state.update {
+            it.copy(
+                isLoginInProgress = false,
+                isLoginRequired = true,
+                password = null,
+                accountSession = it.accountSession?.copy(email = null),
+                snackbarMessage = triggered(messageId),
+            )
+        }
+    }
+
+    private fun GoogleSignInResult.toEphemeralCredentials() = EphemeralCredentials(
+        email = email,
+        password = sub,
+        session = null,
+        firstName = firstName,
+        lastName = lastName,
+    )
 
     /**
-     * Handles non-cancellation errors from the Google Sign-In launcher.
+     * Handles errors surfaced by the Credential Manager launcher (e.g. picker failed).
      */
     fun onGoogleSignInError(throwable: Throwable) {
-        Timber.e(throwable, "Google Sign-In launcher failed")
-        _state.update {
-            it.copy(googleSignInError = triggered(sharedR.string.google_sign_in_failed))
-        }
-    }
-
-    fun onGoogleSignInErrorShown() {
-        _state.update { it.copy(googleSignInError = consumed()) }
+        Timber.e(throwable, "[GSIGN] Launcher reported failure (${throwable::class.simpleName})")
+        setSnackbarMessageId(sharedR.string.google_sign_in_failed)
     }
 
     /**

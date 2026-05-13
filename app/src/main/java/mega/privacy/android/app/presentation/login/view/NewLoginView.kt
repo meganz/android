@@ -93,7 +93,6 @@ fun NewLoginView(
     onResetResendVerificationEmailEvent: () -> Unit,
     stopLogin: () -> Unit,
     onGoogleSignInClicked: () -> Unit = {},
-    onGoogleSignInErrorShown: () -> Unit = {},
     modifier: Modifier = Modifier,
     onLoginExceptionConsumed: () -> Unit = {},
 ) {
@@ -218,15 +217,6 @@ fun NewLoginView(
             snackbarHostState.showSnackbar(
                 message = context.getString(it),
                 duration = SnackbarDuration.Short
-            )
-        }
-
-        EventEffect(
-            event = state.googleSignInError,
-            onConsumed = onGoogleSignInErrorShown,
-        ) { messageRes ->
-            snackbarHostState.showAutoDurationSnackbar(
-                message = context.getString(messageRes),
             )
         }
 

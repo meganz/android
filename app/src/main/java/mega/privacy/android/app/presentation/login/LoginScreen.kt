@@ -151,7 +151,6 @@ fun LoginScreen(
         onResetResendVerificationEmailEvent = viewModel::resetResendVerificationEmailEvent,
         stopLogin = viewModel::stopLogin,
         onGoogleSignInClicked = onGoogleSignInClicked,
-        onGoogleSignInErrorShown = viewModel::onGoogleSignInErrorShown,
     )
 
     if (uiState.ongoingTransfersExist == true) {

@@ -29,6 +29,7 @@ import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandl
 import mega.privacy.android.app.presentation.login.mapper.AccountBlockedTypeStringMapper
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
+import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -37,9 +38,14 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.login.GoogleSignInResult
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
+import mega.privacy.android.domain.exception.LoginRequireValidation
+import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -52,6 +58,7 @@ import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLo
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
+import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
@@ -65,7 +72,7 @@ import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.GoogleSignInUseCase
+import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
@@ -99,6 +106,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -172,7 +180,8 @@ internal class LoginViewModelTest {
     private val monitorMiscLoadedFlow = MutableSharedFlow<Boolean>()
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val getSessionLinkUseCase: GetSessionLinkUseCase = mock()
-    private val googleSignInUseCase: GoogleSignInUseCase = mock()
+    private val decodeGoogleIdTokenUseCase: DecodeGoogleIdTokenUseCase = mock()
+    private val createAccountUseCase: CreateAccountUseCase = mock()
 
     @BeforeEach
     fun setUp() = runTest {
@@ -232,7 +241,8 @@ internal class LoginViewModelTest {
             getUserDataUseCase = getUserDataUseCase,
             getSessionLinkUseCase = getSessionLinkUseCase,
             fetchNodeProvider = mock(),
-            googleSignInUseCase = googleSignInUseCase,
+            decodeGoogleIdTokenUseCase = decodeGoogleIdTokenUseCase,
+            createAccountUseCase = createAccountUseCase,
         )
     }
 
@@ -283,7 +293,8 @@ internal class LoginViewModelTest {
             getDomainNameUseCase,
             monitorMiscLoadedUseCase,
             getSessionLinkUseCase,
-            googleSignInUseCase,
+            decodeGoogleIdTokenUseCase,
+            createAccountUseCase,
         )
     }
 
@@ -886,57 +897,192 @@ internal class LoginViewModelTest {
 
     // region Google Sign-In tests
 
+    private val googleResult = GoogleSignInResult(
+        email = "google.user@example.com",
+        sub = "1234567890",
+        firstName = "Google",
+        lastName = "User",
+    )
+
     @Test
-    fun `test that onGoogleSignIn updates state on successful login`() = runTest {
-        whenever(googleSignInUseCase(eq("fake.jwt.token"), any()))
+    fun `test that onGoogleSignIn logs in via existing flow when account exists`() = runTest {
+        whenever(decodeGoogleIdTokenUseCase("fake.jwt.token")).thenReturn(googleResult)
+        whenever(loginUseCase(eq(googleResult.email), eq(googleResult.sub), any()))
             .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
         underTest.onGoogleSignIn("fake.jwt.token")
         advanceUntilIdle()
 
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.isGoogleSignInInProgress).isFalse()
-            assertThat(state.googleSignInError).isInstanceOf(StateEventWithContentConsumed::class.java)
-        }
+        verify(loginUseCase).invoke(eq(googleResult.email), eq(googleResult.sub), any())
+        verifyNoInteractions(createAccountUseCase)
     }
 
     @Test
-    fun `test that onGoogleSignIn shows error on account exists`() = runTest {
-        whenever(googleSignInUseCase(eq("fake.jwt.token"), any()))
-            .thenReturn(flow { throw CreateAccountException.AccountAlreadyExists })
+    fun `test that onGoogleSignIn navigates to ConfirmEmail after auto-creating a new account`() =
+        runTest {
+            val ephemeralCredentials = EphemeralCredentials(
+                email = googleResult.email,
+                password = googleResult.sub,
+                session = "session",
+                firstName = googleResult.firstName,
+                lastName = googleResult.lastName,
+            )
+            whenever(decodeGoogleIdTokenUseCase("fake.jwt.token")).thenReturn(googleResult)
+            whenever(loginUseCase(eq(googleResult.email), eq(googleResult.sub), any()))
+                .thenReturn(flow { throw LoginWrongEmailOrPassword() })
+            whenever(
+                createAccountUseCase(
+                    email = googleResult.email,
+                    password = googleResult.sub,
+                    firstName = googleResult.firstName.orEmpty(),
+                    lastName = googleResult.lastName.orEmpty(),
+                )
+            ).thenReturn(ephemeralCredentials)
+
+            underTest.onGoogleSignIn("fake.jwt.token")
+            advanceUntilIdle()
+
+            verify(loginUseCase, times(1)).invoke(
+                eq(googleResult.email),
+                eq(googleResult.sub),
+                any()
+            )
+            verify(createAccountUseCase).invoke(
+                email = googleResult.email,
+                password = googleResult.sub,
+                firstName = googleResult.firstName.orEmpty(),
+                lastName = googleResult.lastName.orEmpty(),
+            )
+            verify(ephemeralCredentialManager).setEphemeralCredential(ephemeralCredentials)
+            underTest.state.test {
+                val state = awaitItem()
+                val event = state.isPendingToShowFragment as? StateEventWithContentTriggered
+                assertThat(event?.content).isEqualTo(LoginScreen.ConfirmEmail)
+            }
+        }
+
+    @Test
+    fun `test that onGoogleSignIn shows email-exists snackbar when account already registered with different password`() =
+        runTest {
+            whenever(decodeGoogleIdTokenUseCase("fake.jwt.token")).thenReturn(googleResult)
+            whenever(loginUseCase(eq(googleResult.email), eq(googleResult.sub), any()))
+                .thenReturn(flow { throw LoginWrongEmailOrPassword() })
+            whenever(
+                createAccountUseCase(
+                    email = googleResult.email,
+                    password = googleResult.sub,
+                    firstName = googleResult.firstName.orEmpty(),
+                    lastName = googleResult.lastName.orEmpty(),
+                )
+            ).thenAnswer { throw CreateAccountException.AccountAlreadyExists }
+
+            underTest.onGoogleSignIn("fake.jwt.token")
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.snackbarMessage)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat(state.isLoginInProgress).isFalse()
+                assertThat(state.isLoginRequired).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that onGoogleSignIn shows snackbar when JWT decode fails`() = runTest {
+        whenever(decodeGoogleIdTokenUseCase("fake.jwt.token"))
+            .thenThrow(RuntimeException("malformed"))
 
         underTest.onGoogleSignIn("fake.jwt.token")
         advanceUntilIdle()
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.googleSignInError).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat(state.snackbarMessage)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
         }
+        verifyNoInteractions(loginUseCase)
     }
 
     @Test
-    fun `test that onGoogleSignIn shows error on generic failure`() = runTest {
-        whenever(googleSignInUseCase(eq("fake.jwt.token"), any()))
-            .thenReturn(flow { throw RuntimeException("test error") })
+    fun `test that onGoogleSignIn navigates to ConfirmEmail when account exists but not validated`() =
+        runTest {
+            whenever(decodeGoogleIdTokenUseCase("fake.jwt.token")).thenReturn(googleResult)
+            whenever(loginUseCase(eq(googleResult.email), eq(googleResult.sub), any()))
+                .thenReturn(flow { throw LoginRequireValidation() })
+
+            underTest.onGoogleSignIn("fake.jwt.token")
+            advanceUntilIdle()
+
+            verifyNoInteractions(createAccountUseCase)
+            verify(ephemeralCredentialManager).setEphemeralCredential(
+                EphemeralCredentials(
+                    email = googleResult.email,
+                    password = googleResult.sub,
+                    session = null,
+                    firstName = googleResult.firstName,
+                    lastName = googleResult.lastName,
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                val event = state.isPendingToShowFragment as? StateEventWithContentTriggered
+                assertThat(event?.content).isEqualTo(LoginScreen.ConfirmEmail)
+            }
+        }
+
+    @Test
+    fun `test that onGoogleSignIn switches to 2FA state when MEGA login requires it`() = runTest {
+        whenever(decodeGoogleIdTokenUseCase("fake.jwt.token")).thenReturn(googleResult)
+        whenever(loginUseCase(eq(googleResult.email), eq(googleResult.sub), any()))
+            .thenReturn(flow { throw LoginMultiFactorAuthRequired() })
 
         underTest.onGoogleSignIn("fake.jwt.token")
         advanceUntilIdle()
 
+        verifyNoInteractions(createAccountUseCase)
+        verify(savedStateHandle)["is_2fa_required"] = true
+        verify(savedStateHandle)["pending_2fa_email"] = googleResult.email
+        verify(savedStateHandle)["pending_2fa_password"] = googleResult.sub
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.googleSignInError).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat(state.is2FARequired).isTrue()
+            assertThat(state.is2FAEnabled).isTrue()
+            assertThat(state.isLoginRequired).isFalse()
+            assertThat(state.isLoginInProgress).isFalse()
         }
     }
 
     @Test
-    fun `test that onGoogleSignInError triggers error event`() = runTest {
+    fun `test that onGoogleSignIn falls through to loginFailed for a generic LoginException`() =
+        runTest {
+            whenever(decodeGoogleIdTokenUseCase("fake.jwt.token")).thenReturn(googleResult)
+            whenever(loginUseCase(eq(googleResult.email), eq(googleResult.sub), any()))
+                .thenReturn(flow { throw LoginBlockedAccount() })
+
+            underTest.onGoogleSignIn("fake.jwt.token")
+            advanceUntilIdle()
+
+            verifyNoInteractions(createAccountUseCase)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.password).isNull()
+                assertThat(state.accountSession?.email).isNull()
+                assertThat(state.isLoginInProgress).isFalse()
+                assertThat(state.isLoginRequired).isTrue()
+                assertThat(state.loginException).isInstanceOf(LoginBlockedAccount::class.java)
+            }
+        }
+
+    @Test
+    fun `test that onGoogleSignInError triggers snackbar`() = runTest {
         underTest.onGoogleSignInError(RuntimeException("boom"))
         advanceUntilIdle()
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.googleSignInError).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat(state.snackbarMessage)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
         }
     }
 

@@ -380,7 +380,7 @@ fun RequireLogin(
                 Spacer(modifier = Modifier.height(8.dp))
                 GoogleSignInButton(
                     onClick = onGoogleSignInClicked,
-                    isLoading = state.isGoogleSignInInProgress,
+                    isLoading = state.isLoginInProgress,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
             }
