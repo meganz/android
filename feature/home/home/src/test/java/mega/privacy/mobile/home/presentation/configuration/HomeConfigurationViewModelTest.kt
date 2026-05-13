@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.home.DeleteWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
@@ -40,6 +41,7 @@ class HomeConfigurationViewModelTest {
         mock<MonitorHomeWidgetConfigurationUseCase>()
     private val updateWidgetConfigurationsUseCase = mock<UpdateWidgetConfigurationsUseCase>()
     private val deleteWidgetConfigurationsUseCase = mock<DeleteWidgetConfigurationUseCase>()
+    private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -49,6 +51,7 @@ class HomeConfigurationViewModelTest {
             widgetConfigurationItemMapper = WidgetConfigurationItemMapper(),
             updateWidgetConfigurationsUseCase = updateWidgetConfigurationsUseCase,
             deleteWidgetConfigurationUseCase = deleteWidgetConfigurationsUseCase,
+            getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
         )
     }
 
@@ -60,6 +63,7 @@ class HomeConfigurationViewModelTest {
             monitorHomeWidgetConfigurationUseCase,
             updateWidgetConfigurationsUseCase,
             deleteWidgetConfigurationsUseCase,
+            getEnabledFlaggedItemsUseCase,
         )
     }
 
@@ -74,18 +78,18 @@ class HomeConfigurationViewModelTest {
             }
 
             val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = 1)
+            val dynamicWidgets = setOf(dynamicWidget)
             dynamicWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn setOf(
-                    dynamicWidget,
-                )
+                onBlocking { getWidgets() } doReturn dynamicWidgets
             }
 
             val staticWidget = stubWidget(identifier = "static1", defaultOrder = 0)
+            val staticWidgets = setOf(staticWidget)
             staticWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn setOf(
-                    staticWidget,
-                )
+                onBlocking { getWidgets() } doReturn staticWidgets
             }
+
+            stubGetEnabledFlaggedItemsUseCase(dynamicWidgets, staticWidgets)
 
             underTest.state.test {
                 val actual = awaitItem() as HomeConfigurationUiState.Data
@@ -111,18 +115,18 @@ class HomeConfigurationViewModelTest {
         }
 
         val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = 1)
+        val dynamicWidgets = setOf(dynamicWidget)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(
-                dynamicWidget,
-            )
+            onBlocking { getWidgets() } doReturn dynamicWidgets
         }
 
         val staticWidget = stubWidget(identifier = "static1", defaultOrder = 0)
+        val staticWidgets = setOf(staticWidget)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(
-                staticWidget,
-            )
+            onBlocking { getWidgets() } doReturn staticWidgets
         }
+
+        stubGetEnabledFlaggedItemsUseCase(dynamicWidgets, staticWidgets)
 
         underTest.state.test {
             val actual = awaitItem() as HomeConfigurationUiState.Data
@@ -218,13 +222,17 @@ class HomeConfigurationViewModelTest {
             }
         }
 
+        val dynamicWidgets = setOf(secondWidget, thirdWidget)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(secondWidget, thirdWidget)
+            onBlocking { getWidgets() } doReturn dynamicWidgets
         }
 
+        val staticWidgets = setOf(firstWidget)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(firstWidget)
+            onBlocking { getWidgets() } doReturn staticWidgets
         }
+
+        stubGetEnabledFlaggedItemsUseCase(dynamicWidgets, staticWidgets)
 
         underTest.state.test {
             val actual = awaitItem() as HomeConfigurationUiState.Data
@@ -247,13 +255,17 @@ class HomeConfigurationViewModelTest {
             }
         }
 
+        val dynamicWidgets = setOf(thirdWidget, firstWidget)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(thirdWidget, firstWidget)
+            onBlocking { getWidgets() } doReturn dynamicWidgets
         }
 
+        val staticWidgets = setOf(secondWidget)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(secondWidget)
+            onBlocking { getWidgets() } doReturn staticWidgets
         }
+
+        stubGetEnabledFlaggedItemsUseCase(dynamicWidgets, staticWidgets)
 
         underTest.state.test {
             val actual = awaitItem() as HomeConfigurationUiState.Data
@@ -286,8 +298,9 @@ class HomeConfigurationViewModelTest {
             onBlocking { getWidgets() } doReturn homeWidgets
         }
 
+        val staticWidgets = emptySet<HomeWidget>()
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn emptySet()
+            onBlocking { getWidgets() } doReturn staticWidgets
         }
 
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -296,6 +309,8 @@ class HomeConfigurationViewModelTest {
                 awaitCancellation()
             }
         }
+
+        stubGetEnabledFlaggedItemsUseCase(homeWidgets, staticWidgets)
 
         underTest.state.test {
             val actual = awaitItem() as HomeConfigurationUiState.Data
@@ -341,6 +356,14 @@ class HomeConfigurationViewModelTest {
             on { canDelete } doReturn true
             onBlocking { getWidgetName() } doReturn LocalizedText.Literal("Test")
 
+        }
+    }
+
+    private fun stubGetEnabledFlaggedItemsUseCase(vararg widgetSets: Set<HomeWidget>) {
+        getEnabledFlaggedItemsUseCase.stub {
+            widgetSets.forEach { set ->
+                on { invoke(set) } doReturn flow { emit(set) }
+            }
         }
     }
 }

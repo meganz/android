@@ -14,6 +14,6 @@ class WidgetConfigurationItemMapper @Inject constructor() {
         index = widgetConfiguration?.widgetOrder ?: homeWidget.defaultOrder,
         name = homeWidget.getWidgetName(),
         enabled = widgetConfiguration?.enabled ?: true,
-        canDelete = homeWidget.canDelete,
+        canDelete = homeWidget.canDelete
     )
 }

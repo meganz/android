@@ -41,14 +41,6 @@ internal fun ViewedLinkLoadingItem() {
                 .shimmerEffect()
                 .align(Alignment.CenterVertically)
         )
-
-        MegaIcon(
-            painter = rememberVectorPainter(
-                IconPack.Medium.Thin.Outline.MoreVertical
-            ),
-            contentDescription = null,
-            tint = IconColor.Primary,
-        )
     }
 }
 

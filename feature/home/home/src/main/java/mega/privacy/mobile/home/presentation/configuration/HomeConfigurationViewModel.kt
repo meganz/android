@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
 import mega.privacy.android.domain.usecase.home.DeleteWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
@@ -27,6 +29,7 @@ class HomeConfigurationViewModel @Inject constructor(
     private val widgetConfigurationItemMapper: WidgetConfigurationItemMapper,
     private val updateWidgetConfigurationsUseCase: UpdateWidgetConfigurationsUseCase,
     private val deleteWidgetConfigurationUseCase: DeleteWidgetConfigurationUseCase,
+    private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
 ) : ViewModel() {
     val state: StateFlow<HomeConfigurationUiState> by lazy {
         monitorHomeWidgetConfigurationUseCase()
@@ -35,13 +38,15 @@ class HomeConfigurationViewModel @Inject constructor(
                 val configuration = list.associateBy { config -> config.widgetIdentifier }
 
                 val items = widgetProviders
-                    .flatMap {
-                        it.getWidgets().map { widget ->
-                            widgetConfigurationItemMapper(
-                                homeWidget = widget,
-                                widgetConfiguration = configuration[widget.identifier]
-                            )
-                        }
+                    .flatMap { provider ->
+                        getEnabledFlaggedItemsUseCase(provider.getWidgets())
+                            .first()
+                            .map { widget ->
+                                widgetConfigurationItemMapper(
+                                    homeWidget = widget,
+                                    widgetConfiguration = configuration[widget.identifier]
+                                )
+                            }
                     }
                     .sortedBy { it.index }
 

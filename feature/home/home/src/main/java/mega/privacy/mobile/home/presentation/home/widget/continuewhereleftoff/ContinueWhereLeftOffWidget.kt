@@ -12,9 +12,12 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
+import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
@@ -23,10 +26,11 @@ import mega.privacy.android.navigation.destination.ContinueWhereLeftOffScreenNav
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
-class ContinueWhereLeftOffWidget @Inject constructor() : HomeWidget {
+class ContinueWhereLeftOffWidget @Inject constructor() : HomeWidget, Flagged {
     override val identifier: String = "ContinueWhereLeftOffWidget"
     override val defaultOrder: Int = 4
     override val canDelete: Boolean = true
+    override val feature: Feature = ApiFeatures.ContinueWhereLeftOff
 
     override suspend fun getWidgetName() =
         LocalizedText.StringRes(sharedR.string.home_widget_continue_where_left_off)
@@ -37,7 +41,7 @@ class ContinueWhereLeftOffWidget @Inject constructor() : HomeWidget {
         navigationHandler: NavigationHandler,
         transferHandler: TransferHandler,
     ) {
-        FeatureFlagGate(feature = ApiFeatures.ContinueWhereLeftOff) {
+        FeatureFlagGate(feature = feature) {
             val viewModel: ContinueWhereLeftOffViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }

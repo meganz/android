@@ -26,7 +26,6 @@ class MyAccountHomeWidget @Inject constructor() : HomeWidget {
     override val identifier: String = "MyAccountWidgetProvider"
     override val defaultOrder: Int = 1
     override val canDelete: Boolean = false
-
     override suspend fun getWidgetName() = LocalizedText.StringRes(R.string.section_my_account)
 
     @Composable

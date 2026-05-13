@@ -18,7 +18,6 @@ import mega.privacy.mobile.home.presentation.configuration.model.WidgetConfigura
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.timeout
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions

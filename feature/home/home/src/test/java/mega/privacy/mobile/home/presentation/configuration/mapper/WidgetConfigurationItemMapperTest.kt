@@ -15,11 +15,7 @@ class WidgetConfigurationItemMapperTest {
     @Test
     fun `test that widget without configuration returns default order`() = runTest {
         val expected = 5
-        val homeWidget = mock<HomeWidget> {
-            on { identifier } doReturn "identifier"
-            on { defaultOrder } doReturn expected
-            onBlocking { getWidgetName() } doReturn LocalizedText.Literal("Test Widget")
-        }
+        val homeWidget = createHomeWidget(defaultOrder = expected)
         val actual = underTest(
             homeWidget = homeWidget,
             widgetConfiguration = null,
@@ -30,11 +26,7 @@ class WidgetConfigurationItemMapperTest {
 
     @Test
     fun `test that widget without configuration returns enabled is true`() = runTest {
-        val homeWidget = mock<HomeWidget> {
-            on { identifier } doReturn "identifier"
-            on { defaultOrder } doReturn 5
-            onBlocking { getWidgetName() } doReturn LocalizedText.Literal("Test Widget")
-        }
+        val homeWidget = createHomeWidget()
         val actual = underTest(
             homeWidget = homeWidget,
             widgetConfiguration = null,
@@ -47,11 +39,7 @@ class WidgetConfigurationItemMapperTest {
     fun `test that widget with configuration returns order and enabled status from configuration`() =
         runTest {
             val expectedOrder = 5
-            val homeWidget = mock<HomeWidget> {
-                on { identifier } doReturn "identifier"
-                on { defaultOrder } doReturn expectedOrder + 1
-                onBlocking { getWidgetName() } doReturn LocalizedText.Literal("Test Widget")
-            }
+            val homeWidget = createHomeWidget(defaultOrder = expectedOrder + 1)
             val actual = underTest(
                 homeWidget = homeWidget,
                 widgetConfiguration = HomeWidgetConfiguration(
@@ -65,4 +53,14 @@ class WidgetConfigurationItemMapperTest {
             assertThat(actual.index).isEqualTo(expectedOrder)
             assertThat(actual.enabled).isFalse()
         }
+
+    private fun createHomeWidget(
+        identifier: String = "identifier",
+        defaultOrder: Int = 5,
+        name: LocalizedText = LocalizedText.Literal("Test Widget"),
+    ): HomeWidget = mock {
+        on { this.identifier } doReturn identifier
+        on { this.defaultOrder } doReturn defaultOrder
+        onBlocking { getWidgetName() } doReturn name
+    }
 }
