@@ -60,7 +60,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * M3 Compose Screen for Rubbish Bin
- * This is a fully Compose replacement for RubbishBinComposeFragment when isSingleActivityEnabled == true
+ * This is a fully Compose replacement for RubbishBinComposeFragment.
  * Uses the new NodeViews implementation from core.nodecomponents
  */
 @OptIn(ExperimentalMaterial3Api::class)

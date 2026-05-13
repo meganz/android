@@ -8,7 +8,6 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 
-@Deprecated("This function will be removed after SingleActivity flag goes live. Note that any calls to it while the flag is enabled will result in an exception")
 @Suppress("UNUSED_PARAMETER")
 fun LocationInfo.handleLocationClick(
     activity: Activity,

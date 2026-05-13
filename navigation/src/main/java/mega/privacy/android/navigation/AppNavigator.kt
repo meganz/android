@@ -408,8 +408,8 @@ interface AppNavigator {
     )
 
     /**
-     * Open text editor. Routes by [params]: CloudNode/LocalFile/Chat use SingleActivity NavKey when
-     * enabled; FileLink starts legacy Activity directly (Compose not supported for file link yet).
+     * Open text editor. Routes by [params]: CloudNode/LocalFile/Chat navigate via a NavKey;
+     * FileLink starts the legacy Activity directly (Compose not supported for file link yet).
      *
      * @param context Context
      * @param params Determines source (cloud node, local/zip file, chat attachment, or file link)
@@ -594,7 +594,7 @@ interface AppNavigator {
     )
 
     /**
-     * Send a snackbar message considering SingleActivity feature flag.
+     * Send a snackbar message via the single activity host.
      * @param context The context
      * @param message The message to send
      */

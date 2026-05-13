@@ -16,13 +16,6 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
-    /**
-     * Single activity
-     */
-    SingleActivity(
-        "Enable single activity rewrite",
-        true,
-    ),
 
     /**
      * Search revamp

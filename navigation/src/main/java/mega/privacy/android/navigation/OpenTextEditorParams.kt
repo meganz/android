@@ -5,7 +5,8 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 
 /**
  * Parameters for opening the text editor. Exactly one variant should be used;
- * the navigator routes to the appropriate destination (SingleActivity NavKey or legacy Intent).
+ * the navigator routes to the appropriate destination (NavKey for in-app navigation
+ * or legacy Intent for file links).
  */
 sealed class OpenTextEditorParams {
 
@@ -44,7 +45,7 @@ sealed class OpenTextEditorParams {
     ) : OpenTextEditorParams()
 
     /**
-     * Open text editor for a file link. Uses legacy Activity (no SingleActivity NavKey).
+     * Open text editor for a file link. Uses legacy Activity (no NavKey routing).
      */
     data class FileLink(
         val serializedNode: String?,

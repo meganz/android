@@ -86,7 +86,6 @@ import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorSslVerificationFailedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUseCase
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -209,7 +208,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enforceSingleActivityGuard()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         collectFlow(billingViewModel.billingUpdateEvent) { billingEvent ->
@@ -1158,59 +1156,4 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         }
     }
 
-    /**
-     * IMPORTANT: this value should be override ONLY in Activities that will NOT BE USED once the [AppFeatures.SingleActivity] is activated
-     *
-     * When this value is override by true, if the [AppFeatures.SingleActivity] feature flag is activated, this activity will be finished
-     * at creation and the [MegaActivity] will be launched (or moved to the front) showing an error message.
-     * An error will be also logged to the crash reporting.
-     */
-    open val enforceSingleActivityGuard = false
-
-    private fun enforceSingleActivityGuard() {
-        if (enforceSingleActivityGuard) {
-            val intentForLog = intent
-            lifecycleScope.launch {
-                if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                    val warningMessage = if (intentForLog.isCleanLauncherIntent()) {
-                        null
-                    } else {
-                        val exception = IllegalStateException(
-                            "Trying to show ${this@BaseActivity::class.java.simpleName} " +
-                                    "while SingleActivity feature flag is activated. " +
-                                    "$intentForLog - action: ${intentForLog?.action} - extras: ${intentForLog?.extras}"
-                        )
-
-                        crashReporter.report(exception)
-                        Timber.e(exception)
-                        getString(R.string.general_error)
-                    }
-                    startActivity(
-                        MegaActivity.getIntent(
-                            this@BaseActivity,
-                            warningMessage
-                        )
-                    )
-                    finish()
-                }
-            }
-        }
-    }
-
-    fun Intent?.isCleanLauncherIntent(): Boolean {
-        if (this == null) return false
-
-        val isLauncherCategory = hasCategory(Intent.CATEGORY_LAUNCHER)
-        val isMainAction = action == Intent.ACTION_MAIN || action == null
-
-        val hasNoExtras = extras == null || extras?.isEmpty == true
-        val hasNoData = data == null
-        val hasNoType = type == null
-
-        return isLauncherCategory &&
-                isMainAction &&
-                hasNoExtras &&
-                hasNoData &&
-                hasNoType
-    }
 }
