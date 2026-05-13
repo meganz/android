@@ -51,7 +51,7 @@ internal fun PdfViewerSearchTopBar(
         query = query,
         title = title,
         navigationType = AppBarNavigationType.Back(onClose),
-        searchPlaceholder = localResources.getString(sharedR.string.pdf_viewer_search_placeholder), // TODO: Use string resource
+        searchPlaceholder = localResources.getString(sharedR.string.pdf_viewer_search_placeholder),
         onQueryChanged = {
             if (!isExiting) onQueryChanged(it)
         },
