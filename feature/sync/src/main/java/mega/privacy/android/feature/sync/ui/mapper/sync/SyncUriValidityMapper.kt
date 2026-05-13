@@ -144,10 +144,6 @@ class SyncUriValidityMapper @Inject constructor(
                 mediaUploadPath.isNotEmpty() &&
                 determinePathRelationship(mediaUploadPath, path) != PathRelationship.NO_MATCH
 
-        val isLegacyDCIMMatch = !isNewDCIMLogicEnabled &&
-                localDCIMFolderPath.isNotEmpty() &&
-                determinePathRelationship(localDCIMFolderPath, path) != PathRelationship.NO_MATCH
-
         val folderDisplayName = extractFolderName(path)
         return if (isCameraMatch) {
             Analytics.tracker.trackEvent(SyncLocalFolderConflictEvent)
@@ -162,10 +158,6 @@ class SyncUriValidityMapper @Inject constructor(
                 folderConflictMessageFormatter.formatDeviceFolderMediaUploadsConflict(
                     folderDisplayName
                 )
-            )
-        } else if (isLegacyDCIMMatch) {
-            SyncValidityResult.ShowSnackbar(
-                messageResId = sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message
             )
         } else {
             SyncValidityResult.ValidFolderSelected(

@@ -1,9 +1,7 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.backup.GetLocalSyncOrBackupUriPathUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import java.io.File
 import javax.inject.Inject
@@ -15,7 +13,6 @@ import javax.inject.Inject
 class HasLocalFolderConflictWithSyncUseCase @Inject constructor(
     private val getLocalSyncOrBackupUriPathUseCase: GetLocalSyncOrBackupUriPathUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
     /**
@@ -23,14 +20,6 @@ class HasLocalFolderConflictWithSyncUseCase @Inject constructor(
      * @return true if the path conflicts with an existing sync/backup folder
      */
     suspend operator fun invoke(localFolderPath: String): Boolean {
-        val isFeatureEnabled = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
-        }.getOrElse { false }
-
-        if (!isFeatureEnabled) {
-            return false
-        }
-
         if (localFolderPath.isEmpty() || localFolderPath == "/" || localFolderPath == File.separator) {
             return false
         }

@@ -1850,12 +1850,23 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     /**
      * Checks if any Camera Uploads local or remote folder conflicts with an existing
-     * Sync or Backup folder.
+     * Sync or Backup folder. Local folders are checked first, then remote folders.
      *
      * @return true if a conflict is detected
      */
     private suspend fun hasFolderConflictWithSyncOrBackup(): Boolean {
-        // Check primary local folder
+        if (hasLocalFolderConflictWithSyncOrBackup()) return true
+        if (hasRemoteFolderConflictWithSyncOrBackup()) return true
+        return false
+    }
+
+    /**
+     * Checks if the Camera Uploads or Media Uploads local folder conflicts with an existing
+     * Sync or Backup local folder.
+     *
+     * @return true if a local folder conflict is detected
+     */
+    private suspend fun hasLocalFolderConflictWithSyncOrBackup(): Boolean {
         val primaryPath = getPrimaryFolderPathUseCase()
         if (hasLocalFolderConflictWithSyncUseCase(primaryPath)) {
             Timber.d("Camera Uploads local folder conflicts with sync/backup: $primaryPath")
@@ -1866,7 +1877,28 @@ class CameraUploadsWorker @AssistedInject constructor(
             return true
         }
 
-        // Check primary remote folder
+        if (isMediaUploadsEnabledUseCase()) {
+            val mediaUploadsPath = getSecondaryFolderPathUseCase()
+            if (hasLocalFolderConflictWithSyncUseCase(mediaUploadsPath)) {
+                Timber.d("Media Uploads local folder conflicts with sync/backup: $mediaUploadsPath")
+                sendFolderConflictWithSyncOrBackupStatus(
+                    folderName = mediaUploadsPath.let { File(it).name },
+                    isLocalFolder = true,
+                )
+                return true
+            }
+        }
+
+        return false
+    }
+
+    /**
+     * Checks if the Camera Uploads or Media Uploads remote folder conflicts with an existing
+     * Sync or Backup folder across devices.
+     *
+     * @return true if a remote folder conflict is detected
+     */
+    private suspend fun hasRemoteFolderConflictWithSyncOrBackup(): Boolean {
         val primaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
         if (primaryHandle == -1L) {
             return false
@@ -1889,18 +1921,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             return true
         }
 
-        // Check secondary folders only if media uploads is enabled
         if (isMediaUploadsEnabledUseCase()) {
-            val mediaUploadsPath = getSecondaryFolderPathUseCase()
-            if (hasLocalFolderConflictWithSyncUseCase(mediaUploadsPath)) {
-                Timber.d("Media Uploads local folder conflicts with sync/backup: $mediaUploadsPath")
-                sendFolderConflictWithSyncOrBackupStatus(
-                    folderName = mediaUploadsPath.let { File(it).name },
-                    isLocalFolder = true,
-                )
-                return true
-            }
-            // Check secondary remote folder
             val secondaryHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
             if (secondaryHandle == -1L) {
                 return false

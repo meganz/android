@@ -128,76 +128,78 @@ class SyncUriValidityMapperTest {
     }
 
     @Test
-    fun `test that selecting DCIM folder shows snackbar when isDCIMSelectionEnabled is false`() =
+    fun `test that selecting folder matching Camera Uploads primary path shows conflict message`() =
         runTest {
-        val documentUri = "content://storage/emulated/0/DCIM"
-        val dcimPath = "/storage/emulated/0/DCIM"
-        val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
-        val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
+            val documentUri = "content://storage/emulated/0/DCIM"
+            val dcimPath = "/storage/emulated/0/DCIM"
+            val cameraUploadsFolder = dcimPath
+            val mediaUploadPath = "/storage/emulated/0/OTHER_MEDIA"
 
-        stubCommonMocks(
-            documentUri = documentUri,
-            documentPath = dcimPath,
-            dcimPath = dcimPath,
-            cameraUploadsPath = cameraUploadsFolder,
-            mediaUploadPath = mediaUploadPath,
-            isCameraUploadsEnabled = true,
-            isMediaUploadsEnabled = true
-        )
+            stubCommonMocks(
+                documentUri = documentUri,
+                documentPath = dcimPath,
+                dcimPath = dcimPath,
+                cameraUploadsPath = cameraUploadsFolder,
+                mediaUploadPath = mediaUploadPath,
+                isCameraUploadsEnabled = true,
+                isMediaUploadsEnabled = true,
+            )
 
-        val result = underTest(documentUri)
+            val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncValidityResult.ShowSnackbar
-        assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
-    }
+            assertThat(result).isEqualTo(
+                SyncValidityResult.ShowSnackbarMessage("camera-uploads-conflict"),
+            )
+        }
 
     @Test
-    fun `test that selecting Camera Uploads folder shows snackbar`() = runTest {
+    fun `test that selecting Camera Uploads primary folder shows conflict message`() = runTest {
         val documentUri = "content://storage/emulated/0/DCIM_PHOTOS"
+        val folderPath = "/storage/emulated/0/DCIM_PHOTOS"
         val dcimPath = "/storage/emulated/0/DCIM"
-        val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
-        val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
+        val cameraUploadsFolder = folderPath
+        val mediaUploadPath = "/storage/emulated/0/OTHER_MEDIA"
 
         stubCommonMocks(
             documentUri = documentUri,
-            documentPath = dcimPath,
+            documentPath = folderPath,
             dcimPath = dcimPath,
             cameraUploadsPath = cameraUploadsFolder,
             mediaUploadPath = mediaUploadPath,
             isCameraUploadsEnabled = true,
-            isMediaUploadsEnabled = true
+            isMediaUploadsEnabled = true,
         )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncValidityResult.ShowSnackbar
-        assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
+        assertThat(result).isEqualTo(
+            SyncValidityResult.ShowSnackbarMessage("camera-uploads-conflict"),
+        )
     }
 
     @Test
-    fun `test that selecting Media folder shows snackbar`() = runTest {
+    fun `test that selecting Media Uploads folder shows conflict message`() = runTest {
         val documentUri = "content://storage/emulated/0/PHOTOS"
+        val photosPath = "/storage/emulated/0/PHOTOS"
         val dcimPath = "/storage/emulated/0/DCIM"
         val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
-        val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
+        val mediaUploadPath = photosPath
 
         stubCommonMocks(
             documentUri = documentUri,
-            documentPath = dcimPath,
+            documentPath = photosPath,
             dcimPath = dcimPath,
             cameraUploadsPath = cameraUploadsFolder,
             mediaUploadPath = mediaUploadPath,
             isCameraUploadsEnabled = true,
-            isMediaUploadsEnabled = true
+            isMediaUploadsEnabled = true,
         )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncValidityResult.ShowSnackbar
-        assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
+        assertThat(result).isEqualTo(
+            SyncValidityResult.ShowSnackbarMessage("media-uploads-conflict"),
+        )
     }
 
     @ParameterizedTest(name = "Sync type: {0}")
