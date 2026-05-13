@@ -549,7 +549,8 @@ class VideoPlayerViewModelV2 @Inject constructor(
                 buildPlaySources(mediaPlaySources)
                 setPlayWhenReady(
                     mediaPlaySources.isRestartPlaying &&
-                            !uiState.value.showSubTitlesOptions
+                            !uiState.value.showSubTitlesOptions &&
+                            !isPausedByUser
                 )
                 playerPrepare()
             }

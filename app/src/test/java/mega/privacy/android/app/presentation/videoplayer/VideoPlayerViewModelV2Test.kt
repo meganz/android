@@ -1319,6 +1319,55 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
+    fun `test that buildPlaybackSourcesForPlayer does not resume playback when user has paused`() =
+        runTest {
+            val intent = mock<Intent>()
+            val uri: Uri = mock()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = uri,
+                handle = testHandle,
+                fileName = testFileName
+            )
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+        }
+
+    @Test
+    fun `test that buildPlaybackSourcesForPlayer resumes playback when user has not paused and isRestartPlaying is true`() =
+        runTest {
+            val intent = mock<Intent>()
+            val uri: Uri = mock()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = uri,
+                handle = testHandle,
+                fileName = testFileName
+            )
+            initViewModel()
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+        }
+
+    @Test
     fun `test that pauseForBackground sets Paused and isAutoReplay when player was playing`() =
         runTest {
             whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
