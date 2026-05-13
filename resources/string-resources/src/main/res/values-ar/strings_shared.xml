@@ -2739,4 +2739,6 @@
     <string name="away_status">بعيد</string>
     <string name="last_seen_long_time_ago">[A]آخر ظهور [/A]منذ وقت طويل</string>
     <string name="last_seen_general">[A]آخر ظهور [/A]%1$s %2$s</string>
+    <string name="new_file_subject_when_uploading">الموضوع</string>
+    <string name="new_file_email_when_uploading">عنوان البريد الإلكتروني</string>
 </resources>

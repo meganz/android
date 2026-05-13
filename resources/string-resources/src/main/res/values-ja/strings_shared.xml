@@ -2335,4 +2335,11 @@
     <string name="last_seen_today">[A]最終ログイン[/A]今日 %1$s</string>
     <string name="last_seen_long_time_ago">[A]最終ログイン[/A]はだいぶ前</string>
     <string name="last_seen_general">[A]最終ログイン[/A]%1$s %2$s</string>
+    <string name="google_sign_in">Googleでログイン</string>
+    <string name="google_sign_in_failed">Googleアカウントへのログインに失敗しました。もう一度お試しください。</string>
+    <string name="google_sign_in_email_exists">このメールアドレスは既にアカウントをお持ちです。パスワードを入力してログインしてください。</string>
+    <string name="or_divider">または</string>
+    <string name="general_new_link">新しいリンク</string>
+    <string name="new_file_subject_when_uploading">件名</string>
+    <string name="new_file_email_when_uploading">メールアドレス</string>
 </resources>

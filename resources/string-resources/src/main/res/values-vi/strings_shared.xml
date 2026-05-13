@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Không đủ không&#160;gian lưu&#160;trữ trong thiết&#160;bị của bạn</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Một lỗi không xác&#160;định được đã xảy ra. Liên&#160;hệ support&#64;mega.io.</string>
+    <string name="general_sync_message_unknown_error">Phát sinh một lỗi không xác định được. Xin liên&#160;hệ support&#64;mega.io.</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Thư&#160;mục không thể đồng&#160;bộ hoặc sao&#160;lưu được bởi vì thư&#160;mục tương&#160;ứng trên MEGA đang nằm trong Thùng&#160;Rác</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -79,7 +79,7 @@
     <!-- Search drop down chips filter type file type videos -->
     <string name="search_dropdown_chip_filter_type_file_type_video">Video</string>
     <!-- Search drop down chips filter type file type audio -->
-    <string name="search_dropdown_chip_filter_type_file_type_audio">Thoại</string>
+    <string name="search_dropdown_chip_filter_type_file_type_audio">Âm thanh</string>
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Tài Liệu</string>
     <!-- Search drop down chips filter type file type pdf -->
@@ -539,7 +539,7 @@
     <!-- Sub title of the Contact Permission Explanation -->
     <string name="subtitle_enable_access_contact">Bạn cũng có thể thêm tên liên lạc từ danh&#160;bạ của điện&#160;thoại, nếu bạn cho phép cho MEGA quyền truy&#160;cập.</string>
     <!-- Button text of Contact Permission Explanation -->
-    <string name="grant_permission">Cho phép quyền truy&#160;cập</string>
+    <string name="grant_permission">Cấp quyền truy&#160;cập</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Documents are uploaded as one PDF file -->
     <string name="document_scanning_confirmation_file_type_pdf">PDF</string>
     <!-- One of the Options in the Scan Confirmation page where the scanned Document is uploaded as a JPEG file. This option can only be selected when there is only one scanned document-->
@@ -849,7 +849,7 @@
     <!-- Message displayed when email is successfully resent -->
     <string name="general_email_resend_success_message">Email đã được gửi</string>
     <!--General Request Network Failed text-->
-    <string name="general_request_failed_message">Đã xảy ra lỗi, thử lại</string>
+    <string name="general_request_failed_message">Đã phát&#160;sinh lỗi, xin thử lại</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;đối.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -1337,7 +1337,7 @@
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Màu xám</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Đã xảy ra lỗi và ứng dụng đã chọn không thể mở tệp này.</string>
+    <string name="error_open_file_with">Đã phát&#160;sinh ra lỗi và ứng&#160;dụng đã chọn không thể mở tệp này được.</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Bạn có thể không có ứng dụng nào đã được cài để xem dạng tệp tin này</string>
     <!-- Text to inform the user when an error occurs -->
@@ -2006,7 +2006,7 @@
     <string name="sync_label_media_uploads">Đăng tải phương tiện số</string>
     <string name="general_error_file_not_found">Không thể tìm thấy tệp này</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Lỗi. Tệp PDF bị hỏng hoặc không tồn tại.</string>
-    <string name="pdf_viewer_error_streaming">Đã xảy ra lỗi khi cố mở tệp</string>
+    <string name="pdf_viewer_error_streaming">Đã phát&#160;sinh lỗi khi cố mở tệp&#160;tin</string>
     <string name="pro1_account">Pro I</string>
     <string name="recovering_info">Đang tải&#8230;</string>
     <string name="offline_remove_singular_item_success_message">1 mục đã được xóa</string>
@@ -2287,4 +2287,6 @@
     <string name="last_seen_today">[A]Lần thấy cuối [/A]hôm nay lúc %1$s</string>
     <string name="last_seen_long_time_ago">[A]Lần thấy cuối [/A]đã một thời gian rất lâu</string>
     <string name="last_seen_general">[A]Lần thấy cuối [/A] vào lúc %2$s lúc %1$s</string>
+    <string name="new_file_subject_when_uploading">Tiêu đề</string>
+    <string name="new_file_email_when_uploading">Địa chỉ email</string>
 </resources>

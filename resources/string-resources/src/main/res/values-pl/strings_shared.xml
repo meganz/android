@@ -2584,9 +2584,9 @@
     <string name="home_configuration_screen_toolbar_subtitle">Przeciągnij sekcje, aby zmienić ich kolejność</string>
     <string name="home_configuration_screen_menu_reset_to_default">Przywróć ustawienia domyślne</string>
     <string name="home_configuration_screen_menu_choose_default_start_screen">Wybierz domyślny ekran startowy</string>
-    <string name="home_configuration_widget_removal_not_allowed_message">Co najmniej jedna opcja musi być włączona</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">Wymagana jest co najmniej jedna sekcja strony głównej</string>
     <string name="file_link_subtitle">Link do pliku</string>
-    <string name="favourites_empty_screen_description">Oznacz foldery jako ulubione, aby zobaczyć je tutaj</string>
+    <string name="favourites_empty_screen_description">Dodaj foldery do Ulubionych, aby zobaczyć je tutaj</string>
     <string name="offline_status">Lokalne</string>
     <string name="online_status">Online</string>
     <string name="away_status">Nieaktywny</string>
@@ -2594,4 +2594,13 @@
     <string name="last_seen_today">[A]Ostatnio widziany [/A]dzisiaj %1$s</string>
     <string name="last_seen_long_time_ago">[A]Ostatnio widziany [/A]dawno temu</string>
     <string name="last_seen_general">[A]Ostatnio widziany [/A]%1$s %2$s</string>
+    <string name="name_collision_choose_folder_header">Wybierz folder, który chcesz zachować</string>
+    <string name="name_collision_folder_warning_upload_and_rename">Folder, który przesyłasz, zostanie przemianowany na:</string>
+    <string name="google_sign_in">Zaloguj się przez Google</string>
+    <string name="google_sign_in_failed">Logowanie za pomocą Google nie powiodło się. Spróbuj ponownie.</string>
+    <string name="google_sign_in_email_exists">Masz już konto z tym adresem e-mail. Zaloguj się za pomocą swojego hasła.</string>
+    <string name="or_divider">lub</string>
+    <string name="new_file_subject_when_uploading">Tytuł</string>
+    <string name="new_file_email_when_uploading">E-mail</string>
+    <string name="general_new_link">Nowy link</string>
 </resources>

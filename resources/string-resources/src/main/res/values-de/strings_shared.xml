@@ -2350,7 +2350,7 @@
     <string name="home_widget_continue_where_left_off">Kürzliche Aktivitäten fortsetzen</string>
     <string name="general_skip">Überspringen</string>
     <string name="settings_transfer_connections_title">Transferverbindungen</string>
-    <string name="settings_transfer_connections_text">Legt die Anzahl der parallelen Verbindungen pro Dateitransfer fest. Höhere Werte können die Geschwindigkeit verbessern, aber den Akku- und Datenverbrauch erhöhen.</string>
+    <string name="settings_transfer_connections_text">Legt die maximale Anzahl der Verbindungen fest, die für aktive Transfers parallel verwendet werden. Höhere Werte können die Übertragung großer Dateien beschleunigen, erhöhen jedoch auch den Akku- und Speicherverbrauch.</string>
     <string name="settings_transfer_download_connections">Downloadverbindungen</string>
     <string name="settings_transfer_upload_connections">Uploadverbindungen</string>
     <string name="settings_transfer_connections_slow_networs">%1$d (Ideal für langsame Netzwerke)</string>
@@ -2393,4 +2393,26 @@
     <string name="away_status">Abwesend</string>
     <string name="last_seen_long_time_ago">[A]Zuletzt online [/A]vor sehr langer Zeit</string>
     <string name="last_seen_general">[A]Zuletzt online: [/A]%1$s %2$s</string>
+    <string name="new_file_subject_when_uploading">Betreff</string>
+    <string name="new_file_email_when_uploading">E-Mail-Adresse</string>
+    <string name="home_widget_viewed_links_empty_state">Hier werden angesehene Links angezeigt</string>
+    <string name="home_cwlo_empty_state">Hier werden nicht zu Ende gesehene Inhalte angezeigt</string>
+    <string name="folder_link_guest_banner_title">In Ihrer MEGA-Cloud speichern</string>
+    <string name="folder_link_guest_banner_description">Verlieren Sie nicht den Zugriff auf diesen Link. Erstellen Sie einen kostenlosen Account, um diesen Ordner zu speichern und jederzeit darauf zugreifen zu können.</string>
+    <string name="folder_link_guest_banner_create_account">Kostenlosen Account erstellen</string>
+    <string name="folder_link_guest_banner_dismiss_content_description">Banner schließen</string>
+    <string name="home_configuration_screen_toolbar_title">Startbildschirm anpassen</string>
+    <string name="home_configuration_screen_toolbar_subtitle">Bereiche durch Ziehen neu anordnen</string>
+    <string name="home_configuration_screen_menu_reset_to_default">Standard wiederherstellen</string>
+    <string name="home_configuration_screen_menu_choose_default_start_screen">Standard-Startbildschirm wählen</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">Mindestens ein Startbildschirm-Bereich erforderlich</string>
+    <string name="file_link_subtitle">Dateilink</string>
+    <string name="favourites_empty_screen_description">Ordner zu Favoriten hinzufügen, um sie hier zu sehen</string>
+    <string name="name_collision_choose_folder_header">Wählen Sie den Ordner aus, den Sie behalten möchten</string>
+    <string name="name_collision_folder_warning_upload_and_rename">Der hochgeladene Ordner wird umbenannt in:</string>
+    <string name="google_sign_in">Mit Google anmelden</string>
+    <string name="google_sign_in_failed">Anmeldung mit Google fehlgeschlagen. Bitte versuchen Sie es noch einmal.</string>
+    <string name="google_sign_in_email_exists">Sie haben bereits einen Account mit dieser E-Mail-Adresse. Melden Sie sich mit Ihrem Passwort an.</string>
+    <string name="or_divider">oder</string>
+    <string name="general_new_link">Neuer Link</string>
 </resources>

@@ -121,7 +121,7 @@
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">Không thể tiếp cận thư mục đích</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
-    <string name="sync_stalled_issue_download_issue_detail">Đã xảy ra lỗi khi tải xuống tệp hoặc di chuyển tệp&#160;tin đã tải xuống tạm&#160;thời đến vị&#160;trí cuối&#160;cùng của nó.</string>
+    <string name="sync_stalled_issue_download_issue_detail">Đã phát&#160;sinh ra lỗi khi tải&#160;xuống, hoặc di&#160;chuyển tệp&#160;tin tạm&#160;thời đã tải đến vị&#160;trí đích đã đặt cho nó.</string>
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">Có lỗi cục&#160;bộ ngăn&#160;cản truy&#160;cập thư&#160;mục</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->

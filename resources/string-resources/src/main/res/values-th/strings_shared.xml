@@ -2308,4 +2308,6 @@
     <string name="last_seen_today">[A]ดูครั้งล่าสุด[/A]วันนี้ เวลา %1$s</string>
     <string name="last_seen_long_time_ago">[A]ดูครั้งล่าสุด[/A]เมื่อนานมาแล้ว</string>
     <string name="last_seen_general">[A]ดูครั้งล่าสุดเมื่อ[/A] %1$s เวลา %2$s</string>
+    <string name="new_file_subject_when_uploading">ชื่อ</string>
+    <string name="new_file_email_when_uploading">อีเมล</string>
 </resources>

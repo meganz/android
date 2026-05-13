@@ -651,7 +651,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Kiểm&#160;tra hộp&#160;thư email của bạn để tiếp&#160;tục.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Đã xảy ra lỗi, thử lại</string>
+    <string name="general_text_error">Đã phát&#160;sinh lỗi, xin thử lại</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Cần phải đăng nhập vào tài khoản để thực hiện hoạt động này.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
@@ -891,7 +891,7 @@
     <!-- message shown when the status of the user coudn’t be changed -->
     <string name="changing_status_error">Lỗi. Trạng thái hoạt động chưa được thay đổi</string>
     <!-- message shown when a chat has not been created -->
-    <string name="create_chat_error">Có lỗi xảy ra trong qua trình thoát tạo cuộc chat</string>
+    <string name="create_chat_error">Có lỗi phát&#160;sinh ra trong lúc tạo cuộc chat</string>
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Rung</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
@@ -2023,7 +2023,7 @@
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Không thể tham gia vào cuộc gọi do vượt quá số lượng tối đa thành viên tham gia.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Đã xảy ra lỗi và ứng dụng đã chọn không thể mở tệp này.</string>
+    <string name="error_open_file_with">Đã phát&#160;sinh ra lỗi và ứng&#160;dụng đã chọn không thể mở tệp này được.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">Đang gọi&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -3295,7 +3295,7 @@
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
     <string name="settings_camera_uploads_grant_media_permissions_body">Để bật đăng&#160;tải camêra, cấp quyền cho MEGA truy&#160;cập vào kho hình&#160;ảnh và các nội&#160;dung đa phương&#160;tiện khác có trong thiết&#160;bị của bạn.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Cho phép quyền truy&#160;cập</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Cấp quyền truy&#160;cập</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Không cấp quyền</string>
     <!--  -->
@@ -4379,7 +4379,7 @@
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào Kho&#160;ảnh của bạn</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cho phép quyền truy&#160;cập</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cấp quyền truy&#160;cập</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Cần phải cập&#160;nhật</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->

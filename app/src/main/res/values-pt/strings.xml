@@ -577,7 +577,7 @@
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA - versão do SDK</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
-    <string name="settings_about_karere_version">MEGA chat - versão do SDK</string>
+    <string name="settings_about_karere_version">MEGA Chat - versão do SDK</string>
     <!-- Link to the public code of the app -->
     <string name="settings_about_code_link_title">Ver o código-fonte</string>
     <!-- title of the screen that shows the ZIP files -->

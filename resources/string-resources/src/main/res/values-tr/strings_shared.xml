@@ -2412,9 +2412,9 @@
     <string name="home_configuration_screen_toolbar_subtitle">Bölümleri yeniden sıralamak için sürükleyin</string>
     <string name="home_configuration_screen_menu_reset_to_default">Varsayılana sıfırla</string>
     <string name="home_configuration_screen_menu_choose_default_start_screen">Varsayılan başlangıç ekranı seç</string>
-    <string name="home_configuration_widget_removal_not_allowed_message">En az bir seçenek açık kalmalıdır</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">En az bir ana sayfa bölümü gereklidir</string>
     <string name="file_link_subtitle">Dosya bağlantısı</string>
-    <string name="favourites_empty_screen_description">Klasörleri burada görmek için favori olarak işaretleyin</string>
+    <string name="favourites_empty_screen_description">Klasörleri burada görmek için Favoriler’e ekleyin</string>
     <string name="name_collision_choose_folder_header">Tutmak istediğiniz klasörü seçin</string>
     <string name="name_collision_folder_warning_upload_and_rename">Yüklediğiniz klasör şu şekilde yeniden adlandırılacak:</string>
     <string name="offline_status">Çevrim dışı</string>
@@ -2424,4 +2424,11 @@
     <string name="last_seen_today">[A]Son görülme [/A]bugün %1$s</string>
     <string name="last_seen_long_time_ago">[A]Son görülme [/A]uzun zaman önce</string>
     <string name="last_seen_general">[A]Son görülme [/A]%1$s %2$s</string>
+    <string name="google_sign_in">Google ile giriş yap</string>
+    <string name="google_sign_in_failed">Google ile giriş başarısız oldu. Lütfen tekrar deneyin.</string>
+    <string name="google_sign_in_email_exists">Bu e-posta adresiyle zaten bir hesabınız var. Şifrenizle giriş yapın.</string>
+    <string name="or_divider">veya</string>
+    <string name="general_new_link">Yeni bağlantı</string>
+    <string name="new_file_subject_when_uploading">Konu</string>
+    <string name="new_file_email_when_uploading">E-posta adresi</string>
 </resources>

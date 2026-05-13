@@ -2276,4 +2276,6 @@
     <string name="away_status">Sedang Pergi</string>
     <string name="last_seen_long_time_ago">[A]Terakhir terlihat [/A]sejak lama</string>
     <string name="last_seen_general">[A]Terakhir dilihat [/A]%1$s %2$s</string>
+    <string name="new_file_subject_when_uploading">Subyek</string>
+    <string name="new_file_email_when_uploading">Alamat email</string>
 </resources>

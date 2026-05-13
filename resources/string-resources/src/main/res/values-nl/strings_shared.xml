@@ -2409,7 +2409,7 @@
     <string name="home_configuration_screen_toolbar_subtitle">Sleep de secties om de volgorde te wijzigen</string>
     <string name="home_configuration_screen_menu_reset_to_default">Resetten naar standaard</string>
     <string name="home_configuration_screen_menu_choose_default_start_screen">Kies het standaard startscherm</string>
-    <string name="home_configuration_widget_removal_not_allowed_message">Er moet minstens één optie ingeschakeld blijven</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">Er is ten minste één home sectie vereist</string>
     <string name="file_link_subtitle">Bestandslink</string>
     <string name="offline_status">Offline</string>
     <string name="online_status">Online</string>
@@ -2418,4 +2418,14 @@
     <string name="last_seen_today">[A]Laatst gezien [/A]vandaag %1$s</string>
     <string name="last_seen_long_time_ago">[A]Laatst gezien [/A]een lange tijd geleden</string>
     <string name="last_seen_general">[A]Laatst gezien [/A]%1$s %2$s</string>
+    <string name="favourites_empty_screen_description">Mappen toevoegen tot Favorieten om ze hier weer te geven</string>
+    <string name="name_collision_choose_folder_header">Selecteer de map die u wilt houden</string>
+    <string name="name_collision_folder_warning_upload_and_rename">De folder die u upload wordt hernoemd als:</string>
+    <string name="google_sign_in">Inloggen met Google</string>
+    <string name="google_sign_in_failed">Aanmelden bij Google is mislukt. Probeer het opnieuw.</string>
+    <string name="google_sign_in_email_exists">U heeft al een account met dit e-mailadres. Log in met uw wachtwoord.</string>
+    <string name="or_divider">of</string>
+    <string name="general_new_link">Nieuwe link</string>
+    <string name="new_file_subject_when_uploading">Onderwerp</string>
+    <string name="new_file_email_when_uploading">E-mail adres</string>
 </resources>

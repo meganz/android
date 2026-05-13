@@ -2486,4 +2486,6 @@
     <string name="away_status">Absent</string>
     <string name="last_seen_long_time_ago">[A]Vu pour la dernière fois [/A]il y a longtemps</string>
     <string name="last_seen_general">[A]Vu pour la dernière fois le [/A]%1$s à %2$s</string>
+    <string name="new_file_subject_when_uploading">Objet</string>
+    <string name="new_file_email_when_uploading">Adresse courriel</string>
 </resources>

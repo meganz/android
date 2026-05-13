@@ -2471,4 +2471,6 @@
     <string name="last_seen_today">[A]Ultima visita[/A] oggi %1$s</string>
     <string name="last_seen_long_time_ago">[A]Ultima visita[/A] molto tempo fa</string>
     <string name="last_seen_general">[A]Ultima visita[/A] %1$s %2$s</string>
+    <string name="new_file_subject_when_uploading">Oggetto</string>
+    <string name="new_file_email_when_uploading">Indirizzo email</string>
 </resources>

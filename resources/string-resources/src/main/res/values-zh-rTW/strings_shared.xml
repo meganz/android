@@ -2316,4 +2316,6 @@
     <string name="last_seen_today">今天[A]最後上線時間 [/A]%1$s</string>
     <string name="last_seen_long_time_ago">[A]最後上線時間 [/A]很久以前</string>
     <string name="last_seen_general">[A]最後上線時間 [/A]%1$s %2$s</string>
+    <string name="new_file_subject_when_uploading">標題</string>
+    <string name="new_file_email_when_uploading">電子郵件地止</string>
 </resources>

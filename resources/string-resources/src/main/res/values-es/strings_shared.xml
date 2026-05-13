@@ -2458,4 +2458,6 @@
     <string name="away_status">Ausente</string>
     <string name="last_seen_long_time_ago">[A]Último acceso [/A]hace mucho tiempo</string>
     <string name="last_seen_general">[A]Último acceso [/A]%1$s %2$s</string>
+    <string name="new_file_subject_when_uploading">Asunto</string>
+    <string name="new_file_email_when_uploading">Dirección de correo electrónico</string>
 </resources>
