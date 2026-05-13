@@ -8,6 +8,7 @@ import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 
@@ -41,7 +42,9 @@ fun EntryProviderScope<in DialogNavKey>.openLinkDialogDestination(
                 onDialogHandled()
                 navigate(
                     listOf(DeepLinksDialogNavKey(deepLink = link)),
-                    null
+                    navOptions {
+                        popUpTo(DeepLinksDialogNavKey::class) { inclusive = true }
+                    }
                 )
             },
             onDismiss = {

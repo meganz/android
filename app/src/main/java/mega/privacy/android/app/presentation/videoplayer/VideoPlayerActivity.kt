@@ -36,7 +36,6 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
@@ -221,7 +220,7 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                     NavDisplay(
                         backStack = backStack,
                         onBack = { navigationHandler.back() },
-                        sceneStrategy = dialogStrategy chain bottomSheetStrategy,
+                        sceneStrategies = listOf(dialogStrategy, bottomSheetStrategy),
                         entryDecorators = listOf(
                             rememberSaveableStateHolderNavEntryDecorator(),
                         ),
@@ -422,9 +421,3 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
     }
 }
 
-private infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
-    SceneStrategy { entries ->
-        this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
-            calculateScene(entries)
-        }
-    }

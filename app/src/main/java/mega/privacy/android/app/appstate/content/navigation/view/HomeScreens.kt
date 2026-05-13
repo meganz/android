@@ -42,6 +42,7 @@ import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusPro
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.shared.LocalSharedViewModelStoreOwner
 import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
@@ -81,7 +82,10 @@ fun HomeScreens(
                     OverQuotaDialogNavKey(
                         isOverQuota = storageUiState.storageState == StorageState.Red,
                         overQuotaAlert = false
-                    )
+                    ),
+                    navOptions {
+                        popUpTo(OverQuotaDialogNavKey::class) { inclusive = true }
+                    }
                 )
                 handledStorageState = storageUiState.storageState
             }

@@ -12,7 +12,6 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import de.palm.composestateevents.NavigationEventEffect
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
@@ -75,8 +74,7 @@ internal fun MegaNavDisplay(
     NavDisplay(
         backStack = backStack,
         onBack = { navigationHandler.back() },
-        sceneStrategy = transparentStrategy.chain(dialogStrategy)
-            .chain(bottomSheetStrategy),
+        sceneStrategies = listOf(transparentStrategy, dialogStrategy, bottomSheetStrategy),
         entryDecorators = entryDecorators + listOf(
             rememberOverlaySuppressionNavEntryDecorator(
                 suppressionState
@@ -159,11 +157,3 @@ internal fun MegaNavDisplay(
     }
 }
 
-private infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
-    SceneStrategy { entries ->
-        this@chain.run { calculateScene(entries) } ?: with(sceneStrategy) {
-            calculateScene(
-                entries
-            )
-        }
-    }
