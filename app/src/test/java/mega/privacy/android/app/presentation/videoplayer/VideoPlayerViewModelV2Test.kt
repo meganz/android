@@ -118,6 +118,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoR
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -245,6 +246,8 @@ class VideoPlayerViewModelV2Test {
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private var fakeMonitorConnectivityFlow = MutableSharedFlow<Boolean>()
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
     private val testSize = 100L
@@ -314,6 +317,7 @@ class VideoPlayerViewModelV2Test {
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -332,6 +336,8 @@ class VideoPlayerViewModelV2Test {
             monitorVideoRepeatModeUseCase()
         }.thenReturn(flowOf(RepeatToggleMode.REPEAT_NONE))
         whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
+        fakeMonitorConnectivityFlow = MutableSharedFlow()
+        whenever(monitorConnectivityUseCase()).thenReturn(fakeMonitorConnectivityFlow)
     }
 
     @AfterEach
@@ -389,8 +395,31 @@ class VideoPlayerViewModelV2Test {
             savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase,
+            monitorConnectivityUseCase,
         )
     }
+
+    @Test
+    fun `test that isConnected is updated to true when monitorConnectivityUseCase emits true`() =
+        runTest {
+            initViewModel()
+            fakeMonitorConnectivityFlow.emit(true)
+            underTest.uiState.test {
+                assertThat(awaitItem().isConnected).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isConnected is updated to false when monitorConnectivityUseCase emits false`() =
+        runTest {
+            initViewModel()
+            fakeMonitorConnectivityFlow.emit(false)
+            underTest.uiState.test {
+                assertThat(awaitItem().isConnected).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that the errorState is updated correctly when emit BlockedMegaException`() =
@@ -416,13 +445,13 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
-    fun `test that the isRetry is false when INTENT_EXTRA_KEY_REBUILD_PLAYLIST is false`() =
+    fun `test that retryFailedEvent is triggered when INTENT_EXTRA_KEY_REBUILD_PLAYLIST is false`() =
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(intent = intent, rebuildPlaylist = false)
             underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
-                assertThat(awaitItem().isRetry).isFalse()
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
             }
         }
 
@@ -448,7 +477,7 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
-    fun `test that the isRetry is false when INTENT_EXTRA_KEY_ADAPTER_TYPE is INVALID_VALUE`() =
+    fun `test that retryFailedEvent is triggered when INTENT_EXTRA_KEY_ADAPTER_TYPE is INVALID_VALUE`() =
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(
@@ -458,12 +487,12 @@ class VideoPlayerViewModelV2Test {
             )
             underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
-                assertThat(awaitItem().isRetry).isFalse()
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
             }
         }
 
     @Test
-    fun `test that the isRetry is false when data of Intent is null`() =
+    fun `test that retryFailedEvent is triggered when data of Intent is null`() =
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(
@@ -473,12 +502,12 @@ class VideoPlayerViewModelV2Test {
             )
             underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
-                assertThat(awaitItem().isRetry).isFalse()
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
             }
         }
 
     @Test
-    fun `test that the isRetry is false when INTENT_EXTRA_KEY_HANDLE is INVALID_HANDLE`() =
+    fun `test that retryFailedEvent is triggered when INTENT_EXTRA_KEY_HANDLE is INVALID_HANDLE`() =
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(
@@ -490,12 +519,12 @@ class VideoPlayerViewModelV2Test {
             )
             underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
-                assertThat(awaitItem().isRetry).isFalse()
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
             }
         }
 
     @Test
-    fun `test that the isRetry is false when INTENT_EXTRA_KEY_FILE_NAME is null`() =
+    fun `test that retryFailedEvent is triggered when INTENT_EXTRA_KEY_FILE_NAME is null`() =
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(
@@ -507,12 +536,12 @@ class VideoPlayerViewModelV2Test {
             )
             underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
-                assertThat(awaitItem().isRetry).isFalse()
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
             }
         }
 
     @Test
-    fun `test that the isRetry is null when currentPlayingUri is null when getLocalFolderLink return null`() =
+    fun `test that retryFailedEvent is not triggered when currentPlayingUri is null when getLocalFolderLink return null`() =
         runTest {
             val intent = mock<Intent>()
             initTestDataForTestingInvalidParams(
@@ -526,7 +555,7 @@ class VideoPlayerViewModelV2Test {
             whenever(getLocalFolderLinkUseCase(any())).thenReturn(null)
             underTest.initVideoPlayerData(intent)
             underTest.uiState.test {
-                assertThat(awaitItem().isRetry).isNull()
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(consumed)
             }
         }
 
@@ -1496,17 +1525,24 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
-    fun `test that isRetry is updated correctly after onPlayerError is invoked more than 6 times`() =
+    fun `test that retryEvent is triggered when onPlayerError is invoked within retry limit`() =
         runTest {
             initViewModel()
-            underTest.uiState.drop(1).test {
-                underTest.onPlayerError()
-                assertThat(awaitItem().isRetry).isTrue()
-                repeat(6) {
-                    underTest.onPlayerError()
-                }
-                assertThat(awaitItem().isRetry).isFalse()
-                cancelAndIgnoreRemainingEvents()
+            underTest.onPlayerError()
+            underTest.uiState.test {
+                assertThat(awaitItem().retryEvent).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that retryFailedEvent is triggered when onPlayerError is invoked more than 6 times`() =
+        runTest {
+            initViewModel()
+            repeat(7) { underTest.onPlayerError() }
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
             }
         }
 

@@ -23,7 +23,9 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property currentPlayingIndex the current playing index
  * @property metadata the metadata
  * @property playQueueTitle the play queue title
- * @property isRetry whether it is retry
+ * @property isRetry whether it is retry (legacy video player)
+ * @property retryEvent event triggered when playback should be retried (new video player)
+ * @property retryFailedEvent event triggered when all retries are exhausted or playback build fails (new video player)
  * @property repeatToggleMode the repeat toggle mode
  * @property currentPlayingVideoSize the current playing video size
  * @property mediaPlaybackState the playback state
@@ -59,6 +61,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property blockedError the blocked error event
  * @property isClosedAfterHidingNode whether to close the video player after hiding node.
  * @property nodeSourceType the source type of the current playing node
+ * @property isConnected whether the device is connected to the internet
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -68,6 +71,8 @@ data class VideoPlayerUiState(
     val metadata: Metadata = Metadata(null, null, null, ""),
     val playQueueTitle: String? = null,
     val isRetry: Boolean? = null,
+    val retryEvent: StateEvent = consumed,
+    val retryFailedEvent: StateEvent = consumed,
     val repeatToggleMode: RepeatToggleMode = RepeatToggleMode.REPEAT_NONE,
     val currentPlayingVideoSize: VideoSize? = null,
     val mediaPlaybackState: MediaPlaybackState = MediaPlaybackState.Playing,
@@ -103,4 +108,5 @@ data class VideoPlayerUiState(
     val blockedError: StateEvent = consumed,
     val isClosedAfterHidingNode: Boolean = false,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    val isConnected: Boolean = true,
 )

@@ -21,9 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -83,9 +81,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
 import javax.inject.Inject
 
@@ -177,14 +173,6 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
             val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
             val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
 
-            var showBlockedDialog by rememberSaveable { mutableStateOf(false) }
-
-            EventEffect(
-                event = uiState.blockedError,
-                onConsumed = { videoPlayerViewModelV2.onBlockedErrorConsumed() }) {
-                showBlockedDialog = true
-            }
-
             LaunchedEffect(uiState.snackBarMessage) {
                 uiState.snackBarMessage?.let { message ->
                     snackbarHostState.showAutoDurationSnackbar(message)
@@ -232,6 +220,8 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                                 handleAutoReplayIfPaused = videoPlayerViewModelV2::handleAutoReplayIfPaused,
                                 onTransfer = appTransferViewModel::setTransferEvent,
                                 featureDestinations = featureDestinations,
+                                onRetry = { mediaPlayerGateway.mediaPlayerRetry(true) },
+                                onFinish = { if (!isFinishing) finish() },
                             )
                         },
                     )
@@ -240,24 +230,6 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                         event = transferState.transferEvent,
                         onConsumeEvent = appTransferViewModel::consumedTransferEvent,
                     )
-
-                    if (showBlockedDialog) {
-                        MegaAlertDialog(
-                            title = stringResource(R.string.error_file_not_available),
-                            body = stringResource(R.string.error_takendown_file),
-                            confirmButtonText = stringResource(sharedR.string.general_dismiss_dialog),
-                            cancelButtonText = null,
-                            onConfirm = {
-                                if (!isFinishing) {
-                                    finish()
-                                }
-                            },
-                            onDismiss = {},
-                            dismissOnClickOutside = false,
-                            dismissOnBackPress = false,
-                            cancelEnabled = false,
-                        )
-                    }
                 }
             }
         }

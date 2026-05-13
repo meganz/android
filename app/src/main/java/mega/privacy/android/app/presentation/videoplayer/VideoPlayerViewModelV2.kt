@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -85,7 +86,6 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
-import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
@@ -147,6 +147,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.MonitorVideoR
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -246,6 +247,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private val savePlaybackTimesUseCase: SavePlaybackTimesUseCase,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -294,6 +296,18 @@ class VideoPlayerViewModelV2 @Inject constructor(
         monitorIsHiddenNodesOnboarded()
 
         updateNameWhenNodeUpdates()
+        monitorConnectivity()
+    }
+
+    private fun monitorConnectivity() {
+        monitorConnectivityUseCase()
+            .onEach { isConnected ->
+                uiState.update {
+                    it.copy(isConnected = isConnected)
+                }
+            }
+            .catch { Timber.e(it) }
+            .launchIn(viewModelScope)
     }
 
     private fun currentLaunchSourcesToNodeSourceType(): NodeSourceType =
@@ -501,7 +515,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
 
     private fun logInvalidParam(message: String) {
         Timber.d("Build playback sources failed: $message")
-        uiState.update { it.copy(isRetry = false) }
+        uiState.update { it.copy(retryFailedEvent = triggered) }
     }
 
     private suspend fun setupStreamingServer(launchSource: Int): Boolean {
@@ -1285,8 +1299,16 @@ class VideoPlayerViewModelV2 @Inject constructor(
     internal fun onPlayerError() {
         playerRetry++
         Timber.d("playerRetry: $playerRetry")
-        uiState.update { it.copy(isRetry = playerRetry <= MAX_RETRY) }
+        if (playerRetry <= MAX_RETRY) {
+            uiState.update { it.copy(retryEvent = triggered) }
+        } else {
+            uiState.update { it.copy(retryFailedEvent = triggered) }
+        }
     }
+
+    internal fun onRetryConsumed() = uiState.update { it.copy(retryEvent = consumed) }
+
+    internal fun onRetryFailedConsumed() = uiState.update { it.copy(retryFailedEvent = consumed) }
 
     internal fun updateSnackBarMessage(message: String?) =
         uiState.update { it.copy(snackBarMessage = message) }

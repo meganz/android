@@ -17,6 +17,8 @@ internal fun EntryProviderScope<NavKey>.videoPlayerEntryProvider(
     handleAutoReplayIfPaused: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     featureDestinations: Set<FeatureDestination>,
+    onRetry: () -> Unit,
+    onFinish: () -> Unit,
 ) {
     videoPlayerScreen(
         navigationHandler = navigationHandler,
@@ -27,6 +29,8 @@ internal fun EntryProviderScope<NavKey>.videoPlayerEntryProvider(
             navigationHandler.navigate(it)
         },
         onTransfer = onTransfer,
+        onRetry = onRetry,
+        onFinish = onFinish,
         onMoreActionsClicked = {
             val uiState = viewModel.uiState.value
             navigationHandler.navigate(

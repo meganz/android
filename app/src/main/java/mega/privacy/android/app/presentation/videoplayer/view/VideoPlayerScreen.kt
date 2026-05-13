@@ -58,8 +58,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.core.graphics.scale
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.scale
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -74,6 +74,7 @@ import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -103,7 +104,9 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AddSubtitleDialogEvent
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
@@ -123,6 +126,8 @@ internal fun VideoPlayerScreen(
     player: ExoPlayer?,
     playQueueButtonClicked: () -> Unit,
     onMoreActionsClicked: () -> Unit,
+    onRetry: () -> Unit,
+    onFinish: () -> Unit,
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -155,6 +160,30 @@ internal fun VideoPlayerScreen(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    var showBlockedDialog by rememberSaveable { mutableStateOf(false) }
+    var showRetryFailedDialog by rememberSaveable { mutableStateOf(false) }
+
+    EventEffect(
+        event = uiState.blockedError,
+        onConsumed = { viewModel.onBlockedErrorConsumed() },
+    ) {
+        showBlockedDialog = true
+    }
+
+    EventEffect(
+        event = uiState.retryEvent,
+        onConsumed = { viewModel.onRetryConsumed() },
+    ) {
+        onRetry()
+    }
+
+    EventEffect(
+        event = uiState.retryFailedEvent,
+        onConsumed = { viewModel.onRetryFailedConsumed() },
+    ) {
+        showRetryFailedDialog = true
+    }
 
     var subtitleSheetMatchedInfo by remember { mutableStateOf<SubtitleFileInfo?>(null) }
 
@@ -696,6 +725,41 @@ internal fun VideoPlayerScreen(
                 )
             }
         }
+    }
+
+    if (showBlockedDialog) {
+        MegaAlertDialog(
+            title = resource.getString(R.string.error_file_not_available),
+            body = resource.getString(R.string.error_takendown_file),
+            confirmButtonText = resource.getString(sharedR.string.general_dismiss_dialog),
+            cancelButtonText = null,
+            onConfirm = {
+                showBlockedDialog = false
+                onFinish()
+            },
+            onDismiss = {},
+            dismissOnClickOutside = false,
+            dismissOnBackPress = false,
+            cancelEnabled = false,
+        )
+    }
+
+    if (showRetryFailedDialog) {
+        MegaAlertDialog(
+            text = resource.getString(
+                if (uiState.isConnected) R.string.error_fail_to_open_file_general
+                else R.string.error_fail_to_open_file_no_network
+            ),
+            confirmButtonText = resource.getString(sharedR.string.general_ok),
+            cancelButtonText = null,
+            onConfirm = {
+                showRetryFailedDialog = false
+                onFinish()
+            },
+            onDismiss = {},
+            dismissOnClickOutside = false,
+            dismissOnBackPress = false,
+        )
     }
 }
 
