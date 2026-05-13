@@ -42,7 +42,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.Executors
 
-
 /**
  * Document provider that exposes the user's MEGA Cloud Drive via the Storage Access Framework.
  * Data and use cases are delegated to [CloudDriveDocumentDataProvider], which is injected via the dependency container.
@@ -265,17 +264,23 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         CloudDriveDocumentProviderUiState.NotLoggedIn ->
             throwAuthenticationRequired()
 
-        is CloudDriveDocumentProviderUiState.ChildData -> loadDocumentAsync(
-            documentId,
-            projection
-        )
+        is CloudDriveDocumentProviderUiState.ChildData ->
+            state.children.firstOrNull { it.documentId == documentId }
+                ?.let { documentCursor(row = it, projection = projection) }
+                ?: loadDocumentAsync(documentId, projection)
 
         is CloudDriveDocumentProviderUiState.LoadingChildren -> loadDocumentAsync(
             documentId,
             projection
         )
 
-        is CloudDriveDocumentProviderUiState.FileNotFound -> throw FileNotFoundException("Node not found: $documentId")
+        is CloudDriveDocumentProviderUiState.FileNotFound -> {
+            if (state.documentId == documentId) {
+                throw FileNotFoundException("Node not found: $documentId")
+            } else {
+                loadDocumentAsync(documentId, projection)
+            }
+        }
 
         is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
             dataProvider.refreshRootNode()
@@ -542,8 +547,13 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         CloudDriveDocumentProviderUiState.NotLoggedIn ->
             throwAuthenticationRequired()
 
-        is CloudDriveDocumentProviderUiState.FileNotFound ->
-            throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
+        is CloudDriveDocumentProviderUiState.FileNotFound -> {
+            if (state.documentId == parentDocumentId) {
+                throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
+            } else {
+                loadChildrenAsync(parentDocumentId, projection)
+            }
+        }
 
         is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
             dataProvider.refreshRootNode()
