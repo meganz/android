@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.filelink
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,12 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,9 +30,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -37,6 +43,7 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.CircularLightIconButton
 import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
 import mega.android.core.ui.components.button.SecondaryFilledButtonM3
+import mega.android.core.ui.components.divider.SubtleDivider
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -159,19 +166,25 @@ internal fun FileLinkScreenContent(
                         modifier = Modifier.fillMaxWidth(),
                         onNavigate = onAdsNavigate,
                     ) { adsContentModifier ->
-                        InlineAnchoredButtonGroup(
+                        Column(
                             modifier = adsContentModifier
                                 .fillMaxWidth()
-                                .testTag(FILE_LINK_BOTTOM_BAR_TAG),
-                            primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
-                            primaryButtonLeadingIcon = rememberVectorPainter(
-                                IconPack.Medium.Thin.Outline.CloudUpload,
-                            ),
-                            onPrimaryButtonClick = onSaveToMegaClicked,
-                            textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
-                            onTextOnlyButtonClick = onDownloadClicked,
-                            applyInsets = true,
-                        )
+                                .testTag(FILE_LINK_BOTTOM_BAR_TAG)
+                        ) {
+                            SubtleDivider()
+                            InlineAnchoredButtonGroup(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
+                                primaryButtonLeadingIcon = rememberVectorPainter(
+                                    IconPack.Medium.Thin.Outline.CloudUpload,
+                                ),
+                                onPrimaryButtonClick = onSaveToMegaClicked,
+                                textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
+                                onTextOnlyButtonClick = onDownloadClicked,
+                                applyInsets = true,
+                            )
+                        }
                     }
                 }
             }
@@ -260,91 +273,164 @@ private fun LoadedFileLinkContent(
     isVideo: Boolean,
     onOpenClicked: () -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        BoxSurface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(5f / 4f)
-                .padding(16.dp)
-                .clip(RoundedCornerShape(6.dp)),
-            surfaceColor = SurfaceColor.Surface1,
-        ) {
-            NodeThumbnailView(
-                data = thumbnailData,
-                defaultImage = iconRes,
-                contentDescription = fileName,
-                contentScale = ContentScale.Crop,
-                layoutType = ThumbnailLayoutType.FullSize,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .testTag(FILE_LINK_THUMBNAIL_TAG),
-            )
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-            if (isVideo) {
-                CircularLightIconButton(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .shadow(
-                            elevation = 8.dp,
-                            shape = MaterialTheme.shapes.large,
-                            clip = false
-                        )
-                        .testTag(FILE_LINK_PLAY_BUTTON_TAG),
-                    icon = rememberVectorPainter(IconPack.Medium.Regular.Solid.Play),
-                    onClick = onOpenClicked
-                )
-            }
-
-            if (!duration.isNullOrEmpty()) {
-                DurationBadge(
-                    text = duration,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                        .testTag(FILE_LINK_DURATION_BADGE_TAG),
-                )
-            }
-        }
-
+    if (isLandscape) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Top,
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
-                MegaText(
-                    text = fileName,
-                    textColor = TextColor.Primary,
-                    style = AppTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(FILE_LINK_FILE_NAME_TAG),
-                )
-                MegaText(
-                    text = if (!duration.isNullOrEmpty()) {
-                        stringResource(sharedR.string.file_info_subtitle_format, duration, fileSize)
-                    } else {
-                        fileSize
-                    },
-                    textColor = TextColor.Secondary,
-                    style = AppTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag(FILE_LINK_FILE_SIZE_TAG),
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            SecondaryFilledButtonM3(
-                modifier = Modifier.testTag(FILE_LINK_OPEN_BUTTON_TAG),
-                text = stringResource(sharedR.string.general_open_button),
-                onClick = onOpenClicked,
+            FileLinkThumbnail(
+                fileName = fileName,
+                duration = duration,
+                iconRes = iconRes,
+                thumbnailData = thumbnailData,
+                isVideo = isVideo,
+                onOpenClicked = onOpenClicked,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .aspectRatio(5f / 4f),
+            )
+            FileLinkInfoRow(
+                fileName = fileName,
+                fileSize = fileSize,
+                duration = duration,
+                onOpenClicked = onOpenClicked,
+                modifier = Modifier
+                    .weight(1f)
             )
         }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
+            FileLinkThumbnail(
+                fileName = fileName,
+                duration = duration,
+                iconRes = iconRes,
+                thumbnailData = thumbnailData,
+                isVideo = isVideo,
+                onOpenClicked = onOpenClicked,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(5f / 4f),
+            )
+            FileLinkInfoRow(
+                fileName = fileName,
+                fileSize = fileSize,
+                duration = duration,
+                onOpenClicked = onOpenClicked,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun FileLinkThumbnail(
+    fileName: String,
+    duration: String?,
+    iconRes: Int,
+    thumbnailData: ThumbnailData?,
+    isVideo: Boolean,
+    onOpenClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    BoxSurface(
+        modifier = modifier
+            .padding(16.dp)
+            .clip(RoundedCornerShape(6.dp)),
+        surfaceColor = SurfaceColor.Surface1,
+    ) {
+        NodeThumbnailView(
+            data = thumbnailData,
+            defaultImage = iconRes,
+            contentDescription = fileName,
+            contentScale = ContentScale.Crop,
+            layoutType = ThumbnailLayoutType.FullSize,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .testTag(FILE_LINK_THUMBNAIL_TAG),
+        )
+
+        if (isVideo) {
+            CircularLightIconButton(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .shadow(
+                        elevation = 8.dp,
+                        shape = MaterialTheme.shapes.large,
+                        clip = false
+                    )
+                    .testTag(FILE_LINK_PLAY_BUTTON_TAG),
+                icon = rememberVectorPainter(IconPack.Medium.Regular.Solid.Play),
+                onClick = onOpenClicked
+            )
+        }
+
+        if (!duration.isNullOrEmpty()) {
+            DurationBadge(
+                text = duration,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .testTag(FILE_LINK_DURATION_BADGE_TAG),
+            )
+        }
+    }
+}
+
+@Composable
+private fun FileLinkInfoRow(
+    fileName: String,
+    fileSize: String,
+    duration: String?,
+    onOpenClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            MegaText(
+                text = fileName,
+                textColor = TextColor.Primary,
+                style = AppTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(FILE_LINK_FILE_NAME_TAG),
+            )
+            MegaText(
+                text = if (!duration.isNullOrEmpty()) {
+                    stringResource(sharedR.string.file_info_subtitle_format, duration, fileSize)
+                } else {
+                    fileSize
+                },
+                textColor = TextColor.Secondary,
+                style = AppTheme.typography.bodySmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(FILE_LINK_FILE_SIZE_TAG),
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        SecondaryFilledButtonM3(
+            modifier = Modifier.testTag(FILE_LINK_OPEN_BUTTON_TAG),
+            text = stringResource(sharedR.string.general_open_button),
+            onClick = onOpenClicked,
+        )
     }
 }
 
@@ -440,6 +526,34 @@ private fun LoadedFileLinkContentVideoPreview() {
             iconRes = iconPackR.drawable.ic_video_medium_solid,
             thumbnailData = null,
             isVideo = true,
+            onOpenClicked = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Landscape - Light",
+    device = "spec:width=917dp,height=412dp",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+)
+@Preview(
+    name = "Landscape - Dark",
+    device = "spec:width=917dp,height=412dp",
+    showBackground = true,
+    backgroundColor = 0xFF121212,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun LoadedFileLinkContentLandscapePreview() {
+    AndroidThemeForPreviews {
+        LoadedFileLinkContent(
+            fileName = "Marketing Plan 2026.pdf",
+            fileSize = "10 MB",
+            duration = null,
+            iconRes = iconPackR.drawable.ic_pdf_medium_solid,
+            thumbnailData = null,
+            isVideo = false,
             onOpenClicked = {},
         )
     }
