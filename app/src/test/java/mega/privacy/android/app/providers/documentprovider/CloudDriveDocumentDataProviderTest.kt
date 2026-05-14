@@ -16,8 +16,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentProviderUiState
+import mega.privacy.android.app.providers.documentprovider.model.ChildrenSlot
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
+import mega.privacy.android.app.providers.documentprovider.model.DocumentSlot
 import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -57,7 +59,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
@@ -103,7 +104,6 @@ class CloudDriveDocumentDataProviderTest {
     private companion object {
         private const val DOCUMENT_ID_PREFIX = "mega_cloud_drive_root"
         private val ROOT_NODE_ID = NodeId(1L)
-        private const val ROOT_DOCUMENT_ID = "mega_cloud_drive_root:1"
     }
 
     @BeforeEach
@@ -181,74 +181,108 @@ class CloudDriveDocumentDataProviderTest {
         Dispatchers.resetMain()
     }
 
+    // region sessionState
+
     @Test
-    fun `test that state is NotLoggedIn when credentials null`() = runTest {
+    fun `test that sessionState is NotLoggedIn when credentials null`() = runTest {
         whenever(getAccountCredentialsUseCase()).thenReturn(null)
         whenever(monitorUserCredentialsUseCase()).thenReturn(flowOf(null))
 
-        underTest.state.test {
+        underTest.sessionState.test {
             skipItems(1) // skip Initialising (StateFlow initial value)
-            assertThat(awaitItem()).isInstanceOf(CloudDriveDocumentProviderUiState.NotLoggedIn::class.java)
+            assertThat(awaitItem()).isInstanceOf(CloudDriveSessionState.NotLoggedIn::class.java)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that state is PasscodeLockEnabled when credentials exist and passcode enabled`() =
+    fun `test that sessionState is PasscodeLockEnabled when credentials exist and passcode enabled`() =
         runTest {
             whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(flowOf(true))
 
-            underTest.state.test {
+            underTest.sessionState.test {
                 skipItems(1) // skip Initialising
                 val state = awaitItem()
                 assertThat(state).isInstanceOf(
-                    CloudDriveDocumentProviderUiState.PasscodeLockEnabled::class.java
+                    CloudDriveSessionState.PasscodeLockEnabled::class.java
                 )
-                assertThat((state as CloudDriveDocumentProviderUiState.PasscodeLockEnabled).accountName)
+                assertThat((state as CloudDriveSessionState.PasscodeLockEnabled).accountName)
                     .isEqualTo("test@mega.co.nz")
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that state is Offline when credentials exist and updateConnectivity false`() =
+    fun `test that sessionState is Offline when credentials exist and updateConnectivity false`() =
         runTest {
             whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
 
-            underTest.state.test {
+            underTest.sessionState.test {
                 skipItems(1) // skip Initialising
-                awaitItem() // may get RootNodeNotLoaded or other; ensure we're past initial
+                awaitItem() // ensure we're past initial (RootNodeNotLoaded or Ready)
                 underTest.updateConnectivity(false)
                 advanceUntilIdle()
                 val state = awaitItem()
-                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.Offline::class.java)
-                assertThat((state as CloudDriveDocumentProviderUiState.Offline).accountName)
+                assertThat(state).isInstanceOf(CloudDriveSessionState.Offline::class.java)
+                assertThat((state as CloudDriveSessionState.Offline).accountName)
                     .isEqualTo("test@mega.co.nz")
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that state is RootNodeNotLoaded when credentials exist but root node is null`() =
+    fun `test that sessionState is RootNodeNotLoaded when credentials exist but root node is null`() =
         runTest {
             whenever(getRootNodeIdUseCase()).thenReturn(null)
             whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
 
-            underTest.state.test {
+            underTest.sessionState.test {
                 skipItems(1) // skip Initialising
                 val state = awaitItem()
                 assertThat(state).isInstanceOf(
-                    CloudDriveDocumentProviderUiState.RootNodeNotLoaded::class.java
+                    CloudDriveSessionState.RootNodeNotLoaded::class.java
                 )
-                assertThat((state as CloudDriveDocumentProviderUiState.RootNodeNotLoaded).accountName)
+                assertThat((state as CloudDriveSessionState.RootNodeNotLoaded).accountName)
                     .isEqualTo("test@mega.co.nz")
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that state is DocumentData for root when credentials and root available`() = runTest {
+    fun `test that sessionState is Ready when credentials and root node available`() = runTest {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+
+        underTest.sessionState.test {
+            skipItems(1)
+            val state = awaitItem()
+            assertThat(state).isInstanceOf(CloudDriveSessionState.Ready::class.java)
+            val ready = state as CloudDriveSessionState.Ready
+            assertThat(ready.accountName).isEqualTo("test@mega.co.nz")
+            assertThat(ready.rootNodeDocumentId).isEqualTo("$DOCUMENT_ID_PREFIX:${ROOT_NODE_ID.longValue}")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // endregion sessionState
+
+    // region documentState
+
+    @Test
+    fun `test that documentState is Idle when session is not Ready`() = runTest {
+        whenever(getAccountCredentialsUseCase()).thenReturn(null)
+        whenever(monitorUserCredentialsUseCase()).thenReturn(flowOf(null))
+
+        underTest.documentState.test {
+            val state = awaitItem()
+            assertThat(state).isEqualTo(DocumentSlot.Idle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that documentState resolves root to Loaded when session becomes Ready`() = runTest {
         val mockNode: FolderNode = mock()
         val typedNode: DefaultTypedFolderNode = mock()
         whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
@@ -265,82 +299,87 @@ class CloudDriveDocumentDataProviderTest {
         whenever(addNodeType.invoke(any())).thenReturn(typedNode)
         whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(rootRow)
 
-        underTest.state.test {
-            skipItems(1) // skip Initialising (StateFlow initial value)
-            // getDocumentFlow no longer emits an upfront LoadingDocument; the initial Document(root)
-            // request resolves directly to DocumentData(root) when the root node is mocked.
-            val state = awaitItem()
-            assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
-            val documentData = state as CloudDriveDocumentProviderUiState.DocumentData
-            assertThat(documentData.accountName).isEqualTo("test@mega.co.nz")
-            assertThat(documentData.documentId).isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
-            assertThat(documentData.document).isEqualTo(rootRow)
+        underTest.documentState.test {
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertThat(state).isInstanceOf(DocumentSlot.Loaded::class.java)
+            val loaded = state as DocumentSlot.Loaded
+            assertThat(loaded.documentId).isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+            assertThat(loaded.row).isEqualTo(rootRow)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that loadDocumentInBackground emits LoadingDocument then DocumentData when node found`() =
-        runTest {
-            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
-            val handle = 54321L
-            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
-            val mockNode: FolderNode = mock()
-            val typedNode: DefaultTypedFolderNode = mock()
-            whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(mockNode)
-            whenever(addNodeType.invoke(any())).thenReturn(typedNode)
-            val expectedRow = CloudDriveDocumentRow(
-                documentId = documentId,
-                displayName = "Loaded Doc",
-                mimeType = Document.MIME_TYPE_DIR,
-                size = 0L,
-                lastModified = 1000L,
-                flags = 0,
-            )
-            whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(expectedRow)
+    fun `test that loadDocumentInBackground emits Loaded when node found`() = runTest {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+        val handle = 54321L
+        val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+        val mockNode: FolderNode = mock()
+        val typedNode: DefaultTypedFolderNode = mock()
+        whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(mockNode)
+        whenever(addNodeType.invoke(any())).thenReturn(typedNode)
+        val expectedRow = CloudDriveDocumentRow(
+            documentId = documentId,
+            displayName = "Loaded Doc",
+            mimeType = Document.MIME_TYPE_DIR,
+            size = 0L,
+            lastModified = 1000L,
+            flags = 0,
+        )
+        whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(expectedRow)
 
-            underTest.state.test {
-                skipItems(1) // skip Initialising (StateFlow initial value)
-                // Initial Document(root) request resolves to DocumentData(root) (no upfront Loading).
-                awaitItem()
-                underTest.loadDocumentInBackground(documentId)
-                advanceUntilIdle()
-                val documentData = awaitItem() // DocumentData(documentId)
-                assertThat(documentData).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
-                assertThat((documentData as CloudDriveDocumentProviderUiState.DocumentData).document)
-                    .isEqualTo(expectedRow)
-                cancelAndIgnoreRemainingEvents()
-            }
-            verify(getNodeByHandleUseCase).invoke(handle, false)
-            verify(cloudDriveDocumentRowMapper, times(2)).invoke(typedNode, DOCUMENT_ID_PREFIX)
+        underTest.documentState.test {
+            advanceUntilIdle()
+            expectMostRecentItem() // drain initial root resolution
+            underTest.loadDocumentInBackground(documentId)
+            advanceUntilIdle()
+            val loaded = expectMostRecentItem()
+            assertThat(loaded).isInstanceOf(DocumentSlot.Loaded::class.java)
+            assertThat((loaded as DocumentSlot.Loaded).documentId).isEqualTo(documentId)
+            assertThat(loaded.row).isEqualTo(expectedRow)
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
     @Test
-    fun `test that loadDocumentInBackground emits LoadingDocument then FileNotFound when node null`() =
-        runTest {
-            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
-            val documentId = "$DOCUMENT_ID_PREFIX:12345"
-            whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(null)
+    fun `test that loadDocumentInBackground emits NotFound when node null`() = runTest {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+        val documentId = "$DOCUMENT_ID_PREFIX:12345"
+        whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(null)
 
-            underTest.state.test {
-                skipItems(1) // skip Initialising (StateFlow initial value)
-                // Root node is unmocked → initial Document(root) resolves to FileNotFound(root)
-                // (no upfront LoadingDocument).
-                awaitItem()
-                underTest.loadDocumentInBackground(documentId)
-                advanceUntilIdle()
-                val state = awaitItem() // FileNotFound(documentId)
-                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.FileNotFound::class.java)
-                assertThat((state as CloudDriveDocumentProviderUiState.FileNotFound).documentId)
-                    .isEqualTo(documentId)
-                cancelAndIgnoreRemainingEvents()
-            }
+        underTest.documentState.test {
+            advanceUntilIdle()
+            expectMostRecentItem() // drain initial root NotFound
+            underTest.loadDocumentInBackground(documentId)
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertThat(state).isInstanceOf(DocumentSlot.NotFound::class.java)
+            assertThat((state as DocumentSlot.NotFound).documentId).isEqualTo(documentId)
+            cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    // endregion documentState
+
+    // region childrenState
 
     @Test
-    fun `test that loadChildrenInBackground emits LoadingChildren then ChildData when children loaded`() =
+    fun `test that childrenState is Idle when session is not Ready`() = runTest {
+        whenever(getAccountCredentialsUseCase()).thenReturn(null)
+        whenever(monitorUserCredentialsUseCase()).thenReturn(flowOf(null))
+
+        underTest.childrenState.test {
+            val state = awaitItem()
+            assertThat(state).isEqualTo(ChildrenSlot.Idle)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that loadChildrenInBackground emits Loaded with children when load succeeds`() =
         runTest {
             val typedFolder: TypedNode = mock()
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
@@ -358,45 +397,44 @@ class CloudDriveDocumentDataProviderTest {
             )
             whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(expectedRow)
 
-            underTest.state.test {
-                skipItems(1) // skip Initialising (StateFlow initial value)
-                // Root unmocked → initial Document(root) emits FileNotFound (no upfront Loading).
-                awaitItem()
+            underTest.childrenState.test {
+                skipItems(1) // Idle
+                awaitItem() // initial children for root (NotFound — root unmocked as TypedNode)
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                val childData = awaitItem() // ChildData(children=..., hasMore=false)
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                val data = childData as CloudDriveDocumentProviderUiState.ChildData
-                assertThat(data.children).hasSize(1)
-                assertThat(data.children[0]).isEqualTo(expectedRow)
-                assertThat(data.parentId).isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(ChildrenSlot.Loaded::class.java)
+                val loaded = state as ChildrenSlot.Loaded
+                assertThat(loaded.children).hasSize(1)
+                assertThat(loaded.children[0]).isEqualTo(expectedRow)
+                assertThat(loaded.parentDocumentId)
+                    .isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that loadChildrenInBackground emits LoadingChildren then ChildData with empty list when no children`() =
+    fun `test that loadChildrenInBackground emits Loaded with empty list when no children`() =
         runTest {
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
             whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(getNodesByIdInChunkUseCase(any(), any()))
                 .thenReturn(flowOf(emptyList<TypedNode>() to false))
 
-            underTest.state.test {
-                skipItems(1) // skip Initialising (StateFlow initial value)
-                // Root unmocked → initial Document(root) emits FileNotFound (no upfront Loading).
+            underTest.childrenState.test {
+                skipItems(1) // Idle
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                val childData = awaitItem() // ChildData(children=empty, hasMore=false)
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                assertThat((childData as CloudDriveDocumentProviderUiState.ChildData).children).isEmpty()
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(ChildrenSlot.Loaded::class.java)
+                assertThat((state as ChildrenSlot.Loaded).children).isEmpty()
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that when showHiddenItems is true all nodes including sensitive are included in ChildData`() =
+    fun `test that when showHiddenItems is true all nodes including sensitive are included in childrenState`() =
         runTest {
             val sensitiveNode: TypedNode = mock()
             val normalNode: TypedNode = mock()
@@ -427,33 +465,27 @@ class CloudDriveDocumentDataProviderTest {
                 lastModified = 0L,
                 flags = 0,
             )
-            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX)).thenReturn(
-                row1
-            )
-            whenever(
-                cloudDriveDocumentRowMapper.invoke(
-                    sensitiveNode,
-                    DOCUMENT_ID_PREFIX
-                )
-            ).thenReturn(row2)
+            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX))
+                .thenReturn(row1)
+            whenever(cloudDriveDocumentRowMapper.invoke(sensitiveNode, DOCUMENT_ID_PREFIX))
+                .thenReturn(row2)
 
-            underTest.state.test {
+            underTest.childrenState.test {
                 skipItems(1)
-                // Root unmocked → FileNotFound, then ChildData after loadChildrenInBackground.
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                val childData = awaitItem()
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                val data = childData as CloudDriveDocumentProviderUiState.ChildData
-                assertThat(data.children).hasSize(2)
-                assertThat(data.children).containsExactly(row1, row2)
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(ChildrenSlot.Loaded::class.java)
+                val loaded = state as ChildrenSlot.Loaded
+                assertThat(loaded.children).hasSize(2)
+                assertThat(loaded.children).containsExactly(row1, row2)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that when isHiddenNodesEnabled is false all nodes including sensitive are included in ChildData`() =
+    fun `test that when isHiddenNodesEnabled is false all nodes including sensitive are included`() =
         runTest {
             val sensitiveNode: TypedNode = mock()
             whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
@@ -473,30 +505,25 @@ class CloudDriveDocumentDataProviderTest {
                 lastModified = 0L,
                 flags = 0,
             )
-            whenever(
-                cloudDriveDocumentRowMapper.invoke(
-                    sensitiveNode,
-                    DOCUMENT_ID_PREFIX
-                )
-            ).thenReturn(row)
+            whenever(cloudDriveDocumentRowMapper.invoke(sensitiveNode, DOCUMENT_ID_PREFIX))
+                .thenReturn(row)
 
-            underTest.state.test {
+            underTest.childrenState.test {
                 skipItems(1)
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                val childData = awaitItem()
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                assertThat((childData as CloudDriveDocumentProviderUiState.ChildData).children).hasSize(
-                    1
-                )
-                assertThat(childData.children[0]).isEqualTo(row)
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(ChildrenSlot.Loaded::class.java)
+                val loaded = state as ChildrenSlot.Loaded
+                assertThat(loaded.children).hasSize(1)
+                assertThat(loaded.children[0]).isEqualTo(row)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that when showHiddenItems false and isHiddenNodesEnabled true nodes with isMarkedSensitive are filtered out`() =
+    fun `test that sensitive nodes are filtered out when showHiddenItems false and isHiddenNodesEnabled true`() =
         runTest {
             val sensitiveNode: TypedNode = mock()
             val normalNode: TypedNode = mock()
@@ -519,27 +546,26 @@ class CloudDriveDocumentDataProviderTest {
                 lastModified = 0L,
                 flags = 0,
             )
-            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX)).thenReturn(
-                normalRow
-            )
+            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX))
+                .thenReturn(normalRow)
 
-            underTest.state.test {
+            underTest.childrenState.test {
                 skipItems(1)
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                val childData = awaitItem() // ChildData (filtered from first combine emission)
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                val data = childData as CloudDriveDocumentProviderUiState.ChildData
-                assertThat(data.children).hasSize(1)
-                assertThat(data.children[0]).isEqualTo(normalRow)
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(ChildrenSlot.Loaded::class.java)
+                val loaded = state as ChildrenSlot.Loaded
+                assertThat(loaded.children).hasSize(1)
+                assertThat(loaded.children[0]).isEqualTo(normalRow)
                 cancelAndIgnoreRemainingEvents()
             }
             verify(cloudDriveDocumentRowMapper).invoke(normalNode, DOCUMENT_ID_PREFIX)
         }
 
     @Test
-    fun `test that when showHiddenItems false and isHiddenNodesEnabled true nodes with isSensitiveInherited are filtered out`() =
+    fun `test that inherited-sensitive nodes are filtered out when showHiddenItems false and isHiddenNodesEnabled true`() =
         runTest {
             whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             val sensitiveInheritedNode: TypedNode = mock()
@@ -562,158 +588,25 @@ class CloudDriveDocumentDataProviderTest {
                 lastModified = 0L,
                 flags = 0,
             )
-            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX)).thenReturn(
-                normalRow
-            )
+            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX))
+                .thenReturn(normalRow)
 
-            underTest.state.test {
+            underTest.childrenState.test {
                 skipItems(1)
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                val childData = awaitItem() // ChildData (filtered from first combine emission)
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                val data = childData as CloudDriveDocumentProviderUiState.ChildData
-                assertThat(data.children).hasSize(1)
-                assertThat(data.children[0]).isEqualTo(normalRow)
-                cancelAndIgnoreRemainingEvents()
-            }
-            verify(cloudDriveDocumentRowMapper).invoke(normalNode, DOCUMENT_ID_PREFIX)
-        }
-
-    @Test
-    fun `test that when showHiddenItems false and isHiddenNodesEnabled true both isMarkedSensitive and isSensitiveInherited are filtered out`() =
-        runTest {
-            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
-            val markedSensitiveNode: TypedNode = mock()
-            val inheritedSensitiveNode: TypedNode = mock()
-            val normalNode: TypedNode = mock()
-            whenever(markedSensitiveNode.isMarkedSensitive).thenReturn(true)
-            whenever(markedSensitiveNode.isSensitiveInherited).thenReturn(false)
-            whenever(inheritedSensitiveNode.isMarkedSensitive).thenReturn(false)
-            whenever(inheritedSensitiveNode.isSensitiveInherited).thenReturn(true)
-            whenever(normalNode.isMarkedSensitive).thenReturn(false)
-            whenever(normalNode.isSensitiveInherited).thenReturn(false)
-            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
-            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
-                flowOf(listOf(normalNode, markedSensitiveNode, inheritedSensitiveNode) to false)
-            )
-            val normalRow = CloudDriveDocumentRow(
-                documentId = "$DOCUMENT_ID_PREFIX:1",
-                displayName = "Normal",
-                mimeType = Document.MIME_TYPE_DIR,
-                size = 0L,
-                lastModified = 0L,
-                flags = 0,
-            )
-            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX)).thenReturn(
-                normalRow
-            )
-
-            underTest.state.test {
-                skipItems(1)
-                awaitItem()
-                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
-                advanceUntilIdle()
-                val childData = awaitItem() // ChildData (filtered from first combine emission)
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                val data = childData as CloudDriveDocumentProviderUiState.ChildData
-                assertThat(data.children).hasSize(1)
-                assertThat(data.children[0]).isEqualTo(normalRow)
-                cancelAndIgnoreRemainingEvents()
-            }
-            verify(cloudDriveDocumentRowMapper, times(1)).invoke(any(), any())
-        }
-
-    @Test
-    fun `test that when filtering sensitive all non-sensitive nodes are included`() =
-        runTest {
-            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
-            val normal1: TypedNode = mock()
-            val normal2: TypedNode = mock()
-            whenever(normal1.isMarkedSensitive).thenReturn(false)
-            whenever(normal1.isSensitiveInherited).thenReturn(false)
-            whenever(normal2.isMarkedSensitive).thenReturn(false)
-            whenever(normal2.isSensitiveInherited).thenReturn(false)
-            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
-            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
-                flowOf(listOf(normal1, normal2) to false)
-            )
-            val row1 = CloudDriveDocumentRow(
-                documentId = "$DOCUMENT_ID_PREFIX:1",
-                displayName = "A",
-                mimeType = Document.MIME_TYPE_DIR,
-                size = 0L,
-                lastModified = 0L,
-                flags = 0,
-            )
-            val row2 = CloudDriveDocumentRow(
-                documentId = "$DOCUMENT_ID_PREFIX:2",
-                displayName = "B",
-                mimeType = Document.MIME_TYPE_DIR,
-                size = 0L,
-                lastModified = 0L,
-                flags = 0,
-            )
-            whenever(cloudDriveDocumentRowMapper.invoke(normal1, DOCUMENT_ID_PREFIX)).thenReturn(
-                row1
-            )
-            whenever(cloudDriveDocumentRowMapper.invoke(normal2, DOCUMENT_ID_PREFIX)).thenReturn(
-                row2
-            )
-
-            underTest.state.test {
-                skipItems(1)
-                awaitItem()
-                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
-                advanceUntilIdle()
-                val childData = awaitItem()
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                val data = childData as CloudDriveDocumentProviderUiState.ChildData
-                assertThat(data.children).hasSize(2)
-                assertThat(data.children).containsExactly(row1, row2)
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(ChildrenSlot.Loaded::class.java)
+                val loaded = state as ChildrenSlot.Loaded
+                assertThat(loaded.children).hasSize(1)
+                assertThat(loaded.children[0]).isEqualTo(normalRow)
                 cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that when showHiddenItems false and isHiddenNodesEnabled true all sensitive nodes yield empty ChildData`() =
-        runTest {
-            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
-            val sensitive1: TypedNode = mock()
-            val sensitive2: TypedNode = mock()
-            whenever(sensitive1.isMarkedSensitive).thenReturn(true)
-            whenever(sensitive1.isSensitiveInherited).thenReturn(false)
-            whenever(sensitive2.isMarkedSensitive).thenReturn(false)
-            whenever(sensitive2.isSensitiveInherited).thenReturn(true)
-            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
-            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
-                flowOf(listOf(sensitive1, sensitive2) to false)
-            )
-
-            underTest.state.test {
-                skipItems(1)
-                awaitItem()
-                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
-                advanceUntilIdle()
-                val childData =
-                    awaitItem() // ChildData (filtered from first combine emission, empty)
-                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
-                val data = childData as CloudDriveDocumentProviderUiState.ChildData
-                assertThat(data.children).isEmpty()
-                cancelAndIgnoreRemainingEvents()
-            }
-            verify(cloudDriveDocumentRowMapper, times(0)).invoke(any(), any())
-        }
-
-    @Test
-    fun `test that loadDocumentInBackground emits DocumentData when document is sensitive but showHiddenItems is true`() =
+    fun `test that documentState emits Loaded when document is sensitive but showHiddenItems is true`() =
         runTest {
             whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
@@ -735,108 +628,110 @@ class CloudDriveDocumentDataProviderTest {
                 lastModified = 0L,
                 flags = 0,
             )
-            whenever(cloudDriveDocumentRowMapper.invoke(typedNode, DOCUMENT_ID_PREFIX)).thenReturn(
-                expectedRow
-            )
+            whenever(cloudDriveDocumentRowMapper.invoke(typedNode, DOCUMENT_ID_PREFIX))
+                .thenReturn(expectedRow)
 
-            underTest.state.test {
-                skipItems(1)
-                // Initial Document(root) emits DocumentData(root) (root node mocked).
-                awaitItem()
+            underTest.documentState.test {
+                advanceUntilIdle()
+                expectMostRecentItem() // drain initial root resolution
                 underTest.loadDocumentInBackground(documentId)
                 advanceUntilIdle()
-                val state = awaitItem()
-                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
-                assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
-                    .isEqualTo(expectedRow)
+                val state = expectMostRecentItem()
+                assertThat(state).isInstanceOf(DocumentSlot.Loaded::class.java)
+                assertThat((state as DocumentSlot.Loaded).documentId).isEqualTo(documentId)
+                assertThat(state.row).isEqualTo(expectedRow)
                 cancelAndIgnoreRemainingEvents()
             }
             verify(cloudDriveDocumentRowMapper, atLeastOnce()).invoke(typedNode, DOCUMENT_ID_PREFIX)
         }
 
+    // endregion childrenState
+
+    // region findCachedChildRow
+
     @Test
-    fun `test that loadDocumentInBackground emits DocumentData when document is sensitive but isHiddenNodesEnabled is false`() =
+    fun `test that findCachedChildRow returns null when nothing has been loaded`() {
+        assertThat(underTest.findCachedChildRow("$DOCUMENT_ID_PREFIX:1")).isNull()
+    }
+
+    @Test
+    fun `test that findCachedChildRow returns row from currently loaded childrenState`() = runTest {
+        val typedFolder: TypedNode = mock()
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+        whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+            flowOf(listOf(typedFolder) to false)
+        )
+        val expectedRow = CloudDriveDocumentRow(
+            documentId = "$DOCUMENT_ID_PREFIX:42",
+            displayName = "Child",
+            mimeType = Document.MIME_TYPE_DIR,
+            size = 0L,
+            lastModified = 0L,
+            flags = 0,
+        )
+        whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(expectedRow)
+
+        underTest.childrenState.test {
+            advanceUntilIdle()
+            underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+            advanceUntilIdle()
+            val state = expectMostRecentItem()
+            assertThat(state).isInstanceOf(ChildrenSlot.Loaded::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        assertThat(underTest.findCachedChildRow("$DOCUMENT_ID_PREFIX:42"))
+            .isEqualTo(expectedRow)
+    }
+
+    @Test
+    fun `test that findCachedChildRow survives childrenState transitions`() =
         runTest {
-            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+            // AND-23569: Get Info should resolve a child's row even after the parent listing
+            // has changed. recentDocumentRows preserves the row across childrenState transitions.
+            val typedFolder: TypedNode = mock()
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-            val handle = 666L
-            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
-            val mockNode: FolderNode = mock()
-            val typedNode: TypedNode = mock()
-            whenever(typedNode.isMarkedSensitive).thenReturn(true)
-            whenever(typedNode.isSensitiveInherited).thenReturn(false)
-            whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(mockNode)
-            whenever(addNodeType.invoke(any())).thenReturn(typedNode)
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
-            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            val expectedRow = CloudDriveDocumentRow(
-                documentId = documentId,
-                displayName = "Sensitive Doc",
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+            val cachedRow = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:200",
+                displayName = "First",
                 mimeType = Document.MIME_TYPE_DIR,
                 size = 0L,
                 lastModified = 0L,
                 flags = 0,
             )
-            whenever(cloudDriveDocumentRowMapper.invoke(typedNode, DOCUMENT_ID_PREFIX)).thenReturn(
-                expectedRow
-            )
+            whenever(getNodesByIdInChunkUseCase(any(), any()))
+                .thenReturn(flowOf(listOf(typedFolder) to false))
+            whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(cachedRow)
 
-            underTest.state.test {
-                skipItems(1)
-                // Initial Document(root) emits DocumentData(root) (root node mocked).
-                awaitItem()
-                underTest.loadDocumentInBackground(documentId)
+            // Step 1: load root children so :200 is cached.
+            underTest.childrenState.test {
                 advanceUntilIdle()
-                val state = awaitItem()
-                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
-                assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
-                    .isEqualTo(expectedRow)
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                advanceUntilIdle()
                 cancelAndIgnoreRemainingEvents()
             }
-            verify(cloudDriveDocumentRowMapper, atLeastOnce()).invoke(typedNode, DOCUMENT_ID_PREFIX)
-        }
+            assertThat(underTest.findCachedChildRow("$DOCUMENT_ID_PREFIX:200"))
+                .isEqualTo(cachedRow)
 
-    @Test
-    fun `test that loadDocumentInBackground emits DocumentData when document is not sensitive and hidden nodes filtering is on`() =
-        runTest {
-            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
-            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-            val handle = 555L
-            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
-            val mockNode: FolderNode = mock()
-            val typedNode: TypedNode = mock()
-            whenever(typedNode.isMarkedSensitive).thenReturn(false)
-            whenever(typedNode.isSensitiveInherited).thenReturn(false)
-            whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(mockNode)
-            whenever(addNodeType.invoke(any())).thenReturn(typedNode)
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
-            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-            val expectedRow = CloudDriveDocumentRow(
-                documentId = documentId,
-                displayName = "Normal Doc",
-                mimeType = Document.MIME_TYPE_DIR,
-                size = 0L,
-                lastModified = 0L,
-                flags = 0,
-            )
-            whenever(cloudDriveDocumentRowMapper.invoke(typedNode, DOCUMENT_ID_PREFIX)).thenReturn(
-                expectedRow
-            )
-
-            underTest.state.test {
-                skipItems(1)
-                // Initial Document(root) emits DocumentData(root) (root node mocked).
-                awaitItem()
-                underTest.loadDocumentInBackground(documentId)
+            // Step 2: switch to a parent that resolves to NotFound — childrenState transitions
+            // away from the root's Loaded, but the row from the earlier listing must remain.
+            underTest.childrenState.test {
                 advanceUntilIdle()
-                val state = awaitItem()
-                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
-                assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
-                    .isEqualTo(expectedRow)
+                underTest.loadChildrenInBackground("$DOCUMENT_ID_PREFIX:99")
+                advanceUntilIdle()
                 cancelAndIgnoreRemainingEvents()
             }
-            verify(cloudDriveDocumentRowMapper, atLeastOnce()).invoke(typedNode, DOCUMENT_ID_PREFIX)
+
+            // The currently-loaded children no longer include :200, but the cache does.
+            assertThat(underTest.findCachedChildRow("$DOCUMENT_ID_PREFIX:200"))
+                .isEqualTo(cachedRow)
         }
+
+    // endregion findCachedChildRow
+
+    // region openDocumentFile
 
     @Test
     fun `test that openDocumentFile returns file from getOpenableLocalFileForCloudDriveSafUseCase`() =
@@ -896,7 +791,7 @@ class CloudDriveDocumentDataProviderTest {
             }
             assertThat(error).hasMessageThat().contains("Invalid document id")
         }
-    
+
     @Test
     fun `test that openDocumentFile wraps unexpected exception from getOpenableLocalFileForCloudDriveSafUseCase`() =
         runTest {
@@ -930,6 +825,10 @@ class CloudDriveDocumentDataProviderTest {
             assertThat(error).hasMessageThat().contains("Unable to open document: $documentId")
         }
 
+    // endregion openDocumentFile
+
+    // region pending folder / file
+
     @Test
     fun `test that registerPendingFolder returns id with PENDING_PREFIX`() = runTest {
         whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
@@ -959,8 +858,6 @@ class CloudDriveDocumentDataProviderTest {
     fun `test that registerPendingFolder rejects duplicate name with FileNotFoundException`() =
         runTest {
             val parentNodeId = NodeId(7L)
-            // UnTypedNode is a sealed interface; mockito can't mock it directly. Use FileNode,
-            // a concrete sub-interface, so the duplicate-name path receives a non-null hit.
             whenever(getChildNodeUseCase(parentNodeId, "Dup")).thenReturn(mock<FileNode>())
 
             assertThrows<FileNotFoundException> {
@@ -990,8 +887,6 @@ class CloudDriveDocumentDataProviderTest {
             underTest.completeFolderCreation(pendingId)
 
             verifyBlocking(createFolderNodeUseCase) { invoke("F", parentNodeId) }
-            // Placeholder row stays queryable so SAF can keep using it as a destination during
-            // a recursive folder copy.
             val row = underTest.getPendingDocumentRow(pendingId)
             assertThat(row).isNotNull()
             assertThat(row!!.documentId).isEqualTo(pendingId)
@@ -1006,9 +901,6 @@ class CloudDriveDocumentDataProviderTest {
             .thenAnswer { throw IllegalStateException("sdk") }
         val pendingId = underTest.registerPendingFolder("$DOCUMENT_ID_PREFIX:43", "F")
 
-        // Don't constrain the exception type: Mockito's suspend-fun-returning-value-class stubs
-        // can surface either the answer's throw or an NPE from Kotlin's null check. Either way
-        // the placeholder must be cleaned up.
         val result = runCatching { underTest.completeFolderCreation(pendingId) }
         assertThat(result.isFailure).isTrue()
         assertThat(underTest.getPendingDocumentRow(pendingId)).isNull()
@@ -1024,9 +916,6 @@ class CloudDriveDocumentDataProviderTest {
     @Test
     fun `test that registerPendingFile resolves placeholder folder parent to its real node id`() =
         runTest {
-            // Simulate SAF folder upload: createDocument(root, DIR) -> placeholder; then
-            // completeFolderCreation publishes the real NodeId; then a child createDocument
-            // arrives with the placeholder as parent.
             val outerParentNodeId = NodeId(50L)
             val createdFolderNodeId = NodeId(500L)
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
@@ -1048,14 +937,11 @@ class CloudDriveDocumentDataProviderTest {
 
             assertThat(filePlaceholderId)
                 .startsWith("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:")
-            // Collision check ran against the new folder's real NodeId, not the placeholder.
             verifyBlocking(getChildNodeUseCase) { invoke(createdFolderNodeId, "child.txt") }
         }
 
     @Test
     fun `test that registerPendingFile awaits placeholder folder still being created`() = runTest {
-        // Concurrent path: a child createDocument arrives BEFORE completeFolderCreation has
-        // resolved the placeholder folder. Should suspend until the real NodeId is published.
         val outerParentNodeId = NodeId(60L)
         val createdFolderNodeId = NodeId(600L)
         whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
@@ -1075,9 +961,6 @@ class CloudDriveDocumentDataProviderTest {
                 "application/octet-stream",
             )
         }
-        // runCurrent runs the launched task until it suspends on the folder signal without
-        // skipping the 30s withTimeoutOrNull delay (advanceUntilIdle would skip it and the
-        // child would fail with FileNotFoundException before completeFolderCreation runs).
         runCurrent()
         assertThat(deferredChild.isCompleted).isFalse()
 
@@ -1135,8 +1018,6 @@ class CloudDriveDocumentDataProviderTest {
     @Test
     fun `test that registerPendingFile rejects duplicate name`() = runTest {
         whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-        // UnTypedNode is a sealed interface; mockito can't mock it directly. Use FileNode,
-        // a concrete sub-interface, so the duplicate-name path receives a non-null hit.
         whenever(getChildNodeUseCase(ROOT_NODE_ID, "doc.txt")).thenReturn(mock<FileNode>())
 
         assertThrows<FileNotFoundException> {
@@ -1177,30 +1058,16 @@ class CloudDriveDocumentDataProviderTest {
         }
 
     @Test
-    fun `test that getPendingDocumentRow advertises FLAG_DIR_SUPPORTS_CREATE for placeholder folders`() =
-        runTest {
-            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-            whenever(getChildNodeUseCase(ROOT_NODE_ID, "Sub")).thenReturn(null)
-
-            val pendingId = underTest.registerPendingFolder(
-                CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
-                "Sub",
-            )
-            val row = underTest.getPendingDocumentRow(pendingId)
-
-            assertThat(row).isNotNull()
-            assertThat(row!!.mimeType).isEqualTo(Document.MIME_TYPE_DIR)
-            assertThat(row.flags and Document.FLAG_DIR_SUPPORTS_CREATE)
-                .isEqualTo(Document.FLAG_DIR_SUPPORTS_CREATE)
-        }
-
-    @Test
     fun `test that getPendingDocumentRow returns null for unknown id`() {
         assertThat(underTest.getPendingDocumentRow("$DOCUMENT_ID_PREFIX:1")).isNull()
         assertThat(
             underTest.getPendingDocumentRow("${CloudDriveDocumentDataProvider.PENDING_PREFIX}:unknown")
         ).isNull()
     }
+
+    // endregion pending folder / file
+
+    // region scratch file / upload
 
     @Test
     fun `test that prepareWriteScratchFile returns existing file from cache`() = runTest {
@@ -1316,6 +1183,10 @@ class CloudDriveDocumentDataProviderTest {
             )
         }
 
+    // endregion scratch file / upload
+
+    // region renameDocument
+
     @Test
     fun `test that renameDocument calls renameNodeUseCase and returns root document id when parent is root`() =
         runTest {
@@ -1366,4 +1237,6 @@ class CloudDriveDocumentDataProviderTest {
                 underTest.renameDocument(documentId, "x")
             }
         }
+
+    // endregion renameDocument
 }

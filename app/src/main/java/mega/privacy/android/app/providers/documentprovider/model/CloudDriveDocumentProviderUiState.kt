@@ -3,110 +3,78 @@ package mega.privacy.android.app.providers.documentprovider.model
 import androidx.compose.runtime.Stable
 
 /**
- * Cloud drive document provider ui state
+ * Session-level state of the Cloud Drive document provider, independent of any specific
+ * document or children request. The provider uses this to decide auth prompts, offline
+ * banners, and root cursor summary text.
  */
 @Stable
-sealed interface CloudDriveDocumentProviderUiState {
+sealed interface CloudDriveSessionState {
+    /** Before the first credentials / connectivity / root-node read completes. */
+    data object Initialising : CloudDriveSessionState
 
-    /**
-     * Loading document
-     *
-     * @property accountName
-     * @property currentDocumentId
-     */
-    data class LoadingDocument(
-        override val accountName: String,
-        val currentDocumentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasCredentials
+    /** No credentials available; provider should prompt the user to sign in. */
+    data object NotLoggedIn : CloudDriveSessionState
 
-    /**
-     * Loading children
-     *
-     * @property accountName
-     * @property currentParentDocumentId
-     */
-    data class LoadingChildren(
-        override val accountName: String,
-        val currentParentDocumentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasCredentials
+    /** App passcode lock is enabled; all reads/writes are blocked. */
+    data class PasscodeLockEnabled(val accountName: String) : CloudDriveSessionState
 
-    /**
-     * Not logged in
-     */
-    data object NotLoggedIn : CloudDriveDocumentProviderUiState
+    /** No network connectivity; reads of cached data may still work. */
+    data class Offline(val accountName: String) : CloudDriveSessionState
 
-    /**
-     * Root node not loaded
-     *
-     * @property accountName
-     */
-    data class RootNodeNotLoaded(override val accountName: String) :
-        CloudDriveDocumentProviderUiState, HasCredentials
+    /** Credentials present but root node has not been resolved yet. */
+    data class RootNodeNotLoaded(val accountName: String) : CloudDriveSessionState
 
-    /**
-     * Initial state
-     */
-    data object Initialising : CloudDriveDocumentProviderUiState
-
-    /**
-     * Document data
-     *
-     * @property accountName
-     * @property documentId
-     * @property document
-     */
-    data class DocumentData(
-        override val accountName: String,
-        val documentId: String,
-        val document: CloudDriveDocumentRow,
-    ) : CloudDriveDocumentProviderUiState, HasCredentials
-
-    /**
-     * Child data
-     *
-     * @property accountName
-     * @property parentId
-     * @property children
-     * @property hasMore
-     */
-    data class ChildData(
-        override val accountName: String,
-        val parentId: String,
-        val children: List<CloudDriveDocumentRow>,
-        val hasMore: Boolean,
-    ) : CloudDriveDocumentProviderUiState, HasCredentials
-
-    /**
-     * File not found
-     *
-     * @property accountName
-     * @property documentId
-     */
-    data class FileNotFound(
-        override val accountName: String,
-        val documentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasCredentials
-
-    /**
-     * Passcode lock is enabled
-     * @property accountName
-     */
-    data class PasscodeLockEnabled(
-        override val accountName: String,
-    ) : CloudDriveDocumentProviderUiState, HasCredentials
-
-    /**
-     * Device is offline (no internet connectivity)
-     * @property accountName
-     */
-    data class Offline(
-        override val accountName: String,
-    ) : CloudDriveDocumentProviderUiState, HasCredentials
+    /** Provider is ready to serve documents from the resolved root. */
+    data class Ready(
+        val accountName: String,
+        val rootNodeDocumentId: String,
+    ) : CloudDriveSessionState
 }
 
 /**
- * Has credentials
+ * Per-id state for `queryDocument`. Driven by the `documentRequestFlow` pipeline and
+ * independent of [ChildrenSlot] so the two cannot cancel each other.
  */
-internal interface HasCredentials {
-    val accountName: String
+@Stable
+sealed interface DocumentSlot {
+    /** No document has been requested yet. */
+    data object Idle : DocumentSlot
+
+    /** Loading the row for [documentId]. */
+    data class Loading(val documentId: String) : DocumentSlot
+
+    /** Row for [documentId] resolved. */
+    data class Loaded(
+        val documentId: String,
+        val row: CloudDriveDocumentRow,
+    ) : DocumentSlot
+
+    /** [documentId] does not resolve to a node. */
+    data class NotFound(val documentId: String) : DocumentSlot
+}
+
+/**
+ * Per-parent-id state for `queryChildDocuments`. Driven by the `childrenRequestFlow`
+ * pipeline and independent of [DocumentSlot].
+ */
+@Stable
+sealed interface ChildrenSlot {
+    /** No parent has been requested yet. */
+    data object Idle : ChildrenSlot
+
+    /** Loading the children of [parentDocumentId]. */
+    data class Loading(val parentDocumentId: String) : ChildrenSlot
+
+    /**
+     * Children of [parentDocumentId] resolved. [hasMore] indicates whether the
+     * underlying chunked loader is still streaming more pages.
+     */
+    data class Loaded(
+        val parentDocumentId: String,
+        val children: List<CloudDriveDocumentRow>,
+        val hasMore: Boolean,
+    ) : ChildrenSlot
+
+    /** [parentDocumentId] does not resolve to a folder. */
+    data class NotFound(val parentDocumentId: String) : ChildrenSlot
 }

@@ -41,7 +41,7 @@ class CloudDriveDocumentRowMapper @Inject constructor(
                 displayName = node.name,
                 mimeType = node.type.mimeType,
                 size = node.size,
-                lastModified = node.modificationTime,
+                lastModified = node.modificationTime.times(1000L),
                 flags = Document.FLAG_SUPPORTS_RENAME,
             )
 
@@ -50,8 +50,8 @@ class CloudDriveDocumentRowMapper @Inject constructor(
                 displayName = node.name,
                 mimeType = Document.MIME_TYPE_DIR,
                 size = 0L,
-                lastModified = node.creationTime,
-                flags = Document.FLAG_DIR_SUPPORTS_CREATE or Document.FLAG_SUPPORTS_RENAME,
+                lastModified = node.creationTime.times(1000L),
+                flags = Document.FLAG_SUPPORTS_RENAME,
             )
 
             else -> CloudDriveDocumentRow(

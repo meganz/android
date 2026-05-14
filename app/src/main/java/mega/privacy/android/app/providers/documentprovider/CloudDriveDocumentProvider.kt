@@ -32,9 +32,10 @@ import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentDataProvider.Companion.CLOUD_DRIVE_ROOT_ID
-import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentProviderUiState
+import mega.privacy.android.app.providers.documentprovider.model.ChildrenSlot
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
-import mega.privacy.android.app.providers.documentprovider.model.HasCredentials
+import mega.privacy.android.app.providers.documentprovider.model.DocumentSlot
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -118,11 +119,13 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     }
 
     override fun queryRoots(projection: Array<String>?): Cursor {
-        val summary = when (val state = dataProvider.state.value) {
-            is HasCredentials -> state.accountName
-            CloudDriveDocumentProviderUiState.NotLoggedIn -> getLoginToMEGAString()
-
-            else -> getLoadingString()
+        val summary = when (val session = dataProvider.sessionState.value) {
+            is CloudDriveSessionState.Ready -> session.accountName
+            is CloudDriveSessionState.PasscodeLockEnabled -> session.accountName
+            is CloudDriveSessionState.Offline -> session.accountName
+            is CloudDriveSessionState.RootNodeNotLoaded -> session.accountName
+            CloudDriveSessionState.NotLoggedIn -> getLoginToMEGAString()
+            CloudDriveSessionState.Initialising -> getLoadingString()
         }
         val result =
             getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false).apply {
@@ -136,12 +139,13 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
     private fun listenForRootChanges() {
         rootNotifyJob?.cancel()
-        val wasLoggedIn = dataProvider.state.value is HasCredentials
-        val wasOffline = dataProvider.state.value is CloudDriveDocumentProviderUiState.Offline
+        val before = dataProvider.sessionState.value
+        val wasLoggedIn = before.isLoggedIn
+        val wasOffline = before is CloudDriveSessionState.Offline
         rootNotifyJob = applicationScope.launch {
-            dataProvider.state.first { state ->
-                val isLoggedIn = state is HasCredentials
-                val isOffline = state is CloudDriveDocumentProviderUiState.Offline
+            dataProvider.sessionState.first { current ->
+                val isLoggedIn = current.isLoggedIn
+                val isOffline = current is CloudDriveSessionState.Offline
                 isLoggedIn != wasLoggedIn || isOffline != wasOffline
             }
             delay(NOTIFY_DELAY_MS)
@@ -149,6 +153,12 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             notifyDocumentChanged(CLOUD_DRIVE_ROOT_ID)
         }
     }
+
+    private val CloudDriveSessionState.isLoggedIn: Boolean
+        get() = this is CloudDriveSessionState.Ready ||
+                this is CloudDriveSessionState.Offline ||
+                this is CloudDriveSessionState.PasscodeLockEnabled ||
+                this is CloudDriveSessionState.RootNodeNotLoaded
 
     private fun MatrixCursor.addRootRow(summary: String) {
         newRow().apply {
@@ -160,7 +170,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             add(Root.COLUMN_SUMMARY, summary)
             add(Root.COLUMN_DOCUMENT_ID, CLOUD_DRIVE_ROOT_ID)
             add(Root.COLUMN_ICON, R.mipmap.ic_launcher)
-            add(Root.COLUMN_FLAGS, Root.FLAG_SUPPORTS_CREATE)
+            add(Root.COLUMN_FLAGS, 0)
         }
     }
 
@@ -187,22 +197,74 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         return result
     }
 
+    private fun documentQueryCursor(
+        documentId: String,
+        projection: Array<String>?,
+    ): MatrixCursor {
+        // Session-level cases first — they don't depend on the document slot.
+        when (val session = dataProvider.sessionState.value) {
+            CloudDriveSessionState.NotLoggedIn -> throwAuthenticationRequired()
+            is CloudDriveSessionState.PasscodeLockEnabled ->
+                return getErrorCursor(
+                    resolveDocumentProjection(projection),
+                    getPasscodeLockEnabledString(),
+                )
+
+            is CloudDriveSessionState.Offline ->
+                return getErrorCursor(
+                    resolveDocumentProjection(projection),
+                    getOfflineString(),
+                )
+
+            is CloudDriveSessionState.RootNodeNotLoaded -> {
+                dataProvider.refreshRootNode()
+                return loadDocumentAsync(documentId, projection)
+            }
+
+            CloudDriveSessionState.Initialising,
+            is CloudDriveSessionState.Ready,
+                -> Unit
+        }
+
+        return when (val slot = dataProvider.documentState.value) {
+            is DocumentSlot.Loaded ->
+                if (slot.documentId == documentId) {
+                    documentCursor(row = slot.row, projection = projection)
+                } else {
+                    serveDocumentFromCacheOrLoad(documentId, projection)
+                }
+
+            is DocumentSlot.Loading -> serveDocumentFromCacheOrLoad(documentId, projection)
+
+            is DocumentSlot.NotFound ->
+                if (slot.documentId == documentId) {
+                    throw FileNotFoundException("Node not found: $documentId")
+                } else {
+                    serveDocumentFromCacheOrLoad(documentId, projection)
+                }
+
+            DocumentSlot.Idle -> serveDocumentFromCacheOrLoad(documentId, projection)
+        }
+    }
+
+    private fun serveDocumentFromCacheOrLoad(
+        documentId: String,
+        projection: Array<String>?,
+    ): MatrixCursor {
+        val cachedRow = dataProvider.findCachedChildRow(documentId)
+            ?: return loadDocumentAsync(documentId, projection)
+        // Cache hit: still kick off documentState load so it's warm for subsequent queries.
+        dataProvider.loadDocumentInBackground(documentId)
+        return documentCursor(row = cachedRow, projection = projection)
+    }
+
     private fun listenForDocumentChanges(documentId: String) {
         documentNotifyJob?.cancel()
         documentNotifyJob = applicationScope.launch {
-            dataProvider.state.first { state ->
-                when (state) {
-                    is CloudDriveDocumentProviderUiState.DocumentData ->
-                        state.documentId == documentId
-
-                    is CloudDriveDocumentProviderUiState.FileNotFound ->
-                        state.documentId == documentId
-
-                    is CloudDriveDocumentProviderUiState.PasscodeLockEnabled,
-                    is CloudDriveDocumentProviderUiState.Offline,
-                    CloudDriveDocumentProviderUiState.NotLoggedIn,
-                        -> true
-
+            dataProvider.documentState.first { slot ->
+                when (slot) {
+                    is DocumentSlot.Loaded -> slot.documentId == documentId
+                    is DocumentSlot.NotFound -> slot.documentId == documentId
                     else -> false
                 }
             }
@@ -218,74 +280,9 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             mimeType = Document.MIME_TYPE_DIR,
             size = 0L,
             lastModified = 0L,
-            flags = Document.FLAG_DIR_SUPPORTS_CREATE,
+            flags = 0,
         )
         return documentCursor(row = row, projection = projection)
-    }
-
-    private fun documentQueryCursor(
-        documentId: String,
-        projection: Array<String>?,
-    ): MatrixCursor = when (val state = dataProvider.state.value) {
-        is CloudDriveDocumentProviderUiState.DocumentData -> {
-            if (documentId == state.documentId) {
-                documentCursor(row = state.document, projection = projection)
-            } else {
-                loadDocumentAsync(documentId, projection)
-            }
-        }
-
-        is CloudDriveDocumentProviderUiState.LoadingDocument -> {
-            if (state.currentDocumentId != documentId) {
-                dataProvider.loadDocumentInBackground(documentId)
-            }
-            getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
-        }
-
-        is CloudDriveDocumentProviderUiState.PasscodeLockEnabled -> {
-            getErrorCursor(
-                resolveDocumentProjection(projection),
-                getPasscodeLockEnabledString()
-            )
-        }
-
-        is CloudDriveDocumentProviderUiState.Offline -> {
-            getErrorCursor(
-                resolveDocumentProjection(projection),
-                getOfflineString()
-            )
-        }
-
-        CloudDriveDocumentProviderUiState.Initialising -> loadDocumentAsync(
-            documentId,
-            projection
-        )
-
-        CloudDriveDocumentProviderUiState.NotLoggedIn ->
-            throwAuthenticationRequired()
-
-        is CloudDriveDocumentProviderUiState.ChildData ->
-            state.children.firstOrNull { it.documentId == documentId }
-                ?.let { documentCursor(row = it, projection = projection) }
-                ?: loadDocumentAsync(documentId, projection)
-
-        is CloudDriveDocumentProviderUiState.LoadingChildren -> loadDocumentAsync(
-            documentId,
-            projection
-        )
-
-        is CloudDriveDocumentProviderUiState.FileNotFound -> {
-            if (state.documentId == documentId) {
-                throw FileNotFoundException("Node not found: $documentId")
-            } else {
-                loadDocumentAsync(documentId, projection)
-            }
-        }
-
-        is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
-            dataProvider.refreshRootNode()
-            loadDocumentAsync(documentId, projection)
-        }
     }
 
     private fun loadDocumentAsync(
@@ -311,15 +308,15 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
         val isWrite = dataProvider.isPendingDocumentId(documentId)
 
-        when (dataProvider.state.value) {
-            is CloudDriveDocumentProviderUiState.NotLoggedIn -> throwAuthenticationRequired()
-            is CloudDriveDocumentProviderUiState.PasscodeLockEnabled ->
+        when (dataProvider.sessionState.value) {
+            CloudDriveSessionState.NotLoggedIn -> throwAuthenticationRequired()
+            is CloudDriveSessionState.PasscodeLockEnabled ->
                 throw FileNotFoundException(getPasscodeLockEnabledString())
 
-            is CloudDriveDocumentProviderUiState.Offline ->
+            is CloudDriveSessionState.Offline ->
                 if (!isWrite) throw FileNotFoundException(getOfflineString())
 
-            is CloudDriveDocumentProviderUiState.RootNodeNotLoaded ->
+            is CloudDriveSessionState.RootNodeNotLoaded ->
                 dataProvider.refreshRootNode()
 
             else -> Unit
@@ -466,98 +463,109 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
         val result = childDocumentsCursor(parentDocumentId, projection)
         setNotificationUriForChildDocuments(parentDocumentId, result)
-        if (result.isLoading) {
+        if (needsChildDocumentsRefresh(parentDocumentId)) {
             listenForChildDocumentChanges(parentDocumentId)
         }
         return result
     }
 
+    private fun needsChildDocumentsRefresh(parentDocumentId: String): Boolean =
+        when (val slot = dataProvider.childrenState.value) {
+            is ChildrenSlot.Loaded ->
+                slot.parentDocumentId != parentDocumentId || slot.hasMore
+            is ChildrenSlot.NotFound ->
+                slot.parentDocumentId != parentDocumentId
+            else -> true
+        }
+
+    private fun childDocumentsCursor(
+        parentDocumentId: String,
+        projection: Array<String>?,
+    ): MatrixCursor {
+        // Session-level cases first.
+        when (val session = dataProvider.sessionState.value) {
+            CloudDriveSessionState.NotLoggedIn -> throwAuthenticationRequired()
+            is CloudDriveSessionState.PasscodeLockEnabled ->
+                return getErrorCursor(
+                    resolveDocumentProjection(projection),
+                    getPasscodeLockEnabledString(),
+                )
+
+            is CloudDriveSessionState.Offline ->
+                return getErrorCursor(
+                    resolveDocumentProjection(projection),
+                    getOfflineString(),
+                )
+
+            is CloudDriveSessionState.RootNodeNotLoaded -> {
+                dataProvider.refreshRootNode()
+                return loadChildrenAsync(parentDocumentId, projection)
+            }
+
+            CloudDriveSessionState.Initialising,
+            is CloudDriveSessionState.Ready,
+                -> Unit
+        }
+
+        // Fast path for the folder Info screen: serve a non-loading empty cursor so
+        if (dataProvider.findCachedChildRow(parentDocumentId) != null) {
+            val current = dataProvider.childrenState.value
+            val alreadyHandled = current is ChildrenSlot.Loaded &&
+                    current.parentDocumentId == parentDocumentId
+            if (!alreadyHandled) {
+                dataProvider.loadChildrenInBackground(parentDocumentId)
+                return getMatrixCursor(
+                    resolveDocumentProjection(projection),
+                    withLoadingInfo = false,
+                )
+            }
+        }
+
+        return when (val slot = dataProvider.childrenState.value) {
+            is ChildrenSlot.Loaded ->
+                if (slot.parentDocumentId == parentDocumentId) {
+                    documentCursor(
+                        rows = slot.children + dataProvider.getPendingChildrenForParent(
+                            parentDocumentId
+                        ),
+                        projection = projection,
+                        isLoading = slot.hasMore,
+                    )
+                } else {
+                    loadChildrenAsync(parentDocumentId, projection)
+                }
+
+            is ChildrenSlot.Loading ->
+                if (slot.parentDocumentId != parentDocumentId) {
+                    dataProvider.loadChildrenInBackground(parentDocumentId)
+                    getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
+                } else {
+                    getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
+                }
+
+            is ChildrenSlot.NotFound ->
+                if (slot.parentDocumentId == parentDocumentId) {
+                    throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
+                } else {
+                    loadChildrenAsync(parentDocumentId, projection)
+                }
+
+            ChildrenSlot.Idle -> loadChildrenAsync(parentDocumentId, projection)
+        }
+    }
+
     private fun listenForChildDocumentChanges(parentDocumentId: String) {
         childDocumentsNotifyJob?.cancel()
         childDocumentsNotifyJob = applicationScope.launch {
-            dataProvider.state.first { state ->
-                when (state) {
-                    is CloudDriveDocumentProviderUiState.ChildData ->
-                        state.parentId == parentDocumentId
-
-                    is CloudDriveDocumentProviderUiState.FileNotFound,
-                    is CloudDriveDocumentProviderUiState.PasscodeLockEnabled,
-                    is CloudDriveDocumentProviderUiState.Offline,
-                    CloudDriveDocumentProviderUiState.NotLoggedIn,
-                        -> true
-
+            dataProvider.childrenState.first { slot ->
+                when (slot) {
+                    is ChildrenSlot.Loaded -> slot.parentDocumentId == parentDocumentId
+                    is ChildrenSlot.NotFound -> slot.parentDocumentId == parentDocumentId
                     else -> false
                 }
             }
             delay(NOTIFY_DELAY_MS)
             notifyChildDocumentsChanged(parentDocumentId)
-        }
-    }
-
-    private fun childDocumentsCursor(
-        parentDocumentId: String,
-        projection: Array<String>?,
-    ): MatrixCursor = when (val state = dataProvider.state.value) {
-        is CloudDriveDocumentProviderUiState.PasscodeLockEnabled ->
-            getErrorCursor(
-                resolveDocumentProjection(projection),
-                getPasscodeLockEnabledString()
-            )
-
-        is CloudDriveDocumentProviderUiState.Offline ->
-            getErrorCursor(
-                resolveDocumentProjection(projection),
-                getOfflineString()
-            )
-
-        is CloudDriveDocumentProviderUiState.ChildData -> {
-            if (parentDocumentId == state.parentId) {
-                documentCursor(
-                    rows = state.children + dataProvider.getPendingChildrenForParent(parentDocumentId),
-                    projection = projection,
-                    isLoading = state.hasMore
-                )
-            } else {
-                loadChildrenAsync(parentDocumentId, projection)
-            }
-        }
-
-        is CloudDriveDocumentProviderUiState.DocumentData -> loadChildrenAsync(
-            parentDocumentId,
-            projection
-        )
-
-        is CloudDriveDocumentProviderUiState.LoadingChildren -> {
-            if (parentDocumentId != state.currentParentDocumentId) {
-                dataProvider.loadChildrenInBackground(parentDocumentId)
-            }
-            getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
-        }
-
-        is CloudDriveDocumentProviderUiState.LoadingDocument -> loadChildrenAsync(
-            parentDocumentId,
-            projection
-        )
-
-        CloudDriveDocumentProviderUiState.Initialising -> loadChildrenAsync(
-            parentDocumentId,
-            projection
-        )
-
-        CloudDriveDocumentProviderUiState.NotLoggedIn ->
-            throwAuthenticationRequired()
-
-        is CloudDriveDocumentProviderUiState.FileNotFound -> {
-            if (state.documentId == parentDocumentId) {
-                throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
-            } else {
-                loadChildrenAsync(parentDocumentId, projection)
-            }
-        }
-
-        is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
-            dataProvider.refreshRootNode()
-            loadChildrenAsync(parentDocumentId, projection)
         }
     }
 

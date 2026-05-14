@@ -2,7 +2,6 @@ package mega.privacy.android.app.providers.documentprovider
 
 import android.provider.DocumentsContract.Document
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
@@ -50,10 +49,28 @@ class CloudDriveDocumentRowMapperTest {
         assertThat(row.displayName).isEqualTo("My Folder")
         assertThat(row.mimeType).isEqualTo(Document.MIME_TYPE_DIR)
         assertThat(row.size).isEqualTo(0L)
-        assertThat(row.lastModified).isEqualTo(2000L)
-        assertThat(row.flags).isEqualTo(
-            Document.FLAG_DIR_SUPPORTS_CREATE or Document.FLAG_SUPPORTS_RENAME
+        // SDK reports creationTime in seconds; Android's Document.COLUMN_LAST_MODIFIED is millis.
+        assertThat(row.lastModified).isEqualTo(2_000_000L)
+        assertThat(row.flags).isEqualTo(Document.FLAG_SUPPORTS_RENAME)
+    }
+
+    @Test
+    fun `test that folder row does not advertise FLAG_DIR_SUPPORTS_CREATE`() {
+        val folderNode: TypedFolderNode = mock()
+        whenever(folderNode.id).thenReturn(NodeId(101L))
+        whenever(folderNode.name).thenReturn("Folder")
+        whenever(folderNode.creationTime).thenReturn(1L)
+        whenever(nodeIdToDocumentIdMapper.invoke(NodeId(101L), DOCUMENT_ID_PREFIX))
+            .thenReturn("$DOCUMENT_ID_PREFIX:101")
+
+        val row = underTest(
+            DefaultTypedFolderNode(folderNode, FolderType.Default),
+            DOCUMENT_ID_PREFIX,
         )
+
+        // FLAG_DIR_SUPPORTS_CREATE must NOT be set; with it set, DocumentsUI replaces the
+        // Get Info action with the "Create document here" picker UI for the folder.
+        assertThat(row.flags and Document.FLAG_DIR_SUPPORTS_CREATE).isEqualTo(0)
     }
 
     @Test
@@ -77,7 +94,8 @@ class CloudDriveDocumentRowMapperTest {
         assertThat(row.displayName).isEqualTo("report.pdf")
         assertThat(row.mimeType).isEqualTo("application/pdf")
         assertThat(row.size).isEqualTo(4096L)
-        assertThat(row.lastModified).isEqualTo(3000L)
+        // SDK reports modificationTime in seconds; Android's Document.COLUMN_LAST_MODIFIED is millis.
+        assertThat(row.lastModified).isEqualTo(3_000_000L)
         assertThat(row.flags).isEqualTo(Document.FLAG_SUPPORTS_RENAME)
     }
 }

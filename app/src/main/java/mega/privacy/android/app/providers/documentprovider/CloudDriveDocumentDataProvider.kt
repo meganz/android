@@ -6,6 +6,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.provider.DocumentsContract.Document
 import androidx.annotation.VisibleForTesting
+import androidx.collection.LruCache
 import androidx.core.content.getSystemService
 import dagger.Lazy as DaggerLazy
 import kotlinx.coroutines.CompletableDeferred
@@ -35,8 +36,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
-import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentProviderUiState
+import mega.privacy.android.app.providers.documentprovider.model.ChildrenSlot
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
+import mega.privacy.android.app.providers.documentprovider.model.DocumentSlot
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -96,9 +99,10 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     private val startUploadUseCase: DaggerLazy<StartUploadUseCase>,
     private val getCacheFileUseCase: DaggerLazy<GetCacheFileUseCase>,
 ) {
-
     private val pendingCreates = ConcurrentHashMap<String, PendingCreate>()
     private val pendingFinalizeSignals = ConcurrentHashMap<String, CompletableDeferred<Unit>>()
+
+    private val recentDocumentRows = LruCache<String, CloudDriveDocumentRow>(1024)
 
     /** Lets nested SAF createDocument calls resolve a placeholder parent to the real folder NodeId. */
     private val pendingFolderRealNodeId = ConcurrentHashMap<String, NodeId>()
@@ -148,90 +152,6 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         awaitClose { connectivityManager?.unregisterNetworkCallback(callback) }
     }
 
-    private sealed interface SessionState {
-        data object NotLoggedIn : SessionState
-        data class PasscodeLockEnabled(val accountName: String) : SessionState
-        data class Offline(val accountName: String) : SessionState
-        data class Ready(
-            val accountName: String,
-            val rootNodeId: NodeId?,
-        ) : SessionState
-    }
-
-    @OptIn(FlowPreview::class)
-    val state: StateFlow<CloudDriveDocumentProviderUiState> by lazy {
-        monitorSessionState()
-            .flatMapLatest { sessionState -> sessionStateToUiState(sessionState) }
-            .catch { e ->
-                Timber.e(e, "CloudDriveDocumentDataProvider state")
-                emit(CloudDriveDocumentProviderUiState.NotLoggedIn)
-            }.asUiStateFlow(
-                scope = applicationScope,
-                initialValue = CloudDriveDocumentProviderUiState.Initialising
-            )
-    }
-
-    private fun monitorSessionState(): Flow<SessionState> =
-        combine(
-            monitorPasscodeLockPreferenceUseCase.get()().catch {
-                Timber.e(it)
-                emit(false)
-            },
-            connectivityState,
-            monitorUserCredentialsUseCase.get()().onStart { emit(getAccountCredentialsUseCase.get()()) }
-                .catch {
-                    Timber.e(it)
-                    emit(null)
-                }
-                .distinctUntilChangedBy { it?.email },
-        ) { isPasscodeLockEnabled, isConnected, credentials ->
-            Timber.d("CloudDriveDocumentDataProvider isPasscodeLockEnabled=$isPasscodeLockEnabled isConnected=$isConnected credentials=$credentials")
-            val accountName = credentials?.email ?: ""
-            when {
-                credentials == null -> SessionState.NotLoggedIn
-                isPasscodeLockEnabled -> SessionState.PasscodeLockEnabled(accountName)
-                !isConnected -> SessionState.Offline(accountName)
-                else -> SessionState.Ready(accountName, null)
-            }
-        }.flatMapLatest { sessionState ->
-            if (sessionState is SessionState.Ready && sessionState.rootNodeId == null) {
-                getRootNodeFlow().map { rootNodeId ->
-                    SessionState.Ready(sessionState.accountName, rootNodeId)
-                }
-            } else {
-                flowOf(sessionState)
-            }
-        }
-
-    private fun sessionStateToUiState(
-        sessionState: SessionState,
-    ): Flow<CloudDriveDocumentProviderUiState> = when (sessionState) {
-        SessionState.NotLoggedIn ->
-            flowOf(CloudDriveDocumentProviderUiState.NotLoggedIn)
-
-        is SessionState.PasscodeLockEnabled ->
-            flowOf(CloudDriveDocumentProviderUiState.PasscodeLockEnabled(sessionState.accountName))
-
-        is SessionState.Offline ->
-            flowOf(CloudDriveDocumentProviderUiState.Offline(sessionState.accountName))
-
-        is SessionState.Ready -> {
-            val rootNodeId = sessionState.rootNodeId
-            if (rootNodeId == null) {
-                flowOf(
-                    CloudDriveDocumentProviderUiState.RootNodeNotLoaded(
-                        sessionState.accountName
-                    )
-                )
-            } else {
-                getDataFlows(
-                    sessionState.accountName,
-                    "$CLOUD_DRIVE_ROOT_ID:${rootNodeId.longValue}"
-                )
-            }
-        }
-    }
-
     private val refreshRootNodeChannel =
         Channel<Unit>(1, onBufferOverflow = BufferOverflow.DROP_LATEST)
 
@@ -248,74 +168,195 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     private suspend fun getRootNodeWithFastLoginIfNeeded(): NodeId? =
         getRootNodeIdUseCase.get()() ?: run {
             Timber.d("CloudDriveDocumentDataProvider getRootNodeUseCase returned null, attempting fast login")
-            backgroundFastLoginUseCase.get()().let {
-                getRootNodeIdUseCase.get()()
-            }
+            backgroundFastLoginUseCase.get()()
+            getRootNodeIdUseCase.get()()
         }
 
-    private sealed interface DocumentDataRequest {
-        val documentId: String
-
-        data class Children(override val documentId: String) : DocumentDataRequest
-        data class Document(override val documentId: String) : DocumentDataRequest
+    /**
+     * Session-level state: credentials, passcode lock, connectivity, root node availability.
+     * Independent of any specific document or children request.
+     */
+    @OptIn(FlowPreview::class)
+    val sessionState: StateFlow<CloudDriveSessionState> by lazy {
+        monitorSessionState()
+            .catch { e ->
+                Timber.e(e, "CloudDriveDocumentDataProvider sessionState")
+                emit(CloudDriveSessionState.NotLoggedIn)
+            }
+            .asUiStateFlow(
+                scope = applicationScope,
+                initialValue = CloudDriveSessionState.Initialising,
+            )
     }
 
-    private val requestFlow: MutableStateFlow<DocumentDataRequest> =
-        MutableStateFlow(DocumentDataRequest.Document(CLOUD_DRIVE_ROOT_ID))
-
-    private fun getDataFlows(accountName: String, rootNodeDocumentId: String) =
-        monitorNodeUpdatesUseCase.get()().catch {
-            Timber.e(
-                it,
-                "CloudDriveDocumentDataProvider monitorNodeUpdates"
-            )
-        }.map { }.onStart { emit(Unit) }.flatMapLatest {
-            requestFlow.map { request ->
-                request.resolveRootId(rootNodeDocumentId)
-            }.flatMapLatest { (request, documentId, notificationString) ->
-                when (request) {
-                    is DocumentDataRequest.Children ->
-                        getChildrenFlow(
-                            accountName = accountName,
-                            parentDocumentId = documentId,
-                            notificationString = notificationString,
-                        )
-
-                    is DocumentDataRequest.Document ->
-                        getDocumentFlow(
-                            accountName = accountName,
-                            documentName = documentId,
-                            notificationString = notificationString,
-                        )
+    private fun monitorSessionState(): Flow<CloudDriveSessionState> =
+        combine(
+            monitorPasscodeLockPreferenceUseCase.get()().catch {
+                Timber.e(it)
+                emit(false)
+            },
+            connectivityState,
+            monitorUserCredentialsUseCase.get()()
+                .onStart { emit(getAccountCredentialsUseCase.get()()) }
+                .catch {
+                    Timber.e(it)
+                    emit(null)
                 }
+                .distinctUntilChangedBy { it?.email },
+        ) { isPasscodeLockEnabled, isConnected, credentials ->
+            Timber.d("CloudDriveDocumentDataProvider isPasscodeLockEnabled=$isPasscodeLockEnabled isConnected=$isConnected credentials=$credentials")
+            val accountName = credentials?.email ?: ""
+            when {
+                credentials == null -> AppSession.NotLoggedIn
+                isPasscodeLockEnabled -> AppSession.PasscodeLockEnabled(accountName)
+                !isConnected -> AppSession.Offline(accountName)
+                else -> AppSession.Ready(accountName)
+            }
+        }.flatMapLatest { raw ->
+            when (raw) {
+                AppSession.NotLoggedIn ->
+                    flowOf<CloudDriveSessionState>(CloudDriveSessionState.NotLoggedIn)
+
+                is AppSession.PasscodeLockEnabled ->
+                    flowOf(CloudDriveSessionState.PasscodeLockEnabled(raw.accountName))
+
+                is AppSession.Offline ->
+                    flowOf(CloudDriveSessionState.Offline(raw.accountName))
+
+                is AppSession.Ready ->
+                    getRootNodeFlow().map { rootNodeId ->
+                        if (rootNodeId == null) {
+                            CloudDriveSessionState.RootNodeNotLoaded(raw.accountName)
+                        } else {
+                            CloudDriveSessionState.Ready(
+                                accountName = raw.accountName,
+                                rootNodeDocumentId = "$CLOUD_DRIVE_ROOT_ID:${rootNodeId.longValue}",
+                            )
+                        }
+                    }
             }
         }
 
-    private fun DocumentDataRequest.resolveRootId(
-        rootNodeDocumentId: String,
-    ): Triple<DocumentDataRequest, String, String?> =
-        if (documentId == CLOUD_DRIVE_ROOT_ID) {
-            Triple(this, rootNodeDocumentId, CLOUD_DRIVE_ROOT_ID)
-        } else {
-            Triple(this, documentId, null)
-        }
+    private sealed interface AppSession {
+        data object NotLoggedIn : AppSession
+        data class PasscodeLockEnabled(val accountName: String) : AppSession
+        data class Offline(val accountName: String) : AppSession
+        data class Ready(val accountName: String) : AppSession
+    }
 
+    private val documentRequestFlow: MutableStateFlow<String> =
+        MutableStateFlow(CLOUD_DRIVE_ROOT_ID)
 
-    private fun getChildrenFlow(
-        accountName: String,
-        parentDocumentId: String,
-        notificationString: String? = null,
-    ): Flow<CloudDriveDocumentProviderUiState> {
-        val effectiveId = notificationString ?: parentDocumentId
-        val parentId = documentIdToNodeIdMapper.get()(parentDocumentId, CLOUD_DRIVE_ROOT_ID)
-            ?: return flowOf(
-                CloudDriveDocumentProviderUiState.FileNotFound(
-                    accountName = accountName,
-                    documentId = effectiveId,
-                )
-            )
+    private val childrenRequestFlow: MutableStateFlow<String> =
+        MutableStateFlow(CLOUD_DRIVE_ROOT_ID)
+
+    /**
+     * Per-id state for `queryDocument`. Driven by [documentRequestFlow] independently of
+     * [childrenState], so a children load can never cancel an in-flight document load and
+     * vice versa.
+     */
+    @OptIn(FlowPreview::class)
+    val documentState: StateFlow<DocumentSlot> by lazy {
+        sessionState.flatMapLatest { session ->
+            if (session is CloudDriveSessionState.Ready) {
+                monitorNodeUpdatesUseCase.get()().catch {
+                    Timber.e(it, "CloudDriveDocumentDataProvider documentState nodeUpdates")
+                }.map { }.onStart { emit(Unit) }.flatMapLatest {
+                    documentRequestFlow.flatMapLatest { documentId ->
+                        documentSlotFlow(session, documentId)
+                    }
+                }
+            } else {
+                flowOf(DocumentSlot.Idle)
+            }
+        }.catch { e ->
+            Timber.e(e, "CloudDriveDocumentDataProvider documentState")
+            emit(DocumentSlot.Idle)
+        }.asUiStateFlow(
+            scope = applicationScope,
+            initialValue = DocumentSlot.Idle,
+        )
+    }
+
+    /**
+     * Per-parent-id state for `queryChildDocuments`. Driven by [childrenRequestFlow]
+     * independently of [documentState].
+     */
+    @OptIn(FlowPreview::class)
+    val childrenState: StateFlow<ChildrenSlot> by lazy {
+        sessionState.flatMapLatest { session ->
+            if (session is CloudDriveSessionState.Ready) {
+                monitorNodeUpdatesUseCase.get()().catch {
+                    Timber.e(it, "CloudDriveDocumentDataProvider childrenState nodeUpdates")
+                }.map { }.onStart { emit(Unit) }.flatMapLatest {
+                    childrenRequestFlow.flatMapLatest { parentDocumentId ->
+                        childrenSlotFlow(session, parentDocumentId)
+                    }
+                }
+            } else {
+                flowOf(ChildrenSlot.Idle)
+            }
+        }.catch { e ->
+            Timber.e(e, "CloudDriveDocumentDataProvider childrenState")
+            emit(ChildrenSlot.Idle)
+        }.asUiStateFlow(
+            scope = applicationScope,
+            initialValue = ChildrenSlot.Idle,
+        )
+    }
+
+    private fun documentSlotFlow(
+        session: CloudDriveSessionState.Ready,
+        documentId: String,
+    ): Flow<DocumentSlot> {
+        val (effectiveId, notificationString) = resolveRootDocumentId(
+            documentId,
+            session.rootNodeDocumentId,
+        )
         return flow {
-            val nodesFlow = getNodesByIdInChunkUseCase.get()(parentId).runningFold<
+            emit(DocumentSlot.Loading(documentId))
+            val typedNode = runCatching {
+                val nodeId = documentIdToNodeIdMapper.get()(effectiveId, CLOUD_DRIVE_ROOT_ID)
+                    ?: return@runCatching null
+                getNodeByHandleUseCase.get()(nodeId.longValue)?.let { node -> addNodeType.get()(node) }
+            }.getOrNull()
+
+            if (typedNode == null) {
+                emit(DocumentSlot.NotFound(documentId))
+                return@flow
+            }
+            emitAll(
+                hiddenNodesFilterFlow.map { (isHiddenNodesEnabled, showHiddenItems) ->
+                    val shouldHide = filterNodesByHiddenSettings(
+                        listOf(typedNode),
+                        isHiddenNodesEnabled,
+                        showHiddenItems,
+                    ).isEmpty()
+                    if (shouldHide) {
+                        DocumentSlot.NotFound(documentId)
+                    } else {
+                        val row = cloudDriveDocumentRowMapper.get()(typedNode, CLOUD_DRIVE_ROOT_ID)
+                        val finalRow = notificationString?.let { row.copy(documentId = it) } ?: row
+                        DocumentSlot.Loaded(documentId, finalRow)
+                    }
+                }
+            )
+        }
+    }
+
+    private fun childrenSlotFlow(
+        session: CloudDriveSessionState.Ready,
+        parentDocumentId: String,
+    ): Flow<ChildrenSlot> {
+        val (effectiveId, _) = resolveRootDocumentId(
+            parentDocumentId,
+            session.rootNodeDocumentId,
+        )
+        val parentNodeId = documentIdToNodeIdMapper.get()(effectiveId, CLOUD_DRIVE_ROOT_ID)
+            ?: return flowOf(ChildrenSlot.NotFound(parentDocumentId))
+        return flow {
+            emit(ChildrenSlot.Loading(parentDocumentId))
+            val nodesFlow = getNodesByIdInChunkUseCase.get()(parentNodeId).runningFold<
                     Pair<List<TypedNode>, Boolean>,
                     Pair<List<TypedNode>, Boolean>
                     >(Pair(listOf(), true)) { acc, newValue ->
@@ -324,19 +365,21 @@ class CloudDriveDocumentDataProvider @Inject constructor(
             emitAll(
                 combine(
                     nodesFlow,
-                    hiddenNodesFilterFlow(),
+                    hiddenNodesFilterFlow,
                 ) { (childNodes, hasMore), (isHiddenNodesEnabled, showHiddenItems) ->
                     val filteredNodes = filterNodesByHiddenSettings(
                         childNodes,
                         isHiddenNodesEnabled,
                         showHiddenItems,
                     )
-                    CloudDriveDocumentProviderUiState.ChildData(
-                        accountName = accountName,
-                        parentId = effectiveId,
-                        children = filteredNodes.map {
-                            cloudDriveDocumentRowMapper.get()(it, CLOUD_DRIVE_ROOT_ID)
-                        },
+                    val rows = filteredNodes.map { node ->
+                        cloudDriveDocumentRowMapper.get()(node, CLOUD_DRIVE_ROOT_ID).also { row ->
+                            recentDocumentRows.put(row.documentId, row)
+                        }
+                    }
+                    ChildrenSlot.Loaded(
+                        parentDocumentId = parentDocumentId,
+                        children = rows,
                         hasMore = hasMore,
                     )
                 }
@@ -344,22 +387,39 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         }
     }
 
-    private fun hiddenNodesFilterFlow(): Flow<Pair<Boolean, Boolean>> =
+    /**
+     * Maps the synthetic root id to the real root document id when [documentId] is the root,
+     * preserving the synthetic id for notification URIs so SAF observers don't break.
+     */
+    private fun resolveRootDocumentId(
+        documentId: String,
+        rootNodeDocumentId: String,
+    ): Pair<String, String?> =
+        if (documentId == CLOUD_DRIVE_ROOT_ID) {
+            rootNodeDocumentId to CLOUD_DRIVE_ROOT_ID
+        } else {
+            documentId to null
+        }
+
+    private val hiddenNodesFilterFlow: Flow<Pair<Boolean, Boolean>> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             monitorHiddenNodesEnabledUseCase.get()().catch {
                 Timber.e(
                     it,
                     "CloudDriveDocumentDataProvider monitorHiddenNodesEnabled"
                 )
+                emit(false)
             },
             monitorShowHiddenItemsUseCase.get()().catch {
                 Timber.e(
                     it,
                     "CloudDriveDocumentDataProvider monitorShowHiddenItems"
                 )
+                emit(false)
             },
             ::Pair
         )
+    }
 
     private fun filterNodesByHiddenSettings(
         nodes: List<TypedNode>,
@@ -374,67 +434,15 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         }
     }
 
-    private fun getDocumentFlow(
-        accountName: String,
-        documentName: String,
-        notificationString: String? = null,
-    ): Flow<CloudDriveDocumentProviderUiState> {
-        val effectiveId = notificationString ?: documentName
-        return flow {
-            val typedNode = runCatching {
-                val nodeId = documentIdToNodeIdMapper.get()(
-                    documentName, CLOUD_DRIVE_ROOT_ID
-                ) ?: return@runCatching null
-                getNodeByHandleUseCase.get()(nodeId.longValue)?.let { node -> addNodeType.get()(node) }
-            }.getOrNull()
-
-            if (typedNode == null) {
-                emit(
-                    CloudDriveDocumentProviderUiState.FileNotFound(
-                        accountName = accountName,
-                        documentId = effectiveId,
-                    )
-                )
-            } else {
-                emitAll(
-                    hiddenNodesFilterFlow().map { (isHiddenNodesEnabled, showHiddenItems) ->
-                        val shouldHide = filterNodesByHiddenSettings(
-                            listOf(typedNode),
-                            isHiddenNodesEnabled,
-                            showHiddenItems
-                        ).isEmpty()
-                        if (shouldHide) {
-                            CloudDriveDocumentProviderUiState.FileNotFound(
-                                accountName = accountName,
-                                documentId = effectiveId,
-                            )
-                        } else {
-                            val document =
-                                cloudDriveDocumentRowMapper.get()(typedNode, CLOUD_DRIVE_ROOT_ID)
-                            val finalDocument =
-                                notificationString?.let { document.copy(documentId = it) }
-                                    ?: document
-                            CloudDriveDocumentProviderUiState.DocumentData(
-                                accountName = accountName,
-                                documentId = effectiveId,
-                                document = finalDocument,
-                            )
-                        }
-                    }
-                )
-            }
-        }
-    }
-
     fun loadDocumentInBackground(documentId: String) {
         applicationScope.launch {
-            requestFlow.emit(DocumentDataRequest.Document(documentId))
+            documentRequestFlow.emit(documentId)
         }
     }
 
     fun loadChildrenInBackground(parentDocumentId: String) {
         applicationScope.launch {
-            requestFlow.emit(DocumentDataRequest.Children(parentDocumentId))
+            childrenRequestFlow.emit(parentDocumentId)
         }
     }
 
@@ -457,7 +465,8 @@ class CloudDriveDocumentDataProvider @Inject constructor(
             throw e
         } catch (e: CancellationException) {
             throw e
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Timber.e(e, "openDocumentFile failed for $documentId")
             throw FileNotFoundException("Unable to open document: $documentId")
         }
     }
@@ -482,12 +491,12 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         // Publish before the state.first wait so nested child creates suspended on the signal resume immediately.
         pendingFolderRealNodeId[pendingId] = newNodeId
         pendingFolderSignals.remove(pendingId)?.complete(newNodeId)
-        // Wait for monitorNodeUpdates to land in state, otherwise notifyChildDocumentsChanged races SAF's re-query.
+        // Wait for monitorNodeUpdates to land in childrenState, otherwise notifyChildDocumentsChanged races SAF's re-query.
         val parentDocumentId = parentNodeIdToDocumentId(pending.parentNodeId)
         withTimeoutOrNull(STATE_REFRESH_TIMEOUT_MS) {
-            state.first {
-                it is CloudDriveDocumentProviderUiState.ChildData &&
-                        it.parentId == parentDocumentId &&
+            childrenState.first {
+                it is ChildrenSlot.Loaded &&
+                        it.parentDocumentId == parentDocumentId &&
                         it.children.any { row -> row.displayName == pending.displayName }
             }
         }
@@ -534,6 +543,13 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     fun isPendingDocumentId(documentId: String): Boolean =
         documentId.startsWith("$PENDING_PREFIX:")
 
+    /** Cached row for [documentId] from any loaded listing; survives `childrenState` transitions. */
+    fun findCachedChildRow(documentId: String): CloudDriveDocumentRow? {
+        recentDocumentRows[documentId]?.let { return it }
+        val slot = childrenState.value as? ChildrenSlot.Loaded ?: return null
+        return slot.children.firstOrNull { it.documentId == documentId }
+    }
+
     /** Synthetic rows merged into [parentDocumentId]'s listing; resolved folders are excluded to avoid duplicates with the real node. */
     fun getPendingChildrenForParent(parentDocumentId: String): List<CloudDriveDocumentRow> =
         pendingCreates.entries
@@ -543,22 +559,16 @@ class CloudDriveDocumentDataProvider @Inject constructor(
             }
             .mapNotNull { (pendingId, _) -> getPendingDocumentRow(pendingId) }
 
-    /** Row shown for a placeholder during the gap between createDocument and openDocument. */
+    /** Placeholder row between createDocument and openDocument; FLAG_PARTIAL = content not ready. */
     fun getPendingDocumentRow(documentId: String): CloudDriveDocumentRow? {
         val pending = pendingCreates[documentId] ?: return null
-        // Folder placeholders need FLAG_DIR_SUPPORTS_CREATE so SAF treats them as upload destinations during recursive copy.
-        val flags = if (pending.mimeType == Document.MIME_TYPE_DIR) {
-            Document.FLAG_DIR_SUPPORTS_CREATE
-        } else {
-            Document.FLAG_SUPPORTS_WRITE
-        }
         return CloudDriveDocumentRow(
             documentId = documentId,
             displayName = pending.displayName,
             mimeType = pending.mimeType,
             size = 0L,
             lastModified = System.currentTimeMillis(),
-            flags = flags,
+            flags = Document.FLAG_PARTIAL,
         )
     }
 
@@ -617,9 +627,9 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                     }
                     val parentDocumentId = parentNodeIdToDocumentId(pending.parentNodeId)
                     withTimeoutOrNull(STATE_REFRESH_TIMEOUT_MS) {
-                        state.first {
-                            it is CloudDriveDocumentProviderUiState.ChildData &&
-                                    it.parentId == parentDocumentId &&
+                        childrenState.first {
+                            it is ChildrenSlot.Loaded &&
+                                    it.parentDocumentId == parentDocumentId &&
                                     it.children.any { row -> row.displayName == pending.displayName }
                         }
                     }
@@ -656,15 +666,15 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         val parentDocumentId = resolveParentDocumentId(nodeId)
             ?: throw FileNotFoundException("Cannot resolve parent for $documentId")
         renameNodeUseCase.get()(nodeId.longValue, newName)
-        // Block until state holds DocumentData(newName); SAF's DocumentInfo.fromUri reads
+        // Block until documentState holds Loaded(newName); SAF's DocumentInfo.fromUri reads
         // queryDocument synchronously after this returns and a stale cursor surfaces as
         // "Failed to rename document" in DocumentsUI even though the cloud rename succeeded.
-        requestFlow.emit(DocumentDataRequest.Document(documentId))
+        documentRequestFlow.emit(documentId)
         withTimeoutOrNull(STATE_REFRESH_TIMEOUT_MS) {
-            state.first {
-                it is CloudDriveDocumentProviderUiState.DocumentData &&
+            documentState.first {
+                it is DocumentSlot.Loaded &&
                         it.documentId == documentId &&
-                        it.document.displayName == newName
+                        it.row.displayName == newName
             }
         }
         return parentDocumentId
@@ -691,7 +701,8 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         pendingFolderRealNodeId[parentDocumentId]?.let { return it }
         val pending = pendingCreates[parentDocumentId] ?: return null
         if (pending.mimeType != Document.MIME_TYPE_DIR) return null
-        val signal = pendingFolderSignals.computeIfAbsent(parentDocumentId) { CompletableDeferred() }
+        val signal =
+            pendingFolderSignals.computeIfAbsent(parentDocumentId) { CompletableDeferred() }
         // Re-check after registering the signal in case completion raced with us.
         pendingFolderRealNodeId[parentDocumentId]?.let { return it }
         return runCatching {
@@ -700,11 +711,11 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     }
 
     private fun assertSessionReadyForWrite() {
-        when (state.value) {
-            CloudDriveDocumentProviderUiState.NotLoggedIn ->
+        when (sessionState.value) {
+            CloudDriveSessionState.NotLoggedIn ->
                 throw FileNotFoundException("Not logged in")
 
-            is CloudDriveDocumentProviderUiState.PasscodeLockEnabled ->
+            is CloudDriveSessionState.PasscodeLockEnabled ->
                 throw FileNotFoundException("Passcode lock enabled")
 
             else -> Unit
