@@ -361,10 +361,13 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         }
         when (command) {
             COMMAND_PAUSE -> {
+                val userInitiatedPause = isPausedByUser
                 if (playing()) {
                     setPlayWhenReady(false)
                 }
-                needPlayWhenReceiveResumeCommand = true
+                if (!userInitiatedPause) {
+                    needPlayWhenReceiveResumeCommand = true
+                }
             }
 
             COMMAND_RESUME -> {

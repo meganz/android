@@ -234,6 +234,7 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
             }
         }
         videoPlayerViewModelV2.initVideoPlayerData(intent)
+        AudioPlayerService.pauseAudioPlayer(this)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
         setupObserver()
         initMediaSession()
