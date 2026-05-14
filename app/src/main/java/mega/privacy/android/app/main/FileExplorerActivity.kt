@@ -781,7 +781,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         collectFlow(viewModel.uiState) { fileExplorerState ->
             if (fileExplorerState.shouldFinishScreen) {
                 if (mode == UPLOAD) {
-                    finishAffinity()
+                    if (shouldLeaveApp) {
+                        moveTaskToBack(true)
+                    }
+                    finishAndRemoveTask()
                 } else {
                     finish()
                 }
