@@ -30,6 +30,7 @@ plugins {
     alias(convention.plugins.mega.android.application.firebase)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.firebase.appdistribution")
@@ -184,6 +185,7 @@ android {
     packaging {
         resources.excludes.add("/META-INF/{AL2.0,LGPL2.1}")
     }
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
 }
 
 project.extensions.configure<ApplicationExtension> {
@@ -212,6 +214,7 @@ dependencies {
     implementation(project(":shared:ads"))
     implementation(project(":shared:nodes"))
     implementation(project(":shared:account"))
+    implementation(project(":shared:contact"))
     implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))
@@ -443,6 +446,11 @@ dependencies {
     //QA
     "qaImplementation"(google.firebase.app.distribution)
     "qaImplementation"(testlib.compose.manifest)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 
     lintChecks(project(":lint"))
 }

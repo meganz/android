@@ -15,17 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,15 +27,18 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.snackbar.MegaSnackbar
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.view.ContactItemView
-import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfView
@@ -50,19 +46,19 @@ import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.search.view.EmptySearchView
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
-import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconR
-import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
-import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.contact.components.ContactItemView
+import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import java.util.Locale
 
 /**
  * Composable function that displays the Start Conversation screen.
@@ -71,7 +67,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 fun StartConversationView(
     state: StartConversationState,
     noteToSelfChatUIState: NoteToSelfChatUIState,
-    onContactClicked: (ContactItem) -> Unit,
+    onContactClicked: (Long) -> Unit,
     onSearchTextChange: (String) -> Unit,
     onCloseSearchClicked: () -> Unit,
     onBackPressed: () -> Unit,
@@ -81,34 +77,34 @@ fun StartConversationView(
     onButtonClicked: (StartConversationAction) -> Unit = {},
 ) {
     val listState = rememberLazyListState()
-    val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
-    val scaffoldState = rememberScaffoldState()
+    val title = stringResource(R.string.fab_label_new_chat)
 
-    Scaffold(
+    MegaScaffold(
         modifier = Modifier.navigationBarsPadding(),
-        scaffoldState = scaffoldState,
         topBar = {
             if (state.contactItemList.isEmpty()) {
-                SimpleTopAppBar(
-                    titleId = R.string.fab_label_new_chat,
-                    elevation = !firstItemVisible,
-                    onBackPressed = onBackPressed
+                MegaTopAppBar(
+                    title = title,
+                    navigationType = AppBarNavigationType.Back(onBackPressed),
                 )
             } else {
-                LegacySearchAppBar(
-                    searchWidgetState = state.searchWidgetState,
-                    typedSearch = state.typedSearch,
-                    onSearchTextChange = { typedSearch -> onSearchTextChange(typedSearch) },
-                    onCloseClicked = onCloseSearchClicked,
-                    onBackPressed = onBackPressed,
-                    onSearchClicked = onSearchClicked,
-                    elevation = !firstItemVisible,
-                    title = stringResource(R.string.fab_label_new_chat),
-                    hintId = R.string.hint_action_search
+                MegaSearchTopAppBar(
+                    title = title,
+                    navigationType = AppBarNavigationType.Back(onBackPressed),
+                    query = state.typedSearch,
+                    onQueryChanged = onSearchTextChange,
+                    searchPlaceholder = stringResource(R.string.hint_action_search),
+                    isSearchingMode = state.searchWidgetState == SearchWidgetState.EXPANDED,
+                    onSearchingModeChanged = { isSearching ->
+                        if (isSearching) onSearchClicked() else onCloseSearchClicked()
+                    },
                 )
             }
-        }
+        },
+        snackbarHost = {
+            MegaSnackbar(snackBarHostState = snackbarHostState)
+        },
     ) { paddingValues ->
         LazyColumn(
             state = listState,
@@ -154,12 +150,12 @@ fun StartConversationView(
                             )
                         }
 
-                        val defaultAvatarContent = contactsList[0].getAvatarFirstLetter()
+                        val firstHeader = contactsList[0].headerLetter()
 
-                        header = defaultAvatarContent
+                        header = firstHeader
 
-                        item(key = contactsList[0].handle.hashCode()) {
-                            HeaderItem(text = defaultAvatarContent)
+                        item(key = "header_${contactsList[0].handle}") {
+                            HeaderItem(text = firstHeader)
                         }
                     }
 
@@ -180,18 +176,21 @@ fun StartConversationView(
                 }
 
                 contactsList.forEach { contact ->
-                    val defaultAvatarContent = contact.getAvatarFirstLetter()
+                    val rowHeader = contact.headerLetter()
 
-                    if (header != defaultAvatarContent) {
-                        header = defaultAvatarContent
+                    if (header != rowHeader) {
+                        header = rowHeader
 
-                        item(key = contact.handle.hashCode()) {
-                            HeaderItem(text = defaultAvatarContent)
+                        item(key = "header_${contact.handle}") {
+                            HeaderItem(text = rowHeader)
                         }
                     }
 
                     item(key = contact.handle) {
-                        ContactItemView(contact, onClick = { onContactClicked(contact) })
+                        ContactItemView(
+                            contactItemUiState = contact,
+                            onClick = { onContactClicked(contact.handle) },
+                        )
                     }
                 }
             }
@@ -199,21 +198,19 @@ fun StartConversationView(
 
         if (state.error != null) {
             val error = stringResource(id = state.error)
-            LaunchedEffect(scaffoldState.snackbarHostState) {
-                scaffoldState.snackbarHostState.showSnackbar(
+            LaunchedEffect(snackbarHostState) {
+                snackbarHostState.showSnackbar(
                     message = error,
                     duration = SnackbarDuration.Long
                 )
             }
         }
     }
-
-    SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 }
 
 @Composable
 private fun ContactsHeader() {
-    Text(
+    MegaText(
         modifier = Modifier.padding(
             start = 16.dp,
             top = 16.dp,
@@ -221,7 +218,8 @@ private fun ContactsHeader() {
             bottom = 8.dp
         ),
         text = stringResource(id = sharedR.string.general_section_contacts),
-        style = MaterialTheme.typography.body2
+        textColor = TextColor.Primary,
+        style = AppTheme.typography.bodyMedium,
     )
 }
 
@@ -286,24 +284,23 @@ private fun InviteContactsButton(onInviteContactsClicked: () -> Unit) {
 
 @Composable
 private fun ActionText(actionText: Int) {
-    Text(
+    MegaText(
         modifier = Modifier.padding(end = 8.dp),
-        style = MaterialTheme.typography.subtitle2,
-        fontWeight = FontWeight.Medium,
         text = stringResource(id = actionText),
-        color = MaterialTheme.colors.secondary
+        textColor = TextColor.Accent,
+        style = AppTheme.typography.titleSmall,
     )
 }
 
 @Composable
 private fun HeaderItem(text: String) {
-    Text(
+    MegaText(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
         text = text,
-        fontWeight = FontWeight.Medium,
-        style = MaterialTheme.typography.subtitle2
+        textColor = TextColor.Primary,
+        style = AppTheme.typography.titleSmall,
     )
 }
 
@@ -333,19 +330,16 @@ private fun EmptyContactsView(onInviteContactsClicked: () -> Unit) {
         MegaText(
             modifier = Modifier.padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 16.dp),
             text = stringResource(id = sharedR.string.invite_contacts_to_start_chat_title),
-            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.W500),
-            textColor = TextColor.Primary
+            textColor = TextColor.Primary,
+            style = AppTheme.typography.titleMedium,
         )
 
         MegaText(
             modifier = Modifier.padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 16.dp),
             text = stringResource(id = sharedR.string.invite_contacts_to_start_chat_subtitle),
-            style = MaterialTheme.typography.body1.copy(
-                fontWeight = FontWeight.W400,
-                fontSize = 14.sp
-            ),
-            textAlign = TextAlign.Center,
             textColor = TextColor.Secondary,
+            style = AppTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
         )
 
         RaisedDefaultMegaButton(
@@ -415,3 +409,6 @@ private fun PreviewEmptyContactsView() {
 }
 
 internal const val TEST_TAG_RAISED_DEFAULT_MEGA_BUTTON = "raised_default_mega_button"
+
+private fun ContactItemUiState.headerLetter(): String =
+    displayName.firstOrNull()?.toString()?.uppercase(Locale.getDefault()) ?: ""

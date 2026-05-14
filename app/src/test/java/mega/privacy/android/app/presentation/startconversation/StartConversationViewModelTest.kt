@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -34,6 +33,9 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
+import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -111,6 +113,7 @@ class StartConversationViewModelTest {
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
     private val getNoteToSelfChatUseCase = mock<GetNoteToSelfChatUseCase>()
+    private val contactItemUiStateMapper = ContactItemUiStateMapper(ContactItemStatusMapper())
 
     @BeforeEach
     fun resetMocks() {
@@ -151,6 +154,7 @@ class StartConversationViewModelTest {
             requestUserLastGreenUseCase = requestUserLastGreenUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
+            contactItemUiStateMapper = contactItemUiStateMapper,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -248,7 +252,7 @@ class StartConversationViewModelTest {
 
         underTest.state.map { it.filteredContactList }.drop(1).test {
             underTest.setTypedSearch("email1")
-            assertThat(awaitItem()).isEqualTo(listOf(getContact(1)))
+            assertThat(awaitItem()).isEqualTo(listOf(contactItemUiStateMapper(getContact(1))))
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -262,7 +266,7 @@ class StartConversationViewModelTest {
         testScheduler.advanceUntilIdle()
         underTest.state.map { it.filteredContactList }.drop(1).test {
             underTest.setTypedSearch("email1")
-            assertThat(awaitItem()).isEqualTo(listOf(getContact(1)))
+            assertThat(awaitItem()).isEqualTo(listOf(contactItemUiStateMapper(getContact(1))))
             underTest.setTypedSearch("")
             assertThat(awaitItem()).isNull()
             cancelAndIgnoreRemainingEvents()
@@ -275,7 +279,7 @@ class StartConversationViewModelTest {
             testScheduler.advanceUntilIdle()
             underTest.state.map { it.error }.drop(1).test {
                 connectivityFlow.emit(false)
-                underTest.onContactTap(testContact)
+                underTest.onContactTap(testContact.handle)
                 assertThat(awaitItem()).isEqualTo(R.string.check_internet_connection_error)
             }
         }
@@ -300,7 +304,7 @@ class StartConversationViewModelTest {
             testScheduler.advanceUntilIdle()
             underTest.state.map { it.result }.drop(1).test {
                 connectivityFlow.emit(true)
-                underTest.onContactTap(testContact)
+                underTest.onContactTap(testContact.handle)
                 assertThat(awaitItem()).isEqualTo(invalidHandle)
             }
         }
@@ -328,7 +332,7 @@ class StartConversationViewModelTest {
             testScheduler.advanceUntilIdle()
             underTest.state.map { it.error }.drop(1).test {
                 connectivityFlow.emit(true)
-                underTest.onContactTap(testContact)
+                underTest.onContactTap(testContact.handle)
                 assertThat(awaitItem()).isEqualTo(sharedR.string.general_text_error)
             }
         }
@@ -342,7 +346,7 @@ class StartConversationViewModelTest {
             testScheduler.advanceUntilIdle()
             underTest.state.map { it.result }.drop(1).test {
                 connectivityFlow.emit(true)
-                underTest.onContactTap(testContact)
+                underTest.onContactTap(testContact.handle)
                 assertThat(awaitItem()).isEqualTo(chatHandle)
             }
         }
