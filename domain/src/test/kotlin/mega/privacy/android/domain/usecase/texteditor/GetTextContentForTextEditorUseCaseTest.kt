@@ -16,7 +16,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
-import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.domain.usecase.streaming.StartStreamingServer
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
@@ -41,22 +40,22 @@ internal class GetTextContentForTextEditorUseCaseTest {
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase = mock()
     private val getCacheFileUseCase: GetCacheFileUseCase = mock()
-    private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase = mock()
     private val startStreamingServer: StartStreamingServer = mock()
     private val getStreamingUriStringForNode: GetStreamingUriStringForNode = mock()
     private val downloadNodeUseCase: DownloadNodeUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
+    private val readStreamingContentUseCase: ReadStreamingContentUseCase = mock()
 
     private val underTest = GetTextContentForTextEditorUseCase(
         ioDispatcher = ioDispatcher,
         getNodeByIdUseCase = getNodeByIdUseCase,
         getLocalFileForNodeUseCase = getLocalFileForNodeUseCase,
         getCacheFileUseCase = getCacheFileUseCase,
-        getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
         startStreamingServer = startStreamingServer,
         getStreamingUriStringForNode = getStreamingUriStringForNode,
         downloadNodeUseCase = downloadNodeUseCase,
         fileSystemRepository = fileSystemRepository,
+        readStreamingContentUseCase = readStreamingContentUseCase,
     )
 
     @TempDir
@@ -68,11 +67,11 @@ internal class GetTextContentForTextEditorUseCaseTest {
             getNodeByIdUseCase,
             getLocalFileForNodeUseCase,
             getCacheFileUseCase,
-            getDataBytesFromUrlUseCase,
             startStreamingServer,
             getStreamingUriStringForNode,
             downloadNodeUseCase,
             fileSystemRepository,
+            readStreamingContentUseCase,
         )
     }
 
@@ -213,7 +212,7 @@ internal class GetTextContentForTextEditorUseCaseTest {
         whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
         whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
         whenever(getStreamingUriStringForNode(node)).thenReturn("https://stream.example/file")
-        whenever(getDataBytesFromUrlUseCase(any())).thenReturn("streamed content".toByteArray(Charsets.UTF_8))
+        whenever(readStreamingContentUseCase(any())).thenReturn("streamed content")
 
         val chunks = underTest(nodeHandle = nodeHandle, localPath = null).toList()
         val content = chunks.flatten().joinToString("\n")
@@ -369,8 +368,7 @@ internal class GetTextContentForTextEditorUseCaseTest {
         whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
         whenever(startStreamingServer()).thenReturn(Unit)
         whenever(getStreamingUriStringForNode(node)).thenReturn("https://stream.example/file")
-        whenever(getDataBytesFromUrlUseCase(any()))
-            .thenReturn("chat content".toByteArray(Charsets.UTF_8))
+        whenever(readStreamingContentUseCase(any())).thenReturn("chat content")
 
         val chunks = underTest(
             resolvedNode = node,

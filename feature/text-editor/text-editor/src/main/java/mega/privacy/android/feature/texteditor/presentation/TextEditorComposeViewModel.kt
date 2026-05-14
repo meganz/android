@@ -34,9 +34,12 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
+import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFileLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
@@ -72,6 +75,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     @Assisted val args: Args,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getTextContentForTextEditorUseCase: GetTextContentForTextEditorUseCase,
+    private val getTextContentForFileLinkUseCase: GetTextContentForFileLinkUseCase,
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase,
     private val getShowLineNumbersPreferenceUseCase: GetShowLineNumbersPreferenceUseCase,
     private val setShowLineNumbersPreferenceUseCase: SetShowLineNumbersPreferenceUseCase,
@@ -82,6 +86,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val getChatFileUseCase: GetChatFileUseCase,
+    private val getPublicNodeUseCase: GetPublicNodeUseCase,
+    private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase,
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
@@ -125,6 +131,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     /** Resolved node handle; updated from chat file resolution when opening from chat. */
     private var resolvedNodeHandle: Long = args.nodeHandle
 
+    /** Resolved public node for file link; used for download. */
+    private var resolvedPublicNode: TypedFileNode? = null
+
     /** Last known scroll position reported by the UI, used for persistence. */
     private var lastScrollFraction: Float = 0f
 
@@ -138,6 +147,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 _uiState.update { it.copy(isFullyLoaded = false) }
                 val chatId = args.chatId
                 val messageId = args.messageId
+                val publicUrl = args.publicUrl
                 var resolvedNode: TypedFileNode? = null
                 if (chatId != null && messageId != null) {
                     val chatFileResult = runCatching {
@@ -162,8 +172,37 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         }
                         return@launch
                     }
+                } else if (!publicUrl.isNullOrBlank()) {
+                    val publicNodeResult = runCatching {
+                        getPublicNodeUseCase(publicUrl)
+                    }
+                    val publicNode = publicNodeResult.getOrNull()
+                    if (publicNode != null) {
+                        resolvedNodeHandle = publicNode.id.longValue
+                        resolvedNode = publicNode
+                        resolvedPublicNode = publicNode
+                        _uiState.update {
+                            it.copy(fileName = publicNode.name)
+                        }
+                    } else {
+                        val exception = publicNodeResult.exceptionOrNull()
+                        Timber.e(exception, "Text editor: failed to resolve public node from file link")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorEvent = triggered,
+                                errorMessage = exception?.message?.ifBlank { null },
+                            )
+                        }
+                        return@launch
+                    }
                 }
-                val contentFlow = if (resolvedNode != null) {
+                val contentFlow = if (!publicUrl.isNullOrBlank()) {
+                    getTextContentForFileLinkUseCase(
+                        urlFileLink = publicUrl,
+                        chunkSizeLines = CHUNK_SIZE_LINES,
+                    )
+                } else if (resolvedNode != null) {
                     getTextContentForTextEditorUseCase(
                         resolvedNode = resolvedNode,
                         localPath = args.localPath,
@@ -252,6 +291,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val chatId: Long? = null,
         val messageId: Long? = null,
         val localPath: String? = null,
+        /** Public file link URL; when set the editor resolves the node from this URL. */
+        val publicUrl: String? = null,
     )
 
     /** Total number of chunks in the current mode. */
@@ -598,6 +639,25 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private fun emitDownloadTransferEvent() {
         if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         viewModelScope.launch {
+            val publicNode = resolvedPublicNode
+            if (publicNode != null) {
+                val downloadNode = runCatching {
+                    mapTypedNodeToPublicLinkUseCase(publicNode)
+                }.onFailure {
+                    Timber.e(it, "Text editor: failed to map public node for download")
+                }.getOrDefault(publicNode)
+                _uiState.update {
+                    it.copy(
+                        transferEvent = triggered(
+                            StartDownloadNode(
+                                nodes = listOf(downloadNode),
+                                withStartMessage = true,
+                            )
+                        )
+                    )
+                }
+                return@launch
+            }
             val node = getNodeByIdUseCase(NodeId(resolvedNodeHandle))
             if (node != null) {
                 _uiState.update {
@@ -631,6 +691,21 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             nodeHandle = resolvedNodeHandle,
                             localPath = args.localPath,
                             fileName = name,
+                        ),
+                    ),
+                )
+            }
+            return
+        }
+        if (!args.publicUrl.isNullOrBlank()) {
+            _uiState.update {
+                it.copy(
+                    nodeEffectEvent = triggered(
+                        TextEditorNodeEffect.Share(
+                            nodeHandle = resolvedNodeHandle,
+                            localPath = null,
+                            fileName = name,
+                            resolvedPublicLink = args.publicUrl,
                         ),
                     ),
                 )

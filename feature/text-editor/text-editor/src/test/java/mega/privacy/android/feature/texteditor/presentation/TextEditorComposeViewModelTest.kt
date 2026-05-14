@@ -34,8 +34,12 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFileLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
@@ -67,6 +71,7 @@ import org.mockito.kotlin.whenever
 internal class TextEditorComposeViewModelTest {
 
     private val getTextContentForTextEditorUseCase: GetTextContentForTextEditorUseCase = mock()
+    private val getTextContentForFileLinkUseCase: GetTextContentForFileLinkUseCase = mock()
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getNodeAccessUseCase: GetNodeAccessUseCase = mock()
@@ -74,6 +79,8 @@ internal class TextEditorComposeViewModelTest {
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val exportNodeUseCase: ExportNodeUseCase = mock()
     private val getChatFileUseCase: GetChatFileUseCase = mock()
+    private val getPublicNodeUseCase: GetPublicNodeUseCase = mock()
+    private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase = mock()
     private val getShowLineNumbersPreferenceUseCase: GetShowLineNumbersPreferenceUseCase = mock()
     private val setShowLineNumbersPreferenceUseCase: SetShowLineNumbersPreferenceUseCase = mock()
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase = mock()
@@ -82,13 +89,22 @@ internal class TextEditorComposeViewModelTest {
     private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
         TextEditorBottomBarActionsMapper()
+    private val fileLinkPublicNode: TypedFileNode = mock {
+        whenever(it.id).thenReturn(NodeId(999L))
+        whenever(it.name).thenReturn("public.txt")
+    }
 
     private lateinit var underTest: TextEditorComposeViewModel
+
+    private companion object {
+        const val FILE_LINK_URL = "https://mega.nz/file/abc"
+    }
 
     @BeforeEach
     fun resetMocks() {
         reset(
             getTextContentForTextEditorUseCase,
+            getTextContentForFileLinkUseCase,
             saveTextContentForTextEditorUseCase,
             getNodeByIdUseCase,
             getNodeAccessUseCase,
@@ -96,6 +112,8 @@ internal class TextEditorComposeViewModelTest {
             get1On1ChatIdUseCase,
             exportNodeUseCase,
             getChatFileUseCase,
+            getPublicNodeUseCase,
+            mapTypedNodeToPublicLinkUseCase,
             getShowLineNumbersPreferenceUseCase,
             setShowLineNumbersPreferenceUseCase,
             saveTextEditorScrollUseCase,
@@ -122,6 +140,7 @@ internal class TextEditorComposeViewModelTest {
         chatId: Long? = null,
         messageId: Long? = null,
         localPath: String? = null,
+        publicUrl: String? = null,
         defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
     ) {
         underTest = TextEditorComposeViewModel(
@@ -138,9 +157,11 @@ internal class TextEditorComposeViewModelTest {
                 chatId = chatId,
                 messageId = messageId,
                 localPath = localPath,
+                publicUrl = publicUrl,
             ),
             defaultDispatcher = defaultDispatcher,
             getTextContentForTextEditorUseCase = getTextContentForTextEditorUseCase,
+            getTextContentForFileLinkUseCase = getTextContentForFileLinkUseCase,
             saveTextContentForTextEditorUseCase = saveTextContentForTextEditorUseCase,
             getShowLineNumbersPreferenceUseCase = getShowLineNumbersPreferenceUseCase,
             setShowLineNumbersPreferenceUseCase = setShowLineNumbersPreferenceUseCase,
@@ -151,6 +172,8 @@ internal class TextEditorComposeViewModelTest {
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
             exportNodeUseCase = exportNodeUseCase,
             getChatFileUseCase = getChatFileUseCase,
+            getPublicNodeUseCase = getPublicNodeUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             saveTextEditorScrollUseCase = saveTextEditorScrollUseCase,
             getTextEditorScrollUseCase = getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
@@ -1552,4 +1575,92 @@ internal class TextEditorComposeViewModelTest {
         assertThat(state.errorEvent).isEqualTo(triggered)
         assertThat(state.errorMessage).isEqualTo("SDK error")
     }
+
+    private suspend fun stubFileLinkInit() {
+        whenever(getPublicNodeUseCase(FILE_LINK_URL)).thenReturn(fileLinkPublicNode)
+        whenever(
+            getTextContentForFileLinkUseCase(
+                urlFileLink = any<String>(),
+                chunkSizeLines = any(),
+            )
+        ).thenReturn(flowOf(listOf("hello")))
+        whenever(getNodeByIdUseCase(any())).thenReturn(fileLinkPublicNode)
+        whenever(getNodeAccessUseCase(any())).thenReturn(null)
+    }
+
+    @Test
+    fun `test that init resolves public node when publicUrl is set`() = runTest {
+        stubFileLinkInit()
+
+        initUnderTest(publicUrl = FILE_LINK_URL)
+        advanceUntilIdle()
+
+        verify(getPublicNodeUseCase).invoke(FILE_LINK_URL)
+        verify(getTextContentForFileLinkUseCase).invoke(
+            urlFileLink = any<String>(),
+            chunkSizeLines = any(),
+        )
+        val state = underTest.uiState.value
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.fileName).isEqualTo("public.txt")
+    }
+
+    @Test
+    fun `test that init shows error when getPublicNodeUseCase fails`() = runTest {
+        whenever(getPublicNodeUseCase(FILE_LINK_URL))
+            .thenThrow(RuntimeException("Public node error"))
+
+        initUnderTest(publicUrl = FILE_LINK_URL)
+        advanceUntilIdle()
+
+        verify(getPublicNodeUseCase).invoke(FILE_LINK_URL)
+        verify(getTextContentForTextEditorUseCase, never()).invoke(
+            nodeHandle = any(),
+            localPath = anyOrNull(),
+            chunkSizeLines = any(),
+        )
+        val state = underTest.uiState.value
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.errorEvent).isEqualTo(triggered)
+        assertThat(state.errorMessage).isEqualTo("Public node error")
+    }
+
+    @Test
+    fun `test that share uses publicUrl directly when set`() = runTest {
+        stubFileLinkInit()
+
+        initUnderTest(publicUrl = FILE_LINK_URL, showShare = true)
+        advanceUntilIdle()
+
+        underTest.onMenuAction(TextEditorTopBarAction.Share)
+        advanceUntilIdle()
+
+        val event = underTest.uiState.value.nodeEffectEvent
+        assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+        val shareEffect =
+            (event as StateEventWithContentTriggered).content as TextEditorNodeEffect.Share
+        assertThat(shareEffect.resolvedPublicLink).isEqualTo(FILE_LINK_URL)
+    }
+
+    @Test
+    fun `test that download uses mapTypedNodeToPublicLinkUseCase when publicUrl is set`() =
+        runTest {
+            stubFileLinkInit()
+            val publicLinkFile = PublicLinkFile(fileLinkPublicNode, null)
+            whenever(mapTypedNodeToPublicLinkUseCase(fileLinkPublicNode, null))
+                .thenReturn(publicLinkFile)
+
+            initUnderTest(publicUrl = FILE_LINK_URL, showDownload = true)
+            advanceUntilIdle()
+
+            underTest.onMenuAction(TextEditorTopBarAction.Download)
+            advanceUntilIdle()
+
+            val event = underTest.uiState.value.transferEvent
+            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val downloadEvent =
+                (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+            assertThat(downloadEvent.nodes).hasSize(1)
+            assertThat(downloadEvent.nodes.first()).isInstanceOf(PublicLinkFile::class.java)
+        }
 }

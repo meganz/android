@@ -281,6 +281,10 @@ data class LegacyTextEditorNavKey(
     val localPath: String? = null,
     val chatId: Long? = null,
     val messageId: Long? = null,
+    /** Public file link URL; when set the editor resolves the node from this URL. */
+    val publicUrl: String? = null,
+    /** Serialized node string for public file links; used by the legacy TextEditorActivity. */
+    val serializedNode: String? = null,
 ) : NoSessionNavKey.Optional
 
 @Serializable

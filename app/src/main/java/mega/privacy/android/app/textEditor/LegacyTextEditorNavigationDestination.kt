@@ -140,6 +140,17 @@ private fun buildTextEditorIntent(context: Context, navKey: LegacyTextEditorNavK
                 addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             }
         }
+        navKey.publicUrl != null ->
+            Intent(context, TextEditorActivity::class.java).apply {
+                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, FILE_LINK_ADAPTER)
+                putExtra(
+                    Constants.INTENT_EXTRA_KEY_HANDLE,
+                    navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
+                )
+                putExtra(Constants.EXTRA_SERIALIZE_STRING, navKey.serializedNode)
+                putExtra(TextEditorViewModel.MODE, navKey.mode)
+                putExtra(Constants.URL_FILE_LINK, navKey.publicUrl)
+            }
         else ->
             TextEditorActivity.createIntent(
                 context = context,
@@ -186,6 +197,17 @@ private fun buildTextEditorViewModelArgs(
                 localPath = navKey.localPath,
             )
         }
+        navKey.publicUrl != null ->
+            TextEditorComposeViewModel.Args(
+                nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
+                mode = textEditorModeFromValue(navKey.mode),
+                fileName = navKey.fileName,
+                inExcludedAdapterForGetLinkAndEdit = true,
+                showDownload = true,
+                showShare = true,
+                showSendToChat = false,
+                publicUrl = navKey.publicUrl,
+            )
         else -> {
             val nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE
             val mode = textEditorModeFromValue(navKey.mode)
@@ -272,6 +294,7 @@ private fun TextEditorComposeContent(
         }
 
     val showNodeOptions = navKey.chatId == null && navKey.localPath == null
+        && navKey.publicUrl == null
         && textEditorModeFromValue(navKey.mode) != TextEditorMode.Create
 
     if (showNodeOptions) {

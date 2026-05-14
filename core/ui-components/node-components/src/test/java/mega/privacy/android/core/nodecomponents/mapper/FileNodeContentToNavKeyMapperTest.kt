@@ -310,6 +310,39 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
+    fun `test that TextContent maps to LegacyTextEditorNavKey with FileLink sets publicUrl and serializedNode`() {
+        val nodeHandle = 444L
+        val publicUrl = "https://mega.nz/file/abc"
+        val serialized = "serialized-node-data"
+        val expectedViewType = NodeSourceTypeInt.FILE_LINK_ADAPTER
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            name = "link.txt",
+            fileTypeInfo = TextFileTypeInfo("text/plain", "txt")
+        )
+        whenever(fileNode.serializedData).thenReturn(serialized)
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.FILE_LINK))
+            .thenReturn(expectedViewType)
+
+        val result = underTest(
+            content = FileNodeContent.TextContent,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.FileLink(url = publicUrl),
+            textEditorMode = TextEditorMode.View
+        )
+
+        val expected = LegacyTextEditorNavKey(
+            nodeHandle = nodeHandle,
+            mode = TextEditorMode.View.value,
+            nodeSourceType = expectedViewType,
+            publicUrl = publicUrl,
+            serializedNode = serialized,
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
     fun `test that TextContent maps to LegacyTextEditorNavKey with View mode and default parameters`() {
         val nodeHandle = 123L
         val expectedViewType = NodeSourceTypeInt.INCOMING_SHARES_ADAPTER

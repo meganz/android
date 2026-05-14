@@ -15,12 +15,10 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
-import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.domain.usecase.streaming.StartStreamingServer
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import java.io.FileNotFoundException
-import java.net.URL
 import javax.inject.Inject
 
 /**
@@ -43,11 +41,11 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
     private val getCacheFileUseCase: GetCacheFileUseCase,
-    private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
     private val startStreamingServer: StartStreamingServer,
     private val getStreamingUriStringForNode: GetStreamingUriStringForNode,
     private val downloadNodeUseCase: DownloadNodeUseCase,
     private val fileSystemRepository: FileSystemRepository,
+    private val readStreamingContentUseCase: ReadStreamingContentUseCase,
 ) {
 
     /**
@@ -134,19 +132,9 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
             startStreamingServer()
             val urlString = getStreamingUriStringForNode(node)
             if (!urlString.isNullOrBlank()) {
-                ContentSource.StreamingContent(readFromStreamingUrl(urlString))
+                ContentSource.StreamingContent(readStreamingContentUseCase(urlString))
             } else null
         }.getOrNull() ?: ContentSource.LocalPath(downloadThenReadPath(node))
-    }
-
-    private suspend fun readFromStreamingUrl(urlString: String): String {
-        val bytes = getDataBytesFromUrlUseCase(URL(urlString)) ?: return ""
-        var result = String(bytes, Charsets.UTF_8)
-        val lastBreak = result.lastIndexOf("\n")
-        if (result.isNotEmpty() && lastBreak != -1 && result.length - lastBreak == 1) {
-            result = result.removeRange(lastBreak, result.length)
-        }
-        return result
     }
 
     private suspend fun downloadThenReadPath(node: TypedFileNode): String {

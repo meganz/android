@@ -92,6 +92,8 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 nodeHandle = fileNode.id.longValue,
                 mode = textEditorMode.value,
                 nodeSourceType = viewType,
+                publicUrl = publicUrl,
+                serializedNode = fileNode.serializedData,
             )
 
             is FileNodeContent.AudioOrVideo -> LegacyMediaPlayerNavKey(
