@@ -26,11 +26,6 @@ import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
-import mega.privacy.android.domain.entity.photos.DateCard
-import mega.privacy.android.domain.entity.photos.MediaListItem
-import mega.privacy.android.domain.entity.photos.MediaListItem.PhotoItem
-import mega.privacy.android.domain.entity.photos.MediaListItem.VideoItem
-import mega.privacy.android.domain.entity.photos.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
@@ -39,14 +34,20 @@ import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
-import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.MediaListItem
+import mega.privacy.android.domain.entity.photos.MediaListItem.PhotoItem
+import mega.privacy.android.domain.entity.photos.MediaListItem.VideoItem
+import mega.privacy.android.domain.entity.photos.MediaListMedia
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -78,17 +79,16 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
-import mega.privacy.android.domain.entity.photos.FilterMediaType
-import mega.privacy.android.domain.entity.photos.Sort
-import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
+import mega.privacy.android.shared.account.overquota.StorageCapacityMapper
+import mega.privacy.android.shared.account.overquota.StorageOverQuotaCapacity
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 /**
- * ViewModel for MediaDiscoveryFragment
+ * ViewModel for MediaDiscovery
  */
 @HiltViewModel
 class MediaDiscoveryViewModel @Inject constructor(

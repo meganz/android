@@ -29,7 +29,6 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkMediaDiscoveryImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.PARAM_ERROR_MESSAGE
 import mega.privacy.android.app.presentation.photos.mediadiscovery.view.MediaDiscoveryScreen
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -89,7 +88,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         checkLoginStatus()
 
         val folderId =
-            intent?.getLongExtra(MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID, -1)
+            intent?.getLongExtra(INTENT_KEY_CURRENT_FOLDER_ID, -1)
         val errorMessage = intent?.getIntExtra(PARAM_ERROR_MESSAGE, 0)
         val fromFolderLink = intent?.getBooleanExtra(INTENT_KEY_FROM_FOLDER_LINK, false)
 
@@ -343,5 +342,6 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
         internal const val INTENT_KEY_FROM_FOLDER_LINK = "FROM_FOLDER_LINK"
         internal const val INTENT_KEY_CURRENT_FOLDER_NAME = "CURRENT_FOLDER_NAME"
+        internal const val PARAM_ERROR_MESSAGE = "PARAM_ERROR_MESSAGE"
     }
 }

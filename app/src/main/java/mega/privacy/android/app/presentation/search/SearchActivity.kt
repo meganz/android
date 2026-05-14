@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,7 +32,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
@@ -43,7 +43,6 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
@@ -67,7 +66,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
@@ -75,20 +73,20 @@ import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusPro
 import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -379,11 +377,7 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
         }
     }
 
-    /**
-     * On Item click event received from [FileBrowserViewModel]
-     *
-     * @param currentFileNode [FileNode]
-     */
+
     private suspend fun openFileClicked(currentFileNode: TypedFileNode) {
         runCatching {
             nodeActionsViewModel.handleFileNodeClicked(currentFileNode)
