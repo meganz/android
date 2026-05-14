@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.params.ParameterizedTest
@@ -85,6 +86,7 @@ class CompletedTransferPendingTransferMapperTest {
             { assertThat(actual.state).isEqualTo(TransferState.STATE_FAILED) },
             { assertThat(actual.size).isEqualTo(sizeString) },
             { assertThat(actual.handle).isEqualTo(nodeHandle) },
+            { assertThat(actual.parentHandle).isEqualTo(-1L) },
             { assertThat(actual.path).isEqualTo(fullPath) },
             { assertThat(actual.isOffline).isEqualTo(offline) },
             { assertThat(actual.timestamp).isEqualTo(now) },
@@ -94,5 +96,71 @@ class CompletedTransferPendingTransferMapperTest {
             { assertThat(actual.uniqueId).isEqualTo(uniqueId) },
             { assertThat(actual.totalBytes).isEqualTo(size) }
         )
+    }
+
+    @Test
+    fun `test that an upload sets parentHandle from nodeIdentifier and clears handle`() = runTest {
+        val parentNodeHandle = 786L
+        val pendingTransfer = uploadPendingTransfer(
+            parentNodeHandle = parentNodeHandle,
+            uriPath = "/path/file.txt",
+            fileName = "file.txt",
+        )
+        whenever(stringWrapper.getSizeString(0L)) doReturn "0B"
+
+        val actual = underTest(pendingTransfer, 0L, RuntimeException())
+
+        assertAll(
+            { assertThat(actual.parentHandle).isEqualTo(parentNodeHandle) },
+            { assertThat(actual.handle).isEqualTo(-1L) },
+        )
+    }
+
+    @Test
+    fun `test that fileName falls back to FileGateway when pending transfer fileName is null`() =
+        runTest {
+            val uriPath = "content://media/external/images/media/12345"
+            val resolvedName = "IMG_20260310.jpg"
+            val pendingTransfer = uploadPendingTransfer(
+                parentNodeHandle = 1L,
+                uriPath = uriPath,
+                fileName = null,
+            )
+            whenever(stringWrapper.getSizeString(0L)) doReturn "0B"
+            whenever(fileGateway.getFileNameFromUri(uriPath)) doReturn resolvedName
+
+            val actual = underTest(pendingTransfer, 0L, RuntimeException())
+
+            assertThat(actual.fileName).isEqualTo(resolvedName)
+        }
+
+    @Test
+    fun `test that fileName falls back to uriPath basename when FileGateway returns null`() =
+        runTest {
+            val uriPath = "/storage/emulated/0/Pictures/photo.png"
+            val pendingTransfer = uploadPendingTransfer(
+                parentNodeHandle = 1L,
+                uriPath = uriPath,
+                fileName = null,
+            )
+            whenever(stringWrapper.getSizeString(0L)) doReturn "0B"
+            whenever(fileGateway.getFileNameFromUri(uriPath)) doReturn null
+
+            val actual = underTest(pendingTransfer, 0L, RuntimeException())
+
+            assertThat(actual.fileName).isEqualTo("photo.png")
+        }
+
+    private fun uploadPendingTransfer(
+        parentNodeHandle: Long,
+        uriPath: String,
+        fileName: String?,
+    ) = mock<PendingTransfer> {
+        on { this.uriPath } doReturn UriPath(uriPath)
+        on { this.nodeIdentifier } doReturn
+                PendingTransferNodeIdentifier.CloudDriveNode(NodeId(parentNodeHandle))
+        on { this.transferType } doReturn TransferType.GENERAL_UPLOAD
+        on { this.appData } doReturn emptyList()
+        on { this.fileName } doReturn fileName
     }
 }
