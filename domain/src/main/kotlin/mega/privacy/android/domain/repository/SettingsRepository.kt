@@ -589,6 +589,12 @@ interface SettingsRepository {
     suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String)
 
     /**
+     * Reset all home screen widget configurations.
+     * Typically used on logout to restore the default home layout for the next session.
+     */
+    suspend fun resetHomeScreenWidgetConfigurations()
+
+    /**
      * Get the last version feature shown to the user
      */
     suspend fun getLastVersionNewFeatureShown(): AppVersion?

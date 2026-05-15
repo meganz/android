@@ -11,6 +11,7 @@ import mega.privacy.android.domain.usecase.logout.ClearVideoPlaybackDataLogoutTa
 import mega.privacy.android.domain.usecase.logout.LoadMiscFlagsTask
 import mega.privacy.android.domain.usecase.logout.LogoutTask
 import mega.privacy.android.domain.usecase.logout.RemoveBackupFoldersLogoutTask
+import mega.privacy.android.domain.usecase.logout.ResetHomeWidgetConfigurationsLogoutTask
 
 @Module
 @DisableInstallInCheck
@@ -44,6 +45,11 @@ internal abstract class InternalLogoutModule {
         @Provides
         @IntoSet
         fun provideClearContinueWhereLeftOffDataLogoutTask(task: ClearContinueWhereLeftOffDataLogoutTask): LogoutTask =
+            task
+
+        @Provides
+        @IntoSet
+        fun provideResetHomeWidgetConfigurationsLogoutTask(task: ResetHomeWidgetConfigurationsLogoutTask): LogoutTask =
             task
     }
 }

@@ -688,6 +688,12 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
+    override suspend fun resetHomeScreenWidgetConfigurations() {
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteAllHomeScreenWidgetConfigurations()
+        }
+    }
+
     override suspend fun getLastVersionNewFeatureShown(): AppVersion? =
         withContext(ioDispatcher) {
             uiPreferencesGateway
