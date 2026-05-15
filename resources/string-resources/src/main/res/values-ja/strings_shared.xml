@@ -2342,4 +2342,15 @@
     <string name="general_new_link">新しいリンク</string>
     <string name="new_file_subject_when_uploading">件名</string>
     <string name="new_file_email_when_uploading">メールアドレス</string>
+    <string name="home_configuration_tooltip_description">表示したい内容を選んで、お好みにカスタマイズしましょう</string>
+    <string name="home_configuration_tooltip_action">さわってみる</string>
+    <string name="error_fail_to_play_video_title">動画を再生できません</string>
+    <string name="error_file_not_supported_message">このファイルをダウンロードして、対応するアプリで開いてください。</string>
+    <string name="error_no_internet_title">インターネット接続がありません</string>
+    <string name="error_file_not_supported_title">ファイルがサポートされていません</string>
+    <string name="error_dialog_confirm_button">了解しました</string>
+    <string name="error_no_internet_message">接続の問題によりファイルを開けませんでした。インターネット接続を確認して、もう一度お試しください。</string>
+    <string name="error_fail_to_play_video_message">申し訳ありません。何らかの問題が発生したため、ファイルを開くことができません。</string>
+    <string name="home_configuration_widget_my_account_widget_name">私のアカウント</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">ショートカット</string>
 </resources>

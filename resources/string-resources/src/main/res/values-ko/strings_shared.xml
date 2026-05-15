@@ -2326,4 +2326,7 @@
     <string name="name_collision_folder_warning_upload_and_rename">업로드하는 폴더의 이름이 다음과 같이 변경됩니다:</string>
     <string name="new_file_subject_when_uploading">제목</string>
     <string name="new_file_email_when_uploading">이메일</string>
+    <string name="error_no_internet_title">인터넷 연결이 없습니다</string>
+    <string name="error_dialog_confirm_button">알겠습니다</string>
+    <string name="home_configuration_widget_my_account_widget_name">내 계정</string>
 </resources>

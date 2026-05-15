@@ -43,7 +43,7 @@
     <!-- Sync dialog continue button -->
     <string name="sync_dialog_file_permission_positive_button">Tiếp tục</string>
     <!-- Sync dialog not now button -->
-    <string name="sync_dialog_file_permission_negative_button">Không Phải Lúc Này</string>
+    <string name="sync_dialog_file_permission_negative_button">Không phải lúc này</string>
     <!-- Sync dialog title for battery optimization -->
     <string name="sync_dialog_battery_optimization_title">Tối ưu hóa pin</string>
     <!-- Sync dialog cancel button text -->
@@ -61,15 +61,15 @@
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">Đang đồng&#160;bộ&#8230;</string>
     <!-- Sync permission title for device storage -->
-    <string name="sync_folders_device_storage">Thư&#160;mục thiết&#160;bị</string>
+    <string name="sync_folders_device_storage">Thư mục thiết bị</string>
     <!-- Sync permission title for mega storage -->
-    <string name="sync_folders_mega_storage">Thư&#160;mục trên MEGA</string>
+    <string name="sync_folders_mega_storage">Thư mục trên MEGA</string>
     <!-- Sync while syncing title for Issues info -->
     <string name="sync_card_sync_issues_info">Th.tin vấn đề</string>
     <!-- Sync Pause -->
     <string name="sync_card_pause_sync">Tạm dừng</string>
     <!-- Sync Run -->
-    <string name="sync_card_run_sync">Tiếp tục</string>
+    <string name="sync_card_run_sync">Tiếp tục truyền</string>
     <!-- Sync dialog for sync over Wi-Fi or mobile data -->
     <string name="sync_dialog_message_wifi_or_mobile_data">Dùng WiFi và mạng di động</string>
     <!-- Sync dialog for sync only over Wi-Fi -->

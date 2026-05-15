@@ -2597,4 +2597,7 @@
     <string name="name_collision_folder_warning_upload_and_rename">Загружаемая папка будет переименована в:</string>
     <string name="new_file_subject_when_uploading">Объект</string>
     <string name="new_file_email_when_uploading">Адрес электронной почты</string>
+    <string name="error_no_internet_title">Нет подключения к Интернету</string>
+    <string name="error_dialog_confirm_button">Понятно</string>
+    <string name="home_configuration_widget_my_account_widget_name">Мой аккаунт</string>
 </resources>

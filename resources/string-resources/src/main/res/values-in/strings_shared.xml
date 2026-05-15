@@ -2278,4 +2278,7 @@
     <string name="last_seen_general">[A]Terakhir dilihat [/A]%1$s %2$s</string>
     <string name="new_file_subject_when_uploading">Subyek</string>
     <string name="new_file_email_when_uploading">Alamat email</string>
+    <string name="error_no_internet_title">Tidak ada koneksi internet</string>
+    <string name="error_dialog_confirm_button">Tutup</string>
+    <string name="home_configuration_widget_my_account_widget_name">Akun Saya</string>
 </resources>

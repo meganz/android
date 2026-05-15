@@ -2310,4 +2310,7 @@
     <string name="last_seen_general">[A]ดูครั้งล่าสุดเมื่อ[/A] %1$s เวลา %2$s</string>
     <string name="new_file_subject_when_uploading">ชื่อ</string>
     <string name="new_file_email_when_uploading">อีเมล</string>
+    <string name="error_no_internet_title">ไม่มีการเชื่อมต่ออินเทอร์เน็ต</string>
+    <string name="error_dialog_confirm_button">โอเค เข้าใจแล้ว</string>
+    <string name="home_configuration_widget_my_account_widget_name">บัญชีของฉัน</string>
 </resources>

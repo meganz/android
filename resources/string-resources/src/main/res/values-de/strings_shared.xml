@@ -2415,4 +2415,7 @@
     <string name="google_sign_in_email_exists">Sie haben bereits einen Account mit dieser E-Mail-Adresse. Melden Sie sich mit Ihrem Passwort an.</string>
     <string name="or_divider">oder</string>
     <string name="general_new_link">Neuer Link</string>
+    <string name="error_no_internet_title">Keine Internetverbindung</string>
+    <string name="error_dialog_confirm_button">Schließen</string>
+    <string name="home_configuration_widget_my_account_widget_name">Mein Account</string>
 </resources>

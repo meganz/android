@@ -2515,4 +2515,15 @@
     <string name="new_file_subject_when_uploading">Assunto</string>
     <string name="new_file_email_when_uploading">Email</string>
     <string name="general_new_link">Novo link</string>
+    <string name="home_configuration_tooltip_description">Escolha o que você visualiza, e organize tudo do jeito que preferir</string>
+    <string name="home_configuration_tooltip_action">Explorar</string>
+    <string name="error_no_internet_title">Não há conexão à Internet</string>
+    <string name="error_dialog_confirm_button">Entendi</string>
+    <string name="error_fail_to_play_video_title">Não foi possível reproduzir o vídeo</string>
+    <string name="error_fail_to_play_video_message">Houve um problema e não conseguimos abrir o arquivo.</string>
+    <string name="error_file_not_supported_title">Arquivo não suportado</string>
+    <string name="error_file_not_supported_message">Faça o download deste arquivo para poder abri-lo em um aplicativo compatível.</string>
+    <string name="error_no_internet_message">Não foi possível abrir o arquivo devido a problemas de conectividade. Verifique a sua conexão com a Internet e tente novamente.</string>
+    <string name="home_configuration_widget_my_account_widget_name">Minha conta</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">Atalhos</string>
 </resources>

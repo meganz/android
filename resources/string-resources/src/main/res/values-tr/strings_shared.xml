@@ -2431,4 +2431,15 @@
     <string name="general_new_link">Yeni bağlantı</string>
     <string name="new_file_subject_when_uploading">Konu</string>
     <string name="new_file_email_when_uploading">E-posta adresi</string>
+    <string name="home_configuration_tooltip_description">Neleri göreceğinizi seçin ve ihtiyaçlarınıza göre düzenleyin</string>
+    <string name="home_configuration_tooltip_action">Keşfet</string>
+    <string name="error_no_internet_title">İnternet bağlantısı yok</string>
+    <string name="error_dialog_confirm_button">Tamam</string>
+    <string name="home_configuration_widget_my_account_widget_name">Hesabım</string>
+    <string name="error_fail_to_play_video_title">Video oynatılamıyor</string>
+    <string name="error_fail_to_play_video_message">Üzgünüz. Bir hata oluştu ve dosyayı açamıyoruz.</string>
+    <string name="error_file_not_supported_title">Dosya desteklenmiyor</string>
+    <string name="error_file_not_supported_message">Bu dosyayı uyumlu bir uygulamada açmak için indirin.</string>
+    <string name="error_no_internet_message">Bağlantı sorunları nedeniyle dosya açılamıyor. İnternet bağlantınızı kontrol edin ve tekrar deneyin.</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">Kısayollar</string>
 </resources>
