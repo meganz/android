@@ -1,16 +1,16 @@
 package mega.privacy.android.app.presentation.videoplayer.navigation
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.serialization.Serializable
 import mega.privacy.android.analytics.Analytics
-import androidx.hilt.navigation.compose.hiltViewModel
-import mega.privacy.android.app.mediaplayer.SelectSubtitleComposeView
 import mega.privacy.android.app.mediaplayer.SelectSubtitleFileViewModel
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
+import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerSelectSubtitleView
 import mega.privacy.mobile.analytics.event.AddSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.CancelSelectSubtitlePressedEvent
 
@@ -32,7 +32,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerSelectSubtitleScreen(
             systemUiController.isSystemBarsVisible = true
         }
 
-        SelectSubtitleComposeView(
+        VideoPlayerSelectSubtitleView(
             onAddSubtitle = { info ->
                 Analytics.tracker.trackEvent(AddSubtitlePressedEvent)
                 viewModel.updateSubtitleSelectedStatus(
