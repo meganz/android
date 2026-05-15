@@ -95,6 +95,7 @@ import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Compa
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMoreOption
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSpeedPlaybackMenuAction
@@ -745,12 +746,20 @@ internal fun VideoPlayerScreen(
     }
 
     if (showRetryFailedDialog) {
+        val (title, message) = when (uiState.playerErrorType) {
+            PlayerErrorType.FILE_NOT_SUPPORTED ->
+                sharedR.string.error_file_not_supported_title to sharedR.string.error_file_not_supported_message
+
+            PlayerErrorType.NO_NETWORK ->
+                sharedR.string.error_no_internet_title to sharedR.string.error_no_internet_message
+
+            PlayerErrorType.CANNOT_PLAY, null ->
+                sharedR.string.error_fail_to_play_video_title to sharedR.string.error_fail_to_play_video_message
+        }
         MegaAlertDialog(
-            text = resource.getString(
-                if (uiState.isConnected) R.string.error_fail_to_open_file_general
-                else R.string.error_fail_to_open_file_no_network
-            ),
-            confirmButtonText = resource.getString(sharedR.string.general_ok),
+            title = resource.getString(title),
+            text = resource.getString(message),
+            confirmButtonText = resource.getString(sharedR.string.error_dialog_confirm_button),
             cancelButtonText = null,
             onConfirm = {
                 showRetryFailedDialog = false

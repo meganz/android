@@ -62,6 +62,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isClosedAfterHidingNode whether to close the video player after hiding node.
  * @property nodeSourceType the source type of the current playing node
  * @property isConnected whether the device is connected to the internet
+ * @property playerErrorType the type of player error, null if no error
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -109,4 +110,5 @@ data class VideoPlayerUiState(
     val isClosedAfterHidingNode: Boolean = false,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val isConnected: Boolean = true,
+    val playerErrorType: PlayerErrorType? = null,
 )

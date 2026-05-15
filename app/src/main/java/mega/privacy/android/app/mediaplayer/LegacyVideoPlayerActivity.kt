@@ -397,7 +397,7 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
                     legacyVideoPlayerViewModel.onPlaybackStateChanged(state)
                 }
 
-                override fun onPlayerErrorCallback() = legacyVideoPlayerViewModel.onPlayerError()
+                override fun onPlayerErrorCallback(errorCode: Int) = legacyVideoPlayerViewModel.onPlayerError()
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
                     if (videoWidth == 0 || videoHeight == 0) return

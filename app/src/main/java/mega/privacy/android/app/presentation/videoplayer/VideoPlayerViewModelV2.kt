@@ -22,6 +22,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
+import mega.privacy.android.app.presentation.videoplayer.mapper.PlayerErrorTypeMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
@@ -249,6 +250,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val playerErrorTypeMapper: PlayerErrorTypeMapper,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -1291,13 +1293,17 @@ class VideoPlayerViewModelV2 @Inject constructor(
     internal fun updatePlaybackState(state: MediaPlaybackState) =
         uiState.update { it.copy(mediaPlaybackState = state) }
 
-    internal fun onPlayerError() {
+    internal fun onPlayerError(errorCode: Int) {
         playerRetry++
-        Timber.d("playerRetry: $playerRetry")
+        Timber.d("playerRetry: $playerRetry, errorCode: $errorCode")
+        val errorType = playerErrorTypeMapper(
+            errorCode = errorCode,
+            isConnected = uiState.value.isConnected,
+        )
         if (playerRetry <= MAX_RETRY) {
-            uiState.update { it.copy(retryEvent = triggered) }
+            uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
         } else {
-            uiState.update { it.copy(retryFailedEvent = triggered) }
+            uiState.update { it.copy(retryFailedEvent = triggered, playerErrorType = errorType) }
         }
     }
 

@@ -7,6 +7,7 @@ import android.view.TextureView
 import android.view.View
 import androidx.lifecycle.SavedStateHandle
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
@@ -26,8 +27,10 @@ import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.videoplayer.mapper.PlayerErrorTypeMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
@@ -249,6 +252,7 @@ class VideoPlayerViewModelV2Test {
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
     private var fakeMonitorConnectivityFlow = MutableSharedFlow<Boolean>()
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
@@ -320,6 +324,7 @@ class VideoPlayerViewModelV2Test {
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            playerErrorTypeMapper = playerErrorTypeMapper,
             savedStateHandle = savedStateHandle,
         )
     }
@@ -340,6 +345,7 @@ class VideoPlayerViewModelV2Test {
         whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
         fakeMonitorConnectivityFlow = MutableSharedFlow()
         whenever(monitorConnectivityUseCase()).thenReturn(fakeMonitorConnectivityFlow)
+        whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.CANNOT_PLAY)
     }
 
     @AfterEach
@@ -1530,7 +1536,7 @@ class VideoPlayerViewModelV2Test {
     fun `test that retryEvent is triggered when onPlayerError is invoked within retry limit`() =
         runTest {
             initViewModel()
-            underTest.onPlayerError()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
             underTest.uiState.test {
                 assertThat(awaitItem().retryEvent).isEqualTo(triggered)
                 cancelAndConsumeRemainingEvents()
@@ -1541,9 +1547,26 @@ class VideoPlayerViewModelV2Test {
     fun `test that retryFailedEvent is triggered when onPlayerError is invoked more than 6 times`() =
         runTest {
             initViewModel()
-            repeat(7) { underTest.onPlayerError() }
+            repeat(7) { underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED) }
             underTest.uiState.test {
                 assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that playerErrorType in uiState reflects the result from playerErrorTypeMapper`() =
+        runTest {
+            whenever(
+                playerErrorTypeMapper(
+                    errorCode = PlaybackException.ERROR_CODE_UNSPECIFIED,
+                    isConnected = true,
+                )
+            ).thenReturn(PlayerErrorType.FILE_NOT_SUPPORTED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            underTest.uiState.test {
+                assertThat(awaitItem().playerErrorType).isEqualTo(PlayerErrorType.FILE_NOT_SUPPORTED)
                 cancelAndConsumeRemainingEvents()
             }
         }

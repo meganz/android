@@ -293,7 +293,7 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                     videoPlayerViewModelV2.onPlaybackStateChanged(state)
                 }
 
-                override fun onPlayerErrorCallback() = videoPlayerViewModelV2.onPlayerError()
+                override fun onPlayerErrorCallback(errorCode: Int) = videoPlayerViewModelV2.onPlayerError(errorCode)
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
                     if (videoWidth == 0 || videoHeight == 0) return

@@ -312,7 +312,7 @@ class MediaPlayerFacade @Inject constructor(
 
                     override fun onPlayerError(error: PlaybackException) {
                         Timber.e(error)
-                        mediaPlayerCallback.onPlayerErrorCallback()
+                        mediaPlayerCallback.onPlayerErrorCallback(error.errorCode)
                     }
 
                     override fun onVideoSizeChanged(videoSize: VideoSize) {

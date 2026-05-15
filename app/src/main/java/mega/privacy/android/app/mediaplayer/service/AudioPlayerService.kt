@@ -290,7 +290,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     }
                 }
 
-                override fun onPlayerErrorCallback() {
+                override fun onPlayerErrorCallback(errorCode: Int) {
                     onPlayerError()
                 }
 

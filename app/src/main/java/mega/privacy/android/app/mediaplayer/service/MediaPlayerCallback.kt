@@ -47,8 +47,10 @@ interface MediaPlayerCallback {
 
     /**
      * Callback from onPlayerError
+     *
+     * @param errorCode the ExoPlayer error code from [androidx.media3.common.PlaybackException]
      */
-    fun onPlayerErrorCallback()
+    fun onPlayerErrorCallback(errorCode: Int)
 
     /**
      * Callback from onVideoSizeChanged
