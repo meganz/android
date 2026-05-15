@@ -391,14 +391,25 @@ class UploadFolderViewModel @Inject constructor(
         collisionsResolution: List<NameCollisionResultUiEntity>? = null,
     ) {
         viewModelScope.launch {
+            val cancelledNames = collisionsResolution
+                ?.filter { it.choice == NameCollisionChoice.CANCEL }
+                ?.map { it.nameCollision.name }
+                .orEmpty()
+                .toSet()
             val collisionRename =
                 collisionsResolution?.filter { it.choice == NameCollisionChoice.RENAME }
-            val pathsAndNames = pendingUploads.associate { folderContentData ->
-                val fileName = (collisionRename
-                    ?.firstOrNull { it.nameCollision.name == folderContentData.name }
-                    ?.nameCollision?.renameName
-                        ) ?: folderContentData.name
-                folderContentData.uri.toString() to fileName
+            val pathsAndNames = pendingUploads
+                .filterNot { it.name in cancelledNames }
+                .associate { folderContentData ->
+                    val fileName = (collisionRename
+                        ?.firstOrNull { it.nameCollision.name == folderContentData.name }
+                        ?.nameCollision?.renameName
+                            ) ?: folderContentData.name
+                    folderContentData.uri.toString() to fileName
+                }
+            if (pathsAndNames.isEmpty()) {
+                actionResult.value = null
+                return@launch
             }
             val parentOrRootNodeId = if (parentHandle == INVALID_HANDLE) {
                 runCatching { getRootNodeIdUseCase() }.getOrNull() ?: return@launch
