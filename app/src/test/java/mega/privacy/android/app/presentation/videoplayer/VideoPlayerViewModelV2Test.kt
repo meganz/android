@@ -39,7 +39,6 @@ import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
-import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
@@ -59,6 +58,7 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -140,6 +140,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_LINK_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
@@ -2636,6 +2637,7 @@ class VideoPlayerViewModelV2Test {
         Arguments.of(FROM_CHAT, NodeSourceType.CHAT),
         Arguments.of(FROM_IMAGE_VIEWER, NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER),
         Arguments.of(VERSIONS_ADAPTER, NodeSourceType.VIDEO_PLAYER_VERSIONS),
+        Arguments.of(FILE_LINK_ADAPTER, NodeSourceType.FILE_LINK),
         Arguments.of(FOLDER_LINK_ADAPTER, NodeSourceType.FOLDER_LINK),
         Arguments.of(FROM_ALBUM_SHARING, NodeSourceType.FOLDER_LINK),
         Arguments.of(INCOMING_SHARES_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
@@ -2648,6 +2650,18 @@ class VideoPlayerViewModelV2Test {
         Arguments.of(FAVOURITES_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
         Arguments.of(INVALID_VALUE, NodeSourceType.VIDEO_PLAYER_DEFAULT),
     )
+
+    @Test
+    fun `test that fileLinkUrl in uiState is set when URL_FILE_LINK is present in savedStateHandle`() =
+        runTest {
+            val expectedUrl = "https://mega.nz/file/abc123"
+            savedStateHandle[URL_FILE_LINK] = expectedUrl
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().fileLinkUrl).isEqualTo(expectedUrl)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that updateNameWhenNodeUpdates updates metadata and currentPlayingItemName when name changes for current playing node`() =

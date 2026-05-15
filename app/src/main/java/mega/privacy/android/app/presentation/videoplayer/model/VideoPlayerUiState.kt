@@ -10,8 +10,8 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 
 /**
@@ -61,6 +61,9 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property blockedError the blocked error event
  * @property isClosedAfterHidingNode whether to close the video player after hiding node.
  * @property nodeSourceType the source type of the current playing node
+ * @property fileLinkUrl the public file link URL; non-null only when [nodeSourceType] is
+ *   [mega.privacy.android.domain.entity.node.NodeSourceType.FILE_LINK]. Used to fetch the node
+ *   via GetPublicNodeUseCase when the video player displays bottom-sheet options.
  * @property isConnected whether the device is connected to the internet
  * @property playerErrorType the type of player error, null if no error
  */
@@ -109,6 +112,7 @@ data class VideoPlayerUiState(
     val blockedError: StateEvent = consumed,
     val isClosedAfterHidingNode: Boolean = false,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    val fileLinkUrl: String? = null,
     val isConnected: Boolean = true,
     val playerErrorType: PlayerErrorType? = null,
 )

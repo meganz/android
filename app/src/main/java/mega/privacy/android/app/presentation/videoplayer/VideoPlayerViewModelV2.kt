@@ -87,6 +87,7 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -167,6 +168,7 @@ import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_LINK_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
@@ -254,7 +256,11 @@ class VideoPlayerViewModelV2 @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
-        field: MutableStateFlow<VideoPlayerUiState> = MutableStateFlow(VideoPlayerUiState())
+        field: MutableStateFlow<VideoPlayerUiState> = MutableStateFlow(
+            VideoPlayerUiState(
+                fileLinkUrl = savedStateHandle[URL_FILE_LINK]
+            )
+        )
 
     private var needStopStreamingServer = false
     private var playerRetry = 0
@@ -292,7 +298,11 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private var allowUpdatePausedByUser = true
 
     init {
-        uiState.update { it.copy(nodeSourceType = currentLaunchSourcesToNodeSourceType()) }
+        uiState.update {
+            it.copy(
+                nodeSourceType = currentLaunchSourcesToNodeSourceType(),
+            )
+        }
         setupTransferListener()
 
         handleHiddenNodesUIFlow()
@@ -319,6 +329,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
             RUBBISH_BIN_ADAPTER -> NodeSourceType.RUBBISH_BIN
             FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING -> NodeSourceType.FOLDER_LINK
             FROM_CHAT -> NodeSourceType.CHAT
+            FILE_LINK_ADAPTER -> NodeSourceType.FILE_LINK
             FROM_IMAGE_VIEWER -> NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER
             VERSIONS_ADAPTER -> NodeSourceType.VIDEO_PLAYER_VERSIONS
             else -> NodeSourceType.VIDEO_PLAYER_DEFAULT

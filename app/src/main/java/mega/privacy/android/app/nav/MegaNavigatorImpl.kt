@@ -347,6 +347,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         collectionId: Long?,
         enableAddToAlbum: Boolean?,
         serializedData: String?,
+        publicLinkUrl: String?,
     ) {
         val scope = (context as? LifecycleOwner)?.lifecycleScope ?: applicationScope
         scope.launch {
@@ -372,6 +373,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                     )
                 },
                 serializedData = serializedData,
+                publicLinkUrl = publicLinkUrl,
             )
             withContext(mainDispatcher) {
                 runCatching {

@@ -290,7 +290,8 @@ class FileLinkComposeActivity : PasscodeActivity(),
                                     fileNode = fileNode,
                                     isFolderLink = true,
                                     viewType = FILE_LINK_ADAPTER,
-                                    serializedData = serializedData
+                                    serializedData = serializedData,
+                                    publicLinkUrl = viewModel.state.value.url,
                                 )
                             }.onFailure {
                                 Toast.makeText(

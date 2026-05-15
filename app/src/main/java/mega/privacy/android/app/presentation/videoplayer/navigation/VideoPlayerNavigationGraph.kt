@@ -37,6 +37,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerEntryProvider(
                 NodeOptionsBottomSheetNavKey(
                     nodeHandle = uiState.currentPlayingHandle,
                     nodeSourceType = uiState.nodeSourceType,
+                    publicLinkUrl = uiState.fileLinkUrl,
                 )
             )
         },

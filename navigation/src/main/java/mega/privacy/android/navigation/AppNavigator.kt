@@ -185,6 +185,8 @@ interface AppNavigator {
      * @param mediaQueueTitle the title of the media queue
      * @param collectionTitle the title of the video collection
      * @param enableAddToAlbum the flag to show add to album in context menu
+     * @param publicLinkUrl the public file link URL, used when the video is opened from a file link
+     *   so the node can be fetched via [mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase]
      */
     fun openMediaPlayerActivityByFileNode(
         context: Context,
@@ -200,6 +202,7 @@ interface AppNavigator {
         collectionId: Long? = null,
         enableAddToAlbum: Boolean? = null,
         serializedData: String? = null,
+        publicLinkUrl: String? = null,
     )
 
     /**
