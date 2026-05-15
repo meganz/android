@@ -9,6 +9,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
+import mega.privacy.android.domain.usecase.home.ResetHomeWidgetConfigurationsUseCase
 import mega.privacy.android.domain.usecase.home.DeleteWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
@@ -43,6 +44,7 @@ class HomeConfigurationViewModelTest {
     private val updateWidgetConfigurationsUseCase = mock<UpdateWidgetConfigurationsUseCase>()
     private val deleteWidgetConfigurationsUseCase = mock<DeleteWidgetConfigurationUseCase>()
     private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
+    private val resetHomeWidgetConfigurationsUseCase = mock<ResetHomeWidgetConfigurationsUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -53,6 +55,7 @@ class HomeConfigurationViewModelTest {
             updateWidgetConfigurationsUseCase = updateWidgetConfigurationsUseCase,
             deleteWidgetConfigurationUseCase = deleteWidgetConfigurationsUseCase,
             getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
+            resetHomeWidgetConfigurationsUseCase = resetHomeWidgetConfigurationsUseCase,
         )
     }
 
@@ -65,6 +68,7 @@ class HomeConfigurationViewModelTest {
             updateWidgetConfigurationsUseCase,
             deleteWidgetConfigurationsUseCase,
             getEnabledFlaggedItemsUseCase,
+            resetHomeWidgetConfigurationsUseCase,
         )
     }
 
@@ -367,29 +371,11 @@ class HomeConfigurationViewModelTest {
 
 
     @Test
-    fun `test that reset widget state to default updates all widgets to default order and enabled`() =
+    fun `test that resetWidgetStateToDefault invokes resetHomeWidgetConfigurationsUseCase`() =
         runTest {
-            val firstWidget = stubWidget(identifier = "first", defaultOrder = HomeWidgetOrder.Recents)
-            val secondWidget = stubWidget(identifier = "second", defaultOrder = HomeWidgetOrder.Banner)
-            val thirdWidget = stubWidget(identifier = "third", defaultOrder = HomeWidgetOrder.Shortcuts)
-
-            dynamicWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn setOf(firstWidget, secondWidget)
-            }
-            staticWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn setOf(thirdWidget)
-            }
-
             underTest.resetWidgetStateToDefault()
 
-            val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
-            verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
-            val actual = captor.firstValue.associateBy { it.widgetIdentifier }
-            assertThat(actual).hasSize(3)
-            assertThat(actual["first"]?.widgetOrder).isEqualTo(2)
-            assertThat(actual["second"]?.widgetOrder).isEqualTo(0)
-            assertThat(actual["third"]?.widgetOrder).isEqualTo(1)
-            assertThat(actual.values.all { it.enabled }).isTrue()
+            verify(resetHomeWidgetConfigurationsUseCase).invoke()
         }
 
     private fun stubWidget(

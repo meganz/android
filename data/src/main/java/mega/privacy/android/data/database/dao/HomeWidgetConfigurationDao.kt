@@ -51,4 +51,10 @@ internal interface HomeWidgetConfigurationDao {
      */
     @Query("DELETE FROM home_widget_configuration WHERE widget_identifier = :widgetIdentifier")
     fun deleteWidgetConfigurationById(widgetIdentifier: String)
+
+    /**
+     * Delete all widget configurations
+     */
+    @Query("DELETE FROM home_widget_configuration")
+    suspend fun deleteAllWidgetConfigurations()
 }

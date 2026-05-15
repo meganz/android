@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
+import mega.privacy.android.domain.usecase.home.ResetHomeWidgetConfigurationsUseCase
 import mega.privacy.android.domain.usecase.home.DeleteWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
@@ -30,6 +31,7 @@ class HomeConfigurationViewModel @Inject constructor(
     private val updateWidgetConfigurationsUseCase: UpdateWidgetConfigurationsUseCase,
     private val deleteWidgetConfigurationUseCase: DeleteWidgetConfigurationUseCase,
     private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
+    private val resetHomeWidgetConfigurationsUseCase: ResetHomeWidgetConfigurationsUseCase,
 ) : ViewModel() {
     val state: StateFlow<HomeConfigurationUiState> by lazy {
         monitorHomeWidgetConfigurationUseCase()
@@ -133,17 +135,7 @@ class HomeConfigurationViewModel @Inject constructor(
     fun resetWidgetStateToDefault() {
         viewModelScope.launch {
             runCatching {
-                val defaultConfigurations = widgetProviders
-                    .flatMap { provider ->
-                        provider.getWidgets().map { widget ->
-                            HomeWidgetConfiguration(
-                                widgetIdentifier = widget.identifier,
-                                widgetOrder = widget.defaultOrder.ordinal,
-                                enabled = true,
-                            )
-                        }
-                    }
-                updateWidgetConfigurationsUseCase(defaultConfigurations)
+                resetHomeWidgetConfigurationsUseCase()
             }.onFailure {
                 Timber.e(it, "Failed to reset widget configurations to default")
             }

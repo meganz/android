@@ -650,6 +650,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
         homeWidgetConfigurationDao.get().deleteWidgetConfigurationById(widgetIdentifier)
     }
 
+    override suspend fun deleteAllHomeScreenWidgetConfigurations() {
+        homeWidgetConfigurationDao.get().deleteAllWidgetConfigurations()
+    }
+
     companion object {
         internal const val MAX_INSERT_LIST_SIZE = 200
     }

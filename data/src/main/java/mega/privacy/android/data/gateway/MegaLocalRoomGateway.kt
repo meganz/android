@@ -648,4 +648,9 @@ interface MegaLocalRoomGateway {
      * @param widgetIdentifier
      */
     suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String)
+
+    /**
+     * Delete all home screen widget configurations
+     */
+    suspend fun deleteAllHomeScreenWidgetConfigurations()
 }
