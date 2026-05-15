@@ -303,6 +303,7 @@ internal fun HomeScreen(
                 needCloseIcon = true,
                 needDivider = true,
                 anchorViewCoordinates = it,
+                onDismissRequest = onHomeConfigurationTooltipDismissed
             )
         }
     }
