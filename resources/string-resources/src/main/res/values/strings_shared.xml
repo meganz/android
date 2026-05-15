@@ -2850,4 +2850,8 @@
     <string name="error_no_internet_message">Unable to open the file due to connectivity issues. Please check your internet connection and try again.</string>
     <!-- Confirm button text for video player error dialogs -->
     <string name="error_dialog_confirm_button">OK, got it</string>
+    <!-- Widget display name for "Shortcuts" in home configuration -->
+    <string name="home_configuration_widget_shortcuts_widget_name">Shortcuts</string>
+    <!-- Widget display name for "My account" in home configuration -->
+    <string name="home_configuration_widget_my_account_widget_name">My account</string>
 </resources>

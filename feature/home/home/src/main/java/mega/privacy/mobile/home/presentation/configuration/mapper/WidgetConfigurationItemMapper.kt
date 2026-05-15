@@ -11,9 +11,11 @@ class WidgetConfigurationItemMapper @Inject constructor() {
         widgetConfiguration: HomeWidgetConfiguration?,
     ) = WidgetConfigurationItem(
         identifier = homeWidget.identifier,
-        index = widgetConfiguration?.widgetOrder ?: homeWidget.defaultOrder,
+        index = widgetConfiguration?.widgetOrder ?: homeWidget.defaultOrder.ordinal,
         name = homeWidget.getWidgetName(),
         enabled = widgetConfiguration?.enabled ?: true,
-        canDelete = homeWidget.canDelete
+        canDelete = homeWidget.canDelete,
+        isConfigurable = homeWidget.isConfigurable,
+        isDraggable = homeWidget.isDraggable
     )
 }

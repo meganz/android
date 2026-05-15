@@ -9,13 +9,16 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 
 class MultiCardExampleHomeWidget(
     val photo: Photo,
 ) : HomeWidget {
     override val identifier: String = "MultiCardExampleHomeWidget:${photo.id}"
-    override val defaultOrder: Int = 50
+    override val defaultOrder: HomeWidgetOrder = HomeWidgetOrder.ContinueWhereLeftOff
     override val canDelete: Boolean = true
+    override val isConfigurable: Boolean = true
+    override val isDraggable: Boolean = true
 
     override suspend fun getWidgetName(): LocalizedText {
         return LocalizedText.Literal("Photo: ${photo.name}")

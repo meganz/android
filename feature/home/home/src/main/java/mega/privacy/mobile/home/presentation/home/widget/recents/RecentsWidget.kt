@@ -43,6 +43,7 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
 import mega.privacy.android.navigation.destination.RecentsScreenNavKey
@@ -66,8 +67,10 @@ import javax.inject.Inject
 class RecentsWidget @Inject constructor() : HomeWidget {
 
     override val identifier: String = "RecentsWidgetProvider"
-    override val defaultOrder: Int = 3
+    override val defaultOrder: HomeWidgetOrder = HomeWidgetOrder.Recents
     override val canDelete: Boolean = false
+    override val isConfigurable: Boolean = true
+    override val isDraggable: Boolean = true
     override suspend fun getWidgetName() = LocalizedText.StringRes(sharedR.string.section_recents)
 
     @Composable

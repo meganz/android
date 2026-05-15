@@ -11,6 +11,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.PwmBannerCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferItBannerCloseButtonPressedEvent
@@ -24,9 +25,10 @@ import javax.inject.Inject
 class BannerWidget @Inject constructor() : HomeWidget {
 
     override val identifier: String = "BannerWidgetProvider"
-    override val defaultOrder: Int = 2
+    override val defaultOrder: HomeWidgetOrder = HomeWidgetOrder.Banner
     override val canDelete: Boolean = false
-
+    override val isConfigurable: Boolean = false
+    override val isDraggable: Boolean = false
     override suspend fun getWidgetName() = LocalizedText.StringRes(sharedR.string.section_banners)
 
     @Composable
