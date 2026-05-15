@@ -34,7 +34,9 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
@@ -2608,18 +2610,20 @@ class VideoPlayerViewModelV2Test {
     private fun provideAdapterToNodeSourceType() = listOf(
         Arguments.of(OFFLINE_ADAPTER, NodeSourceType.OFFLINE),
         Arguments.of(RUBBISH_BIN_ADAPTER, NodeSourceType.RUBBISH_BIN),
-        Arguments.of(INCOMING_SHARES_ADAPTER, NodeSourceType.INCOMING_SHARES),
-        Arguments.of(OUTGOING_SHARES_ADAPTER, NodeSourceType.OUTGOING_SHARES),
-        Arguments.of(LINKS_ADAPTER, NodeSourceType.LINKS),
-        Arguments.of(BACKUPS_ADAPTER, NodeSourceType.BACKUPS),
-        Arguments.of(FILE_BROWSER_ADAPTER, NodeSourceType.CLOUD_DRIVE),
-        Arguments.of(VIDEO_BROWSE_ADAPTER, NodeSourceType.VIDEOS),
-        Arguments.of(RECENTS_BUCKET_ADAPTER, NodeSourceType.RECENTS_BUCKET),
-        Arguments.of(FAVOURITES_ADAPTER, NodeSourceType.FAVOURITES),
-        Arguments.of(INVALID_VALUE, NodeSourceType.CLOUD_DRIVE),
+        Arguments.of(FROM_CHAT, NodeSourceType.CHAT),
+        Arguments.of(FROM_IMAGE_VIEWER, NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER),
+        Arguments.of(VERSIONS_ADAPTER, NodeSourceType.VIDEO_PLAYER_VERSIONS),
         Arguments.of(FOLDER_LINK_ADAPTER, NodeSourceType.FOLDER_LINK),
         Arguments.of(FROM_ALBUM_SHARING, NodeSourceType.FOLDER_LINK),
-        Arguments.of(VERSIONS_ADAPTER, NodeSourceType.CLOUD_DRIVE),
+        Arguments.of(INCOMING_SHARES_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
+        Arguments.of(OUTGOING_SHARES_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
+        Arguments.of(LINKS_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
+        Arguments.of(BACKUPS_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
+        Arguments.of(FILE_BROWSER_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
+        Arguments.of(VIDEO_BROWSE_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
+        Arguments.of(RECENTS_BUCKET_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
+        Arguments.of(FAVOURITES_ADAPTER, NodeSourceType.VIDEO_PLAYER_DEFAULT),
+        Arguments.of(INVALID_VALUE, NodeSourceType.VIDEO_PLAYER_DEFAULT),
     )
 
     @Test

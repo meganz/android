@@ -48,6 +48,9 @@ import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.qualifier.features.Backups
 import mega.privacy.android.domain.qualifier.features.Chat
 import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.VideoPlayerDefault
+import mega.privacy.android.domain.qualifier.features.VideoPlayerImageViewer
+import mega.privacy.android.domain.qualifier.features.VideoPlayerVersions
 import mega.privacy.android.domain.qualifier.features.FileLink
 import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
@@ -383,6 +386,73 @@ abstract class NodeActionsBottomSheetModule {
                 downloadMenuAction,
             )
         }
+
+        /**
+         * Provide video player default bottom sheet options
+         */
+        @Provides
+        @ElementsIntoSet
+        @VideoPlayerDefault
+        @Singleton
+        fun provideVideoPlayerDefaultBottomSheetOptions(
+            infoMenuAction: InfoBottomSheetMenuItem,
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
+            copyMenuAction: CopyBottomSheetMenuItem,
+            shareMenuAction: ShareBottomSheetMenuItem,
+            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
+            getLinkMenuAction: GetLinkBottomSheetMenuItem,
+            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
+            hideMenuAction: HideBottomSheetMenuItem,
+            unhideMenuAction: UnhideBottomSheetMenuItem,
+            renameMenuAction: RenameBottomSheetMenuItem,
+            moveMenuAction: MoveBottomSheetMenuItem,
+            trashMenuAction: TrashBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
+            return setOf(
+                infoMenuAction,
+                downloadMenuAction,
+                sendToChatMenuAction,
+                copyMenuAction,
+                shareMenuAction,
+                manageLinkMenuAction,
+                getLinkMenuAction,
+                removeLinkMenuAction,
+                hideMenuAction,
+                unhideMenuAction,
+                renameMenuAction,
+                moveMenuAction,
+                trashMenuAction,
+            )
+        }
+
+        /**
+         * Provide video player versions bottom sheet options
+         */
+        @Provides
+        @ElementsIntoSet
+        @VideoPlayerVersions
+        @Singleton
+        fun provideVideoPlayerVersionsBottomSheetOptions(
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> = setOf(downloadMenuAction)
+
+        /**
+         * Provide video player image viewer bottom sheet options
+         */
+        @Provides
+        @ElementsIntoSet
+        @VideoPlayerImageViewer
+        @Singleton
+        fun provideVideoPlayerImageViewerBottomSheetOptions(
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+            hideMenuAction: HideBottomSheetMenuItem,
+            unhideMenuAction: UnhideBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> = setOf(
+            downloadMenuAction,
+            hideMenuAction,
+            unhideMenuAction,
+        )
 
         /**
          * Provide offline bottom sheet options

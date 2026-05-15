@@ -86,6 +86,7 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil
@@ -314,17 +315,11 @@ class VideoPlayerViewModelV2 @Inject constructor(
         when (currentLaunchSources) {
             OFFLINE_ADAPTER -> NodeSourceType.OFFLINE
             RUBBISH_BIN_ADAPTER -> NodeSourceType.RUBBISH_BIN
-            INCOMING_SHARES_ADAPTER -> NodeSourceType.INCOMING_SHARES
-            OUTGOING_SHARES_ADAPTER -> NodeSourceType.OUTGOING_SHARES
-            LINKS_ADAPTER -> NodeSourceType.LINKS
-            BACKUPS_ADAPTER -> NodeSourceType.BACKUPS
-            FILE_BROWSER_ADAPTER -> NodeSourceType.CLOUD_DRIVE
-            VIDEO_BROWSE_ADAPTER -> NodeSourceType.VIDEOS
-            RECENTS_BUCKET_ADAPTER -> NodeSourceType.RECENTS_BUCKET
-            FAVOURITES_ADAPTER -> NodeSourceType.FAVOURITES
             FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING -> NodeSourceType.FOLDER_LINK
             FROM_CHAT -> NodeSourceType.CHAT
-            else -> NodeSourceType.CLOUD_DRIVE
+            FROM_IMAGE_VIEWER -> NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER
+            VERSIONS_ADAPTER -> NodeSourceType.VIDEO_PLAYER_VERSIONS
+            else -> NodeSourceType.VIDEO_PLAYER_DEFAULT
         }
 
     private fun updateNameWhenNodeUpdates() {
