@@ -2460,4 +2460,7 @@
     <string name="last_seen_general">[A]Último acceso [/A]%1$s %2$s</string>
     <string name="new_file_subject_when_uploading">Asunto</string>
     <string name="new_file_email_when_uploading">Dirección de correo electrónico</string>
+    <string name="error_no_internet_title">No hay conexión a internet</string>
+    <string name="error_dialog_confirm_button">Entendido</string>
+    <string name="home_configuration_widget_my_account_widget_name">Mi cuenta</string>
 </resources>

@@ -47,11 +47,11 @@
     <!-- The name of the Device or Folder Sub State when its code is INVALID_SCAN_INTERVAL -->
     <string name="general_sync_invalid_scan_interval">掃描間隔無效。檢查掃描間隔設定並且重試。</string>
     <!-- The name of the Device or Folder Sub State when its code is NOTIFICATION_SYSTEM_UNAVAILABLE -->
-    <string name="general_sync_notification_system_unavailable">無法與資料夾位置通訊。檢查該位置是否可用，而且是否已授予該資料夾位置的權限。</string>
+    <string name="general_sync_notification_system_unavailable">無法連線至資料夾位置。請檢查該位置是否可供存取，並確認已獲得該資料夾位置的存取權限。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_ADD_WATCH -->
-    <string name="general_sync_unable_to_add_watch">無法新增檔案系統偵聽。確保有足夠的可用空間和記憶體，並且您已授予資料夾位置的權限。</string>
+    <string name="general_sync_unable_to_add_watch">無法新增檔案系統監控。請確保有足夠的可用空間與記憶體，並確認您已授予該資料夾位置的存取權限。</string>
     <!-- The name of the Device or Folder Sub State when its code is UNABLE_TO_RETRIEVE_ROOT_FSID -->
-    <string name="general_sync_unable_to_retrieve_root_fsid">無法讀取同步位置。檢查該位置是否可用，而且是否已授予該資料夾位置的權限。</string>
+    <string name="general_sync_unable_to_retrieve_root_fsid">無法讀取同步位置。請檢查該位置是否可供存取，並確認已獲得該資料夾位置的存取權限。</string>
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">您裝置上的儲存空間不足</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
@@ -833,7 +833,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">正在上傳⋯</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%%正在上傳⋯</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%%上傳進行中⋯</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">非活躍</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -2318,4 +2318,30 @@
     <string name="last_seen_general">[A]最後上線時間 [/A]%1$s %2$s</string>
     <string name="new_file_subject_when_uploading">標題</string>
     <string name="new_file_email_when_uploading">電子郵件地止</string>
+    <string name="home_widget_viewed_links_clear_history">清除已檢視的連結紀錄</string>
+    <string name="home_widget_viewed_links_clear_history_dialog_message">確定要清除所有已檢視的連結紀錄嗎？此動作將無法復原。</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">已檢視連結紀錄已清除</string>
+    <string name="home_widget_viewed_links_empty_state">已檢視的連結將會顯示在此</string>
+    <string name="home_cwlo_empty_state">未完成的項目將會顯示在此</string>
+    <string name="folder_link_guest_banner_title">儲存到您的MEGA雲端空間</string>
+    <string name="folder_link_guest_banner_description">請妥善保存此連結。建立免費帳號即可儲存此資料夾並隨時隨地進行存取。</string>
+    <string name="folder_link_guest_banner_create_account">建立免費帳戶</string>
+    <string name="folder_link_guest_banner_dismiss_content_description">關閉橫幅</string>
+    <string name="home_configuration_screen_toolbar_title">自訂主畫面</string>
+    <string name="home_configuration_screen_toolbar_subtitle">拖曳區塊以重新排序</string>
+    <string name="home_configuration_screen_menu_reset_to_default">回復預設</string>
+    <string name="home_configuration_screen_menu_choose_default_start_screen">選擇預設啟動畫面</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">主畫面必須包含至少一個區塊</string>
+    <string name="file_link_subtitle">檔案連結</string>
+    <string name="favourites_empty_screen_description">將資料夾加入收藏，即可在此查看</string>
+    <string name="name_collision_choose_folder_header">請選擇您想要保留的資料夾</string>
+    <string name="name_collision_folder_warning_upload_and_rename">您正在上傳的資料夾將重新命名為：</string>
+    <string name="google_sign_in">使用Google帳號登入</string>
+    <string name="google_sign_in_failed">Google登入失敗，請稍後再試。</string>
+    <string name="google_sign_in_email_exists">此電子郵件已有帳號。請直接登入。</string>
+    <string name="or_divider">或</string>
+    <string name="general_new_link">新連結</string>
+    <string name="error_no_internet_title">無網路連線</string>
+    <string name="error_dialog_confirm_button">好的，明白了</string>
+    <string name="home_configuration_widget_my_account_widget_name">我的帳戶</string>
 </resources>

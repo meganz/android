@@ -11,7 +11,7 @@
     <!-- Action text to retake current scan picture (Document scanner) -->
     <string name="scan_action_retake">Quét lại</string>
     <!-- Document scanner file name -->
-    <string name="scan_file_name">Tên tệp&#160;tin</string>
+    <string name="scan_file_name">Tên tệp tin</string>
     <!-- Input field description in the document save screen (Document scanner) -->
     <string name="scan_file_type">Dạng tệp</string>
     <!-- Input field description in the document save screen (Document scanner) -->
@@ -39,9 +39,9 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">Cần quyền hạn sử&#160;dụng Camêra để quét tài&#160;liệu</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">Tên không hợp&#160;lệ</string>
+    <string name="scan_incorrect_name">Tên không hợp lệ</string>
     <!-- Error text for invalid characters -->
-    <string name="scan_invalid_characters">Ký&#160;tự không hợp&#160;lệ</string>
+    <string name="scan_invalid_characters">Ký tự không hợp lệ</string>
     <!-- Snackbar text for incorrect name -->
     <string name="scan_snackbar_incorrect_name">Sửa lại tên tệp cho phù&#160;hợp trước khi tiến&#160;hành</string>
     <!-- Dialog message showing file progress -->

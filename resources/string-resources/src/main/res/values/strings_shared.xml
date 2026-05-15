@@ -1745,7 +1745,7 @@
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years.
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
     is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
@@ -1783,7 +1783,7 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
     is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
     <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
@@ -2843,15 +2843,15 @@
     <!-- Title of the error dialog shown when a video file fails to play due to a general error -->
     <string name="error_fail_to_play_video_title">Unable to play video</string>
     <!-- Message of the error dialog shown when a video file fails to play due to a general error -->
-    <string name="error_fail_to_play_video_message">We are sorry. Something went wrong and we are unable to open the file.</string>
+    <string name="error_fail_to_play_video_message">Sorry. Something went wrong and we’re unable to open the file.</string>
     <!-- Title of the error dialog shown when a video file format is not supported by the player -->
     <string name="error_file_not_supported_title">File not supported</string>
     <!-- Message of the error dialog shown when a video file format is not supported by the player -->
-    <string name="error_file_not_supported_message">You will need to download this file in order to open it in a compatible app.</string>
+    <string name="error_file_not_supported_message">Download this file to open it in a compatible app.</string>
     <!-- Title of the error dialog shown when a video cannot be opened due to no internet connection -->
     <string name="error_no_internet_title">No internet connection</string>
     <!-- Message of the error dialog shown when a video cannot be opened due to no internet connection -->
-    <string name="error_no_internet_message">Unable to open the file due to connectivity issues. Please check your internet connection and try again.</string>
+    <string name="error_no_internet_message">Unable to open the file due to connectivity issues. Check your internet connection and try again.</string>
     <!-- Confirm button text for video player error dialogs -->
     <string name="error_dialog_confirm_button">OK, got it</string>
     <!-- Widget display name for "Shortcuts" in home configuration -->

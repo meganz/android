@@ -2603,4 +2603,9 @@
     <string name="new_file_subject_when_uploading">Tytuł</string>
     <string name="new_file_email_when_uploading">E-mail</string>
     <string name="general_new_link">Nowy link</string>
+    <string name="home_configuration_tooltip_description">Wybierz to, co widzisz, i zorganizuj to tak, aby odpowiadało twoim potrzebom</string>
+    <string name="home_configuration_tooltip_action">Eksploruj</string>
+    <string name="error_no_internet_title">Brak połączenia z internetem</string>
+    <string name="error_dialog_confirm_button">OK, rozumiem</string>
+    <string name="home_configuration_widget_my_account_widget_name">Moje konto</string>
 </resources>

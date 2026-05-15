@@ -1257,7 +1257,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">發生錯誤，通話無法連線。</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
-    <string name="no_contacts_permissions">未授予任何聯絡權限</string>
+    <string name="no_contacts_permissions">未授予通訊錄存取權限</string>
     <!-- Option of the sliding panel to go to QR code section -->
     <string name="choose_qr_option_panel">我的二維條碼</string>
     <!-- Title of the screen that shows the options to the QR code -->
@@ -1363,7 +1363,7 @@
     <!-- Password strong -->
     <string name="pass_strong">強</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
-    <string name="title_notification_call_in_progress">正在通話中</string>
+    <string name="title_notification_call_in_progress">通話正在進行中</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">返回通話</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
@@ -2095,7 +2095,7 @@
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
     <string name="error_max_pdf_password">您輸入的密碼無效</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
-    <string name="not_allow_play_alert">正在通話時無法播放影音檔案。</string>
+    <string name="not_allow_play_alert">通話進行中無法播放影音檔案。</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
     <string name="ongoing_call_messages">正在進行中的通話</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
@@ -3815,7 +3815,7 @@
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_label">重複</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_send_calendar_invite_label">發送行事曆邀請</string>
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">發送會議邀請</string>
     <!-- Title of option to add description in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_add_description_label">加入說明</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
@@ -4167,7 +4167,7 @@
     <!-- Meeting list tooltip description for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_description">您現在可以點選右側的三個小圓點並選擇[A]事件[/A]來查看、取消、或編輯週期性會的任何事件。</string>
     <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">透過電子郵件向與會者發送行事曆邀請，以便他們可以將會議加到行事曆中。</string>
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">透過電子郵件向與會者發送會議邀請，以便他們可以將會議加到行事曆中。</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">會議已更新</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->

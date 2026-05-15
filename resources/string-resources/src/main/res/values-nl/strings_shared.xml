@@ -2428,4 +2428,9 @@
     <string name="general_new_link">Nieuwe link</string>
     <string name="new_file_subject_when_uploading">Onderwerp</string>
     <string name="new_file_email_when_uploading">E-mail adres</string>
+    <string name="home_configuration_tooltip_description">Kies wat u ziet en organiseer het naar eigen wens</string>
+    <string name="home_configuration_tooltip_action">Ontdekken</string>
+    <string name="error_no_internet_title">Geen internet verbinding</string>
+    <string name="error_dialog_confirm_button">OK, ik snap het</string>
+    <string name="home_configuration_widget_my_account_widget_name">Mijn Account</string>
 </resources>

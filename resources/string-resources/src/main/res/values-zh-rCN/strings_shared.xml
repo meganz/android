@@ -2336,4 +2336,7 @@
     <string name="last_seen_general">[A]上次登录[/A]%1$s %2$s</string>
     <string name="new_file_subject_when_uploading">主题</string>
     <string name="new_file_email_when_uploading">电子邮件地址</string>
+    <string name="error_no_internet_title">无网络连接</string>
+    <string name="error_dialog_confirm_button">好的，明白了</string>
+    <string name="home_configuration_widget_my_account_widget_name">我的帐户</string>
 </resources>

@@ -2488,4 +2488,7 @@
     <string name="last_seen_general">[A]Vu pour la dernière fois le [/A]%1$s à %2$s</string>
     <string name="new_file_subject_when_uploading">Objet</string>
     <string name="new_file_email_when_uploading">Adresse courriel</string>
+    <string name="error_no_internet_title">Aucune connexion à Internet</string>
+    <string name="error_dialog_confirm_button">Fermer</string>
+    <string name="home_configuration_widget_my_account_widget_name">Mon compte</string>
 </resources>

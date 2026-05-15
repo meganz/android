@@ -2507,4 +2507,7 @@
     <string name="name_collision_choose_folder_header">Selectează folderul pe care vrei să-l păstrezi.</string>
     <string name="name_collision_folder_warning_upload_and_rename">Folderul pe care îl încarci va fi redenumit ca:</string>
     <string name="home_configuration_widget_removal_not_allowed_message">Este necesară cel puțin o secțiune de acasă.</string>
+    <string name="error_no_internet_title">Fără conexiune la internet</string>
+    <string name="error_dialog_confirm_button">Bine, am înțeles</string>
+    <string name="home_configuration_widget_my_account_widget_name">Contul meu</string>
 </resources>
