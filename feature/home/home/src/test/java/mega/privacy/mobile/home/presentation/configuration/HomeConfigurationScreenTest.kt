@@ -39,6 +39,8 @@ class HomeConfigurationScreenTest {
         name = LocalizedText.Literal("Widget A"),
         enabled = true,
         canDelete = true,
+        isConfigurable = true,
+        isDraggable = true,
     )
 
     private val widgetB = WidgetConfigurationItem(
@@ -47,6 +49,8 @@ class HomeConfigurationScreenTest {
         name = LocalizedText.Literal("Widget B"),
         enabled = false,
         canDelete = true,
+        isConfigurable = true,
+        isDraggable = true,
     )
 
     private fun setContent(
@@ -296,5 +300,52 @@ class HomeConfigurationScreenTest {
             .assertIsDisplayed()
         composeRule.onNodeWithTag(TEST_TAG_MENU_CHOOSE_DEFAULT_START_SCREEN, useUnmergedTree = true)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that widget item is not displayed when isConfigurable is false`() {
+        val nonConfigurableWidget = widgetA.copy(isConfigurable = false)
+        setContent(
+            state = HomeConfigurationUiState.Data(
+                allowRemoval = true,
+                widgets = listOf(nonConfigurableWidget),
+            )
+        )
+
+        composeRule.onNodeWithTag(
+            TEST_TAG_WIDGET_CONFIGURATION_ITEM + nonConfigurableWidget.identifier,
+            useUnmergedTree = true,
+        ).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that reorder icon is displayed when isDraggable is true`() {
+        setContent(
+            state = HomeConfigurationUiState.Data(
+                allowRemoval = true,
+                widgets = listOf(widgetA),
+            )
+        )
+
+        composeRule.onNodeWithContentDescription("Reorder icon", useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that reorder icon is not displayed when isDraggable is false`() {
+        val nonDraggableWidget = widgetA.copy(isDraggable = false)
+        setContent(
+            state = HomeConfigurationUiState.Data(
+                allowRemoval = true,
+                widgets = listOf(nonDraggableWidget),
+            )
+        )
+
+        composeRule.onNodeWithTag(
+            TEST_TAG_WIDGET_CONFIGURATION_ITEM + nonDraggableWidget.identifier,
+            useUnmergedTree = true,
+        ).assertIsDisplayed()
+        composeRule.onNodeWithContentDescription("Reorder icon", useUnmergedTree = true)
+            .assertDoesNotExist()
     }
 }

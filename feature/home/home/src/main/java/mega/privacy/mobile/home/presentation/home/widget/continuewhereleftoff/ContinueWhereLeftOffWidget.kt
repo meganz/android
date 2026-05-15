@@ -22,14 +22,17 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.destination.ContinueWhereLeftOffScreenNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 class ContinueWhereLeftOffWidget @Inject constructor() : HomeWidget, Flagged {
     override val identifier: String = "ContinueWhereLeftOffWidget"
-    override val defaultOrder: Int = 4
+    override val defaultOrder: HomeWidgetOrder = HomeWidgetOrder.ContinueWhereLeftOff
     override val canDelete: Boolean = true
+    override val isConfigurable: Boolean = true
+    override val isDraggable: Boolean = true
     override val feature: Feature = ApiFeatures.ContinueWhereLeftOff
 
     override suspend fun getWidgetName() =

@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUs
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 import org.junit.jupiter.api.AfterEach
@@ -90,14 +91,14 @@ class HomeViewModelTest {
             }
         }
 
-        val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = 1)
+        val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
         dynamicWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn setOf(
                 dynamicWidget,
             )
         }
 
-        val staticWidget = stubWidget(identifier = "static1", defaultOrder = 0)
+        val staticWidget = stubWidget(identifier = "static1", defaultOrder = HomeWidgetOrder.Banner)
         staticWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn setOf(
                 staticWidget,
@@ -135,14 +136,14 @@ class HomeViewModelTest {
             }
         }
 
-        val dynamicWidget = stubWidget(identifier = dynamicIdentifier, defaultOrder = 1)
+        val dynamicWidget = stubWidget(identifier = dynamicIdentifier, defaultOrder = HomeWidgetOrder.Shortcuts)
         dynamicWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn setOf(
                 dynamicWidget,
             )
         }
 
-        val staticWidget = stubWidget(identifier = staticIdentifier, defaultOrder = 0)
+        val staticWidget = stubWidget(identifier = staticIdentifier, defaultOrder = HomeWidgetOrder.Banner)
         staticWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn setOf(
                 staticWidget,
@@ -180,14 +181,14 @@ class HomeViewModelTest {
             }
         }
 
-        val dynamicWidget = stubWidget(identifier = dynamicIdentifier, defaultOrder = 1)
+        val dynamicWidget = stubWidget(identifier = dynamicIdentifier, defaultOrder = HomeWidgetOrder.Shortcuts)
         dynamicWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn setOf(
                 dynamicWidget,
             )
         }
 
-        val staticWidget = stubWidget(identifier = staticIdentifier, defaultOrder = 0)
+        val staticWidget = stubWidget(identifier = staticIdentifier, defaultOrder = HomeWidgetOrder.Banner)
         staticWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn setOf(
                 staticWidget,
@@ -310,7 +311,7 @@ class HomeViewModelTest {
 
     private fun stubWidget(
         identifier: String,
-        defaultOrder: Int,
+        defaultOrder: HomeWidgetOrder,
     ): HomeWidget {
         return mock<HomeWidget> {
             on { this.identifier } doReturn identifier

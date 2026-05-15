@@ -51,7 +51,9 @@ class HomeConfigurationViewModel @Inject constructor(
                     .sortedBy { it.index }
 
                 HomeConfigurationUiState.Data(
-                    allowRemoval = items.count { widget -> widget.enabled } > 1,
+                    allowRemoval = items
+                        .filter { it.isConfigurable }
+                        .count { widget -> widget.enabled } > 1,
                     widgets = items,
                 )
 
@@ -74,22 +76,38 @@ class HomeConfigurationViewModel @Inject constructor(
     }
 
     fun updateWidgetOrder(orderedItems: List<WidgetConfigurationItem>) {
-        updateWidgets(orderedItems.mapIndexed { index, widgetConfigurationItem ->
-            widgetConfigurationItem.copy(index = index)
-        })
+        viewModelScope.launch {
+            runCatching {
+                val latestEnabledByIdentifier = monitorHomeWidgetConfigurationUseCase()
+                    .first()
+                    .associate { it.widgetIdentifier to it.enabled }
+
+                val updated = orderedItems.mapIndexed { index, item ->
+                    HomeWidgetConfiguration(
+                        widgetIdentifier = item.identifier,
+                        widgetOrder = index,
+                        enabled = latestEnabledByIdentifier[item.identifier] ?: item.enabled,
+                    )
+                }
+                updateWidgetConfigurationsUseCase(updated)
+            }.onFailure {
+                Timber.e(it, "Failed to update widget order")
+            }
+        }
     }
 
     private fun updateWidgets(items: List<WidgetConfigurationItem>) {
         Timber.d("Updated widget configurations: \n ${items.joinToString("\n")}")
         viewModelScope.launch {
             runCatching {
-                updateWidgetConfigurationsUseCase(items.map {
+                val updated = items.map {
                     HomeWidgetConfiguration(
                         widgetIdentifier = it.identifier,
                         widgetOrder = it.index,
                         enabled = it.enabled
                     )
-                })
+                }
+                updateWidgetConfigurationsUseCase(updated)
             }.onFailure {
                 Timber.e(it, "Failed to update widget configurations")
             }
@@ -120,7 +138,7 @@ class HomeConfigurationViewModel @Inject constructor(
                         provider.getWidgets().map { widget ->
                             HomeWidgetConfiguration(
                                 widgetIdentifier = widget.identifier,
-                                widgetOrder = widget.defaultOrder,
+                                widgetOrder = widget.defaultOrder.ordinal,
                                 enabled = true,
                             )
                         }

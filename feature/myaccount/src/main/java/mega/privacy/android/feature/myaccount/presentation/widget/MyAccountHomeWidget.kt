@@ -11,9 +11,10 @@ import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.MyAccountHomeWidgetButtonPressedEvent
 import mega.privacy.mobile.analytics.event.UpgradeAccountHomeWidgetButtonPressedEvent
 import javax.inject.Inject
@@ -24,9 +25,12 @@ import javax.inject.Inject
 class MyAccountHomeWidget @Inject constructor() : HomeWidget {
 
     override val identifier: String = "MyAccountWidgetProvider"
-    override val defaultOrder: Int = 1
+    override val defaultOrder: HomeWidgetOrder = HomeWidgetOrder.MyAccount
     override val canDelete: Boolean = false
-    override suspend fun getWidgetName() = LocalizedText.StringRes(R.string.section_my_account)
+    override val isConfigurable: Boolean = true
+    override val isDraggable: Boolean = true
+    override suspend fun getWidgetName() =
+        LocalizedText.StringRes(sharedR.string.home_configuration_widget_my_account_widget_name)
 
     @Composable
     override fun DisplayWidget(

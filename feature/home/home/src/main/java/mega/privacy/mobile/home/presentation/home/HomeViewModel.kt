@@ -48,7 +48,7 @@ class HomeViewModel @Inject constructor(
                                 ?: true
                         }.sortedBy { widget ->
                             configuration[widget.identifier]?.widgetOrder
-                                ?: widget.defaultOrder
+                                ?: widget.defaultOrder.ordinal
                         }.map {
                             HomeWidgetItem(
                                 it.identifier,

@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.home.DeleteWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
 import mega.privacy.mobile.home.presentation.configuration.mapper.WidgetConfigurationItemMapper
 import mega.privacy.mobile.home.presentation.configuration.model.HomeConfigurationUiState
@@ -77,13 +78,13 @@ class HomeConfigurationViewModelTest {
                 }
             }
 
-            val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = 1)
+            val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
             val dynamicWidgets = setOf(dynamicWidget)
             dynamicWidgetsProvider.stub {
                 onBlocking { getWidgets() } doReturn dynamicWidgets
             }
 
-            val staticWidget = stubWidget(identifier = "static1", defaultOrder = 0)
+            val staticWidget = stubWidget(identifier = "static1", defaultOrder = HomeWidgetOrder.Banner)
             val staticWidgets = setOf(staticWidget)
             staticWidgetsProvider.stub {
                 onBlocking { getWidgets() } doReturn staticWidgets
@@ -114,13 +115,13 @@ class HomeConfigurationViewModelTest {
             }
         }
 
-        val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = 1)
+        val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
         val dynamicWidgets = setOf(dynamicWidget)
         dynamicWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn dynamicWidgets
         }
 
-        val staticWidget = stubWidget(identifier = "static1", defaultOrder = 0)
+        val staticWidget = stubWidget(identifier = "static1", defaultOrder = HomeWidgetOrder.Banner)
         val staticWidgets = setOf(staticWidget)
         staticWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn staticWidgets
@@ -157,9 +158,15 @@ class HomeConfigurationViewModelTest {
                     enabled = true,
                 ),
             )
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(configurationList)
+                    awaitCancellation()
+                }
+            }
             underTest.updateWidgetOrder(configurationList.map {
                 WidgetConfigurationItemMapper().invoke(
-                    homeWidget = stubWidget(it.widgetIdentifier, it.widgetOrder),
+                    homeWidget = stubWidget(it.widgetIdentifier, HomeWidgetOrder.Banner),
                     widgetConfiguration = it,
                 )
             })
@@ -171,11 +178,50 @@ class HomeConfigurationViewModelTest {
         }
 
     @Test
+    fun `test that update widget order preserves enabled state from the latest stored configurations`() =
+        runTest {
+            // Stored state: a is enabled, b is disabled.
+            val storedConfigurations = listOf(
+                HomeWidgetConfiguration(widgetIdentifier = "a", widgetOrder = 0, enabled = true),
+                HomeWidgetConfiguration(widgetIdentifier = "b", widgetOrder = 1, enabled = false),
+            )
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(storedConfigurations)
+                    awaitCancellation()
+                }
+            }
+            // Caller passes items with a stale `enabled = true` for both — the VM must
+            // ignore that and source enabled from the stored configurations instead.
+            val orderedItems = listOf(
+                WidgetConfigurationItemMapper().invoke(
+                    homeWidget = stubWidget("b", HomeWidgetOrder.Banner),
+                    widgetConfiguration = HomeWidgetConfiguration("b", widgetOrder = 0, enabled = true),
+                ),
+                WidgetConfigurationItemMapper().invoke(
+                    homeWidget = stubWidget("a", HomeWidgetOrder.Banner),
+                    widgetConfiguration = HomeWidgetConfiguration("a", widgetOrder = 1, enabled = true),
+                ),
+            )
+
+            underTest.updateWidgetOrder(orderedItems)
+
+            val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
+            verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
+            val actual = captor.firstValue.associateBy { it.widgetIdentifier }
+            assertThat(actual["a"]?.enabled).isTrue()
+            assertThat(actual["b"]?.enabled).isFalse()
+            // Order from the caller is still honoured.
+            assertThat(actual["b"]?.widgetOrder).isEqualTo(0)
+            assertThat(actual["a"]?.widgetOrder).isEqualTo(1)
+        }
+
+    @Test
     fun `test that calling update enabled state calls update configuration use case with correct values`() =
         runTest {
             underTest.updateEnabledState(
                 item = WidgetConfigurationItemMapper().invoke(
-                    homeWidget = stubWidget("id", 0),
+                    homeWidget = stubWidget("id", HomeWidgetOrder.Banner),
                     widgetConfiguration = HomeWidgetConfiguration(
                         widgetIdentifier = "id",
                         widgetOrder = 0,
@@ -193,9 +239,9 @@ class HomeConfigurationViewModelTest {
 
     @Test
     fun `test that widgets are sorted by index ascending`() = runTest {
-        val secondWidget = stubWidget(identifier = "second", defaultOrder = 5)
-        val thirdWidget = stubWidget(identifier = "third", defaultOrder = 6)
-        val firstWidget = stubWidget(identifier = "first", defaultOrder = 4)
+        val secondWidget = stubWidget(identifier = "second", defaultOrder = HomeWidgetOrder.ViewedLinks)
+        val thirdWidget = stubWidget(identifier = "third", defaultOrder = HomeWidgetOrder.ContinueWhereLeftOff)
+        val firstWidget = stubWidget(identifier = "first", defaultOrder = HomeWidgetOrder.MyAccount)
 
         monitorHomeWidgetConfigurationUseCase.stub {
             on { invoke() } doReturn flow {
@@ -244,9 +290,9 @@ class HomeConfigurationViewModelTest {
 
     @Test
     fun `test that widgets are sorted by default order when no configuration exists`() = runTest {
-        val thirdWidget = stubWidget(identifier = "third", defaultOrder = 2)
-        val firstWidget = stubWidget(identifier = "first", defaultOrder = 0)
-        val secondWidget = stubWidget(identifier = "second", defaultOrder = 1)
+        val thirdWidget = stubWidget(identifier = "third", defaultOrder = HomeWidgetOrder.Recents)
+        val firstWidget = stubWidget(identifier = "first", defaultOrder = HomeWidgetOrder.Banner)
+        val secondWidget = stubWidget(identifier = "second", defaultOrder = HomeWidgetOrder.Shortcuts)
 
         monitorHomeWidgetConfigurationUseCase.stub {
             on { invoke() } doReturn flow {
@@ -291,7 +337,7 @@ class HomeConfigurationViewModelTest {
         )
 
         val homeWidgets = configurationList.map {
-            stubWidget(it.widgetIdentifier, it.widgetOrder)
+            stubWidget(it.widgetIdentifier, HomeWidgetOrder.Banner)
         }.toSet()
 
         dynamicWidgetsProvider.stub {
@@ -323,9 +369,9 @@ class HomeConfigurationViewModelTest {
     @Test
     fun `test that reset widget state to default updates all widgets to default order and enabled`() =
         runTest {
-            val firstWidget = stubWidget(identifier = "first", defaultOrder = 2)
-            val secondWidget = stubWidget(identifier = "second", defaultOrder = 0)
-            val thirdWidget = stubWidget(identifier = "third", defaultOrder = 1)
+            val firstWidget = stubWidget(identifier = "first", defaultOrder = HomeWidgetOrder.Recents)
+            val secondWidget = stubWidget(identifier = "second", defaultOrder = HomeWidgetOrder.Banner)
+            val thirdWidget = stubWidget(identifier = "third", defaultOrder = HomeWidgetOrder.Shortcuts)
 
             dynamicWidgetsProvider.stub {
                 onBlocking { getWidgets() } doReturn setOf(firstWidget, secondWidget)
@@ -348,7 +394,7 @@ class HomeConfigurationViewModelTest {
 
     private fun stubWidget(
         identifier: String,
-        defaultOrder: Int,
+        defaultOrder: HomeWidgetOrder,
     ): HomeWidget {
         return mock<HomeWidget> {
             on { this.identifier } doReturn identifier

@@ -17,7 +17,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
-class HomeChipsWidgetViewModelTest {
+class ShortcutsWidgetViewModelTest {
 
     private lateinit var underTest: HomeChipsWidgetViewModel
 

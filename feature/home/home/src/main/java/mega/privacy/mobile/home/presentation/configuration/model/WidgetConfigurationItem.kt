@@ -8,4 +8,6 @@ data class WidgetConfigurationItem(
     val name: LocalizedText,
     val enabled: Boolean,
     val canDelete: Boolean,
+    val isConfigurable: Boolean,
+    val isDraggable: Boolean,
 )

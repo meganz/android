@@ -25,6 +25,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.destination.AudioSectionNavKey
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.FavouritesNavKey
@@ -42,10 +43,12 @@ class HomeChipsWidget @Inject constructor(
 ) : HomeWidget {
 
     override val identifier: String = "HomeChipsWidgetProvider"
-    override val defaultOrder: Int = 0
+    override val defaultOrder: HomeWidgetOrder = HomeWidgetOrder.Shortcuts
     override val canDelete: Boolean = false
-
-    override suspend fun getWidgetName() = LocalizedText.Literal("Home Chips")
+    override val isConfigurable: Boolean = true
+    override val isDraggable: Boolean = false
+    override suspend fun getWidgetName() =
+        LocalizedText.StringRes(sharedR.string.home_configuration_widget_shortcuts_widget_name)
 
     @Composable
     override fun DisplayWidget(

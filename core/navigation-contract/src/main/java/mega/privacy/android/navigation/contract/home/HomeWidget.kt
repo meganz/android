@@ -15,8 +15,10 @@ import mega.privacy.android.navigation.contract.TransferHandler
  */
 interface HomeWidget {
     val identifier: String
-    val defaultOrder: Int
+    val defaultOrder: HomeWidgetOrder
     val canDelete: Boolean
+    val isConfigurable: Boolean
+    val isDraggable: Boolean
     suspend fun getWidgetName(): LocalizedText
 
     @Composable
