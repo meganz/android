@@ -1,33 +1,20 @@
 package mega.privacy.android.shared.contact.components
 
 import android.text.format.DateFormat
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.contact.component.ContactStatusDot
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.divider.SubtleDivider
 import mega.android.core.ui.components.list.FlexibleLineListItem
-import mega.android.core.ui.components.profile.MediumProfileIcon
-import mega.android.core.ui.components.profile.MediumProfilePicture
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.android.core.ui.theme.values.IconColor
-import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.resources.R
@@ -136,51 +123,6 @@ fun ContactItemView(
 }
 
 
-@Composable
-private fun ContactAvatar(
-    avatar: AvatarData,
-    displayName: String,
-    isVerified: Boolean,
-    selected: Boolean,
-) {
-    Box(modifier = Modifier.testTag(CONTACT_ITEM_VIEW_AVATAR)) {
-        if (selected) {
-            MediumProfileIcon(
-                icon = IconPack.Medium.Thin.Outline.Check,
-                iconTint = IconColor.Inverse,
-                contentDescription = null,
-                avatarColor = DSTokens.colors.icon.brand,
-            )
-        } else {
-            when (avatar) {
-                is AvatarData.Image -> MediumProfilePicture(
-                    imageFile = avatar.file,
-                    name = null,
-                    contentDescription = displayName,
-                )
-
-                is AvatarData.Initials -> MediumProfilePicture(
-                    imageFile = null,
-                    name = avatar.initials,
-                    contentDescription = displayName,
-                    avatarColor = avatar.avatarColor,
-                )
-            }
-            if (isVerified) {
-                Image(
-                    painter = painterResource(IconR.drawable.ic_contact_verified),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 2.dp, y = (-2).dp)
-                        .size(14.dp)
-                        .testTag(CONTACT_ITEM_VIEW_VERIFIED_BADGE),
-                )
-            }
-        }
-    }
-}
-
 private fun statusText(status: ContactItemStatus): Int = when (status) {
     ContactItemStatus.Away -> R.string.away_status
     ContactItemStatus.Online -> R.string.online_status
@@ -246,7 +188,6 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
 
 
 internal const val CONTACT_ITEM_VIEW_ROW = "contact_item_view:row"
-internal const val CONTACT_ITEM_VIEW_AVATAR = "contact_item_view:avatar"
 internal const val CONTACT_ITEM_VIEW_VERIFIED_BADGE = "contact_item_view:verified_badge"
 
 private class ContactItemPreviewProvider :
