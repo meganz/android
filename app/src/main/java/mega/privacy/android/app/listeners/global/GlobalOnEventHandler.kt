@@ -1,11 +1,15 @@
 package mega.privacy.android.app.listeners.global
 
 import android.content.Context
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
 import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -96,20 +100,30 @@ class GlobalOnEventHandler @Inject constructor(
             runCatching {
                 val isAdsFeatureEnabled =
                     getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
-                if (isAdsFeatureEnabled) {
-                    if (!isMobileAdsInitializeCalled.getAndSet(true)) {
-                        Timber.d("Initialising MobileAds")
-                        MobileAds.initialize(
-                            appContext,
-                            InitializationConfig.Builder("ca-app-pub-2135147798858967~2157690671")
-                                .build()
-                        )
-                    }
+                if (!isAdsFeatureEnabled) return@launch
+
+                if (!isProcessForeground()) {
+                    Timber.d("Skipping MobileAds init: process not in foreground")
+                    return@launch
+                }
+
+                if (!isMobileAdsInitializeCalled.getAndSet(true)) {
+                    Timber.d("Initialising MobileAds")
+                    MobileAds.initialize(
+                        appContext,
+                        InitializationConfig.Builder("ca-app-pub-2135147798858967~2157690671")
+                            .build()
+                    )
                 }
             }.onFailure {
                 Timber.e(it, "MobileAds initialization failed")
             }
         }
+    }
+
+    private suspend fun isProcessForeground(): Boolean = withContext(Dispatchers.Main) {
+        ProcessLifecycleOwner.get().lifecycle.currentState
+            .isAtLeast(Lifecycle.State.STARTED)
     }
 
     private suspend fun updateDomainName() {
