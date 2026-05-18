@@ -202,6 +202,7 @@ internal fun HomeScreen(
                                         homeConfigurationIconCoordinates = coordinates
                                     },
                                 onClick = {
+                                    onHomeConfigurationTooltipDismissed()
                                     navigationHandler.navigate(HomeConfiguration)
                                 },
                             ) {
