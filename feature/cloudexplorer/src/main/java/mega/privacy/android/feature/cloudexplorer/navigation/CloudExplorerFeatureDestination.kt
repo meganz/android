@@ -10,6 +10,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
@@ -18,7 +19,6 @@ import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.rememberNewFileNameResult
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -32,20 +32,24 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             shareFilesToMegaDestination(
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onStartUpload = transferHandler::setTransferEvent
+                onStartUpload = transferHandler::setTransferEvent,
+                monitorResult = navigationHandler::monitorResult,
+                clearResult = navigationHandler::clearResult,
             )
             shareTextToMegaDestination(
-                navigationHandler = navigationHandler,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
                 onStartUpload = transferHandler::setTransferEvent,
+                monitorResult = navigationHandler::monitorResult,
+                clearResult = navigationHandler::clearResult,
             )
             nodeExplorerDestination(
-                navigationHandler = navigationHandler,
                 onCloseExplorerScreen = { navigationHandler.backTo(it, true) },
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
                 onStartUpload = transferHandler::setTransferEvent,
+                monitorResult = navigationHandler::monitorResult,
+                clearResult = navigationHandler::clearResult,
             )
         }
 
@@ -53,6 +57,8 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (NavKey) -> Unit,
         onStartUpload: (TransferTriggerEvent) -> Unit,
+        monitorResult: (String) -> Flow<Any?>,
+        clearResult: (String) -> Unit,
     ) {
         entry<ShareFilesToMegaNavKey> { key ->
             val viewModel =
@@ -60,6 +66,11 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                     factory.create(ShareFilesToMegaViewModel.Args(shareUris = key.shareUris))
                 }
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val onStartNewGroupChat = rememberStartNewGroupChat(
+                monitorResult = monitorResult,
+                clearResult = clearResult,
+                onNavigate = onNavigate,
+            )
 
             ShareFilesToMegaScreen(
                 uiState = uiState,
@@ -67,15 +78,17 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigateBack = { onNavigateBack(key) },
                 onStartUpload = onStartUpload,
                 onNavigate = onNavigate,
+                onStartNewGroupChat = onStartNewGroupChat,
             )
         }
     }
 
     fun EntryProviderScope<NavKey>.shareTextToMegaDestination(
-        navigationHandler: NavigationHandler,
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (NavKey) -> Unit,
         onStartUpload: (TransferTriggerEvent) -> Unit,
+        monitorResult: (String) -> Flow<Any?>,
+        clearResult: (String) -> Unit,
     ) {
         entry<ShareTextToMegaNavKey> { key ->
             val viewModel = hiltViewModel<ShareTextToMegaViewModel>()
@@ -83,12 +96,19 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             var isProcessingAction by rememberSaveable { mutableStateOf(false) }
 
             rememberNewFileNameResult(
-                navigationHandler = navigationHandler,
+                monitorResult = monitorResult,
+                clearResult = clearResult,
                 startNavKey = key,
                 createTextFile = { name, content ->
                     isProcessingAction = true
                     viewModel.createTextFile(name, content)
                 },
+            )
+
+            val onStartNewGroupChat = rememberStartNewGroupChat(
+                monitorResult = monitorResult,
+                clearResult = clearResult,
+                onNavigate = onNavigate,
             )
 
             ShareTextToMegaScreen(
@@ -99,16 +119,18 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 onFileUriConsumed = viewModel::onFileUriConsumed,
+                onStartNewGroupChat = onStartNewGroupChat,
             )
         }
     }
 
     fun EntryProviderScope<NavKey>.nodeExplorerDestination(
-        navigationHandler: NavigationHandler,
         onCloseExplorerScreen: (NavKey) -> Unit,
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (NavKey) -> Unit,
         onStartUpload: (TransferTriggerEvent) -> Unit,
+        monitorResult: (String) -> Flow<Any?>,
+        clearResult: (String) -> Unit,
     ) {
         entry<NodesExplorerNavKey> { key ->
             var isProcessingAction by rememberSaveable { mutableStateOf(false) }
@@ -120,7 +142,8 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                         (uiState as? ShareTextToMegaUiState.Data)?.fileUri ?: consumed()
 
                     rememberNewFileNameResult(
-                        navigationHandler = navigationHandler,
+                        monitorResult = monitorResult,
+                        clearResult = clearResult,
                         startNavKey = startNavKey,
                         createTextFile = { name, content ->
                             isProcessingAction = true
@@ -130,6 +153,12 @@ class CloudExplorerFeatureDestination : FeatureDestination {
 
                     fileUri to viewModel::onFileUriConsumed
                 } ?: (consumed() to {})
+
+            val onStartNewGroupChat = rememberStartNewGroupChat(
+                monitorResult = monitorResult,
+                clearResult = clearResult,
+                onNavigate = onNavigate,
+            )
 
             NodesExplorerScreen(
                 explorerMode = key.explorerMode,
@@ -144,6 +173,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = { onNavigate(it) },
                 onStartUpload = onStartUpload,
                 onFileUriConsumed = onFileUriConsumed,
+                onStartNewGroupChat = onStartNewGroupChat,
             )
         }
     }

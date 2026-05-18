@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerContent
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.extensions.actionStringId
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.extensions.titleStringId
 import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerContent
@@ -43,6 +44,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.Nod
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreenContent
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
 import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
+import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
@@ -66,6 +68,7 @@ internal fun ExplorerScreen(
     onFolderPicked: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
     onChatsSelected: (List<Long>) -> Unit = {},
+    onStartNewGroupChat: ((CreateGroupChatNavKey.NewGroupChatResult) -> Unit) -> Unit = {},
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
@@ -279,7 +282,21 @@ internal fun ExplorerScreen(
                     }
                 }
                 if (explorerMode.isChatAvailable) {
-                    //Add chat tab
+                    addTextTabWithScrollableContent(
+                        tabItem = TabItems(
+                            title = stringResource(sharedR.string.general_chat),
+                            testTag = CHAT_TAB_TAG,
+                        ),
+                    ) { _, modifier ->
+                        ChatExplorerContent(
+                            onNewGroupChatClick = {
+                                onStartNewGroupChat { selection ->
+
+                                }
+                            },
+                            modifier = modifier,
+                        )
+                    }
                 }
             },
             initialSelectedIndex = tabIndex,
@@ -325,6 +342,7 @@ internal const val ACTION_BUTTONS_VIEW_TAG = "$CLOUD_EXPLORER_VIEW_TAG:action_bu
 internal const val CLOUD_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:cloud_tab"
 internal const val INCOMING_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:incoming_tab"
 internal const val FAVOURITES_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:favourites_tab"
+internal const val CHAT_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:chat_tab"
 internal const val CLOUD_TAB_INDEX = 0
 internal const val INCOMING_TAB_INDEX = 1
 internal const val FAVOURITES_TAB_INDEX = 2

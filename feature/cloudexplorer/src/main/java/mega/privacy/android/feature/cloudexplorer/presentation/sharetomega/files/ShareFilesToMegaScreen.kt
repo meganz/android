@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
+import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 
@@ -26,6 +27,7 @@ internal fun ShareFilesToMegaScreen(
     onStartUpload: (TransferTriggerEvent) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
+    onStartNewGroupChat: ((CreateGroupChatNavKey.NewGroupChatResult) -> Unit) -> Unit = {},
 ) {
     if (uiState is ShareFilesToMegaUiState.Loading) {
         //See if we need a loading view
@@ -52,6 +54,7 @@ internal fun ShareFilesToMegaScreen(
                 folderPickedIdLong = nodeId.longValue
                 uploadUrisEventState.trigger(dataUiState.shareUris.map { it.toUri() })
             },
+            onStartNewGroupChat = onStartNewGroupChat,
         )
 
         ShareToMegaUpload(

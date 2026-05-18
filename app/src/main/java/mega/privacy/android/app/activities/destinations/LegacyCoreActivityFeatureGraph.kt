@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.contact.invite.navigation.inviteCon
 import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsRequestLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.createGroupChatLegacyDestination
 import mega.privacy.android.app.presentation.fileexplorer.fileExplorer
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
@@ -120,6 +121,9 @@ class LegacyCoreActivityFeatureGraph(
             audioSectionDestination(
                 removeDestination = navigationHandler::back,
                 navigationHandler = navigationHandler,
+            )
+            createGroupChatLegacyDestination(
+                returnResult = navigationHandler::returnResult,
             )
         }
 }
