@@ -523,7 +523,7 @@ fun MediaMainScreen(
             )
         },
     ) { paddingValues ->
-        val tabEntries = remember(mediaMainUiState.isMediaRevampPhase2Enabled) {
+        val tabEntries = rememberSaveable(mediaMainUiState.isMediaRevampPhase2Enabled) {
             if (mediaMainUiState.isMediaRevampPhase2Enabled) {
                 MediaScreen.entries
             } else {
@@ -543,7 +543,7 @@ fun MediaMainScreen(
                     selectionModeType.isAnActiveSelection() || isSearchModeForVideosOrPlaylists,
                 pagerScrollEnabled =
                     selectionModeType == MediaSelectionModeType.None && !isSearchModeForVideosOrPlaylists,
-                initialSelectedIndex = currentTabIndex,
+                initialSelectedIndex = currentTabIndex.coerceAtMost(tabEntries.lastIndex),
                 onTabSelected = { index ->
                     currentTabIndex = index
                     tabEntries.getOrNull(index)?.let { selectedTab ->
