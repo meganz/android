@@ -70,7 +70,9 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavPriority
@@ -113,6 +115,12 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var navigationQueue: NavigationEventQueue
+
+    @Inject
+    lateinit var getNodeByIdUseCase: GetNodeByIdUseCase
+
+    @Inject
+    lateinit var isOutShareUseCase: IsOutShareUseCase
 
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
@@ -303,6 +311,8 @@ class FileInfoActivity : BaseActivity() {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             megaNodeUtilWrapper = megaNodeUtilWrapper,
             megaNavigator = megaNavigator,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            isOutShareUseCase = isOutShareUseCase,
         )
     }
 

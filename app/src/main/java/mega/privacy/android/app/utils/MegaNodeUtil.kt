@@ -63,7 +63,6 @@ import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -419,7 +418,7 @@ object MegaNodeUtil {
 
         val handle = n.handle
         if (cameraSyncHandle != null && cameraSyncHandle.isNotEmpty()
-            && handle == cameraSyncHandle.toLong() && !isNodeInRubbishOrDeleted(handle)
+            && handle == cameraSyncHandle.toLong() && !isNodeInRubbishOrDeletedInternal(handle)
         ) {
             return true
         }
@@ -430,18 +429,7 @@ object MegaNodeUtil {
         }
 
         return (secondaryMediaHandle != null && secondaryMediaHandle.isNotEmpty()
-                && handle == secondaryMediaHandle.toLong() && !isNodeInRubbishOrDeleted(handle))
-    }
-
-    /**
-     * Checks if a node is  outgoing or a pending outgoing share.
-     *
-     * @param node MegaNode to check
-     * @return True if the node is a outgoing or a pending outgoing share, false otherwise
-     */
-    @JvmStatic
-    fun isOutShare(node: MegaNode?): Boolean {
-        return node?.isOutShare == true || MegaApplication.getInstance().megaApi.isPendingShare(node)
+                && handle == secondaryMediaHandle.toLong() && !isNodeInRubbishOrDeletedInternal(handle))
     }
 
     /**
@@ -456,20 +444,20 @@ object MegaNodeUtil {
         return if (node.isInShare) {
             IconPackR.drawable.ic_folder_incoming_medium_solid
         } else if (isCameraUploads(node)) {
-            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShare(node)) {
+            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(node)) {
                 IconPackR.drawable.ic_folder_outgoing_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_camera_uploads_medium_solid
             }
         } else if (isMyChatFilesFolder(node)) {
-            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShare(node)) {
+            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(node)) {
                 IconPackR.drawable.ic_folder_outgoing_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_chat_medium_solid
             }
         } else if (isSynced(node)) {
             IconPackR.drawable.ic_folder_sync_medium_solid
-        } else if (isOutShare(node)) {
+        } else if (isOutShareInternal(node)) {
             IconPackR.drawable.ic_folder_outgoing_medium_solid
         } else if (isRootBackupFolder(node)) {
             IconPackR.drawable.ic_backup_medium_solid
@@ -502,7 +490,7 @@ object MegaNodeUtil {
      */
     private fun isDeviceBackupFolder(node: MegaNode?): Boolean {
         Timber.d("MyBackup + isDeviceBackupFolder node.handle = ${node?.handle}")
-        return (node?.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank() && !isNodeInRubbishOrDeleted(
+        return (node?.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank() && !isNodeInRubbishOrDeletedInternal(
             node.handle
         ))
     }
@@ -515,7 +503,7 @@ object MegaNodeUtil {
      */
     private fun isRootBackupFolder(node: MegaNode?): Boolean {
         Timber.d("MyBackup + isRootBackupFolder node.handle = ${node?.handle}")
-        return (node?.handle == myBackupHandle && !isNodeInRubbishOrDeleted(node.handle))
+        return (node?.handle == myBackupHandle && !isNodeInRubbishOrDeletedInternal(node.handle))
     }
 
     /**
@@ -614,17 +602,26 @@ object MegaNodeUtil {
     }
 
     /**
-     * This method is to detect whether the node has been deleted completely
-     * or in rubbish bin
+     * Internal helper to detect whether the node has been deleted completely or is in rubbish bin.
+     *
      * @param handle node's handle to be detected
      * @return whether the node is in rubbish
      */
-    @JvmStatic
-    fun isNodeInRubbishOrDeleted(handle: Long): Boolean {
+    private fun isNodeInRubbishOrDeletedInternal(handle: Long): Boolean {
         val megaApi = MegaApplication.getInstance().megaApi
         val node = megaApi.getNodeByHandle(handle)
 
         return node == null || megaApi.isInRubbish(node)
+    }
+
+    /**
+     * Internal helper that checks if a node is an outgoing or a pending outgoing share.
+     *
+     * @param node MegaNode to check
+     * @return True if the node is an outgoing or a pending outgoing share, false otherwise
+     */
+    private fun isOutShareInternal(node: MegaNode?): Boolean {
+        return node?.isOutShare == true || MegaApplication.getInstance().megaApi.isPendingShare(node)
     }
 
     /**
@@ -638,84 +635,6 @@ object MegaNodeUtil {
         for (node in nodes) {
             if (!node.isFile || node.isTakenDown) {
                 return false
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Check if all nodes have full access.
-     *
-     * @param nodes nodes to check
-     * @return whether all nodes have full access
-     */
-    @JvmStatic
-    fun allHaveFullAccess(nodes: List<MegaNode?>): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-        for (node in nodes) {
-            if (megaApi.checkAccessErrorExtended(
-                    node,
-                    MegaShare.ACCESS_FULL
-                ).errorCode != MegaError.API_OK
-            ) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Check if all nodes have owner access and are not taken down.
-     *
-     * @param nodes List of nodes to check.
-     * @return True if all nodes have owner access and are not taken down, false otherwise.
-     */
-    @JvmStatic
-    fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
-
-        for (node in nodes) {
-            if (megaApi.checkAccessErrorExtended(
-                    node,
-                    MegaShare.ACCESS_OWNER
-                ).errorCode != MegaError.API_OK
-                || node?.isTakenDown == true
-            ) {
-                return false
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Checks if a folder node is empty.
-     * If a folder is empty means although contains more folders inside,
-     * all of them don't contain any file.
-     *
-     * @param node  MegaNode to check.
-     * @return  True if the folder is folder and is empty, false otherwise.
-     */
-    @JvmStatic
-    fun isEmptyFolder(node: MegaNode?): Boolean {
-        if (node == null || node.isFile) {
-            return false
-        }
-
-        val megaApi = MegaApplication.getInstance().megaApi
-        val children: List<MegaNode?>? = megaApi.getChildren(node)
-
-        if (children != null && children.isNotEmpty()) {
-            for (child in children) {
-                if (child == null) {
-                    continue
-                }
-
-                if (child.isFile || !isEmptyFolder(child)) {
-                    return false
-                }
             }
         }
 
@@ -1399,7 +1318,7 @@ object MegaNodeUtil {
 
             // First, check if the node exists in Backups.
             // If the node doesn't exist in Backups, or is in Rubbish Bin, return BACKUP_NONE
-            if (!megaApi.isInVault(selectedNode) || isNodeInRubbishOrDeleted(selectedNode.handle)) {
+            if (!megaApi.isInVault(selectedNode) || isNodeInRubbishOrDeletedInternal(selectedNode.handle)) {
                 Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_NONE")
                 return BACKUP_NONE
             }

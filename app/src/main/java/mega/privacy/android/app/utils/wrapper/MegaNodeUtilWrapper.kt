@@ -139,14 +139,6 @@ interface MegaNodeUtilWrapper {
     fun existsMyChatFilesFolder(): Boolean
 
     /**
-     * Checks if a node is  outgoing or a pending outgoing share.
-     *
-     * @param node MegaNode to check
-     * @return True if the node is a outgoing or a pending outgoing share, false otherwise
-     */
-    suspend fun isOutShare(node: MegaNode): Boolean
-
-    /**
      * Gets the the icon that has to be displayed for a folder.
      *
      * @param node          MegaNode referencing the folder to check
@@ -175,46 +167,12 @@ interface MegaNodeUtilWrapper {
     fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long): Boolean
 
     /**
-     * This method is to detect whether the node has been deleted completely
-     * or in rubbish bin
-     * @param handle node's handle to be detected
-     * @return whether the node is in rubbish
-     */
-    fun isNodeInRubbishOrDeleted(handle: Long): Boolean
-
-    /**
      * Check if all nodes are file nodes and not taken down.
      *
      * @param nodes nodes to check
      * @return whether all nodes are file nodes and not taken down.
      */
     fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>): Boolean
-
-    /**
-     * Check if all nodes have full access.
-     *
-     * @param nodes nodes to check
-     * @return whether all nodes have full access
-     */
-    fun allHaveFullAccess(nodes: List<MegaNode?>): Boolean
-
-    /**
-     * Check if all nodes have owner access and are not taken down.
-     *
-     * @param nodes List of nodes to check.
-     * @return True if all nodes have owner access and are not taken down, false otherwise.
-     */
-    fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>): Boolean
-
-    /**
-     * Checks if a folder node is empty.
-     * If a folder is empty means although contains more folders inside,
-     * all of them don't contain any file.
-     *
-     * @param node  MegaNode to check.
-     * @return  True if the folder is folder and is empty, false otherwise.
-     */
-    fun isEmptyFolder(node: MegaNode?): Boolean
 
     /**
      * Get list of all child files.

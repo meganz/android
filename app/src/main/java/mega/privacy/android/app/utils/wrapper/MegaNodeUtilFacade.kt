@@ -82,8 +82,6 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun existsMyChatFilesFolder() = MegaNodeUtil.existsMyChatFilesFolder()
 
-    override suspend fun isOutShare(node: MegaNode) = MegaNodeUtil.isOutShare(node)
-
     override fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem) =
         MegaNodeUtil.getFolderIcon(node, drawerItem)
 
@@ -93,18 +91,8 @@ class MegaNodeUtilFacade @Inject constructor(
     override fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long) =
         MegaNodeUtil.showShareOption(adapterType, isFolderLink, handle)
 
-    override fun isNodeInRubbishOrDeleted(handle: Long) =
-        MegaNodeUtil.isNodeInRubbishOrDeleted(handle)
-
     override fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>) =
         MegaNodeUtil.areAllFileNodesAndNotTakenDown(nodes)
-
-    override fun allHaveFullAccess(nodes: List<MegaNode?>) = MegaNodeUtil.allHaveFullAccess(nodes)
-
-    override fun allHaveOwnerAccessAndNotTakenDown(nodes: List<MegaNode?>) =
-        MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown(nodes)
-
-    override fun isEmptyFolder(node: MegaNode?) = MegaNodeUtil.isEmptyFolder(node)
 
     override fun getDlList(
         megaApi: MegaApiAndroid,

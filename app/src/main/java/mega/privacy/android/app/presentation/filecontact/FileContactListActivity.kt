@@ -49,6 +49,8 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -77,6 +79,12 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
     @Inject
     lateinit var megaNavigator: MegaNavigator
+
+    @Inject
+    lateinit var getNodeByIdUseCase: GetNodeByIdUseCase
+
+    @Inject
+    lateinit var isOutShareUseCase: IsOutShareUseCase
 
     internal val viewModel by viewModels<FileContactListViewModel>()
 
@@ -405,6 +413,8 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             megaNodeUtilWrapper = megaNodeUtilWrapper,
             megaNavigator = megaNavigator,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            isOutShareUseCase = isOutShareUseCase,
         )
     }
 

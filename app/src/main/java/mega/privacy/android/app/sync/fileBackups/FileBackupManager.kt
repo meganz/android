@@ -18,7 +18,10 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_MENU_BACKUP_SHAR
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.createBackupsWarningDialog
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -32,6 +35,8 @@ class FileBackupManager(
     val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     val megaNodeUtilWrapper: MegaNodeUtilWrapper,
     val megaNavigator: MegaNavigator,
+    val getNodeByIdUseCase: GetNodeByIdUseCase,
+    val isOutShareUseCase: IsOutShareUseCase,
 ) {
 
     object BackupDialogState {
@@ -110,7 +115,8 @@ class FileBackupManager(
             initBackupWarningState()
             when (actionType) {
                 ACTION_BACKUP_SHARE_FOLDER -> activity.lifecycleScope.launch {
-                    if (megaNode?.let { megaNodeUtilWrapper.isOutShare(it) } == true) {
+                    val typedNode = megaNode?.let { getNodeByIdUseCase(NodeId(it.handle)) }
+                    if (megaNode != null && typedNode != null && isOutShareUseCase(typedNode)) {
                         megaNavigator.openFileContactListActivity(
                             context = activity,
                             handle = megaNode.handle,
