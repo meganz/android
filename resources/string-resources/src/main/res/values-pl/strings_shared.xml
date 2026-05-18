@@ -2608,4 +2608,10 @@
     <string name="error_no_internet_title">Brak połączenia z internetem</string>
     <string name="error_dialog_confirm_button">OK, rozumiem</string>
     <string name="home_configuration_widget_my_account_widget_name">Moje konto</string>
+    <string name="error_fail_to_play_video_title">Nie można odtworzyć wideo</string>
+    <string name="error_fail_to_play_video_message">Przepraszamy. Coś poszło nie tak i nie możemy otworzyć pliku.</string>
+    <string name="error_file_not_supported_title">Plik nie jest obsługiwany</string>
+    <string name="error_file_not_supported_message">Pobierz ten plik, aby otworzyć go w kompatybilnej aplikacji.</string>
+    <string name="error_no_internet_message">Nie można otworzyć pliku z powodu problemów z łącznością. Sprawdź połączenie z Internetem i spróbuj ponownie.</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">Skróty</string>
 </resources>

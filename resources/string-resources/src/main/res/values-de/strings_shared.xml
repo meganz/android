@@ -2418,4 +2418,12 @@
     <string name="error_no_internet_title">Keine Internetverbindung</string>
     <string name="error_dialog_confirm_button">Schließen</string>
     <string name="home_configuration_widget_my_account_widget_name">Mein Account</string>
+    <string name="home_configuration_tooltip_description">Wählen Sie die gewünschten Inhalte aus und ordnen Sie sie frei an</string>
+    <string name="home_configuration_tooltip_action">Entdecken</string>
+    <string name="error_fail_to_play_video_title">Das Video kann nicht abgespielt werden</string>
+    <string name="error_fail_to_play_video_message">Sorry! Ein Fehler ist aufgetreten – wir können die Datei nicht öffnen.</string>
+    <string name="error_file_not_supported_title">Datei nicht unterstützt</string>
+    <string name="error_file_not_supported_message">Laden Sie diese Datei herunter und öffnen Sie sie in einer kompatiblen App.</string>
+    <string name="error_no_internet_message">Die Datei kann aufgrund von Verbindungsproblemen nicht geöffnet werden. Überprüfen Sie Ihre Internetverbindung und versuchen Sie es dann erneut.</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">Verknüpfungen</string>
 </resources>
