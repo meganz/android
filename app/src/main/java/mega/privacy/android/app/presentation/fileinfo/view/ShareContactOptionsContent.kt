@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -15,43 +16,56 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.preview.contactItemForPreviews
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.contact.components.ContactItemView
+import mega.privacy.android.shared.contact.model.AvatarData
+import mega.privacy.android.shared.contact.model.ContactItemUiState
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**
- * Content for file contacts list bottom sheet
+ * Share contact options content
+ *
+ * @param contactPermission
+ * @param allowChangePermission
+ * @param onInfoClicked
+ * @param onChangePermissionClicked
+ * @param onRemoveClicked
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ColumnScope.ShareContactOptionsContent(
-    contactPermission: ContactPermission,
+    contactPermission: ContactPermissionUiState,
     allowChangePermission: Boolean,
     onInfoClicked: () -> Unit,
     onChangePermissionClicked: () -> Unit,
     onRemoveClicked: () -> Unit,
 ) {
-    ContactItemView(
-        contactItem = contactPermission.contactItem,
-        onClick = null,
-        statusOverride = contactPermission.accessPermission.description()?.let {
-            stringResource(id = it)
-        } ?: "",
-        dividerType = DividerType.SmallStartPadding,
-        modifier = Modifier
-            .semantics { testTagsAsResourceId = true }
-            .testTag(SHARE_CONTACT_OPTIONS_TITLE)
-            .padding(vertical = 8.dp)
-    )
+    with(contactPermission.contactItemUiState) {
+        ContactItemView(
+            displayName = displayName,
+            statusText = contactPermission.permission.description()?.let {
+                stringResource(id = it)
+            } ?: "",
+            status = status,
+            avatar = avatar,
+            isVerified = isVerified,
+            modifier = Modifier
+                .semantics { testTagsAsResourceId = true }
+                .testTag(SHARE_CONTACT_OPTIONS_TITLE)
+                .padding(vertical = 8.dp)
+        )
+    }
+//    dividerType = DividerType.SmallStartPadding,
     MenuActionListTile(
         text = stringResource(id = R.string.general_info),
         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Info),
@@ -87,7 +101,19 @@ private fun FileContactsListBottomSheetContentPreview(
     @PreviewParameter(BooleanProvider::class) allowChangePermission: Boolean,
 ) = Column(modifier = Modifier.sizeIn(minHeight = 200.dp)) {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
-        val contactPermission = contactPermissionForPreview
+        val contact = ContactItemUiState(
+            handle = 2L,
+            displayName = "Bob Brown",
+            status = ContactItemStatus.Away,
+            lastSeen = 65535,
+            avatar = AvatarData.Initials(initials = "B", avatarColor = Color(0xFF1565C0)),
+            isVerified = false,
+        )
+        val contactPermission = ContactPermissionUiState(
+            contactItemUiState = contact,
+            email = "Bob@Brown.com",
+            permission = AccessPermission.READWRITE,
+        )
         ShareContactOptionsContent(
             contactPermission = contactPermission,
             allowChangePermission,

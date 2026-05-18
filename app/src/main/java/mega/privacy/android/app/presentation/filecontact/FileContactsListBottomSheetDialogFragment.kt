@@ -28,11 +28,12 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -64,6 +65,9 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
     @Inject
     lateinit var contactsRepository: ContactsRepository
 
+    @Inject
+    lateinit var contactItemUiStateMapper: ContactItemUiStateMapper
+    
     /**
      * This constructor shouldn't be used, is just here to avoid crashes on recreation. Fragment will be automatically dismissed.
      * This is a temporal fix while this dialog is migrated to compose
@@ -135,16 +139,17 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 var contactPermission by remember {
-                    mutableStateOf<ContactPermission?>(null)
+                    mutableStateOf<ContactPermissionUiState?>(null)
                 }
                 LaunchedEffect(share?.user) {
                     contactsRepository.getContactItem(UserId(contact?.handle ?: -1L), false)?.let {
-                        contactPermission = ContactPermission(
-                            contactItem = it,
-                            accessPermission = getAccessPermission(share?.access),
+                        contactPermission = ContactPermissionUiState(
+                            contactItemUiState = contactItemUiStateMapper(it),
+                            email = it.email,
+                            permission = getAccessPermission(share?.access),
                         )
                     } ?: run {
-                        Timber.Forest.e("Contact item not found ${contact?.handle}")
+                        Timber.e("Contact item not found ${contact?.handle}")
                     }
                 }
                 val themeMode by monitorThemeModeUseCase()

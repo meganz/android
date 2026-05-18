@@ -84,6 +84,9 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
+import mega.privacy.android.shared.contact.mapper.ContactPermissionUiStateMapper
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
@@ -97,7 +100,6 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -163,6 +165,8 @@ internal class FileInfoViewModelTest {
     private val previewFile: File = mock()
     private val getImageNodeByIdUseCase = mock<GetImageNodeByIdUseCase>()
     private val nodeDestinationMapper = mock<NodeDestinationMapper>()
+    private val contactItemStatusMapper = mock<ContactItemStatusMapper>()
+    private val contactPermissionUiStateMapper = mock<ContactPermissionUiStateMapper>()
 
     @BeforeEach
     fun cleanUp() = runTest {
@@ -266,6 +270,8 @@ internal class FileInfoViewModelTest {
             getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
             iODispatcher = UnconfinedTestDispatcher(),
             nodeDestinationMapper = nodeDestinationMapper,
+            contactItemStatusMapper = contactItemStatusMapper,
+            contactPermissionUiStateMapper = contactPermissionUiStateMapper,
         )
     }
 
@@ -844,17 +850,21 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test getOutShares result is set on uiState`() = runTest {
-        val expected = mock<List<ContactPermission>>()
-        whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
+        val result = listOf(mock<ContactPermission>())
+        whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(result)
+        val expected = mock<ContactPermissionUiState>()
+        whenever(contactPermissionUiStateMapper.invoke(any())).thenReturn(expected)
         underTest.setNode(node.handle, true)
-        assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
+        assertThat(underTest.uiState.value.outShares).isEqualTo(listOf(expected))
     }
 
     @Test
     fun `test getOutShares is fetched when contacts update is received and there are out shares`() =
         runTest {
-            val expected = mock<List<ContactPermission>>()
-            whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
+            val result = listOf(mock<ContactPermission>())
+            whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(result)
+            val expected = mock<ContactPermissionUiState>()
+            whenever(contactPermissionUiStateMapper.invoke(any())).thenReturn(expected)
             val updateChanges = mapOf(Pair(UserId(1L), listOf(UserChanges.Alias)))
             val update = mock<UserUpdate> {
                 on { changes }.thenReturn(updateChanges)

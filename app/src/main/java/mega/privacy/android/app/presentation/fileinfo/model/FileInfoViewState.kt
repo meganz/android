@@ -7,13 +7,13 @@ import mega.privacy.android.app.presentation.account.model.AccountDeactivatedSta
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 
 /**
  * Represents the view state of the File info screen
@@ -59,6 +59,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property isPhoto true if the node is a photo (Image or Video)
  * @property accountDeactivatedStatus the status of the account if it's deactivated
  * @property leaveFolderNodeIds the list of node ids to be left
+ * @property isDecrypted
  * @property nodeDestination the node location type for navigation
  */
 internal data class FileInfoViewState(
@@ -74,14 +75,14 @@ internal data class FileInfoViewState(
     val previewUriString: String? = null,
     val thumbnailUriString: String? = null,
     val folderTreeInfo: FolderTreeInfo? = null,
-    val outShares: List<ContactPermission> = emptyList(),
+    val outShares: List<ContactPermissionUiState> = emptyList(),
     val nodeLocationInfo: LocationInfo? = null,
     val isAvailableOffline: Boolean = false,
     val isAvailableOfflineEnabled: Boolean = false,
     val isAvailableOfflineAvailable: Boolean = false,
     val inShareOwnerContactItem: ContactItem? = null,
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
-    val contactToShowOptions: ContactPermission? = null,
+    val contactToShowOptions: ContactPermissionUiState? = null,
     val outShareContactsSelected: List<String> = emptyList(),
     val iconResource: Int? = null,
     val sizeInBytes: Long = 0,

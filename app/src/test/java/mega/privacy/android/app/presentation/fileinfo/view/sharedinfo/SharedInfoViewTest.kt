@@ -1,17 +1,20 @@
 package mega.privacy.android.app.presentation.fileinfo.view.sharedinfo
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADER
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
-import mega.privacy.android.app.presentation.preview.contactItemForPreviews
-import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.shared.contact.model.AvatarData
+import mega.privacy.android.shared.contact.model.ContactItemUiState
+import mega.privacy.android.shared.contact.model.ContactPermissionUiState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,10 +26,20 @@ class SharedInfoViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    val contact = ContactItemUiState(
+        handle = 2L,
+        displayName = "Bob Brown",
+        status = ContactItemStatus.Away,
+        lastSeen = 65535,
+        avatar = AvatarData.Initials(initials = "B", avatarColor = Color(0xFF1565C0)),
+        isVerified = false,
+    )
+
     private fun contacts(number: Int) = List(number) {
-        mock<ContactPermission> {
-            on { accessPermission }.thenReturn(AccessPermission.READWRITE)
-            on { contactItem }.thenReturn(contactItemForPreviews)
+        mock<ContactPermissionUiState> {
+            on { permission }.thenReturn(AccessPermission.READWRITE)
+            on { email }.thenReturn("contactItemForPreviews@mega.co.nz")
+            on { contactItemUiState }.thenReturn(contact)
         }
     }
 

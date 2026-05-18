@@ -67,7 +67,6 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -195,9 +194,9 @@ class FileInfoActivity : BaseActivity() {
                     },
                     onVersionsClick = this::navigateToVersions,
                     onSetDescriptionClick = viewModel::setNodeDescription,
-                    onSharedWithContactClick = { this.navigateToUserDetails(it.contactItem) },
-                    onSharedWithContactSelected = { viewModel.contactSelectedInSharedList(it.contactItem.email) },
-                    onSharedWithContactUnselected = { viewModel.contactUnselectedInSharedList(it.contactItem.email) },
+                    onSharedWithContactClick = { this.navigateToUserDetails(it.email) },
+                    onSharedWithContactSelected = { viewModel.contactSelectedInSharedList(it.email) },
+                    onSharedWithContactUnselected = { viewModel.contactUnselectedInSharedList(it.email) },
                     onSharedWithContactMoreOptionsClick = { viewModel.contactToShowOptions(it) },
                     onShowMoreSharedWithContactsClick = this::navigateToSharedContacts,
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
@@ -209,13 +208,13 @@ class FileInfoActivity : BaseActivity() {
                     },
                     getAddress = viewModel::getAddress,
                     onShareContactOptionsDismissed = { viewModel.contactToShowOptions(null) },
-                    onSharedWithContactRemoveClicked = { viewModel.initiateRemoveContacts(listOf(it.contactItem.email)) },
+                    onSharedWithContactRemoveClicked = { viewModel.initiateRemoveContacts(listOf(it.email)) },
                     onSharedWithContactChangePermissionClicked = {
-                        viewModel.initiateChangePermission(listOf(it.contactItem.email))
+                        viewModel.initiateChangePermission(listOf(it.email))
                     },
                     onSharedWithContactMoreInfoClick = {
                         val i = Intent(this, ContactInfoActivity::class.java)
-                        i.putExtra(Constants.NAME, it.contactItem.email)
+                        i.putExtra(Constants.NAME, it.email)
                         startActivity(i)
                     }
                 )
@@ -440,9 +439,9 @@ class FileInfoActivity : BaseActivity() {
         )
     }
 
-    private fun navigateToUserDetails(contactItem: ContactItem) {
+    private fun navigateToUserDetails(email: String) {
         val i = Intent(this, ContactInfoActivity::class.java)
-        i.putExtra(Constants.NAME, contactItem.email)
+        i.putExtra(Constants.NAME, email)
         startActivity(i)
     }
 
