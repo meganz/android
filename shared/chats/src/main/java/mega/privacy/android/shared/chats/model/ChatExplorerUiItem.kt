@@ -3,9 +3,9 @@ package mega.privacy.android.shared.chats.model
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import java.io.File
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.icon.pack.IconPack
+import java.io.File
 
 /**
  * UI model for one row in the chat explorer list.
@@ -17,6 +17,7 @@ import mega.privacy.android.icon.pack.IconPack
 @Immutable
 sealed class ChatExplorerUiItem {
 
+    abstract val id: Long
     abstract val isSelected: Boolean
     abstract val isEnabled: Boolean
     open val icon: ImageVector? = null
@@ -41,6 +42,7 @@ sealed class ChatExplorerUiItem {
      */
     @Immutable
     data class NoteToSelf(
+        override val id: Long,
         val isHint: Boolean,
         override val isSelected: Boolean,
         override val isEnabled: Boolean = true,
@@ -62,6 +64,7 @@ sealed class ChatExplorerUiItem {
      */
     @Immutable
     data class Meeting(
+        override val id: Long,
         override val isSelected: Boolean,
         override val isEnabled: Boolean,
         override val participants: Int,
@@ -75,6 +78,7 @@ sealed class ChatExplorerUiItem {
      */
     @Immutable
     data class GroupChat(
+        override val id: Long,
         override val isSelected: Boolean,
         override val isEnabled: Boolean,
         override val participants: Int,
@@ -101,6 +105,7 @@ sealed class ChatExplorerUiItem {
      */
     @Immutable
     data class OneToOneChat(
+        override val id: Long,
         override val contactName: String?,
         override val contactEmail: String? = null,
         override val contactAvatarFile: File? = null,
@@ -116,6 +121,7 @@ sealed class ChatExplorerUiItem {
      */
     @Immutable
     data class Contact(
+        override val id: Long,
         override val contactName: String?,
         override val userStatus: ChatStatus,
         override val contactEmail: String? = null,

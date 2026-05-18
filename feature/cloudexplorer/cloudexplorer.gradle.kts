@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))
+    implementation(project(":shared:chats"))
     implementation(project(":shared:nodes"))
     implementation(project(":shared:transfers"))
 

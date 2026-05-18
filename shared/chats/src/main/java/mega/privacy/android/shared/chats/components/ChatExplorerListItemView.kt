@@ -7,17 +7,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.resources.R as shareR
-import java.io.File
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
@@ -31,6 +31,8 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
+import mega.privacy.android.shared.resources.R as shareR
+import java.io.File
 
 /**
  * Composable for the chat explorer list item
@@ -39,10 +41,10 @@ import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
  * @param onItemClicked Callback when the item is clicked
  */
 @Composable
-private fun ChatExplorerListItemView(
-    modifier: Modifier = Modifier,
+fun ChatExplorerListItemView(
     item: ChatExplorerUiItem,
     onItemClicked: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     when (item) {
         is ChatExplorerUiItem.NoteToSelf ->
@@ -67,7 +69,13 @@ private fun ChatExplorerListItemView(
                 hasAvatarIcon = item.hasAvatarIcon,
                 icon = item.icon,
                 title = item.title,
-                subtitle = item.participants?.toString(),
+                subtitle = item.participants?.let { count ->
+                    pluralStringResource(
+                        id = shareR.plurals.general_number_participants,
+                        count = count,
+                        count,
+                    )
+                },
                 avatarColor = item.avatarPrimaryColor,
                 avatarSecondaryColor = item.avatarSecondaryColor,
                 onItemClicked = onItemClicked,
@@ -78,7 +86,7 @@ private fun ChatExplorerListItemView(
             isSelected = item.isSelected,
             isEnabled = item.isEnabled,
             title = item.contactName,
-            subtitle = item.userStatus?.toString(),
+            subtitle = item.userStatus?.toSubtitleStringRes()?.let { stringResource(it) },
             avatarColor = item.avatarPrimaryColor,
             avatarSecondaryColor = item.avatarSecondaryColor,
             contactAvatarFile = item.contactAvatarFile,
@@ -91,7 +99,8 @@ private fun ChatExplorerListItemView(
  * Composable for chat list item
  *
  * @param isSelected Whether the item is currently selected.
- * @param isEnabled Whether item is enabled.
+ * @param isEnabled Whether item is enabled. When false, the row is dimmed, the
+ * trailing checkbox is hidden, and clicks route to [onDisabledItemClicked].
  * @param title The title of the item.
  * @param subtitle The subtitle of the item.
  * @param isHint When true, shows a plain icon (e.g. note-to-self hint) instead of an avatar slot.
@@ -101,13 +110,13 @@ private fun ChatExplorerListItemView(
  * @param icon The image vector for hint, group chat, meeting, or note-to-self icon row.
  * @param avatarColor The background primary color for the avatar.
  * @param avatarSecondaryColor The background secondary color for the avatar.
- * @param onItemClicked Callback when the item is clicked.
+ * @param onItemClicked Callback when the row is clicked.
  */
 @Composable
 internal fun ChatExplorerListItemView(
-    modifier: Modifier = Modifier,
     isSelected: Boolean,
     isEnabled: Boolean,
+    modifier: Modifier = Modifier,
     title: String? = null,
     subtitle: String? = null,
     isHint: Boolean = false,
@@ -118,10 +127,10 @@ internal fun ChatExplorerListItemView(
     avatarSecondaryColor: Color? = null,
     onItemClicked: () -> Unit,
 ) {
+    val contentAlpha = if (isEnabled) 1f else DISABLED_CONTENT_ALPHA
     GenericListItem(
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-        enabled = isEnabled,
         enableClick = true,
         leadingElement = {
             when {
@@ -129,6 +138,7 @@ internal fun ChatExplorerListItemView(
                     icon?.let {
                         MegaIcon(
                             modifier = Modifier
+                                .alpha(contentAlpha)
                                 .size(24.dp)
                                 .testTag(NOTE_TO_SELF_HINT_ICON_TAG),
                             painter = rememberVectorPainter(it),
@@ -142,6 +152,7 @@ internal fun ChatExplorerListItemView(
                     if (icon != null && avatarColor != null) {
                         MediumProfileIcon(
                             modifier = Modifier
+                                .alpha(contentAlpha)
                                 .padding(8.dp)
                                 .testTag(MEETING_ICON_TAG),
                             icon = icon,
@@ -156,6 +167,7 @@ internal fun ChatExplorerListItemView(
                     avatarColor?.let {
                         MediumProfilePicture(
                             modifier = Modifier
+                                .alpha(contentAlpha)
                                 .padding(8.dp)
                                 .testTag(CONTACT_AVATAR_TAG),
                             imageFile = contactAvatarFile,
@@ -171,6 +183,7 @@ internal fun ChatExplorerListItemView(
             title?.let {
                 MegaText(
                     modifier = Modifier
+                        .alpha(contentAlpha)
                         .testTag(TITLE_TAG)
                         .padding(bottom = 2.dp),
                     text = it,
@@ -190,14 +203,16 @@ internal fun ChatExplorerListItemView(
                     style = AppTheme.typography.bodySmall,
                     maxLines = 1,
                     modifier = Modifier
-                        .weight(1f, fill = false)
+                        .alpha(contentAlpha)
                         .testTag(SUBTITLE_TAG),
                 )
             }
         },
         trailingElement = {
             Box(
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier
+                    .alpha(contentAlpha)
+                    .size(24.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Checkbox(
@@ -211,6 +226,19 @@ internal fun ChatExplorerListItemView(
         },
         onClickListener = onItemClicked,
     )
+}
+
+private const val DISABLED_CONTENT_ALPHA = 0.3f
+
+private fun ChatStatus.toSubtitleStringRes(): Int? = when (this) {
+    ChatStatus.Online -> shareR.string.online_status
+    ChatStatus.Away -> shareR.string.away_status
+    ChatStatus.Busy -> shareR.string.busy_status
+    ChatStatus.Offline,
+    ChatStatus.NoNetworkConnection,
+    ChatStatus.Reconnecting,
+    ChatStatus.Connecting,
+        -> null
 }
 
 internal const val NOTE_TO_SELF_HINT_ICON_TAG = "chat_explorer_list_item:note_to_self_hint_icon"
@@ -244,39 +272,46 @@ private class ChatExplorerListItemPreviewParameterProvider :
     override val values: Sequence<ChatExplorerUiItem>
         get() = sequenceOf(
             ChatExplorerUiItem.NoteToSelf(
+                id = 1L,
                 isHint = true,
                 isSelected = false,
                 isEnabled = true,
             ),
             ChatExplorerUiItem.NoteToSelf(
+                id = 2L,
                 isHint = true,
                 isSelected = true,
                 isEnabled = true,
             ),
             ChatExplorerUiItem.NoteToSelf(
+                id = 3L,
                 isHint = false,
                 isSelected = false,
                 isEnabled = true,
             ),
             ChatExplorerUiItem.GroupChat(
+                id = 4L,
                 title = "Team standup",
                 participants = 12,
                 isSelected = false,
                 isEnabled = true,
             ),
             ChatExplorerUiItem.GroupChat(
+                id = 5L,
                 title = "Team standup",
                 participants = 3,
                 isSelected = true,
                 isEnabled = false,
             ),
             ChatExplorerUiItem.Meeting(
+                id = 6L,
                 title = "Weekly sync",
                 participants = 5,
                 isSelected = true,
                 isEnabled = true,
             ),
             ChatExplorerUiItem.OneToOneChat(
+                id = 7L,
                 userStatus = ChatStatus.Online,
                 contactName = "Alice",
                 contactAvatarFile = null,
@@ -286,6 +321,7 @@ private class ChatExplorerListItemPreviewParameterProvider :
                 isEnabled = true,
             ),
             ChatExplorerUiItem.Contact(
+                id = 8L,
                 userStatus = ChatStatus.Offline,
                 contactName = "Bob",
                 contactAvatarFile = null,
