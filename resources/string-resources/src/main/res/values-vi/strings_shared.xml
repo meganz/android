@@ -2314,7 +2314,13 @@
     <string name="google_sign_in_email_exists">Bạn đã có tài&#160;khoản với email này. Hãy đăng&#160;nhập bằng mật&#160;khẩu để tiếp&#160;tục.</string>
     <string name="home_configuration_tooltip_description">Chọn những gì bạn muốn xem và sắp xếp lại sao cho phù hợp với nhu cầu của bạn.</string>
     <string name="home_configuration_tooltip_action">Khám phá</string>
-    <string name="error_no_internet_title">Không có kết nối internet</string>
+    <string name="error_no_internet_title">Không có kết&#160;nối internet</string>
     <string name="error_dialog_confirm_button">OK, hiểu rồi</string>
-    <string name="home_configuration_widget_my_account_widget_name">Tài Khoản của Tôi</string>
+    <string name="home_configuration_widget_my_account_widget_name">Tài&#160;khoản</string>
+    <string name="error_file_not_supported_message">Tải&#160;xuống tệp&#160;tin này để mở trong ứng&#160;dụng tương&#160;thích.</string>
+    <string name="error_file_not_supported_title">Tệp&#160;tin không được hỗ&#160;trợ</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">Lối tắt</string>
+    <string name="error_fail_to_play_video_message">Rất tiếc. Đã xảy ra lỗi và chúng tôi không thể mở được tệp&#160;tin.</string>
+    <string name="error_no_internet_message">Không thể mở tệp&#160;tin do sự cố kết&#160;nối. Xin kiểm&#160;tra kết&#160;nối Internet rồi thử lại.</string>
+    <string name="error_fail_to_play_video_title">Không thể phát video</string>
 </resources>

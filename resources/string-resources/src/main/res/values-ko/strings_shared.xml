@@ -2312,7 +2312,7 @@
     <string name="home_configuration_screen_toolbar_subtitle">순서를 바꾸려면 섹션을 드래그하세요</string>
     <string name="home_configuration_screen_menu_reset_to_default">기본값으로 재설정</string>
     <string name="home_configuration_screen_menu_choose_default_start_screen">기본 시작 화면 선택</string>
-    <string name="home_configuration_widget_removal_not_allowed_message">최소 하나의 옵션은 켜져 있어야 합니다</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">최소 하나의 홈 섹션이 필요합니다</string>
     <string name="file_link_subtitle">파일 링크</string>
     <string name="offline_status">오프라인</string>
     <string name="online_status">온라인</string>
@@ -2326,7 +2326,20 @@
     <string name="name_collision_folder_warning_upload_and_rename">업로드하는 폴더의 이름이 다음과 같이 변경됩니다:</string>
     <string name="new_file_subject_when_uploading">제목</string>
     <string name="new_file_email_when_uploading">이메일</string>
-    <string name="error_no_internet_title">인터넷 연결이 없습니다</string>
+    <string name="error_no_internet_title">인터넷 연결 없음</string>
     <string name="error_dialog_confirm_button">알겠습니다</string>
     <string name="home_configuration_widget_my_account_widget_name">내 계정</string>
+    <string name="google_sign_in">Google로 로그인</string>
+    <string name="google_sign_in_failed">Google 로그인 실패. 다시 시도하세요.</string>
+    <string name="google_sign_in_email_exists">이미 이 이메일로 계정을 가지고 있습니다. 암호로 로그인하세요.</string>
+    <string name="or_divider">또는</string>
+    <string name="general_new_link">새 링크</string>
+    <string name="home_configuration_tooltip_description">무엇을 볼지 원하는대로 정리하세요</string>
+    <string name="home_configuration_tooltip_action">찾아보기</string>
+    <string name="error_fail_to_play_video_title">동영상 재생 불가</string>
+    <string name="error_fail_to_play_video_message">죄송합니다. 무언가 잘못 되어서 파일을 열 수 없습니다.</string>
+    <string name="error_file_not_supported_title">지원되지 않는 파일</string>
+    <string name="error_file_not_supported_message">호환되는 앱에서 이 파일을 열려면 다운로드 하세요.</string>
+    <string name="error_no_internet_message">연결 문제로 인해 파일을 열 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">바로 가기</string>
 </resources>
