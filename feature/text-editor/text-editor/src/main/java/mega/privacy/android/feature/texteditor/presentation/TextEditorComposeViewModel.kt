@@ -136,6 +136,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     /** Last known scroll position reported by the UI, used for persistence. */
     private var lastScrollFraction: Float = 0f
+    private var lastScrollOffset: Int = 0
 
     init {
         viewModelScope.launch {
@@ -253,6 +254,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             isLoading = false,
                             errorEvent = consumed,
                             totalLineCount = fullContentLines.size,
+                            contentVersion = it.contentVersion + 1,
                         )
                     }
                 }
@@ -479,6 +481,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     private fun emitCloseEvent() {
         viewModelScope.launch {
+            // Order matters: saveRecentlyUsed() must run before saveScrollState() because
+            // the scroll table has a FK to recently_used, and the REPLACE strategy on
+            // recently_used cascade-deletes the scroll row before re-inserting.
+            saveRecentlyUsed()
             saveScrollState()
             _uiState.update { it.copy(closeEvent = triggered) }
         }
@@ -812,11 +818,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private fun ceilDiv(a: Int, b: Int): Int = (a + b - 1) / b
 
     /**
-     * Called by the UI to report the current scroll fraction (0.0–1.0).
-     * Used for persistence when the user leaves the editor.
+     * Called by the UI to report the current scroll position.
+     * [fraction] is the normalised position (0.0–1.0) used to calculate the chunk index.
+     * [scrollOffset] is the pixel offset within the first visible chunk, for precise restoration.
      */
-    fun updateScrollFraction(fraction: Float) {
+    fun updateScrollPosition(fraction: Float, scrollOffset: Int) {
         lastScrollFraction = fraction
+        lastScrollOffset = scrollOffset
     }
 
     private suspend fun saveScrollState() {
@@ -825,34 +833,37 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             saveTextEditorScrollUseCase(
                 TextEditorScroll(
                     nodeHandle = resolvedNodeHandle,
-                    cursorPosition = 0, // TODO: persist actual cursor offset when edit mode cursor tracking is added
+                    cursorPosition = lastScrollOffset,
                     scrollFraction = lastScrollFraction,
                 )
             )
         }.onFailure { Timber.e(it, "Failed to save text editor scroll state") }
     }
 
-    private fun restoreScrollPosition() {
+    private suspend fun restoreScrollPosition() {
         if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
-        viewModelScope.launch {
-            runCatching {
-                getTextEditorScrollUseCase(resolvedNodeHandle)
-            }.onSuccess { scroll ->
-                if (scroll != null) {
-                    val chunkCount = getChunkCount()
-                    val targetIndex = (scroll.scrollFraction * chunkCount).toInt()
-                        .coerceIn(0, (chunkCount - 1).coerceAtLeast(0))
-                    _uiState.update { it.copy(restoreScrollIndex = targetIndex) }
+        runCatching {
+            getTextEditorScrollUseCase(resolvedNodeHandle)
+        }.onSuccess { scroll ->
+            if (scroll != null) {
+                val chunkCount = getChunkCount()
+                val targetIndex = (scroll.scrollFraction * chunkCount).toInt()
+                    .coerceIn(0, (chunkCount - 1).coerceAtLeast(0))
+                _uiState.update {
+                    it.copy(
+                        restoreScrollIndex = targetIndex,
+                        restoreScrollOffset = scroll.cursorPosition,
+                    )
                 }
-            }.onFailure { Timber.e(it, "Failed to restore text editor scroll state") }
-        }
+            }
+        }.onFailure { Timber.e(it, "Failed to restore text editor scroll state") }
     }
 
     /**
      * Called by the UI after the scroll restoration has been applied.
      */
     fun consumeRestoreScrollIndex() {
-        _uiState.update { it.copy(restoreScrollIndex = null) }
+        _uiState.update { it.copy(restoreScrollIndex = null, restoreScrollOffset = 0) }
     }
 
     /**
@@ -888,17 +899,15 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
-    private fun saveRecentlyUsed() {
+    private suspend fun saveRecentlyUsed() {
         if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         val fileName = _uiState.value.fileName
-        viewModelScope.launch {
-            runCatching {
-                saveRecentlyUsedItemUseCase(
-                    nodeHandle = resolvedNodeHandle,
-                    type = RecentlyUsedType.TextEditor,
-                    fileName = fileName,
-                )
-            }.onFailure { Timber.e(it, "Failed to save recently used item") }
-        }
+        runCatching {
+            saveRecentlyUsedItemUseCase(
+                nodeHandle = resolvedNodeHandle,
+                type = RecentlyUsedType.TextEditor,
+                fileName = fileName,
+            )
+        }.onFailure { Timber.e(it, "Failed to save recently used item") }
     }
 }

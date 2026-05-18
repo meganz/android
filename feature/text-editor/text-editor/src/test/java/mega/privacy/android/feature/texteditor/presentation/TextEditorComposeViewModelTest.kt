@@ -1462,6 +1462,29 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
+    fun `test that restoreScrollOffset is populated when saved state has non-zero cursorPosition`() =
+        runTest {
+            whenever(
+                getTextContentForTextEditorUseCase(
+                    nodeHandle = any(),
+                    localPath = anyOrNull(),
+                    chunkSizeLines = any()
+                )
+            ).thenReturn(flowOf((1..1000).map { "line $it" }))
+            whenever(getTextEditorScrollUseCase(42L)).thenReturn(
+                TextEditorScroll(
+                    nodeHandle = 42L,
+                    cursorPosition = 500,
+                    scrollFraction = 0.5f,
+                )
+            )
+            initUnderTest(nodeHandle = 42L)
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.restoreScrollOffset).isEqualTo(500)
+        }
+
+    @Test
     fun `test that restoreScrollIndex is null when no saved state exists`() = runTest {
         whenever(getTextContentForTextEditorUseCase(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any()))
             .thenReturn(flowOf(listOf("line1")))
@@ -1479,7 +1502,7 @@ internal class TextEditorComposeViewModelTest {
         initUnderTest(nodeHandle = 42L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
-        underTest.updateScrollFraction(0.7f)
+        underTest.updateScrollPosition(0.7f, 0)
         underTest.handleClose()
         advanceUntilIdle()
 
@@ -1494,6 +1517,27 @@ internal class TextEditorComposeViewModelTest {
         underTest.consumeRestoreScrollIndex()
         assertThat(underTest.uiState.value.restoreScrollIndex).isNull()
     }
+
+    @Test
+    fun `test that scroll fraction is saved as zero when updateScrollPosition is never called`() =
+        runTest {
+            whenever(
+                getTextContentForTextEditorUseCase(
+                    nodeHandle = any(),
+                    localPath = anyOrNull(),
+                    chunkSizeLines = any()
+                )
+            ).thenReturn(flowOf(listOf("line1")))
+            initUnderTest(nodeHandle = 42L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+
+            underTest.handleClose()
+            advanceUntilIdle()
+
+            val captor = argumentCaptor<TextEditorScroll>()
+            verify(saveTextEditorScrollUseCase).invoke(captor.capture())
+            assertThat(captor.firstValue.scrollFraction).isEqualTo(0f)
+        }
 
     @Test
     fun `test that init resolves chat file and loads content when chatId and messageId are provided`() =

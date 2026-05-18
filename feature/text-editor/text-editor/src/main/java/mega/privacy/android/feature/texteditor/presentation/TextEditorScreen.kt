@@ -41,6 +41,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -194,13 +195,25 @@ fun TextEditorScreen(
         null
     }
 
+    // snapshotFlow re-emits automatically when layoutInfo.totalItemsCount changes as
+    // new chunks are loaded, so chunkCount is intentionally excluded from the key to
+    // avoid cancelling/relaunching the collector on every chunk load.
+    LaunchedEffect(lazyListState) {
+        snapshotFlow {
+            val totalItems = lazyListState.layoutInfo.totalItemsCount
+            val fraction = if (totalItems <= 1) 0f
+            else lazyListState.firstVisibleItemIndex.toFloat() / (totalItems - 1).toFloat()
+            fraction to lazyListState.firstVisibleItemScrollOffset
+        }.collect { (fraction, offset) ->
+            viewModel.updateScrollPosition(fraction.coerceIn(0f, 1f), offset)
+        }
+    }
+
     BackHandler {
         when {
             barsHidden -> scrollBarState.revealBar()
             uiState.showDiscardDialog -> viewModel.dismissDiscardDialog()
-            uiState.mode == TextEditorMode.Edit -> viewModel.handleClose()
-            uiState.mode == TextEditorMode.Create -> viewModel.handleClose()
-            else -> onBack()
+            else -> viewModel.handleClose()
         }
     }
 
@@ -324,6 +337,9 @@ fun TextEditorScreen(
                             showLineNumbers = uiState.showLineNumbers,
                             readOnly = !isEditable,
                             requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
+                            restoreScrollIndex = uiState.restoreScrollIndex,
+                            restoreScrollOffset = uiState.restoreScrollOffset,
+                            onRestoreScrollConsumed = viewModel::consumeRestoreScrollIndex,
                             restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
                             onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
                         )
@@ -433,7 +449,7 @@ private fun CollapsingTopBar(
 
                     else -> TextEditorViewModeTopAppBar(
                         title = fileName,
-                        onBack = onBack,
+                        onBack = viewModel::handleClose,
                         onMenuAction = viewModel::onMenuAction,
                         onOpenNodeOptions = onOpenNodeOptions,
                         onTitleClick = onTitleClick,

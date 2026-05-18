@@ -86,6 +86,11 @@ fun TextEditorContent(
     readOnly: Boolean,
     /** When true (e.g. Create mode), first chunk requests focus and shows the IME once content is shown. */
     requestInitialFocusOnFirstChunk: Boolean = false,
+    /** When non-null, scrolls the list to this chunk index to restore saved reading progress. */
+    restoreScrollIndex: Int? = null,
+    /** Pixel offset within the target chunk for precise scroll restoration. */
+    restoreScrollOffset: Int = 0,
+    onRestoreScrollConsumed: () -> Unit = {},
     /** When non-null, restores focus to this chunk index and shows the keyboard (e.g. after rotation). */
     restoreFocusChunkIndex: Int? = null,
     onRestoreFocusConsumed: () -> Unit = {},
@@ -104,6 +109,13 @@ fun TextEditorContent(
         Box(modifier = Modifier
             .fillMaxSize()
             .then(if (!readOnly) Modifier.imePadding() else Modifier)) {
+            LaunchedEffect(restoreScrollIndex) {
+                val targetIndex = restoreScrollIndex ?: return@LaunchedEffect
+                snapshotFlow { lazyListState.layoutInfo.totalItemsCount }
+                    .first { it > targetIndex }
+                lazyListState.scrollToItem(targetIndex, restoreScrollOffset)
+                onRestoreScrollConsumed()
+            }
             if (readOnly) {
                 ViewModeLazyColumn(
                     lazyListState = lazyListState,
