@@ -82,13 +82,15 @@ class HomeConfigurationViewModelTest {
                 }
             }
 
-            val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
+            val dynamicWidget =
+                stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
             val dynamicWidgets = setOf(dynamicWidget)
             dynamicWidgetsProvider.stub {
                 onBlocking { getWidgets() } doReturn dynamicWidgets
             }
 
-            val staticWidget = stubWidget(identifier = "static1", defaultOrder = HomeWidgetOrder.Banner)
+            val staticWidget =
+                stubWidget(identifier = "static1", defaultOrder = HomeWidgetOrder.Banner)
             val staticWidgets = setOf(staticWidget)
             staticWidgetsProvider.stub {
                 onBlocking { getWidgets() } doReturn staticWidgets
@@ -119,7 +121,8 @@ class HomeConfigurationViewModelTest {
             }
         }
 
-        val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
+        val dynamicWidget =
+            stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
         val dynamicWidgets = setOf(dynamicWidget)
         dynamicWidgetsProvider.stub {
             onBlocking { getWidgets() } doReturn dynamicWidgets
@@ -200,11 +203,19 @@ class HomeConfigurationViewModelTest {
             val orderedItems = listOf(
                 WidgetConfigurationItemMapper().invoke(
                     homeWidget = stubWidget("b", HomeWidgetOrder.Banner),
-                    widgetConfiguration = HomeWidgetConfiguration("b", widgetOrder = 0, enabled = true),
+                    widgetConfiguration = HomeWidgetConfiguration(
+                        "b",
+                        widgetOrder = 0,
+                        enabled = true
+                    ),
                 ),
                 WidgetConfigurationItemMapper().invoke(
                     homeWidget = stubWidget("a", HomeWidgetOrder.Banner),
-                    widgetConfiguration = HomeWidgetConfiguration("a", widgetOrder = 1, enabled = true),
+                    widgetConfiguration = HomeWidgetConfiguration(
+                        "a",
+                        widgetOrder = 1,
+                        enabled = true
+                    ),
                 ),
             )
 
@@ -243,8 +254,10 @@ class HomeConfigurationViewModelTest {
 
     @Test
     fun `test that widgets are sorted by index ascending`() = runTest {
-        val secondWidget = stubWidget(identifier = "second", defaultOrder = HomeWidgetOrder.ViewedLinks)
-        val thirdWidget = stubWidget(identifier = "third", defaultOrder = HomeWidgetOrder.ContinueWhereLeftOff)
+        val secondWidget =
+            stubWidget(identifier = "second", defaultOrder = HomeWidgetOrder.ViewedLinks)
+        val thirdWidget =
+            stubWidget(identifier = "third", defaultOrder = HomeWidgetOrder.ContinueWhereLeftOff)
         val firstWidget = stubWidget(identifier = "first", defaultOrder = HomeWidgetOrder.MyAccount)
 
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -294,9 +307,12 @@ class HomeConfigurationViewModelTest {
 
     @Test
     fun `test that widgets are sorted by default order when no configuration exists`() = runTest {
-        val thirdWidget = stubWidget(identifier = "third", defaultOrder = HomeWidgetOrder.Recents)
-        val firstWidget = stubWidget(identifier = "first", defaultOrder = HomeWidgetOrder.Banner)
-        val secondWidget = stubWidget(identifier = "second", defaultOrder = HomeWidgetOrder.Shortcuts)
+        val thirdWidget =
+            stubWidget(identifier = "third", defaultOrder = HomeWidgetOrder.entries[2])
+        val firstWidget =
+            stubWidget(identifier = "first", defaultOrder = HomeWidgetOrder.entries[0])
+        val secondWidget =
+            stubWidget(identifier = "second", defaultOrder = HomeWidgetOrder.entries[1])
 
         monitorHomeWidgetConfigurationUseCase.stub {
             on { invoke() } doReturn flow {
