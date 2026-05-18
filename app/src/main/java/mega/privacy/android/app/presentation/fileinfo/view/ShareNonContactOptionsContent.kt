@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
@@ -9,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -16,20 +16,20 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.vdurmont.emoji.EmojiParser
+import mega.android.core.ui.components.contact.state.ContactItemStatus
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.model.ContactAvatar
-import mega.privacy.android.app.presentation.contact.model.ContactStatus
-import mega.privacy.android.app.presentation.contact.model.ContactUiItem
-import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.contact.components.ContactItemView
+import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 
 /**
  * Content for file contacts list bottom sheet for a Pending contact
@@ -43,27 +43,27 @@ fun ColumnScope.ShareNonContactOptionsContent(
     allowChangePermission: Boolean,
     onChangePermissionClicked: () -> Unit,
     onRemoveClicked: () -> Unit,
+    emojify: (String) -> String? = EmojiUtilsShortcodes::emojify,
+    extractEmojiList: (String) -> List<String?>? = EmojiParser::extractEmojis,
 ) {
-    val uiItem = ContactUiItem(
-        nameOrEmail = nonContactEmail,
-        contactStatus = ContactStatus(null, null),
-        avatar = ContactAvatar.InitialsAvatar(
-            firstLetter = getAvatarFirstLetter(nonContactEmail),
-            defaultAvatarColor = Color(avatarColor),
-            areCredentialsVerified = false,
-        )
-    )
     ContactItemView(
-        contactUiItem = uiItem,
-        onClick = null,
+        displayName = nonContactEmail,
+        statusText = accessPermission.description()?.let {
+            stringResource(id = it)
+        } ?: "",
+        status = ContactItemStatus.Unknown,
+        avatar = AvatarData.Initials(
+            getAvatarFirstLetter(
+                text = nonContactEmail,
+                emojify = emojify,
+                extractEmojiList = extractEmojiList
+            ), Color(avatarColor)
+        ),
+        isVerified = false,
         modifier = Modifier
             .semantics { testTagsAsResourceId = true }
             .testTag(SHARE_NON_CONTACT_OPTIONS_TITLE)
             .padding(vertical = 8.dp),
-        statusOverride = accessPermission.description()?.let {
-            stringResource(id = it)
-        } ?: "",
-        dividerType = DividerType.SmallStartPadding,
     )
     if (allowChangePermission) {
         MenuActionListTile(
@@ -86,15 +86,17 @@ fun ColumnScope.ShareNonContactOptionsContent(
 @Composable
 private fun ShareNonContactOptionsContentPreview(
     @PreviewParameter(BooleanProvider::class) allowChangePermission: Boolean,
-) = OriginalTheme(isDark = isSystemInDarkTheme()) {
+) = AndroidThemeForPreviews {
     Column(modifier = Modifier.sizeIn(minHeight = 200.dp)) {
         ShareNonContactOptionsContent(
             nonContactEmail = "xyz@mega.co.nz",
             accessPermission = AccessPermission.READ,
-            avatarColor = 2,
+            avatarColor = Color.Red.toArgb(),
             allowChangePermission = allowChangePermission,
             onChangePermissionClicked = {},
             onRemoveClicked = {},
+            emojify = { it },
+            extractEmojiList = { null }
         )
     }
 }
