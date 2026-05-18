@@ -52,8 +52,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /** Number of lines per chunk in both view and edit modes.
- * Unified so that item indices match 1:1 across mode switches, eliminating scroll jumps. */
-internal const val CHUNK_SIZE = 200
+ *  Sized for a good balance between selection range and memory/layout cost. */
+internal const val CHUNK_SIZE = 1000
 
 /** Same value as [nz.mega.sdk.MegaApiJava.INVALID_HANDLE]; avoids SDK dependency in the feature module. */
 private const val INVALID_NODE_HANDLE = -1L

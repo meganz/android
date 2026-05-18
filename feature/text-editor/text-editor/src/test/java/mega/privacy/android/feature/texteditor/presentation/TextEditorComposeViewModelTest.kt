@@ -606,7 +606,8 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that setEditMode creates chunks from loaded content`() = runTest {
-        val allLines = (1..1500).map { "line$it" }
+        val totalLines = CHUNK_SIZE * 3 - 1
+        val allLines = (1..totalLines).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
@@ -614,7 +615,7 @@ internal class TextEditorComposeViewModelTest {
 
         underTest.setEditMode()
 
-        assertThat(underTest.getChunkCount()).isEqualTo(8)
+        assertThat(underTest.getChunkCount()).isEqualTo(3)
         val chunk0State = underTest.getOrCreateChunkState(0)
         val chunk0Text = chunk0State.text.toString()
         assertThat(chunk0Text.split("\n").first()).isEqualTo("line1")
@@ -743,7 +744,8 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that getChunkText returns correct lines for chunk index`() = runTest {
-        val allLines = (1..200).map { "line$it" }
+        val totalLines = CHUNK_SIZE + 100
+        val allLines = (1..totalLines).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
@@ -755,10 +757,10 @@ internal class TextEditorComposeViewModelTest {
         assertThat(chunk0Lines.first()).isEqualTo("line1")
         assertThat(chunk0Lines.last()).isEqualTo("line${CHUNK_SIZE}")
 
-        val lastChunkIndex = (200 - 1) / CHUNK_SIZE
+        val lastChunkIndex = (totalLines - 1) / CHUNK_SIZE
         val lastChunk = underTest.getChunkText(lastChunkIndex)
         val lastChunkLines = lastChunk.split("\n")
-        assertThat(lastChunkLines.last()).isEqualTo("line200")
+        assertThat(lastChunkLines.last()).isEqualTo("line$totalLines")
     }
 
     @Test
@@ -1081,7 +1083,7 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that getChunkStartLine returns correct offset for second chunk`() = runTest {
-        val allLines = (1..400).map { "line$it" }
+        val allLines = (1..(CHUNK_SIZE + 100)).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
@@ -1323,7 +1325,8 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that getChunkCount returns correct count in View mode`() = runTest {
-        val allLines = (1..500).map { "line$it" }
+        val totalLines = CHUNK_SIZE * 3 - 1
+        val allLines = (1..totalLines).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
@@ -1340,7 +1343,8 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that getChunkCount returns correct count in Edit mode`() = runTest {
-        val allLines = (1..500).map { "line$it" }
+        val totalLines = CHUNK_SIZE * 3 - 1
+        val allLines = (1..totalLines).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)

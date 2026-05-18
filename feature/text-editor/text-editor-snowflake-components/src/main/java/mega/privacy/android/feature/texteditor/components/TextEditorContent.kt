@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -61,6 +62,7 @@ private val LineNumberGutterPadding = 6.dp
 private val ViewModeBottomContentPadding = 80.dp
 private val LineNumberTextSize = 12.sp
 private val LineNumberTextSizeSmall = 10.sp
+
 
 /**
  * Virtualised text editor content backed by a [LazyColumn].
@@ -288,11 +290,13 @@ private fun ReadOnlyChunkItem(
             )
         },
     ) {
-        BasicText(
-            text = chunkText,
-            style = textStyle,
-            onTextLayout = { layoutResult = it },
-        )
+        SelectionContainer {
+            BasicText(
+                text = chunkText,
+                style = textStyle,
+                onTextLayout = { layoutResult = it },
+            )
+        }
     }
 }
 
@@ -369,8 +373,11 @@ private fun EditorChunkLayout(
             )
         )
         val gutterPlaceable = if (hasGutter) {
+            // Use fitPrioritizingHeight to auto-cap dimensions to the
+            // Constraints bit-budget on very tall chunks (long wrapping
+            // lines on high-density screens).
             measurables[1].measure(
-                Constraints(
+                Constraints.fitPrioritizingHeight(
                     minWidth = gutterWidthPx,
                     maxWidth = gutterWidthPx,
                     minHeight = textPlaceable.height,
