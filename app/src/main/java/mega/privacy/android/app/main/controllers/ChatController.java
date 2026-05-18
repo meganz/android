@@ -384,7 +384,7 @@ public class ChatController {
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_NO_ANSWER:
-                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle(), context).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle(), megaChatApi.getMyUserHandle(), context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_FAILED:
@@ -392,7 +392,7 @@ public class ChatController {
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_CANCELLED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle(), context).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle(), megaChatApi.getMyUserHandle(), context).toString();
                             break;
                     }
 
@@ -494,7 +494,7 @@ public class ChatController {
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_NO_ANSWER:
-                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle(), context).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle(), megaChatApi.getMyUserHandle(), context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_FAILED:
@@ -502,7 +502,7 @@ public class ChatController {
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_CANCELLED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle(), context).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle(), megaChatApi.getMyUserHandle(), context).toString();
                             break;
                     }
 
