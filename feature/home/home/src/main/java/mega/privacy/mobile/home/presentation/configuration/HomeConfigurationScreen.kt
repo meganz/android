@@ -132,7 +132,6 @@ fun HomeConfigurationContentView(
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
     var currentItems by remember(state.widgets) { mutableStateOf(state.widgets) }
-    var draggedWidget by remember { mutableStateOf<WidgetConfigurationItem?>(null) }
 
     MegaReorderableLazyColumn(
         items = currentItems,
@@ -144,15 +143,15 @@ fun HomeConfigurationContentView(
         onMove = { from, to ->
             // Make sure non-draggable items are not reordered by other items
             if (currentItems.getOrNull(to.index)?.isDraggable == true) {
-                currentItems = currentItems.toMutableList().apply { move(from.index, to.index) }
+                currentItems = with(currentItems.toMutableList()) {
+                    removeAt(from.index).also { element ->
+                        add(to.index, element)
+                    }
+                    this
+                }
+
+                onWidgetOrderChange(currentItems)
             }
-        },
-        onDragStarted = { dragged, _ ->
-            draggedWidget = dragged
-        },
-        onDragStopped = {
-            draggedWidget = null
-            onWidgetOrderChange(currentItems)
         },
         dragEnabled = { it.isDraggable }
     ) { item ->
@@ -191,12 +190,6 @@ fun HomeConfigurationContentView(
             }
         }
     }
-}
-
-fun <T> MutableList<T>.move(fromIndex: Int, toIndex: Int) {
-    if (fromIndex == toIndex) return
-    val item = removeAt(fromIndex)
-    add(if (toIndex > fromIndex && toIndex != size) toIndex - 1 else toIndex, item)
 }
 
 const val TEST_TAG_WIDGET_CONFIGURATION_VIEW = "widget_configuration:list"

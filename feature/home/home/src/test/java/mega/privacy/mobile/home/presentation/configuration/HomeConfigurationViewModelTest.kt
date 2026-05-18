@@ -2,16 +2,17 @@ package mega.privacy.mobile.home.presentation.configuration
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
-import mega.privacy.android.domain.usecase.home.ResetHomeWidgetConfigurationsUseCase
-import mega.privacy.android.domain.usecase.home.DeleteWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
+import mega.privacy.android.domain.usecase.home.ResetHomeWidgetConfigurationsUseCase
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
@@ -42,7 +43,6 @@ class HomeConfigurationViewModelTest {
     private val monitorHomeWidgetConfigurationUseCase =
         mock<MonitorHomeWidgetConfigurationUseCase>()
     private val updateWidgetConfigurationsUseCase = mock<UpdateWidgetConfigurationsUseCase>()
-    private val deleteWidgetConfigurationsUseCase = mock<DeleteWidgetConfigurationUseCase>()
     private val getEnabledFlaggedItemsUseCase = mock<GetEnabledFlaggedItemsUseCase>()
     private val resetHomeWidgetConfigurationsUseCase = mock<ResetHomeWidgetConfigurationsUseCase>()
 
@@ -53,9 +53,9 @@ class HomeConfigurationViewModelTest {
             monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
             widgetConfigurationItemMapper = WidgetConfigurationItemMapper(),
             updateWidgetConfigurationsUseCase = updateWidgetConfigurationsUseCase,
-            deleteWidgetConfigurationUseCase = deleteWidgetConfigurationsUseCase,
             getEnabledFlaggedItemsUseCase = getEnabledFlaggedItemsUseCase,
             resetHomeWidgetConfigurationsUseCase = resetHomeWidgetConfigurationsUseCase,
+            applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
         )
     }
 
@@ -66,7 +66,6 @@ class HomeConfigurationViewModelTest {
             staticWidgetsProvider,
             monitorHomeWidgetConfigurationUseCase,
             updateWidgetConfigurationsUseCase,
-            deleteWidgetConfigurationsUseCase,
             getEnabledFlaggedItemsUseCase,
             resetHomeWidgetConfigurationsUseCase,
         )
@@ -392,6 +391,36 @@ class HomeConfigurationViewModelTest {
             underTest.resetWidgetStateToDefault()
 
             verify(resetHomeWidgetConfigurationsUseCase).invoke()
+        }
+
+    @Test
+    fun `test that updateWidgetOrder calls updateWidgetConfigurationsUseCase with correct order`() =
+        runTest {
+            val mapper = WidgetConfigurationItemMapper()
+            val orderedItems = listOf("first", "second", "third").map { id ->
+                mapper(
+                    homeWidget = stubWidget(id, HomeWidgetOrder.Banner),
+                    widgetConfiguration = HomeWidgetConfiguration(
+                        widgetIdentifier = id,
+                        widgetOrder = 0,
+                        enabled = true,
+                    ),
+                )
+            }
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            }
+
+            underTest.updateWidgetOrder(orderedItems)
+
+            val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
+            verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
+            assertThat(captor.firstValue.map { it.widgetIdentifier to it.widgetOrder })
+                .containsExactly("first" to 0, "second" to 1, "third" to 2)
+                .inOrder()
         }
 
     private fun stubWidget(
