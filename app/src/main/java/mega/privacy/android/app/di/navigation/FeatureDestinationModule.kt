@@ -1,5 +1,6 @@
 package mega.privacy.android.app.di.navigation
 
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,10 +41,10 @@ class FeatureDestinationModule {
     fun provideLegacyCoreActivityFeatureDestination(
         nodeContentUriIntentMapper: NodeContentUriIntentMapper,
         mediaPlayerIntentMapper: MediaPlayerIntentMapper,
-        megaChatRequestHandler: MegaChatRequestHandler,
-        chatManagement: ChatManagement,
-        setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
-        rtcAudioManagerGateway: RTCAudioManagerGateway,
+        megaChatRequestHandler: Lazy<MegaChatRequestHandler>,
+        chatManagement: Lazy<ChatManagement>,
+        setChatVideoInDeviceUseCase: Lazy<SetChatVideoInDeviceUseCase>,
+        rtcAudioManagerGateway: Lazy<RTCAudioManagerGateway>,
         viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
         snackbarEventQueue: SnackbarEventQueue,
     ): FeatureDestination =

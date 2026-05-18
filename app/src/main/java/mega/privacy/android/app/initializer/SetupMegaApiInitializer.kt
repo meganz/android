@@ -75,9 +75,11 @@ class SetupMegaApiInitializer : Initializer<Unit> {
         megaApi.downloadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
         megaApi.uploadMethod = MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE
         addListeners(megaApi, entryPoint)
-        setStreamingBufferSize(megaApi, context)
-        setSDKLanguage(megaApi)
-        setResourceLimit(megaApi)
+        entryPoint.appScope().launch {
+            setStreamingBufferSize(megaApi, context)
+            setSDKLanguage(megaApi)
+            setResourceLimit(megaApi)
+        }
     }
 
     private fun addListeners(

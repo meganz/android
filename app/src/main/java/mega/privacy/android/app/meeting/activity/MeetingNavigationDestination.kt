@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import dagger.Lazy
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -22,10 +23,10 @@ import mega.privacy.android.navigation.destination.WaitingRoomNavKeyInfo
 
 fun EntryProviderScope<NavKey>.legacyMeetingScreen(
     removeDestination: () -> Unit,
-    megaChatRequestHandler: MegaChatRequestHandler,
-    chatManagement: ChatManagement,
-    setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
-    rtcAudioManagerGateway: RTCAudioManagerGateway,
+    megaChatRequestHandler: Lazy<MegaChatRequestHandler>,
+    chatManagement: Lazy<ChatManagement>,
+    setChatVideoInDeviceUseCase: Lazy<SetChatVideoInDeviceUseCase>,
+    rtcAudioManagerGateway: Lazy<RTCAudioManagerGateway>,
 ) {
     entry<LegacyMeetingNavKey>(
         metadata = transparentMetadata()
@@ -36,7 +37,11 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                 putExtra(MeetingActivity.MEETING_CHAT_ID, key.chatId)
                 when (val meetingInfo = key.meetingInfo) {
                     is MeetingNavKeyInfo.JoinAsGuest -> {
-                        initGuestMeeting(key.chatId, megaChatRequestHandler, chatManagement)
+                        initGuestMeeting(
+                            key.chatId,
+                            megaChatRequestHandler.get(),
+                            chatManagement.get()
+                        )
 
                         setAction(MeetingActivity.MEETING_ACTION_GUEST)
                         putExtra(MeetingActivity.MEETING_IS_GUEST, true)
@@ -46,7 +51,7 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                     }
 
                     is MeetingNavKeyInfo.RejoinInProgressCall -> {
-                        chatManagement.setOpeningMeetingLink(key.chatId, true)
+                        chatManagement.get().setOpeningMeetingLink(key.chatId, true)
 
                         setAction(MeetingActivity.MEETING_ACTION_JOIN)
                         putExtra(
@@ -59,7 +64,7 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                     }
 
                     is MeetingNavKeyInfo.JoinInProgressCall -> {
-                        chatManagement.setOpeningMeetingLink(key.chatId, true)
+                        chatManagement.get().setOpeningMeetingLink(key.chatId, true)
 
                         setAction(MeetingActivity.MEETING_ACTION_JOIN)
                         putExtra(MeetingActivity.MEETING_NAME, meetingInfo.meetingName)
@@ -74,14 +79,15 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                     }
 
                     is MeetingNavKeyInfo.OpenCall -> {
+                        val chatMgmt = chatManagement.get()
                         if (meetingInfo.answer) {
-                            setChatVideoInDeviceUseCase()
-                            chatManagement.removeJoiningCallChatId(key.chatId)
-                            rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                            setChatVideoInDeviceUseCase.get().invoke()
+                            chatMgmt.removeJoiningCallChatId(key.chatId)
+                            rtcAudioManagerGateway.get().removeRTCAudioManagerRingIn()
                             CallUtil.clearIncomingCallNotification(meetingInfo.callId)
                         }
-                        chatManagement.setSpeakerStatus(key.chatId, meetingInfo.hasLocalVideo)
-                        chatManagement.setRequestSentCall(
+                        chatMgmt.setSpeakerStatus(key.chatId, meetingInfo.hasLocalVideo)
+                        chatMgmt.setRequestSentCall(
                             meetingInfo.callId,
                             meetingInfo.isOutgoing
                         )
@@ -103,8 +109,8 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
 
 fun EntryProviderScope<NavKey>.legacyWaitingRoomScreen(
     removeDestination: () -> Unit,
-    chatRequestHandler: MegaChatRequestHandler,
-    chatManagement: ChatManagement,
+    chatRequestHandler: Lazy<MegaChatRequestHandler>,
+    chatManagement: Lazy<ChatManagement>,
 ) {
     entry<LegacyWaitingRoomNavKey>(
         metadata = transparentMetadata()
@@ -115,13 +121,17 @@ fun EntryProviderScope<NavKey>.legacyWaitingRoomScreen(
                 putExtra(WaitingRoomActivity.EXTRA_CHAT_ID, key.chatId)
                 when (val waitingRoomInfo = key.waitingRoomInfo) {
                     is WaitingRoomNavKeyInfo.JoinWaitingRoom -> {
-                        chatManagement.setOpeningMeetingLink(key.chatId, true)
+                        chatManagement.get().setOpeningMeetingLink(key.chatId, true)
                         putExtra(WaitingRoomActivity.EXTRA_CHAT_LINK, waitingRoomInfo.link)
                         setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
 
                     is WaitingRoomNavKeyInfo.JoinAsGuest -> {
-                        initGuestMeeting(key.chatId, chatRequestHandler, chatManagement)
+                        initGuestMeeting(
+                            key.chatId,
+                            chatRequestHandler.get(),
+                            chatManagement.get()
+                        )
                         putExtra(WaitingRoomActivity.EXTRA_CHAT_LINK, waitingRoomInfo.link)
                         setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }

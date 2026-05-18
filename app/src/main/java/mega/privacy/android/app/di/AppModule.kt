@@ -1,12 +1,6 @@
 package mega.privacy.android.app.di
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.content.pm.PackageManager.NameNotFoundException
-import android.os.Build
-import androidx.preference.PreferenceManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -84,27 +78,7 @@ internal class AppModule {
     ): MegaApiAndroid {
         NativeLibraryLoader.awaitLoaded()
         FileWrapper.initializeFactory(fileGateway)
-        val packageInfo: PackageInfo
-        var path: String? = null
-        try {
-            // PackageManager.PackageInfoFlags can only be used for devices
-            // running Android 13 and above. For devices running below Android 13,
-            // the normal getPackageInfo() is used
-            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(
-                    context.packageName,
-                    PackageManager.PackageInfoFlags.of(0)
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getPackageInfo(context.packageName, 0)
-            }
-            path = (packageInfo.applicationInfo?.dataDir + "/")
-                ?: throw NullPointerException("Application info is null")
-        } catch (e: NameNotFoundException) {
-            e.printStackTrace()
-        }
-
+        val path = "${context.dataDir.path}/"
         val userAgent = "${BuildConfig.USER_AGENT} ${BuildConfig.ENVIRONMENT}".trim()
         return MegaApiAndroid(MegaApplication.APP_KEY, userAgent, path)
     }
@@ -112,29 +86,9 @@ internal class AppModule {
     @MegaApiFolder
     @Singleton
     @Provides
-    @Suppress("DEPRECATION")
     fun provideMegaApiFolder(@ApplicationContext context: Context): MegaApiAndroid {
         NativeLibraryLoader.awaitLoaded()
-        val packageInfo: PackageInfo
-        var path: String? = null
-        try {
-            // PackageManager.PackageInfoFlags can only be used for devices
-            // running Android 13 and above. For devices running below Android 13,
-            // the normal getPackageInfo() is used
-            packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(
-                    context.packageName,
-                    PackageManager.PackageInfoFlags.of(0)
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getPackageInfo(context.packageName, 0)
-            }
-            path = packageInfo.applicationInfo?.dataDir + "/"
-        } catch (e: NameNotFoundException) {
-            e.printStackTrace()
-        }
-
+        val path = "${context.dataDir.path}/"
         return MegaApiAndroid(MegaApplication.APP_KEY, BuildConfig.USER_AGENT, path)
     }
 
@@ -143,11 +97,6 @@ internal class AppModule {
     fun provideMegaChatApi(@MegaApi megaApi: MegaApiAndroid): MegaChatApiAndroid {
         return MegaChatApiAndroid(megaApi)
     }
-
-    @Singleton
-    @Provides
-    fun providePreferences(@ApplicationContext context: Context): SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
 
     @Singleton
     @Provides

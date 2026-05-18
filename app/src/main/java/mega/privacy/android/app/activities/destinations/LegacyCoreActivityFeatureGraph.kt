@@ -2,6 +2,7 @@ package mega.privacy.android.app.activities.destinations
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import dagger.Lazy
 import leftMeetingDestination
 import mega.privacy.android.app.activities.navigation.fileInfoScreen
 import mega.privacy.android.app.businessExpiredAlertLegacyDestination
@@ -48,10 +49,10 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 class LegacyCoreActivityFeatureGraph(
     nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     mediaPlayerIntentMapper: MediaPlayerIntentMapper,
-    megaChatRequestHandler: MegaChatRequestHandler,
-    chatManagement: ChatManagement,
-    setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
-    rtcAudioManagerGateway: RTCAudioManagerGateway,
+    megaChatRequestHandler: Lazy<MegaChatRequestHandler>,
+    chatManagement: Lazy<ChatManagement>,
+    setChatVideoInDeviceUseCase: Lazy<SetChatVideoInDeviceUseCase>,
+    rtcAudioManagerGateway: Lazy<RTCAudioManagerGateway>,
     private val viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
     snackbarEventQueue: SnackbarEventQueue,
 ) : FeatureDestination {
