@@ -1,7 +1,10 @@
 package mega.privacy.android.domain.repository
 
 import androidx.paging.PagingSource
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 
 /**
  * Repository for managing viewed links — files and folders opened via MEGA deep links.
@@ -38,4 +41,17 @@ interface ViewedLinksRepository {
      * Deletes all viewed link entries (both file and folder links).
      */
     suspend fun clearLinks()
+
+    /**
+     * Observes the persisted sort preference for the viewed-links list.
+     */
+    fun monitorSortPreference(): Flow<Pair<ViewedLinksSortField, SortDirection>>
+
+    /**
+     * Persists the sort preference for the viewed-links list.
+     */
+    suspend fun setSortPreference(
+        sortField: ViewedLinksSortField,
+        sortDirection: SortDirection,
+    )
 }

@@ -15,3 +15,10 @@ internal annotation class RequestPhoneNumberPreference
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier
 internal annotation class ContinueWhereLeftOffSortPreference
+
+/**
+ * Annotation for ViewedLinksSortPreferenceDataStore
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+internal annotation class ViewedLinksSortPreference

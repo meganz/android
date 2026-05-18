@@ -27,9 +27,11 @@ import mega.privacy.android.data.preferences.migration.CredentialsPreferencesMig
 import mega.privacy.android.data.preferences.qaAccountCacheDataStoreName
 import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
+import mega.privacy.android.data.preferences.viewedLinksSortPreferenceFileName
 import mega.privacy.android.data.qualifier.ContinueWhereLeftOffSortPreference
 import mega.privacy.android.data.qualifier.MediaTimelinePreferenceDataStore
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
+import mega.privacy.android.data.qualifier.ViewedLinksSortPreference
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import javax.inject.Named
 import javax.inject.Singleton
@@ -176,5 +178,19 @@ internal object DataStoreModule {
         ),
         scope = CoroutineScope(ioDispatcher),
         produceFile = { context.preferencesDataStoreFile(continueWhereLeftOffSortPreferenceFileName) }
+    )
+
+    @Provides
+    @Singleton
+    @ViewedLinksSortPreference
+    internal fun provideViewedLinksSortPreferenceDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        scope = CoroutineScope(ioDispatcher),
+        produceFile = { context.preferencesDataStoreFile(viewedLinksSortPreferenceFileName) }
     )
 }

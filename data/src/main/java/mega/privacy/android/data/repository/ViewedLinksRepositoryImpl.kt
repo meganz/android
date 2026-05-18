@@ -3,6 +3,8 @@ package mega.privacy.android.data.repository
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
@@ -10,7 +12,10 @@ import mega.privacy.android.data.database.entity.ViewedLinkRawItem
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.viewedlinks.RecentlyViewedLinkTypeIdMapper
 import mega.privacy.android.data.mapper.viewedlinks.ViewedLinkRawItemMapper
+import mega.privacy.android.data.preferences.ViewedLinksSortPreferenceDataStore
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ViewedLinksRepository
 import javax.inject.Inject
@@ -23,6 +28,7 @@ import javax.inject.Inject
  * @property viewedLinkRawItemMapper
  * @property recentlyViewedLinkTypeIdMapper
  * @property deviceGateway
+ * @property sortPreferenceDataStore
  * @property ioDispatcher
  */
 internal class ViewedLinksRepositoryImpl @Inject constructor(
@@ -30,6 +36,7 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
     private val viewedLinkRawItemMapper: ViewedLinkRawItemMapper,
     private val recentlyViewedLinkTypeIdMapper: RecentlyViewedLinkTypeIdMapper,
     private val deviceGateway: DeviceGateway,
+    private val sortPreferenceDataStore: ViewedLinksSortPreferenceDataStore,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewedLinksRepository {
 
@@ -59,6 +66,16 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
 
     override suspend fun clearLinks() = withContext(ioDispatcher) {
         recentlyViewedLinkDao.deleteAll()
+    }
+
+    override fun monitorSortPreference(): Flow<Pair<ViewedLinksSortField, SortDirection>> =
+        sortPreferenceDataStore.monitorSortPreference().flowOn(ioDispatcher)
+
+    override suspend fun setSortPreference(
+        sortField: ViewedLinksSortField,
+        sortDirection: SortDirection,
+    ) = withContext(ioDispatcher) {
+        sortPreferenceDataStore.setSortPreference(sortField, sortDirection)
     }
 
     private class MappingPagingSource(
