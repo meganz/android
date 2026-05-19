@@ -40,7 +40,6 @@ class HomeConfigurationViewModel @Inject constructor(
             .onEach { Timber.d("Widget configurations: \n ${it.joinToString("\n")}") }
             .map { list ->
                 val configuration = list.associateBy { config -> config.widgetIdentifier }
-
                 val items = widgetProviders
                     .flatMap { provider ->
                         getEnabledFlaggedItemsUseCase(provider.getWidgets())
@@ -52,13 +51,14 @@ class HomeConfigurationViewModel @Inject constructor(
                                 )
                             }
                     }
-                    .sortedBy { it.index }
+                val allowRemoval = items.filter { it.isConfigurable }.count { it.enabled } > 1
+                val fixedWidgets = items.filterNot { it.isDraggable }.sortedBy { it.index }
+                val draggableWidgets = items.filter { it.isDraggable }.sortedBy { it.index }
 
                 HomeConfigurationUiState.Data(
-                    allowRemoval = items
-                        .filter { it.isConfigurable }
-                        .count { widget -> widget.enabled } > 1,
-                    widgets = items,
+                    allowRemoval = allowRemoval,
+                    draggableWidgets = draggableWidgets,
+                    fixedWidgets = fixedWidgets
                 )
 
             }.catch { e ->
