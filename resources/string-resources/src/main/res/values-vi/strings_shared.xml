@@ -2323,4 +2323,6 @@
     <string name="error_fail_to_play_video_message">Rất tiếc. Đã xảy ra lỗi và chúng tôi không thể mở được tệp&#160;tin.</string>
     <string name="error_no_internet_message">Không thể mở tệp&#160;tin do sự cố kết&#160;nối. Xin kiểm&#160;tra kết&#160;nối Internet rồi thử lại.</string>
     <string name="error_fail_to_play_video_title">Không thể phát video</string>
+    <string name="general_new_group_chat">Nhóm chat mới</string>
+    <string name="general_new_group_chat_created">Nhóm chat mới đã được tạo</string>
 </resources>

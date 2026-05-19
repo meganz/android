@@ -2281,4 +2281,6 @@
     <string name="error_no_internet_title">Tidak ada koneksi internet</string>
     <string name="error_dialog_confirm_button">Tutup</string>
     <string name="home_configuration_widget_my_account_widget_name">Akun Saya</string>
+    <string name="general_new_group_chat">Obrolan grup baru</string>
+    <string name="general_new_group_chat_created">Obrolan grup baru dibuat</string>
 </resources>

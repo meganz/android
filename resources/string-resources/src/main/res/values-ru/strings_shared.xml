@@ -2600,4 +2600,6 @@
     <string name="error_no_internet_title">Нет подключения к Интернету</string>
     <string name="error_dialog_confirm_button">Понятно</string>
     <string name="home_configuration_widget_my_account_widget_name">Мой аккаунт</string>
+    <string name="general_new_group_chat">Новый групповой чат</string>
+    <string name="general_new_group_chat_created">Новый групповой чат создан</string>
 </resources>

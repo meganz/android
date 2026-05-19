@@ -2510,4 +2510,6 @@
     <string name="error_no_internet_title">Fără conexiune la internet</string>
     <string name="error_dialog_confirm_button">Bine, am înțeles</string>
     <string name="home_configuration_widget_my_account_widget_name">Contul meu</string>
+    <string name="general_new_group_chat">Chat de group nou</string>
+    <string name="general_new_group_chat_created">A fost creat un nou chat de grup</string>
 </resources>

@@ -2342,4 +2342,6 @@
     <string name="error_file_not_supported_message">호환되는 앱에서 이 파일을 열려면 다운로드 하세요.</string>
     <string name="error_no_internet_message">연결 문제로 인해 파일을 열 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</string>
     <string name="home_configuration_widget_shortcuts_widget_name">바로 가기</string>
+    <string name="general_new_group_chat">새 단체 대화</string>
+    <string name="general_new_group_chat_created">새 단체 대화 생성됨</string>
 </resources>

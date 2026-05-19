@@ -2442,4 +2442,6 @@
     <string name="error_file_not_supported_message">Bu dosyayı uyumlu bir uygulamada açmak için indirin.</string>
     <string name="error_no_internet_message">Bağlantı sorunları nedeniyle dosya açılamıyor. İnternet bağlantınızı kontrol edin ve tekrar deneyin.</string>
     <string name="home_configuration_widget_shortcuts_widget_name">Kısayollar</string>
+    <string name="general_new_group_chat">Yeni grup sohbeti</string>
+    <string name="general_new_group_chat_created">Yeni grup sohbeti oluşturuldu</string>
 </resources>
