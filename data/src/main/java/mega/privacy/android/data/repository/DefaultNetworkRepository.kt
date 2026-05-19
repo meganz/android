@@ -7,6 +7,7 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Handler
 import android.os.HandlerThread
+import android.os.Message
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -22,7 +23,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -124,10 +127,16 @@ internal class DefaultNetworkRepository @Inject constructor(
                 )
             }
         }
-        connectivityManager?.registerDefaultNetworkCallback(
-            callback,
-            Handler(handlerThread.looper)
-        )
+        val safeHandler = object : Handler(handlerThread.looper) {
+            override fun dispatchMessage(msg: Message) {
+                try {
+                    super.dispatchMessage(msg)
+                } catch (t: Throwable) {
+                    Timber.e(t, "Dropped malformed network callback message")
+                }
+            }
+        }
+        connectivityManager?.registerDefaultNetworkCallback(callback, safeHandler)
 
         awaitClose {
             connectivityManager?.unregisterNetworkCallback(callback)
@@ -135,7 +144,9 @@ internal class DefaultNetworkRepository @Inject constructor(
             job.cancel()
         }
     }.flowOn(ioDispatcher)
-        .debounce(150L)
+        .debounce(300L)
+        .distinctUntilChanged()
+        .onEach { Timber.d("Current state $it") }
         .catch { Timber.e(it, "MonitorConnectivity Exception") }
         .stateIn(
             applicationScope,
