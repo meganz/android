@@ -231,6 +231,13 @@ enum class ApiFeatures(
         description = "Enable Google Sign-In on login screen",
         singleCheckPerRun = true,
         defaultValue = false
+    ),
+
+    CloudDriveDocumentProvider(
+        experimentName = "cdsp",
+        description = "Enable MEGA Cloud Drive as a SAF root in the Android system file picker",
+        singleCheckPerRun = true,
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

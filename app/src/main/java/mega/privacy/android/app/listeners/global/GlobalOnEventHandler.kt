@@ -1,6 +1,9 @@
 package mega.privacy.android.app.listeners.global
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.pm.PackageManager
+import android.provider.DocumentsContract
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
@@ -10,7 +13,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentProvider
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.domain.entity.MyAccountUpdate
@@ -71,6 +76,7 @@ class GlobalOnEventHandler @Inject constructor(
                 applicationScope.launch {
                     broadcastMiscStateUseCase(MiscLoadedState.FlagsReady)
                     updateDomainName()
+                    updateCloudDriveDocumentProviderState()
                 }
                 MegaApplication.getInstance().checkEnabledCookies()
                 initialiseAdsIfNeeded()
@@ -124,6 +130,38 @@ class GlobalOnEventHandler @Inject constructor(
     private suspend fun isProcessForeground(): Boolean = withContext(Dispatchers.Main) {
         ProcessLifecycleOwner.get().lifecycle.currentState
             .isAtLeast(Lifecycle.State.STARTED)
+    }
+
+    /**
+     * Enable or disable [CloudDriveDocumentProvider] based on the
+     * [ApiFeatures.CloudDriveDocumentProvider] feature flag, then notify SAF so DocumentsUI
+     * re-scans roots.
+     */
+    private suspend fun updateCloudDriveDocumentProviderState() {
+        val isEnabled = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.CloudDriveDocumentProvider)
+        }.getOrElse {
+            false
+        }
+        Timber.d("CloudDriveDocumentProvider ff value $isEnabled")
+        runCatching {
+            val component = ComponentName(appContext, CloudDriveDocumentProvider::class.java)
+            val currentState = appContext.packageManager.getComponentEnabledSetting(component)
+            val desiredState = if (isEnabled) PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+            else PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+
+            if (currentState != desiredState) {
+                appContext.packageManager.setComponentEnabledSetting(
+                    component, desiredState, PackageManager.DONT_KILL_APP,
+                )
+                appContext.contentResolver.notifyChange(
+                    DocumentsContract.buildRootsUri(BuildConfig.CLOUD_DRIVE_DOCUMENT_PROVIDER_AUTHORITY),
+                    null,
+                )
+            }
+        }.onFailure {
+            Timber.e(it, "Failed to update CloudDriveDocumentProvider state")
+        }
     }
 
     private suspend fun updateDomainName() {
