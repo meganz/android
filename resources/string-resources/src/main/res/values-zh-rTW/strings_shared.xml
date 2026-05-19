@@ -2344,4 +2344,6 @@
     <string name="error_no_internet_title">無網路連線</string>
     <string name="error_dialog_confirm_button">好的，明白了</string>
     <string name="home_configuration_widget_my_account_widget_name">我的帳戶</string>
+    <string name="general_new_group_chat">新群組對話</string>
+    <string name="general_new_group_chat_created">已建立群組對話</string>
 </resources>

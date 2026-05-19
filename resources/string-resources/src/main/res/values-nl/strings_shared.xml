@@ -2439,4 +2439,6 @@
     <string name="error_file_not_supported_message">Download dit bestand om het in een compatibele applicatie te openen.</string>
     <string name="error_no_internet_message">Het bestand kan niet worden geopend vanwege verbindingsproblemen. Controleer uw internetverbinding en probeer het opnieuw.</string>
     <string name="home_configuration_widget_shortcuts_widget_name">Snelkoppelingen</string>
+    <string name="general_new_group_chat">Nieuw groep gesprek</string>
+    <string name="general_new_group_chat_created">Nieuw groepsgesprek gecreëerd</string>
 </resources>

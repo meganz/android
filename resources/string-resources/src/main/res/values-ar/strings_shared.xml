@@ -2744,4 +2744,6 @@
     <string name="error_no_internet_title">لا يوجد اتصال بالإنترنت</string>
     <string name="error_dialog_confirm_button">إغلاق</string>
     <string name="home_configuration_widget_my_account_widget_name">حسابي</string>
+    <string name="general_new_group_chat">مجموعة محادثة جديدة</string>
+    <string name="general_new_group_chat_created">تم إنشاء محادثة جماعية جديدة</string>
 </resources>

@@ -2463,4 +2463,6 @@
     <string name="error_no_internet_title">No hay conexión a internet</string>
     <string name="error_dialog_confirm_button">Entendido</string>
     <string name="home_configuration_widget_my_account_widget_name">Mi cuenta</string>
+    <string name="general_new_group_chat">Nuevo chat de grupo</string>
+    <string name="general_new_group_chat_created">Se ha creado un nuevo chat de grupo</string>
 </resources>

@@ -2313,4 +2313,6 @@
     <string name="error_no_internet_title">ไม่มีการเชื่อมต่ออินเทอร์เน็ต</string>
     <string name="error_dialog_confirm_button">โอเค เข้าใจแล้ว</string>
     <string name="home_configuration_widget_my_account_widget_name">บัญชีของฉัน</string>
+    <string name="general_new_group_chat">แชทกลุ่มใหม่</string>
+    <string name="general_new_group_chat_created">สร้างแชทกลุ่มใหม่แล้ว</string>
 </resources>

@@ -1073,7 +1073,7 @@
     <!-- Title of the tab section for active transfers -->
     <string name="transfers_section_tab_title_active_transfers">Ativas</string>
     <!-- Title of the tab section for failed transfers -->
-    <string name="transfers_section_tab_title_failed_transfers">Falhas</string>
+    <string name="transfers_section_tab_title_failed_transfers">Erros</string>
     <!--Text for showing the empty state when there are no transfers. The [A][/A] format marks are to put the text in a different color and style.-->
     <string name="transfers_no_transfers_empty_text">Não há transferências</string>
     <!--Text for showing the empty state when there are no active transfers. The [A][/A] format marks are to put the text in a different color and style.-->
@@ -2526,4 +2526,6 @@
     <string name="error_no_internet_message">Não foi possível abrir o arquivo devido a problemas de conectividade. Verifique a sua conexão com a Internet e tente novamente.</string>
     <string name="home_configuration_widget_my_account_widget_name">Minha conta</string>
     <string name="home_configuration_widget_shortcuts_widget_name">Atalhos</string>
+    <string name="general_new_group_chat">Novo chat de grupo</string>
+    <string name="general_new_group_chat_created">Novo chat de grupo criado</string>
 </resources>

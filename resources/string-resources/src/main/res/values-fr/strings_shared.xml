@@ -2491,4 +2491,6 @@
     <string name="error_no_internet_title">Aucune connexion à Internet</string>
     <string name="error_dialog_confirm_button">Fermer</string>
     <string name="home_configuration_widget_my_account_widget_name">Mon compte</string>
+    <string name="general_new_group_chat">Nouvelle conversation de groupe</string>
+    <string name="general_new_group_chat_created">La nouvelle conversation de groupe a été créée</string>
 </resources>
