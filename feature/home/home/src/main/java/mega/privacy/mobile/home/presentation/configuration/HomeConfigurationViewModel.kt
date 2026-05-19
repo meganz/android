@@ -3,6 +3,7 @@ package mega.privacy.mobile.home.presentation.configuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -10,10 +11,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetEnabledFlaggedItemsUseCase
-import mega.privacy.android.domain.usecase.home.ResetHomeWidgetConfigurationsUseCase
-import mega.privacy.android.domain.usecase.home.DeleteWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
+import mega.privacy.android.domain.usecase.home.ResetHomeWidgetConfigurationsUseCase
 import mega.privacy.android.domain.usecase.home.UpdateWidgetConfigurationsUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
@@ -29,10 +30,11 @@ class HomeConfigurationViewModel @Inject constructor(
     private val monitorHomeWidgetConfigurationUseCase: MonitorHomeWidgetConfigurationUseCase,
     private val widgetConfigurationItemMapper: WidgetConfigurationItemMapper,
     private val updateWidgetConfigurationsUseCase: UpdateWidgetConfigurationsUseCase,
-    private val deleteWidgetConfigurationUseCase: DeleteWidgetConfigurationUseCase,
     private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
     private val resetHomeWidgetConfigurationsUseCase: ResetHomeWidgetConfigurationsUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
+
     val state: StateFlow<HomeConfigurationUiState> by lazy {
         monitorHomeWidgetConfigurationUseCase()
             .onEach { Timber.d("Widget configurations: \n ${it.joinToString("\n")}") }
@@ -78,7 +80,7 @@ class HomeConfigurationViewModel @Inject constructor(
     }
 
     fun updateWidgetOrder(orderedItems: List<WidgetConfigurationItem>) {
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
                 val latestEnabledByIdentifier = monitorHomeWidgetConfigurationUseCase()
                     .first()
@@ -99,8 +101,7 @@ class HomeConfigurationViewModel @Inject constructor(
     }
 
     private fun updateWidgets(items: List<WidgetConfigurationItem>) {
-        Timber.d("Updated widget configurations: \n ${items.joinToString("\n")}")
-        viewModelScope.launch {
+        applicationScope.launch {
             runCatching {
                 val updated = items.map {
                     HomeWidgetConfiguration(
@@ -112,22 +113,6 @@ class HomeConfigurationViewModel @Inject constructor(
                 updateWidgetConfigurationsUseCase(updated)
             }.onFailure {
                 Timber.e(it, "Failed to update widget configurations")
-            }
-        }
-    }
-
-    fun deleteWidget(item: WidgetConfigurationItem) {
-        if (!item.canDelete) return
-        viewModelScope.launch {
-            runCatching {
-                for (provider in widgetProviders) {
-                    if (provider.deleteWidget(item.identifier)) {
-                        deleteWidgetConfigurationUseCase(item.identifier)
-                        break
-                    }
-                }
-            }.onFailure {
-                Timber.e(it, "Failed to delete widget: ${item.identifier}")
             }
         }
     }
