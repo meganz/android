@@ -423,6 +423,8 @@ internal class MegaNavigatorImpl @Inject constructor(
         searchedItems: List<Long>?,
         collectionTitle: String?,
         collectionId: Long?,
+        publicLinkUrl: String?,
+        localFilePath: String?,
     ) {
         val contentUri = NodeContentUri.LocalContentUri(localFile)
         val info = fileTypeInfo ?: getFileTypeInfoUseCase(localFile)
@@ -443,6 +445,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             searchedItems = searchedItems,
             collectionTitle = collectionTitle,
             collectionId = collectionId,
+            publicLinkUrl = publicLinkUrl,
+            localFilePath = localFilePath,
         )
         context.startActivity(intent)
     }

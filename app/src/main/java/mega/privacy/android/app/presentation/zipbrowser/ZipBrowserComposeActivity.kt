@@ -191,7 +191,8 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
                     viewType = ZIP_ADAPTER,
                     handle = file.name.hashCode().toLong(),
                     parentId = -1L,
-                    sortOrder = SortOrder.ORDER_DEFAULT_ASC
+                    sortOrder = SortOrder.ORDER_DEFAULT_ASC,
+                    localFilePath = file.absolutePath
                 )
             }.onFailure {
                 Timber.e(it)

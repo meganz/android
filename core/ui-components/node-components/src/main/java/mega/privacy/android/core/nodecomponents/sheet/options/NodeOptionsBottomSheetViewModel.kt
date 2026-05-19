@@ -32,9 +32,8 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
-import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
-import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
@@ -82,7 +81,8 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     @Assisted private val nodeId: Long,
     @Assisted private val nodeSourceType: NodeSourceType,
     @Assisted private val partiallyExpand: Boolean,
-    @Assisted private val publicLinkUrl: String?,
+    @Assisted("publicLinkUrl") private val publicLinkUrl: String?,
+    @Assisted("localFilePath") private val localFilePath: String?,
 ) : ViewModel() {
 
     private var offlineMonitorJob: Job? = null
@@ -111,6 +111,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
         if (publicLinkUrl.isNullOrBlank()
             && nodeSourceType != NodeSourceType.FOLDER_LINK
             && nodeSourceType != NodeSourceType.FILE_LINK
+            && nodeSourceType != NodeSourceType.VIDEO_PLAYER_ZIP_FILE
         ) {
             viewModelScope.launch {
                 monitorNodeUpdatesById(NodeId(nodeId))
@@ -272,7 +273,8 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             nodeId: Long,
             nodeSourceType: NodeSourceType,
             partiallyExpand: Boolean,
-            publicLinkUrl: String?,
+            @Assisted("publicLinkUrl") publicLinkUrl: String?,
+            @Assisted("localFilePath") localFilePath: String?,
         ): NodeOptionsBottomSheetViewModel
     }
 }

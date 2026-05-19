@@ -235,6 +235,8 @@ interface AppNavigator {
         searchedItems: List<Long>? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
+        publicLinkUrl: String? = null,
+        localFilePath: String? = null,
     )
 
     /**

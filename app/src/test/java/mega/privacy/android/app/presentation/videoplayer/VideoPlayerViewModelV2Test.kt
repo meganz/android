@@ -2637,6 +2637,7 @@ class VideoPlayerViewModelV2Test {
         Arguments.of(FROM_CHAT, NodeSourceType.CHAT),
         Arguments.of(FROM_IMAGE_VIEWER, NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER),
         Arguments.of(VERSIONS_ADAPTER, NodeSourceType.VIDEO_PLAYER_VERSIONS),
+        Arguments.of(ZIP_ADAPTER, NodeSourceType.VIDEO_PLAYER_ZIP_FILE),
         Arguments.of(FILE_LINK_ADAPTER, NodeSourceType.FILE_LINK),
         Arguments.of(FOLDER_LINK_ADAPTER, NodeSourceType.FOLDER_LINK),
         Arguments.of(FROM_ALBUM_SHARING, NodeSourceType.FOLDER_LINK),

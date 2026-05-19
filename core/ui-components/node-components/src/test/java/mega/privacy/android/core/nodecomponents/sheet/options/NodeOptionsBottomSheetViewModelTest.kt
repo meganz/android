@@ -17,19 +17,17 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
-import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
-import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
-import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
-import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -41,9 +39,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -92,6 +90,7 @@ class NodeOptionsBottomSheetViewModelTest {
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         partiallyExpand: Boolean = true,
         publicLinkUrl: String? = null,
+        localFilePath: String? = null,
     ) {
         viewModel = NodeOptionsBottomSheetViewModel(
             nodeBottomSheetActionMapper = nodeBottomSheetActionMapper,
@@ -115,6 +114,7 @@ class NodeOptionsBottomSheetViewModelTest {
             nodeSourceType = nodeSourceType,
             partiallyExpand = partiallyExpand,
             publicLinkUrl = publicLinkUrl,
+            localFilePath = localFilePath,
         )
     }
 

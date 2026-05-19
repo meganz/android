@@ -24,6 +24,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTIO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.URL_LOCAL_FILE_PATH
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -68,6 +69,7 @@ class MediaPlayerIntentMapper @Inject constructor(
         enableAddToAlbum: Boolean = false,
         serializedData: String? = null,
         publicLinkUrl: String? = null,
+        localFilePath: String? = null,
     ): Intent {
         val useRevamp = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerRevamp)
@@ -114,6 +116,9 @@ class MediaPlayerIntentMapper @Inject constructor(
             }
             publicLinkUrl?.let {
                 putExtra(URL_FILE_LINK, it)
+            }
+            localFilePath?.let {
+                putExtra(URL_LOCAL_FILE_PATH, it)
             }
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, enableAddToAlbum)

@@ -38,6 +38,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerEntryProvider(
                     nodeHandle = uiState.currentPlayingHandle,
                     nodeSourceType = uiState.nodeSourceType,
                     publicLinkUrl = uiState.fileLinkUrl,
+                    localFilePath = uiState.localFilePath,
                 )
             )
         },

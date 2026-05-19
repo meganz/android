@@ -88,6 +88,7 @@ import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.URL_LOCAL_FILE_PATH
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -258,7 +259,8 @@ class VideoPlayerViewModelV2 @Inject constructor(
     val uiState: StateFlow<VideoPlayerUiState>
         field: MutableStateFlow<VideoPlayerUiState> = MutableStateFlow(
             VideoPlayerUiState(
-                fileLinkUrl = savedStateHandle[URL_FILE_LINK]
+                fileLinkUrl = savedStateHandle[URL_FILE_LINK],
+                localFilePath = savedStateHandle[URL_LOCAL_FILE_PATH],
             )
         )
 
@@ -332,6 +334,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
             FILE_LINK_ADAPTER -> NodeSourceType.FILE_LINK
             FROM_IMAGE_VIEWER -> NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER
             VERSIONS_ADAPTER -> NodeSourceType.VIDEO_PLAYER_VERSIONS
+            ZIP_ADAPTER -> NodeSourceType.VIDEO_PLAYER_ZIP_FILE
             else -> NodeSourceType.VIDEO_PLAYER_DEFAULT
         }
 

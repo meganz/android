@@ -393,6 +393,7 @@ object Constants {
     const val ID_MSG: String = "ID_MSG"
     const val IS_OVER_QUOTA: String = "IS_OVERQUOTA"
     const val URL_FILE_LINK: String = "URL_FILE_LINK"
+    const val URL_LOCAL_FILE_PATH: String = "URL_LOCAL_FILE_PATH"
     const val OPEN_SCAN_QR: String = "OPEN_SCAN_QR"
     const val INVITE_CONTACT: String = "INVITE_CONTACT"
     const val TYPE_CALL_PERMISSION: String = "TYPE_CALL_PERMISSION"

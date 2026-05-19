@@ -20,6 +20,7 @@ data class NodeOptionsBottomSheetNavKey(
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val partiallyExpand: Boolean = true,
     val publicLinkUrl: String? = null,
+    val localFilePath: String? = null,
 ) : NoSessionNavKey.Optional {
 
     companion object {
@@ -50,6 +51,7 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
                         it.nodeSourceType,
                         it.partiallyExpand,
                         it.publicLinkUrl,
+                        it.localFilePath,
                     )
                 }
             )
