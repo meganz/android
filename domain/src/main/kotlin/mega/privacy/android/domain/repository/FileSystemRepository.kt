@@ -163,6 +163,21 @@ interface FileSystemRepository {
     suspend fun writeTextToPath(path: String, text: String)
 
     /**
+     * Persist a large transient bundle's bytes under [key]. Overwrites any existing entry.
+     */
+    suspend fun saveLargeBundle(key: String, bytes: ByteArray)
+
+    /**
+     * Read the bytes previously stored via [saveLargeBundle] under [key], or null if absent.
+     */
+    suspend fun readLargeBundle(key: String): ByteArray?
+
+    /**
+     * Drop the bytes stored via [saveLargeBundle] under [key]. No-op if absent.
+     */
+    suspend fun deleteLargeBundle(key: String)
+
+    /**
      * Returns the parent path of the file represented by path
      */
     suspend fun getParent(path: String): String

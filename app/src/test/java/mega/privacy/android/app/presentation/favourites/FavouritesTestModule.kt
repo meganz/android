@@ -7,12 +7,10 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.GetTypedNodeModule
 import mega.privacy.android.app.di.MapperModule
 import mega.privacy.android.app.di.MegaUtilModule
-import mega.privacy.android.app.di.homepage.favourites.OpenFileModule
 import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.app.di.sortorder.SortOrderUseCases
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
-import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
@@ -33,7 +31,7 @@ import org.mockito.kotlin.mock
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [MegaUtilModule::class, OpenFileModule::class, MapperModule::class, SortOrderUseCases::class, PhotosUseCases::class, GetTypedNodeModule::class]
+    replaces = [MegaUtilModule::class, MapperModule::class, SortOrderUseCases::class, PhotosUseCases::class, GetTypedNodeModule::class]
 )
 object FavouritesTestModule {
     val getAllFavoritesUseCase = mock<GetAllFavoritesUseCase>()
@@ -50,9 +48,6 @@ object FavouritesTestModule {
 
     @Provides
     fun provideMegaUtilWrapper(): MegaUtilWrapper = megaUtilWrapper
-
-    @Provides
-    fun provideOpenFileWrapper(): OpenFileWrapper = mock()
 
     @Provides
     fun provideFavouriteMapper(): FavouriteMapper = favouriteMapper

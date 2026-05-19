@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.components.largebundle.LargeBundleHolder
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
@@ -55,6 +56,7 @@ class SlideshowViewModelTest {
         mock()
     private val checkUri: CheckFileUriUseCase = mock()
     private val clearImageResultUseCase: ClearImageResultUseCase = mock()
+    private val largeBundleHolder: LargeBundleHolder = mock()
 
     private fun initViewModel() = SlideshowViewModel(
         savedStateHandle = savedStateHandle,
@@ -69,6 +71,7 @@ class SlideshowViewModelTest {
         setSecureSlideshowTutorialShownUseCase = setSecureSlideshowTutorialShownUseCase,
         checkUri = checkUri,
         clearImageResultUseCase = clearImageResultUseCase,
+        largeBundleHolder = largeBundleHolder,
     )
 
     @Test

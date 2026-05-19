@@ -140,6 +140,22 @@ interface FileGateway {
     suspend fun writeTextToPath(path: String, text: String)
 
     /**
+     * Read raw bytes from the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @return file content as ByteArray, or null if the file does not exist
+     */
+    suspend fun readBytesFromPath(path: String): ByteArray?
+
+    /**
+     * Write raw bytes to the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @param bytes content to write
+     */
+    suspend fun writeBytesToPath(path: String, bytes: ByteArray)
+
+    /**
      * Get offline files root path
      *
      * @return the root path of offline files

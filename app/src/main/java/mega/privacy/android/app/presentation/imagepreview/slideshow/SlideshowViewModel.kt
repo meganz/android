@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +17,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.components.largebundle.LargeBundleHolder
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
@@ -29,7 +29,6 @@ import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
@@ -58,13 +57,17 @@ class SlideshowViewModel @Inject constructor(
     private val setSecureSlideshowTutorialShownUseCase: SetSecureSlideshowTutorialShownUseCase,
     private val checkUri: CheckFileUriUseCase,
     private val clearImageResultUseCase: ClearImageResultUseCase,
+    private val largeBundleHolder: LargeBundleHolder,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[ImagePreviewViewModel.IMAGE_NODE_FETCHER_SOURCE]
             ?: ImagePreviewFetcherSource.TIMELINE
 
-    private val params: Bundle
-        get() = savedStateHandle[ImagePreviewViewModel.FETCHER_PARAMS] ?: Bundle()
+    private suspend fun loadParams(): Bundle {
+        return savedStateHandle.get<String>(ImagePreviewViewModel.FETCHER_PARAMS)?.let {
+            largeBundleHolder.get(it)
+        } ?: Bundle()
+    }
 
     private val currentImageNodeIdValue: Long
         get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_ID_VALUE] ?: 0L
@@ -105,7 +108,8 @@ class SlideshowViewModel @Inject constructor(
         }
     }
 
-    private fun monitorSlideshowSettings() {
+    private fun monitorSlideshowSettings() = viewModelScope.launch {
+        val params = loadParams()
         val orderFlow = monitorSlideshowOrderSettingUseCase().distinctUntilChanged()
         val imageNodesFlow = imageNodeFetchers[imagePreviewFetcherSource]?.monitorImageNodes(params)
             ?.catch { Timber.e(it) } ?: flowOf(emptyList())

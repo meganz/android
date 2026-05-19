@@ -46,6 +46,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
+import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.presentation.extensions.getStorageState
@@ -400,10 +401,19 @@ class ImagePreviewActivity : BaseActivity() {
             }
 
             viewModel.isFileLink() -> {
-                intent.getBundleExtra(FETCHER_PARAMS)?.getString(PublicFileImageNodeFetcher.URL)
-                    ?.let { link ->
-                        MegaNodeUtil.shareLink(this, link, imageNode.name)
+                intent.getStringExtra(FETCHER_PARAMS)?.let { paramsKey ->
+                    lifecycleScope.launch {
+                        largeBundleHolder.get(paramsKey)
+                            ?.getString(PublicFileImageNodeFetcher.URL)
+                            ?.let { link ->
+                                MegaNodeUtil.shareLink(
+                                    this@ImagePreviewActivity,
+                                    link,
+                                    imageNode.name,
+                                )
+                            }
                     }
+                }
             }
 
             else -> lifecycleScope.launch {
@@ -616,6 +626,9 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
+        if (isFinishing) {
+            intent.getStringExtra(FETCHER_PARAMS)?.let { largeBundleHolder.release(it) }
+        }
         viewModel.clearImageResultCache()
         super.onDestroy()
     }
@@ -632,11 +645,14 @@ class ImagePreviewActivity : BaseActivity() {
             isForeign: Boolean = false,
             enableAddToAlbum: Boolean = false,
         ): Intent {
+            val paramsKey = context.largeBundleHolder.put(
+                bundleOf(*params.toList().toTypedArray())
+            )
             return Intent(context, ImagePreviewActivity::class.java).apply {
                 putExtra(IMAGE_NODE_FETCHER_SOURCE, imageSource)
                 putExtra(IMAGE_PREVIEW_MENU_OPTIONS, menuOptionsSource)
                 putExtra(PARAMS_CURRENT_IMAGE_NODE_ID_VALUE, anchorImageNodeId?.longValue)
-                putExtra(FETCHER_PARAMS, bundleOf(*params.toList().toTypedArray()))
+                putExtra(FETCHER_PARAMS, paramsKey)
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
                 putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, enableAddToAlbum)
             }

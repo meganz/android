@@ -144,6 +144,23 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.writeTextToPath(path, text)
     }
 
+    override suspend fun saveLargeBundle(key: String, bytes: ByteArray) =
+        withContext(ioDispatcher) {
+            val file = cacheGateway.getCacheFile(LARGE_BUNDLE_CACHE_FOLDER, key) ?: return@withContext
+            fileGateway.writeBytesToPath(file.absolutePath, bytes)
+        }
+
+    override suspend fun readLargeBundle(key: String): ByteArray? = withContext(ioDispatcher) {
+        val file = cacheGateway.getCacheFile(LARGE_BUNDLE_CACHE_FOLDER, key) ?: return@withContext null
+        fileGateway.readBytesFromPath(file.absolutePath)
+    }
+
+    override suspend fun deleteLargeBundle(key: String) = withContext(ioDispatcher) {
+        val file = cacheGateway.getCacheFile(LARGE_BUNDLE_CACHE_FOLDER, key) ?: return@withContext
+        fileGateway.deleteFile(file)
+        Unit
+    }
+
     override suspend fun getParent(path: String): String = withContext(ioDispatcher) {
         File(path).parent ?: path
     }
@@ -526,4 +543,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         return "$fileNameWithoutExtension ($counter)$fullExtension"
     }
 
+    private companion object {
+        const val LARGE_BUNDLE_CACHE_FOLDER = "large_bundle"
+    }
 }

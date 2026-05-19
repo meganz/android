@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.largebundle.LargeBundleHolder
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
@@ -118,14 +119,17 @@ class ImagePreviewViewModel @Inject constructor(
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val getNodeByHandle: GetNodeByHandle,
+    private val largeBundleHolder: LargeBundleHolder,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
 
-    private val params: Bundle
-        get() = savedStateHandle[FETCHER_PARAMS] ?: Bundle()
+    private suspend fun loadParams(): Bundle {
+        val key = savedStateHandle.get<String>(FETCHER_PARAMS) ?: return Bundle()
+        return largeBundleHolder.get(key) ?: Bundle()
+    }
 
     private val currentImageNodeIdValue: Long
         get() = savedStateHandle[PARAMS_CURRENT_IMAGE_NODE_ID_VALUE] ?: 0L
@@ -162,6 +166,7 @@ class ImagePreviewViewModel @Inject constructor(
 
     private suspend fun handleInitFlow() {
         val imageFetcher = imageNodeFetchers[imagePreviewFetcherSource] ?: return
+        val params = loadParams()
         combine(
             monitorShowHiddenItemsUseCase(),
             monitorAccountDetailUseCase(),
@@ -871,6 +876,7 @@ class ImagePreviewViewModel @Inject constructor(
         context: Context,
         imageNode: ImageNode,
     ) = viewModelScope.launch {
+        val params = loadParams()
         imagePreviewVideoLauncher.launchVideoScreen(
             context = context,
             imageNode = imageNode,

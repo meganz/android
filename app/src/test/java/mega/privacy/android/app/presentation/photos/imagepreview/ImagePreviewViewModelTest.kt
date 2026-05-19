@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.largebundle.LargeBundleHolder
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
@@ -128,6 +129,7 @@ class ImagePreviewViewModelTest {
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase =
         mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
+    private val largeBundleHolder: LargeBundleHolder = mock()
 
     @Suppress("DEPRECATION")
     private val getNodeByHandle: GetNodeByHandle = mock()
@@ -217,6 +219,7 @@ class ImagePreviewViewModelTest {
             getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             getNodeByHandle = getNodeByHandle,
+            largeBundleHolder = largeBundleHolder,
             context = mock()
         )
     }

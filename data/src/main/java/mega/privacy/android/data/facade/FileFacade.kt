@@ -197,6 +197,13 @@ internal class FileFacade @Inject constructor(
         File(path).writeText(text)
     }
 
+    override suspend fun readBytesFromPath(path: String): ByteArray? =
+        File(path).takeIf { it.exists() }?.readBytes()
+
+    override suspend fun writeBytesToPath(path: String, bytes: ByteArray) {
+        File(path).writeBytes(bytes)
+    }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun getExternalFile(
         selectionArgs: Array<String>,
