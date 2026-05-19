@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnLoadNodeName
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnNodeNameChanged
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameConfirmed
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameValidationPassed
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeNameErrorMessageMapper
@@ -51,12 +52,7 @@ class RenameNodeDialogViewModel @Inject constructor(
                     runCatching {
                         getNodeByHandleUseCase(action.nodeId)
                     }.onSuccess { node ->
-                        _state.update {
-                            it.copy(
-                                nodeName = node?.name,
-                                errorMessage = null
-                            )
-                        }
+                        _state.update { it.copy(nodeName = node?.name) }
                     }
                 }
             }
@@ -80,6 +76,12 @@ class RenameNodeDialogViewModel @Inject constructor(
 
             is OnChangeNodeExtensionDialogShown -> {
                 _state.update { it.copy(showChangeNodeExtensionDialogEvent = consumed()) }
+            }
+
+            is OnNodeNameChanged -> {
+                if (_state.value.errorMessage != null) {
+                    _state.update { it.copy(errorMessage = null) }
+                }
             }
         }
     }

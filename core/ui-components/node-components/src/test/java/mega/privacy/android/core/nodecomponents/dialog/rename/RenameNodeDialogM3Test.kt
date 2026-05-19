@@ -36,6 +36,7 @@ class RenameNodeDialogM3Test {
                 resetRenameValidationPassed = { },
                 resetShowChangeNodeExtensionDialog = { },
                 onRenameConfirmed = { },
+                onNodeNameChanged = { },
                 onDismiss = mockOnDismiss,
                 onRenameNode = { }
             )
@@ -67,6 +68,7 @@ class RenameNodeDialogM3Test {
                 resetRenameValidationPassed = { },
                 resetShowChangeNodeExtensionDialog = { },
                 onRenameConfirmed = mockOnRenameConfirmed,
+                onNodeNameChanged = { },
                 onDismiss = { },
                 onRenameNode = { }
             )
@@ -102,6 +104,7 @@ class RenameNodeDialogM3Test {
                 resetRenameValidationPassed = { },
                 resetShowChangeNodeExtensionDialog = mockResetShowChangeNodeExtensionDialog,
                 onRenameConfirmed = { },
+                onNodeNameChanged = { },
                 onDismiss = mockOnDismiss,
                 onRenameNode = { }
             )
@@ -139,6 +142,7 @@ class RenameNodeDialogM3Test {
                 resetRenameValidationPassed = { },
                 resetShowChangeNodeExtensionDialog = mockResetShowChangeNodeExtensionDialog,
                 onRenameConfirmed = { },
+                onNodeNameChanged = { },
                 onDismiss = mockOnDismiss,
                 onRenameNode = mockOnRenameNode
             )

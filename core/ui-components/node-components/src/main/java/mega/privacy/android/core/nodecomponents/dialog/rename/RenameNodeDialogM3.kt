@@ -22,6 +22,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnLoadNodeName
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnNodeNameChanged
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameConfirmed
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameValidationPassed
 import mega.privacy.android.domain.entity.node.NodeId
@@ -62,6 +63,9 @@ fun RenameNodeDialogM3(
         onRenameConfirmed = { newNodeName ->
             viewModel.handleAction(OnRenameConfirmed(nodeId.longValue, newNodeName))
         },
+        onNodeNameChanged = {
+            viewModel.handleAction(OnNodeNameChanged)
+        },
         onDismiss = onDismiss,
         onRenameNode = { newNodeName ->
             viewModel.renameNode(nodeId, newNodeName)
@@ -77,6 +81,7 @@ internal fun RenameNodeDialogM3View(
     resetRenameValidationPassed: () -> Unit,
     resetShowChangeNodeExtensionDialog: () -> Unit,
     onRenameConfirmed: (String) -> Unit,
+    onNodeNameChanged: () -> Unit,
     onDismiss: () -> Unit,
     onRenameNode: (String) -> Unit,
 ) {
@@ -127,6 +132,7 @@ internal fun RenameNodeDialogM3View(
                 onRenameConfirmed = { newNodeName ->
                     onRenameConfirmed(newNodeName)
                 },
+                onInputChanged = onNodeNameChanged,
                 onRenameCancelled = onDismiss
             )
         }
@@ -158,6 +164,7 @@ private fun RenameNodeDialogBody(
     nodeName: String,
     @StringRes errorMessage: Int?,
     onRenameConfirmed: (String) -> Unit,
+    onInputChanged: () -> Unit,
     onRenameCancelled: () -> Unit,
 ) {
     var inputValue by rememberSaveable(
@@ -178,7 +185,13 @@ private fun RenameNodeDialogBody(
         title = stringResource(id = sharedR.string.context_rename),
         positiveButtonText = stringResource(id = sharedR.string.context_rename),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-        onValueChange = { inputValue = it },
+        onValueChange = {
+            val textChanged = it.text != inputValue.text
+            inputValue = it
+            if (textChanged) {
+                onInputChanged()
+            }
+        },
         errorText = errorMessage?.let { nonNullErrorMessage ->
             if (nonNullErrorMessage == sharedR.string.general_invalid_characters_defined) {
                 stringResource(nonNullErrorMessage, NODE_NAME_INVALID_CHARACTERS)
@@ -208,6 +221,7 @@ private fun PreviewRenameNodeDialogM3ViewNormal() {
             resetRenameValidationPassed = {},
             resetShowChangeNodeExtensionDialog = {},
             onRenameConfirmed = {},
+            onNodeNameChanged = {},
             onDismiss = {},
             onRenameNode = {}
         )
@@ -227,6 +241,7 @@ private fun PreviewRenameNodeDialogM3ViewError() {
             resetRenameValidationPassed = {},
             resetShowChangeNodeExtensionDialog = {},
             onRenameConfirmed = {},
+            onNodeNameChanged = {},
             onDismiss = {},
             onRenameNode = {}
         )
@@ -245,6 +260,7 @@ private fun PreviewRenameNodeDialogM3ViewEmpty() {
             resetRenameValidationPassed = {},
             resetShowChangeNodeExtensionDialog = {},
             onRenameConfirmed = {},
+            onNodeNameChanged = {},
             onDismiss = {},
             onRenameNode = {}
         )
@@ -263,6 +279,7 @@ private fun PreviewRenameNodeDialogM3ViewFolder() {
             resetRenameValidationPassed = {},
             resetShowChangeNodeExtensionDialog = {},
             onRenameConfirmed = {},
+            onNodeNameChanged = {},
             onDismiss = {},
             onRenameNode = {}
         )

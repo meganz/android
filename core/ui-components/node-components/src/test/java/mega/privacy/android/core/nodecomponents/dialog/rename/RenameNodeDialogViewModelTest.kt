@@ -85,6 +85,34 @@ class RenameNodeDialogViewModelTest {
         assertThat(nodeName).isEqualTo(underTest.state.value.nodeName)
     }
 
+    @Test
+    fun `test that OnLoadNodeName does not clear errorMessage when one is set`() = runTest {
+        val nodeId = NodeId(123L)
+        val newNodeName = "Bad?Name"
+        val node: FileNode = mock()
+        val errorRes = sharedR.string.general_invalid_characters_defined
+        whenever(node.name).thenReturn(newNodeName)
+        whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+        whenever(
+            checkForValidNameUseCase(
+                newName = newNodeName,
+                node = node,
+                isRenameAction = true
+            )
+        ).thenReturn(InvalidNameType.INVALID_NAME)
+        whenever(nodeNameErrorMessageMapper(InvalidNameType.INVALID_NAME, false))
+            .thenReturn(errorRes)
+
+        underTest.handleAction(
+            RenameNodeDialogAction.OnRenameConfirmed(nodeId.longValue, newNodeName)
+        )
+        assertThat(underTest.state.value.errorMessage).isEqualTo(errorRes)
+
+        underTest.handleAction(RenameNodeDialogAction.OnLoadNodeName(nodeId.longValue))
+
+        assertThat(underTest.state.value.errorMessage).isEqualTo(errorRes)
+    }
+
 
     @Test
     fun `test that OnRenameConfirmed triggers success state when no validation error`() =
@@ -184,6 +212,34 @@ class RenameNodeDialogViewModelTest {
                 StateEventWithContentTriggered::class.java
             )
         }
+
+    @Test
+    fun `test that OnNodeNameChanged clears errorMessage`() = runTest {
+        val nodeId = NodeId(123L)
+        val invalidName = "Bad?Name"
+        val node: FileNode = mock()
+        val errorRes = sharedR.string.general_invalid_characters_defined
+        whenever(node.name).thenReturn(invalidName)
+        whenever(getNodeByHandleUseCase(nodeId.longValue)).thenReturn(node)
+        whenever(
+            checkForValidNameUseCase(
+                newName = invalidName,
+                node = node,
+                isRenameAction = true
+            )
+        ).thenReturn(InvalidNameType.INVALID_NAME)
+        whenever(nodeNameErrorMessageMapper(InvalidNameType.INVALID_NAME, false))
+            .thenReturn(errorRes)
+
+        underTest.handleAction(
+            RenameNodeDialogAction.OnRenameConfirmed(nodeId.longValue, invalidName)
+        )
+        assertThat(underTest.state.value.errorMessage).isEqualTo(errorRes)
+
+        underTest.handleAction(RenameNodeDialogAction.OnNodeNameChanged)
+
+        assertThat(underTest.state.value.errorMessage).isNull()
+    }
 
     @Test
     fun `test that OnChangeNodeExtensionDialogShown updates showChangeNodeExtensionDialog to consumed`() =
