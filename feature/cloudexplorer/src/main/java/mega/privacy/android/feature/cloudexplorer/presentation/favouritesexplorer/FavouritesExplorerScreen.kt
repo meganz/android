@@ -2,27 +2,38 @@ package mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplor
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.tabs.TabsScope
 import mega.android.core.ui.components.text.SpannableText
+import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.FAVOURITES_TAB_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ExplorerNavKey
+import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
@@ -111,6 +122,51 @@ private fun EmptyFolder() {
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
         description = SpannableText(stringResource(sharedR.string.favourites_empty_screen_description)),
     )
+}
+
+@Composable
+internal fun TabsScope.FavouritesExplorerTab(
+    explorerMode: ExplorerMode,
+    startNavKey: ExplorerNavKey,
+    shareUris: List<UriPath>?,
+    protectedUserTap: (() -> Unit) -> Unit,
+    onNavigate: (NavKey) -> Unit,
+    onNavigateBack: () -> Unit,
+) {
+    val viewModel =
+        hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
+            factory.create(
+                args = FavouritesExplorerViewModel.Args(showFiles = !explorerMode.isFolderPicker)
+            )
+        }
+    val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    addTextTabWithScrollableContent(
+        tabItem = TabItems(
+            title = stringResource(sharedR.string.video_section_title_favourite_playlist),
+            testTag = FAVOURITES_TAB_TAG,
+        ),
+    ) { _, modifier ->
+        FavouritesExplorerContent(
+            uiStateShared = uiStateShared,
+            onNavigateBack = { protectedUserTap { onNavigateBack() } },
+            consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
+            onFolderClick = { nodeId ->
+                protectedUserTap {
+                    onNavigate(
+                        NodesExplorerNavKey(
+                            nodeId = nodeId,
+                            nodeSourceType = uiStateShared.nodeSourceType,
+                            explorerMode = explorerMode,
+                            startNavKey = startNavKey,
+                            shareUris = shareUris,
+                        )
+                    )
+                }
+            },
+            onRefreshNodes = viewModel::refreshNodes,
+            modifier = modifier,
+        )
+    }
 }
 
 @CombinedThemePreviews

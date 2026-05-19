@@ -2,6 +2,7 @@ package mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesex
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -10,13 +11,19 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.tabs.TabsScope
+import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -24,11 +31,15 @@ import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.hasWritePermission
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ExplorerNavKey
+import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewIncomingShareFolderNodeUiItem
@@ -132,6 +143,46 @@ private fun EmptyFolder() {
         imagePainter = painterResource(iconPackR.drawable.ic_folder_arrow_up_glass),
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
     )
+}
+
+@Composable
+internal fun TabsScope.IncomingExplorerTab(
+    explorerMode: ExplorerMode,
+    startNavKey: ExplorerNavKey,
+    shareUris: List<UriPath>?,
+    protectedUserTap: (() -> Unit) -> Unit,
+    onNavigate: (NavKey) -> Unit,
+    onNavigateBack: () -> Unit,
+) {
+    val viewModel = hiltViewModel<IncomingSharesExplorerViewModel>()
+    val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    addTextTabWithScrollableContent(
+        tabItem = TabItems(
+            title = stringResource(sharedR.string.general_title_incoming_shares),
+            testTag = INCOMING_TAB_TAG,
+        ),
+    ) { _, modifier ->
+        IncomingSharesExplorerContent(
+            uiStateShared = uiStateShared,
+            onNavigateBack = { protectedUserTap { onNavigateBack() } },
+            consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
+            onFolderClick = { nodeId ->
+                protectedUserTap {
+                    onNavigate(
+                        NodesExplorerNavKey(
+                            nodeId = nodeId,
+                            nodeSourceType = uiStateShared.nodeSourceType,
+                            explorerMode = explorerMode,
+                            startNavKey = startNavKey,
+                            shareUris = shareUris,
+                        )
+                    )
+                }
+            },
+            onRefreshNodes = viewModel::refreshNodes,
+            modifier = modifier,
+        )
+    }
 }
 
 @CombinedThemePreviews

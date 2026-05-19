@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega
+package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -9,8 +9,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaUiState
-import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

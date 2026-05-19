@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega
+package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text
 
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
@@ -15,8 +15,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.file.CreateTextFileWithContentUseCase
-import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaUiState
-import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaViewModel
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

@@ -33,13 +33,12 @@ import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerContent
+import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerTab
+import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.rememberChatExplorerSelectionState
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.extensions.actionStringId
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.extensions.titleStringId
-import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerContent
-import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerContent
-import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerTab
+import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingExplorerTab
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreenContent
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
@@ -87,19 +86,7 @@ internal fun ExplorerScreen(
         }
     val nodesExplorerUiState by nodesExplorerViewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
     val nodesExplorerUiStateShared by nodesExplorerViewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
-    val incomingSharesExplorerViewModel =
-        if (!isInnerNavigation && explorerMode.isIncomingAvailable)
-            hiltViewModel<IncomingSharesExplorerViewModel>() else null
-    val incomingSharesExplorerUiStateShared =
-        incomingSharesExplorerViewModel?.nodeExplorerSharedUiState?.collectAsStateWithLifecycle()
-    val favouritesExplorerViewModel =
-        if (!isInnerNavigation) hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
-            factory.create(
-                args = FavouritesExplorerViewModel.Args(showFiles = !explorerMode.isFolderPicker)
-            )
-        } else null
-    val favouritesExplorerUiStateShared =
-        favouritesExplorerViewModel?.nodeExplorerSharedUiState?.collectAsStateWithLifecycle()
+    val chatExplorerSelectionState = rememberChatExplorerSelectionState()
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -119,40 +106,16 @@ internal fun ExplorerScreen(
                     stringResource(explorerMode.titleStringId)
                 },
                 actions = buildList {
-                    when (selectedTabIndex) {
-                        CLOUD_TAB_INDEX -> {
-                            if (nodesExplorerUiStateShared.items.isNotEmpty()) {
-                                //Add search
-                                //Add select all in case explorerMode.isFolderPicker().not()
+                    if (selectedTabIndex == CLOUD_TAB_INDEX && explorerMode.isFolderPicker) {
+                        add(
+                            MenuActionWithClick(NewFolderMenuAction) {
+                                if (!isProcessingAction) {
+                                    showNewFolderDialog = true
+                                }
                             }
-                            if (explorerMode.isFolderPicker) {
-                                add(
-                                    MenuActionWithClick(NewFolderMenuAction) {
-                                        if (!isProcessingAction) {
-                                            showNewFolderDialog = true
-                                        }
-                                    }
-                                )
-                            }
-                        }
-
-                        INCOMING_TAB_INDEX -> {
-                            if (incomingSharesExplorerUiStateShared?.value?.items?.isNotEmpty() == true) {
-                                //Add search
-                            }
-                        }
-
-                        FAVOURITES_TAB_INDEX -> {
-                            if (favouritesExplorerUiStateShared?.value?.items?.isNotEmpty() == true) {
-                                //Add search
-                                //Add select all in case explorerMode.isFolderPicker().not()
-                            }
-                        }
-
-                        CHAT_TAB_INDEX -> {
-                            //Add search, never empty as at least the note to self is available
-                        }
+                        )
                     }
+                    //TODO Add search and select all per tab (cloud-style tabs use isFolderPicker().not() for select all)
                 },
             )
         },
@@ -163,25 +126,23 @@ internal fun ExplorerScreen(
                 onPrimaryButtonClick = {
                     protectedUserTap {
                         when {
-                            explorerMode.isFolderPicker && selectedTabIndex != CHAT_TAB_INDEX -> {
+                            explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX ->
+                                onChatsSelected(chatExplorerSelectionState.selectedChatIds.toList())
+
+                            explorerMode.isFolderPicker ->
                                 onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
-                            }
 
-                            explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX -> {
-                                //Replace with valid chatId list
-                                onChatsSelected(emptyList())
-                            }
-
-                            else -> {
+                            else ->
                                 //Replace with valid nodeIds list
                                 onFilesPicked(emptyList())
-                            }
                         }
                     }
                 },
                 primaryButtonEnabled = when {
-                    explorerMode.isFolderPicker -> selectedTabIndex == CLOUD_TAB_INDEX
-                    else -> true
+                    !explorerMode.isFolderPicker -> true
+                    selectedTabIndex == CLOUD_TAB_INDEX -> true
+                    selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
+                    else -> false
                 },
                 textOnlyButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
                 onTextOnlyButtonClick = { protectedUserTap { onCloseExplorerScreen() } },
@@ -223,80 +184,31 @@ internal fun ExplorerScreen(
                         modifier = modifier,
                     )
                 }
-                if (incomingSharesExplorerUiStateShared?.value != null) {
-                    addTextTabWithScrollableContent(
-                        tabItem = TabItems(
-                            title = stringResource(sharedR.string.general_title_incoming_shares),
-                            testTag = INCOMING_TAB_TAG
-                        ),
-                    ) { _, modifier ->
-                        IncomingSharesExplorerContent(
-                            uiStateShared = incomingSharesExplorerUiStateShared.value,
-                            onNavigateBack = { protectedUserTap { onNavigateBack() } },
-                            consumeNavigateBack = incomingSharesExplorerViewModel::onNavigateBackEventConsumed,
-                            onFolderClick = { nodeId ->
-                                protectedUserTap {
-                                    onNavigate(
-                                        NodesExplorerNavKey(
-                                            nodeId = nodeId,
-                                            nodeSourceType = incomingSharesExplorerUiStateShared.value.nodeSourceType,
-                                            explorerMode = explorerMode,
-                                            startNavKey = startNavKey,
-                                            shareUris = shareUris,
-                                        )
-                                    )
-                                }
-                            },
-                            onRefreshNodes = incomingSharesExplorerViewModel::refreshNodes,
-                            modifier = modifier
-                        )
-                    }
+                if (!isInnerNavigation && explorerMode.isIncomingAvailable) {
+                    IncomingExplorerTab(
+                        explorerMode = explorerMode,
+                        startNavKey = startNavKey,
+                        shareUris = shareUris,
+                        protectedUserTap = protectedUserTap,
+                        onNavigate = onNavigate,
+                        onNavigateBack = onNavigateBack,
+                    )
                 }
-                if (favouritesExplorerUiStateShared?.value != null) {
-                    addTextTabWithScrollableContent(
-                        tabItem = TabItems(
-                            title = stringResource(sharedR.string.video_section_title_favourite_playlist),
-                            testTag = FAVOURITES_TAB_TAG
-                        ),
-                    ) { _, modifier ->
-                        FavouritesExplorerContent(
-                            uiStateShared = favouritesExplorerUiStateShared.value,
-                            onNavigateBack = { protectedUserTap { onNavigateBack() } },
-                            consumeNavigateBack = favouritesExplorerViewModel::onNavigateBackEventConsumed,
-                            onFolderClick = { nodeId ->
-                                protectedUserTap {
-                                    onNavigate(
-                                        NodesExplorerNavKey(
-                                            nodeId = nodeId,
-                                            nodeSourceType = favouritesExplorerUiStateShared.value.nodeSourceType,
-                                            explorerMode = explorerMode,
-                                            startNavKey = startNavKey,
-                                            shareUris = shareUris,
-                                        )
-                                    )
-                                }
-                            },
-                            onRefreshNodes = favouritesExplorerViewModel::refreshNodes,
-                            modifier = modifier
-                        )
-                    }
+                if (!isInnerNavigation) {
+                    FavouritesExplorerTab(
+                        explorerMode = explorerMode,
+                        startNavKey = startNavKey,
+                        shareUris = shareUris,
+                        protectedUserTap = protectedUserTap,
+                        onNavigate = onNavigate,
+                        onNavigateBack = onNavigateBack,
+                    )
                 }
-                if (explorerMode.isChatAvailable) {
-                    addTextTabWithScrollableContent(
-                        tabItem = TabItems(
-                            title = stringResource(sharedR.string.general_chat),
-                            testTag = CHAT_TAB_TAG,
-                        ),
-                    ) { _, modifier ->
-                        ChatExplorerContent(
-                            onNewGroupChatClick = {
-                                onStartNewGroupChat { selection ->
-
-                                }
-                            },
-                            modifier = modifier,
-                        )
-                    }
+                if (!isInnerNavigation && explorerMode.isChatAvailable) {
+                    ChatExplorerTab(
+                        selectionState = chatExplorerSelectionState,
+                        onStartNewGroupChat = onStartNewGroupChat,
+                    )
                 }
             },
             initialSelectedIndex = tabIndex,
