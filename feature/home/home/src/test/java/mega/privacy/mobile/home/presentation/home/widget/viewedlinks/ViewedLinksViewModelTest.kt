@@ -3,6 +3,7 @@ package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.testing.asSnapshot
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
@@ -16,12 +17,15 @@ import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SetViewedLinksSortUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -54,6 +58,8 @@ class ViewedLinksViewModelTest {
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val clearViewedLinksUseCase = mock<ClearViewedLinksUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
+    private val monitorViewTypeUseCase = mock<MonitorViewType>()
+    private val setViewTypeUseCase = mock<SetViewType>()
 
     private lateinit var underTest: ViewedLinksViewModel
 
@@ -68,6 +74,8 @@ class ViewedLinksViewModelTest {
             fileTypeIconMapper,
             clearViewedLinksUseCase,
             snackbarEventQueue,
+            monitorViewTypeUseCase,
+            setViewTypeUseCase,
         )
     }
 
@@ -75,17 +83,24 @@ class ViewedLinksViewModelTest {
         links: List<ViewedLink>,
         sortField: ViewedLinksSortField = ViewedLinksSortField.LastAccessed,
         sortDirection: SortDirection = SortDirection.Descending,
+        viewType: ViewType = ViewType.LIST,
     ) {
         whenever(monitorViewedLinksSortPreferenceUseCase())
             .thenReturn(flowOf(sortField to sortDirection))
         whenever(monitorViewedLinksUseCase(any(), any())).thenAnswer { fakePagingSource(links) }
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(viewType))
         whenever(viewedLinksSortMapper(any<NodeSortOption>())).thenAnswer { invocation ->
             when (invocation.getArgument<NodeSortOption>(0)) {
                 NodeSortOption.Name -> ViewedLinksSortField.Name
                 else -> ViewedLinksSortField.LastAccessed
             }
         }
-        whenever(viewedLinksSortMapper(any<ViewedLinksSortField>(), any())).thenAnswer { invocation ->
+        whenever(
+            viewedLinksSortMapper(
+                any<ViewedLinksSortField>(),
+                any()
+            )
+        ).thenAnswer { invocation ->
             val field = invocation.getArgument<ViewedLinksSortField>(0)
             val direction = invocation.getArgument<SortDirection>(1)
             NodeSortConfiguration(
@@ -105,6 +120,8 @@ class ViewedLinksViewModelTest {
             fileTypeIconMapper = fileTypeIconMapper,
             clearViewedLinksUseCase = clearViewedLinksUseCase,
             snackbarEventQueue = snackbarEventQueue,
+            monitorViewTypeUseCase = monitorViewTypeUseCase,
+            setViewTypeUseCase = setViewTypeUseCase,
         )
     }
 
@@ -283,6 +300,52 @@ class ViewedLinksViewModelTest {
 
         verify(setViewedLinksSortUseCase)
             .invoke(ViewedLinksSortField.LastAccessed, SortDirection.Ascending)
+    }
+
+    @Test
+    fun `test that uiState reflects view type emitted by monitorViewTypeUseCase`() = runTest {
+        initViewModel(links = emptyList(), viewType = ViewType.GRID)
+
+        underTest.uiState.test {
+            awaitViewType(ViewType.GRID)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that changeViewType calls setViewTypeUseCase with GRID when current is LIST`() =
+        runTest {
+            initViewModel(links = emptyList(), viewType = ViewType.LIST)
+
+            underTest.uiState.test {
+                awaitViewType(ViewType.LIST)
+                underTest.changeViewType()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(setViewTypeUseCase).invoke(ViewType.GRID)
+        }
+
+    @Test
+    fun `test that changeViewType calls setViewTypeUseCase with LIST when current is GRID`() =
+        runTest {
+            initViewModel(links = emptyList(), viewType = ViewType.GRID)
+
+            underTest.uiState.test {
+                awaitViewType(ViewType.GRID)
+                underTest.changeViewType()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(setViewTypeUseCase).invoke(ViewType.LIST)
+        }
+
+    private suspend fun ReceiveTurbine<ViewedLinksUiState>.awaitViewType(expected: ViewType) {
+        var state = awaitItem()
+        while (state.currentViewType != expected) {
+            state = awaitItem()
+        }
+        assertThat(state.currentViewType).isEqualTo(expected)
     }
 
     private fun fakePagingSource(items: List<ViewedLink>): PagingSource<Int, ViewedLink> =

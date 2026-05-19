@@ -58,6 +58,7 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
             },
             onClearAllLinks = viewModel::clearAllLinks,
             onSortOptionSelected = viewModel::updateSortConfiguration,
+            onChangeViewTypeClick = viewModel::changeViewType,
             onBack = navigationHandler::back,
         )
     }

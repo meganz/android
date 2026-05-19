@@ -24,11 +24,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SetViewedLinksSortUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
@@ -61,6 +64,8 @@ import javax.inject.Inject
  * @param fileTypeIconMapper
  * @param clearViewedLinksUseCase
  * @param snackbarEventQueue
+ * @param monitorViewTypeUseCase
+ * @param setViewTypeUseCase
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -73,6 +78,8 @@ internal class ViewedLinksViewModel @Inject constructor(
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val clearViewedLinksUseCase: ClearViewedLinksUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
+    private val monitorViewTypeUseCase: MonitorViewType,
+    private val setViewTypeUseCase: SetViewType,
 ) : ViewModel() {
     private val resolvedLinkCache = lruCache<String, ViewedLinkUiItem>(maxSize = PAGE_SIZE * 100)
     private val clearAllLinksEvent = MutableStateFlow<StateEvent>(consumed)
@@ -82,10 +89,12 @@ internal class ViewedLinksViewModel @Inject constructor(
             monitorViewedLinksSortPreferenceUseCase()
                 .map { (field, direction) -> viewedLinksSortMapper(field, direction) },
             clearAllLinksEvent,
-        ) { sortConfiguration, clearAllLinksEvent ->
+            monitorViewTypeUseCase(),
+        ) { sortConfiguration, clearAllLinksEvent, viewType ->
             ViewedLinksUiState(
                 clearAllLinksEvent = clearAllLinksEvent,
                 sortConfiguration = sortConfiguration,
+                currentViewType = viewType,
             )
         }.catch { e ->
             Timber.e(e, "Failed to build ViewedLinks UI state")
@@ -154,6 +163,19 @@ internal class ViewedLinksViewModel @Inject constructor(
 
     internal fun onClearAllLinksEventConsumed() {
         clearAllLinksEvent.update { consumed }
+    }
+
+    internal fun changeViewType() {
+        viewModelScope.launch {
+            runCatching {
+                val toViewType = if (uiState.value.currentViewType == ViewType.LIST) {
+                    ViewType.GRID
+                } else {
+                    ViewType.LIST
+                }
+                setViewTypeUseCase(toViewType)
+            }
+        }
     }
 
     internal fun updateSortConfiguration(configuration: NodeSortConfiguration) {

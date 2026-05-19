@@ -53,7 +53,7 @@ import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.ViewedLinksWidget.Companion.MAX_VISIBLE_VIEWED_LINK
-import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkLoadingItem
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkListLoadingItem
 import javax.inject.Inject
 
 /**
@@ -134,7 +134,7 @@ internal fun ViewedLinksView(
                         .clickable { onViewAllClicked() },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    ViewedLinkLoadingItem()
+                    ViewedLinkListLoadingItem()
                 }
             }
 

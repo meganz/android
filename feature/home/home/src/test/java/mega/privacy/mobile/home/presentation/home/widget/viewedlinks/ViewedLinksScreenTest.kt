@@ -21,10 +21,14 @@ import kotlinx.coroutines.flow.emptyFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_TOGGLE_TAG
+import mega.privacy.android.shared.nodes.components.LIST_VIEW_TOGGLE_TAG
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.VIEWED_LINK_GRID_LOADING_ITEM_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.VIEWED_LINK_LOADING_ITEM_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
@@ -208,6 +212,136 @@ class ViewedLinksScreenTest {
             .assertCountEquals(0)
     }
 
+    @Test
+    fun `test that grid view toggle is displayed when current view type is LIST`() {
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.LIST),
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(GRID_VIEW_TOGGLE_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that list view toggle is displayed when current view type is GRID`() {
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(LIST_VIEW_TOGGLE_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClick is invoked when grid view toggle is clicked`() {
+        var clicked = false
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.LIST),
+            onChangeViewTypeClick = { clicked = true },
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(GRID_VIEW_TOGGLE_TAG).performClick()
+
+        assertThat(clicked).isTrue()
+    }
+
+    @Test
+    fun `test that onChangeViewTypeClick is invoked when list view toggle is clicked`() {
+        var clicked = false
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+            onChangeViewTypeClick = { clicked = true },
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onNodeWithTag(LIST_VIEW_TOGGLE_TAG).performClick()
+
+        assertThat(clicked).isTrue()
+    }
+
+    @Test
+    fun `test that grid items are displayed when current view type is GRID`() {
+        setContent(
+            items = listOf(fileLinkItem, folderLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_GRID_ITEM_TEST_TAG)
+            .assertCountEquals(2)
+    }
+
+    @Test
+    fun `test that list items are not displayed when current view type is GRID`() {
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_ITEM_TEST_TAG)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that grid loading items are displayed in grid view while refresh is loading`() {
+        setContent(
+            items = null,
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+        )
+
+        composeRule.onAllNodesWithTag(VIEWED_LINK_GRID_LOADING_ITEM_TEST_TAG)
+            .assertCountEquals(6)
+    }
+
+    @Test
+    fun `test that list loading items are not displayed in grid view while refresh is loading`() {
+        setContent(
+            items = null,
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+        )
+
+        composeRule.onAllNodesWithTag(VIEWED_LINK_LOADING_ITEM_TEST_TAG)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that onFileLinkClicked is called with correct url when a grid file link item is clicked`() {
+        var clickedUrl: String? = null
+
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+            onFileLinkClicked = { clickedUrl = it },
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_GRID_ITEM_TEST_TAG)[0].performClick()
+
+        assertThat(clickedUrl).isEqualTo(fileLinkItem.viewedLink.linkUrl)
+    }
+
+    @Test
+    fun `test that onFolderLinkClicked is called with correct url when a grid folder link item is clicked`() {
+        var clickedUrl: String? = null
+
+        setContent(
+            items = listOf(folderLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+            onFolderLinkClicked = { clickedUrl = it },
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_GRID_ITEM_TEST_TAG)[0].performClick()
+
+        assertThat(clickedUrl).isEqualTo(folderLinkItem.viewedLink.linkUrl)
+    }
+
     /**
      * @param items List of items to render; `null` keeps the refresh state in `Loading`
      *   (no PagingData ever emitted), which is how the loading skeleton is exercised.
@@ -219,6 +353,7 @@ class ViewedLinksScreenTest {
         onFileLinkClicked: (String) -> Unit = {},
         onClearAllLinks: () -> Unit = {},
         onSortOptionSelected: (NodeSortConfiguration) -> Unit = {},
+        onChangeViewTypeClick: () -> Unit = {},
         onBack: () -> Unit = {},
     ) {
         composeRule.setContent {
@@ -231,6 +366,7 @@ class ViewedLinksScreenTest {
                     onFileLinkClicked = onFileLinkClicked,
                     onClearAllLinks = onClearAllLinks,
                     onSortOptionSelected = onSortOptionSelected,
+                    onChangeViewTypeClick = onChangeViewTypeClick,
                     onBack = onBack,
                 )
             }
