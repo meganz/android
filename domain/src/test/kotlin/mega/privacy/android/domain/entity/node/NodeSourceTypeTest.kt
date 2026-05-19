@@ -53,6 +53,7 @@ class NodeSourceTypeTest {
             Arguments.of(NodeSourceType.VIDEO_PLAYER_DEFAULT),
             Arguments.of(NodeSourceType.VIDEO_PLAYER_VERSIONS),
             Arguments.of(NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER),
+            Arguments.of(NodeSourceType.VIDEO_PLAYER_ZIP_FILE),
         )
     }
 }

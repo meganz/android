@@ -80,6 +80,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     NodeSourceType.VIDEO_PLAYER_DEFAULT,
                     NodeSourceType.VIDEO_PLAYER_VERSIONS,
                     NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER,
+                    NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
                         -> ORDER_CLOUD
 
                     NodeSourceType.FAVOURITES -> ORDER_FAVOURITES

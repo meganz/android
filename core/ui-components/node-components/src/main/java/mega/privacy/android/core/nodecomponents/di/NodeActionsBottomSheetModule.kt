@@ -51,6 +51,7 @@ import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.VideoPlayerDefault
 import mega.privacy.android.domain.qualifier.features.VideoPlayerImageViewer
 import mega.privacy.android.domain.qualifier.features.VideoPlayerVersions
+import mega.privacy.android.domain.qualifier.features.VideoPlayerZipFile
 import mega.privacy.android.domain.qualifier.features.FileLink
 import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
@@ -452,6 +453,21 @@ abstract class NodeActionsBottomSheetModule {
             downloadMenuAction,
             hideMenuAction,
             unhideMenuAction,
+        )
+
+        /**
+         * Provide video player zip file bottom sheet options
+         */
+        @Provides
+        @ElementsIntoSet
+        @VideoPlayerZipFile
+        @Singleton
+        fun provideVideoPlayerZipFileOptions(
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+            shareMenuAction: ShareBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> = setOf(
+            downloadMenuAction,
+            shareMenuAction,
         )
 
         /**

@@ -129,6 +129,11 @@ enum class NodeSourceType {
     VIDEO_PLAYER_IMAGE_VIEWER,
 
     /**
+     * When node source is Video Player opened from Zip File
+     */
+    VIDEO_PLAYER_ZIP_FILE,
+
+    /**
      * When node source is Continue Where Left Off
      */
     CONTINUE_WHERE_LEFT_OFF

@@ -16,12 +16,13 @@ import mega.privacy.android.core.nodecomponents.menu.provider.LinksMenuOptionsPr
 import mega.privacy.android.core.nodecomponents.menu.provider.NodeMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.OfflineMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.OutgoingSharesMenuOptionsProvider
-import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerDefaultMenuOptionsProvider
-import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerImageViewerMenuOptionsProvider
-import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerVersionsMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.RecentsBucketMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.RubbishBinMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.TimelineMenuOptionProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerDefaultMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerImageViewerMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerVersionsMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerZipFileMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlaylistOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideoRecentlyWatchedOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideosMenuOptionProvider
@@ -154,5 +155,11 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindVideoPlayerImageViewerOptionsProvider(
         provider: VideoPlayerImageViewerMenuOptionsProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindVideoPlayerZipFileOptionsProvider(
+        provider: VideoPlayerZipFileMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 }

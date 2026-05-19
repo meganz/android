@@ -36,6 +36,7 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
         NodeSourceType.VIDEO_PLAYER_DEFAULT,
         NodeSourceType.VIDEO_PLAYER_VERSIONS,
         NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER,
+        NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
         NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
             -> null
 

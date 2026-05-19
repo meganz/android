@@ -53,6 +53,7 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
             NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER,
             NodeSourceType.VIDEO_PLAYER_VERSIONS,
             NodeSourceType.CONTINUE_WHERE_LEFT_OFF,
+            NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
                 -> getCloudSortOrder()
 
             NodeSourceType.OFFLINE -> getOfflineSortOrder()
