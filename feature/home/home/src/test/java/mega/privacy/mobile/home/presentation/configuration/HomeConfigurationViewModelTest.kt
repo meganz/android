@@ -99,7 +99,7 @@ class HomeConfigurationViewModelTest {
 
             underTest.state.test {
                 val actual = awaitItem() as HomeConfigurationUiState.Data
-                assertThat(actual.widgets).hasSize(2)
+                assertThat(actual.draggableWidgets).hasSize(2)
             }
         }
 
@@ -137,12 +137,12 @@ class HomeConfigurationViewModelTest {
 
         underTest.state.test {
             val actual = awaitItem() as HomeConfigurationUiState.Data
-            assertThat(actual.widgets).hasSize(2)
+            assertThat(actual.draggableWidgets).hasSize(2)
             val dynamicItem =
-                actual.widgets.first { it.identifier == "dynamic1" }
+                actual.draggableWidgets.first { it.identifier == "dynamic1" }
             assertThat(dynamicItem.enabled).isFalse()
             val staticItem =
-                actual.widgets.first { it.identifier == "static1" }
+                actual.draggableWidgets.first { it.identifier == "static1" }
             assertThat(staticItem.enabled).isTrue()
         }
     }
@@ -298,7 +298,7 @@ class HomeConfigurationViewModelTest {
 
         underTest.state.test {
             val actual = awaitItem() as HomeConfigurationUiState.Data
-            assertThat(actual.widgets.map { it.identifier })
+            assertThat(actual.draggableWidgets.map { it.identifier })
                 .containsExactly("first", "second", "third")
                 .inOrder()
         }
@@ -334,7 +334,7 @@ class HomeConfigurationViewModelTest {
 
         underTest.state.test {
             val actual = awaitItem() as HomeConfigurationUiState.Data
-            assertThat(actual.widgets.map { it.identifier })
+            assertThat(actual.draggableWidgets.map { it.identifier })
                 .containsExactly("first", "second", "third")
                 .inOrder()
         }
@@ -379,11 +379,49 @@ class HomeConfigurationViewModelTest {
 
         underTest.state.test {
             val actual = awaitItem() as HomeConfigurationUiState.Data
-            assertThat(actual.widgets.count { it.enabled }).isEqualTo(1)
+            assertThat(actual.draggableWidgets.count { it.enabled }).isEqualTo(1)
             assertThat(actual.allowRemoval).isFalse()
         }
     }
 
+
+    @Test
+    fun `test that non-draggable widgets are placed in fixedWidgets and draggable widgets in draggableWidgets`() =
+        runTest {
+            val fixedWidget = stubWidget(
+                identifier = "fixed",
+                defaultOrder = HomeWidgetOrder.Banner,
+                isDraggable = false,
+            )
+            val draggableWidget = stubWidget(
+                identifier = "draggable",
+                defaultOrder = HomeWidgetOrder.Shortcuts,
+                isDraggable = true,
+            )
+            val staticWidgets = setOf(fixedWidget)
+            val dynamicWidgets = setOf(draggableWidget)
+            staticWidgetsProvider.stub {
+                onBlocking { getWidgets() } doReturn staticWidgets
+            }
+            dynamicWidgetsProvider.stub {
+                onBlocking { getWidgets() } doReturn dynamicWidgets
+            }
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            }
+            stubGetEnabledFlaggedItemsUseCase(staticWidgets, dynamicWidgets)
+
+            underTest.state.test {
+                val actual = awaitItem() as HomeConfigurationUiState.Data
+                assertThat(actual.fixedWidgets.map { it.identifier })
+                    .containsExactly("fixed")
+                assertThat(actual.draggableWidgets.map { it.identifier })
+                    .containsExactly("draggable")
+            }
+        }
 
     @Test
     fun `test that resetWidgetStateToDefault invokes resetHomeWidgetConfigurationsUseCase`() =
@@ -426,13 +464,16 @@ class HomeConfigurationViewModelTest {
     private fun stubWidget(
         identifier: String,
         defaultOrder: HomeWidgetOrder,
+        isDraggable: Boolean = true,
+        isConfigurable: Boolean = true,
     ): HomeWidget {
         return mock<HomeWidget> {
             on { this.identifier } doReturn identifier
             on { this.defaultOrder } doReturn defaultOrder
             on { canDelete } doReturn true
+            on { this.isDraggable } doReturn isDraggable
+            on { this.isConfigurable } doReturn isConfigurable
             onBlocking { getWidgetName() } doReturn LocalizedText.Literal("Test")
-
         }
     }
 

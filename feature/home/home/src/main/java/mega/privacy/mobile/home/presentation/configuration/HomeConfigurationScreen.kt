@@ -1,6 +1,7 @@
 package mega.privacy.mobile.home.presentation.configuration
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -131,64 +132,85 @@ fun HomeConfigurationContentView(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
 ) {
-    var currentItems by remember(state.widgets) { mutableStateOf(state.widgets) }
+    var draggableItems by remember(state.draggableWidgets) { mutableStateOf(state.draggableWidgets) }
 
-    MegaReorderableLazyColumn(
-        items = currentItems,
-        lazyListState = lazyListState,
-        key = { it.identifier },
-        modifier = modifier
-            .fillMaxSize()
-            .testTag(TEST_TAG_WIDGET_CONFIGURATION_VIEW),
-        onMove = { from, to ->
-            // Make sure non-draggable items are not reordered by other items
-            if (currentItems.getOrNull(to.index)?.isDraggable == true) {
-                currentItems = with(currentItems.toMutableList()) {
-                    removeAt(from.index).also { element ->
-                        add(to.index, element)
-                    }
-                    this
-                }
-
-                onWidgetOrderChange(currentItems)
-            }
-        },
-        dragEnabled = { it.isDraggable }
-    ) { item ->
-        if (item.isConfigurable) {
-            Row(
-                modifier = Modifier
-                    .testTag(TEST_TAG_WIDGET_CONFIGURATION_ITEM + item.identifier)
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                if (item.isDraggable) {
-                    MegaIcon(
-                        painter = rememberVectorPainter(IconPack.Small.Thin.Outline.QueueLine),
-                        contentDescription = "Reorder icon",
-                        tint = IconColor.Secondary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                } else {
-                    Spacer(Modifier.size(16.dp))
-                }
-
-                MegaText(text = item.name.text, modifier = Modifier.weight(1f))
-
-                Toggle(
-                    isChecked = item.enabled,
-                    modifier = Modifier.testTag(TEST_TAG_WIDGET_CONFIGURATION_ITEM_TOGGLE + item.identifier),
-                    onCheckedChange = {
-                        if (state.allowRemoval || !item.enabled) {
-                            onWidgetEnabledChange(item, it)
-                        } else {
-                            onWidgetStateChangeFailed()
-                        }
-                    },
+    Column(modifier = modifier.fillMaxSize()) {
+        state.fixedWidgets.forEach { item ->
+            if (item.isConfigurable) {
+                WidgetConfigurationRow(
+                    item = item,
+                    allowRemoval = state.allowRemoval,
+                    onEnabledChange = onWidgetEnabledChange,
+                    onStateChangeFailed = onWidgetStateChangeFailed,
                 )
             }
         }
+
+        MegaReorderableLazyColumn(
+            items = draggableItems,
+            lazyListState = lazyListState,
+            key = { it.identifier },
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag(TEST_TAG_WIDGET_CONFIGURATION_VIEW),
+            onMove = { from, to ->
+                draggableItems = draggableItems.toMutableList().apply {
+                    add(to.index, removeAt(from.index))
+                }
+                onWidgetOrderChange(draggableItems)
+            },
+        ) { item ->
+            if (item.isConfigurable) {
+                WidgetConfigurationRow(
+                    item = item,
+                    allowRemoval = state.allowRemoval,
+                    onEnabledChange = onWidgetEnabledChange,
+                    onStateChangeFailed = onWidgetStateChangeFailed,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WidgetConfigurationRow(
+    item: WidgetConfigurationItem,
+    allowRemoval: Boolean,
+    onEnabledChange: (WidgetConfigurationItem, Boolean) -> Unit,
+    onStateChangeFailed: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .testTag(TEST_TAG_WIDGET_CONFIGURATION_ITEM + item.identifier)
+            .padding(vertical = 12.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        if (item.isDraggable) {
+            MegaIcon(
+                painter = rememberVectorPainter(IconPack.Small.Thin.Outline.QueueLine),
+                contentDescription = "Reorder icon",
+                tint = IconColor.Secondary,
+                modifier = Modifier.size(16.dp)
+            )
+        } else {
+            Spacer(Modifier.size(16.dp))
+        }
+
+        MegaText(text = item.name.text, modifier = Modifier.weight(1f))
+
+        Toggle(
+            isChecked = item.enabled,
+            modifier = Modifier.testTag(TEST_TAG_WIDGET_CONFIGURATION_ITEM_TOGGLE + item.identifier),
+            onCheckedChange = {
+                if (allowRemoval || !item.enabled) {
+                    onEnabledChange(item, it)
+                } else {
+                    onStateChangeFailed()
+                }
+            },
+        )
     }
 }
 

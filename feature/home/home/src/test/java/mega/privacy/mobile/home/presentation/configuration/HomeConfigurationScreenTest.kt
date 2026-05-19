@@ -111,7 +111,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(widgetA, widgetB),
+                draggableWidgets = listOf(widgetA, widgetB),
+                fixedWidgets = emptyList(),
             )
         )
 
@@ -124,7 +125,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(widgetA, widgetB),
+                draggableWidgets = listOf(widgetA, widgetB),
+                fixedWidgets = emptyList(),
             )
         )
 
@@ -145,7 +147,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(widgetA, widgetB),
+                draggableWidgets = listOf(widgetA, widgetB),
+                fixedWidgets = emptyList(),
             )
         )
 
@@ -164,7 +167,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(widgetA),
+                draggableWidgets = listOf(widgetA),
+                fixedWidgets = emptyList(),
             )
         )
 
@@ -192,7 +196,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(widgetA),
+                draggableWidgets = listOf(widgetA),
+                fixedWidgets = emptyList(),
             ),
             onWidgetEnabledChange = onWidgetEnabledChange,
         )
@@ -211,7 +216,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = false,
-                widgets = listOf(widgetB),
+                draggableWidgets = listOf(widgetB),
+                fixedWidgets = emptyList(),
             ),
             onWidgetEnabledChange = onWidgetEnabledChange,
         )
@@ -230,7 +236,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = false,
-                widgets = listOf(widgetA),
+                draggableWidgets = listOf(widgetA),
+                fixedWidgets = emptyList(),
             ),
             onWidgetEnabledChange = onWidgetEnabledChange,
         )
@@ -249,7 +256,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = false,
-                widgets = listOf(widgetA),
+                draggableWidgets = listOf(widgetA),
+                fixedWidgets = emptyList(),
             ),
             showSnackbarMessage = showSnackbarMessage,
         )
@@ -270,7 +278,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(widgetA),
+                draggableWidgets = listOf(widgetA),
+                fixedWidgets = emptyList(),
             ),
             showSnackbarMessage = showSnackbarMessage,
         )
@@ -288,7 +297,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(widgetA),
+                draggableWidgets = listOf(widgetA),
+                fixedWidgets = emptyList(),
             )
         )
 
@@ -308,7 +318,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(nonConfigurableWidget),
+                draggableWidgets = listOf(nonConfigurableWidget),
+                fixedWidgets = emptyList(),
             )
         )
 
@@ -323,7 +334,8 @@ class HomeConfigurationScreenTest {
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(widgetA),
+                draggableWidgets = listOf(widgetA),
+                fixedWidgets = emptyList(),
             )
         )
 
@@ -332,12 +344,13 @@ class HomeConfigurationScreenTest {
     }
 
     @Test
-    fun `test that reorder icon is not displayed when isDraggable is false`() {
+    fun `test that reorder icon is not displayed for fixed widgets`() {
         val nonDraggableWidget = widgetA.copy(isDraggable = false)
         setContent(
             state = HomeConfigurationUiState.Data(
                 allowRemoval = true,
-                widgets = listOf(nonDraggableWidget),
+                draggableWidgets = emptyList(),
+                fixedWidgets = listOf(nonDraggableWidget),
             )
         )
 
@@ -347,5 +360,40 @@ class HomeConfigurationScreenTest {
         ).assertIsDisplayed()
         composeRule.onNodeWithContentDescription("Reorder icon", useUnmergedTree = true)
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that fixed widget items are displayed`() {
+        val fixedWidget = widgetA.copy(identifier = "fixed_widget", isDraggable = false)
+        setContent(
+            state = HomeConfigurationUiState.Data(
+                allowRemoval = true,
+                draggableWidgets = emptyList(),
+                fixedWidgets = listOf(fixedWidget),
+            )
+        )
+
+        composeRule.onNodeWithTag(
+            TEST_TAG_WIDGET_CONFIGURATION_ITEM + fixedWidget.identifier,
+            useUnmergedTree = true,
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that fixed widget item is not displayed when isConfigurable is false`() {
+        val nonConfigurableFixedWidget =
+            widgetA.copy(isDraggable = false, isConfigurable = false)
+        setContent(
+            state = HomeConfigurationUiState.Data(
+                allowRemoval = true,
+                draggableWidgets = emptyList(),
+                fixedWidgets = listOf(nonConfigurableFixedWidget),
+            )
+        )
+
+        composeRule.onNodeWithTag(
+            TEST_TAG_WIDGET_CONFIGURATION_ITEM + nonConfigurableFixedWidget.identifier,
+            useUnmergedTree = true,
+        ).assertDoesNotExist()
     }
 }
