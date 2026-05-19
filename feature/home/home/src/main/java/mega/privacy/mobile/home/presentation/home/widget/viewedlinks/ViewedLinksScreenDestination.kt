@@ -48,6 +48,7 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
         )
 
         ViewedLinksScreen(
+            uiState = uiState,
             lazyItems = lazyItems,
             onFolderLinkClicked = { link ->
                 navigationHandler.navigate(FolderLinkNavKey(link))
@@ -56,6 +57,7 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
                 navigationHandler.navigate(FileLinkNavKey(link))
             },
             onClearAllLinks = viewModel::clearAllLinks,
+            onSortOptionSelected = viewModel::updateSortConfiguration,
             onBack = navigationHandler::back,
         )
     }

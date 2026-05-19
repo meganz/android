@@ -94,7 +94,7 @@ class NodeSortConfigurationUiMapper @Inject constructor() {
             NodeSortOption.Favourite -> if (isAscending) SortOrder.ORDER_FAV_ASC else SortOrder.ORDER_FAV_DESC
             NodeSortOption.Label -> if (isAscending) SortOrder.ORDER_LABEL_ASC else SortOrder.ORDER_LABEL_DESC
             NodeSortOption.Created -> if (isAscending) SortOrder.ORDER_CREATION_ASC else SortOrder.ORDER_CREATION_DESC
-            NodeSortOption.Modified -> if (isAscending) SortOrder.ORDER_MODIFICATION_ASC else SortOrder.ORDER_MODIFICATION_DESC
+            NodeSortOption.Modified, NodeSortOption.LastAccessed -> if (isAscending) SortOrder.ORDER_MODIFICATION_ASC else SortOrder.ORDER_MODIFICATION_DESC
             NodeSortOption.Size -> if (isAscending) SortOrder.ORDER_SIZE_ASC else SortOrder.ORDER_SIZE_DESC
             NodeSortOption.ShareCreated -> if (isAscending) SortOrder.ORDER_CREATION_ASC else SortOrder.ORDER_CREATION_DESC
             NodeSortOption.LinkCreated -> if (isAscending) SortOrder.ORDER_CREATION_ASC else SortOrder.ORDER_CREATION_DESC

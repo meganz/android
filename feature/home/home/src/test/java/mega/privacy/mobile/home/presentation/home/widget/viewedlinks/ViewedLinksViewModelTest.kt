@@ -3,21 +3,32 @@ package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.testing.asSnapshot
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SetViewedLinksSortUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.mapper.ViewedLinksSortMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,19 +41,15 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
-/**
- * Tests for [ViewedLinksViewModel].
- *
- * Verifies that:
- * - File links resolve icon and preview path via [GetPublicNodeUseCase]
- * - Folder links use a static folder icon with no preview
- * - Unresolvable file links fall back to extension-based icon via [FileTypeIconMapper]
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ViewedLinksViewModelTest {
     private val monitorViewedLinksUseCase = mock<MonitorViewedLinksUseCase>()
+    private val monitorViewedLinksSortPreferenceUseCase =
+        mock<MonitorViewedLinksSortPreferenceUseCase>()
+    private val setViewedLinksSortUseCase = mock<SetViewedLinksSortUseCase>()
+    private val viewedLinksSortMapper = mock<ViewedLinksSortMapper>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val clearViewedLinksUseCase = mock<ClearViewedLinksUseCase>()
@@ -54,6 +61,9 @@ class ViewedLinksViewModelTest {
     fun resetMocks() {
         reset(
             monitorViewedLinksUseCase,
+            monitorViewedLinksSortPreferenceUseCase,
+            setViewedLinksSortUseCase,
+            viewedLinksSortMapper,
             getPublicNodeUseCase,
             fileTypeIconMapper,
             clearViewedLinksUseCase,
@@ -61,10 +71,36 @@ class ViewedLinksViewModelTest {
         )
     }
 
-    private fun initViewModel(links: List<ViewedLink>) {
-        whenever(monitorViewedLinksUseCase()).thenAnswer { fakePagingSource(links) }
+    private fun initViewModel(
+        links: List<ViewedLink>,
+        sortField: ViewedLinksSortField = ViewedLinksSortField.LastAccessed,
+        sortDirection: SortDirection = SortDirection.Descending,
+    ) {
+        whenever(monitorViewedLinksSortPreferenceUseCase())
+            .thenReturn(flowOf(sortField to sortDirection))
+        whenever(monitorViewedLinksUseCase(any(), any())).thenAnswer { fakePagingSource(links) }
+        whenever(viewedLinksSortMapper(any<NodeSortOption>())).thenAnswer { invocation ->
+            when (invocation.getArgument<NodeSortOption>(0)) {
+                NodeSortOption.Name -> ViewedLinksSortField.Name
+                else -> ViewedLinksSortField.LastAccessed
+            }
+        }
+        whenever(viewedLinksSortMapper(any<ViewedLinksSortField>(), any())).thenAnswer { invocation ->
+            val field = invocation.getArgument<ViewedLinksSortField>(0)
+            val direction = invocation.getArgument<SortDirection>(1)
+            NodeSortConfiguration(
+                sortOption = when (field) {
+                    ViewedLinksSortField.Name -> NodeSortOption.Name
+                    ViewedLinksSortField.LastAccessed -> NodeSortOption.LastAccessed
+                },
+                sortDirection = direction,
+            )
+        }
         underTest = ViewedLinksViewModel(
             monitorViewedLinksUseCase = monitorViewedLinksUseCase,
+            monitorViewedLinksSortPreferenceUseCase = monitorViewedLinksSortPreferenceUseCase,
+            setViewedLinksSortUseCase = setViewedLinksSortUseCase,
+            viewedLinksSortMapper = viewedLinksSortMapper,
             getPublicNodeUseCase = getPublicNodeUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             clearViewedLinksUseCase = clearViewedLinksUseCase,
@@ -169,6 +205,85 @@ class ViewedLinksViewModelTest {
             verify(snackbarEventQueue)
                 .queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
         }
+
+    @Test
+    fun `test that clearing all viewed links triggers clearAllLinksEvent`() = runTest {
+        initViewModel(emptyList())
+        underTest.clearAllLinks()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().clearAllLinksEvent).isEqualTo(triggered)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onClearAllLinksEventConsumed resets the event to consumed`() = runTest {
+        initViewModel(emptyList())
+        underTest.clearAllLinks()
+        underTest.onClearAllLinksEventConsumed()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().clearAllLinksEvent).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that pagedItems uses sort preference for the paging factory`() = runTest {
+        initViewModel(
+            links = emptyList(),
+            sortField = ViewedLinksSortField.Name,
+            sortDirection = SortDirection.Ascending,
+        )
+
+        underTest.pagedItems.asSnapshot()
+
+        verify(monitorViewedLinksUseCase)
+            .invoke(ViewedLinksSortField.Name, SortDirection.Ascending)
+    }
+
+    @Test
+    fun `test that uiState reflects persisted sort preference`() = runTest {
+        initViewModel(
+            links = emptyList(),
+            sortField = ViewedLinksSortField.Name,
+            sortDirection = SortDirection.Descending,
+        )
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.sortConfiguration.sortOption).isEqualTo(NodeSortOption.Name)
+            assertThat(state.sortConfiguration.sortDirection)
+                .isEqualTo(SortDirection.Descending)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that updateSortConfiguration calls setViewedLinksSortUseCase with mapped field`() =
+        runTest {
+            initViewModel(emptyList())
+
+            underTest.updateSortConfiguration(
+                NodeSortConfiguration(NodeSortOption.Name, SortDirection.Descending)
+            )
+
+            verify(setViewedLinksSortUseCase)
+                .invoke(ViewedLinksSortField.Name, SortDirection.Descending)
+        }
+
+    @Test
+    fun `test that updateSortConfiguration maps LastAccessed to LastAccessed field`() = runTest {
+        initViewModel(emptyList())
+
+        underTest.updateSortConfiguration(
+            NodeSortConfiguration(NodeSortOption.LastAccessed, SortDirection.Ascending)
+        )
+
+        verify(setViewedLinksSortUseCase)
+            .invoke(ViewedLinksSortField.LastAccessed, SortDirection.Ascending)
+    }
 
     private fun fakePagingSource(items: List<ViewedLink>): PagingSource<Int, ViewedLink> =
         object : PagingSource<Int, ViewedLink>() {

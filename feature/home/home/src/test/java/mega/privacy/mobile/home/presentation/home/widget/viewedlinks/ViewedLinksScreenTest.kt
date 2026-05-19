@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.VIEWED_LINK_LOADING_ITEM_TEST_TAG
 import org.junit.Rule
@@ -213,19 +214,23 @@ class ViewedLinksScreenTest {
      */
     private fun setContent(
         items: List<ViewedLinkUiItem>?,
+        uiState: ViewedLinksUiState = ViewedLinksUiState(),
         onFolderLinkClicked: (String) -> Unit = {},
         onFileLinkClicked: (String) -> Unit = {},
         onClearAllLinks: () -> Unit = {},
+        onSortOptionSelected: (NodeSortConfiguration) -> Unit = {},
         onBack: () -> Unit = {},
     ) {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 val lazyItems = lazyItemsOf(items)
                 ViewedLinksScreen(
+                    uiState = uiState,
                     lazyItems = lazyItems,
                     onFolderLinkClicked = onFolderLinkClicked,
                     onFileLinkClicked = onFileLinkClicked,
                     onClearAllLinks = onClearAllLinks,
+                    onSortOptionSelected = onSortOptionSelected,
                     onBack = onBack,
                 )
             }

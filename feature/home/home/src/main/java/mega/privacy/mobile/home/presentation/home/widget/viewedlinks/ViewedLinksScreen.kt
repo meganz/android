@@ -34,6 +34,7 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
@@ -41,8 +42,13 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkLoadingItem
 
@@ -50,25 +56,24 @@ import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.Viewed
  * Full-screen Viewed Links list. Displays all viewed file and folder links
  * without the 4-item limit used in the Home widget. Items are loaded lazily
  * via Paging 3.
- *
- * @param lazyItems Paginated list of resolved viewed-link UI items.
- * @param onFolderLinkClicked Callback when a folder link is tapped.
- * @param onFileLinkClicked Callback when a file link is tapped.
- * @param onClearAllLinks Callback when the user confirms clearing the viewed links history.
- * @param onBack Callback when the back button is pressed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ViewedLinksScreen(
+    uiState: ViewedLinksUiState,
     lazyItems: LazyPagingItems<ViewedLinkUiItem>,
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
     onClearAllLinks: () -> Unit,
+    onSortOptionSelected: (NodeSortConfiguration) -> Unit,
     onBack: () -> Unit,
 ) {
+    val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val optionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSortSheet by rememberSaveable { mutableStateOf(false) }
     var showOptionsSheet by rememberSaveable { mutableStateOf(false) }
     var showClearConfirmationDialog by rememberSaveable { mutableStateOf(false) }
-    val optionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isRefreshing = lazyItems.loadState.refresh is LoadState.Loading && lazyItems.itemCount == 0
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
@@ -88,7 +93,21 @@ internal fun ViewedLinksScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            if (lazyItems.loadState.refresh is LoadState.Loading) {
+            item(key = SORT_HEADER_KEY) {
+                NodeHeaderItem(
+                    onSortOrderClick = { showSortSheet = true },
+                    onChangeViewTypeClick = {
+                        // Todo: Grid view type implemented next
+                    },
+                    sortConfiguration = uiState.sortConfiguration,
+                    isListView = true,
+                    showSortOrder = true,
+                    showChangeViewType = false,
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                )
+            }
+
+            if (isRefreshing) {
                 items(count = LOADING_PLACEHOLDER_COUNT) {
                     ViewedLinkLoadingItem()
                 }
@@ -101,7 +120,8 @@ internal fun ViewedLinksScreen(
                     OneLineListItem(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .testTag(VIEWED_LINKS_ITEM_TEST_TAG),
+                            .testTag(VIEWED_LINKS_ITEM_TEST_TAG)
+                            .animateItem(),
                         text = item.viewedLink.name,
                         leadingElement = {
                             NodeThumbnailView(
@@ -132,6 +152,30 @@ internal fun ViewedLinksScreen(
                 }
             }
         }
+    }
+
+    if (showSortSheet) {
+        SortBottomSheet(
+            title = stringResource(sharedR.string.action_sort_by_header),
+            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CONTINUE_WHERE_LEFT_OFF),
+            sheetState = sortSheetState,
+            selectedSort = SortBottomSheetResult(
+                sortOptionItem = uiState.sortConfiguration.sortOption,
+                sortDirection = uiState.sortConfiguration.sortDirection,
+            ),
+            onDismissRequest = { showSortSheet = false },
+            onSortOptionSelected = { result ->
+                if (result != null) {
+                    onSortOptionSelected(
+                        NodeSortConfiguration(
+                            sortOption = result.sortOptionItem,
+                            sortDirection = result.sortDirection,
+                        )
+                    )
+                }
+                showSortSheet = false
+            },
+        )
     }
 
     if (showOptionsSheet) {
@@ -174,6 +218,7 @@ internal fun ViewedLinksScreen(
 internal const val CLEAR_HISTORY_TAG = "viewed_links:clear_history"
 internal const val CLEAR_HISTORY_DIALOG_TAG = "viewed_links:clear_history_dialog"
 internal const val VIEWED_LINKS_ITEM_TEST_TAG = "viewed_links:item"
+internal const val SORT_HEADER_KEY = "viewed_links:sort_header"
 private const val LOADING_PLACEHOLDER_COUNT = 6
 
 @CombinedThemePreviews
@@ -254,10 +299,12 @@ private fun ViewedLinksScreenPreview() {
     val lazyItems = flowOf(PagingData.from(previewItems)).collectAsLazyPagingItems()
     AndroidThemeForPreviews {
         ViewedLinksScreen(
+            uiState = ViewedLinksUiState(),
             lazyItems = lazyItems,
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
             onClearAllLinks = {},
+            onSortOptionSelected = {},
             onBack = {},
         )
     }
@@ -269,10 +316,12 @@ private fun ViewedLinksScreenLoadingPreview() {
     val lazyItems = flowOf<PagingData<ViewedLinkUiItem>>().collectAsLazyPagingItems()
     AndroidThemeForPreviews {
         ViewedLinksScreen(
+            uiState = ViewedLinksUiState(),
             lazyItems = lazyItems,
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
             onClearAllLinks = {},
+            onSortOptionSelected = {},
             onBack = {},
         )
     }

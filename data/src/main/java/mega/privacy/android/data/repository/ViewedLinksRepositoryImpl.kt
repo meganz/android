@@ -2,10 +2,12 @@ package mega.privacy.android.data.repository
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import androidx.sqlite.db.SimpleSQLiteQuery
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK
 import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.entity.RecentlyViewedLinkEntity
 import mega.privacy.android.data.database.entity.ViewedLinkRawItem
@@ -40,12 +42,28 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewedLinksRepository {
 
-    override fun getViewedLinksPagingSource(): PagingSource<Int, ViewedLink> =
-        MappingPagingSource(
-            source = recentlyViewedLinkDao.getViewedLinksPagingSource(),
+    override fun getViewedLinksPagingSource(
+        sortField: ViewedLinksSortField,
+        sortDirection: SortDirection,
+    ): PagingSource<Int, ViewedLink> {
+        val column = when (sortField) {
+            ViewedLinksSortField.Name -> "node_name COLLATE NOCASE"
+            ViewedLinksSortField.LastAccessed -> "last_accessed_timestamp"
+        }
+        val direction = when (sortDirection) {
+            SortDirection.Ascending -> "ASC"
+            SortDirection.Descending -> "DESC"
+        }
+        val query = SimpleSQLiteQuery(
+            "SELECT node_handle, type_id, node_name, link_url, last_accessed_timestamp " +
+                    "FROM $TABLE_RECENTLY_VIEWED_LINK ORDER BY $column $direction"
+        )
+        return MappingPagingSource(
+            source = recentlyViewedLinkDao.getViewedLinksPagingSource(query),
             mapper = viewedLinkRawItemMapper,
             ioDispatcher = ioDispatcher,
         )
+    }
 
     override suspend fun saveLink(viewedLink: ViewedLink) = withContext(ioDispatcher) {
         val accessedTimestamp = viewedLink.accessedTimestamp
@@ -68,7 +86,7 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
         recentlyViewedLinkDao.deleteAll()
     }
 
-    override fun monitorSortPreference(): Flow<Pair<ViewedLinksSortField, SortDirection>> =
+    override fun monitorSortPreference() =
         sortPreferenceDataStore.monitorSortPreference().flowOn(ioDispatcher)
 
     override suspend fun setSortPreference(

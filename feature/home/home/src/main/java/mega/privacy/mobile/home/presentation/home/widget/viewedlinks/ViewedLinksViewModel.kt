@@ -1,5 +1,6 @@
 package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 
+import androidx.core.util.lruCache
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -8,11 +9,16 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,12 +26,17 @@ import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.SetViewedLinksSortUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.mapper.ViewedLinksSortMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,35 +51,64 @@ import javax.inject.Inject
  * Folder links are displayed with a static folder icon and no thumbnail.
  *
  * @property pagedItems The paginated stream of [ViewedLinkUiItem]s, cached for the
- *   ViewModel scope so configuration changes do not refetch.
+ *   ViewModel scope so configuration changes do not refetch. The flow re-emits a fresh
+ *   [PagingData] whenever the persisted sort preference changes.
  * @param monitorViewedLinksUseCase
+ * @param monitorViewedLinksSortPreferenceUseCase
+ * @param setViewedLinksSortUseCase
+ * @param viewedLinksSortMapper
  * @param getPublicNodeUseCase
  * @param fileTypeIconMapper
  * @param clearViewedLinksUseCase
  * @param snackbarEventQueue
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class ViewedLinksViewModel @Inject constructor(
     monitorViewedLinksUseCase: MonitorViewedLinksUseCase,
+    private val monitorViewedLinksSortPreferenceUseCase: MonitorViewedLinksSortPreferenceUseCase,
+    private val setViewedLinksSortUseCase: SetViewedLinksSortUseCase,
+    private val viewedLinksSortMapper: ViewedLinksSortMapper,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val clearViewedLinksUseCase: ClearViewedLinksUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
-    private val resolvedLinkCache = mutableMapOf<String, ViewedLinkUiItem>()
-    private val _uiState = MutableStateFlow(ViewedLinksUiState())
-    val uiState = _uiState.asStateFlow()
+    private val resolvedLinkCache = lruCache<String, ViewedLinkUiItem>(maxSize = PAGE_SIZE * 100)
+    private val clearAllLinksEvent = MutableStateFlow<StateEvent>(consumed)
 
-    val pagedItems: Flow<PagingData<ViewedLinkUiItem>> = Pager(
-        config = PagingConfig(
-            pageSize = PAGE_SIZE,
-            initialLoadSize = PAGE_SIZE,
-            enablePlaceholders = false,
-        ),
-        pagingSourceFactory = { monitorViewedLinksUseCase() }
-    ).flow
-        .map { pagingData -> pagingData.map { it.toUiItem() } }
-        .cachedIn(viewModelScope)
+    val uiState: StateFlow<ViewedLinksUiState> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            monitorViewedLinksSortPreferenceUseCase()
+                .map { (field, direction) -> viewedLinksSortMapper(field, direction) },
+            clearAllLinksEvent,
+        ) { sortConfiguration, clearAllLinksEvent ->
+            ViewedLinksUiState(
+                clearAllLinksEvent = clearAllLinksEvent,
+                sortConfiguration = sortConfiguration,
+            )
+        }.catch { e ->
+            Timber.e(e, "Failed to build ViewedLinks UI state")
+        }.asUiStateFlow(
+            viewModelScope,
+            ViewedLinksUiState(),
+        )
+    }
+
+    val pagedItems: Flow<PagingData<ViewedLinkUiItem>> =
+        monitorViewedLinksSortPreferenceUseCase()
+            .flatMapLatest { (field, direction) ->
+                Pager(
+                    config = PagingConfig(
+                        pageSize = PAGE_SIZE,
+                        initialLoadSize = PAGE_SIZE,
+                        enablePlaceholders = false,
+                    ),
+                    pagingSourceFactory = { monitorViewedLinksUseCase(field, direction) },
+                ).flow
+            }
+            .map { pagingData -> pagingData.map { it.toUiItem() } }
+            .cachedIn(viewModelScope)
 
     /**
      * Resolves a single [ViewedLink] to its UI item.
@@ -98,7 +138,7 @@ internal class ViewedLinksViewModel @Inject constructor(
             iconRes = node?.getIcon(fileTypeIconMapper)
                 ?: fileTypeIconMapper(link.name.substringAfterLast('.', "")),
             previewPath = node?.previewPath,
-        ).also { resolvedLinkCache[link.linkUrl] = it }
+        ).also { resolvedLinkCache.put(link.linkUrl, it) }
     }
 
     internal fun clearAllLinks() {
@@ -107,13 +147,24 @@ internal class ViewedLinksViewModel @Inject constructor(
                 .onFailure { Timber.e(it, "Failed to clear viewed links history") }
                 .onSuccess {
                     snackbarEventQueue.queueMessage(sharedR.string.home_widget_viewed_links_clear_history_success_message)
-                    _uiState.update { it.copy(clearAllLinksEvent = triggered) }
+                    clearAllLinksEvent.update { triggered }
                 }
         }
     }
 
     internal fun onClearAllLinksEventConsumed() {
-        _uiState.update { it.copy(clearAllLinksEvent = consumed) }
+        clearAllLinksEvent.update { consumed }
+    }
+
+    internal fun updateSortConfiguration(configuration: NodeSortConfiguration) {
+        viewModelScope.launch {
+            runCatching {
+                setViewedLinksSortUseCase(
+                    sortField = viewedLinksSortMapper(configuration.sortOption),
+                    sortDirection = configuration.sortDirection,
+                )
+            }.onFailure { Timber.e(it, "Failed to persist viewed-links sort preference") }
+        }
     }
 
     private companion object {

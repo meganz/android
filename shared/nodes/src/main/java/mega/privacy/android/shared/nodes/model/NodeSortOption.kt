@@ -29,6 +29,11 @@ enum class NodeSortOption(
         defaultSortDirection = SortDirection.Descending,
     ),
 
+    LastAccessed(
+        sharedR.string.node_sort_option_last_accessed_label,
+        defaultSortDirection = SortDirection.Descending,
+    ),
+
     Size(sharedR.string.action_sort_by_size, defaultSortDirection = SortDirection.Descending),
 
     ShareCreated(
@@ -102,7 +107,7 @@ enum class NodeSortOption(
 
             NodeSourceType.CONTINUE_WHERE_LEFT_OFF -> listOf(
                 Name,
-                Created,
+                LastAccessed,
             )
 
             else -> listOf(

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -97,13 +98,21 @@ internal class ViewedLinksRepositoryImplTest {
                 accessedTimestamp = 2000L,
             ),
         )
-        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource())
+        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource(any()))
             .thenReturn(fakeRawPagingSource(rawItems))
         whenever(viewedLinkRawItemMapper(rawItems[0])).thenReturn(expectedLinks[0])
         whenever(viewedLinkRawItemMapper(rawItems[1])).thenReturn(expectedLinks[1])
 
-        val result = underTest.getViewedLinksPagingSource()
-            .load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
+        val result = underTest.getViewedLinksPagingSource(
+            ViewedLinksSortField.LastAccessed,
+            SortDirection.Descending,
+        ).load(
+            PagingSource.LoadParams.Refresh(
+                key = null,
+                loadSize = 10,
+                placeholdersEnabled = false
+            )
+        )
 
         assertThat(result).isInstanceOf(PagingSource.LoadResult.Page::class.java)
         assertThat((result as PagingSource.LoadResult.Page).data).isEqualTo(expectedLinks)
@@ -118,7 +127,7 @@ internal class ViewedLinksRepositoryImplTest {
             lastAccessedTimestamp = 1000L,
             linkUrl = "https://mega.nz/file/abc",
         )
-        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource())
+        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource(any()))
             .thenReturn(fakeRawPagingSource(listOf(rawItem)))
         whenever(viewedLinkRawItemMapper(rawItem)).thenReturn(
             ViewedLink(
@@ -130,19 +139,35 @@ internal class ViewedLinksRepositoryImplTest {
             )
         )
 
-        underTest.getViewedLinksPagingSource()
-            .load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
+        underTest.getViewedLinksPagingSource(
+            ViewedLinksSortField.Name,
+            SortDirection.Ascending,
+        ).load(
+            PagingSource.LoadParams.Refresh(
+                key = null,
+                loadSize = 10,
+                placeholdersEnabled = false
+            )
+        )
 
         verify(viewedLinkRawItemMapper).invoke(rawItem)
     }
 
     @Test
     fun `test that getViewedLinksPagingSource returns empty page when no links`() = runTest {
-        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource())
+        whenever(recentlyViewedLinkDao.getViewedLinksPagingSource(any()))
             .thenReturn(fakeRawPagingSource(emptyList()))
 
-        val result = underTest.getViewedLinksPagingSource()
-            .load(PagingSource.LoadParams.Refresh(key = null, loadSize = 10, placeholdersEnabled = false))
+        val result = underTest.getViewedLinksPagingSource(
+            ViewedLinksSortField.LastAccessed,
+            SortDirection.Descending,
+        ).load(
+            PagingSource.LoadParams.Refresh(
+                key = null,
+                loadSize = 10,
+                placeholdersEnabled = false
+            )
+        )
 
         assertThat(result).isInstanceOf(PagingSource.LoadResult.Page::class.java)
         assertThat((result as PagingSource.LoadResult.Page).data).isEmpty()

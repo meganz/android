@@ -450,7 +450,7 @@ internal fun NodeSortOption.trackAnalyticsEvent() {
         NodeSortOption.Favourite -> SortByFavouriteMenuItemEvent
         NodeSortOption.Label -> SortByLabelMenuItemEvent
         NodeSortOption.Created -> SortByDateAddedMenuItemEvent
-        NodeSortOption.Modified -> SortByDateModifiedMenuItemEvent
+        NodeSortOption.Modified, NodeSortOption.LastAccessed -> SortByDateModifiedMenuItemEvent
         NodeSortOption.Size -> SortBySizeMenuItemEvent
         NodeSortOption.ShareCreated -> SortByShareCreationMenuItemEvent
         NodeSortOption.LinkCreated -> SortByLinkCreationMenuItemEvent

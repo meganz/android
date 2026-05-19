@@ -3,7 +3,9 @@ package mega.privacy.android.domain.usecase.viewedlinks
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.ViewedLink
+import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 import mega.privacy.android.domain.repository.ViewedLinksRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,14 +28,40 @@ internal class MonitorViewedLinksUseCaseTest {
     }
 
     @Test
-    fun `test that invoke returns the repository paging source`() {
+    fun `test that invoke returns the repository paging source for given sort`() {
         val source = emptyPagingSource()
-        whenever(viewedLinksRepository.getViewedLinksPagingSource()).thenReturn(source)
+        whenever(
+            viewedLinksRepository.getViewedLinksPagingSource(
+                ViewedLinksSortField.Name,
+                SortDirection.Ascending,
+            )
+        ).thenReturn(source)
 
-        val result = underTest()
+        val result = underTest(ViewedLinksSortField.Name, SortDirection.Ascending)
 
         assertThat(result).isSameInstanceAs(source)
-        verify(viewedLinksRepository).getViewedLinksPagingSource()
+        verify(viewedLinksRepository).getViewedLinksPagingSource(
+            ViewedLinksSortField.Name,
+            SortDirection.Ascending,
+        )
+    }
+
+    @Test
+    fun `test that invoke forwards Created Descending to the repository`() {
+        val source = emptyPagingSource()
+        whenever(
+            viewedLinksRepository.getViewedLinksPagingSource(
+                ViewedLinksSortField.LastAccessed,
+                SortDirection.Descending,
+            )
+        ).thenReturn(source)
+
+        underTest(ViewedLinksSortField.LastAccessed, SortDirection.Descending)
+
+        verify(viewedLinksRepository).getViewedLinksPagingSource(
+            ViewedLinksSortField.LastAccessed,
+            SortDirection.Descending,
+        )
     }
 
     private fun emptyPagingSource(): PagingSource<Int, ViewedLink> =

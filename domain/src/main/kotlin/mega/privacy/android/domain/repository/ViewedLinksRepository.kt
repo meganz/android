@@ -16,11 +16,17 @@ import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 interface ViewedLinksRepository {
 
     /**
-     * Returns a [PagingSource] over all viewed links (file and folder links), sorted by
-     * most recently accessed. The source is invalidated automatically whenever the
-     * underlying table changes.
+     * Returns a [PagingSource] over all viewed links (file and folder links), sorted by the
+     * supplied [sortField] and [sortDirection]. The source is invalidated automatically
+     * whenever the underlying table changes.
+     *
+     * @param sortField the field used to order results.
+     * @param sortDirection ascending or descending.
      */
-    fun getViewedLinksPagingSource(): PagingSource<Int, ViewedLink>
+    fun getViewedLinksPagingSource(
+        sortField: ViewedLinksSortField,
+        sortDirection: SortDirection,
+    ): PagingSource<Int, ViewedLink>
 
     /**
      * Saves or updates a viewed link entry. If a link with the same node handle already exists,
