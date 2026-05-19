@@ -75,13 +75,16 @@ pipeline {
 
                         def skillFile = "${WORKSPACE}/.claude/skills/ask-ai/SKILL.md"
                         def mrUrl = resolveMrUrl()
-                        def question = extractQuestion(env.gitlabTriggerPhrase)
+                        // Pass the comment verbatim; the model understands that @ai
+                        // refers to itself (see SKILL.md). Preserves capitalization,
+                        // punctuation, and the reviewer's natural phrasing.
+                        def question = (env.gitlabTriggerPhrase ?: '').trim()
 
                         if (!mrUrl) {
-                            error("${ASK_AI_CMD}: missing MR URL — gitlabSourceRepoHomepage and gitlabMergeRequestIid must be set by the GitLab webhook")
+                            error("${ASK_AI_CMD}: missing MR URL, gitlabSourceRepoHomepage and gitlabMergeRequestIid must be set by the GitLab webhook")
                         }
                         if (!question) {
-                            error("${ASK_AI_CMD}: empty question after stripping the trigger prefix")
+                            error("${ASK_AI_CMD}: empty comment body from gitlabTriggerPhrase")
                         }
                         if (!fileExists(skillFile)) {
                             error("${ASK_AI_CMD}: skill file not found at ${skillFile}")
@@ -147,11 +150,20 @@ def shouldRunAskAi() {
         return false
     }
     String body = env.gitlabTriggerPhrase
-    if (extractQuestion(body) == null) {
-        echo "shouldRunAskAi: skipping, comment does not start with ${ASK_AI_CMD}: '${(body ?: '').take(120)}'"
+    if (!hasAiMention(body)) {
+        echo "shouldRunAskAi: skipping, comment does not contain a ${ASK_AI_CMD} mention: '${(body ?: '').take(120)}'"
         return false
     }
     return true
+}
+
+/**
+ * True when the body contains a standalone `@ai` mention. Case-insensitive.
+ * The lookbehind blocks false positives like `email@ai.com`; the word
+ * boundary after `ai` blocks `@aim`.
+ */
+def hasAiMention(String body) {
+    return body != null && (body =~ /(?i)(?<!\w)@ai\b/)
 }
 
 /**
@@ -162,17 +174,6 @@ def resolveMrUrl() {
     String homepage = env.gitlabSourceRepoHomepage
     String iid = env.gitlabMergeRequestIid
     return (homepage && iid) ? "${homepage}/-/merge_requests/${iid}" : null
-}
-
-/**
- * Strip the `@ai` mention prefix from the note body and return the rest as
- * the question. Case-insensitive. A word boundary after `@ai` prevents
- * matches like `@aim`. Returns null if the body does not start with `@ai`.
- */
-def extractQuestion(String body) {
-    if (body == null) return null
-    def matcher = (body.trim() =~ /(?i)^@ai\b\s*(.*)$/)
-    return matcher.find() ? matcher.group(1).trim() : null
 }
 
 /**
@@ -221,7 +222,7 @@ def lookupDiscussionIdViaApi(String mrIid) {
 
     for (def disc : reversed) {
         for (def note : (disc.notes ?: [])) {
-            if (((note.body ?: '') as String).trim() ==~ /(?i)^@ai\b.*/) {
+            if (((note.body ?: '') as String) =~ /(?i)(?<!\w)@ai\b/) {
                 return disc.id
             }
         }
@@ -236,8 +237,9 @@ def lookupDiscussionIdViaApi(String mrIid) {
 //
 //   1. Jenkins job → GitLab Plugin trigger:
 //        ✓ "Comments" enabled
-//        ✓ trigger phrase regex: (?i)^@ai\b.*
-//        ✓ kept in sync with extractQuestion() above
+//        ✓ trigger phrase regex: (.*@ai .*)
+//          (matches @ai anywhere in the comment; kept in sync with the
+//          @ai detection in hasAiMention() above)
 //
 //   2. GitLab project → Settings → Webhooks: tick "Comments" only, point at
 //      the Jenkins job's webhook URL.

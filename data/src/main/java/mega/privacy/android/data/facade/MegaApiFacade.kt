@@ -347,14 +347,6 @@ internal class MegaApiFacade @Inject constructor(
         }
     }.buffer(Channel.Factory.UNLIMITED).shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
-    override fun getFavourites(
-        node: MegaNode?,
-        count: Int,
-        listener: MegaRequestListenerInterface?,
-    ) {
-        megaApi.getFavourites(node, count, listener)
-    }
-
     override suspend fun getMegaNodeByHandle(nodeHandle: Long): MegaNode? =
         megaApi.getNodeByHandle(nodeHandle)
 

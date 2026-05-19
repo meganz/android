@@ -5,21 +5,22 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.repository.FavouritesRepository
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaHandleList
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSearchFilter
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -41,6 +42,9 @@ class DefaultFavouritesRepositoryTest {
     private val favouriteInfo = mock<FolderNode>()
 
     private val nodeMapper: NodeMapper = mock()
+    private val megaSearchFilterMapper: MegaSearchFilterMapper = mock()
+    private val sortOrderIntMapper: SortOrderIntMapper = mock()
+    private val cancelTokenProvider: CancelTokenProvider = mock()
 
     @Before
     fun setUp() {
@@ -48,88 +52,81 @@ class DefaultFavouritesRepositoryTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             nodeMapper = nodeMapper,
+            megaSearchFilterMapper = megaSearchFilterMapper,
+            sortOrderIntMapper = sortOrderIntMapper,
+            cancelTokenProvider = cancelTokenProvider,
         )
     }
 
     @Test
-    fun `test that get all favourites returns successfully if no error is thrown`() = runTest {
-        val megaHandleListTest = mock<MegaHandleList>()
-        whenever(megaHandleListTest.size()).thenReturn(1)
-        whenever(megaHandleListTest[0]).thenReturn(1L)
+    fun `test that get all favourites returns successfully via searchWithFilter when excludeSensitives is false`() =
+        runTest {
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = anyOrNull(),
+                    searchQuery = any(),
+                    searchTarget = any(),
+                    searchCategory = eq(SearchCategory.FAVOURITES),
+                    modificationDate = anyOrNull(),
+                    creationDate = anyOrNull(),
+                    description = anyOrNull(),
+                    tag = anyOrNull(),
+                    useAndForTextQuery = any(),
+                    sensitivityFilter = eq(null),
+                )
+            ).thenReturn(filter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
+            whenever(megaApiGateway.searchWithFilter(eq(filter), any(), eq(token), anyOrNull()))
+                .thenReturn(listOf(node))
+            whenever(
+                nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull())
+            ).thenReturn(favouriteInfo)
 
-        whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
+            val actual = underTest.getAllFavorites()
 
-        val api = mock<MegaApiJava>()
-        val request = mock<MegaRequest> {
-            on { megaHandleList }.thenReturn(megaHandleListTest)
+            assertThat(actual[0]).isSameInstanceAs(favouriteInfo)
         }
-        val error = mock<MegaError> {
-            on { errorCode }.thenReturn(MegaError.API_OK)
-        }
 
-        whenever(megaApiGateway.getFavourites(anyOrNull(), any(), any())).thenAnswer {
-            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
-                api,
-                request,
-                error
-            )
-        }
+    @Test
+    fun `test that get all favourites with excludeSensitives true uses NonSensitiveOnly filter`() =
+        runTest {
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = anyOrNull(),
+                    searchQuery = any(),
+                    searchTarget = any(),
+                    searchCategory = eq(SearchCategory.FAVOURITES),
+                    modificationDate = anyOrNull(),
+                    creationDate = anyOrNull(),
+                    description = anyOrNull(),
+                    tag = anyOrNull(),
+                    useAndForTextQuery = any(),
+                    sensitivityFilter = eq(SensitivityFilterOption.NonSensitiveOnly),
+                )
+            ).thenReturn(filter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(sortOrderIntMapper(any(), any())).thenReturn(0)
+            whenever(megaApiGateway.searchWithFilter(eq(filter), any(), eq(token), anyOrNull()))
+                .thenReturn(listOf(node))
+            whenever(
+                nodeMapper(any(), any(), any(), anyOrNull(), anyOrNull())
+            ).thenReturn(favouriteInfo)
 
-        whenever(
-            nodeMapper(
+            val actual = underTest.getAllFavorites(excludeSensitives = true)
+
+            assertThat(actual[0]).isSameInstanceAs(favouriteInfo)
+            verify(megaApiGateway).searchWithFilter(
+                eq(filter),
                 any(),
-                any(),
-                any(),
+                eq(token),
                 anyOrNull(),
-                anyOrNull()
-            )
-        ).thenReturn(
-            favouriteInfo
-        )
-
-        val actual = underTest.getAllFavorites()
-        assertThat(actual[0]).isSameInstanceAs(favouriteInfo)
-    }
-
-
-    @Test(expected = MegaException::class)
-    fun `test that get an exception is thrown if the api does not return successfully`() = runTest {
-        val megaHandleListTest = mock<MegaHandleList>()
-        whenever(megaHandleListTest.size()).thenReturn(1)
-        whenever(megaHandleListTest[0]).thenReturn(1L)
-
-        whenever(megaApiGateway.getMegaNodeByHandle(1L)).thenReturn(node)
-
-        val api = mock<MegaApiJava>()
-        val request = mock<MegaRequest> {
-            on { megaHandleList }.thenReturn(megaHandleListTest)
-        }
-        val error = mock<MegaError> {
-            on { errorCode }.thenReturn(MegaError.API_OK + 1)
-        }
-
-        whenever(megaApiGateway.getFavourites(anyOrNull(), any(), any())).thenAnswer {
-            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
-                api,
-                request,
-                error
             )
         }
-
-        whenever(
-            nodeMapper(
-                any(),
-                any(),
-                any(),
-                anyOrNull(),
-                anyOrNull()
-            )
-        ).thenReturn(
-            favouriteInfo
-        )
-
-        underTest.getAllFavorites()
-    }
 
     @Test
     fun `test that add favourites works properly`() = runTest {

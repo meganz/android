@@ -5,12 +5,17 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -24,7 +29,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesAction
@@ -37,6 +44,7 @@ import mega.privacy.android.shared.nodes.model.NodeUiItem
 import timber.log.Timber
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
     private val getAllFavoritesUseCase: GetAllFavoritesUseCase,
@@ -47,6 +55,8 @@ class FavouritesViewModel @Inject constructor(
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavouritesUiState())
@@ -58,6 +68,14 @@ class FavouritesViewModel @Inject constructor(
         monitorCloudSortOrder()
         checkSearchRevampEnabled()
     }
+
+    private fun excludeSensitivesFlow(): Flow<Boolean> = combine(
+        monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
+        monitorShowHiddenItemsUseCase().catch { Timber.e(it) },
+    ) { isHiddenNodesEnabled, showHiddenNodes ->
+        _uiState.update { it.copy(isHiddenNodesEnabled = isHiddenNodesEnabled) }
+        isHiddenNodesEnabled && !showHiddenNodes
+    }.distinctUntilChanged()
 
     /**
      * Process FavouritesAction and call relevant methods
@@ -76,7 +94,8 @@ class FavouritesViewModel @Inject constructor(
 
     private suspend fun loadNodes() {
         runCatching {
-            val nodes = getAllFavoritesUseCase().first()
+            val excludeSensitives = excludeSensitivesFlow().first()
+            val nodes = getAllFavoritesUseCase(excludeSensitives = excludeSensitives).first()
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 nodeSourceType = NodeSourceType.FAVOURITES,
@@ -97,8 +116,11 @@ class FavouritesViewModel @Inject constructor(
 
     private fun monitorFavourites() {
         viewModelScope.launch {
-            getAllFavoritesUseCase()
-                .catch { Timber.e(it) }
+            excludeSensitivesFlow()
+                .flatMapLatest { excludeSensitives ->
+                    getAllFavoritesUseCase(excludeSensitives = excludeSensitives)
+                        .catch { Timber.e(it) }
+                }
                 .collectLatest { nodes ->
                     val nodeUiItems = nodeUiItemMapper(
                         nodeList = nodes,

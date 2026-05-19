@@ -123,7 +123,7 @@ internal fun FavouritesContent(
                 spanCount = spanCount,
                 items = uiState.items,
                 isNextPageLoading = false,
-                isHiddenNodesEnabled = false,
+                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                 showHiddenNodes = false,
                 onMenuClicked = {
                     showNodeOptionsBottomSheet(

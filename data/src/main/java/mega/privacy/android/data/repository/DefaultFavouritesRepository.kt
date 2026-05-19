@@ -2,19 +2,19 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FavouritesRepository
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * The repository implementation class regarding favourites
@@ -25,6 +25,9 @@ internal class DefaultFavouritesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val nodeMapper: NodeMapper,
+    private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val sortOrderIntMapper: SortOrderIntMapper,
+    private val cancelTokenProvider: CancelTokenProvider,
 ) : FavouritesRepository {
 
     override suspend fun addFavourites(nodeIds: List<NodeId>) {
@@ -36,24 +39,20 @@ internal class DefaultFavouritesRepository @Inject constructor(
         }
     }
 
-    override suspend fun getAllFavorites(): List<UnTypedNode> =
+    override suspend fun getAllFavorites(excludeSensitives: Boolean): List<UnTypedNode> =
         withContext(ioDispatcher) {
-            val handleList = suspendCoroutine<MegaHandleList> { continuation ->
-                megaApiGateway.getFavourites(
-                    node = null,
-                    count = 0,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request, error ->
-                            if (error.errorCode == MegaError.API_OK) {
-                                continuation.resumeWith(Result.success(request.megaHandleList))
-                            } else {
-                                continuation.failWithError(error, "getAllFavorites")
-                            }
-                        }
-                    )
-                )
-            }
-            mapNodesToFavouriteInfo(handleList.getNodes())
+            val filter = megaSearchFilterMapper(
+                parentHandle = null,
+                searchCategory = SearchCategory.FAVOURITES,
+                sensitivityFilter = SensitivityFilterOption.NonSensitiveOnly.takeIf { excludeSensitives },
+            )
+            val token = cancelTokenProvider.getOrCreateCancelToken()
+            val nodes = megaApiGateway.searchWithFilter(
+                filter,
+                sortOrderIntMapper(SortOrder.ORDER_NONE),
+                token,
+            )
+            mapNodesToFavouriteInfo(nodes)
         }
 
     override suspend fun removeFavourites(nodeIds: List<NodeId>) {
@@ -64,14 +63,6 @@ internal class DefaultFavouritesRepository @Inject constructor(
             }
         }
     }
-
-    /**
-     * Get node from MegaHandleList
-     * @return List<MegaNode>
-     */
-    private suspend fun MegaHandleList.getNodes() = (0..size())
-        .map { this[it] }
-        .mapNotNull { megaApiGateway.getMegaNodeByHandle(it) }
 
     /**
      * Convert the MegaNode list to FavouriteInfo list

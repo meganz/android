@@ -26,6 +26,7 @@ data class FavouritesUiState(
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     val isSearchRevampEnabled: Boolean = false,
+    val isHiddenNodesEnabled: Boolean = false,
 ) {
 
     /**

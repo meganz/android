@@ -21,7 +21,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesAction
@@ -35,7 +37,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -61,6 +66,8 @@ class FavouritesViewModelTest {
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
 
     @AfterEach
     fun tearDown() {
@@ -72,7 +79,9 @@ class FavouritesViewModelTest {
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase,
-            getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase,
+            monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase,
         )
     }
 
@@ -85,6 +94,8 @@ class FavouritesViewModelTest {
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
         monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
         getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+        monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+        monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
     )
 
     private suspend fun setupTestData(items: List<TypedNode>) {
@@ -92,7 +103,9 @@ class FavouritesViewModelTest {
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
             NodeSortConfiguration.default
         )
-        whenever(getAllFavoritesUseCase()).thenReturn(flowOf(items))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(getAllFavoritesUseCase(excludeSensitives = false)).thenReturn(flowOf(items))
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
@@ -758,7 +771,7 @@ class FavouritesViewModelTest {
         // 1. From monitorFavourites() (continuous collection)
         // 2. From loadNodes() when first sort order is emitted
         // 3. From loadNodes() when second sort order is emitted
-        verify(getAllFavoritesUseCase, times(3)).invoke()
+        verify(getAllFavoritesUseCase, times(3)).invoke(excludeSensitives = false)
     }
 
     @Test
@@ -791,7 +804,7 @@ class FavouritesViewModelTest {
         }
 
         setupTestData(listOf(node1))
-        whenever(getAllFavoritesUseCase()).thenReturn(
+        whenever(getAllFavoritesUseCase(excludeSensitives = false)).thenReturn(
             flowOf(listOf(node1), listOf(node1, node2))
         )
 

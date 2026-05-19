@@ -395,14 +395,6 @@ interface MegaApiGateway {
     val globalRequestEvents: Flow<RequestEvent>
 
     /**
-     * Get favourites
-     * @param node Node and its children that will be searched for favourites. Search all nodes if null
-     * @param count if count is zero return all favourite nodes, otherwise return only 'count' favourite nodes
-     * @param listener MegaRequestListener to track this request
-     */
-    fun getFavourites(node: MegaNode?, count: Int, listener: MegaRequestListenerInterface?)
-
-    /**
      * Get MegaNode by node handle
      * @param nodeHandle node handle
      * @return MegaNode
