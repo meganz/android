@@ -1,11 +1,13 @@
 package mega.privacy.mobile.home.presentation.home.widget.continuewhereleftoff
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,7 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +41,7 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeft
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
@@ -51,24 +57,29 @@ internal fun ContinueWhereLeftOffCarousel(
     onViewAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (items.isEmpty()) return
-
     Column(modifier = modifier) {
-        ContinueWhereLeftOffHeader(onViewAllClick = onViewAllClick)
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(
-                items = items,
-                key = { it.nodeHandle },
-                contentType = { it.type },
-            ) { item ->
-                ContinueWhereLeftOffCard(
-                    item = item,
-                    onClick = { onItemClick(item) },
-                )
+        ContinueWhereLeftOffHeader(
+            onViewAllClick = onViewAllClick,
+            showChevron = items.isNotEmpty(),
+        )
+        if (items.isEmpty()) {
+            ContinueWhereLeftOffEmptyView()
+        } else {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(
+                    items = items,
+                    key = { it.nodeHandle },
+                    contentType = { it.type },
+                ) { item ->
+                    ContinueWhereLeftOffCard(
+                        item = item,
+                        onClick = { onItemClick(item) },
+                    )
+                }
             }
         }
     }
@@ -77,6 +88,7 @@ internal fun ContinueWhereLeftOffCarousel(
 @Composable
 private fun ContinueWhereLeftOffHeader(
     onViewAllClick: () -> Unit,
+    showChevron: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -91,21 +103,51 @@ private fun ContinueWhereLeftOffHeader(
             textColor = TextColor.Primary,
             modifier = Modifier.weight(1f),
         )
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .wrapContentSize(unbounded = true, align = Alignment.Center)
-                .size(48.dp)
-                .clickable { onViewAllClick() },
-            contentAlignment = Alignment.Center,
-        ) {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.ChevronRight,
-                contentDescription = null,
-                tint = IconColor.Secondary,
-                modifier = Modifier.size(24.dp),
-            )
+        if (showChevron) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .wrapContentSize(unbounded = true, align = Alignment.Center)
+                    .size(48.dp)
+                    .testTag(CONTINUE_WHERE_LEFT_OFF_CHEVRON_TEST_TAG)
+                    .clickable { onViewAllClick() },
+                contentAlignment = Alignment.Center,
+            ) {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.ChevronRight,
+                    contentDescription = null,
+                    tint = IconColor.Secondary,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun ContinueWhereLeftOffEmptyView(
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MegaText(
+            text = stringResource(sharedR.string.home_cwlo_empty_state),
+            style = AppTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
+            textColor = TextColor.Secondary,
+            modifier = Modifier
+                .weight(1f)
+                .testTag(CONTINUE_WHERE_LEFT_OFF_EMPTY_TEXT_TEST_TAG),
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Image(
+            painter = painterResource(R.drawable.ic_cwlo_empty_state),
+            contentDescription = null,
+            modifier = Modifier.size(60.dp),
+        )
     }
 }
 
@@ -191,3 +233,20 @@ private fun ContinueWhereLeftOffCarouselPreview() {
         )
     }
 }
+
+@CombinedThemePreviews
+@Composable
+private fun ContinueWhereLeftOffCarouselEmptyPreview() {
+    AndroidThemeForPreviews {
+        ContinueWhereLeftOffCarousel(
+            items = emptyList(),
+            onItemClick = {},
+            onViewAllClick = {},
+        )
+    }
+}
+
+internal const val CONTINUE_WHERE_LEFT_OFF_EMPTY_TEXT_TEST_TAG =
+    "continue_where_left_off_widget:empty_text"
+internal const val CONTINUE_WHERE_LEFT_OFF_CHEVRON_TEST_TAG =
+    "continue_where_left_off_widget:chevron"
