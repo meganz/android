@@ -1,70 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/contact_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants" >
 
-    <RelativeLayout
+    <FrameLayout
         android:id="@+id/item_content"
         android:layout_width="match_parent"
-        android:layout_height="72dp">
+        android:layout_height="wrap_content">
 
-        <mega.privacy.android.app.components.RoundedImageView
-            android:id="@+id/contact_avatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="fitCenter"
-            android:layout_marginLeft="18dp"
-            rounded:corner_radius="20dp"
-            android:layout_centerVertical="true"/>
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/contact_compose_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
-        <ImageView
-            android:id="@+id/verified_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_contact_verified"
-            android:layout_marginStart="42dp"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"/>
-
-        <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
-            android:id="@+id/contact_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/contact_avatar"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="13dp"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            rounded:emojiSize="14sp" />
-
-        <ImageView
-            android:id="@+id/contact_state"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_alignTop="@id/contact_name"
-            android:layout_toRightOf="@id/contact_name"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="6dp"
-            android:background="@null"
-            tools:src="@drawable/ic_offline_light" />
-
-        <TextView
-            android:id="@+id/contact_mail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/contact_name"
-            android:layout_toRightOf="@id/contact_avatar"
-            android:layout_marginLeft="13dp"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary"
-            android:ellipsize="end"
-            android:maxLines="1" />
-
-    </RelativeLayout>
+    </FrameLayout>
 
     <RelativeLayout
         android:id="@+id/header"

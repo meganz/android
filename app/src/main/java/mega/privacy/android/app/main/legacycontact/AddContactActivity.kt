@@ -622,13 +622,10 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
      */
     fun setShareAdapterContacts(contacts: ArrayList<ShareContactInfo>) {
         if (adapterShareHeader == null) {
-            adapterShareHeader = ShareContactsHeaderAdapter(addContactActivity, contacts)
+            adapterShareHeader = ShareContactsHeaderAdapter(addContactActivity!!, contacts)
             recyclerViewList?.adapter = adapterShareHeader
             adapterShareHeader?.SetOnItemClickListener { view, position ->
-                itemClick(
-                    view,
-                    position
-                )
+                itemClick(view, position)
             }
         } else {
             adapterShareHeader?.setContacts(contacts)
@@ -654,6 +651,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             }
             val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
             emptyTextView?.text = result
+            setEmptyStateVisibility(true)
         } else {
             setEmptyStateVisibility(false)
         }
@@ -1425,7 +1423,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
             return
         }
 
-        setEmptyStateVisibility(true)
+        setEmptyStateVisibility(false)
         progressBar?.visibility = View.VISIBLE
         getContactsTask = GetContactsTask(this)
         getContactsTask?.execute()
