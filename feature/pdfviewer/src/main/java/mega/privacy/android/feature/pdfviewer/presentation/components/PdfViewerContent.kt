@@ -42,8 +42,10 @@ import java.io.File
  * @param highlightPdfRects Pre-calculated screen-coordinate RectFs for highlighting the current selected search match
  * @param allMatchRectsByPage PDF-coordinate RectFs for all matches keyed by 0-based page index;
  *        drawn in a lighter colour so every result is visible at a glance
- * @param scrubProgress Optional scrub position in 0f..1f while the user is dragging the page indicator.
- *                      Null when not scrubbing.
+ * @param scrubProgress 0f..1f drag position; null when not actively dragging
+ *                      (still null while merely pressed — see [isScrubPressed]).
+ * @param isScrubPressed True while the thumb is pressed or dragged; used to stop an in-flight
+ *                       fling on press (mirrors legacy DefaultScrollHandle ACTION_DOWN).
  * @param onPageChanged Callback when page changes (page: 1-indexed, totalPages)
  * @param onLoadComplete Callback when PDF finishes loading
  * @param onError Callback when an error occurs
@@ -60,6 +62,7 @@ internal fun PdfViewerContent(
     highlightPdfRects: List<RectF>?,
     allMatchRectsByPage: Map<Int, List<RectF>>,
     scrubProgress: Float?,
+    isScrubPressed: Boolean,
     onPageChanged: (Int, Int) -> Unit,
     onLoadComplete: (Int) -> Unit,
     onError: (PdfViewerError) -> Unit,
@@ -146,11 +149,16 @@ internal fun PdfViewerContent(
             // If PDF is already loaded, just handle page navigation or reload on source change
             if (pdfView.pageCount > 0) {
                 if (currentSignature == lastSourceSignature.value) {
+                    // Press stops fling without committing a position
+                    if (isScrubPressed) {
+                        pdfView.stopFling()
+                    }
                     if (scrubProgress != null) {
                         // User is dragging the page indicator - scrub continuously.
                         pdfView.setPositionOffset(scrubProgress.coerceIn(0f, 1f), false)
-                    } else if (pdfView.currentPage != currentPage - 1) {
+                    } else if (!isScrubPressed && pdfView.currentPage != currentPage - 1) {
                         // Page changed programmatically (e.g. prev/next button). Animate.
+                        // !isScrubPressed prevents jumpTo from bouncing back to a stale page when Compose currentPage lags PDFView on press.
                         pdfView.jumpTo(currentPage - 1, true)
                     }
                     return@AndroidView

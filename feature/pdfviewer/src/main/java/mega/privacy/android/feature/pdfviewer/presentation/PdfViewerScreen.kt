@@ -115,14 +115,19 @@ internal fun PdfViewerScreen(
     val bytes = uiState.pdfBytes?.bytes
     val currentPage = uiState.currentPage
 
-    // Null when not scrubbing; 0f..1f while the user drags the page indicator.
+    // Null when not actively dragging; 0f..1f while the user drags the page indicator's thumb.
     var scrubProgress by remember { mutableStateOf<Float?>(null) }
+
+    // True from the moment the thumb is pressed until the press or drag ends.
+    // Lets the PDF view stop an in-flight fling on press without committing a new scroll position.
+    var isScrubPressed by remember { mutableStateOf(false) }
+
     var indicatorVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(currentPage, uiState.totalPages, scrubProgress) {
+    LaunchedEffect(currentPage, uiState.totalPages, scrubProgress, isScrubPressed) {
         if (uiState.totalPages > 1) {
             indicatorVisible = true
-            if (scrubProgress == null) {
+            if (scrubProgress == null && !isScrubPressed) {
                 delay(PAGE_INDICATOR_AUTO_HIDE_MS)
                 indicatorVisible = false
             }
@@ -226,6 +231,7 @@ internal fun PdfViewerScreen(
                                 highlightPdfRects = searchState.currentMatchPdfRects,
                                 allMatchRectsByPage = searchState.allMatchRectsByPage,
                                 scrubProgress = scrubProgress,
+                                isScrubPressed = isScrubPressed,
                                 onPageChanged = onPageChanged,
                                 onLoadComplete = onLoadComplete,
                                 onError = onError,
@@ -241,10 +247,12 @@ internal fun PdfViewerScreen(
                         PdfPageIndicator(
                             currentPage = currentPage,
                             totalPages = uiState.totalPages,
-                            // scrubProgress != null guards the race window where the auto-hide timer
-                            // fires (e.g. jump to next search result) before LaunchedEffect re-runs when a drag begins.
-                            isVisible = indicatorVisible || scrubProgress != null,
+                            // scrubProgress != null / isScrubPressed guard the race window where the
+                            // auto-hide timer fires (e.g. jump to next search result) before
+                            // LaunchedEffect re-runs when a press or drag begins.
+                            isVisible = indicatorVisible || scrubProgress != null || isScrubPressed,
                             onScrub = { scrubProgress = it },
+                            onScrubPressed = { isScrubPressed = it },
                         )
                     }
 

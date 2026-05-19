@@ -69,6 +69,9 @@ import kotlin.math.roundToInt
  *                  or within an auto-hide window). The indicator also stays visible while pressed.
  * @param onScrub Called with a 0f..1f scroll proportion during an active scrub drag, or `null`
  *                when the drag ends or is cancelled.
+ * @param onScrubPressed Invoked with `true` while the thumb is pressed or dragged, and `false`
+ *                       on release. Lets callers stop an in-flight fling on press without
+ *                       committing a scroll position.
  * @param modifier Modifier for the composable
  */
 @Composable
@@ -77,6 +80,7 @@ fun PdfPageIndicator(
     totalPages: Int,
     isVisible: Boolean,
     onScrub: (Float?) -> Unit,
+    onScrubPressed: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (totalPages > 1) {
@@ -85,6 +89,7 @@ fun PdfPageIndicator(
             totalPages = totalPages,
             isVisible = isVisible,
             onScrub = onScrub,
+            onScrubPressed = onScrubPressed,
             modifier = modifier,
         )
     }
@@ -96,6 +101,7 @@ private fun PdfPageIndicatorContent(
     totalPages: Int,
     isVisible: Boolean,
     onScrub: (Float?) -> Unit,
+    onScrubPressed: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
@@ -104,7 +110,7 @@ private fun PdfPageIndicatorContent(
     val pageProportion =
         ((currentPage - 1).toFloat() / (totalPages - 1).toFloat()).coerceIn(0f, 1f)
     val travelScale = travelScaleForTotalPages(totalPages)
-    val state = rememberPdfIndicatorScrubState(pageProportion, travelScale, onScrub)
+    val state = rememberPdfIndicatorScrubState(pageProportion, travelScale, onScrub, onScrubPressed)
 
     // Snap Y until the track is measured once; enabling tween in the same pass as first layout
     // would animate from target 0 (trackHeightPx was 0) to the real offset.
@@ -289,6 +295,7 @@ private fun Modifier.scrubGestures(state: PdfIndicatorScrubState): Modifier =
 @Stable
 private class PdfIndicatorScrubState(
     private val onScrub: (Float?) -> Unit,
+    private val onScrubPressed: (Boolean) -> Unit,
 ) {
     /** Page-derived proportion, updated every recomposition from the input state. */
     var pageProportion: Float by mutableFloatStateOf(0f)
@@ -319,12 +326,18 @@ private class PdfIndicatorScrubState(
             return (trackHeightPx * visualProportion).roundToInt()
         }
 
+    // Press only signals "stop any in-flight fling" — it does not commit a scroll position.
+    // dragProportion must be re-synced here because targetYPx switches to reading it once
+    // isPressed flips true; otherwise the thumb jumps to a stale value.
     fun onPress() {
         isPressed = true
+        dragProportion = pageProportion
+        onScrubPressed(true)
     }
 
     fun onRelease() {
         isPressed = false
+        onScrubPressed(false)
     }
 
     fun onDragStart() {
@@ -349,6 +362,7 @@ private class PdfIndicatorScrubState(
     fun onDragEnd() {
         isPressed = false
         onScrub(null)
+        onScrubPressed(false)
     }
 }
 
@@ -357,11 +371,18 @@ private fun rememberPdfIndicatorScrubState(
     pageProportion: Float,
     travelScale: Float,
     onScrub: (Float?) -> Unit,
+    onScrubPressed: (Boolean) -> Unit,
 ): PdfIndicatorScrubState {
     // Indirection via rememberUpdatedState so the state object holds a stable lambda
-    // reference while always calling the freshest caller-provided [onScrub].
+    // reference while always calling the freshest caller-provided callbacks.
     val latestOnScrub = rememberUpdatedState(onScrub)
-    val state = remember { PdfIndicatorScrubState(onScrub = { latestOnScrub.value(it) }) }
+    val latestOnScrubPressed = rememberUpdatedState(onScrubPressed)
+    val state = remember {
+        PdfIndicatorScrubState(
+            onScrub = { latestOnScrub.value(it) },
+            onScrubPressed = { latestOnScrubPressed.value(it) },
+        )
+    }
     state.pageProportion = pageProportion
     state.travelScale = travelScale
     return state
@@ -388,6 +409,7 @@ private fun PdfPageIndicatorPreview() {
             totalPages = 14,
             isVisible = true,
             onScrub = {},
+            onScrubPressed = {},
         )
     }
 }
@@ -401,6 +423,7 @@ private fun PdfPageIndicatorTwoPagePreview() {
             totalPages = 2,
             isVisible = true,
             onScrub = {},
+            onScrubPressed = {},
         )
     }
 }

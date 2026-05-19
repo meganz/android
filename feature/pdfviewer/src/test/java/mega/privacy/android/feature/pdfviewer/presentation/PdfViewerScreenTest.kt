@@ -375,6 +375,47 @@ class PdfViewerScreenTest {
     }
 
     @Test
+    fun `test that PdfPageIndicator remains visible while thumb is pressed without dragging`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(defaultState(currentPage = 2, totalPages = 4))
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        // Press the thumb without moving — isScrubPressed should keep the indicator visible
+        // past the auto-hide delay even though scrubProgress is still null.
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput { down(center) }
+
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that PdfPageIndicator is hidden after release when thumb was pressed without dragging`() {
+        composeTestRule.mainClock.autoAdvance = false
+        setContent(defaultState(currentPage = 2, totalPages = 4))
+        composeTestRule.mainClock.advanceTimeBy(100)
+
+        // Press without dragging, then release. Auto-hide should resume after release.
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .performTouchInput {
+                down(center)
+                up()
+            }
+
+        // Advance past auto-hide delay (2000ms) and exit animation
+        composeTestRule.mainClock.advanceTimeBy(5000)
+
+        composeTestRule
+            .onNodeWithTag(PDF_PAGE_INDICATOR_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun `test that onPasswordInputChanged is invoked when user types in password field`() {
         setContent(defaultState(error = PdfViewerError.PasswordProtected))
 
