@@ -71,7 +71,7 @@ data class PdfViewerSearchState(
  * @param isOnline Whether the device has an internet connection
  * @param source The source of the PDF document
  * @param title The title to display in the toolbar
- * @param currentPage The current page number (1-indexed)
+ * @param currentPage The current page number (1-indexed). Null until the initial page is resolved
  * @param totalPages The total number of pages in the PDF
  * @param isToolbarVisible Whether the toolbar is currently visible
  * @param currentPassword The current password (if entered)
@@ -93,7 +93,7 @@ internal data class PdfViewerState(
     val isOnline: Boolean = true,
     val source: PdfViewerSource? = null,
     val title: String? = null,
-    val currentPage: Int = 1,
+    val currentPage: Int? = null,
     val totalPages: Int = 0,
     val isToolbarVisible: Boolean = true,
     val currentPassword: String? = null,

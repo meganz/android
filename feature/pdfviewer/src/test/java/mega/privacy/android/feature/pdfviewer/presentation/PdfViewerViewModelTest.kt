@@ -182,6 +182,7 @@ class PdfViewerViewModelTest {
     @Test
     fun `test that initial state has correct title from args`() = runTest {
         underTest = initViewModel()
+        advanceUntilIdle()
 
         underTest.state.test {
             val state = awaitItem()
@@ -192,6 +193,7 @@ class PdfViewerViewModelTest {
     @Test
     fun `test that initial state has correct nodeHandle from args`() = runTest {
         underTest = initViewModel()
+        advanceUntilIdle()
 
         underTest.state.test {
             val state = awaitItem()
@@ -262,6 +264,7 @@ class PdfViewerViewModelTest {
     @Test
     fun `test that initial state has nodeSourceType from args`() = runTest {
         underTest = initViewModel()
+        advanceUntilIdle()
 
         underTest.state.test {
             val state = awaitItem()
@@ -274,6 +277,7 @@ class PdfViewerViewModelTest {
         runTest {
             val folderLinkArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.FOLDER_LINK)
             underTest = initViewModel(args = folderLinkArgs)
+            advanceUntilIdle()
 
             underTest.state.test {
                 val state = awaitItem()
@@ -393,6 +397,7 @@ class PdfViewerViewModelTest {
                 nodeSourceType = NodeSourceType.RUBBISH_BIN,
             )
             underTest = initViewModel(args = rubbishBinArgs)
+            advanceUntilIdle()
 
             underTest.state.test {
                 val state = awaitItem()
@@ -412,6 +417,7 @@ class PdfViewerViewModelTest {
                 nodeSourceType = NodeSourceType.BACKUPS,
             )
             underTest = initViewModel(args = backupsArgs)
+            advanceUntilIdle()
 
             underTest.state.test {
                 val state = awaitItem()
@@ -906,6 +912,58 @@ class PdfViewerViewModelTest {
 
         verify(getLastPageViewedInPdfUseCase, never()).invoke(any())
     }
+
+    @Test
+    fun `test that currentPage is null before init coroutines run and becomes 1 after`() =
+        runTest {
+            underTest = initViewModel()
+
+            underTest.state.test {
+                // Before advancing the dispatcher: the launched coroutine in loadLastViewedPage()
+                // hasn't run yet, so currentPage is still null and the screen shows loading.
+                assertThat(awaitItem().currentPage).isNull()
+
+                advanceUntilIdle()
+
+                // After the coroutine runs, currentPage is resolved to the mocked value (1).
+                assertThat(expectMostRecentItem().currentPage).isEqualTo(1)
+            }
+        }
+
+    @Test
+    fun `test that currentPage is set to 1 immediately when isExternalFile is true`() = runTest {
+        underTest = initViewModel(args = externalFileArgs)
+
+        underTest.state.test {
+            // External files skip the DB lookup and resolve currentPage synchronously to 1.
+            assertThat(awaitItem().currentPage).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that currentPage defaults to 1 when getLastPageViewedInPdfUseCase fails`() = runTest {
+        whenever(getLastPageViewedInPdfUseCase(12345L)).thenThrow(RuntimeException("db error"))
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentPage).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun `test that currentPage is set to last viewed page when getLastPageViewedInPdfUseCase returns saved page`() =
+        runTest {
+            whenever(getLastPageViewedInPdfUseCase(12345L)).thenReturn(7)
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.source).isNotNull()
+                assertThat(state.currentPage).isEqualTo(7)
+            }
+        }
 
     @Test
     fun `test that onPageChanged does not persist last page when isExternalFile is true`() =

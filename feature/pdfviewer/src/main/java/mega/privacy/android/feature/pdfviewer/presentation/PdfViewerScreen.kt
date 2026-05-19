@@ -113,12 +113,13 @@ internal fun PdfViewerScreen(
 
     val pdfUri = remember(uiState.source) { getPdfUri(uiState.source) }
     val bytes = uiState.pdfBytes?.bytes
+    val currentPage = uiState.currentPage
 
     // Null when not scrubbing; 0f..1f while the user drags the page indicator.
     var scrubProgress by remember { mutableStateOf<Float?>(null) }
     var indicatorVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(uiState.currentPage, uiState.totalPages, scrubProgress) {
+    LaunchedEffect(currentPage, uiState.totalPages, scrubProgress) {
         if (uiState.totalPages > 1) {
             indicatorVisible = true
             if (scrubProgress == null) {
@@ -130,9 +131,9 @@ internal fun PdfViewerScreen(
         }
     }
 
-    // Only show loading spinner when waiting for remote bytes to download
-    // For local content, render PdfViewerContent immediately and let PDFView handle its own loading
-    val showLoading = uiState.source?.isRemote == true && uiState.pdfBytes == null
+    // Show loading until the initial page is resolved and remote content downloaded.
+    val showLoading = currentPage == null ||
+            (uiState.source?.isRemote == true && uiState.pdfBytes == null)
 
     val showFloatingToolbar = !showLoading
             && !uiState.isExternalFile
@@ -215,11 +216,11 @@ internal fun PdfViewerScreen(
                         // Note: when isPasswordError=true, no branch matches intentionally.
                         // The password dialog is rendered as a full-screen overlay below (outside the scaffold).
 
-                        !uiState.isPasswordError && uiState.source != null -> {
+                        !uiState.isPasswordError && uiState.source != null && currentPage != null -> {
                             PdfViewerContent(
                                 pdfUri = pdfUri,
                                 pdfBytes = bytes,
-                                currentPage = uiState.currentPage,
+                                currentPage = currentPage,
                                 password = uiState.currentPassword,
                                 highlightPageIndex = searchState.currentMatchPageIndex,
                                 highlightPdfRects = searchState.currentMatchPdfRects,
@@ -236,14 +237,16 @@ internal fun PdfViewerScreen(
 
                     // Fast-scroll page indicator — draggable thumb on the right edge that
                     // also reflects the current scroll position of the document.
-                    PdfPageIndicator(
-                        currentPage = uiState.currentPage,
-                        totalPages = uiState.totalPages,
-                        // scrubProgress != null guards the race window where the auto-hide timer
-                        // fires (e.g. jump to next search result) before LaunchedEffect re-runs when a drag begins.
-                        isVisible = indicatorVisible || scrubProgress != null,
-                        onScrub = { scrubProgress = it },
-                    )
+                    if (currentPage != null) {
+                        PdfPageIndicator(
+                            currentPage = currentPage,
+                            totalPages = uiState.totalPages,
+                            // scrubProgress != null guards the race window where the auto-hide timer
+                            // fires (e.g. jump to next search result) before LaunchedEffect re-runs when a drag begins.
+                            isVisible = indicatorVisible || scrubProgress != null,
+                            onScrub = { scrubProgress = it },
+                        )
+                    }
 
                     // Floating search results bar (bottom-center)
                     if (searchState.isSearchActive && searchState.hasResults) {

@@ -166,8 +166,11 @@ internal class PdfViewerViewModel @AssistedInject constructor(
             )
         }
 
-        // External PDFs have no MEGA node handle; skip last-page / recently-used persistence.
-        if (!args.isExternalFile) {
+        if (args.isExternalFile) {
+            // External files don't save currentPage
+            _state.update { it.copy(currentPage = 1) }
+        } else {
+            // Show loading until currentPage is resolved
             loadLastViewedPage()
         }
 
@@ -667,8 +670,10 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     private fun loadLastViewedPage() {
         viewModelScope.launch {
-            val lastPage = getLastPageViewedInPdfUseCase(args.nodeHandle)
-            _state.update { it.copy(currentPage = lastPage?.toInt() ?: 1) }
+            val lastPage = runCatching { getLastPageViewedInPdfUseCase(args.nodeHandle)?.toInt() ?: 1 }
+                    .onFailure { Timber.e(it, "Failed to load last viewed page for node ${args.nodeHandle}") }
+                    .getOrDefault(1)
+            _state.update { it.copy(currentPage = lastPage) }
         }
     }
 
