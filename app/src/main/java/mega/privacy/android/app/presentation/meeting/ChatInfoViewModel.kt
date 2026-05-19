@@ -33,7 +33,8 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
-import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantUiStateMapper
+import mega.privacy.android.app.presentation.meeting.model.ChatParticipantUiState
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
@@ -142,6 +143,7 @@ class ChatInfoViewModel @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
+    private val chatParticipantUiStateMapper: ChatParticipantUiStateMapper,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -326,8 +328,12 @@ class ChatInfoViewModel @Inject constructor(
                 }
                 .collectLatest { list ->
                     Timber.d("Updated list of participants: list ${list.size}")
+                    val mapped = list.map(chatParticipantUiStateMapper::invoke)
                     _uiState.update {
-                        it.copy(participantItemList = list, numOfParticipants = list.size)
+                        it.copy(
+                            participantItemList = mapped,
+                            numOfParticipants = mapped.size,
+                        )
                     }
                     updateFirstAndSecondParticipants()
                 }
@@ -951,9 +957,9 @@ class ChatInfoViewModel @Inject constructor(
     /**
      * Open bottom panel option of a participant.
      *
-     * @param participant [ChatParticipant]
+     * @param participant [ChatParticipantUiState]
      */
-    fun onParticipantTap(participant: ChatParticipant) =
+    fun onParticipantTap(participant: ChatParticipantUiState) =
         _uiState.update {
             it.copy(selected = participant)
         }

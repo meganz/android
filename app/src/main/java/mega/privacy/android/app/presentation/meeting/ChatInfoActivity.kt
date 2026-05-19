@@ -68,7 +68,7 @@ import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.chat.ChatParticipant
+import mega.privacy.android.app.presentation.meeting.model.ChatParticipantUiState
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.ChatNavKey
@@ -335,7 +335,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
     /**
      * Shows panel to show participant's options
      */
-    private fun showParticipantOptionsPanel(participant: ChatParticipant) {
+    private fun showParticipantOptionsPanel(participant: ChatParticipantUiState) {
         if (bottomSheetDialogFragment.isBottomSheetDialogShown()) {
             return
         }
@@ -352,13 +352,13 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
     /**
      * Shows an alert dialog to confirm the deletion of a participant.
      *
-     * @param participant [ChatParticipant]
+     * @param participant [ChatParticipantUiState]
      */
-    private fun showRemoveParticipantDialog(participant: ChatParticipant) {
+    private fun showRemoveParticipantDialog(participant: ChatParticipantUiState) {
         val dialogBuilder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
-        val name = participant.data.fullName
+        val name = participant.contactItem.displayName
         dialogBuilder.setMessage(getString(R.string.confirmation_remove_chat_contact, name))
             .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int -> viewModel.removeSelectedParticipant() }
             .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
