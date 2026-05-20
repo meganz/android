@@ -36,16 +36,18 @@ class CoroutineMainDispatcherExtension(
     /**
      * A function that defines the API for Extensions that wish to provide additional behavior
      * to test containers before all tests are invoked.
+     * @param context
      */
-    override fun beforeAll(p0: ExtensionContext?) {
+    override fun beforeAll(context: ExtensionContext) {
         Dispatchers.setMain(testDispatcher)
     }
 
     /**
      * A function that defines the API for Extensions that wish to provide additional behavior
      * to test containers after all tests have been invoked.
+     * @param context
      */
-    override fun afterAll(p0: ExtensionContext?) {
+    override fun afterAll(context: ExtensionContext) {
         Dispatchers.resetMain()
     }
 }

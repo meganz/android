@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.chat.messages.reactions.ReactionUpdate
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -125,56 +124,54 @@ class MonitorReactionUpdatesUseCaseTest {
         private val myUserHandle = 234L
         private val userHandle = 456L
 
-        override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
-            return Stream.of(
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 2),
-                    listOf(Reaction(reaction1, 1, listOf(myUserHandle), true)),
-                    listOf(Reaction(reaction1, 2, listOf(myUserHandle, userHandle), true)),
-                    true,
-                    2,
-                    1,
+        override fun provideArguments(context: ExtensionContext) = Stream.of(
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 2),
+                listOf(Reaction(reaction1, 1, listOf(myUserHandle), true)),
+                listOf(Reaction(reaction1, 2, listOf(myUserHandle, userHandle), true)),
+                true,
+                2,
+                1,
+            ),
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 2),
+                listOf(Reaction(reaction1, 1, listOf(userHandle), false)),
+                listOf(Reaction(reaction1, 2, listOf(userHandle, userHandle), false)),
+                false,
+                2,
+                1,
+            ),
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 1),
+                emptyList<Reaction>(),
+                listOf(Reaction(reaction1, 1, listOf(userHandle), false)),
+                false,
+                1,
+                0,
+            ),
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 1),
+                emptyList<Reaction>(),
+                listOf(Reaction(reaction1, 1, listOf(myUserHandle), true)),
+                true,
+                1,
+                0,
+            ),
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 2),
+                listOf(
+                    Reaction(reaction1, 1, listOf(userHandle), false),
+                    Reaction(reaction2, 1, listOf(userHandle), false)
                 ),
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 2),
-                    listOf(Reaction(reaction1, 1, listOf(userHandle), false)),
-                    listOf(Reaction(reaction1, 2, listOf(userHandle, userHandle), false)),
-                    false,
-                    2,
-                    1,
+                listOf(
+                    Reaction(reaction1, 2, listOf(myUserHandle, userHandle), true),
+                    Reaction(reaction2, 1, listOf(userHandle), false)
                 ),
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 1),
-                    emptyList<Reaction>(),
-                    listOf(Reaction(reaction1, 1, listOf(userHandle), false)),
-                    false,
-                    1,
-                    0,
-                ),
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 1),
-                    emptyList<Reaction>(),
-                    listOf(Reaction(reaction1, 1, listOf(myUserHandle), true)),
-                    true,
-                    1,
-                    0,
-                ),
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 2),
-                    listOf(
-                        Reaction(reaction1, 1, listOf(userHandle), false),
-                        Reaction(reaction2, 1, listOf(userHandle), false)
-                    ),
-                    listOf(
-                        Reaction(reaction1, 2, listOf(myUserHandle, userHandle), true),
-                        Reaction(reaction2, 1, listOf(userHandle), false)
-                    ),
-                    true,
-                    2,
-                    2,
-                ),
-            )
-        }
+                true,
+                2,
+                2,
+            ),
+        )
     }
 
     internal class MonitorReactionRemovedArgumentsProvider : ArgumentsProvider {
@@ -185,43 +182,41 @@ class MonitorReactionUpdatesUseCaseTest {
         private val myUserHandle = 234L
         private val userHandle = 456L
 
-        override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
-            return Stream.of(
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 0),
-                    listOf(Reaction(reaction1, 1, listOf(userHandle), false)),
-                    emptyList<Reaction>(),
-                    false,
-                    1,
+        override fun provideArguments(context: ExtensionContext) = Stream.of(
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 0),
+                listOf(Reaction(reaction1, 1, listOf(userHandle), false)),
+                emptyList<Reaction>(),
+                false,
+                1,
+            ),
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 0),
+                listOf(Reaction(reaction1, 1, listOf(myUserHandle), true)),
+                emptyList<Reaction>(),
+                true,
+                1,
+            ),
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 0),
+                listOf(
+                    Reaction(reaction1, 1, listOf(userHandle), false),
+                    Reaction(reaction2, 1, listOf(userHandle), false)
                 ),
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 0),
-                    listOf(Reaction(reaction1, 1, listOf(myUserHandle), true)),
-                    emptyList<Reaction>(),
-                    true,
-                    1,
+                listOf(Reaction(reaction2, 1, listOf(userHandle), false)),
+                false,
+                2,
+            ),
+            Arguments.of(
+                ReactionUpdate(msgId, reaction1, 0),
+                listOf(
+                    Reaction(reaction1, 1, listOf(myUserHandle), false),
+                    Reaction(reaction2, 1, listOf(userHandle), false)
                 ),
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 0),
-                    listOf(
-                        Reaction(reaction1, 1, listOf(userHandle), false),
-                        Reaction(reaction2, 1, listOf(userHandle), false)
-                    ),
-                    listOf(Reaction(reaction2, 1, listOf(userHandle), false)),
-                    false,
-                    2,
-                ),
-                Arguments.of(
-                    ReactionUpdate(msgId, reaction1, 0),
-                    listOf(
-                        Reaction(reaction1, 1, listOf(myUserHandle), false),
-                        Reaction(reaction2, 1, listOf(userHandle), false)
-                    ),
-                    listOf(Reaction(reaction2, 1, listOf(userHandle), false)),
-                    true,
-                    2,
-                ),
-            )
-        }
+                listOf(Reaction(reaction2, 1, listOf(userHandle), false)),
+                true,
+                2,
+            ),
+        )
     }
 }

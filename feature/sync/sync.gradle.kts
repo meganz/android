@@ -64,6 +64,7 @@ dependencies {
     implementation(google.guava)
     implementation(androidx.material3)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.documentfile)
 
     testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(testlib.bundles.ui.test)

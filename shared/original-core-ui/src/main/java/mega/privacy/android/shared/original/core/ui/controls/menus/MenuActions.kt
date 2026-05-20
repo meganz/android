@@ -31,15 +31,15 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
-import com.google.android.material.R
+import mega.android.core.ui.model.menu.MenuAction
+import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.appbar.LocalMegaAppBarColors
 import mega.privacy.android.shared.original.core.ui.controls.appbar.addClick
 import mega.privacy.android.shared.original.core.ui.controls.tooltips.Tooltip
-import mega.android.core.ui.model.menu.MenuAction
-import mega.android.core.ui.model.menu.MenuActionWithClick
-import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.shared.resources.R as sharedR
 
 
 /**
@@ -120,7 +120,7 @@ private fun RowScope.OverflowDropDown(
     Box(contentAlignment = Alignment.BottomEnd) {
         IconButtonWithTooltip(
             iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
-            description = stringResource(id = R.string.abc_action_menu_overflow_description),
+            description = stringResource(id = sharedR.string.more_options),
             onClick = { showMoreMenu = !showMoreMenu },
             modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
             enabled = enabled,

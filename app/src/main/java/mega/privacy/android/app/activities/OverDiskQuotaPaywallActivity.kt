@@ -236,7 +236,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
                 "[M]",
                 "<font color='" + ColorUtils.getThemeColorHexString(
                     applicationContext,
-                    com.google.android.material.R.attr.colorError
+                    android.R.attr.colorError
                 ) + "'>"
             )
             text = text.replace("[/M]", "</font>")

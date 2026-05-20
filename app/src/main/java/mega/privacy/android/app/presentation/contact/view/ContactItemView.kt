@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.contact.view
 
 
-import mega.privacy.android.icon.pack.R as IconR
 import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -25,12 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.model.ContactAvatar
 import mega.privacy.android.app.presentation.contact.model.ContactStatus
@@ -40,17 +41,16 @@ import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.icon.pack.R as IconR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import mega.android.core.ui.theme.values.TextColor
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 /**
  * View to show a contactItem with their avatar and connection status
@@ -194,7 +194,7 @@ internal fun getLastSeenString(lastGreen: Int?): String? {
         }
 
         compareLastSeenWithToday(lastGreenCalendar) == 0 -> {
-            val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+            val dateFormat = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).apply {
                 timeZone = lastGreenCalendar.timeZone
             }
             val time = dateFormat.format(lastGreenCalendar.time)
@@ -202,14 +202,14 @@ internal fun getLastSeenString(lastGreen: Int?): String? {
         }
 
         else -> {
-            var dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+            var dateFormat = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).apply {
                 timeZone = lastGreenCalendar.timeZone
             }
             val time = dateFormat.format(lastGreenCalendar.time)
 
             dateFormat = SimpleDateFormat(
-                DateFormat.getBestDateTimePattern(Locale.getDefault(), "dd MMM"),
-                Locale.getDefault()
+                DateFormat.getBestDateTimePattern(LocalLocale.current.platformLocale, "dd MMM"),
+                LocalLocale.current.platformLocale
             )
             val day = dateFormat.format(lastGreenCalendar.time)
             stringResource(R.string.last_seen_general, day, time)

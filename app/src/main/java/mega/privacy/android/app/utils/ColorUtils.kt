@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils
 
-import com.google.android.material.R as MaterialR
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -65,7 +64,7 @@ object ColorUtils {
         return tintIcon(
             context,
             drawableId,
-            getThemeColor(context, MaterialR.attr.colorControlNormal)
+            getThemeColor(context, android.R.attr.colorControlNormal)
         )
     }
 
@@ -234,8 +233,8 @@ object ColorUtils {
     @JvmStatic
     fun setErrorAwareInputAppearance(editText: EditText, error: Boolean) {
         if (error) {
-            editText.setTextColor(getThemeColor(editText.context, MaterialR.attr.colorError))
-            setEditTextUnderlineColorAttr(editText, MaterialR.attr.colorError)
+            editText.setTextColor(getThemeColor(editText.context, android.R.attr.colorError))
+            setEditTextUnderlineColorAttr(editText, android.R.attr.colorError)
             editText.highlightColor =
                 ContextCompat.getColor(editText.context, R.color.teal_100_teal_050)
         } else {

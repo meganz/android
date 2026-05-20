@@ -22,8 +22,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.Ignore
@@ -94,8 +96,10 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that fetchThumbnail is invoked`() =
         runTest {
-            whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
-            whenever(imageNode.fetchThumbnail).thenReturn(fetchThumbnailLambda)
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchThumbnail } doReturn fetchThumbnailLambda
+            }
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).test {
                 awaitItem()
                 verify(fetchThumbnailLambda).invoke()
@@ -108,8 +112,10 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that imageResult thumbnailUri matches value returned by fetchThumbnail`() =
         runTest {
-            whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
-            whenever(imageNode.fetchThumbnail).thenReturn(fetchThumbnailLambda)
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchThumbnail } doReturn fetchThumbnailLambda
+            }
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).test {
                 assertThat(awaitItem().thumbnailUri).isEqualTo("$FILE$thumbnailFilePath")
                 cancelAndIgnoreRemainingEvents()
@@ -121,10 +127,12 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that fetchPreview is invoked`() =
         runTest {
-            whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
-            whenever(imageNode.fetchThumbnail).thenReturn(fetchThumbnailLambda)
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchThumbnail } doReturn fetchThumbnailLambda
+                on { fetchPreview } doReturn fetchPreviewLambda
+            }
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
-            whenever(imageNode.fetchPreview).thenReturn(fetchPreviewLambda)
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).test {
                 awaitItem()
                 verify(fetchPreviewLambda).invoke()
@@ -137,10 +145,12 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that imageResult previewUri matches value returned by fetchPreview`() =
         runTest {
-            whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
-            whenever(imageNode.fetchThumbnail).thenReturn(fetchThumbnailLambda)
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchThumbnail } doReturn fetchThumbnailLambda
+                on { fetchPreview } doReturn fetchPreviewLambda
+            }
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
-            whenever(imageNode.fetchPreview).thenReturn(fetchPreviewLambda)
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).test {
                 assertThat(awaitItem().previewUri).isEqualTo("$FILE$previewFilePath")
                 cancelAndIgnoreRemainingEvents()
@@ -152,10 +162,12 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that imageResult isFullyLoaded is true after fetching preview when isFullSizeRequired is false`() =
         runTest {
-            whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
-            whenever(imageNode.fetchThumbnail).thenReturn(fetchThumbnailLambda)
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchThumbnail } doReturn fetchThumbnailLambda
+                on { fetchPreview } doReturn fetchPreviewLambda
+            }
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(false)
-            whenever(imageNode.fetchPreview).thenReturn(fetchPreviewLambda)
             underTest.invoke(imageNode, false, highPriority = false, resetDownloads = {}).test {
                 assertThat(awaitItem().previewUri).isEqualTo("$FILE$previewFilePath")
                 assertThat(awaitItem().isFullyLoaded).isEqualTo(true)
@@ -168,10 +180,12 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that imageResult isFullyLoaded is false after fetching preview when isFullSizeRequired is true`() =
         runTest {
-            whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
-            whenever(imageNode.fetchThumbnail).thenReturn(fetchThumbnailLambda)
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchThumbnail } doReturn fetchThumbnailLambda
+                on { fetchPreview } doReturn fetchPreviewLambda
+            }
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
-            whenever(imageNode.fetchPreview).thenReturn(fetchPreviewLambda)
             underTest.invoke(imageNode, true, highPriority = false, resetDownloads = {}).test {
                 assertThat(awaitItem().previewUri).isEqualTo("$FILE$previewFilePath")
                 assertThat(awaitItem().isFullyLoaded).isEqualTo(false)
@@ -182,10 +196,12 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that fetchFullImage is invoked when isFullSizeRequired is true`() =
         runTest {
-            whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
-            whenever(imageNode.fetchThumbnail).thenReturn(fetchThumbnailLambda)
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchThumbnail } doReturn fetchThumbnailLambda
+                on { fetchPreview } doReturn fetchPreviewLambda
+            }
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
-            whenever(imageNode.fetchPreview).thenReturn(fetchPreviewLambda)
 
             val fetchFullImageLambda: (Boolean, () -> Unit) -> Flow<ImageProgress> = mock {
                 onBlocking { invoke(any(), any()) }.thenReturn(flow {
@@ -205,10 +221,12 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that fetchFullImage is not invoked when isFullSizeRequired is false`() =
         runTest {
-            whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
-            whenever(imageNode.fetchThumbnail).thenReturn(fetchThumbnailLambda)
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { fetchThumbnail } doReturn fetchThumbnailLambda
+                on { fetchPreview } doReturn fetchPreviewLambda
+            }
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(false)
-            whenever(imageNode.fetchPreview).thenReturn(fetchPreviewLambda)
 
             val fetchFullImageLambda: (Boolean, () -> Unit) -> Flow<ImageProgress> = mock {
                 onBlocking { invoke(any(), any()) }.thenReturn(flow {

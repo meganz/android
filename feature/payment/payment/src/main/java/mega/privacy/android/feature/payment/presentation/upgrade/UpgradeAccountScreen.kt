@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -67,7 +68,6 @@ import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
-import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,7 +87,7 @@ fun UpgradeAccountScreen(
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val resources = LocalResources.current
-    val locale = Locale.getDefault()
+    val locale = LocalLocale.current.platformLocale
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 

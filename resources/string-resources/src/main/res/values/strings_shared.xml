@@ -2873,4 +2873,6 @@
     </plurals>
     <!-- Sort parameter label indicating the sort option for nodes based on the last accessed timestamp -->
     <string name="node_sort_option_last_accessed_label">Date</string>
+    <!-- Generic more options text tooltip for menu items -->
+    <string name="more_options">More options</string>
 </resources>

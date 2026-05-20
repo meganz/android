@@ -226,13 +226,11 @@ internal class ContactMessageViewModelTest {
 
     internal class CheckContactArgumentsProvider : ArgumentsProvider {
 
-        override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
-            return Stream.of(
-                Arguments.of(true, true),
-                Arguments.of(false, true),
-                Arguments.of(true, false),
-                Arguments.of(false, false),
-            )
-        }
+        override fun provideArguments(context: ExtensionContext) = Stream.of(
+            Arguments.of(true, true),
+            Arguments.of(false, true),
+            Arguments.of(true, false),
+            Arguments.of(false, false),
+        )
     }
 }

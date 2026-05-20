@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -71,7 +72,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -512,9 +512,9 @@ internal class TextEditorViewModelTest {
 
 
     private fun provideIsMarkDownFileTestData() = listOf(
-        arrayOf("file.md", true),
-        arrayOf("file.txt", false),
-        arrayOf(null, false),
+        arrayOf<Any?>("file.md", true),
+        arrayOf<Any?>("file.txt", false),
+        arrayOf<Any?>(null, false),
     )
 
     @Test

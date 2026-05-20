@@ -338,13 +338,16 @@ class DefaultAlbumRepositoryTest {
             AlbumId(3L),
         )
 
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest>()
         whenever(megaApiGateway.removeSet(any(), any())).thenAnswer {
             (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                mock(),
-                mock {
-                    on { errorCode }.thenReturn(MegaError.API_OK)
-                },
+                api,
+                request,
+                megaError,
             )
         }
 

@@ -245,12 +245,12 @@ class NodeExplorerSharedViewModelTest {
     }
 
     private fun storageStates() = listOf(
-        arrayOf(StorageState.Red, true),
-        arrayOf(StorageState.PayWall, true),
-        arrayOf(StorageState.Green, false),
-        arrayOf(StorageState.Change, false),
-        arrayOf(StorageState.Orange, false),
-        arrayOf(StorageState.Unknown, false)
+        arrayOf<Any>(StorageState.Red, true),
+        arrayOf<Any>(StorageState.PayWall, true),
+        arrayOf<Any>(StorageState.Green, false),
+        arrayOf<Any>(StorageState.Change, false),
+        arrayOf<Any>(StorageState.Orange, false),
+        arrayOf<Any>(StorageState.Unknown, false)
     )
 
     companion object {

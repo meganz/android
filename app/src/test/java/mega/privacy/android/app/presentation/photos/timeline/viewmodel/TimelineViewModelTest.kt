@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
-import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
 import mega.privacy.android.app.presentation.photos.model.RememberPreferences
@@ -31,8 +30,12 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -58,10 +61,7 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
-import mega.privacy.android.domain.entity.photos.FilterMediaType
-import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
-import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -344,7 +344,7 @@ internal class TimelineViewModelTest {
                     )
                 )
             val hasPhoto =
-                Correspondence.transforming<DateCard, Photo>({ it?.photo }, "contains photo")
+                Correspondence.transforming<DateCard?, Photo?>({ it?.photo }, "contains photo")
 
             assertWithMessage("Day card photos do not match").that(initialisedState.daysCardPhotos)
                 .comparingElementsUsing(hasPhoto)
@@ -814,7 +814,7 @@ internal class TimelineViewModelTest {
                     )
                 )
             val hasPhoto =
-                Correspondence.transforming<DateCard, Photo>({ it?.photo }, "contains photo")
+                Correspondence.transforming<DateCard?, Photo?>({ it?.photo }, "contains photo")
 
             assertWithMessage("Day card photos do not match").that(state.daysCardPhotos)
                 .comparingElementsUsing(hasPhoto)

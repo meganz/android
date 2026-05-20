@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -145,7 +146,7 @@ internal fun getLastSeenString(lastGreen: Int?): String? {
         }
 
         compareLastSeenWithToday(lastGreenCalendar) == 0 -> {
-            val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+            val dateFormat = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).apply {
                 timeZone = lastGreenCalendar.timeZone
             }
             val time = dateFormat.format(lastGreenCalendar.time)
@@ -153,14 +154,14 @@ internal fun getLastSeenString(lastGreen: Int?): String? {
         }
 
         else -> {
-            var dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault()).apply {
+            var dateFormat = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).apply {
                 timeZone = lastGreenCalendar.timeZone
             }
             val time = dateFormat.format(lastGreenCalendar.time)
 
             dateFormat = SimpleDateFormat(
-                DateFormat.getBestDateTimePattern(Locale.getDefault(), "dd MMM"),
-                Locale.getDefault()
+                DateFormat.getBestDateTimePattern(LocalLocale.current.platformLocale, "dd MMM"),
+                LocalLocale.current.platformLocale
             )
             val day = dateFormat.format(lastGreenCalendar.time)
             stringResource(R.string.last_seen_general, day, time)

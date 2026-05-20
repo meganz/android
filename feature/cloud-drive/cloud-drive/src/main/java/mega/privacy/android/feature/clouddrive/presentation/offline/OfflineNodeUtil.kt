@@ -3,6 +3,7 @@ package mega.privacy.android.feature.clouddrive.presentation.offline
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.formatter.formatFileSize
@@ -95,7 +96,7 @@ private fun getFileDescription(offlineFileInformation: OfflineFileInformation): 
 @Composable
 private fun formatModifiedDate(offlineFileInformation: OfflineFileInformation): String {
     val addedTime = offlineFileInformation.addedTime ?: return ""
-    return formatModifiedDate(java.util.Locale.getDefault(), addedTime)
+    return formatModifiedDate(LocalLocale.current.platformLocale, addedTime)
 }
 
 /**

@@ -264,8 +264,8 @@ class CloudDriveViewModelTest {
             on { name }.thenReturn(nodeName)
             on { isNodeKeyDecrypted }.thenReturn(true)
         }
-        whenever(getNodeInfoByIdUseCase(any())).thenReturn(nodeInfo)
         setupTestData(emptyList())
+        whenever(getNodeInfoByIdUseCase(any())).thenReturn(nodeInfo)
         val underTest = createViewModel()
         advanceUntilIdle()
         underTest.uiState.test {
@@ -280,8 +280,8 @@ class CloudDriveViewModelTest {
             on { name }.thenReturn("Test Folder2")
             on { isNodeKeyDecrypted }.thenReturn(false)
         }
-        whenever(getNodeInfoByIdUseCase(any())).thenReturn(nodeInfo)
         setupTestData(emptyList())
+        whenever(getNodeInfoByIdUseCase(any())).thenReturn(nodeInfo)
         val underTest = createViewModel()
         advanceUntilIdle()
         underTest.uiState.test {

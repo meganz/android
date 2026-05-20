@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -75,7 +76,6 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 import mega.privacy.android.shared.resources.R as sharedR
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 /**
  * Scheduled meeting info View
@@ -643,9 +643,9 @@ fun getStringForDndTime(seconds: Long): String {
     val df =
         SimpleDateFormat(
             android.text.format.DateFormat.getBestDateTimePattern(
-                Locale.getDefault(),
+                LocalLocale.current.platformLocale,
                 "HH:mm"
-            ), Locale.getDefault()
+            ), LocalLocale.current.platformLocale
         )
     val tz = cal.timeZone
 

@@ -19,17 +19,17 @@ internal class AccountTypeMapperTest {
     }
 
     private fun provideParameters() = listOf(
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_FREE, AccountType.FREE),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_PROI, AccountType.PRO_I),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_PROII, AccountType.PRO_II),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_PROIII, AccountType.PRO_III),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_LITE, AccountType.PRO_LITE),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_PRO_FLEXI, AccountType.PRO_FLEXI),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_BUSINESS, AccountType.BUSINESS),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_STARTER, AccountType.STARTER),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_BASIC, AccountType.BASIC),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_ESSENTIAL, AccountType.ESSENTIAL),
-        arrayOf(MegaAccountDetails.ACCOUNT_TYPE_FEATURE, AccountType.FREE),
-        arrayOf(999, AccountType.UNKNOWN)
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_FREE, AccountType.FREE),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_PROI, AccountType.PRO_I),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_PROII, AccountType.PRO_II),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_PROIII, AccountType.PRO_III),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_LITE, AccountType.PRO_LITE),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_PRO_FLEXI, AccountType.PRO_FLEXI),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_BUSINESS, AccountType.BUSINESS),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_STARTER, AccountType.STARTER),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_BASIC, AccountType.BASIC),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_ESSENTIAL, AccountType.ESSENTIAL),
+        arrayOf<Any>(MegaAccountDetails.ACCOUNT_TYPE_FEATURE, AccountType.FREE),
+        arrayOf<Any>(999, AccountType.UNKNOWN)
     )
 }

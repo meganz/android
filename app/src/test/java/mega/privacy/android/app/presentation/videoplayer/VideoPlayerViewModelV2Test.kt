@@ -915,12 +915,12 @@ class VideoPlayerViewModelV2Test {
         }
 
     private fun provideParametersForFolderLink() = listOf(
-        arrayOf(
+        arrayOf<Any>(
             INVALID_VALUE,
             suspend { getRootNodeFromMegaApiFolderUseCase() },
             suspend { getLocalFolderLinkUseCase(any()) }
         ),
-        arrayOf(
+        arrayOf<Any>(
             testHandle,
             suspend { getParentNodeFromMegaApiFolderUseCase(any()) },
             suspend { getLocalFolderLinkUseCase(any()) }

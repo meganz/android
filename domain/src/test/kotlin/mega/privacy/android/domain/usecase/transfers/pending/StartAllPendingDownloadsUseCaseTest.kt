@@ -290,7 +290,7 @@ class StartAllPendingDownloadsUseCaseTest {
         }
 
     @Test
-    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is added when there is an exception collecting the pending transfers`() =
+    fun `test that state is updated to ErrorStarting and failed completed transfer is added on collection error`() =
         runTest {
             val pendingTransfer = mock<PendingTransfer>()
             val pendingTransfers = listOf(pendingTransfer)
@@ -323,7 +323,7 @@ class StartAllPendingDownloadsUseCaseTest {
         }
 
     @Test
-    fun `test that pending transfers state is updated to ErrorStarting and failed completed transfer is not added when there is an exception collecting the pending transfers and pending transfer is a preview`() =
+    fun `test that state is updated to ErrorStarting and failed completed transfer is not added on collection error for preview transfer`() =
         runTest {
             val pendingTransfer = mock<PendingTransfer> {
                 on { appData } doReturn listOf(TransferAppData.PreviewDownload)

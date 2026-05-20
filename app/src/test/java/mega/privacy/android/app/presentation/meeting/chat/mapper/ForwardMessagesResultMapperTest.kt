@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
 import mega.privacy.android.domain.entity.chat.messages.ForwardResult
 import org.junit.jupiter.api.BeforeAll
@@ -39,243 +38,241 @@ class ForwardMessagesResultMapperTest {
         private val chatId = 123L
         private val otherChatId = 456L
 
-        override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
-            return Stream.of(
-                Arguments.of(
-                    listOf(ForwardResult.Success(chatId)),
-                    1,
-                    ForwardMessagesToChatsResult.AllSucceeded(chatId, 1)
+        override fun provideArguments(context: ExtensionContext) = Stream.of(
+            Arguments.of(
+                listOf(ForwardResult.Success(chatId)),
+                1,
+                ForwardMessagesToChatsResult.AllSucceeded(chatId, 1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.GeneralError),
+                1,
+                ForwardMessagesToChatsResult.AllFailed(1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.ErrorNotAvailable), 1,
+                ForwardMessagesToChatsResult.AllNotAvailable(1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.Success(chatId), ForwardResult.Success(otherChatId)),
+                1,
+                ForwardMessagesToChatsResult.AllSucceeded(null, 1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.Success(chatId), ForwardResult.GeneralError),
+                1,
+                ForwardMessagesToChatsResult.SomeFailed(chatId, 1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.Success(chatId), ForwardResult.ErrorNotAvailable),
+                1,
+                ForwardMessagesToChatsResult.SomeNotAvailable(chatId, 1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.GeneralError, ForwardResult.GeneralError),
+                1,
+                ForwardMessagesToChatsResult.AllFailed(1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.ErrorNotAvailable, ForwardResult.ErrorNotAvailable),
+                1,
+                ForwardMessagesToChatsResult.AllNotAvailable(1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.GeneralError, ForwardResult.ErrorNotAvailable),
+                1,
+                ForwardMessagesToChatsResult.AllFailed(1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.Success(chatId), ForwardResult.Success(chatId)),
+                2,
+                ForwardMessagesToChatsResult.AllSucceeded(chatId, 2)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.GeneralError),
-                    1,
-                    ForwardMessagesToChatsResult.AllFailed(1)
+                2,
+                ForwardMessagesToChatsResult.AllSucceeded(null, 2)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.Success(chatId), ForwardResult.GeneralError),
+                2,
+                ForwardMessagesToChatsResult.SomeFailed(chatId, 1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.Success(chatId), ForwardResult.ErrorNotAvailable),
+                2,
+                ForwardMessagesToChatsResult.SomeNotAvailable(chatId, 1)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.GeneralError, ForwardResult.GeneralError),
+                2,
+                ForwardMessagesToChatsResult.AllFailed(2)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.ErrorNotAvailable, ForwardResult.ErrorNotAvailable),
+                2,
+                ForwardMessagesToChatsResult.AllNotAvailable(2)
+            ),
+            Arguments.of(
+                listOf(ForwardResult.GeneralError, ForwardResult.ErrorNotAvailable),
+                2,
+                ForwardMessagesToChatsResult.AllFailed(2)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(chatId)
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.ErrorNotAvailable), 1,
-                    ForwardMessagesToChatsResult.AllNotAvailable(1)
+                3,
+                ForwardMessagesToChatsResult.AllSucceeded(chatId, 3)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.Success(chatId), ForwardResult.Success(otherChatId)),
-                    1,
-                    ForwardMessagesToChatsResult.AllSucceeded(null, 1)
+                3,
+                ForwardMessagesToChatsResult.AllSucceeded(null, 3)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.GeneralError,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.Success(chatId), ForwardResult.GeneralError),
-                    1,
-                    ForwardMessagesToChatsResult.SomeFailed(chatId, 1)
+                3,
+                ForwardMessagesToChatsResult.SomeFailed(chatId, 1)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.GeneralError,
+                    ForwardResult.Success(otherChatId),
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.Success(chatId), ForwardResult.ErrorNotAvailable),
-                    1,
-                    ForwardMessagesToChatsResult.SomeNotAvailable(chatId, 1)
+                3,
+                ForwardMessagesToChatsResult.SomeFailed(null, 1)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.GeneralError,
+                    ForwardResult.GeneralError,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.GeneralError, ForwardResult.GeneralError),
-                    1,
-                    ForwardMessagesToChatsResult.AllFailed(1)
+                3,
+                ForwardMessagesToChatsResult.SomeFailed(null, 2)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.ErrorNotAvailable,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.ErrorNotAvailable, ForwardResult.ErrorNotAvailable),
-                    1,
-                    ForwardMessagesToChatsResult.AllNotAvailable(1)
+                3,
+                ForwardMessagesToChatsResult.SomeNotAvailable(chatId, 1)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.Success(otherChatId),
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.GeneralError, ForwardResult.ErrorNotAvailable),
-                    1,
-                    ForwardMessagesToChatsResult.AllFailed(1)
+                3,
+                ForwardMessagesToChatsResult.SomeNotAvailable(null, 1)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.Success(chatId),
+                    ForwardResult.Success(otherChatId),
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.Success(chatId), ForwardResult.Success(chatId)),
-                    2,
-                    ForwardMessagesToChatsResult.AllSucceeded(chatId, 2)
+                3,
+                ForwardMessagesToChatsResult.SomeNotAvailable(null, 2)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.GeneralError,
+                    ForwardResult.GeneralError,
+                    ForwardResult.GeneralError,
                 ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                    ),
-                    2,
-                    ForwardMessagesToChatsResult.AllSucceeded(null, 2)
+                3,
+                ForwardMessagesToChatsResult.AllFailed(3)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.GeneralError,
+                    ForwardResult.GeneralError,
+                    ForwardResult.GeneralError,
+                    ForwardResult.GeneralError,
+                    ForwardResult.GeneralError,
+                    ForwardResult.GeneralError,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.Success(chatId), ForwardResult.GeneralError),
-                    2,
-                    ForwardMessagesToChatsResult.SomeFailed(chatId, 1)
+                3,
+                ForwardMessagesToChatsResult.AllFailed(3)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.Success(chatId), ForwardResult.ErrorNotAvailable),
-                    2,
-                    ForwardMessagesToChatsResult.SomeNotAvailable(chatId, 1)
+                3,
+                ForwardMessagesToChatsResult.AllNotAvailable(3)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.GeneralError, ForwardResult.GeneralError),
-                    2,
-                    ForwardMessagesToChatsResult.AllFailed(2)
+                3,
+                ForwardMessagesToChatsResult.AllNotAvailable(3)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.GeneralError,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.ErrorNotAvailable, ForwardResult.ErrorNotAvailable),
-                    2,
-                    ForwardMessagesToChatsResult.AllNotAvailable(2)
+                3,
+                ForwardMessagesToChatsResult.AllFailed(3)
+            ),
+            Arguments.of(
+                listOf(
+                    ForwardResult.GeneralError,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.GeneralError,
+                    ForwardResult.ErrorNotAvailable,
+                    ForwardResult.ErrorNotAvailable,
                 ),
-                Arguments.of(
-                    listOf(ForwardResult.GeneralError, ForwardResult.ErrorNotAvailable),
-                    2,
-                    ForwardMessagesToChatsResult.AllFailed(2)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(chatId)
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.AllSucceeded(chatId, 3)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.AllSucceeded(null, 3)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.GeneralError,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.SomeFailed(chatId, 1)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.GeneralError,
-                        ForwardResult.Success(otherChatId),
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.SomeFailed(null, 1)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.GeneralError,
-                        ForwardResult.GeneralError,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.SomeFailed(null, 2)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.ErrorNotAvailable,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.SomeNotAvailable(chatId, 1)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.Success(otherChatId),
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.SomeNotAvailable(null, 1)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.Success(chatId),
-                        ForwardResult.Success(otherChatId),
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.SomeNotAvailable(null, 2)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.GeneralError,
-                        ForwardResult.GeneralError,
-                        ForwardResult.GeneralError,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.AllFailed(3)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.GeneralError,
-                        ForwardResult.GeneralError,
-                        ForwardResult.GeneralError,
-                        ForwardResult.GeneralError,
-                        ForwardResult.GeneralError,
-                        ForwardResult.GeneralError,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.AllFailed(3)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.AllNotAvailable(3)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.AllNotAvailable(3)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.GeneralError,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.AllFailed(3)
-                ),
-                Arguments.of(
-                    listOf(
-                        ForwardResult.GeneralError,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.GeneralError,
-                        ForwardResult.ErrorNotAvailable,
-                        ForwardResult.ErrorNotAvailable,
-                    ),
-                    3,
-                    ForwardMessagesToChatsResult.AllFailed(3)
-                ),
-            )
-        }
+                3,
+                ForwardMessagesToChatsResult.AllFailed(3)
+            ),
+        )
     }
 }

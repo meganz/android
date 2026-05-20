@@ -3188,14 +3188,12 @@ internal class ChatViewModelTest {
 
 internal class StartCallArgumentsProvider : ArgumentsProvider {
 
-    override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
-        return Stream.of(
-            Arguments.of(false, false, false),
-            Arguments.of(false, true, false),
-            Arguments.of(false, false, true),
-            Arguments.of(false, true, true),
-            Arguments.of(true, true, false),
-            Arguments.of(true, true, true),
-        )
-    }
+    override fun provideArguments(context: ExtensionContext) = Stream.of(
+        Arguments.of(false, false, false),
+        Arguments.of(false, true, false),
+        Arguments.of(false, false, true),
+        Arguments.of(false, true, true),
+        Arguments.of(true, true, false),
+        Arguments.of(true, true, true),
+    )
 }

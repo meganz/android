@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 
 import androidx.documentfile.provider.DocumentFile
 
+
 internal sealed interface SyncNewFolderAction {
 
     /**

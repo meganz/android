@@ -63,12 +63,10 @@ internal class OpenOrStartCallArgumentsProvider : ArgumentsProvider {
 
     private val chatId = 123L
 
-    override fun provideArguments(context: ExtensionContext): Stream<out Arguments>? {
-        return Stream.of(
-            Arguments.of(-1L, null, null),
-            Arguments.of(chatId, null, null),
-            Arguments.of(chatId, mock<ChatCall>(), null),
-            Arguments.of(chatId, null, mock<ChatCall> { on { this.chatId } doReturn chatId }),
-        )
-    }
+    override fun provideArguments(context: ExtensionContext) = Stream.of(
+        Arguments.of(-1L, null, null),
+        Arguments.of(chatId, null, null),
+        Arguments.of(chatId, mock<ChatCall>(), null),
+        Arguments.of(chatId, null, mock<ChatCall> { on { this.chatId } doReturn chatId }),
+    )
 }
