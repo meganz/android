@@ -30,6 +30,8 @@ internal class ChatExplorerUiItemMapper @Inject constructor(
                 isHint = false,
                 isSelected = false,
                 isEnabled = isWritable,
+                isArchived = chat.isArchived,
+                lastTimestamp = chat.lastTimestamp,
             )
 
             chat.isGroup || chat.peerHandle == INVALID_HANDLE ->
@@ -43,6 +45,8 @@ internal class ChatExplorerUiItemMapper @Inject constructor(
                 userStatus = onlineStatus(chat.peerHandle),
                 isSelected = false,
                 isEnabled = isWritable,
+                isArchived = chat.isArchived,
+                lastTimestamp = chat.lastTimestamp,
             )
         }
     }
@@ -84,6 +88,8 @@ internal class ChatExplorerUiItemMapper @Inject constructor(
                 participants = participants,
                 isSelected = false,
                 isEnabled = isWritable,
+                isArchived = chat.isArchived,
+                lastTimestamp = chat.lastTimestamp,
             )
         } else {
             ChatExplorerUiItem.GroupChat(
@@ -92,6 +98,8 @@ internal class ChatExplorerUiItemMapper @Inject constructor(
                 participants = participants,
                 isSelected = false,
                 isEnabled = isWritable,
+                isArchived = chat.isArchived,
+                lastTimestamp = chat.lastTimestamp,
             )
         }
     }

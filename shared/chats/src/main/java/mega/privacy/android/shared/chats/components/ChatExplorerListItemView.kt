@@ -276,18 +276,24 @@ private class ChatExplorerListItemPreviewParameterProvider :
                 isHint = true,
                 isSelected = false,
                 isEnabled = true,
+                isArchived = false,
+                lastTimestamp = 0L,
             ),
             ChatExplorerUiItem.NoteToSelf(
                 id = 2L,
                 isHint = true,
                 isSelected = true,
                 isEnabled = true,
+                isArchived = false,
+                lastTimestamp = 0L,
             ),
             ChatExplorerUiItem.NoteToSelf(
                 id = 3L,
                 isHint = false,
                 isSelected = false,
                 isEnabled = true,
+                isArchived = false,
+                lastTimestamp = 0L,
             ),
             ChatExplorerUiItem.GroupChat(
                 id = 4L,
@@ -295,6 +301,8 @@ private class ChatExplorerListItemPreviewParameterProvider :
                 participants = 12,
                 isSelected = false,
                 isEnabled = true,
+                isArchived = false,
+                lastTimestamp = 0L,
             ),
             ChatExplorerUiItem.GroupChat(
                 id = 5L,
@@ -302,6 +310,8 @@ private class ChatExplorerListItemPreviewParameterProvider :
                 participants = 3,
                 isSelected = true,
                 isEnabled = false,
+                isArchived = false,
+                lastTimestamp = 0L,
             ),
             ChatExplorerUiItem.Meeting(
                 id = 6L,
@@ -309,6 +319,8 @@ private class ChatExplorerListItemPreviewParameterProvider :
                 participants = 5,
                 isSelected = true,
                 isEnabled = true,
+                isArchived = false,
+                lastTimestamp = 0L,
             ),
             ChatExplorerUiItem.OneToOneChat(
                 id = 7L,
@@ -319,6 +331,8 @@ private class ChatExplorerListItemPreviewParameterProvider :
                 secondaryColor = previewAvatarSecondary,
                 isSelected = false,
                 isEnabled = true,
+                isArchived = false,
+                lastTimestamp = 0L,
             ),
             ChatExplorerUiItem.Contact(
                 id = 8L,

@@ -20,6 +20,8 @@ sealed class ChatExplorerUiItem {
     abstract val id: Long
     abstract val isSelected: Boolean
     abstract val isEnabled: Boolean
+    abstract val isArchived: Boolean
+    abstract val lastTimestamp: Long
     open val icon: ImageVector? = null
     open val hasAvatarIcon: Boolean = false
 
@@ -46,6 +48,8 @@ sealed class ChatExplorerUiItem {
         val isHint: Boolean,
         override val isSelected: Boolean,
         override val isEnabled: Boolean = true,
+        override val isArchived: Boolean,
+        override val lastTimestamp: Long,
         override val icon: ImageVector = IconPack.Medium.Thin.Outline.FileText,
         override val hasAvatarIcon: Boolean = !isHint,
     ) : ChatExplorerUiItem()
@@ -69,6 +73,8 @@ sealed class ChatExplorerUiItem {
         override val isEnabled: Boolean,
         override val participants: Int,
         override val title: String,
+        override val isArchived: Boolean,
+        override val lastTimestamp: Long,
         override val icon: ImageVector = IconPack.Medium.Thin.Solid.Video,
         override val hasAvatarIcon: Boolean = true,
     ) : GroupChatAndMeeting()
@@ -83,6 +89,8 @@ sealed class ChatExplorerUiItem {
         override val isEnabled: Boolean,
         override val participants: Int,
         override val title: String,
+        override val isArchived: Boolean,
+        override val lastTimestamp: Long,
         override val icon: ImageVector = IconPack.Medium.Thin.Solid.MessageChatCircle,
         override val hasAvatarIcon: Boolean = true,
     ) : GroupChatAndMeeting()
@@ -114,6 +122,8 @@ sealed class ChatExplorerUiItem {
         override val userStatus: ChatStatus,
         override val isSelected: Boolean,
         override val isEnabled: Boolean,
+        override val isArchived: Boolean,
+        override val lastTimestamp: Long,
     ) : OneToOneChatAndContact()
 
     /**
@@ -130,5 +140,7 @@ sealed class ChatExplorerUiItem {
         override val secondaryColor: Color? = null,
         override val isSelected: Boolean,
         override val isEnabled: Boolean,
+        override val isArchived: Boolean = true,
+        override val lastTimestamp: Long = -1,
     ) : OneToOneChatAndContact()
 }

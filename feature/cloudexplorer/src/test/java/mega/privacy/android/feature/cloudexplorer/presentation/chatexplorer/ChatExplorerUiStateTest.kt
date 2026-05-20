@@ -80,6 +80,8 @@ internal class ChatExplorerUiStateTest {
             participants = 3,
             isSelected = false,
             isEnabled = true,
+            isArchived = false,
+            lastTimestamp = 0L,
         )
 
         val result = item.withSelected(true) as ChatExplorerUiItem.Meeting
@@ -96,6 +98,8 @@ internal class ChatExplorerUiStateTest {
             userStatus = ChatStatus.Offline,
             isSelected = false,
             isEnabled = true,
+            isArchived = false,
+            lastTimestamp = 0L,
         )
 
         val result = item.withSelected(true) as ChatExplorerUiItem.OneToOneChat
@@ -127,6 +131,8 @@ internal class ChatExplorerUiStateTest {
         isHint = false,
         isSelected = isSelected,
         isEnabled = true,
+        isArchived = false,
+        lastTimestamp = 0L,
     )
 
     private fun groupChat(
@@ -138,5 +144,7 @@ internal class ChatExplorerUiStateTest {
         participants = 2,
         isSelected = isSelected,
         isEnabled = true,
+        isArchived = false,
+        lastTimestamp = 0L,
     )
 }

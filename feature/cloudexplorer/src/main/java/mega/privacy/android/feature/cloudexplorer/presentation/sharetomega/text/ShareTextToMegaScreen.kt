@@ -9,6 +9,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -16,7 +18,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
-import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.NewURLFileDialogNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
@@ -32,7 +33,8 @@ internal fun ShareTextToMegaScreen(
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     onFileUriConsumed: () -> Unit,
-    onStartNewGroupChat: ((CreateGroupChatNavKey.NewGroupChatResult) -> Unit) -> Unit = {},
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     when (uiState) {
         is ShareTextToMegaUiState.Loading -> {
@@ -75,7 +77,8 @@ internal fun ShareTextToMegaScreen(
                         }
                     )
                 },
-                onStartNewGroupChat = onStartNewGroupChat,
+                monitorResult = monitorResult,
+                clearResult = clearResult,
             )
 
             ShareToMegaUpload(

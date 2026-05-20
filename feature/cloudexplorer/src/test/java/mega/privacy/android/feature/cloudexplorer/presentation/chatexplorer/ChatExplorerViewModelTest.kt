@@ -4,6 +4,8 @@ import androidx.compose.ui.graphics.Color
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -12,18 +14,17 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.chat.ChatListItem
+import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserContact
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
-import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactHandleUseCase
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import org.junit.jupiter.api.AfterEach
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -49,8 +51,6 @@ internal class ChatExplorerViewModelTest {
     private val getNoteToSelfChatUseCase = mock<GetNoteToSelfChatUseCase>()
     private val monitorChatListItemUpdates = mock<MonitorChatListItemUpdates>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
-    private val get1On1ChatIdUseCase = mock<Get1On1ChatIdUseCase>()
-    private val getContactHandleUseCase = mock<GetContactHandleUseCase>()
     private val chatExplorerUiItemMapper = mock<ChatExplorerUiItemMapper>()
 
     @AfterEach
@@ -62,8 +62,6 @@ internal class ChatExplorerViewModelTest {
             getNoteToSelfChatUseCase,
             monitorChatListItemUpdates,
             createGroupChatRoomUseCase,
-            get1On1ChatIdUseCase,
-            getContactHandleUseCase,
             chatExplorerUiItemMapper,
         )
     }
@@ -75,8 +73,6 @@ internal class ChatExplorerViewModelTest {
         getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
         monitorChatListItemUpdates = monitorChatListItemUpdates,
         createGroupChatRoomUseCase = createGroupChatRoomUseCase,
-        get1On1ChatIdUseCase = get1On1ChatIdUseCase,
-        getContactHandleUseCase = getContactHandleUseCase,
         chatExplorerUiItemMapper = chatExplorerUiItemMapper,
     )
 
@@ -109,6 +105,8 @@ internal class ChatExplorerViewModelTest {
             isHint = false,
             isSelected = false,
             isEnabled = true,
+            isArchived = chat.isArchived,
+            lastTimestamp = chat.lastTimestamp,
         )
 
         chat.isGroup -> ChatExplorerUiItem.GroupChat(
@@ -117,6 +115,8 @@ internal class ChatExplorerViewModelTest {
             participants = 0,
             isSelected = false,
             isEnabled = true,
+            isArchived = chat.isArchived,
+            lastTimestamp = chat.lastTimestamp,
         )
 
         else -> ChatExplorerUiItem.OneToOneChat(
@@ -127,6 +127,8 @@ internal class ChatExplorerViewModelTest {
             userStatus = ChatStatus.Offline,
             isSelected = false,
             isEnabled = true,
+            isArchived = chat.isArchived,
+            lastTimestamp = chat.lastTimestamp,
         )
     }
 
@@ -159,14 +161,18 @@ internal class ChatExplorerViewModelTest {
         isGroup: Boolean = false,
         isNoteToSelf: Boolean = false,
         peerHandle: Long = if (isGroup || isNoteToSelf) -1L else chatId,
+        changes: ChatListItemChanges? = null,
+        isArchived: Boolean = false,
     ) = ChatListItem(
         chatId = chatId,
         title = title,
+        changes = changes,
         ownPrivilege = ChatRoomPermission.Standard,
         isGroup = isGroup,
         isNoteToSelf = isNoteToSelf,
         peerHandle = peerHandle,
         lastTimestamp = lastTimestamp,
+        isArchived = isArchived,
     )
 
     private fun contactItem(
@@ -264,13 +270,16 @@ internal class ChatExplorerViewModelTest {
     }
 
     @Test
-    fun `test that monitorChatListItemUpdates triggers a reload`() = runTest {
+    fun `test that update for new chat is prepended to recents`() = runTest {
         val first = chatItem(chatId = 1L, title = "First", lastTimestamp = 100L)
-        val second = chatItem(chatId = 2L, title = "Second", lastTimestamp = 200L)
+        val second = chatItem(
+            chatId = 2L,
+            title = "Second",
+            lastTimestamp = 200L,
+            changes = ChatListItemChanges.LastTS,
+        )
         val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
-        whenever(getActiveChatListItemsUseCase())
-            .thenReturn(listOf(first))
-            .thenReturn(listOf(first, second))
+        whenever(getActiveChatListItemsUseCase()).thenReturn(listOf(first))
         whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
         whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
         whenever(monitorChatListItemUpdates()).thenReturn(updates)
@@ -284,19 +293,540 @@ internal class ChatExplorerViewModelTest {
             updates.emit(second)
             val secondData = awaitItem() as ChatExplorerUiState.Data
             assertThat(secondData.recents.map { it.id }).containsExactly(2L, 1L).inOrder()
+            verify(getActiveChatListItemsUseCase, times(1)).invoke()
         }
     }
 
     @Test
-    fun `test that archived noteToSelf is excluded from others`() = runTest {
-        val archivedNote = chatItem(chatId = 9L, title = "Note", isNoteToSelf = true)
+    fun `test that update for existing chat in recents replaces it in place`() = runTest {
+        val original = chatItem(
+            chatId = 1L,
+            title = "Original",
+            isGroup = true,
+            lastTimestamp = 100L,
+        )
+        val renamed = chatItem(
+            chatId = 1L,
+            title = "Renamed",
+            isGroup = true,
+            lastTimestamp = 100L,
+            changes = ChatListItemChanges.Title,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(listOf(original))
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(listOf(original, renamed))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat((before.recents.single() as ChatExplorerUiItem.GroupChat).title)
+                .isEqualTo("Original")
+
+            updates.emit(renamed)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.recents).hasSize(1)
+            assertThat((after.recents.single() as ChatExplorerUiItem.GroupChat).title)
+                .isEqualTo("Renamed")
+            verify(getActiveChatListItemsUseCase, times(1)).invoke()
+        }
+    }
+
+    @Test
+    fun `test that update with non in place change is ignored`() = runTest {
+        val first = chatItem(
+            chatId = 1L,
+            title = "Renamed",
+            isGroup = true,
+            changes = ChatListItemChanges.Title,
+        )
+        val ignored = chatItem(
+            chatId = 2L,
+            title = "Ignored",
+            isGroup = true,
+            changes = ChatListItemChanges.UnreadCount,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 2)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(listOf(first, ignored))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val empty = awaitData()
+            assertThat(empty.recents).isEmpty()
+
+            updates.emit(ignored)
+            updates.emit(first)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.recents.map { it.id }).containsExactly(1L)
+            assertThat(after.others).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that new chat overflowing recents pushes oldest to others`() = runTest {
+        val recents = (1..5).map { i ->
+            chatItem(chatId = i.toLong(), title = "Chat $i", lastTimestamp = i.toLong())
+        }
+        val newChat = chatItem(
+            chatId = 100L,
+            title = "Zebra",
+            isGroup = true,
+            lastTimestamp = 500L,
+            changes = ChatListItemChanges.LastTS,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(recents)
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(recents + newChat)
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat(before.recents.map { it.id })
+                .containsExactly(5L, 4L, 3L, 2L, 1L).inOrder()
+            assertThat(before.others).isEmpty()
+
+            updates.emit(newChat)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.recents.map { it.id })
+                .containsExactly(100L, 5L, 4L, 3L, 2L).inOrder()
+            assertThat(after.others.map { it.id }).containsExactly(1L)
+        }
+    }
+
+    @Test
+    fun `test that sequential updates compound over the latest state`() = runTest {
+        val firstChat = chatItem(
+            chatId = 1L,
+            title = "First",
+            lastTimestamp = 100L,
+            changes = ChatListItemChanges.LastTS,
+        )
+        val secondChat = chatItem(
+            chatId = 2L,
+            title = "Second",
+            lastTimestamp = 200L,
+            changes = ChatListItemChanges.LastTS,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 2)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(listOf(firstChat, secondChat))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            awaitData()
+
+            updates.emit(firstChat)
+            val afterFirst = awaitItem() as ChatExplorerUiState.Data
+            assertThat(afterFirst.recents.map { it.id }).containsExactly(1L)
+
+            updates.emit(secondChat)
+            val afterSecond = awaitItem() as ChatExplorerUiState.Data
+            assertThat(afterSecond.recents.map { it.id }).containsExactly(2L, 1L).inOrder()
+        }
+    }
+
+    @Test
+    fun `test that archive update moves a recents chat into others`() = runTest {
+        val first = chatItem(chatId = 1L, title = "Alpha", isGroup = true, lastTimestamp = 100L)
+        val second = chatItem(chatId = 2L, title = "Beta", isGroup = true, lastTimestamp = 200L)
+        val archived = chatItem(
+            chatId = 1L,
+            title = "Alpha",
+            isGroup = true,
+            lastTimestamp = 100L,
+            changes = ChatListItemChanges.Archive,
+            isArchived = true,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(listOf(first, second))
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(listOf(first, second, archived))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat(before.recents.map { it.id }).containsExactly(2L, 1L).inOrder()
+            assertThat(before.others).isEmpty()
+
+            updates.emit(archived)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.recents.map { it.id }).containsExactly(2L)
+            assertThat(after.others.map { it.id }).containsExactly(1L)
+        }
+    }
+
+    @Test
+    fun `test that archive from recents promotes the highest-timestamp active overflow`() = runTest {
+        val recents = (1..5).map { i ->
+            chatItem(chatId = i.toLong(), title = "Chat $i", lastTimestamp = i.toLong() + 10)
+        }
+        val overflowZ =
+            chatItem(chatId = 100L, title = "Zebra", isGroup = true, lastTimestamp = 9L)
+        val overflowA =
+            chatItem(chatId = 101L, title = "Aardvark", isGroup = true, lastTimestamp = 5L)
+        val archivedOldest = chatItem(
+            chatId = 1L,
+            title = "Chat 1",
+            lastTimestamp = 11L,
+            changes = ChatListItemChanges.Archive,
+            isArchived = true,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase())
+            .thenReturn(recents + overflowZ + overflowA)
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(recents + overflowZ + overflowA + archivedOldest)
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat(before.recents.map { it.id })
+                .containsExactly(5L, 4L, 3L, 2L, 1L).inOrder()
+            assertThat(before.others.map { it.id }).containsExactly(101L, 100L)
+
+            updates.emit(archivedOldest)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.recents.map { it.id })
+                .containsExactly(5L, 4L, 3L, 2L, 100L).inOrder()
+            assertThat(after.others.map { it.id }).containsExactly(101L, 1L)
+        }
+    }
+
+    @Test
+    fun `test that archive from recents skips archived items when picking promotion`() = runTest {
+        val recents = (1..5).map { i ->
+            chatItem(chatId = i.toLong(), title = "Chat $i", lastTimestamp = i.toLong() + 10)
+        }
+        val archivedAlpha = chatItem(
+            chatId = 200L,
+            title = "Aardvark archived",
+            isGroup = true,
+            isArchived = true,
+        )
+        val activeOverflow = chatItem(
+            chatId = 201L,
+            title = "Zebra active",
+            isGroup = true,
+            lastTimestamp = 5L,
+        )
+        val archivingFromRecents = chatItem(
+            chatId = 1L,
+            title = "Chat 1",
+            lastTimestamp = 11L,
+            changes = ChatListItemChanges.Archive,
+            isArchived = true,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(recents + activeOverflow)
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(listOf(archivedAlpha))
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(recents + activeOverflow + archivedAlpha + archivingFromRecents)
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat(before.others.map { it.id }).containsExactly(200L, 201L)
+
+            updates.emit(archivingFromRecents)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.recents.map { it.id })
+                .containsExactly(5L, 4L, 3L, 2L, 201L).inOrder()
+            assertThat(after.others.map { it.id }).containsExactly(200L, 1L)
+        }
+    }
+
+    @Test
+    fun `test that archive update for a new chat inserts it into others`() = runTest {
+        val present = chatItem(chatId = 1L, title = "Alpha", isGroup = true, lastTimestamp = 100L)
+        val newArchived = chatItem(
+            chatId = 9L,
+            title = "Aardvark",
+            isGroup = true,
+            lastTimestamp = 50L,
+            changes = ChatListItemChanges.Archive,
+            isArchived = true,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(listOf(present))
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(listOf(present, newArchived))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat(before.recents.map { it.id }).containsExactly(1L)
+            assertThat(before.others).isEmpty()
+
+            updates.emit(newArchived)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.recents.map { it.id }).containsExactly(1L)
+            assertThat(after.others.map { it.id }).containsExactly(9L)
+        }
+    }
+
+    @Test
+    fun `test that unarchive update moves an others chat into recents when there is room`() =
+        runTest {
+            val active = chatItem(chatId = 1L, title = "Active", isGroup = true, lastTimestamp = 100L)
+            val archivedChat = chatItem(
+                chatId = 2L,
+                title = "Archived",
+                isGroup = true,
+                lastTimestamp = 50L,
+                isArchived = true,
+            )
+            val unarchived = chatItem(
+                chatId = 2L,
+                title = "Archived",
+                isGroup = true,
+                lastTimestamp = 50L,
+                changes = ChatListItemChanges.Archive,
+                isArchived = false,
+            )
+            val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+            whenever(getActiveChatListItemsUseCase()).thenReturn(listOf(active))
+            whenever(getArchivedChatListItemsUseCase()).thenReturn(listOf(archivedChat))
+            whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+            whenever(monitorChatListItemUpdates()).thenReturn(updates)
+            stubMapperForChats(listOf(active, archivedChat, unarchived))
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                val before = awaitData()
+                assertThat(before.recents.map { it.id }).containsExactly(1L)
+                assertThat(before.others.map { it.id }).containsExactly(2L)
+
+                updates.emit(unarchived)
+                val after = awaitItem() as ChatExplorerUiState.Data
+                assertThat(after.recents.map { it.id }).containsExactly(1L, 2L).inOrder()
+                assertThat(after.others).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that unarchive update keeps chat in others when its timestamp is below recents minimum`() =
+        runTest {
+            val recents = (1..5).map { i ->
+                chatItem(chatId = i.toLong(), title = "Chat $i", lastTimestamp = i.toLong() + 100)
+            }
+            val archivedChat = chatItem(
+                chatId = 9L,
+                title = "Archived",
+                isGroup = true,
+                lastTimestamp = 50L,
+                isArchived = true,
+            )
+            val unarchived = chatItem(
+                chatId = 9L,
+                title = "Reactivated",
+                isGroup = true,
+                lastTimestamp = 50L,
+                changes = ChatListItemChanges.Archive,
+                isArchived = false,
+            )
+            val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+            whenever(getActiveChatListItemsUseCase()).thenReturn(recents)
+            whenever(getArchivedChatListItemsUseCase()).thenReturn(listOf(archivedChat))
+            whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+            whenever(monitorChatListItemUpdates()).thenReturn(updates)
+            stubMapperForChats(recents + archivedChat + unarchived)
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                val before = awaitData()
+                assertThat(before.recents).hasSize(5)
+                assertThat((before.others.single() as ChatExplorerUiItem.GroupChat).title)
+                    .isEqualTo("Archived")
+
+                updates.emit(unarchived)
+                val after = awaitItem() as ChatExplorerUiState.Data
+                assertThat(after.recents.map { it.id })
+                    .containsExactly(5L, 4L, 3L, 2L, 1L).inOrder()
+                assertThat(after.others).hasSize(1)
+                assertThat((after.others.single() as ChatExplorerUiItem.GroupChat).title)
+                    .isEqualTo("Reactivated")
+            }
+        }
+
+    @Test
+    fun `test that unarchive update promotes the chat when its timestamp beats recents minimum`() =
+        runTest {
+            val recents = (1..5).map { i ->
+                chatItem(chatId = i.toLong(), title = "Chat $i", lastTimestamp = i.toLong())
+            }
+            val archivedChat = chatItem(
+                chatId = 9L,
+                title = "Archived",
+                isGroup = true,
+                lastTimestamp = 50L,
+                isArchived = true,
+            )
+            val unarchived = chatItem(
+                chatId = 9L,
+                title = "Reactivated",
+                isGroup = true,
+                lastTimestamp = 50L,
+                changes = ChatListItemChanges.Archive,
+                isArchived = false,
+            )
+            val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+            whenever(getActiveChatListItemsUseCase()).thenReturn(recents)
+            whenever(getArchivedChatListItemsUseCase()).thenReturn(listOf(archivedChat))
+            whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+            whenever(monitorChatListItemUpdates()).thenReturn(updates)
+            stubMapperForChats(recents + archivedChat + unarchived)
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                val before = awaitData()
+                assertThat(before.recents.map { it.id })
+                    .containsExactly(5L, 4L, 3L, 2L, 1L).inOrder()
+
+                updates.emit(unarchived)
+                val after = awaitItem() as ChatExplorerUiState.Data
+                assertThat(after.recents.map { it.id })
+                    .containsExactly(9L, 5L, 4L, 3L, 2L).inOrder()
+                assertThat(after.others.map { it.id }).containsExactly(1L)
+            }
+        }
+
+    @Test
+    fun `test that update for existing chat in others replaces it in place`() = runTest {
+        val recents = (1..5).map { i ->
+            chatItem(chatId = i.toLong(), title = "Chat $i", lastTimestamp = (10 - i).toLong())
+        }
+        val overflow = chatItem(chatId = 100L, title = "Zebra", isGroup = true, lastTimestamp = 0L)
+        val renamed = chatItem(
+            chatId = 100L,
+            title = "Aardvark",
+            isGroup = true,
+            lastTimestamp = 0L,
+            changes = ChatListItemChanges.Title,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(recents + overflow)
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(recents + overflow + renamed)
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat((before.others.single() as ChatExplorerUiItem.GroupChat).title)
+                .isEqualTo("Zebra")
+
+            updates.emit(renamed)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.others).hasSize(1)
+            assertThat((after.others.single() as ChatExplorerUiItem.GroupChat).title)
+                .isEqualTo("Aardvark")
+        }
+    }
+
+    @Test
+    fun `test that archived noteToSelf is placed in others`() = runTest {
+        val archivedNote = chatItem(
+            chatId = 9L,
+            title = "Note",
+            isNoteToSelf = true,
+            isArchived = true,
+        )
         stubChatLists(archived = listOf(archivedNote))
+        stubMapperForChats(listOf(archivedNote))
         val underTest = buildViewModel()
 
         underTest.uiState.test {
             val data = awaitData()
-            assertThat(data.others).isEmpty()
-            verifyNoInteractions(chatExplorerUiItemMapper)
+            assertThat(data.noteToSelf).isNull()
+            assertThat(data.others.single()).isInstanceOf(ChatExplorerUiItem.NoteToSelf::class.java)
+            assertThat(data.others.single().id).isEqualTo(9L)
+        }
+    }
+
+    @Test
+    fun `test that archiving the active noteToSelf moves it from slot into others`() = runTest {
+        val activeNote = chatItem(chatId = 9L, title = "Note", isNoteToSelf = true)
+        val archivedNote = chatItem(
+            chatId = 9L,
+            title = "Note",
+            isNoteToSelf = true,
+            isArchived = true,
+            changes = ChatListItemChanges.Archive,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(listOf(activeNote))
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(listOf(activeNote, archivedNote))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat(before.noteToSelf).isNotNull()
+            assertThat(before.others).isEmpty()
+
+            updates.emit(archivedNote)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.noteToSelf).isNull()
+            assertThat(after.others.single()).isInstanceOf(ChatExplorerUiItem.NoteToSelf::class.java)
+            assertThat(after.others.single().isArchived).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that unarchiving a noteToSelf in others moves it back into the slot`() = runTest {
+        val archivedNote = chatItem(
+            chatId = 9L,
+            title = "Note",
+            isNoteToSelf = true,
+            isArchived = true,
+        )
+        val unarchivedNote = chatItem(
+            chatId = 9L,
+            title = "Note",
+            isNoteToSelf = true,
+            isArchived = false,
+            changes = ChatListItemChanges.Archive,
+        )
+        val updates = MutableSharedFlow<ChatListItem>(extraBufferCapacity = 1)
+        whenever(getActiveChatListItemsUseCase()).thenReturn(emptyList())
+        whenever(getArchivedChatListItemsUseCase()).thenReturn(listOf(archivedNote))
+        whenever(getVisibleContactsWithoutChatRoomUseCase()).thenReturn(emptyList())
+        whenever(monitorChatListItemUpdates()).thenReturn(updates)
+        stubMapperForChats(listOf(archivedNote, unarchivedNote))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val before = awaitData()
+            assertThat(before.noteToSelf).isNull()
+            assertThat(before.others).hasSize(1)
+
+            updates.emit(unarchivedNote)
+            val after = awaitItem() as ChatExplorerUiState.Data
+            assertThat(after.noteToSelf).isNotNull()
+            assertThat(after.noteToSelf!!.isArchived).isFalse()
+            assertThat(after.others).isEmpty()
         }
     }
 
@@ -314,11 +844,18 @@ internal class ChatExplorerViewModelTest {
     }
 
     @Test
-    fun `test that onContactsSelectedForGroupChat opens 1on1 chat when single email selected`() =
+    fun `test that onContactsSelectedForGroupChat creates group when single email selected`() =
         runTest {
             stubChatLists()
-            whenever(getContactHandleUseCase("alice@mega.nz")).thenReturn(42L)
-            whenever(get1On1ChatIdUseCase(42L)).thenReturn(123L)
+            whenever(
+                createGroupChatRoomUseCase(
+                    emails = listOf("alice@mega.nz"),
+                    title = null,
+                    isEkr = false,
+                    addParticipants = true,
+                    chatLink = false,
+                )
+            ).thenReturn(123L)
             val underTest = buildViewModel()
 
             underTest.onContactsSelectedForGroupChat(
@@ -331,8 +868,13 @@ internal class ChatExplorerViewModelTest {
                 )
             )
 
-            verify(get1On1ChatIdUseCase).invoke(42L)
-            verifyNoInteractions(createGroupChatRoomUseCase)
+            verify(createGroupChatRoomUseCase).invoke(
+                emails = listOf("alice@mega.nz"),
+                title = null,
+                isEkr = false,
+                addParticipants = true,
+                chatLink = false,
+            )
         }
 
     @Test
@@ -358,7 +900,6 @@ internal class ChatExplorerViewModelTest {
                 addParticipants = false,
                 chatLink = true,
             )
-            verifyNoInteractions(get1On1ChatIdUseCase)
         }
 
     @Test
@@ -378,8 +919,77 @@ internal class ChatExplorerViewModelTest {
             )
 
             verifyNoInteractions(createGroupChatRoomUseCase)
-            verifyNoInteractions(get1On1ChatIdUseCase)
-            verifyNoInteractions(getContactHandleUseCase)
         }
+
+    @Test
+    fun `test that onContactsSelectedForGroupChat emits newChatCreatedEvent on success`() =
+        runTest {
+            stubChatLists()
+            stubMapperForChats(emptyList())
+            whenever(
+                createGroupChatRoomUseCase(
+                    emails = listOf("alice@mega.nz", "bob@mega.nz"),
+                    title = "Team",
+                    isEkr = false,
+                    addParticipants = true,
+                    chatLink = false,
+                )
+            ).thenReturn(456L)
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                val initial = awaitData()
+                assertThat(initial.newChatCreatedEvent).isEqualTo(consumed())
+
+                underTest.onContactsSelectedForGroupChat(
+                    CreateGroupChatNavKey.NewGroupChatResult(
+                        emails = listOf("alice@mega.nz", "bob@mega.nz"),
+                        title = "Team",
+                        isEkr = false,
+                        allowAddParticipants = true,
+                        isChatLink = false,
+                    )
+                )
+
+                val triggered = awaitItem() as ChatExplorerUiState.Data
+                assertThat(triggered.newChatCreatedEvent).isEqualTo(triggered(456L))
+            }
+        }
+
+    @Test
+    fun `test that onNewChatCreatedConsumed clears the event`() = runTest {
+        stubChatLists()
+        stubMapperForChats(emptyList())
+        whenever(
+            createGroupChatRoomUseCase(
+                emails = listOf("alice@mega.nz"),
+                title = null,
+                isEkr = false,
+                addParticipants = true,
+                chatLink = false,
+            )
+        ).thenReturn(789L)
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            awaitData()
+
+            underTest.onContactsSelectedForGroupChat(
+                CreateGroupChatNavKey.NewGroupChatResult(
+                    emails = listOf("alice@mega.nz"),
+                    title = null,
+                    isEkr = false,
+                    allowAddParticipants = true,
+                    isChatLink = false,
+                )
+            )
+            val triggered = awaitItem() as ChatExplorerUiState.Data
+            assertThat(triggered.newChatCreatedEvent).isEqualTo(triggered(789L))
+
+            underTest.onNewChatCreatedConsumed()
+            val consumed = awaitItem() as ChatExplorerUiState.Data
+            assertThat(consumed.newChatCreatedEvent).isEqualTo(consumed())
+        }
+    }
 
 }

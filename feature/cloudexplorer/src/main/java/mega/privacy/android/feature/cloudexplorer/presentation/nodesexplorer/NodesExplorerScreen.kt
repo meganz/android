@@ -16,6 +16,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -35,7 +37,6 @@ import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudE
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.NewURLFileDialogNavKey
@@ -65,7 +66,8 @@ internal fun NodesExplorerScreen(
     shareUris: List<UriPath>? = null,
     onStartUpload: (TransferTriggerEvent) -> Unit = {},
     onFileUriConsumed: () -> Unit = {},
-    onStartNewGroupChat: ((CreateGroupChatNavKey.NewGroupChatResult) -> Unit) -> Unit = {},
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     val uploadUrisEventState = rememberUploadUrisEventState()
     var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
@@ -119,7 +121,8 @@ internal fun NodesExplorerScreen(
         onFilesPicked = {},
         onNavigateBack = onNavigateBack,
         onNavigate = onNavigate,
-        onStartNewGroupChat = onStartNewGroupChat,
+        monitorResult = monitorResult,
+        clearResult = clearResult,
     )
 
     if (isShareToMega) {

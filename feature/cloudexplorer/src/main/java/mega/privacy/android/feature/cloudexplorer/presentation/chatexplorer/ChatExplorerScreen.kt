@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -25,6 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.consumed
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaText
@@ -48,7 +53,7 @@ import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
-internal fun ChatExplorerContent(
+private fun ChatExplorerContent(
     uiState: ChatExplorerUiState,
     selectedChatIds: Set<Long>,
     onNewGroupChatClick: () -> Unit,
@@ -110,7 +115,7 @@ private fun EmptyView(
                 onChatToggled = onChatToggled,
             )
         }
-        RecentChatsAndMeetingsHeaderItemView()
+        AllContactsChatsAndMeetingsHeaderItemView()
         EmptyStateView(
             modifier = Modifier
                 .weight(1f)
@@ -233,10 +238,41 @@ private fun NewGroupChatItemView(onClick: () -> Unit) {
 @Composable
 internal fun TabsScope.ChatExplorerTab(
     selectionState: ChatExplorerSelectionState,
-    onStartNewGroupChat: ((CreateGroupChatNavKey.NewGroupChatResult) -> Unit) -> Unit,
+    onNavigate: (NavKey) -> Unit,
+    monitorResult: (String) -> Flow<Any?>,
+    clearResult: (String) -> Unit,
 ) {
     val viewModel = hiltViewModel<ChatExplorerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val resources = LocalResources.current
+    val snackbarHostState = LocalSnackBarHostState.current
+    val coroutineScope = rememberCoroutineScope()
+    val newChatCreatedEvent =
+        (uiState as? ChatExplorerUiState.Data)?.newChatCreatedEvent ?: consumed()
+    val newGroupChatResult by monitorResult(CreateGroupChatNavKey.KEY)
+        .collectAsStateWithLifecycle(initialValue = null)
+
+    LaunchedEffect(newGroupChatResult) {
+        (newGroupChatResult as? CreateGroupChatNavKey.NewGroupChatResult)?.let { result ->
+            clearResult(CreateGroupChatNavKey.KEY)
+            viewModel.onContactsSelectedForGroupChat(result)
+        }
+    }
+
+    EventEffect(
+        event = newChatCreatedEvent,
+        onConsumed = viewModel::onNewChatCreatedConsumed,
+    ) { chatId ->
+        if (chatId !in selectionState.selectedChatIds) {
+            selectionState.toggleSelection(chatId)
+        }
+        coroutineScope.launch {
+            snackbarHostState?.showAutoDurationSnackbar(
+                resources.getString(sharedR.string.general_new_group_chat_created)
+            )
+        }
+    }
+
     addTextTabWithScrollableContent(
         tabItem = TabItems(
             title = stringResource(sharedR.string.general_chat),
@@ -246,9 +282,7 @@ internal fun TabsScope.ChatExplorerTab(
         ChatExplorerContent(
             uiState = uiState,
             selectedChatIds = selectionState.selectedChatIds,
-            onNewGroupChatClick = {
-                onStartNewGroupChat(viewModel::onContactsSelectedForGroupChat)
-            },
+            onNewGroupChatClick = { onNavigate(CreateGroupChatNavKey) },
             onChatToggled = selectionState::toggleSelection,
             modifier = modifier,
         )
@@ -292,6 +326,8 @@ private fun ChatExplorerContentPreview() {
                     isHint = false,
                     isSelected = false,
                     isEnabled = true,
+                    isArchived = false,
+                    lastTimestamp = 0L,
                 ),
                 recents = listOf(
                     ChatExplorerUiItem.OneToOneChat(
@@ -302,6 +338,8 @@ private fun ChatExplorerContentPreview() {
                         userStatus = ChatStatus.Online,
                         isSelected = true,
                         isEnabled = true,
+                        isArchived = false,
+                        lastTimestamp = 0L,
                     ),
                     ChatExplorerUiItem.GroupChat(
                         id = 12L,
@@ -309,6 +347,8 @@ private fun ChatExplorerContentPreview() {
                         participants = 8,
                         isSelected = false,
                         isEnabled = true,
+                        isArchived = false,
+                        lastTimestamp = 0L,
                     ),
                 ),
                 others = listOf(
@@ -354,6 +394,8 @@ private fun ChatExplorerEmptyListPreview() {
                     isHint = false,
                     isSelected = false,
                     isEnabled = true,
+                    isArchived = false,
+                    lastTimestamp = 0L,
                 ),
                 recents = emptyList(),
                 others = emptyList(),

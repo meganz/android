@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -15,7 +17,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
-import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 
@@ -27,7 +28,8 @@ internal fun ShareFilesToMegaScreen(
     onStartUpload: (TransferTriggerEvent) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
-    onStartNewGroupChat: ((CreateGroupChatNavKey.NewGroupChatResult) -> Unit) -> Unit = {},
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     if (uiState is ShareFilesToMegaUiState.Loading) {
         //See if we need a loading view
@@ -54,7 +56,8 @@ internal fun ShareFilesToMegaScreen(
                 folderPickedIdLong = nodeId.longValue
                 uploadUrisEventState.trigger(dataUiState.shareUris.map { it.toUri() })
             },
-            onStartNewGroupChat = onStartNewGroupChat,
+            monitorResult = monitorResult,
+            clearResult = clearResult,
         )
 
         ShareToMegaUpload(

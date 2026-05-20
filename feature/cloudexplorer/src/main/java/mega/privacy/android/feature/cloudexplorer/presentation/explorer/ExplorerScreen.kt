@@ -19,6 +19,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -43,7 +45,6 @@ import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.Nod
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreenContent
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
 import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
-import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
@@ -67,7 +68,8 @@ internal fun ExplorerScreen(
     onFolderPicked: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
     onChatsSelected: (List<Long>) -> Unit = {},
-    onStartNewGroupChat: ((CreateGroupChatNavKey.NewGroupChatResult) -> Unit) -> Unit = {},
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
@@ -207,7 +209,9 @@ internal fun ExplorerScreen(
                 if (!isInnerNavigation && explorerMode.isChatAvailable) {
                     ChatExplorerTab(
                         selectionState = chatExplorerSelectionState,
-                        onStartNewGroupChat = onStartNewGroupChat,
+                        onNavigate = onNavigate,
+                        monitorResult = monitorResult,
+                        clearResult = clearResult,
                     )
                 }
             },

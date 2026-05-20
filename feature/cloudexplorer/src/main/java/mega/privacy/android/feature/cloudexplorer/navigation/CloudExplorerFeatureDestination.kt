@@ -66,19 +66,14 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                     factory.create(ShareFilesToMegaViewModel.Args(shareUris = key.shareUris))
                 }
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val onStartNewGroupChat = rememberStartNewGroupChat(
-                monitorResult = monitorResult,
-                clearResult = clearResult,
-                onNavigate = onNavigate,
-            )
-
             ShareFilesToMegaScreen(
                 uiState = uiState,
                 startNavKey = key,
                 onNavigateBack = { onNavigateBack(key) },
                 onStartUpload = onStartUpload,
                 onNavigate = onNavigate,
-                onStartNewGroupChat = onStartNewGroupChat,
+                monitorResult = monitorResult,
+                clearResult = clearResult,
             )
         }
     }
@@ -105,12 +100,6 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 },
             )
 
-            val onStartNewGroupChat = rememberStartNewGroupChat(
-                monitorResult = monitorResult,
-                clearResult = clearResult,
-                onNavigate = onNavigate,
-            )
-
             ShareTextToMegaScreen(
                 uiState = uiState,
                 startNavKey = key,
@@ -119,7 +108,8 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 onFileUriConsumed = viewModel::onFileUriConsumed,
-                onStartNewGroupChat = onStartNewGroupChat,
+                monitorResult = monitorResult,
+                clearResult = clearResult,
             )
         }
     }
@@ -154,12 +144,6 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                     fileUri to viewModel::onFileUriConsumed
                 } ?: (consumed() to {})
 
-            val onStartNewGroupChat = rememberStartNewGroupChat(
-                monitorResult = monitorResult,
-                clearResult = clearResult,
-                onNavigate = onNavigate,
-            )
-
             NodesExplorerScreen(
                 explorerMode = key.explorerMode,
                 startNavKey = key.startNavKey,
@@ -173,7 +157,8 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = { onNavigate(it) },
                 onStartUpload = onStartUpload,
                 onFileUriConsumed = onFileUriConsumed,
-                onStartNewGroupChat = onStartNewGroupChat,
+                monitorResult = monitorResult,
+                clearResult = clearResult,
             )
         }
     }
