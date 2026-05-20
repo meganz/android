@@ -131,8 +131,20 @@ private fun statusText(status: ContactItemStatus): Int = when (status) {
     else -> R.string.offline_status
 }
 
+/**
+ * Standard last-seen formatter for contact rows.
+ *
+ * Converts the SDK's "minutes since last seen" integer into a localised
+ * human-readable string (e.g. "Last seen today at 14:32", "Last seen long
+ * time ago"). Used by contact list rows and chat headers to render a user's
+ * presence subtitle when they are not currently online.
+ *
+ * @param lastGreen minutes elapsed since the user was last seen, or `null`
+ *                  if unknown.
+ * @return the formatted "Last seen …" string, or `null` if [lastGreen] is `null`.
+ */
 @Composable
-internal fun getLastSeenString(lastGreen: Int?): String? {
+fun getLastSeenString(lastGreen: Int?): String? {
     if (lastGreen == null) return null
 
     val lastGreenCalendar = Calendar.getInstance().apply { add(Calendar.MINUTE, -lastGreen) }

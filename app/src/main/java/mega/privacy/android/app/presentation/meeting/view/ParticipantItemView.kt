@@ -27,7 +27,7 @@ import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.presentation.contact.view.getLastSeenString
+import mega.privacy.android.shared.contact.components.getLastSeenString
 import mega.privacy.android.app.presentation.meeting.model.ChatParticipantUiState
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.icon.pack.IconPack

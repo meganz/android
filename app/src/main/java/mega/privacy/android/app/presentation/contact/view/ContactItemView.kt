@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.contact.view
 
 
-import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
@@ -24,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,15 +40,13 @@ import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.icon.pack.R as IconR
+import mega.privacy.android.shared.contact.components.getLastSeenString
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.text.MarqueeText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
-import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
 /**
  * View to show a contactItem with their avatar and connection status
@@ -175,62 +171,6 @@ internal fun ContactItemView(
         }
         dividerType?.let {
             MegaDivider(it)
-        }
-    }
-}
-
-@Composable
-internal fun getLastSeenString(lastGreen: Int?): String? {
-    if (lastGreen == null) return null
-
-    val lastGreenCalendar = Calendar.getInstance().apply { add(Calendar.MINUTE, -lastGreen) }
-    val timeToConsiderAsLongTimeAgo = 65535
-
-    Timber.d("Ts last green: %s", lastGreenCalendar.timeInMillis)
-
-    return when {
-        lastGreen >= timeToConsiderAsLongTimeAgo -> {
-            stringResource(id = R.string.last_seen_long_time_ago)
-        }
-
-        compareLastSeenWithToday(lastGreenCalendar) == 0 -> {
-            val dateFormat = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).apply {
-                timeZone = lastGreenCalendar.timeZone
-            }
-            val time = dateFormat.format(lastGreenCalendar.time)
-            stringResource(R.string.last_seen_today, time)
-        }
-
-        else -> {
-            var dateFormat = SimpleDateFormat("HH:mm", LocalLocale.current.platformLocale).apply {
-                timeZone = lastGreenCalendar.timeZone
-            }
-            val time = dateFormat.format(lastGreenCalendar.time)
-
-            dateFormat = SimpleDateFormat(
-                DateFormat.getBestDateTimePattern(LocalLocale.current.platformLocale, "dd MMM"),
-                LocalLocale.current.platformLocale
-            )
-            val day = dateFormat.format(lastGreenCalendar.time)
-            stringResource(R.string.last_seen_general, day, time)
-        }
-    }.replace("[A]", "").replace("[/A]", "")
-}
-
-private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
-    val today = Calendar.getInstance()
-
-    return when {
-        lastGreen.get(Calendar.YEAR) != today.get(Calendar.YEAR) -> {
-            lastGreen.get(Calendar.YEAR) - today.get(Calendar.YEAR)
-        }
-
-        lastGreen.get(Calendar.MONTH) != today.get(Calendar.MONTH) -> {
-            lastGreen.get(Calendar.MONTH) - today.get(Calendar.MONTH)
-        }
-
-        else -> {
-            lastGreen.get(Calendar.DAY_OF_MONTH) - today.get(Calendar.DAY_OF_MONTH)
         }
     }
 }
