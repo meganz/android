@@ -1,9 +1,13 @@
 package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 
-import androidx.compose.foundation.clickable
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -37,11 +42,13 @@ import androidx.paging.compose.itemKey
 import kotlinx.coroutines.flow.flowOf
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.list.OneLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.surface.BoxSurface
+import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -84,6 +91,9 @@ internal fun ViewedLinksScreen(
     onFolderLinkClicked: (String) -> Unit,
     onFileLinkClicked: (String) -> Unit,
     onClearAllLinks: () -> Unit,
+    onDeleteSelectedLinks: () -> Unit,
+    onToggleSelection: (Long) -> Unit,
+    onClearSelection: () -> Unit,
     onSortOptionSelected: (NodeSortConfiguration) -> Unit,
     onChangeViewTypeClick: () -> Unit,
     onBack: () -> Unit,
@@ -93,20 +103,54 @@ internal fun ViewedLinksScreen(
     var showSortSheet by rememberSaveable { mutableStateOf(false) }
     var showOptionsSheet by rememberSaveable { mutableStateOf(false) }
     var showClearConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    var showDeleteSelectedDialog by rememberSaveable { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val isRefreshing = lazyItems.loadState.refresh is LoadState.Loading
+    val isInSelectionMode = uiState.isInSelectionMode
+
+    BackHandler(enabled = isInSelectionMode) { onClearSelection() }
+
+    val onItemClick = { item: ViewedLinkUiItem ->
+        if (isInSelectionMode) {
+            onToggleSelection(item.viewedLink.nodeHandle)
+        } else {
+            when (item.viewedLink.type) {
+                RecentlyViewedLinkType.FolderLink ->
+                    onFolderLinkClicked(item.viewedLink.linkUrl)
+
+                else ->
+                    onFileLinkClicked(item.viewedLink.linkUrl)
+            }
+        }
+    }
+    val onItemLongClick = { item: ViewedLinkUiItem ->
+        onToggleSelection(item.viewedLink.nodeHandle)
+    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
-            MegaTopAppBar(
-                title = stringResource(sharedR.string.home_widget_viewed_links_section_header),
-                navigationType = AppBarNavigationType.Back(onBack),
-                actions = listOf(
-                    MenuActionWithClick(CommonMenuAction.More) {
-                        showOptionsSheet = true
-                    }
+            if (isInSelectionMode) {
+                MegaTopAppBar(
+                    modifier = Modifier.testTag(VIEWED_LINKS_SELECTION_TOOLBAR_TAG),
+                    title = uiState.selectedCount.toString(),
+                    navigationType = AppBarNavigationType.Close(onClearSelection),
+                    actions = listOf(
+                        MenuActionWithClick(CommonMenuAction.Clear) {
+                            showDeleteSelectedDialog = true
+                        }
+                    ),
                 )
-            )
+            } else {
+                MegaTopAppBar(
+                    title = stringResource(sharedR.string.home_widget_viewed_links_section_header),
+                    navigationType = AppBarNavigationType.Back(onBack),
+                    actions = listOf(
+                        MenuActionWithClick(CommonMenuAction.More) {
+                            showOptionsSheet = true
+                        }
+                    )
+                )
+            }
         },
     ) { paddingValues ->
         val modifier = Modifier
@@ -117,10 +161,12 @@ internal fun ViewedLinksScreen(
                 lazyItems = lazyItems,
                 isRefreshing = isRefreshing,
                 sortConfiguration = uiState.sortConfiguration,
+                selectedNodeHandles = uiState.selectedNodeHandles,
+                isInSelectionMode = isInSelectionMode,
                 onSortOrderClick = { showSortSheet = true },
                 onChangeViewTypeClick = onChangeViewTypeClick,
-                onFolderLinkClicked = onFolderLinkClicked,
-                onFileLinkClicked = onFileLinkClicked,
+                onItemClick = onItemClick,
+                onItemLongClick = onItemLongClick,
                 modifier = modifier,
             )
         } else {
@@ -128,10 +174,12 @@ internal fun ViewedLinksScreen(
                 lazyItems = lazyItems,
                 isRefreshing = isRefreshing,
                 sortConfiguration = uiState.sortConfiguration,
+                selectedNodeHandles = uiState.selectedNodeHandles,
+                isInSelectionMode = isInSelectionMode,
                 onSortOrderClick = { showSortSheet = true },
                 onChangeViewTypeClick = onChangeViewTypeClick,
-                onFolderLinkClicked = onFolderLinkClicked,
-                onFileLinkClicked = onFileLinkClicked,
+                onItemClick = onItemClick,
+                onItemLongClick = onItemLongClick,
                 modifier = modifier,
             )
         }
@@ -196,6 +244,25 @@ internal fun ViewedLinksScreen(
             onNegativeButtonClicked = { showClearConfirmationDialog = false },
         )
     }
+
+    if (showDeleteSelectedDialog && uiState.isInSelectionMode) {
+        BasicDialog(
+            modifier = Modifier.testTag(DELETE_SELECTED_DIALOG_TAG),
+            title = pluralStringResource(
+                sharedR.plurals.viewed_links_remove_selected_links_dialog_title,
+                uiState.selectedCount,
+                uiState.selectedCount
+            ),
+            positiveButtonText = stringResource(sharedR.string.general_clear),
+            negativeButtonText = stringResource(sharedR.string.general_dismiss_dialog),
+            onPositiveButtonClicked = {
+                showDeleteSelectedDialog = false
+                onDeleteSelectedLinks()
+            },
+            onDismiss = { showDeleteSelectedDialog = false },
+            onNegativeButtonClicked = { showDeleteSelectedDialog = false },
+        )
+    }
 }
 
 @Composable
@@ -203,10 +270,12 @@ private fun ViewedLinksList(
     lazyItems: LazyPagingItems<ViewedLinkUiItem>,
     isRefreshing: Boolean,
     sortConfiguration: NodeSortConfiguration,
+    selectedNodeHandles: Set<Long>,
+    isInSelectionMode: Boolean,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
-    onFolderLinkClicked: (String) -> Unit,
-    onFileLinkClicked: (String) -> Unit,
+    onItemClick: (ViewedLinkUiItem) -> Unit,
+    onItemLongClick: (ViewedLinkUiItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier) {
@@ -219,6 +288,7 @@ private fun ViewedLinksList(
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
+
         if (isRefreshing) {
             items(count = LOADING_PLACEHOLDER_COUNT) { ViewedLinkListLoadingItem() }
         } else {
@@ -229,8 +299,10 @@ private fun ViewedLinksList(
                 val item = lazyItems[index] ?: return@items
                 ViewedLinkListItem(
                     item = item,
-                    onFolderLinkClicked = onFolderLinkClicked,
-                    onFileLinkClicked = onFileLinkClicked,
+                    isSelected = item.viewedLink.nodeHandle in selectedNodeHandles,
+                    isInSelectionMode = isInSelectionMode,
+                    onClick = { onItemClick(item) },
+                    onLongClick = { onItemLongClick(item) },
                     modifier = Modifier.animateItem(),
                 )
             }
@@ -246,10 +318,12 @@ private fun ViewedLinksGrid(
     lazyItems: LazyPagingItems<ViewedLinkUiItem>,
     isRefreshing: Boolean,
     sortConfiguration: NodeSortConfiguration,
+    selectedNodeHandles: Set<Long>,
+    isInSelectionMode: Boolean,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
-    onFolderLinkClicked: (String) -> Unit,
-    onFileLinkClicked: (String) -> Unit,
+    onItemClick: (ViewedLinkUiItem) -> Unit,
+    onItemLongClick: (ViewedLinkUiItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyVerticalGrid(
@@ -280,8 +354,10 @@ private fun ViewedLinksGrid(
                 val item = lazyItems[index] ?: return@items
                 ViewedLinkGridItem(
                     item = item,
-                    onFolderLinkClicked = onFolderLinkClicked,
-                    onFileLinkClicked = onFileLinkClicked,
+                    isSelected = item.viewedLink.nodeHandle in selectedNodeHandles,
+                    isInSelectionMode = isInSelectionMode,
+                    onClick = { onItemClick(item) },
+                    onLongClick = { onItemLongClick(item) },
                 )
             }
             if (lazyItems.loadState.append is LoadState.Loading) {
@@ -310,58 +386,74 @@ private fun SortHeader(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ViewedLinkListItem(
     item: ViewedLinkUiItem,
-    onFolderLinkClicked: (String) -> Unit,
-    onFileLinkClicked: (String) -> Unit,
+    isSelected: Boolean,
+    isInSelectionMode: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    OneLineListItem(
+    BoxSurface(
         modifier = modifier
             .fillMaxWidth()
             .testTag(VIEWED_LINKS_ITEM_TEST_TAG),
-        text = item.viewedLink.name,
-        leadingElement = {
-            NodeThumbnailView(
-                modifier = Modifier.size(32.dp),
-                layoutType = ThumbnailLayoutType.List,
-                data = item.previewPath?.let { ThumbnailUriRequest(UriPath(it)) },
-                defaultImage = item.iconRes,
-                contentDescription = "Thumbnail",
-            )
-        },
-        onClickListener = {
-            when (item.viewedLink.type) {
-                RecentlyViewedLinkType.FolderLink ->
-                    onFolderLinkClicked(item.viewedLink.linkUrl)
-
-                else ->
-                    onFileLinkClicked(item.viewedLink.linkUrl)
-            }
-        },
-    )
+        surfaceColor = if (isSelected) SurfaceColor.Surface1 else SurfaceColor.PageBackground
+    ) {
+        OneLineListItem(
+            modifier = Modifier.fillMaxWidth(),
+            text = item.viewedLink.name,
+            leadingElement = {
+                NodeThumbnailView(
+                    modifier = Modifier.size(32.dp),
+                    layoutType = ThumbnailLayoutType.List,
+                    data = item.previewPath?.let { ThumbnailUriRequest(UriPath(it)) },
+                    defaultImage = item.iconRes,
+                    contentDescription = "Thumbnail",
+                )
+            },
+            onLongClickListener = onLongClick,
+            onClickListener = onClick,
+            trailingElement = if (isInSelectionMode) {
+                {
+                    Box(
+                        modifier = Modifier.size(24.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Checkbox(
+                            checked = isSelected,
+                            onCheckStateChanged = { },
+                            tapTargetArea = false,
+                            clickable = false,
+                            modifier = Modifier.testTag(VIEWED_LINKS_ITEM_CHECKBOX_TAG),
+                        )
+                    }
+                }
+            } else null,
+        )
+    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ViewedLinkGridItem(
     item: ViewedLinkUiItem,
-    onFolderLinkClicked: (String) -> Unit,
-    onFileLinkClicked: (String) -> Unit,
+    isSelected: Boolean,
+    isInSelectionMode: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ) {
-    Column(
+    ColumnSurface(
         modifier = Modifier
             .fillMaxWidth()
             .testTag(VIEWED_LINKS_GRID_ITEM_TEST_TAG)
-            .clickable {
-                when (item.viewedLink.type) {
-                    RecentlyViewedLinkType.FolderLink ->
-                        onFolderLinkClicked(item.viewedLink.linkUrl)
-
-                    else ->
-                        onFileLinkClicked(item.viewedLink.linkUrl)
-                }
-            },
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            ),
+        surfaceColor = if (isSelected) SurfaceColor.Surface1 else SurfaceColor.PageBackground,
     ) {
         BoxSurface(
             surfaceColor = SurfaceColor.Surface1,
@@ -381,16 +473,34 @@ private fun ViewedLinkGridItem(
                 contentScale = ContentScale.Crop,
             )
         }
-        MegaText(
-            text = item.viewedLink.name,
-            textColor = TextColor.Primary,
-            style = AppTheme.typography.bodySmall,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
+
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp, top = 6.dp, bottom = 6.dp),
-        )
+                .padding(horizontal = 4.dp)
+                .defaultMinSize(minHeight = 44.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            MegaText(
+                text = item.viewedLink.name,
+                textColor = TextColor.Primary,
+                style = AppTheme.typography.bodySmall,
+                overflow = TextOverflow.MiddleEllipsis,
+                maxLines = 2,
+                modifier = Modifier.weight(1f),
+            )
+
+            if (isInSelectionMode) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckStateChanged = { },
+                    tapTargetArea = false,
+                    clickable = false,
+                    modifier = Modifier.testTag(VIEWED_LINKS_GRID_ITEM_CHECKBOX_TAG),
+                )
+            }
+        }
     }
 }
 
@@ -398,6 +508,11 @@ internal const val CLEAR_HISTORY_TAG = "viewed_links:clear_history"
 internal const val CLEAR_HISTORY_DIALOG_TAG = "viewed_links:clear_history_dialog"
 internal const val VIEWED_LINKS_ITEM_TEST_TAG = "viewed_links:item"
 internal const val VIEWED_LINKS_GRID_ITEM_TEST_TAG = "viewed_links:grid_item"
+internal const val VIEWED_LINKS_SELECTION_TOOLBAR_TAG = "viewed_links:selection_toolbar"
+internal const val VIEWED_LINKS_ITEM_CHECKBOX_TAG = "viewed_links:item_checkbox"
+internal const val VIEWED_LINKS_GRID_ITEM_CHECKBOX_TAG = "viewed_links:grid_item_checkbox"
+internal const val DELETE_SELECTED_DIALOG_TAG = "viewed_links:delete_selected_dialog"
+internal const val DELETE_SELECTED_ACTION_TAG = "viewed_links:delete_selected_action"
 internal const val SORT_HEADER_KEY = "viewed_links:sort_header"
 private const val LOADING_PLACEHOLDER_COUNT = 6
 
@@ -484,6 +599,9 @@ private fun ViewedLinksScreenPreview() {
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
             onClearAllLinks = {},
+            onDeleteSelectedLinks = {},
+            onToggleSelection = {},
+            onClearSelection = {},
             onSortOptionSelected = {},
             onChangeViewTypeClick = {},
             onBack = {},
@@ -502,6 +620,9 @@ private fun ViewedLinksScreenLoadingPreview() {
             onFolderLinkClicked = {},
             onFileLinkClicked = {},
             onClearAllLinks = {},
+            onDeleteSelectedLinks = {},
+            onToggleSelection = {},
+            onClearSelection = {},
             onSortOptionSelected = {},
             onChangeViewTypeClick = {},
             onBack = {},

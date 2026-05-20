@@ -8,11 +8,12 @@ import javax.inject.Inject
  *
  * @property viewedLinksRepository
  */
-class RemoveViewedLinkUseCase @Inject constructor(
+class RemoveViewedLinksUseCase @Inject constructor(
     private val viewedLinksRepository: ViewedLinksRepository,
 ) {
     /**
-     * @param nodeHandle the handle of the node to remove.
+     * @param nodeHandles set of node handles to remove.
      */
-    suspend operator fun invoke(nodeHandle: Long) = viewedLinksRepository.removeLink(nodeHandle)
+    suspend operator fun invoke(nodeHandles: Set<Long>) =
+        viewedLinksRepository.removeLinks(nodeHandles)
 }

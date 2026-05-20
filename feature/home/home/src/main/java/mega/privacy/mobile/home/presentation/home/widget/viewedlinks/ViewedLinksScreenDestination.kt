@@ -57,6 +57,9 @@ fun EntryProviderScope<NavKey>.viewedLinksScreen(
                 navigationHandler.navigate(FileLinkNavKey(link))
             },
             onClearAllLinks = viewModel::clearAllLinks,
+            onDeleteSelectedLinks = viewModel::deleteSelectedLinks,
+            onToggleSelection = viewModel::toggleSelection,
+            onClearSelection = viewModel::clearSelection,
             onSortOptionSelected = viewModel::updateSortConfiguration,
             onChangeViewTypeClick = viewModel::changeViewType,
             onBack = navigationHandler::back,

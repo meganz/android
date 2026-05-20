@@ -10,6 +10,8 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.longClick
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -342,6 +344,89 @@ class ViewedLinksScreenTest {
         assertThat(clickedUrl).isEqualTo(folderLinkItem.viewedLink.linkUrl)
     }
 
+    @Test
+    fun `test that normal toolbar is shown when no items are selected`() {
+        setContent(items = listOf(fileLinkItem))
+
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_SELECTION_TOOLBAR_TAG)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that selection toolbar is shown when items are selected`() {
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(selectedNodeHandles = setOf(fileLinkItem.viewedLink.nodeHandle)),
+        )
+
+        composeRule.onNodeWithTag(VIEWED_LINKS_SELECTION_TOOLBAR_TAG).assertIsDisplayed()
+        composeRule.onNodeWithText("1").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that long pressing a list item invokes onToggleSelection`() {
+        var toggledHandle: Long? = null
+        setContent(
+            items = listOf(fileLinkItem),
+            onToggleSelection = { toggledHandle = it },
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_ITEM_TEST_TAG)[0]
+            .performTouchInput { longClick() }
+
+        assertThat(toggledHandle).isEqualTo(fileLinkItem.viewedLink.nodeHandle)
+    }
+
+    @Test
+    fun `test that tapping a list item in selection mode invokes onToggleSelection`() {
+        var toggledHandle: Long? = null
+        var navigatedToFile = false
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(selectedNodeHandles = setOf(999L)),
+            onToggleSelection = { toggledHandle = it },
+            onFileLinkClicked = { navigatedToFile = true },
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_ITEM_TEST_TAG)[0].performClick()
+
+        assertThat(toggledHandle).isEqualTo(fileLinkItem.viewedLink.nodeHandle)
+        assertThat(navigatedToFile).isFalse()
+    }
+
+    @Test
+    fun `test that long pressing a grid item invokes onToggleSelection`() {
+        var toggledHandle: Long? = null
+        setContent(
+            items = listOf(folderLinkItem),
+            uiState = ViewedLinksUiState(currentViewType = ViewType.GRID),
+            onToggleSelection = { toggledHandle = it },
+        )
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(VIEWED_LINKS_GRID_ITEM_TEST_TAG)[0]
+            .performTouchInput { longClick() }
+
+        assertThat(toggledHandle).isEqualTo(folderLinkItem.viewedLink.nodeHandle)
+    }
+
+    @Test
+    fun `test that tapping the close icon invokes onClearSelection`() {
+        var cleared = false
+        setContent(
+            items = listOf(fileLinkItem),
+            uiState = ViewedLinksUiState(selectedNodeHandles = setOf(1L)),
+            onClearSelection = { cleared = true },
+        )
+
+        composeRule.onNodeWithContentDescription(navigationIconContentDescription)
+            .performClick()
+
+        assertThat(cleared).isTrue()
+    }
+
     /**
      * @param items List of items to render; `null` keeps the refresh state in `Loading`
      *   (no PagingData ever emitted), which is how the loading skeleton is exercised.
@@ -352,6 +437,9 @@ class ViewedLinksScreenTest {
         onFolderLinkClicked: (String) -> Unit = {},
         onFileLinkClicked: (String) -> Unit = {},
         onClearAllLinks: () -> Unit = {},
+        onDeleteSelectedLinks: () -> Unit = {},
+        onToggleSelection: (Long) -> Unit = {},
+        onClearSelection: () -> Unit = {},
         onSortOptionSelected: (NodeSortConfiguration) -> Unit = {},
         onChangeViewTypeClick: () -> Unit = {},
         onBack: () -> Unit = {},
@@ -365,6 +453,9 @@ class ViewedLinksScreenTest {
                     onFolderLinkClicked = onFolderLinkClicked,
                     onFileLinkClicked = onFileLinkClicked,
                     onClearAllLinks = onClearAllLinks,
+                    onDeleteSelectedLinks = onDeleteSelectedLinks,
+                    onToggleSelection = onToggleSelection,
+                    onClearSelection = onClearSelection,
                     onSortOptionSelected = onSortOptionSelected,
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     onBack = onBack,

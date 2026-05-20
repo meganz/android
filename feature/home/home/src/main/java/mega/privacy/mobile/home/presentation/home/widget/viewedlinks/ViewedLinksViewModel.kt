@@ -29,6 +29,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SetViewedLinksSortUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -77,12 +78,14 @@ internal class ViewedLinksViewModel @Inject constructor(
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val clearViewedLinksUseCase: ClearViewedLinksUseCase,
+    private val removeViewedLinksUseCase: RemoveViewedLinksUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val monitorViewTypeUseCase: MonitorViewType,
     private val setViewTypeUseCase: SetViewType,
 ) : ViewModel() {
     private val resolvedLinkCache = lruCache<String, ViewedLinkUiItem>(maxSize = PAGE_SIZE * 100)
     private val clearAllLinksEvent = MutableStateFlow<StateEvent>(consumed)
+    private val selectedNodeHandles = MutableStateFlow<Set<Long>>(emptySet())
 
     val uiState: StateFlow<ViewedLinksUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
@@ -90,11 +93,13 @@ internal class ViewedLinksViewModel @Inject constructor(
                 .map { (field, direction) -> viewedLinksSortMapper(field, direction) },
             clearAllLinksEvent,
             monitorViewTypeUseCase(),
-        ) { sortConfiguration, clearAllLinksEvent, viewType ->
+            selectedNodeHandles,
+        ) { sortConfiguration, clearAllLinksEvent, viewType, selectedHandles ->
             ViewedLinksUiState(
                 clearAllLinksEvent = clearAllLinksEvent,
                 sortConfiguration = sortConfiguration,
                 currentViewType = viewType,
+                selectedNodeHandles = selectedHandles,
             )
         }.catch { e ->
             Timber.e(e, "Failed to build ViewedLinks UI state")
@@ -175,6 +180,34 @@ internal class ViewedLinksViewModel @Inject constructor(
                 }
                 setViewTypeUseCase(toViewType)
             }
+        }
+    }
+
+    internal fun toggleSelection(nodeHandle: Long) {
+        selectedNodeHandles.update { current ->
+            if (current.contains(nodeHandle)) {
+                current - nodeHandle
+            } else {
+                current + nodeHandle
+            }
+        }
+    }
+
+    internal fun clearSelection() {
+        selectedNodeHandles.update { emptySet() }
+    }
+
+    internal fun deleteSelectedLinks() {
+        val handlesToDelete = selectedNodeHandles.value
+        if (handlesToDelete.isEmpty()) return
+
+        viewModelScope.launch {
+            runCatching { removeViewedLinksUseCase(handlesToDelete) }
+                .onFailure {
+                    Timber.e(it, "Failed to remove viewed links $handlesToDelete")
+                }.onSuccess {
+                    clearSelection()
+                }
         }
     }
 

@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SetViewedLinksSortUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -57,6 +58,7 @@ class ViewedLinksViewModelTest {
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val clearViewedLinksUseCase = mock<ClearViewedLinksUseCase>()
+    private val removeViewedLinksUseCase = mock<RemoveViewedLinksUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val monitorViewTypeUseCase = mock<MonitorViewType>()
     private val setViewTypeUseCase = mock<SetViewType>()
@@ -73,6 +75,7 @@ class ViewedLinksViewModelTest {
             getPublicNodeUseCase,
             fileTypeIconMapper,
             clearViewedLinksUseCase,
+            removeViewedLinksUseCase,
             snackbarEventQueue,
             monitorViewTypeUseCase,
             setViewTypeUseCase,
@@ -119,6 +122,7 @@ class ViewedLinksViewModelTest {
             getPublicNodeUseCase = getPublicNodeUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             clearViewedLinksUseCase = clearViewedLinksUseCase,
+            removeViewedLinksUseCase = removeViewedLinksUseCase,
             snackbarEventQueue = snackbarEventQueue,
             monitorViewTypeUseCase = monitorViewTypeUseCase,
             setViewTypeUseCase = setViewTypeUseCase,
@@ -338,6 +342,99 @@ class ViewedLinksViewModelTest {
             }
 
             verify(setViewTypeUseCase).invoke(ViewType.LIST)
+        }
+
+    @Test
+    fun `test that selectedNodeHandles is empty by default`() = runTest {
+        initViewModel(emptyList())
+
+        underTest.uiState.test {
+            assertThat(awaitItem().selectedNodeHandles).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that toggleSelection adds handle when not selected`() = runTest {
+        initViewModel(emptyList())
+        underTest.toggleSelection(42L)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.selectedNodeHandles).containsExactly(42L)
+            assertThat(state.isInSelectionMode).isTrue()
+            assertThat(state.selectedCount).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that toggleSelection removes handle when already selected`() = runTest {
+        initViewModel(emptyList())
+        underTest.toggleSelection(42L)
+        underTest.toggleSelection(42L)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.selectedNodeHandles).isEmpty()
+            assertThat(state.isInSelectionMode).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that clearSelection empties the selection`() = runTest {
+        initViewModel(emptyList())
+        underTest.toggleSelection(1L)
+        underTest.toggleSelection(2L)
+        underTest.clearSelection()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().selectedNodeHandles).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that deleteSelectedLinks does not call removeViewedLinksUseCase when no items are selected`() =
+        runTest {
+            initViewModel(emptyList())
+
+            underTest.deleteSelectedLinks()
+
+            verifyNoMoreInteractions(removeViewedLinksUseCase)
+            verifyNoMoreInteractions(snackbarEventQueue)
+        }
+
+    @Test
+    fun `test that deleteSelectedLinks clears selection after success`() = runTest {
+        initViewModel(emptyList())
+        underTest.toggleSelection(1L)
+        underTest.deleteSelectedLinks()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().selectedNodeHandles).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that deleteSelectedLinks does not clear selection when removeViewedLinksUseCase fails`() =
+        runTest {
+            initViewModel(emptyList())
+            whenever(removeViewedLinksUseCase(any()))
+                .thenAnswer { throw RuntimeException("boom") }
+
+            underTest.toggleSelection(1L)
+            underTest.toggleSelection(2L)
+            underTest.deleteSelectedLinks()
+
+            verify(removeViewedLinksUseCase).invoke(setOf(1L, 2L))
+            verifyNoMoreInteractions(snackbarEventQueue)
+            underTest.uiState.test {
+                assertThat(awaitItem().selectedNodeHandles).containsExactly(1L, 2L)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     private suspend fun ReceiveTurbine<ViewedLinksUiState>.awaitViewType(expected: ViewType) {

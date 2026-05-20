@@ -66,6 +66,17 @@ sealed interface CommonMenuAction : MenuActionWithIcon {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.SearchSmall)
     }
 
+    data object Clear : CommonMenuAction {
+        override val testTag: String = "node_selection_action:clear"
+
+        @Composable
+        override fun getDescription() = stringResource(R.string.general_clear)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser)
+    }
+
     companion object {
         const val DEFAULT_MAX_VISIBLE_ITEMS = 4
     }

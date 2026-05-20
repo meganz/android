@@ -4,7 +4,6 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.sqlite.db.SimpleSQLiteQuery
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_RECENTLY_VIEWED_LINK
@@ -78,8 +77,8 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
         recentlyViewedLinkDao.insertOrUpdateLink(recentlyViewedLinkEntity)
     }
 
-    override suspend fun removeLink(nodeHandle: Long) = withContext(ioDispatcher) {
-        recentlyViewedLinkDao.deleteByNodeHandle(nodeHandle)
+    override suspend fun removeLinks(nodeHandles: Set<Long>) = withContext(ioDispatcher) {
+        recentlyViewedLinkDao.deleteByNodeHandles(nodeHandles)
     }
 
     override suspend fun clearLinks() = withContext(ioDispatcher) {

@@ -222,10 +222,10 @@ internal class ViewedLinksRepositoryImplTest {
         }
 
     @Test
-    fun `test that removeLink calls deleteByNodeHandle`() = runTest {
-        underTest.removeLink(789L)
+    fun `test that removeLinks calls deleteByNodeHandles with all handles`() = runTest {
+        underTest.removeLinks(setOf(789L, 790L))
 
-        verify(recentlyViewedLinkDao).deleteByNodeHandle(789L)
+        verify(recentlyViewedLinkDao).deleteByNodeHandles(setOf(789L, 790L))
     }
 
     @Test

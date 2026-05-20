@@ -2799,7 +2799,7 @@
     <!-- Appbar subtitle of file link screen-->
     <string name="file_link_subtitle">File link</string>
     <!-- Description for the empty view in Favourites sections. -->
-    <string name="favourites_empty_screen_description">Add folders to Favourites to see them here</string>
+    <string name="favourites_empty_screen_description">Add files and folders to Favourites to see them here</string>
     <!-- Header giving more context about a folder name collision, informing there are different option to choose. -->
     <string name="name_collision_choose_folder_header">Select the folder you want to keep</string>
     <!-- Informs about what is expected after choose the option upload and rename for a folder name collision. -->
@@ -2875,4 +2875,9 @@
     <string name="node_sort_option_last_accessed_label">Date</string>
     <!-- Generic more options text tooltip for menu items -->
     <string name="more_options">More options</string>
+    <!-- Title of the confirmation dialog to confirm the removal of selected items from the viewed links history -->
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="one">Clear viewed link?</item>
+        <item quantity="other">Clear viewed links?</item>
+    </plurals>
 </resources>

@@ -15,6 +15,9 @@ import mega.privacy.android.shared.nodes.model.NodeSortOption
  * @property clearAllLinksEvent Event triggered when the viewed links history has been cleared.
  * @property sortConfiguration The active sort option and direction.
  * @property currentViewType Whether the list is shown as list or grid.
+ * @property selectedNodeHandles Node handles currently selected in multi-selection mode.
+ * @property isInSelectionMode Flag to determine if state is currently in selection mode
+ * @property selectedCount The number of nodes selected
  */
 data class ViewedLinksUiState(
     val clearAllLinksEvent: StateEvent = consumed,
@@ -23,7 +26,11 @@ data class ViewedLinksUiState(
         sortDirection = SortDirection.Descending,
     ),
     val currentViewType: ViewType = ViewType.LIST,
-)
+    val selectedNodeHandles: Set<Long> = emptySet(),
+) {
+    val isInSelectionMode: Boolean = selectedNodeHandles.isNotEmpty()
+    val selectedCount: Int = selectedNodeHandles.size
+}
 
 /**
  * A viewed link with resolved icon and optional preview path for thumbnail display.

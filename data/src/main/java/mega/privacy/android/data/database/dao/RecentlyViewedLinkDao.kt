@@ -24,10 +24,10 @@ internal interface RecentlyViewedLinkDao {
     suspend fun insertOrUpdateLink(entity: RecentlyViewedLinkEntity)
 
     /**
-     * Delete a recently viewed link by node handle.
+     * Delete a set of recently viewed links by node handle.
      */
-    @Query("DELETE FROM $TABLE_RECENTLY_VIEWED_LINK WHERE node_handle = :nodeHandle")
-    suspend fun deleteByNodeHandle(nodeHandle: Long)
+    @Query("DELETE FROM $TABLE_RECENTLY_VIEWED_LINK WHERE node_handle IN (:nodeHandles)")
+    suspend fun deleteByNodeHandles(nodeHandles: Set<Long>)
 
     /**
      * Delete all recently viewed links.
