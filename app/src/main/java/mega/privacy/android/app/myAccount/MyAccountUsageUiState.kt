@@ -79,5 +79,21 @@ data class MyAccountUsageUiState(
     val businessStatus: BusinessAccountStatus? = null,
     val paymentAlertType: PaymentAlertType = PaymentAlertType.None,
     val paymentAlertDate: Long = 0L,
-)
+) {
+    /** True when the account is not a paid account. */
+    val isFreeAccount: Boolean
+        get() = !accountType.isPaid
+
+    /** True when the upgrade button should be shown (not Business or Pro Flexi). */
+    val showUpgradeButton: Boolean
+        get() = !isBusinessAccount && !isProFlexiAccount
+
+    /** True when the payment alert section should be shown. */
+    val showPaymentAlert: Boolean
+        get() = when {
+            isProFlexiAccount -> true
+            isBusinessAccount -> isMasterBusinessAccount
+            else -> (hasRenewableSubscription || hasExpirableSubscription) && !isFreeAccount
+        }
+}
 
