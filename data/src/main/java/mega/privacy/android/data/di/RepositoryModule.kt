@@ -44,14 +44,15 @@ import mega.privacy.android.data.repository.DocumentSectionRepositoryImpl
 import mega.privacy.android.data.repository.DomainNameMigrationRepositoryImpl
 import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
 import mega.privacy.android.data.repository.FileLinkRepositoryImpl
+import mega.privacy.android.data.repository.FileServiceRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
-import mega.privacy.android.data.repository.LinksRepositoryImpl
 import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.HttpConnectionRepositoryImpl
 import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
 import mega.privacy.android.data.repository.InitializationRepositoryImpl
 import mega.privacy.android.data.repository.LegacyNotificationRepository
+import mega.privacy.android.data.repository.LinksRepositoryImpl
 import mega.privacy.android.data.repository.MediaRecorderRepositoryImpl
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
@@ -105,13 +106,14 @@ import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileLinkRepository
+import mega.privacy.android.domain.repository.FileServiceRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.repository.LinksRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.HttpConnectionRepository
 import mega.privacy.android.domain.repository.InAppUpdateRepository
 import mega.privacy.android.domain.repository.InitializationRepository
+import mega.privacy.android.domain.repository.LinksRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.MediaRecorderRepository
 import mega.privacy.android.domain.repository.NetworkRepository
@@ -415,6 +417,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAgeSignalRepository(implementation: AgeSignalRepositoryImpl): AgeSignalRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFileServiceRepository(implementation: FileServiceRepositoryImpl): FileServiceRepository
 
     @Binds
     @Singleton

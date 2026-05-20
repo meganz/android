@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaFlag
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaLoggerInterface
@@ -1200,7 +1201,7 @@ interface MegaApiGateway {
     fun getRecentBucketById(
         id: String,
         excludeSensitives: Boolean,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     )
 
     /**
@@ -4011,4 +4012,47 @@ interface MegaApiGateway {
      * @param listener
      */
     fun addRequestListener(listener: MegaRequestListenerInterface)
+
+    /**
+     * @brief Get the options for reclaiming storage used by MEGA's file services.
+     *
+     * The returned options are a snapshot of the current state of the file service reclaim
+     * options. Modifying the returned object won't have any effect on the actual options used
+     * by the file services.
+     *
+     * The caller takes ownership of the returned value and should use delete to release the
+     * memory when it's no longer needed.
+     */
+    fun fileServiceGetReclaimOptions(): MegaFileServiceReclaimOptions?
+
+    /**
+     * @brief Set the options for reclaiming storage used by MEGA's file services.
+     *
+     * The provided options will be applied to the file services, and they will affect how the
+     * file services reclaim storage.
+     *
+     * @param options Options to set for reclaiming storage used by MEGA's file services.
+     */
+    fun fileServiceSetReclaimOptions(options: MegaFileServiceReclaimOptions?)
+
+    /**
+     * @brief Trigger the file services to reclaim storage according to the current options.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_FILE_SERVICE_RECLAIM.
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getTotalBytes - Returns the number of bytes that were reclaimed.
+     *
+     * If the request fails, the MegaError code in onRequestFinish can be:
+     * - MegaError::API_EINTERNAL - If the reclaim process failed to run.
+     *
+     * @param options Options to consider when reclaiming storage. If null, the currently
+     * configured options are used (see [fileServiceSetReclaimOptions]).
+     * @param listener
+     */
+    fun fileServiceReclaim(
+        options: MegaFileServiceReclaimOptions?,
+        listener: MegaRequestListenerInterface?,
+    )
 }

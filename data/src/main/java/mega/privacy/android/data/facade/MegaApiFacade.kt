@@ -26,6 +26,7 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
+import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaFlag
 import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaHandleList
@@ -1641,5 +1642,19 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) {
         megaApi.decryptPasswordProtectedLink(passwordProtectedLink, password, listener)
+    }
+
+    override fun fileServiceGetReclaimOptions(): MegaFileServiceReclaimOptions? =
+        megaApi.fileServiceGetReclaimOptions()
+
+    override fun fileServiceSetReclaimOptions(options: MegaFileServiceReclaimOptions?) {
+        megaApi.fileServiceSetReclaimOptions(options)
+    }
+
+    override fun fileServiceReclaim(
+        options: MegaFileServiceReclaimOptions?,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.fileServiceReclaim(options, listener)
     }
 }
