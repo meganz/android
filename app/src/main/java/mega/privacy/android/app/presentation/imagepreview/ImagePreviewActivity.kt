@@ -79,6 +79,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
@@ -92,6 +93,7 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -117,6 +119,9 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
+
+    @Inject
+    lateinit var exportNodeUseCase: ExportNodeUseCase
 
     @Inject
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
@@ -429,8 +434,39 @@ class ImagePreviewActivity : BaseActivity() {
                     Timber.w("shareNode: cannot resolve MegaNode for ${imageNode.id}")
                     return@launch
                 }
-                MegaNodeUtil.shareNode(this@ImagePreviewActivity, node)
+                shareCurrentNode(node)
             }
+        }
+    }
+
+    private fun shareCurrentNode(node: nz.mega.sdk.MegaNode) {
+        val localPath = FileUtil.getLocalFile(node)
+        if (!localPath.isNullOrBlank() && !node.isFolder) {
+            FileUtil.shareFile(this, File(localPath), node.name)
+            return
+        }
+        if (node.isExported) {
+            val intent = Intent(Intent.ACTION_SEND)
+                .putExtra(Intent.EXTRA_SUBJECT, node.name)
+            MegaNodeUtil.startShareIntent(this, intent, node.publicLink, node.name)
+            return
+        }
+        lifecycleScope.launch {
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(node.handle),
+                    callerName = "ImagePreviewActivity:share",
+                )
+            }.onSuccess { link ->
+                val intent = Intent(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_SUBJECT, node.name)
+                MegaNodeUtil.startShareIntent(
+                    this@ImagePreviewActivity,
+                    intent,
+                    link,
+                    node.name,
+                )
+            }.onFailure { Timber.e(it) }
         }
     }
 

@@ -50,27 +50,11 @@ class MegaNodeUtilFacade @Inject constructor(
         context: Context,
     ) = MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, context)
 
-    override fun shareNode(context: Context, node: MegaNode?) {
-        MegaNodeUtil.shareNode(context, node)
-    }
-
-    override fun shareNode(
-        context: Context,
-        node: MegaNode?,
-        onExportFinishedListener: (() -> Unit)?,
-    ) {
-        MegaNodeUtil.shareNode(context, node, onExportFinishedListener)
-    }
-
     override fun areAllNodesDownloaded(context: Context, listNodes: List<MegaNode>) =
         MegaNodeUtil.areAllNodesDownloaded(context, listNodes)
 
     override fun getExportNodesLink(listNodes: List<MegaNode>) =
         MegaNodeUtil.getExportNodesLink(listNodes)
-
-    override fun shareNodes(context: Context, nodes: List<MegaNode>) {
-        MegaNodeUtil.shareNodes(context, nodes)
-    }
 
     override fun shouldContinueWithoutError(context: Context, node: MegaNode?) =
         MegaNodeUtil.shouldContinueWithoutError(context, node)
@@ -85,9 +69,6 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun isInRootLinksLevel(adapterType: Int, parentHandle: Long) =
         MegaNodeUtil.isInRootLinksLevel(adapterType, parentHandle)
-
-    override fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long) =
-        MegaNodeUtil.showShareOption(adapterType, isFolderLink, handle)
 
     override fun areAllFileNodesAndNotTakenDown(nodes: List<MegaNode>) =
         MegaNodeUtil.areAllFileNodesAndNotTakenDown(nodes)

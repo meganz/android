@@ -51,11 +51,12 @@ import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.shareFile
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
-import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
+import mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -96,6 +97,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -169,6 +171,7 @@ class TextEditorViewModel @Inject constructor(
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
+    private val exportNodeUseCase: ExportNodeUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -1158,7 +1161,35 @@ class TextEditorViewModel @Inject constructor(
             )
 
             FILE_LINK_ADAPTER -> shareLink(context, urlFileLink, getNode()?.name)
-            else -> shareNode(context, getNode()!!) { updateNode() }
+            else -> shareCurrentNode(context)
+        }
+    }
+
+    private fun shareCurrentNode(context: Context) {
+        val node = getNode() ?: return
+        val localPath = getLocalFile(node)
+        if (!localPath.isNullOrBlank() && !node.isFolder) {
+            shareFile(context, File(localPath), node.name)
+            return
+        }
+        if (node.isExported) {
+            val intent = Intent(Intent.ACTION_SEND)
+                .putExtra(Intent.EXTRA_SUBJECT, node.name)
+            startShareIntent(context, intent, node.publicLink, node.name)
+            return
+        }
+        viewModelScope.launch {
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(node.handle),
+                    callerName = "TextEditorViewModel:share",
+                )
+            }.onSuccess { link ->
+                val intent = Intent(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_SUBJECT, node.name)
+                startShareIntent(context, intent, link, node.name)
+                updateNode()
+            }.onFailure { Timber.e(it) }
         }
     }
 

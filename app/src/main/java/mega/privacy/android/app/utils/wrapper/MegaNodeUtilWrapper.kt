@@ -45,31 +45,6 @@ interface MegaNodeUtilWrapper {
     fun showTakenDownNodeActionNotAvailableDialog(node: MegaNode?, context: Context): Boolean
 
     /**
-     *
-     * Shares a node.
-     *
-     * @param context Current Context.
-     * @param node    Node to share.
-     */
-    fun shareNode(context: Context, node: MegaNode?)
-
-    /**
-     *
-     * Shares a node.
-     * If the node is a folder creates and/or shares the folder link.
-     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
-     *
-     * @param context                  Current Context.
-     * @param node                     Node to share.
-     * @param onExportFinishedListener Listener to manage the result of export request.
-     */
-    fun shareNode(
-        context: Context,
-        node: MegaNode?,
-        onExportFinishedListener: (() -> Unit)?,
-    )
-
-    /**
      * Method to know if all nodes are unloaded. If so, share them.
      *
      * @param context   The Activity context.
@@ -85,19 +60,6 @@ interface MegaNodeUtilWrapper {
      * @return The link with all exported nodes
      */
     fun getExportNodesLink(listNodes: List<MegaNode>): StringBuilder
-
-    /**
-     * Share multiple nodes out of MEGA app.
-     *
-     * If a folder is involved, we will share links of all nodes.
-     *
-     * Other apps can't handle the mixture of link and file, so if there is any file that is not
-     * downloaded, we will share links of all files.
-     *
-     * @param context the context where nodes are shared
-     * @param nodes nodes to share
-     */
-    fun shareNodes(context: Context, nodes: List<MegaNode>)
 
     /**
      * Checks if there is any error before continues any action.
@@ -148,15 +110,6 @@ interface MegaNodeUtilWrapper {
      */
     fun isInRootLinksLevel(adapterType: Int, parentHandle: Long): Boolean
 
-    /**
-     * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
-     *
-     * @param adapterType   view in which is required the check
-     * @param isFolderLink  if true, the node comes from a folder link
-     * @param handle        identifier of the MegaNode to check
-     * @return True if the option "share" should be visible, false otherwise
-     */
-    fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long): Boolean
 
     /**
      * Check if all nodes are file nodes and not taken down.

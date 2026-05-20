@@ -83,6 +83,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
@@ -126,6 +127,9 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
      */
     @Inject
     lateinit var listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper
+
+    @Inject
+    lateinit var exportNodeUseCase: ExportNodeUseCase
 
     private val snackbarHostState = SnackbarHostState()
 
@@ -254,8 +258,7 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                                 when (action) {
                                     VideoSectionMenuAction.VideoSectionShareAction ->
                                         lifecycleScope.launch {
-                                            MegaNodeUtil.shareNodes(
-                                                this@VideoSectionActivity,
+                                            shareSelectedNodes(
                                                 videoSectionViewModel.getSelectedMegaNode()
                                             )
                                             videoSectionViewModel.clearAllSelectedVideosOfPlaylist()
@@ -557,6 +560,41 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                 Timber.e(it)
             }
         }
+    }
+
+    private suspend fun shareSelectedNodes(nodes: List<nz.mega.sdk.MegaNode>) {
+        if (nodes.isEmpty()) return
+
+        // If every node has a local file available, share the files directly.
+        val localFiles = nodes.map { node ->
+            if (node.isFolder) null
+            else mega.privacy.android.app.utils.FileUtil.getLocalFile(node)?.let { java.io.File(it) }
+        }
+        if (localFiles.all { it != null }) {
+            @Suppress("UNCHECKED_CAST")
+            mega.privacy.android.app.utils.FileUtil.shareFiles(this, localFiles as List<java.io.File>)
+            return
+        }
+
+        // Combine already-exported links and export the remaining ones.
+        val links = StringBuilder()
+        nodes.filter { it.isExported }.forEach { links.append(it.publicLink).append("\n\n") }
+        nodes.filter { !it.isExported }.forEach { node ->
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(node.handle),
+                    callerName = "VideoSectionActivity:shareSelectedNodes",
+                )
+            }.onSuccess { link -> links.append(link).append("\n\n") }
+                .onFailure { Timber.e(it) }
+        }
+        if (links.isEmpty()) return
+
+        val title = nodes.singleOrNull()?.name
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_SUBJECT, title)
+        }
+        MegaNodeUtil.startShareIntent(this, shareIntent, links.toString(), title)
     }
 
     companion object {

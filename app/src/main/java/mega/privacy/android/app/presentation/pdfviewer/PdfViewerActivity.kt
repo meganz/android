@@ -83,9 +83,8 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
-import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
-import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
+import mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
@@ -368,9 +367,15 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         }
     }
 
+    private var lastShareOptionVisible: Boolean = false
+
     private fun collectFLows() {
         collectFlow(viewModel.uiState) { pdfViewerState ->
             with(pdfViewerState) {
+                if (isShareOptionVisible != lastShareOptionVisible) {
+                    lastShareOptionVisible = isShareOptionVisible
+                    invalidateOptionsMenu()
+                }
                 (startChatOfflineDownloadEvent as? StateEventWithContentTriggered)?.let { event ->
                     startDownloadViewModel.onSaveOfflineClicked(
                         chatFile = event.content,
@@ -442,6 +447,17 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                 if (showTakenDownDialogEvent != consumed && !isAlertDialogShown(takenDownDialog)) {
                     takenDownDialog = showTakenDownAlert(this@PdfViewerActivity)
                     viewModel.onTakenDownDialogShown()
+                }
+                (shareLinkEvent as? StateEventWithContentTriggered)?.let { event ->
+                    val shareIntent = Intent(Intent.ACTION_SEND)
+                        .putExtra(Intent.EXTRA_SUBJECT, event.content.nodeName)
+                    startShareIntent(
+                        this@PdfViewerActivity,
+                        shareIntent,
+                        event.content.link,
+                        event.content.nodeName,
+                    )
+                    viewModel.onShareLinkConsumed()
                 }
                 (moveOrRemoveNodeEvent as? StateEventWithContentTriggered)?.let { event ->
                     handleMoveOrRemoveNodeEvent(event.content)
@@ -1102,7 +1118,12 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             if (type == Constants.SEARCH_ADAPTER) {
                 fromIncoming = nC!!.nodeComesFromIncoming(megaApi.getNodeByHandle(handle))
             }
-            shareMenuItem.isVisible = showShareOption(type, isFolderLink, handle)
+            shareMenuItem.isVisible = viewModel.uiState.value.isShareOptionVisible
+            viewModel.updateShareOptionVisibility(
+                adapterType = type,
+                isFolderLink = isFolderLink,
+                nodeHandle = handle,
+            )
             if (type == Constants.OFFLINE_ADAPTER) {
                 getLinkMenuItem.isVisible = false
                 removeLinkMenuItem.isVisible = false
@@ -1471,7 +1492,18 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                     shareLink(this, intent.getStringExtra(Constants.URL_FILE_LINK), node?.name)
                 } else {
                     val node = megaApi.getNodeByHandle(handle)
-                    shareNode(this, node)
+                    if (node != null) {
+                        val localPath = FileUtil.getLocalFile(node)
+                        if (!localPath.isNullOrBlank() && !node.isFolder) {
+                            FileUtil.shareFile(this, File(localPath), node.name)
+                        } else {
+                            viewModel.shareNode(
+                                nodeHandle = node.handle,
+                                nodeName = node.name,
+                                publicLink = if (node.isExported) node.publicLink else null,
+                            )
+                        }
+                    }
                 }
             }
 

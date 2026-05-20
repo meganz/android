@@ -125,6 +125,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
@@ -158,6 +159,9 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
     @VideoPlayer
     @Inject
     lateinit var mediaPlayerGateway: MediaPlayerGateway
+
+    @Inject
+    lateinit var exportNodeUseCase: ExportNodeUseCase
 
     private val legacyVideoPlayerViewModel: LegacyVideoPlayerViewModel by viewModels()
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
@@ -466,7 +470,7 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
                         MegaNodeUtil.shareLink(this, content.fileLink, content.title)
 
                     is MenuOptionClickedContent.ShareNode ->
-                        MegaNodeUtil.shareNode(context = this, node = content.node)
+                        content.node?.let { shareCurrentNode(it) }
 
                     is MenuOptionClickedContent.GetLink ->
                         if (!showTakenDownNodeActionNotAvailableDialog(content.node, this)) {
@@ -520,6 +524,37 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
             throwable.message?.let { errorMessage ->
                 legacyVideoPlayerViewModel.updateSnackBarMessage(errorMessage)
             }
+        }
+    }
+
+    private fun shareCurrentNode(node: nz.mega.sdk.MegaNode) {
+        val localPath = FileUtil.getLocalFile(node)
+        if (!localPath.isNullOrBlank() && !node.isFolder) {
+            FileUtil.shareFile(this, java.io.File(localPath), node.name)
+            return
+        }
+        if (node.isExported) {
+            val intent = Intent(Intent.ACTION_SEND)
+                .putExtra(Intent.EXTRA_SUBJECT, node.name)
+            MegaNodeUtil.startShareIntent(this, intent, node.publicLink, node.name)
+            return
+        }
+        lifecycleScope.launch {
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(node.handle),
+                    callerName = "LegacyVideoPlayerActivity:share",
+                )
+            }.onSuccess { link ->
+                val intent = Intent(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_SUBJECT, node.name)
+                MegaNodeUtil.startShareIntent(
+                    this@LegacyVideoPlayerActivity,
+                    intent,
+                    link,
+                    node.name,
+                )
+            }.onFailure { Timber.e(it) }
         }
     }
 

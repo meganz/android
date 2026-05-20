@@ -5,57 +5,60 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
+import mega.privacy.android.app.utils.Constants.ADAPTER_TYPES_WITHOUT_ACCESS_CHECK
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
-import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.exception.BlockedMegaException
-import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
-import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
 import mega.privacy.android.domain.usecase.pdf.SetOrUpdateLastPageViewedInPdfUseCase
-import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
-import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.net.URL
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * View model for [PdfViewerActivity]
@@ -83,6 +86,8 @@ class PdfViewerViewModel @Inject constructor(
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
+    private val exportNodeUseCase: ExportNodeUseCase,
+    private val getNodeAccessUseCase: GetNodeAccessUseCase,
 ) : ViewModel() {
 
     private val handle: Long
@@ -262,7 +267,7 @@ class PdfViewerViewModel @Inject constructor(
                 _state.update {
                     it.copy(nodeCopyError = throwable)
                 }
-                Timber.e("Error while copying", throwable)
+                Timber.e(throwable, "Error while copying")
             }
         }
     }
@@ -296,7 +301,7 @@ class PdfViewerViewModel @Inject constructor(
                     }
                 }
             }.onFailure { throwable ->
-                Timber.e("Error while moving", throwable)
+                Timber.e(throwable, "Error while moving")
                 _state.update {
                     it.copy(nodeMoveError = throwable)
                 }
@@ -313,7 +318,7 @@ class PdfViewerViewModel @Inject constructor(
                 getDataBytesFromUrlUseCase(URL(uri))
             }.onSuccess { data ->
                 _state.update { it.copy(pdfStreamData = data) }
-            }.onFailure { Timber.e("Exception loading PDF as stream", it) }
+            }.onFailure { Timber.e(it, "Exception loading PDF as stream") }
         }
     }
 
@@ -560,5 +565,68 @@ class PdfViewerViewModel @Inject constructor(
      */
     fun onConsumeMoveOrRemoveNodeEvent() {
         _state.update { it.copy(moveOrRemoveNodeEvent = consumed()) }
+    }
+
+    /**
+     * Update the visibility of the toolbar share option based on the current node permissions.
+     *
+     * @param adapterType  view in which is required the check
+     * @param isFolderLink if true the node comes from a folder link
+     * @param nodeHandle   identifier of the node to check
+     */
+    fun updateShareOptionVisibility(
+        adapterType: Int,
+        isFolderLink: Boolean,
+        nodeHandle: Long,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                isFolderLink.not() && ((adapterType in ADAPTER_TYPES_WITHOUT_ACCESS_CHECK) || (getNodeAccessUseCase(
+                    NodeId(
+                        nodeHandle
+                    )
+                ) == AccessPermission.OWNER))
+            }.onSuccess { visible ->
+                _state.update { it.copy(isShareOptionVisible = visible) }
+            }.onFailure {
+                Timber.e(it)
+                _state.update { it.copy(isShareOptionVisible = false) }
+            }
+        }
+    }
+
+    /**
+     * Export the node link and emit an event so the activity can launch the share chooser.
+     *
+     * @param nodeHandle handle of the node to share
+     * @param nodeName   name of the node (used as share subject and chooser title)
+     * @param publicLink existing public link if the node is already exported, null otherwise
+     */
+    fun shareNode(nodeHandle: Long, nodeName: String, publicLink: String?) {
+        if (publicLink != null) {
+            _state.update {
+                it.copy(shareLinkEvent = triggered(PdfShareLink(publicLink, nodeName)))
+            }
+            return
+        }
+        viewModelScope.launch {
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(nodeHandle),
+                    callerName = "PdfViewerViewModel:shareNode",
+                )
+            }.onSuccess { link ->
+                _state.update {
+                    it.copy(shareLinkEvent = triggered(PdfShareLink(link, nodeName)))
+                }
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Resets the share link event after it has been handled.
+     */
+    fun onShareLinkConsumed() {
+        _state.update { it.copy(shareLinkEvent = consumed()) }
     }
 }

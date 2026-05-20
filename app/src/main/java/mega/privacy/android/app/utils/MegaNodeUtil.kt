@@ -24,7 +24,6 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
@@ -35,11 +34,9 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
-import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.getTappedNodeLocalFile
 import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
-import mega.privacy.android.app.utils.FileUtil.shareFile
 import mega.privacy.android.app.utils.FileUtil.shareFiles
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_DEVICE
@@ -120,54 +117,6 @@ object MegaNodeUtil {
     }
 
     /**
-     *
-     * Shares a node.
-     *
-     * @param context Current Context.
-     * @param node    Node to share.
-     */
-    @JvmStatic
-    fun shareNode(context: Context, node: MegaNode?) {
-        shareNode(context, node, null)
-    }
-
-    /**
-     *
-     * Shares a node.
-     * If the node is a folder creates and/or shares the folder link.
-     * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
-     *
-     * @param context                  Current Context.
-     * @param node                     Node to share.
-     * @param onExportFinishedListener Listener to manage the result of export request.
-     */
-    @JvmStatic
-    fun shareNode(
-        context: Context,
-        node: MegaNode?,
-        onExportFinishedListener: (() -> Unit)?,
-    ) {
-        if (shouldContinueWithoutError(context, node)) {
-            val path = getLocalFile(node)
-
-            if (!path.isNullOrBlank() && !node.isFolder) {
-                shareFile(context, File(path), node.name)
-            } else if (node.isExported) {
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.putExtra(Intent.EXTRA_SUBJECT, node.name)
-                startShareIntent(context, intent, node.publicLink, title = node.name)
-            } else {
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.putExtra(Intent.EXTRA_SUBJECT, node.name)
-                MegaApplication.getInstance().megaApi.exportNode(
-                    node,
-                    ExportListener(context, intent, onExportFinishedListener)
-                )
-            }
-        }
-    }
-
-    /**
      * Method to know if all nodes are unloaded. If so, share them.
      *
      * @param context   The Activity context.
@@ -211,55 +160,6 @@ object MegaNodeUtil {
         }
 
         return links
-    }
-
-    /**
-     * Share multiple nodes out of MEGA app.
-     *
-     * If a folder is involved, we will share links of all nodes.
-     *
-     * Other apps can't handle the mixture of link and file, so if there is any file that is not
-     * downloaded, we will share links of all files.
-     *
-     * @param context the context where nodes are shared
-     * @param nodes nodes to share
-     */
-    @JvmStatic
-    fun shareNodes(context: Context, nodes: List<MegaNode>) {
-        if (!shouldContinueWithoutError(context, nodes)) {
-            return
-        }
-
-        if (areAllNodesDownloaded(context, nodes)) {
-            return
-        }
-
-        var notExportedNodes = 0
-        val links = getExportNodesLink(nodes)
-
-        for (node in nodes) {
-            if (!node.isExported) {
-                notExportedNodes++
-            }
-        }
-        val title = nodes.singleOrNull()?.name
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            putExtra(Intent.EXTRA_SUBJECT, title)
-        }
-        if (notExportedNodes == 0) {
-            startShareIntent(context, intent, links.toString(), null)
-            return
-        }
-
-        val megaApi = MegaApplication.getInstance().megaApi
-        val exportListener =
-            ExportListener(context, notExportedNodes, links, intent)
-
-        for (node in nodes) {
-            if (!node.isExported) {
-                megaApi.exportNode(node, exportListener)
-            }
-        }
     }
 
     /**
@@ -575,30 +475,6 @@ object MegaNodeUtil {
     @JvmStatic
     fun isInRootLinksLevel(adapterType: Int, parentHandle: Long): Boolean {
         return adapterType == LINKS_ADAPTER && parentHandle == INVALID_HANDLE
-    }
-
-    /**
-     * Checks if the Toolbar option "share" should be visible or not depending on the permissions of the MegaNode
-     *
-     * @param adapterType   view in which is required the check
-     * @param isFolderLink  if true, the node comes from a folder link
-     * @param handle        identifier of the MegaNode to check
-     * @return True if the option "share" should be visible, false otherwise
-     */
-    @JvmStatic
-    fun showShareOption(adapterType: Int, isFolderLink: Boolean, handle: Long): Boolean {
-        if (isFolderLink) {
-            return false
-        } else if (adapterType != OFFLINE_ADAPTER &&
-            adapterType != ZIP_ADAPTER && adapterType != FILE_LINK_ADAPTER
-        ) {
-            val megaApi = MegaApplication.getInstance().megaApi
-            val node = megaApi.getNodeByHandle(handle)
-
-            return node != null && megaApi.getAccess(node) == MegaShare.ACCESS_OWNER
-        }
-
-        return true
     }
 
     /**

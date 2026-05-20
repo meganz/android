@@ -159,6 +159,7 @@ internal class TextEditorViewModelTest {
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
+            exportNodeUseCase = mock()
         )
     }
 

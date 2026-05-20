@@ -57,6 +57,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.ADAPTER_TYPES_WITHOUT_ACCESS_CHECK
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -83,8 +84,11 @@ import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
@@ -110,6 +114,12 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private lateinit var binding: ActivityAudioPlayerBinding
 
     @Inject
+    lateinit var exportNodeUseCase: ExportNodeUseCase
+
+    @Inject
+    lateinit var getNodeAccessUseCase: GetNodeAccessUseCase
+
+    @Inject
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
@@ -122,6 +132,62 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private var takenDownDialog: AlertDialog? = null
 
     private var tempNodeId: NodeId? = null
+
+    @Volatile
+    private var isShareMenuVisible: Boolean = false
+    private var lastShareCheckedHandle: Long = INVALID_HANDLE
+    private var lastShareCheckedAdapter: Int = INVALID_VALUE
+
+    private fun shareCurrentNode(node: MegaNode) {
+        val localPath = FileUtil.getLocalFile(node)
+        if (!localPath.isNullOrBlank() && !node.isFolder) {
+            FileUtil.shareFile(this, File(localPath), node.name)
+            return
+        }
+        if (node.isExported) {
+            val intent = Intent(Intent.ACTION_SEND)
+                .putExtra(Intent.EXTRA_SUBJECT, node.name)
+            MegaNodeUtil.startShareIntent(this, intent, node.publicLink, node.name)
+            return
+        }
+        lifecycleScope.launch {
+            runCatching {
+                exportNodeUseCase(
+                    nodeToExport = NodeId(node.handle),
+                    callerName = "AudioPlayerActivity:share",
+                )
+            }.onSuccess { link ->
+                val intent = Intent(Intent.ACTION_SEND)
+                    .putExtra(Intent.EXTRA_SUBJECT, node.name)
+                MegaNodeUtil.startShareIntent(
+                    this@AudioPlayerActivity,
+                    intent,
+                    link,
+                    node.name,
+                )
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    private fun updateShareMenuVisibility(adapterType: Int, handle: Long) {
+        if (adapterType == lastShareCheckedAdapter && handle == lastShareCheckedHandle) return
+        lastShareCheckedAdapter = adapterType
+        lastShareCheckedHandle = handle
+        lifecycleScope.launch {
+            runCatching {
+                (adapterType in ADAPTER_TYPES_WITHOUT_ACCESS_CHECK) || (getNodeAccessUseCase(
+                    NodeId(
+                        handle
+                    )
+                ) == AccessPermission.OWNER)
+            }.onSuccess { visible ->
+                if (visible != isShareMenuVisible) {
+                    isShareMenuVisible = visible
+                    invalidateOptionsMenu()
+                }
+            }.onFailure { Timber.e(it) }
+        }
+    }
 
     private val nameCollisionActivityContract = registerForActivityResult(
         NameCollisionActivityContract()
@@ -418,10 +484,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
                         else -> {
                             playerServiceGateway?.let {
-                                MegaNodeUtil.shareNode(
-                                    context = this,
-                                    node = megaApi.getNodeByHandle(it.getCurrentPlayingHandle())
-                                )
+                                megaApi.getNodeByHandle(it.getCurrentPlayingHandle())
+                                    ?.let { node -> shareCurrentNode(node) }
                             }
                         }
                     }
@@ -967,17 +1031,14 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     menu.findItem(R.id.properties).isVisible =
                                         currentFragmentId == R.id.audio_main_player
 
-                                    menu.findItem(R.id.share).isVisible =
-                                        currentFragmentId == R.id.audio_main_player
-                                                && MegaNodeUtil.showShareOption(
-                                            adapterType = adapterType,
-                                            isFolderLink = false,
-                                            handle = node.handle
-                                        )
-                                    menu.findItem(R.id.send_to_chat).isVisible = true
-
                                     val access = megaApi.getAccess(node)
                                     val isAccessOwner = access == MegaShare.ACCESS_OWNER
+
+                                    menu.findItem(R.id.share).isVisible =
+                                        currentFragmentId == R.id.audio_main_player
+                                                && isShareMenuVisible
+                                    menu.findItem(R.id.send_to_chat).isVisible = true
+                                    updateShareMenuVisibility(adapterType, node.handle)
 
                                     menu.findItem(R.id.get_link).isVisible =
                                         isAccessOwner && !node.isExported
