@@ -66,8 +66,11 @@ object VideoCaptureUtils {
     /**
      * Get the video capture devices list.
      *
+     * Need `@JvmStatic`: SDK native code looks it up via GetStaticMethodID (see megachat.cpp).
+     *
      * @return The video capture devices list.
      */
+    @JvmStatic
     private fun deviceList(): Array<String> {
         Timber.d("DeviceList")
         try {
