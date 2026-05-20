@@ -1,41 +1,42 @@
 package mega.privacy.android.app.contacts.list.adapter
 
-import androidx.core.content.ContextCompat
+import android.net.Uri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import coil3.asImage
-import coil3.load
-import coil3.request.transformations
-import coil3.transform.CircleCropTransformation
 import mega.privacy.android.app.contacts.list.data.ContactItem
+import mega.privacy.android.app.contacts.list.mapper.ContactItemDataToContactItemUiStateMapper
 import mega.privacy.android.app.databinding.ItemContactDataBinding
+import mega.privacy.android.app.utils.AvatarUtil
+import java.io.File
 
 /**
  * RecyclerView's ViewHolder to show ContactItem Data info.
  *
- * @property binding    Item's view binding
+ * @property binding                     Item's view binding.
+ * @property contactItemUiStateMapper    Maps the legacy [ContactItem.Data] row
+ *                                       into the UI state consumed by the
+ *                                       embedded `ContactItemView`.
  */
 class ContactListDataViewHolder(
     private val binding: ItemContactDataBinding,
+    private val contactItemUiStateMapper: ContactItemDataToContactItemUiStateMapper,
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    private val rowState: ContactListRowState = ContactListRowState()
+    private var contentInstalled: Boolean = false
+
     fun bind(item: ContactItem.Data) {
-        binding.txtName.text = item.getTitle()
-        binding.txtLastSeen.text = item.lastSeen
-        binding.txtLastSeen.isVisible = !item.lastSeen.isNullOrBlank()
+        rowState.uiState = contactItemUiStateMapper(
+            item = item,
+            avatarFile = item.avatarUri?.toAvatarFile(),
+            avatarColorArgb = AvatarUtil.getColorAvatar(item.handle),
+        )
+        if (!contentInstalled) {
+            bindContactListRow(binding.contactComposeView, rowState)
+            contentInstalled = true
+        }
         binding.chipNew.isVisible = item.isNew
-        binding.verifiedIcon.isVisible = item.isVerified
-        binding.imgThumbnail.load(
-            data = item.avatarUri ?: item.placeholder
-        ) {
-            transformations(CircleCropTransformation())
-            placeholder(item.placeholder.asImage())
-        }
-        if (item.statusColor != null) {
-            val color = ContextCompat.getColor(itemView.context, item.statusColor)
-            binding.imgState.setColorFilter(color)
-        } else {
-            binding.imgState.clearColorFilter()
-        }
     }
+
+    private fun Uri.toAvatarFile(): File? = path?.let(::File)?.takeIf { it.exists() }
 }
