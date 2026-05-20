@@ -174,6 +174,7 @@ class OfflineViewModel @AssistedInject constructor(
                 it.copy(
                     isLoadingCurrentFolder = false,
                     offlineNodes = offlineNodeList
+                        .distinctBy { it.id }
                         .map { file ->
                             OfflineNodeUiItem(
                                 offlineFileInformation = file,

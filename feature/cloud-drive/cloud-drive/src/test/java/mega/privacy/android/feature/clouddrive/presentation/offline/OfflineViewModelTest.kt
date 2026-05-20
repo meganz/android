@@ -190,6 +190,46 @@ class OfflineViewModelTest {
     }
 
     @Test
+    fun `test that offlineNodes is deduped by id when getOfflineNodesByParentIdUseCase returns duplicates`() =
+        runTest {
+            val parentId = -1
+            val duplicateId = 42
+            val uniqueId = 43
+            val first = mock<OfflineFileInformation> {
+                on { id } doReturn duplicateId
+                on { name } doReturn "first"
+                on { handle } doReturn "100"
+                on { addedTime } doReturn 100000L
+            }
+            val duplicate = mock<OfflineFileInformation> {
+                on { id } doReturn duplicateId
+                on { name } doReturn "duplicate"
+                on { handle } doReturn "101"
+                on { addedTime } doReturn 100000L
+            }
+            val unique = mock<OfflineFileInformation> {
+                on { id } doReturn uniqueId
+                on { name } doReturn "unique"
+                on { handle } doReturn "200"
+                on { addedTime } doReturn 100000L
+            }
+
+            whenever(getOfflineNodesByParentIdUseCase(parentId))
+                .thenReturn(listOf(first, duplicate, unique))
+            whenever(monitorOfflineNodeUpdatesUseCase()) doReturn flowOf(emptyList())
+
+            initViewModel(nodeId = parentId)
+
+            underTest.uiState.test {
+                val state = expectMostRecentItem()
+                assertThat(state.offlineNodes).hasSize(2)
+                assertThat(state.offlineNodes.map { it.offlineFileInformation.id })
+                    .containsExactly(duplicateId, uniqueId)
+                    .inOrder()
+            }
+        }
+
+    @Test
     fun `test that the selected node size is equal to the total offline list size when select all is clicked`() =
         runTest {
             val parentId = 1
