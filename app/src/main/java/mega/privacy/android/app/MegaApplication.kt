@@ -33,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fcm.FcmManager
@@ -216,6 +217,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var fcmManager: FcmManager
 
+    @Inject
+    lateinit var globalInitialiser: GlobalInitialiser
+
     var localIpAddress: String? = ""
 
     private val meetingListener = MeetingListener()
@@ -328,6 +332,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
      *
      */
     override fun onStart(owner: LifecycleOwner) {
+        globalInitialiser.onAppStart()
         applicationScope.launch {
             val backgroundStatus = megaChatApi.backgroundStatus
             Timber.d("Application start with backgroundStatus: %s", backgroundStatus)

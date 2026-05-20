@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.BlockedState
 import mega.privacy.android.app.appstate.global.model.GlobalState
@@ -47,7 +46,6 @@ import javax.inject.Inject
 class GlobalStateViewModel @Inject constructor(
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
-    private val globalInitialiser: GlobalInitialiser,
     private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
     private val blockedStateMapper: BlockedStateMapper,
     private val handleBlockedStateSessionUseCase: HandleBlockedStateSessionUseCase,
@@ -58,10 +56,6 @@ class GlobalStateViewModel @Inject constructor(
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
 ) : ViewModel() {
     private val refreshSessionFlow = MutableSharedFlow<RefreshEvent>()
-
-    init {
-        globalInitialiser.onAppStart()
-    }
 
     val state: StateFlow<GlobalState> by lazy {
         getStateValues().catch {

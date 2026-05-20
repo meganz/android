@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
-import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.domain.entity.AccountBlockedEvent
@@ -59,7 +58,6 @@ class GlobalStateViewModelTest {
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
 
-    private val globalInitialiser = mock<GlobalInitialiser>()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
 
@@ -78,7 +76,6 @@ class GlobalStateViewModelTest {
         underTest = GlobalStateViewModel(
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
-            globalInitialiser = globalInitialiser,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
             blockedStateMapper = BlockedStateMapper(),
             handleBlockedStateSessionUseCase = handleBlockedStateSessionUseCase,
@@ -95,7 +92,6 @@ class GlobalStateViewModelTest {
         reset(
             monitorThemeModeUseCase,
             monitorUserCredentialsUseCase,
-            globalInitialiser,
             handleBlockedStateSessionUseCase,
             snackbarEventQueue,
             monitorFetchNodesFinishUseCase,
@@ -103,11 +99,6 @@ class GlobalStateViewModelTest {
             backgroundFastLoginUseCase,
             monitorConnectivityUseCase,
         )
-    }
-
-    @Test
-    fun `test that app start initializers are called during initialization`() = runTest {
-        verify(globalInitialiser).onAppStart()
     }
 
     @Test

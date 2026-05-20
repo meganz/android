@@ -54,7 +54,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
@@ -216,9 +215,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
-
-    @Inject
-    lateinit var globalInitialiser: GlobalInitialiser
 
     @Inject
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
@@ -476,7 +472,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         super.onCreate(savedInstanceState)
         shouldLeaveApp =
             intent?.action == Intent.ACTION_SEND || intent?.action == Intent.ACTION_SEND_MULTIPLE
-        globalInitialiser.onAppStart()
         binding = ActivityFileExplorerBinding.inflate(layoutInflater)
         consumeInsetsWithToolbar(
             type = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
