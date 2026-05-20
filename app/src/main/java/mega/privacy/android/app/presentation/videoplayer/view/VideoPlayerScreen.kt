@@ -265,6 +265,20 @@ internal fun VideoPlayerScreen(
 
     var playerView by remember { mutableStateOf<PlayerView?>(null) }
 
+    val scheduleAutoHide = remember(coroutineScope, systemUiController) {
+        { hideSystemBars: Boolean ->
+            autoHideJob?.cancel()
+            autoHideJob = coroutineScope.launch {
+                delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
+                isControllerViewVisible = false
+                if (hideSystemBars) {
+                    systemUiController.isSystemBarsVisible = false
+                }
+                playerView?.hideController()
+            }
+        }
+    }
+
     var snapshotScreen by rememberSaveable { mutableStateOf(false) }
     val writeStoragePermission = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
         rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
@@ -316,17 +330,16 @@ internal fun VideoPlayerScreen(
         }
     }
 
-    LaunchedEffect(playbackState, uiState.showSubTitlesOptions, uiState.isMoreOptionShown) {
-        if (playbackState <= STATE_BUFFERING ||
-            uiState.showSubTitlesOptions ||
-            uiState.isMoreOptionShown
-        ) {
-            autoHideJob?.cancel()
-        } else if (isControllerViewVisible) {
-            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-            isControllerViewVisible = false
-            systemUiController.isSystemBarsVisible = false
-            playerView?.hideController()
+    LaunchedEffect(
+        isPlaying,
+        uiState.showSubTitlesOptions,
+        uiState.isMoreOptionShown,
+        isSpeedOptionsShown
+    ) {
+        if (uiState.isLocked) return@LaunchedEffect
+        autoHideJob?.cancel()
+        if (isPlaying && !uiState.showSubTitlesOptions && !uiState.isMoreOptionShown && !isSpeedOptionsShown && isControllerViewVisible) {
+            scheduleAutoHide(true)
         }
     }
 
@@ -445,46 +458,45 @@ internal fun VideoPlayerScreen(
                                         isControllerViewVisible = true
                                         systemUiController.isSystemBarsVisible = false
                                         playerComposeView.showController()
-                                        autoHideJob = coroutineScope.launch {
-                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                            isControllerViewVisible = false
-                                            playerComposeView.hideController()
-                                        }
+                                        scheduleAutoHide(false)
                                     } else {
-                                        autoHideJob = coroutineScope.launch {
-                                            isControllerViewVisible = true
-                                            systemUiController.isSystemBarsVisible = true
-                                            playerComposeView.showController()
-                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                            isControllerViewVisible = false
-                                            systemUiController.isSystemBarsVisible = false
-                                            playerComposeView.hideController()
+                                        isControllerViewVisible = true
+                                        systemUiController.isSystemBarsVisible = true
+                                        playerComposeView.showController()
+                                        if (isPlaying) {
+                                            scheduleAutoHide(true)
                                         }
                                     }
                                 },
                                 playerViewClicked = {
-                                    val visible = !isControllerViewVisible
                                     autoHideJob?.cancel()
-                                    isControllerViewVisible = visible
-                                    if (!uiState.isLocked) {
-                                        systemUiController.isSystemBarsVisible = visible
-                                    }
-                                    if (visible) {
+                                    if (isControllerViewVisible) {
+                                        isControllerViewVisible = false
+                                        if (!uiState.isLocked) {
+                                            systemUiController.isSystemBarsVisible = false
+                                        }
+                                        playerComposeView.hideController()
+                                    } else {
+                                        isControllerViewVisible = true
+                                        if (!uiState.isLocked) {
+                                            systemUiController.isSystemBarsVisible = true
+                                        }
                                         playerComposeView.showController()
                                         if (uiState.isLocked) {
-                                            autoHideJob = coroutineScope.launch {
-                                                delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                                isControllerViewVisible = false
-                                                playerComposeView.hideController()
-                                            }
+                                            scheduleAutoHide(false)
+                                        } else if (isPlaying) {
+                                            scheduleAutoHide(true)
                                         }
-                                    } else {
-                                        playerComposeView.hideController()
                                     }
                                 },
                                 onSnapshotSelected = {
                                     writeStoragePermission?.launchPermissionRequest() ?: run {
                                         snapshotScreen = true
+                                    }
+                                },
+                                resetAutoHideTimer = {
+                                    if (isPlaying && isControllerViewVisible && !uiState.isLocked) {
+                                        scheduleAutoHide(true)
                                     }
                                 },
                             ).also { controller ->
@@ -496,13 +508,6 @@ internal fun VideoPlayerScreen(
                                     if (visibility == View.VISIBLE) {
                                         applyPlayPauseIcon()
                                         applyControlIcons()
-                                    }
-                                    if (visibility == View.VISIBLE && !isControllerViewVisible && !uiState.isLocked) {
-                                        autoHideJob?.cancel()
-                                        autoHideJob = coroutineScope.launch {
-                                            delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                            playerComposeView.hideController()
-                                        }
                                     }
                                 }
                             )
@@ -519,13 +524,6 @@ internal fun VideoPlayerScreen(
                             }
 
                             playerComposeView.controllerAutoShow = false
-
-                            autoHideJob = coroutineScope.launch {
-                                delay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS)
-                                isControllerViewVisible = false
-                                systemUiController.isSystemBarsVisible = false
-                                playerComposeView.hideController()
-                            }
                         }
                 },
                 onRelease = {

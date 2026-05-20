@@ -48,6 +48,7 @@ class VideoPlayerController(
     private val lockStateChanged: (lock: Boolean) -> Unit,
     private val playerViewClicked: () -> Unit,
     private val onSnapshotSelected: () -> Unit,
+    private val resetAutoHideTimer: () -> Unit,
 ) {
     private val repeatToggleButton = container.findViewById<ImageButton>(R.id.repeat_toggle)
     private val playerComposeView = container.findViewById<PlayerView>(R.id.player_compose_view)
@@ -92,6 +93,7 @@ class VideoPlayerController(
         updateRepeatToggleButtonUI(context, defaultRepeatToggleMode)
         repeatToggleButton.setOnClickListener {
             updateRepeatToggleMode()
+            resetAutoHideTimer()
         }
     }
 
@@ -152,6 +154,7 @@ class VideoPlayerController(
         fullscreenButton.setOnClickListener {
             isFullscreen.value = !isFullscreen.value
             fullscreenClickedCallback(isFullscreen.value)
+            resetAutoHideTimer()
         }
     }
 
@@ -182,6 +185,7 @@ class VideoPlayerController(
                 Analytics.tracker.trackEvent(VideoPlayerRotateToPortraitPressedEvent)
                 ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             }
+            resetAutoHideTimer()
         }
     }
 
