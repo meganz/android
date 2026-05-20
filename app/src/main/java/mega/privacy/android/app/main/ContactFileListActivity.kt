@@ -91,9 +91,11 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -128,6 +130,12 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     @Inject
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     @Inject
     @ApplicationScope
@@ -305,12 +313,26 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     override fun showNewFolderDialog(typedText: String?) {
         newFolderDialog =
-            showNewFolderDialog(this, this, megaApi.getNodeByHandle(parentHandle), typedText)
+            showNewFolderDialog(
+                context = this,
+                actionNodeCallback = this,
+                parentNode = megaApi.getNodeByHandle(parentHandle),
+                typedText = typedText,
+                getRootNodeUseCase = getRootNodeUseCase,
+                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+            )
     }
 
     override fun showNewTextFileDialog(typedName: String?) {
         megaApi.getNodeByHandle(parentHandle)?.let {
-            newTextFileDialog = showNewTxtFileDialog(this, it, typedName, false)
+            newTextFileDialog = showNewTxtFileDialog(
+                context = this,
+                parent = it,
+                typedName = typedName,
+                fromHome = false,
+                getRootNodeUseCase = getRootNodeUseCase,
+                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+            )
         }
     }
 

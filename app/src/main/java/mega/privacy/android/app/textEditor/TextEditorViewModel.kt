@@ -32,6 +32,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.features.CloudDriveFeature
 import mega.privacy.android.app.listeners.ExportListener
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
@@ -76,6 +77,7 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -89,10 +91,13 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
@@ -161,6 +166,9 @@ class TextEditorViewModel @Inject constructor(
     // Use existing use case for smart filename generation
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
+    private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -1265,5 +1273,74 @@ class TextEditorViewModel @Inject constructor(
         }
 
         return result
+    }
+
+    /**
+     * Decides whether the current node should be moved to the rubbish bin or
+     * removed permanently and emits a corresponding confirmation event for the
+     * activity to display the appropriate dialog.
+     *
+     * @param handle handle of the node to move or remove.
+     */
+    fun checkMoveOrRemoveNode(handle: Long) {
+        viewModelScope.launch {
+            val isInRubbish = runCatching { isNodeInRubbishBinUseCase(NodeId(handle)) }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(false)
+            val result = if (isInRubbish) {
+                MoveOrRemoveNodeResult.ConfirmRemoveFromMega(handle)
+            } else {
+                MoveOrRemoveNodeResult.ConfirmMoveToRubbish(handle)
+            }
+            _uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Moves the node identified by [handle] to the rubbish bin and emits a
+     * success, failure or foreign-quota event for the activity to react to.
+     */
+    fun moveNodeToRubbishBin(handle: Long) {
+        viewModelScope.launch {
+            val result = runCatching { moveNodeToRubbishBinUseCase(NodeId(handle)) }
+                .fold(
+                    onSuccess = { MoveOrRemoveNodeResult.MovedToRubbish },
+                    onFailure = { throwable ->
+                        Timber.e(throwable)
+                        if (throwable is ForeignNodeException) {
+                            MoveOrRemoveNodeResult.ForeignNodeOverQuota
+                        } else {
+                            MoveOrRemoveNodeResult.MoveFailed
+                        }
+                    }
+                )
+            _uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Permanently removes the node identified by [handle] from MEGA and emits a
+     * success or failure event for the activity to react to.
+     */
+    fun removeNodeFromMega(handle: Long) {
+        viewModelScope.launch {
+            val result = runCatching { deleteNodeByHandleUseCase(NodeId(handle)) }
+                .fold(
+                    onSuccess = { MoveOrRemoveNodeResult.Removed },
+                    onFailure = { throwable ->
+                        Timber.e(throwable)
+                        MoveOrRemoveNodeResult.RemoveFailed
+                    }
+                )
+            _uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Consumes the [TextEditorViewState.moveOrRemoveNodeEvent] after the
+     * activity has handled it.
+     */
+    fun onConsumeMoveOrRemoveNodeEvent() {
+        _uiState.update { it.copy(moveOrRemoveNodeEvent = consumed()) }
     }
 }

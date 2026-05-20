@@ -90,7 +90,9 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -115,6 +117,12 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
@@ -442,10 +450,12 @@ class ImagePreviewActivity : BaseActivity() {
                 }
             }
             MegaNodeDialogUtil.showRenameNodeDialog(
-                this@ImagePreviewActivity,
-                node,
-                snackbarShower,
-                null,
+                context = this@ImagePreviewActivity,
+                node = node,
+                snackbarShower = snackbarShower,
+                actionNodeCallback = null,
+                getRootNodeUseCase = getRootNodeUseCase,
+                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
             )
         }
     }

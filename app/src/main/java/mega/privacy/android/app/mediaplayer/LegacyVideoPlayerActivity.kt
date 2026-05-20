@@ -64,6 +64,7 @@ import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
@@ -86,6 +87,7 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAc
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMenuAction.VideoPlayerUnhideAction
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getRequest
@@ -113,13 +115,16 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
@@ -140,6 +145,12 @@ import javax.inject.Inject
 class LegacyVideoPlayerActivity : PasscodeActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     /**
      * MediaPlayerGateway for video player
@@ -273,6 +284,13 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
                 event = uiState.blockedError,
                 onConsumed = { legacyVideoPlayerViewModel.onBlockedErrorConsumed() }) {
                 showBlockedDialog = true
+            }
+
+            EventEffect(
+                event = uiState.moveOrRemoveNodeEvent,
+                onConsumed = { legacyVideoPlayerViewModel.onConsumeMoveOrRemoveNodeEvent() },
+            ) { result ->
+                handleMoveOrRemoveNodeEvent(result)
             }
 
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
@@ -476,7 +494,9 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
                                         legacyVideoPlayerViewModel.uiState.value.metadata.copy(nodeName = newName)
                                     legacyVideoPlayerViewModel.updateMetadata(newMetadata)
                                 }
-                            })
+                            },
+                            getRootNodeUseCase = getRootNodeUseCase,
+                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,)
                 }
                 legacyVideoPlayerViewModel.clearMenuOptionClickedContent()
             }
@@ -671,11 +691,68 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
     }
 
     private fun handleMoveToRubbishAction(playingHandle: Long) {
-        MegaNodeDialogUtil.moveToRubbishOrRemove(
-            handle = playingHandle,
-            activity = this,
-            snackbarShower = this
-        )
+        if (!Util.isOnline(this)) {
+            legacyVideoPlayerViewModel.updateSnackBarMessage(
+                getString(R.string.error_server_connection_problem)
+            )
+            return
+        }
+        legacyVideoPlayerViewModel.checkMoveOrRemoveNode(playingHandle)
+    }
+
+    private fun handleMoveOrRemoveNodeEvent(result: MoveOrRemoveNodeResult) {
+        when (result) {
+            is MoveOrRemoveNodeResult.ConfirmMoveToRubbish -> showMoveToRubbishConfirmation(result.handle)
+            is MoveOrRemoveNodeResult.ConfirmRemoveFromMega -> showRemoveFromMegaConfirmation(result.handle)
+            MoveOrRemoveNodeResult.MovedToRubbish -> {
+                legacyVideoPlayerViewModel.updateSnackBarMessage(
+                    getString(sharedR.string.node_moved_success_message)
+                )
+                finish()
+            }
+
+            MoveOrRemoveNodeResult.MoveFailed -> legacyVideoPlayerViewModel.updateSnackBarMessage(
+                getString(R.string.context_no_moved)
+            )
+
+            MoveOrRemoveNodeResult.ForeignNodeOverQuota ->
+                showForeignStorageOverQuotaWarningDialog(this)
+
+            MoveOrRemoveNodeResult.Removed -> {
+                legacyVideoPlayerViewModel.updateSnackBarMessage(
+                    getString(R.string.context_correctly_removed)
+                )
+                finish()
+            }
+
+            MoveOrRemoveNodeResult.RemoveFailed -> legacyVideoPlayerViewModel.updateSnackBarMessage(
+                getString(R.string.context_no_removed)
+            )
+
+            MoveOrRemoveNodeResult.Offline -> legacyVideoPlayerViewModel.updateSnackBarMessage(
+                getString(R.string.error_server_connection_problem)
+            )
+        }
+    }
+
+    private fun showMoveToRubbishConfirmation(handle: Long) {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.confirmation_move_to_rubbish))
+            .setPositiveButton(getString(R.string.general_move)) { _, _ ->
+                legacyVideoPlayerViewModel.moveNodeToRubbishBin(handle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
+            .show()
+    }
+
+    private fun showRemoveFromMegaConfirmation(handle: Long) {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.confirmation_delete_from_mega))
+            .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
+                legacyVideoPlayerViewModel.removeNodeFromMega(handle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
+            .show()
     }
 
     private fun handleAddToAction(playingHandle: Long) {

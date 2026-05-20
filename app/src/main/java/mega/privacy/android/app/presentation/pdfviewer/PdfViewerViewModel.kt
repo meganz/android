@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -35,9 +36,13 @@ import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -75,6 +80,9 @@ class PdfViewerViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
+    private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
 ) : ViewModel() {
 
     private val handle: Long
@@ -485,5 +493,72 @@ class PdfViewerViewModel @Inject constructor(
      */
     fun onTakenDownDialogShown() {
         _state.update { it.copy(showTakenDownDialogEvent = consumed) }
+    }
+
+    /**
+     * Decides whether the node identified by [handle] should be moved to the
+     * rubbish bin or removed permanently and emits a corresponding confirmation
+     * event for the activity to display the appropriate dialog.
+     */
+    fun checkMoveOrRemoveNode(handle: Long) {
+        viewModelScope.launch {
+            val isInRubbish = runCatching { isNodeInRubbishBinUseCase(NodeId(handle)) }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(false)
+            val result = if (isInRubbish) {
+                MoveOrRemoveNodeResult.ConfirmRemoveFromMega(handle)
+            } else {
+                MoveOrRemoveNodeResult.ConfirmMoveToRubbish(handle)
+            }
+            _state.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Moves the node identified by [handle] to the rubbish bin and emits a
+     * success, failure or foreign-quota event for the activity to react to.
+     */
+    fun moveNodeToRubbishBin(handle: Long) {
+        viewModelScope.launch {
+            val result = runCatching { moveNodeToRubbishBinUseCase(NodeId(handle)) }
+                .fold(
+                    onSuccess = { MoveOrRemoveNodeResult.MovedToRubbish },
+                    onFailure = { throwable ->
+                        Timber.e(throwable)
+                        if (throwable is ForeignNodeException) {
+                            MoveOrRemoveNodeResult.ForeignNodeOverQuota
+                        } else {
+                            MoveOrRemoveNodeResult.MoveFailed
+                        }
+                    }
+                )
+            _state.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Permanently removes the node identified by [handle] from MEGA and emits a
+     * success or failure event for the activity to react to.
+     */
+    fun removeNodeFromMega(handle: Long) {
+        viewModelScope.launch {
+            val result = runCatching { deleteNodeByHandleUseCase(NodeId(handle)) }
+                .fold(
+                    onSuccess = { MoveOrRemoveNodeResult.Removed },
+                    onFailure = { throwable ->
+                        Timber.e(throwable)
+                        MoveOrRemoveNodeResult.RemoveFailed
+                    }
+                )
+            _state.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Consumes the [PdfViewerState.moveOrRemoveNodeEvent] after the activity
+     * has handled it.
+     */
+    fun onConsumeMoveOrRemoveNodeEvent() {
+        _state.update { it.copy(moveOrRemoveNodeEvent = consumed()) }
     }
 }

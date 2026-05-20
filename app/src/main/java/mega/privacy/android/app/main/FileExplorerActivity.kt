@@ -123,10 +123,12 @@ import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
@@ -217,6 +219,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     private val viewModel by viewModels<FileExplorerViewModel>()
 
@@ -603,8 +611,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 if (getBoolean(IS_NEW_FOLDER_DIALOG_SHOWN, false)) {
                     newFolderDialog =
                         showNewFolderDialog(
-                            this@FileExplorerActivity, this@FileExplorerActivity,
-                            currentParentNode, savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT)
+                            context = this@FileExplorerActivity,
+                            actionNodeCallback = this@FileExplorerActivity,
+                            parentNode = currentParentNode,
+                            typedText = savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT),
+                            getRootNodeUseCase = getRootNodeUseCase,
+                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                         )
                 }
             }
@@ -2384,10 +2396,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
             R.id.cab_menu_create_folder -> {
                 newFolderDialog = showNewFolderDialog(
-                    this,
-                    this,
-                    currentParentNode,
-                    null
+                    context = this,
+                    actionNodeCallback = this,
+                    parentNode = currentParentNode,
+                    typedText = null,
+                    getRootNodeUseCase = getRootNodeUseCase,
+                    getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                 )
             }
 

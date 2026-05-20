@@ -243,9 +243,17 @@ class ContactFileListBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
                 Timber.w("The activity is not an instance of OnFolderLeaveCallBack")
             }
         } else if (id == R.id.rename_option) {
+
+            val getRootNodeUseCase = contactFileListActivity?.getRootNodeUseCase ?: contactInfoActivity?.getRootNodeUseCase ?: return
+            val getTypedChildrenNodeUseCase = contactFileListActivity?.getTypedChildrenNodeUseCase ?: contactInfoActivity?.getTypedChildrenNodeUseCase ?: return
+
             showRenameNodeDialog(
-                requireActivity(), node, activity as? SnackbarShower,
-                activity as? ActionNodeCallback
+                context = requireActivity(),
+                node = node,
+                snackbarShower = activity as? SnackbarShower,
+                actionNodeCallback = activity as? ActionNodeCallback,
+                getRootNodeUseCase = getRootNodeUseCase,
+                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
             )
         } else if (id == R.id.move_option) {
             if (requireActivity() is ContactFileListActivity) {

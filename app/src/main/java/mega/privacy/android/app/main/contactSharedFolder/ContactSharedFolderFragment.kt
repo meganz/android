@@ -32,11 +32,14 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.create
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Fragment for Contact shared Folder
@@ -47,6 +50,12 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     companion object {
         private const val MAX_SHARED_FOLDER_NUMBER_TO_BE_DISPLAYED = 5
     }
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     private var _binding: FragmentContactSharedFolderListBinding? = null
     private val binding: FragmentContactSharedFolderListBinding
@@ -415,7 +424,9 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                         val node = documents[0]
                         MegaNodeDialogUtil.showRenameNodeDialog(
                             context, node, (requireActivity() as SnackbarShower),
-                            (requireActivity() as ActionNodeCallback)
+                            (requireActivity() as ActionNodeCallback),
+                            getRootNodeUseCase = getRootNodeUseCase,
+                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                         )
                     }
                 }

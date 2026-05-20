@@ -65,6 +65,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -72,13 +73,13 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.create
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
@@ -93,6 +94,8 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.resources.R as sharedR
@@ -129,6 +132,12 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     /**
      * Application scope
@@ -434,8 +443,89 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                     takenDownDialog = showTakenDownAlert(this@PdfViewerActivity)
                     viewModel.onTakenDownDialogShown()
                 }
+                (moveOrRemoveNodeEvent as? StateEventWithContentTriggered)?.let { event ->
+                    handleMoveOrRemoveNodeEvent(event.content)
+                    viewModel.onConsumeMoveOrRemoveNodeEvent()
+                }
             }
         }
+    }
+
+    private fun onMoveOrRemoveActionClicked(handle: Long) {
+        if (!Util.isOnline(this)) {
+            showSnackbar(
+                SNACKBAR_TYPE,
+                getString(R.string.error_server_connection_problem),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+            return
+        }
+        viewModel.checkMoveOrRemoveNode(handle)
+    }
+
+    private fun handleMoveOrRemoveNodeEvent(result: MoveOrRemoveNodeResult) {
+        when (result) {
+            is MoveOrRemoveNodeResult.ConfirmMoveToRubbish -> showMoveToRubbishConfirmation(result.handle)
+            is MoveOrRemoveNodeResult.ConfirmRemoveFromMega -> showRemoveFromMegaConfirmation(result.handle)
+            MoveOrRemoveNodeResult.MovedToRubbish -> {
+                showSnackbar(
+                    SNACKBAR_TYPE,
+                    getString(sharedR.string.node_moved_success_message),
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+                finish()
+            }
+
+            MoveOrRemoveNodeResult.MoveFailed -> showSnackbar(
+                SNACKBAR_TYPE,
+                getString(R.string.context_no_moved),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+
+            MoveOrRemoveNodeResult.ForeignNodeOverQuota ->
+                showForeignStorageOverQuotaWarningDialog(this)
+
+            MoveOrRemoveNodeResult.Removed -> {
+                showSnackbar(
+                    SNACKBAR_TYPE,
+                    getString(R.string.context_correctly_removed),
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+                finish()
+            }
+
+            MoveOrRemoveNodeResult.RemoveFailed -> showSnackbar(
+                SNACKBAR_TYPE,
+                getString(R.string.context_no_removed),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+
+            MoveOrRemoveNodeResult.Offline -> showSnackbar(
+                SNACKBAR_TYPE,
+                getString(R.string.error_server_connection_problem),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+        }
+    }
+
+    private fun showMoveToRubbishConfirmation(handle: Long) {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.confirmation_move_to_rubbish))
+            .setPositiveButton(getString(R.string.general_move)) { _, _ ->
+                viewModel.moveNodeToRubbishBin(handle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
+            .show()
+    }
+
+    private fun showRemoveFromMegaConfirmation(handle: Long) {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.confirmation_delete_from_mega))
+            .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
+                viewModel.removeNodeFromMega(handle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
+            .show()
     }
 
     private fun handleCopyMoveError(copyMoveError: Throwable, isCopy: Boolean) {
@@ -1414,7 +1504,14 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             }
 
             R.id.pdf_viewer_rename -> {
-                showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this, this)
+                showRenameNodeDialog(
+                    context = this,
+                    node = megaApi.getNodeByHandle(handle),
+                    snackbarShower = this,
+                    actionNodeCallback = this,
+                    getRootNodeUseCase = getRootNodeUseCase,
+                    getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                )
             }
 
             R.id.pdf_viewer_hide -> {
@@ -1442,7 +1539,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             R.id.pdf_viewer_copy -> showCopy()
 
             R.id.pdf_viewer_move_to_trash, R.id.pdf_viewer_remove -> {
-                moveToRubbishOrRemove(handle, this, this)
+                onMoveOrRemoveActionClicked(handle)
             }
 
             R.id.chat_pdf_viewer_import -> importNode()

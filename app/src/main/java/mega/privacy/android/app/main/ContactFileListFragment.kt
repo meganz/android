@@ -56,6 +56,8 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
@@ -82,6 +84,12 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
     @Inject
     lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     /**
      * [MegaNavigator] injection
@@ -138,8 +146,12 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             } else if (itemId == R.id.cab_menu_rename) {
                 val node = documents[0]
                 showRenameNodeDialog(
-                    context, node, activity as SnackbarShower?,
-                    activity as ActionNodeCallback?
+                    context = context,
+                    node = node,
+                    snackbarShower = activity as SnackbarShower?,
+                    actionNodeCallback = activity as ActionNodeCallback?,
+                    getRootNodeUseCase = getRootNodeUseCase,
+                    getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                 )
             }
             return false

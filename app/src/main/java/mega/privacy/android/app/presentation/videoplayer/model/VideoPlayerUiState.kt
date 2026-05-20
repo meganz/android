@@ -4,6 +4,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -66,6 +67,8 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  *   via GetPublicNodeUseCase when the video player displays bottom-sheet options.
  * @property isConnected whether the device is connected to the internet
  * @property playerErrorType the type of player error, null if no error
+ * @property moveOrRemoveNodeEvent one-shot event emitted while moving or removing the
+ *   current playing node, used to drive confirmation dialogs and snackbars from the activity.
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -115,4 +118,5 @@ data class VideoPlayerUiState(
     val fileLinkUrl: String? = null,
     val isConnected: Boolean = true,
     val playerErrorType: PlayerErrorType? = null,
+    val moveOrRemoveNodeEvent: StateEventWithContent<MoveOrRemoveNodeResult> = consumed(),
 )

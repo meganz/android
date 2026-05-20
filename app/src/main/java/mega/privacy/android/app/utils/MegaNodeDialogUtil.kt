@@ -17,6 +17,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -24,39 +26,33 @@ import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.interfaces.showSnackbar
-import dagger.hilt.android.EntryPointAccessors
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
-import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.SHOW_IM_DELAY
 import mega.privacy.android.app.utils.Util.isOffline
-import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.navigation.MegaNavigatorEntryPoint
 import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.resources.R as sharedR
-import nz.mega.sdk.MegaApiJava
 import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
 import java.util.Locale
 
 object MegaNodeDialogUtil {
@@ -98,6 +94,8 @@ object MegaNodeDialogUtil {
      * @param node               A valid node.
      * @param snackbarShower     Interface to show snackbar.
      * @param actionNodeCallback Callback to finish the rename action if needed, null otherwise.
+     * @param getRootNodeUseCase
+     * @param getTypedChildrenNodeUseCase
      * @return The rename dialog.
      */
     @JvmStatic
@@ -106,6 +104,8 @@ object MegaNodeDialogUtil {
         node: MegaNode?,
         snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?,
+        getRootNodeUseCase: GetRootNodeUseCase,
+        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ): AlertDialog {
         val renameDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -115,8 +115,17 @@ object MegaNodeDialogUtil {
             .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         return setFinalValuesAndShowDialog(
-            context, node, actionNodeCallback, snackbarShower,
-            null, null, false, renameDialogBuilder, TYPE_RENAME
+            context = context,
+            node = node,
+            actionNodeCallback = actionNodeCallback,
+            snackbarShower = snackbarShower,
+            data = null,
+            defaultURLName = null,
+            fromHome = false,
+            builder = renameDialogBuilder,
+            dialogType = TYPE_RENAME,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
         )
     }
 
@@ -127,6 +136,8 @@ object MegaNodeDialogUtil {
      * @param actionNodeCallback Callback to finish the create folder action if needed, null otherwise.
      * @param parentNode         Required parent node for checking if already exist a folder with that name.
      * @param typedText          Typed text if the dialog has to be shown after a screen rotation.
+     * @param getRootNodeUseCase
+     * @param getTypedChildrenNodeUseCase
      * @return The create new folder dialog.
      */
     @JvmStatic
@@ -135,6 +146,8 @@ object MegaNodeDialogUtil {
         actionNodeCallback: ActionNodeCallback?,
         parentNode: MegaNode?,
         typedText: String? = null,
+        getRootNodeUseCase: GetRootNodeUseCase,
+        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ): AlertDialog {
         val newFolderDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -144,8 +157,17 @@ object MegaNodeDialogUtil {
             .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         val dialog = setFinalValuesAndShowDialog(
-            context, parentNode, actionNodeCallback, null, null, null,
-            false, newFolderDialogBuilder, TYPE_NEW_FOLDER
+            context = context,
+            node = parentNode,
+            actionNodeCallback = actionNodeCallback,
+            snackbarShower = null,
+            data = null,
+            defaultURLName = null,
+            fromHome = false,
+            builder = newFolderDialogBuilder,
+            dialogType = TYPE_NEW_FOLDER,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
         )
 
         if (!typedText.isNullOrEmpty()) {
@@ -162,6 +184,8 @@ object MegaNodeDialogUtil {
      * @param parent    A valid node. Specifically the parent in which the file will be created.
      * @param typedName The previous typed text.
      * @param fromHome  True if the text file will be created from Homepage, false otherwise.
+     * @param getRootNodeUseCase
+     * @param getTypedChildrenNodeUseCase
      * @return The create new text file dialog.
      */
     @JvmStatic
@@ -170,6 +194,8 @@ object MegaNodeDialogUtil {
         parent: MegaNode,
         typedName: String?,
         fromHome: Boolean,
+        getRootNodeUseCase: GetRootNodeUseCase,
+        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ): AlertDialog {
         val newTxtFileDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -179,15 +205,17 @@ object MegaNodeDialogUtil {
             .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         val dialog = setFinalValuesAndShowDialog(
-            context,
-            parent,
-            null,
-            null,
-            null,
-            null,
-            fromHome,
-            newTxtFileDialogBuilder,
-            TYPE_NEW_TXT_FILE
+            context = context,
+            node = parent,
+            actionNodeCallback = null,
+            snackbarShower = null,
+            data = null,
+            defaultURLName = null,
+            fromHome = fromHome,
+            builder = newTxtFileDialogBuilder,
+            dialogType = TYPE_NEW_TXT_FILE,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
         )
 
         if (typedName != null && typedName != TXT_EXTENSION) {
@@ -213,6 +241,8 @@ object MegaNodeDialogUtil {
      *                              - TYPE_NEW_FOLDER:   Create new folder action.
      *                              - TYPE_NEW_FILE:     Create new file action.
      *                              - TYPE_NEW_URL_FILE: Create new URL file action.
+     * @param getRootNodeUseCase
+     * @param getTypedChildrenNodeUseCase
      * @return The created dialog.
      */
     @Suppress("DEPRECATION")
@@ -226,6 +256,8 @@ object MegaNodeDialogUtil {
         fromHome: Boolean,
         builder: AlertDialog.Builder,
         dialogType: Int,
+        getRootNodeUseCase: GetRootNodeUseCase,
+        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ): AlertDialog {
         builder.setView(R.layout.dialog_create_rename_node)
 
@@ -278,8 +310,18 @@ object MegaNodeDialogUtil {
                     setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
                             checkActionDialogValue(
-                                context, node, actionNodeCallback, snackbarShower,
-                                typeText, data, errorText, fromHome, dialog, dialogType
+                                context = context,
+                                node = node,
+                                actionNodeCallback = actionNodeCallback,
+                                snackbarShower = snackbarShower,
+                                typeText = typeText,
+                                data = data,
+                                errorText = errorText,
+                                fromHome = fromHome,
+                                dialog = dialog,
+                                dialogType = dialogType,
+                                getRootNodeUseCase = getRootNodeUseCase,
+                                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                             )
                         }
 
@@ -292,8 +334,18 @@ object MegaNodeDialogUtil {
                 dialog.getButton(BUTTON_POSITIVE)
                     .setOnClickListener {
                         checkActionDialogValue(
-                            context, node, actionNodeCallback, snackbarShower,
-                            typeText, data, errorText, fromHome, dialog, dialogType
+                            context = context,
+                            node = node,
+                            actionNodeCallback = actionNodeCallback,
+                            snackbarShower = snackbarShower,
+                            typeText = typeText,
+                            data = data,
+                            errorText = errorText,
+                            fromHome = fromHome,
+                            dialog = dialog,
+                            dialogType = dialogType,
+                            getRootNodeUseCase = getRootNodeUseCase,
+                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                         )
                     }
 
@@ -324,6 +376,8 @@ object MegaNodeDialogUtil {
      *                              - TYPE_NEW_FOLDER:   Create new folder action.
      *                              - TYPE_NEW_FILE:     Create new file action.
      *                              - TYPE_NEW_URL_FILE: Create new URL file action.
+     * @param getRootNodeUseCase
+     * @param getTypedChildrenNodeUseCase
      */
     private fun checkActionDialogValue(
         context: Context,
@@ -336,6 +390,8 @@ object MegaNodeDialogUtil {
         fromHome: Boolean,
         dialog: AlertDialog,
         dialogType: Int,
+        getRootNodeUseCase: GetRootNodeUseCase,
+        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ) {
         val typedString = typeText?.text.toString().trim()
 
@@ -375,7 +431,13 @@ object MegaNodeDialogUtil {
                 )
             }
 
-            nameAlreadyExists(typedString, dialogType == TYPE_RENAME, node) -> {
+            nameAlreadyExists(
+                typedString = typedString,
+                isRenameAction = dialogType == TYPE_RENAME,
+                node = node,
+                getRootNodeUseCase = getRootNodeUseCase,
+                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+            ) -> {
                 showDialogError(
                     typeText,
                     errorText,
@@ -621,126 +683,36 @@ object MegaNodeDialogUtil {
     }
 
     /**
-     * Move a node into rubbish bin, or remove it if it's already moved into rubbish bin.
-     *
-     * @param handle handle of the node
-     * @param activity Android activity
-     * @param snackbarShower interface to show snackbar
-     */
-    @JvmStatic
-    @Suppress("DEPRECATION")
-    fun moveToRubbishOrRemove(
-        handle: Long,
-        activity: Activity,
-        snackbarShower: SnackbarShower,
-    ) {
-        val megaApi = MegaApplication.getInstance().megaApi
-
-        if (!isOnline(activity)) {
-            snackbarShower.showSnackbar(activity.getString(R.string.error_server_connection_problem))
-            return
-        }
-
-        val node = megaApi.getNodeByHandle(handle) ?: return
-        val rubbishNode = megaApi.rubbishNode
-
-        if (rubbishNode?.handle != megaApi.getRootParentNode(node).handle) {
-            MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                .setMessage(activity.getString(R.string.confirmation_move_to_rubbish))
-                .setPositiveButton(activity.getString(R.string.general_move)) { _, _ ->
-                    val progress = MegaProgressDialogUtil.createProgressDialog(
-                        activity,
-                        activity.getString(R.string.context_move_to_trash)
-                    )
-
-                    megaApi.moveNode(
-                        node, rubbishNode,
-                        OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, megaError ->
-                            if (megaRequest.type == MegaRequest.TYPE_MOVE) {
-
-                                if (megaError.errorCode == MegaError.API_OK) {
-                                    activity.finish()
-                                }
-
-                                val isForeignOverQuota =
-                                    megaError.errorCode == MegaError.API_EOVERQUOTA && megaApi.isForeignNode(
-                                        megaRequest.parentHandle
-                                    )
-
-                                if (isForeignOverQuota) {
-                                    showForeignStorageOverQuotaWarningDialog(activity)
-                                } else {
-                                    snackbarShower.showSnackbar(
-                                        activity.getString(
-                                            if (megaError.errorCode == MegaError.API_OK) sharedR.string.node_moved_success_message
-                                            else R.string.context_no_moved
-                                        )
-                                    )
-                                }
-                            }
-                        })
-                    )
-
-                    progress.show()
-                }
-                .setNegativeButton(activity.getString(sharedR.string.general_dialog_cancel_button), null)
-                .show()
-        } else {
-            MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                .setMessage(activity.getString(R.string.confirmation_delete_from_mega))
-                .setPositiveButton(activity.getString(R.string.general_remove)) { _, _ ->
-                    val progress = MegaProgressDialogUtil.createProgressDialog(
-                        activity,
-                        activity.getString(R.string.context_delete_from_mega)
-                    )
-
-                    megaApi.remove(node, RemoveListener {
-                        progress.dismiss()
-                        if (it) {
-                            snackbarShower.showSnackbar(activity.getString(R.string.context_correctly_removed))
-                            activity.finish()
-                        } else {
-                            snackbarShower.showSnackbar(activity.getString(R.string.context_no_removed))
-                        }
-                    })
-
-                    progress.show()
-                }
-                .setNegativeButton(activity.getString(sharedR.string.general_dialog_cancel_button), null)
-                .show()
-        }
-    }
-
-    /**
-     * Checks if exists a node with the typed name within the same parent folder:
-     * - If the action is rename, then gets the parent node.
+     * Checks if a node with [typedString] already exists within the same parent folder:
+     * - If the action is rename, the parent is the parent of [node].
      * - If not:
-     *      * If the received node is null, then the parent node is the root.
-     *      * If not, then the received node is the parent.
+     *      * If [node] is null, the parent is the cloud root.
+     *      * If not, [node] itself is the parent.
      *
      * @param typedString    Typed text to set as the new node name.
      * @param isRenameAction True if the action is rename, false otherwise.
-     * @param node           Node to rename or parent where new file/folder should be created.
+     * @param node           Node to rename, or the parent where the new file/folder
+     *                       should be created.
      */
     @JvmStatic
     fun nameAlreadyExists(
         typedString: String,
         isRenameAction: Boolean,
         node: MegaNode?,
+        getRootNodeUseCase: GetRootNodeUseCase,
+        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
 
-        val parentNode = when {
-            isRenameAction -> megaApi.getParentNode(node)
-            node == null -> megaApi.rootNode
-            else -> node
-        } ?: return false
+        return runBlocking {
+            val parentId = when {
+                node == null -> getRootNodeUseCase()?.id
+                isRenameAction -> NodeId(node.parentHandle)
+                else -> NodeId(node.handle)
+            } ?: return@runBlocking false
 
-        val existingNode = megaApi.getChildren(parentNode)?.find { childNode ->
-            childNode.name == typedString
+            getTypedChildrenNodeUseCase(parentId, SortOrder.ORDER_NONE)
+                .any { child -> child.name == typedString }
         }
-
-        return existingNode != null
     }
 
     /**

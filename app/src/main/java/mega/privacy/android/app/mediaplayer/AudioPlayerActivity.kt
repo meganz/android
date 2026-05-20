@@ -85,6 +85,8 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
@@ -97,6 +99,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 /**
  * Extending MediaPlayerActivity is to declare portrait in manifest,
@@ -105,6 +108,12 @@ import java.io.File
 @AndroidEntryPoint
 class AudioPlayerActivity : MediaPlayerActivity() {
     private lateinit var binding: ActivityAudioPlayerBinding
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
@@ -298,7 +307,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                 //Avoid the dialog is shown repeatedly when screen is rotated.
                                 viewModel.renameUpdate(null)
                             }
-                        })
+                        },
+                        getRootNodeUseCase = getRootNodeUseCase,
+                        getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,)
                 }
             }
         }

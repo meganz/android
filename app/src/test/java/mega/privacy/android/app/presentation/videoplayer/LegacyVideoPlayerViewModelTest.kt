@@ -112,8 +112,10 @@ import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.DownloadTriggerEvent
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
@@ -136,6 +138,8 @@ import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
@@ -312,6 +316,8 @@ class LegacyVideoPlayerViewModelTest {
     private val deletePlaybackInformationUseCase = mock<DeletePlaybackInformationUseCase>()
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
+    private val moveNodeToRubbishBinUseCase = mock<MoveNodeToRubbishBinUseCase>()
+    private val deleteNodeByHandleUseCase = mock<DeleteNodeByHandleUseCase>()
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
     private val testSize = 100L
@@ -398,6 +404,8 @@ class LegacyVideoPlayerViewModelTest {
             deletePlaybackInformationUseCase = deletePlaybackInformationUseCase,
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
+            deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
         )
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
@@ -3066,6 +3074,125 @@ class LegacyVideoPlayerViewModelTest {
                 cancelAndConsumeRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that checkMoveOrRemoveNode emits ConfirmMoveToRubbish when node is not in rubbish`() =
+        runTest {
+            initViewModel()
+            val handle = 12345L
+            whenever(isNodeInRubbishBinUseCase(NodeId(handle))).thenReturn(false)
+
+            underTest.checkMoveOrRemoveNode(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = event.triggeredContent()
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ConfirmMoveToRubbish(handle))
+            }
+        }
+
+    @Test
+    fun `test that checkMoveOrRemoveNode emits ConfirmRemoveFromMega when node is in rubbish`() =
+        runTest {
+            initViewModel()
+            val handle = 54321L
+            whenever(isNodeInRubbishBinUseCase(NodeId(handle))).thenReturn(true)
+
+            underTest.checkMoveOrRemoveNode(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = event.triggeredContent()
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ConfirmRemoveFromMega(handle))
+            }
+        }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits MovedToRubbish on success`() = runTest {
+        initViewModel()
+        val handle = 111L
+
+        underTest.moveNodeToRubbishBin(handle)
+        advanceUntilIdle()
+
+        verify(moveNodeToRubbishBinUseCase).invoke(NodeId(handle))
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = event.triggeredContent()
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.MovedToRubbish)
+        }
+    }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits ForeignNodeOverQuota when use case throws ForeignNodeException`() =
+        runTest {
+            initViewModel()
+            val handle = 222L
+            whenever(moveNodeToRubbishBinUseCase(NodeId(handle)))
+                .thenThrow(ForeignNodeException())
+
+            underTest.moveNodeToRubbishBin(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = event.triggeredContent()
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ForeignNodeOverQuota)
+            }
+        }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits MoveFailed when use case throws other exception`() =
+        runTest {
+            initViewModel()
+            val handle = 333L
+            whenever(moveNodeToRubbishBinUseCase(NodeId(handle)))
+                .thenThrow(RuntimeException("boom"))
+
+            underTest.moveNodeToRubbishBin(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = event.triggeredContent()
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.MoveFailed)
+            }
+        }
+
+    @Test
+    fun `test that removeNodeFromMega emits Removed on success`() = runTest {
+        initViewModel()
+        val handle = 444L
+
+        underTest.removeNodeFromMega(handle)
+        advanceUntilIdle()
+
+        verify(deleteNodeByHandleUseCase).invoke(NodeId(handle))
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = event.triggeredContent()
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.Removed)
+        }
+    }
+
+    @Test
+    fun `test that removeNodeFromMega emits RemoveFailed when use case throws`() = runTest {
+        initViewModel()
+        val handle = 555L
+        whenever(deleteNodeByHandleUseCase(NodeId(handle)))
+            .thenThrow(RuntimeException("boom"))
+
+        underTest.removeNodeFromMega(handle)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = event.triggeredContent()
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.RemoveFailed)
+        }
+    }
 
     companion object {
         @JvmField

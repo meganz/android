@@ -70,8 +70,10 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.navOptions
@@ -115,6 +117,12 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var navigationQueue: NavigationEventQueue
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     @Inject
     lateinit var getNodeByIdUseCase: GetNodeByIdUseCase
@@ -498,7 +506,14 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun showRenameDialog() =
-        showRenameNodeDialog(this, viewModel.node, this, null)
+        showRenameNodeDialog(
+            context = this,
+            node = viewModel.node,
+            snackbarShower = this,
+            actionNodeCallback = null,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+        )
 
     private suspend fun consumeEvent(
         event: FileInfoOneOffViewEvent,

@@ -54,6 +54,7 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.presentation.videoplayer.mapper.LaunchSourceMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
@@ -129,6 +130,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.St
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -155,6 +157,8 @@ import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
@@ -300,6 +304,8 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     private val deletePlaybackInformationUseCase: DeletePlaybackInformationUseCase,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
+    private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val uiState: StateFlow<VideoPlayerUiState>
@@ -2261,6 +2267,73 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     }
 
     internal fun onBlockedErrorConsumed() = uiState.update { it.copy(blockedError = consumed) }
+
+    /**
+     * Decides whether the node identified by [handle] should be moved to the
+     * rubbish bin or removed permanently and emits a corresponding confirmation
+     * event for the activity to display the appropriate dialog.
+     */
+    fun checkMoveOrRemoveNode(handle: Long) {
+        viewModelScope.launch {
+            val isInRubbish = runCatching { isNodeInRubbishBinUseCase(NodeId(handle)) }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(false)
+            val result = if (isInRubbish) {
+                MoveOrRemoveNodeResult.ConfirmRemoveFromMega(handle)
+            } else {
+                MoveOrRemoveNodeResult.ConfirmMoveToRubbish(handle)
+            }
+            uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Moves the node identified by [handle] to the rubbish bin and emits a
+     * success, failure or foreign-quota event for the activity to react to.
+     */
+    fun moveNodeToRubbishBin(handle: Long) {
+        viewModelScope.launch {
+            val result = runCatching { moveNodeToRubbishBinUseCase(NodeId(handle)) }
+                .fold(
+                    onSuccess = { MoveOrRemoveNodeResult.MovedToRubbish },
+                    onFailure = { throwable ->
+                        Timber.e(throwable)
+                        if (throwable is ForeignNodeException) {
+                            MoveOrRemoveNodeResult.ForeignNodeOverQuota
+                        } else {
+                            MoveOrRemoveNodeResult.MoveFailed
+                        }
+                    }
+                )
+            uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Permanently removes the node identified by [handle] from MEGA and emits
+     * a success or failure event for the activity to react to.
+     */
+    fun removeNodeFromMega(handle: Long) {
+        viewModelScope.launch {
+            val result = runCatching { deleteNodeByHandleUseCase(NodeId(handle)) }
+                .fold(
+                    onSuccess = { MoveOrRemoveNodeResult.Removed },
+                    onFailure = { throwable ->
+                        Timber.e(throwable)
+                        MoveOrRemoveNodeResult.RemoveFailed
+                    }
+                )
+            uiState.update { it.copy(moveOrRemoveNodeEvent = triggered(result)) }
+        }
+    }
+
+    /**
+     * Consumes the [VideoPlayerUiState.moveOrRemoveNodeEvent] after the
+     * activity has handled it.
+     */
+    fun onConsumeMoveOrRemoveNodeEvent() {
+        uiState.update { it.copy(moveOrRemoveNodeEvent = consumed()) }
+    }
 
     companion object {
         private const val MEDIA_PLAYER_STATE_ENDED = 4

@@ -74,7 +74,6 @@ import mega.privacy.android.app.presentation.meeting.managechathistory.view.scre
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.UsersInWaitingRoomDialog
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
-import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -97,6 +96,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
@@ -105,7 +105,9 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -133,6 +135,12 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     @Inject
     lateinit var passcodeCheck: PasscodeCheck
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     /**
      * Get theme mode

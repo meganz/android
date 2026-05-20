@@ -37,6 +37,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -52,12 +53,14 @@ import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CONVERTED_FILE_NAME
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
@@ -79,7 +82,6 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
@@ -93,6 +95,8 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
@@ -122,6 +126,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
 /**
@@ -129,6 +134,12 @@ import kotlin.math.roundToInt
  */
 @AndroidEntryPoint
 class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
+
+    @Inject
+    lateinit var getRootNodeUseCase: GetRootNodeUseCase
+
+    @Inject
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     companion object {
         private const val SCROLL_TEXT = "SCROLL_TEXT"
@@ -459,11 +470,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.action_move_to_trash, R.id.action_remove -> {
                 Analytics.tracker.trackEvent(TextEditorMoveToTheRubbishBinMenuItemEvent)
-                moveToRubbishOrRemove(
-                    viewModel.getNode()!!.handle,
-                    this,
-                    this
-                )
+                onMoveOrRemoveActionClicked(viewModel.getNode()!!.handle)
             }
 
             R.id.chat_action_import -> importNode()
@@ -920,6 +927,13 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 binding.editFab.isVisible = isLoaded
             }
         }
+
+        collectFlow(viewModel.uiState.map { it.moveOrRemoveNodeEvent }) { event ->
+            (event as? StateEventWithContentTriggered)?.let {
+                handleMoveOrRemoveNodeEvent(it.content)
+                viewModel.onConsumeMoveOrRemoveNodeEvent()
+            }
+        }
     }
 
     /**
@@ -1078,12 +1092,16 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             return
         }
 
-        renameDialog =
-            showRenameNodeDialog(this, viewModel.getNode()!!, this, object : ActionNodeCallback {
+        renameDialog = showRenameNodeDialog(
+            context = this, node = viewModel.getNode(), snackbarShower = this,
+            actionNodeCallback = object : ActionNodeCallback {
                 override fun finishRenameActionWithSuccess(newName: String) {
                     binding.nameText.text = newName
                 }
-            })
+            },
+            getRootNodeUseCase = getRootNodeUseCase,
+            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+        )
     }
 
     /**
@@ -1432,5 +1450,61 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 binding.editFab.show()
             }
         }
+    }
+
+    private fun onMoveOrRemoveActionClicked(handle: Long) {
+        if (!isOnline(this)) {
+            showSnackbar(getString(R.string.error_server_connection_problem))
+            return
+        }
+        viewModel.checkMoveOrRemoveNode(handle)
+    }
+
+    private fun handleMoveOrRemoveNodeEvent(result: MoveOrRemoveNodeResult) {
+        when (result) {
+            is MoveOrRemoveNodeResult.ConfirmMoveToRubbish -> showMoveToRubbishConfirmation(result.handle)
+            is MoveOrRemoveNodeResult.ConfirmRemoveFromMega -> showRemoveFromMegaConfirmation(result.handle)
+            MoveOrRemoveNodeResult.MovedToRubbish -> {
+                showSnackbar(getString(sharedResR.string.node_moved_success_message))
+                finish()
+            }
+
+            MoveOrRemoveNodeResult.MoveFailed ->
+                showSnackbar(getString(R.string.context_no_moved))
+
+            MoveOrRemoveNodeResult.ForeignNodeOverQuota ->
+                showForeignStorageOverQuotaWarningDialog(this)
+
+            MoveOrRemoveNodeResult.Removed -> {
+                showSnackbar(getString(R.string.context_correctly_removed))
+                finish()
+            }
+
+            MoveOrRemoveNodeResult.RemoveFailed ->
+                showSnackbar(getString(R.string.context_no_removed))
+
+            MoveOrRemoveNodeResult.Offline ->
+                showSnackbar(getString(R.string.error_server_connection_problem))
+        }
+    }
+
+    private fun showMoveToRubbishConfirmation(handle: Long) {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.confirmation_move_to_rubbish))
+            .setPositiveButton(getString(R.string.general_move)) { _, _ ->
+                viewModel.moveNodeToRubbishBin(handle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
+            .show()
+    }
+
+    private fun showRemoveFromMegaConfirmation(handle: Long) {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.confirmation_delete_from_mega))
+            .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
+                viewModel.removeNodeFromMega(handle)
+            }
+            .setNegativeButton(getString(sharedR.string.general_dialog_cancel_button), null)
+            .show()
     }
 }

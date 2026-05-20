@@ -37,6 +37,8 @@ import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -44,9 +46,12 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
@@ -120,6 +125,9 @@ internal class TextEditorViewModelTest {
             on(it.invoke(feature = CloudDriveFeature.INCOMING_SHARE_NAME_DUPLICATION_FIX)) doReturn false
         }
     }
+    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
+    private val moveNodeToRubbishBinUseCase = mock<MoveNodeToRubbishBinUseCase>()
+    private val deleteNodeByHandleUseCase = mock<DeleteNodeByHandleUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -147,7 +155,10 @@ internal class TextEditorViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             crashReporter = mock(),
             getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
+            deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
         )
     }
 
@@ -161,6 +172,9 @@ internal class TextEditorViewModelTest {
             downloadNodeUseCase,
             getNodeByIdUseCase,
             getNodeNameCollisionRenameNameUseCase,
+            isNodeInRubbishBinUseCase,
+            moveNodeToRubbishBinUseCase,
+            deleteNodeByHandleUseCase,
         )
     }
 
@@ -740,6 +754,120 @@ internal class TextEditorViewModelTest {
         paginationField.isAccessible = true
         val paginationLiveData = paginationField.get(underTest) as MutableLiveData<Pagination>
         paginationLiveData.value = pagination
+    }
+
+    @Test
+    fun `test that checkMoveOrRemoveNode emits ConfirmMoveToRubbish when node is not in rubbish`() =
+        runTest {
+            val handle = 12345L
+            whenever(isNodeInRubbishBinUseCase(NodeId(handle))).thenReturn(false)
+
+            underTest.checkMoveOrRemoveNode(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ConfirmMoveToRubbish(handle))
+            }
+        }
+
+    @Test
+    fun `test that checkMoveOrRemoveNode emits ConfirmRemoveFromMega when node is in rubbish`() =
+        runTest {
+            val handle = 54321L
+            whenever(isNodeInRubbishBinUseCase(NodeId(handle))).thenReturn(true)
+
+            underTest.checkMoveOrRemoveNode(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ConfirmRemoveFromMega(handle))
+            }
+        }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits MovedToRubbish on success`() = runTest {
+        val handle = 111L
+
+        underTest.moveNodeToRubbishBin(handle)
+        advanceUntilIdle()
+
+        verify(moveNodeToRubbishBinUseCase).invoke(NodeId(handle))
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = (event as StateEventWithContentTriggered).content
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.MovedToRubbish)
+        }
+    }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits ForeignNodeOverQuota when use case throws ForeignNodeException`() =
+        runTest {
+            val handle = 222L
+            whenever(moveNodeToRubbishBinUseCase(NodeId(handle)))
+                .thenThrow(ForeignNodeException())
+
+            underTest.moveNodeToRubbishBin(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.ForeignNodeOverQuota)
+            }
+        }
+
+    @Test
+    fun `test that moveNodeToRubbishBin emits MoveFailed when use case throws other exception`() =
+        runTest {
+            val handle = 333L
+            whenever(moveNodeToRubbishBinUseCase(NodeId(handle)))
+                .thenThrow(RuntimeException("boom"))
+
+            underTest.moveNodeToRubbishBin(handle)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val event = awaitItem().moveOrRemoveNodeEvent
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content).isEqualTo(MoveOrRemoveNodeResult.MoveFailed)
+            }
+        }
+
+    @Test
+    fun `test that removeNodeFromMega emits Removed on success`() = runTest {
+        val handle = 444L
+
+        underTest.removeNodeFromMega(handle)
+        advanceUntilIdle()
+
+        verify(deleteNodeByHandleUseCase).invoke(NodeId(handle))
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = (event as StateEventWithContentTriggered).content
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.Removed)
+        }
+    }
+
+    @Test
+    fun `test that removeNodeFromMega emits RemoveFailed when use case throws`() = runTest {
+        val handle = 555L
+        whenever(deleteNodeByHandleUseCase(NodeId(handle)))
+            .thenThrow(RuntimeException("boom"))
+
+        underTest.removeNodeFromMega(handle)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val event = awaitItem().moveOrRemoveNodeEvent
+            val content = (event as StateEventWithContentTriggered).content
+            assertThat(content).isEqualTo(MoveOrRemoveNodeResult.RemoveFailed)
+        }
     }
 
     companion object {
