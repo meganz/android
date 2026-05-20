@@ -283,6 +283,7 @@ class AudioPlayerFragment : Fragment() {
             serviceGateway?.run {
                 setupPlayerView(this, viewHolder.binding.playerView)
                 viewHolder.layoutArtwork()
+                viewHolder.applyControlIcons(requireContext())
             }
 
             serviceViewModelGateway?.run {
