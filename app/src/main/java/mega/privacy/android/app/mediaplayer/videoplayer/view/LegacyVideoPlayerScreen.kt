@@ -8,6 +8,7 @@ import android.os.Environment.DIRECTORY_DCIM
 import android.os.Environment.getExternalStoragePublicDirectory
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.Animatable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.navigation.BottomSheetNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -42,6 +44,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.scale
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -55,7 +58,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
-import androidx.compose.material.navigation.BottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -71,7 +73,6 @@ import mega.privacy.android.app.presentation.videoplayer.LegacyVideoPlayerViewMo
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.view.AddSubtitlesDialog
-import mega.privacy.android.app.mediaplayer.videoplayer.view.LegacyVideoPlayerTopBar
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -249,6 +250,17 @@ internal fun LegacyVideoPlayerScreen(
                                     }
                                 }
 
+                                fun applyControlIcons() {
+                                    playerComposeView.findViewById<ImageButton>(R.id.exo_prev)
+                                        ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_prev))
+                                    playerComposeView.findViewById<ImageButton>(R.id.exo_rew)
+                                        ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_15_minus))
+                                    playerComposeView.findViewById<ImageButton>(R.id.exo_next)
+                                        ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_next))
+                                    playerComposeView.findViewById<ImageButton>(R.id.exo_ffwd)
+                                        ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_15_plus))
+                                }
+
                                 legacyVideoPlayerController = LegacyVideoPlayerController(
                                     context = context,
                                     uiState = uiState,
@@ -341,6 +353,9 @@ internal fun LegacyVideoPlayerScreen(
 
                                 playerComposeView.setControllerVisibilityListener(
                                     PlayerView.ControllerVisibilityListener { visibility ->
+                                        if (visibility == View.VISIBLE) {
+                                            applyControlIcons()
+                                        }
                                         if (visibility == View.VISIBLE && !isControllerViewVisible) {
                                             autoHideJob?.cancel()
                                             autoHideJob = coroutineScope.launch {
@@ -352,6 +367,7 @@ internal fun LegacyVideoPlayerScreen(
                                 )
 
                                 playerComposeView.player = player
+                                applyControlIcons()
                                 playerComposeView.controllerShowTimeoutMs = 0
                                 updateResizeMode(uiState.isFullscreen)
 

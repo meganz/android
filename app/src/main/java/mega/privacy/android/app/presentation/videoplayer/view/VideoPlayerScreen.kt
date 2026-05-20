@@ -396,6 +396,17 @@ internal fun VideoPlayerScreen(
                                     )
                             }
 
+                            fun applyControlIcons() {
+                                playerComposeView.findViewById<ImageButton>(R.id.exo_prev)
+                                    ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_prev))
+                                playerComposeView.findViewById<ImageButton>(R.id.exo_rew)
+                                    ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_15_minus))
+                                playerComposeView.findViewById<ImageButton>(R.id.exo_next)
+                                    ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_next))
+                                playerComposeView.findViewById<ImageButton>(R.id.exo_ffwd)
+                                    ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_15_plus))
+                            }
+
                             videoPlayerController = VideoPlayerController(
                                 context = context,
                                 uiState = uiState,
@@ -484,6 +495,7 @@ internal fun VideoPlayerScreen(
                                 PlayerView.ControllerVisibilityListener { visibility ->
                                     if (visibility == View.VISIBLE) {
                                         applyPlayPauseIcon()
+                                        applyControlIcons()
                                     }
                                     if (visibility == View.VISIBLE && !isControllerViewVisible && !uiState.isLocked) {
                                         autoHideJob?.cancel()
@@ -496,6 +508,7 @@ internal fun VideoPlayerScreen(
                             )
 
                             playerComposeView.player = player
+                            applyControlIcons()
                             playerComposeView.controllerShowTimeoutMs = 0
                             updateResizeMode(uiState.isFullscreen)
 
