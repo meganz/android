@@ -103,7 +103,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SH
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
-import mega.privacy.android.app.utils.MegaNodeUtil.cloudRootHandle
 import mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder
 import mega.privacy.android.app.utils.MegaNodeUtil.myChatFilesFolder
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
@@ -2764,7 +2763,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
         when (currentTab) {
             CLOUD_FRAGMENT -> if (cloudExplorerFragment == null
-                || !hide && parentHandleCloud != cloudRootHandle && parentHandleCloud != INVALID_HANDLE
+                || !hide && parentHandleCloud != viewModel.getCloudRootHandle() && parentHandleCloud != INVALID_HANDLE
             ) {
                 return
             }

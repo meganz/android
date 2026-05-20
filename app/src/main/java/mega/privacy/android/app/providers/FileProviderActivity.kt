@@ -73,7 +73,6 @@ import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.cloudRootHandle
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
@@ -1762,7 +1761,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
      */
     fun hideTabs(hide: Boolean, currentTab: Int) {
         when (currentTab) {
-            CLOUD_TAB -> if (cDriveProviderLol == null || !hide && parentHandle != cloudRootHandle && parentHandle != INVALID_HANDLE) {
+            CLOUD_TAB -> if (cDriveProviderLol == null || !hide && parentHandle != viewModel.getCloudRootHandle() && parentHandle != INVALID_HANDLE) {
                 return
             }
 

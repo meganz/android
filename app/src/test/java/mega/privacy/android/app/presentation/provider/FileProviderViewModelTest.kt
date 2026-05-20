@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
@@ -39,6 +40,7 @@ class FileProviderViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase = mock()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -48,6 +50,7 @@ class FileProviderViewModelTest {
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getRootNodeIdUseCase = getRootNodeIdUseCase,
         )
     }
 
@@ -57,6 +60,7 @@ class FileProviderViewModelTest {
             monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase,
             stopCameraUploadsUseCase,
+            getRootNodeIdUseCase,
         )
     }
 
@@ -93,6 +97,21 @@ class FileProviderViewModelTest {
                 assertThat(actual).isEqualTo(expected)
             }
         }
+
+    @Test
+    fun `test that getCloudRootHandle returns the value emitted by getRootNodeIdUseCase`() = runTest {
+        val rootHandle = 123L
+        whenever(getRootNodeIdUseCase()) doReturn NodeId(rootHandle)
+        val viewModel = FileProviderViewModel(
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+            stopCameraUploadsUseCase = stopCameraUploadsUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            getRootNodeIdUseCase = getRootNodeIdUseCase,
+        )
+
+        assertThat(viewModel.getCloudRootHandle()).isEqualTo(rootHandle)
+    }
 
     @Test
     fun `test that state event is consumed when consume transfer trigger event is invoked`() =

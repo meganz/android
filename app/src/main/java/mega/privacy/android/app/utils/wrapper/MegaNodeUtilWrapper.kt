@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
 import nz.mega.sdk.MegaApiAndroid
@@ -27,13 +26,6 @@ interface MegaNodeUtilWrapper {
      * @see MegaNodeUtil.existsMyChatFilesFolder
      */
     fun getMyChatFilesFolder(): MegaNode?
-
-    /**
-     * Gets the handle of Cloud root node.
-     *
-     * @return The handle of Cloud root node if available, invalid handle otherwise.
-     */
-    fun getCloudRootHandle(): Long
 
     /**
      * The method to calculate how many nodes are folders in array list
@@ -250,21 +242,6 @@ interface MegaNodeUtilWrapper {
      * @param handles handles to copy
      */
     fun selectFolderToCopy(activity: Activity, handles: LongArray)
-
-    /**
-     * Get location info of a node.
-     *
-     * @param adapterType node source adapter type
-     * @param fromIncomingShare is from incoming share
-     * @param handle node handle
-     *
-     * @return location info
-     */
-    fun getNodeLocationInfo(
-        adapterType: Int,
-        fromIncomingShare: Boolean,
-        handle: Long,
-    ): LocationInfo?
 
     /**
      * Launch [ZipBrowserActivity] to preview a zip file.

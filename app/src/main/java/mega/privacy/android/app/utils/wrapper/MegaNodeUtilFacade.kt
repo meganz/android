@@ -42,8 +42,6 @@ class MegaNodeUtilFacade @Inject constructor(
 ) : MegaNodeUtilWrapper {
     override fun getMyChatFilesFolder() = MegaNodeUtil.myChatFilesFolder
 
-    override fun getCloudRootHandle() = MegaNodeUtil.cloudRootHandle
-
     override fun getNumberOfFolders(nodes: List<MegaNode?>?) =
         MegaNodeUtil.getNumberOfFolders(nodes)
 
@@ -128,12 +126,6 @@ class MegaNodeUtilFacade @Inject constructor(
     override fun selectFolderToCopy(activity: Activity, handles: LongArray) {
         MegaNodeUtil.selectFolderToCopy(activity, handles)
     }
-
-    override fun getNodeLocationInfo(
-        adapterType: Int,
-        fromIncomingShare: Boolean,
-        handle: Long,
-    ) = MegaNodeUtil.getNodeLocationInfo(adapterType, fromIncomingShare, handle)
 
     override fun openZip(
         context: Context,
