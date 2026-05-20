@@ -17,9 +17,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.sheets.BottomSheetAction
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.analytics.Analytics
@@ -27,7 +28,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsUiState
 import mega.privacy.android.app.presentation.transfers.model.completed.CompletedTransferActionsViewModel
 import mega.privacy.android.app.presentation.transfers.view.failed.TEST_TAG_FAILED_TRANSFERS_VIEW
-import mega.android.core.ui.components.sheets.BottomSheetAction
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType

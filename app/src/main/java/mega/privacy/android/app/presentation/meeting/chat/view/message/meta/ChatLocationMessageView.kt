@@ -10,12 +10,12 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.LocationMessageView
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.getMessageText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.chat.messages.meta.LocationMessage
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import kotlin.math.abs

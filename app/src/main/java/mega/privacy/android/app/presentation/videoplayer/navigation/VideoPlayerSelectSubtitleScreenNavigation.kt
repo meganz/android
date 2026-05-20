@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.videoplayer.navigation
 
 import androidx.compose.runtime.LaunchedEffect
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.google.accompanist.systemuicontroller.rememberSystemUiController

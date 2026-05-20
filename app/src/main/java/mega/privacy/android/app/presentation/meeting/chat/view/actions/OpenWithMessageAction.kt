@@ -8,7 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
@@ -17,7 +18,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.dialog.CanNotOpen
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
-import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.mobile.analytics.event.ChatConversationOpenWithActionMenuItemEvent
 import timber.log.Timber
 

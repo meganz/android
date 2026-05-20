@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
@@ -23,15 +23,15 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.nodes.R as NodesR
-import mega.privacy.android.shared.nodes.components.NodeLabelCircle
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.model.label.ChangeLabelState
 import mega.privacy.android.core.nodecomponents.model.label.Label
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.core.nodecomponents.R
 
 @Composable
 internal fun ChangeLabelBottomSheetContentM3(

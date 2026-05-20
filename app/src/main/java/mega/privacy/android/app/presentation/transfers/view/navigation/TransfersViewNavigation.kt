@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.transfers.view.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -12,12 +12,12 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
-import mega.privacy.android.shared.account.overquota.OverQuotaStatusViewModel
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusViewModel
 
 internal fun NavGraphBuilder.transfersScreen(
     onBackPress: () -> Unit,

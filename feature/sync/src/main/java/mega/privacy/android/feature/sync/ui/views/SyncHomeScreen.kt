@@ -9,11 +9,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.navigation.StopBackupMegaPicker
 import mega.privacy.android.feature.sync.navigation.SyncList
@@ -29,6 +28,7 @@ import mega.privacy.android.feature.sync.ui.synclist.solvedissues.SyncSolvedIssu
 import mega.privacy.android.feature.sync.ui.synclist.stalledissues.SyncStalledIssuesViewModel
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold

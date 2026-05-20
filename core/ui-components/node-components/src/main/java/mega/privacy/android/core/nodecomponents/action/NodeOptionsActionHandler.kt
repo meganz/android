@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DeferrableMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType

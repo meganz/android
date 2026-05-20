@@ -5,10 +5,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Dialog to move nodes to rubbish bin or delete them permanently

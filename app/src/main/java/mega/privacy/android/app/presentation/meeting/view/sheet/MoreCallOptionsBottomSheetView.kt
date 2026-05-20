@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.view.sheet
 
-import mega.privacy.android.icon.pack.R as iconPackR
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -23,7 +22,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -32,9 +31,10 @@ import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
-import mega.privacy.android.shared.original.core.ui.theme.black
-import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.CallOnHoldType
+import mega.privacy.android.domain.entity.call.ChatCall
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.original.core.ui.theme.black
 
 /**
  * Recurring Meeting Occurrence bottom sheet view

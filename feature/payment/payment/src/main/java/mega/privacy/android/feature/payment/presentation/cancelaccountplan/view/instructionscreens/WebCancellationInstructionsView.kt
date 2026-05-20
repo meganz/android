@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.view.GenericInstructionStep
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.view.InstructionStepWithBoldText

@@ -13,13 +13,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeOptionsBottomSheetViewModel
 import mega.privacy.android.app.presentation.view.extension.fileInfo
@@ -37,6 +35,7 @@ import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerTyp
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
+import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 
 

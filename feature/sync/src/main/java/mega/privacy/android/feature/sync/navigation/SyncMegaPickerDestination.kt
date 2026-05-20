@@ -1,13 +1,13 @@
 package mega.privacy.android.feature.sync.navigation
 
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 
 /**
  * Route to the MEGA folder picker screen

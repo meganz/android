@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.offline
 
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent

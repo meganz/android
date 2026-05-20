@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.upload
 
 import android.app.Activity
 import androidx.activity.compose.LocalActivity
-import mega.privacy.android.core.passcode.rememberPasscodeAwareLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -12,11 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
+import mega.privacy.android.core.passcode.rememberPasscodeAwareLauncher
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator

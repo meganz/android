@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.search.navigation
 
 import androidx.compose.material.navigation.bottomSheet
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType

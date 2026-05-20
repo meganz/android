@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey

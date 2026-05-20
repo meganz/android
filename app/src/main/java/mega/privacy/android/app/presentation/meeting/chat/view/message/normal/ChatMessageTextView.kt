@@ -10,13 +10,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.meeting.chat.model.MessageListViewModel
+import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.MessageText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.domain.entity.chat.messages.normal.TextMessage
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**

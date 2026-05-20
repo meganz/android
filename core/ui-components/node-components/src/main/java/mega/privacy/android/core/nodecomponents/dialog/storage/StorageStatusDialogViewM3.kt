@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
@@ -45,11 +45,11 @@ import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.shared.nodes.R as NodesR
-import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as sharedR
 
 // Constants for test tags
 internal const val TITLE_TAG_M3 = "storage_status_dialog_m3:text_title"

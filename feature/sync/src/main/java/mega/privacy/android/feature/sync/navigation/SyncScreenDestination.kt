@@ -4,12 +4,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.documentfile.provider.DocumentFile
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -31,6 +30,7 @@ import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.SyncMegaPickerNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.whatsnew
 
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import mega.privacy.android.navigation.contract.NavigationHandler

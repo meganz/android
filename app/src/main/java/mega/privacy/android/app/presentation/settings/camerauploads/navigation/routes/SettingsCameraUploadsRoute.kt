@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.settings.camerauploads.navigation.
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsView
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel

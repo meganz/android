@@ -5,7 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,9 +14,9 @@ import androidx.navigation.navArgument
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.dialog.storagestatus.StorageStatusDialogView
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 

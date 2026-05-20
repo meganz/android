@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.meeting.chat.view.message.attachme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.CoreVoiceClipMessageView

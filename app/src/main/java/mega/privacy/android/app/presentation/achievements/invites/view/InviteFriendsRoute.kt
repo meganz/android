@@ -40,11 +40,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.getTextByDurationInDays
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
@@ -58,6 +57,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.dark_blue_5
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal object InviteFriendsViewTestTags {
     // InviteFriendsView

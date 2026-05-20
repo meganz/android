@@ -13,13 +13,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.domain.entity.chat.messages.management.ScheduledMeetingUpdatedMessage
 import mega.privacy.android.shared.original.core.ui.model.MegaSpanStyle
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.chat.messages.management.ScheduledMeetingUpdatedMessage
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
 /**

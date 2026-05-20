@@ -2,9 +2,10 @@ package mega.privacy.android.app.presentation.meeting.chat.view.navigation.compo
 
 import android.annotation.SuppressLint
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.navigation.BottomSheetNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -15,7 +16,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import androidx.compose.material.navigation.BottomSheetNavigator
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.Constants
 import java.net.URLEncoder

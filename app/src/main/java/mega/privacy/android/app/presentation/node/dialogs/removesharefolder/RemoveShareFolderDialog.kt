@@ -5,10 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.StateEvent
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderState
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderViewModel
 import mega.privacy.android.domain.entity.node.NodeId
