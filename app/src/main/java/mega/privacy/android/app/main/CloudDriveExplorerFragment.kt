@@ -770,6 +770,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      * @param sourceData original nodes
      */
     suspend fun updateNodesByAdapter(sourceData: List<MegaNode?>) {
+        if (!isAdded) return
         val safeSourceData = sourceData.toList()
         val data = if (fileExplorerViewModel.showHiddenItems) {
             safeSourceData

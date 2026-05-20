@@ -2342,25 +2342,27 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun handleNodeUpdates() {
         Timber.d("handleNodeUpdates")
-        cDriveExplorer?.let { cDriveExplorer ->
-            if (cloudExplorerFragment != null) {
-                cDriveExplorer.lifecycleScope.launch {
-                    nodes = withContext(ioDispatcher) {
-                        if (megaApi.getNodeByHandle(cDriveExplorer.parentHandle) != null) {
-                            megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
-                        } else {
-                            megaApi.rootNode?.let { rootNode ->
-                                parentHandle = rootNode.handle ?: INVALID_HANDLE
-                                megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
-                            }
+        val cDriveFragment = cDriveExplorer ?: return
+        if (cloudExplorerFragment != null) {
+            lifecycleScope.launch {
+                nodes = withContext(ioDispatcher) {
+                    if (megaApi.getNodeByHandle(cDriveFragment.parentHandle) != null) {
+                        megaApi.getChildren(megaApi.getNodeByHandle(cDriveFragment.parentHandle))
+                    } else {
+                        megaApi.rootNode?.let { rootNode ->
+                            parentHandle = rootNode.handle ?: INVALID_HANDLE
+                            megaApi.getChildren(megaApi.getNodeByHandle(cDriveFragment.parentHandle))
                         }
                     }
-
-                    nodes?.let {
-                        cDriveExplorer.updateNodesByAdapter(it)
-                    }
-                    cDriveExplorer.recyclerView.invalidate()
                 }
+
+                // Make sure that fragment is attached before calling its method
+                if (!cDriveFragment.isAdded) return@launch
+
+                nodes?.let {
+                    cDriveFragment.updateNodesByAdapter(it)
+                }
+                cDriveFragment.recyclerView.invalidate()
             }
         }
     }
