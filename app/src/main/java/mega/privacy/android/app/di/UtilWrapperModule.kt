@@ -37,7 +37,7 @@ import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.shared.resources.R as sharedR
-import org.webrtc.Camera1Enumerator
+import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraEnumerator
 
 /**
@@ -176,10 +176,12 @@ abstract class UtilWrapperModule {
          * Provides [CameraEnumeratorWrapper]
          */
         @Provides
-        fun provideCameraEnumeratorWrapper(): CameraEnumeratorWrapper =
+        fun provideCameraEnumeratorWrapper(
+            @ApplicationContext context: Context,
+        ): CameraEnumeratorWrapper =
             object : CameraEnumeratorWrapper {
                 override fun invoke(): CameraEnumerator =
-                    Camera1Enumerator(true)
+                    Camera2Enumerator(context)
             }
     }
 }

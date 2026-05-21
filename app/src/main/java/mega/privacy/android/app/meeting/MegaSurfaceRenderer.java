@@ -183,16 +183,19 @@ public class MegaSurfaceRenderer implements TextureView.SurfaceTextureListener {
 
         if (canvas == null) return;
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.MULTIPLY);
-        boolean isFrontCameraInUse = true;
-        try {
-            isFrontCameraInUse = isFrontCameraInUse();
-        } catch (Exception e) {
-            Timber.e(e);
-        }
 
-        if (isLocal && isFrontCameraInUse) {
-            canvas.scale(-1, 1);
-            canvas.translate(-canvas.getWidth(), 0);
+        if (isLocal) {
+            boolean isFrontCameraInUse = true;
+            try {
+                isFrontCameraInUse = isFrontCameraInUse();
+            } catch (Exception e) {
+                Timber.e(e);
+            }
+
+            if (isFrontCameraInUse) {
+                canvas.scale(-1, 1);
+                canvas.translate(-canvas.getWidth(), 0);
+            }
         }
         if (isSmallCamera) {
             paint.reset();

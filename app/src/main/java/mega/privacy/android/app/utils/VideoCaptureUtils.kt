@@ -1,9 +1,10 @@
 package mega.privacy.android.app.utils
 
+import android.content.Context
 import androidx.annotation.Keep
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
-import org.webrtc.Camera1Enumerator
+import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraEnumerator
 import org.webrtc.CapturerObserver
 import org.webrtc.SurfaceTextureHelper
@@ -18,6 +19,15 @@ import timber.log.Timber
 object VideoCaptureUtils {
 
     private var videoCapturer: VideoCapturer? = null
+
+    // Cache to avoid re-enumerating Camera2 on every video frame; invalidated when device name changes
+    @Volatile
+    private var cachedDeviceName: String? = null
+
+    @Volatile
+    private var cachedIsFrontCamera: Boolean = false
+
+    private fun context(): Context = MegaApplication.getInstance().applicationContext
 
     /**
      * Indicates if show video is allowed. The default value is TRUE, but this value will change to
@@ -74,7 +84,7 @@ object VideoCaptureUtils {
     private fun deviceList(): Array<String> {
         Timber.d("DeviceList")
         try {
-            val enumerator: CameraEnumerator = Camera1Enumerator(true)
+            val enumerator: CameraEnumerator = Camera2Enumerator(context())
             return enumerator.deviceNames
         } catch (e: Exception) {
             Timber.e(e)
@@ -144,7 +154,7 @@ object VideoCaptureUtils {
      */
     private fun getCameraDevice(front: Boolean): String? {
         try {
-            val enumerator: CameraEnumerator = Camera1Enumerator(true)
+            val enumerator: CameraEnumerator = Camera2Enumerator(context())
             val deviceList = deviceList()
             for (device in deviceList) {
                 if ((front && enumerator.isFrontFacing(device)) || (!front && enumerator.isBackFacing(device))) {
@@ -166,7 +176,7 @@ object VideoCaptureUtils {
     @JvmStatic
     fun isFrontCamera(device: String?): Boolean {
         try {
-            val enumerator: CameraEnumerator = Camera1Enumerator(true)
+            val enumerator: CameraEnumerator = Camera2Enumerator(context())
             return enumerator.isFrontFacing(device)
         } catch (e: Exception) {
             Timber.e(e)
@@ -183,12 +193,27 @@ object VideoCaptureUtils {
     @JvmStatic
     fun isBackCamera(device: String?): Boolean {
         try {
-            val enumerator: CameraEnumerator = Camera1Enumerator(true)
+            val enumerator: CameraEnumerator = Camera2Enumerator(context())
             return enumerator.isBackFacing(device)
         } catch (e: Exception) {
             Timber.e(e)
         }
         return false
+    }
+
+    private fun isFrontCameraFromCache(deviceName: String): Boolean {
+        if (deviceName == cachedDeviceName) {
+            return cachedIsFrontCamera
+        }
+        synchronized(VideoCaptureUtils::class.java) {
+            // Re-check inside the lock: another thread may have already updated the cache
+            // between the outer check and acquiring the lock, making enumeration redundant.
+            if (deviceName != cachedDeviceName) {
+                cachedIsFrontCamera = isFrontCamera(deviceName)
+                cachedDeviceName = deviceName
+            }
+            return cachedIsFrontCamera
+        }
     }
 
     /**
@@ -200,8 +225,9 @@ object VideoCaptureUtils {
     fun isFrontCameraInUse(): Boolean {
         try {
             val megaChatApi = MegaApplication.getInstance().megaChatApi
-            val deviceName = megaChatApi.videoDeviceSelected ?: return false
-            return isFrontCamera(deviceName)
+            val deviceName = megaChatApi.videoDeviceSelected
+            if (deviceName.isNullOrEmpty()) return false
+            return isFrontCameraFromCache(deviceName)
         } catch (e: Exception) {
             Timber.e(e)
         }
@@ -235,8 +261,8 @@ object VideoCaptureUtils {
         stopVideoCapture()
 
         try {
-            val context = MegaApplication.getInstance().applicationContext
-            val capturer = createCameraCapturer(Camera1Enumerator(true), deviceName)
+            val context = context()
+            val capturer = createCameraCapturer(Camera2Enumerator(context), deviceName)
             videoCapturer = capturer
 
             if (capturer == null) {
