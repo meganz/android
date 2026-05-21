@@ -257,45 +257,13 @@ object MegaNodeUtil {
      * @return True if the node is "My chat files" attribute, false otherwise
      */
     private fun isMyChatFilesFolder(node: MegaNode?): Boolean {
+        if (node == null || node.handle == INVALID_HANDLE) return false
         val megaApplication = MegaApplication.getInstance()
-
-        return node != null && node.handle != INVALID_HANDLE &&
-                existsMyChatFilesFolder() &&
-                node.handle == megaApplication.dbH.myChatFilesFolderHandle
+        val storedHandle = megaApplication.dbH.myChatFilesFolderHandle
+        if (storedHandle == INVALID_HANDLE || node.handle != storedHandle) return false
+        val storedNode = megaApplication.megaApi.getNodeByHandle(storedHandle) ?: return false
+        return !megaApplication.megaApi.isInRubbish(storedNode)
     }
-
-    /**
-     * Checks if the user attribute "My chat files" is saved in DB and exists
-     *
-     * @return True if the the user attribute "My chat files" is saved in the DB, false otherwise
-     */
-    @JvmStatic
-    fun existsMyChatFilesFolder(): Boolean {
-        val dbH = MegaApplication.getInstance().dbH
-        val megaApi: MegaApiJava = MegaApplication.getInstance().megaApi
-
-        if (dbH.myChatFilesFolderHandle != INVALID_HANDLE) {
-            val myChatFilesFolder = megaApi.getNodeByHandle(dbH.myChatFilesFolderHandle)
-
-            return myChatFilesFolder != null &&
-                    myChatFilesFolder.handle != INVALID_HANDLE &&
-                    !megaApi.isInRubbish(myChatFilesFolder)
-        }
-
-        return false
-    }
-
-    /**
-     * Gets the node of the user attribute "My chat files" from the DB.
-     *
-     * Before call this method is necessary to call existsMyChatFilesFolder() method
-     *
-     * @return "My chat files" folder node
-     * @see MegaNodeUtil.existsMyChatFilesFolder
-     */
-    @JvmStatic
-    val myChatFilesFolder: MegaNode?
-        get() = MegaApplication.getInstance().megaApi.getNodeByHandle(MegaApplication.getInstance().dbH.myChatFilesFolderHandle)
 
     /**
      * Checks if a node is "Camera Uploads" or "Media Uploads" folder.

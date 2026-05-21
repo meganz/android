@@ -16,8 +16,6 @@ import static mega.privacy.android.app.utils.ContactUtil.getContactEmailDB;
 import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.ContactUtil.getFirstNameDB;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder;
-import static mega.privacy.android.app.utils.MegaNodeUtil.getMyChatFilesFolder;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnCalendar;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
@@ -37,7 +35,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.ExportListener;
-import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
@@ -652,38 +649,6 @@ public class ChatController {
 
         if (context instanceof NodeAttachmentHistoryActivity) {
             ((NodeAttachmentHistoryActivity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER);
-        }
-    }
-
-    public void prepareMessagesToForward(ArrayList<MegaChatMessage> messagesSelected, long idChat) {
-        Timber.d("Number of messages: %d,Chat ID: %d", messagesSelected.size(), idChat);
-
-        ArrayList<MegaChatMessage> messagesToImport = new ArrayList<>();
-        long[] idMessages = new long[messagesSelected.size()];
-        for (int i = 0; i < messagesSelected.size(); i++) {
-            idMessages[i] = messagesSelected.get(i).getMsgId();
-
-            Timber.d("Type of message: %s", messagesSelected.get(i).getType());
-            if ((messagesSelected.get(i).getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) || (messagesSelected.get(i).getType() == MegaChatMessage.TYPE_VOICE_CLIP)) {
-                if (messagesSelected.get(i).getUserHandle() != megaChatApi.getMyUserHandle()) {
-                    //Node has to be imported
-                    messagesToImport.add(messagesSelected.get(i));
-                }
-            }
-        }
-
-        if (messagesToImport.isEmpty()) {
-            forwardMessages(messagesSelected, idChat);
-        } else {
-            if (context instanceof NodeAttachmentHistoryActivity) {
-                ((NodeAttachmentHistoryActivity) context).storedUnhandledData(messagesSelected, messagesToImport);
-                if (existsMyChatFilesFolder()) {
-                    ((NodeAttachmentHistoryActivity) context).setMyChatFilesFolder(getMyChatFilesFolder());
-                    ((NodeAttachmentHistoryActivity) context).handleStoredData();
-                } else {
-                    megaApi.getMyChatFilesFolder(new GetAttrUserListener(context));
-                }
-            }
         }
     }
 

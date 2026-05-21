@@ -40,8 +40,6 @@ class MegaNodeUtilFacade @Inject constructor(
     private val streamingGateway: StreamingGateway,
     @ApplicationScope private val coroutineScope: CoroutineScope,
 ) : MegaNodeUtilWrapper {
-    override fun getMyChatFilesFolder() = MegaNodeUtil.myChatFilesFolder
-
     override fun getNumberOfFolders(nodes: List<MegaNode?>?) =
         MegaNodeUtil.getNumberOfFolders(nodes)
 
@@ -61,8 +59,6 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun shouldContinueWithoutError(context: Context, nodes: List<MegaNode>?) =
         MegaNodeUtil.shouldContinueWithoutError(context, nodes)
-
-    override fun existsMyChatFilesFolder() = MegaNodeUtil.existsMyChatFilesFolder()
 
     override fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem) =
         MegaNodeUtil.getFolderIcon(node, drawerItem)

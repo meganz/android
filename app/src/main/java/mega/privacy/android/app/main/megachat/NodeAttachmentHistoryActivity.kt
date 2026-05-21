@@ -28,12 +28,14 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.primitives.Longs
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedR
@@ -45,6 +47,7 @@ import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward
 import mega.privacy.android.app.listeners.CreateChatListener
+import mega.privacy.android.app.listeners.GetAttrUserListener
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter
@@ -78,6 +81,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -103,6 +107,9 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
     @Inject
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
+
+    @Inject
+    lateinit var getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase
 
     private val viewModel by viewModels<NodeAttachmentHistoryViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
@@ -147,7 +154,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
     var chatC: ChatController? = null
 
-    private var myChatFilesFolder: MegaNode? = null
+    private var myChatFilesFolderHandle: Long? = null
     private var preservedMessagesSelected: ArrayList<MegaChatMessage>? = null
     private var preservedMessagesToImport: ArrayList<MegaChatMessage>? = null
 
@@ -747,12 +754,12 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             preservedMessagesSelected = null
         } else {
             preservedMessagesToImport?.let {
-                myChatFilesFolder?.let { newParentNode ->
+                myChatFilesFolderHandle?.let { newParentHandle ->
                     val messageIdsToCopy = it.map { it.msgId }
                     viewModel.copyAttachmentsToForward(
                         chatId = chatId,
                         messageIdsToCopy = messageIdsToCopy,
-                        newParentHandle = newParentNode.handle,
+                        newParentHandle = newParentHandle,
                     )
                 }
             }
@@ -792,7 +799,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 Timber.d("Forward message")
                 clearSelections()
                 hideMultipleSelect()
-                chatC?.prepareMessagesToForward(messagesSelected, chatId)
+                prepareMessagesToForward(messagesSelected, chatId)
             } else if (itemId == R.id.chat_cab_menu_delete) {
                 clearSelections()
                 hideMultipleSelect()
@@ -977,6 +984,45 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     fun forwardMessages(messagesSelected: ArrayList<MegaChatMessage>?) {
         Timber.d("forwardMessages")
         chatC?.forwardMessages(messagesSelected, chatId)
+    }
+
+    /**
+     * Splits the messages to forward into those that can be forwarded directly and those that
+     * need to be imported into the "My chat files" folder first.
+     */
+    private fun prepareMessagesToForward(
+        messagesSelected: ArrayList<MegaChatMessage>?,
+        idChat: Long,
+    ) {
+        if (messagesSelected.isNullOrEmpty()) return
+        Timber.d("Number of messages: %d, Chat ID: %d", messagesSelected.size, idChat)
+        val messagesToImport = ArrayList<MegaChatMessage>()
+        messagesSelected.forEach { message ->
+            val type = message.type
+            if (type == MegaChatMessage.TYPE_NODE_ATTACHMENT || type == MegaChatMessage.TYPE_VOICE_CLIP) {
+                if (message.userHandle != megaChatApi.myUserHandle) {
+                    messagesToImport.add(message)
+                }
+            }
+        }
+
+        if (messagesToImport.isEmpty()) {
+            forwardMessages(messagesSelected)
+            return
+        }
+
+        storedUnhandledData(messagesSelected, messagesToImport)
+        lifecycleScope.launch {
+            val chatFilesFolderId = runCatching { getMyChatsFilesFolderIdUseCase() }
+                .onFailure { Timber.e(it, "Error getting my chat files folder id") }
+                .getOrNull()
+            if (chatFilesFolderId != null) {
+                setMyChatFilesFolderHandle(chatFilesFolderId.longValue)
+                handleStoredData()
+            } else {
+                megaApi.getMyChatFilesFolder(GetAttrUserListener(this@NodeAttachmentHistoryActivity))
+            }
+        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -1316,7 +1362,16 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     }
 
     fun setMyChatFilesFolder(myChatFilesFolder: MegaNode?) {
-        this.myChatFilesFolder = myChatFilesFolder
+        this.myChatFilesFolderHandle = myChatFilesFolder?.handle
+    }
+
+    /**
+     * Sets the handle of the "My chat files" folder.
+     *
+     * @param handle The handle to set.
+     */
+    fun setMyChatFilesFolderHandle(handle: Long) {
+        this.myChatFilesFolderHandle = handle
     }
 
     companion object {

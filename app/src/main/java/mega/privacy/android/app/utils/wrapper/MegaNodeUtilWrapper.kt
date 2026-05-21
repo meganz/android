@@ -9,23 +9,12 @@ import androidx.appcompat.app.AlertDialog
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.io.File
 
 interface MegaNodeUtilWrapper {
-
-    /**
-     * Gets the node of the user attribute "My chat files" from the DB.
-     *
-     * Before call this method is necessary to call existsMyChatFilesFolder() method
-     *
-     * @return "My chat files" folder node
-     * @see MegaNodeUtil.existsMyChatFilesFolder
-     */
-    fun getMyChatFilesFolder(): MegaNode?
 
     /**
      * The method to calculate how many nodes are folders in array list
@@ -85,12 +74,6 @@ interface MegaNodeUtilWrapper {
         nodes: List<MegaNode>?,
     ): Boolean
 
-    /**
-     * Checks if the user attribute "My chat files" is saved in DB and exists
-     *
-     * @return True if the the user attribute "My chat files" is saved in the DB, false otherwise
-     */
-    fun existsMyChatFilesFolder(): Boolean
 
     /**
      * Gets the the icon that has to be displayed for a folder.

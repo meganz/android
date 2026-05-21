@@ -102,8 +102,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SH
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_FOLDER_DIALOG_TEXT
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
-import mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder
-import mega.privacy.android.app.utils.MegaNodeUtil.myChatFilesFolder
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -124,6 +122,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -222,6 +221,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
+    @Inject
+    lateinit var getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase
+
     private val viewModel by viewModels<FileExplorerViewModel>()
 
     private lateinit var binding: ActivityFileExplorerBinding
@@ -265,7 +267,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private var importFileF = false
     private var importFragmentSelected = -1
     private var action: String? = null
-    private var myChatFilesNode: MegaNode? = null
+    private var myChatFilesFolderHandle: Long? = null
     private val attachNodes: ArrayList<MegaNode> = ArrayList()
     private val uploadDocuments: ArrayList<DocumentEntity> = ArrayList()
     private var filesChecked = 0
@@ -1745,7 +1747,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             val fingerprint = megaApi.getFingerprint(info.uri.value)
             val node = megaApi.getNodeByFingerprint(fingerprint)
             if (node != null) {
-                if (node.parentHandle == myChatFilesNode?.handle) {
+                if (node.parentHandle == myChatFilesFolderHandle) {
                     //	File is in My Chat Files --> Add to attach
                     attachNodes.add(node)
                     filesChecked++
@@ -1754,7 +1756,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     // Note: This block is executed when a file is first uploaded to a cloud drive,
                     //       and then sent to chat again via the Share Intent from another app.
                     lifecycleScope.launch {
-                        val newParentNodeHandle = myChatFilesNode?.handle
+                        val newParentNodeHandle = myChatFilesFolderHandle
                         runCatching {
                             requireNotNull(newParentNodeHandle)
                             copyNodeUseCase(
@@ -1800,19 +1802,21 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             intent.action = ACTION_PROCESSED
         }
 
-        when {
-            infos == null -> {
-                dismissAlertDialogIfExists(statusDialog)
-                showSnackbar(getString(sharedR.string.unable_to_open_selected_file_message))
-            }
+        if (infos == null) {
+            dismissAlertDialogIfExists(statusDialog)
+            showSnackbar(getString(sharedR.string.unable_to_open_selected_file_message))
+            return
+        }
 
-            existsMyChatFilesFolder() -> {
-                setMyChatFilesFolder(myChatFilesFolder)
+        lifecycleScope.launch {
+            val chatFilesFolderId = runCatching { getMyChatsFilesFolderIdUseCase() }
+                .onFailure { Timber.e(it, "Error getting my chat files folder id") }
+                .getOrNull()
+            if (chatFilesFolderId != null) {
+                setMyChatFilesFolderHandle(chatFilesFolderId.longValue)
                 checkIfFilesExistsInMEGA()
-            }
-
-            else -> {
-                megaApi.getMyChatFilesFolder(GetAttrUserListener(this))
+            } else {
+                megaApi.getMyChatFilesFolder(GetAttrUserListener(this@FileExplorerActivity))
             }
         }
     }
@@ -2706,7 +2710,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * @param myChatFilesNode The node to set.
      */
     fun setMyChatFilesFolder(myChatFilesNode: MegaNode?) {
-        this.myChatFilesNode = myChatFilesNode
+        this.myChatFilesFolderHandle = myChatFilesNode?.handle
+    }
+
+    /**
+     * Sets the handle of the "My chat files" folder.
+     *
+     * @param handle The handle to set.
+     */
+    fun setMyChatFilesFolderHandle(handle: Long) {
+        this.myChatFilesFolderHandle = handle
     }
 
     /**
