@@ -50,10 +50,10 @@ internal class FetchChildrenMapper @Inject constructor(
         withContext(ioDispatcher) {
             if (fromFolderLink) {
                 megaApiFolderGateway.getChildren(filter, sortOrderIntMapper(order), token)
-                    .map { nodeMapperProvider.get().invoke(it) }
+                    .mapNotNull { nodeMapperProvider.get().invoke(it) }
             } else {
                 megaApiGateway.getChildren(filter, sortOrderIntMapper(order), token)
-                    .map { nodeMapperProvider.get().invoke(it) }
+                    .mapNotNull { nodeMapperProvider.get().invoke(it) }
             }
         }
     }

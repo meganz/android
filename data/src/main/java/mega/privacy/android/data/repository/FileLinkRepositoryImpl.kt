@@ -43,6 +43,7 @@ internal class FileLinkRepositoryImpl @Inject constructor(
 
         val previewPath = getPreviewPath(publicNode)
         val node = nodeMapper(publicNode, requireSerializedData = true)
+            ?: throw NullPointerException("Non null node found be null when fetched from api")
         (node as? DefaultFileNode)?.copy(previewPath = previewPath) ?: node
     }
 

@@ -107,10 +107,7 @@ class NodeMapperTest {
         val megaNode = getMockNode(isFile = true)
         whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(true)
 
-        val actual =
-            underTest(
-                megaNode = megaNode,
-            )
+        val actual = underTest(megaNode = megaNode)
 
         assertThat(actual).isInstanceOf(DefaultFileNode::class.java)
     }
@@ -121,10 +118,7 @@ class NodeMapperTest {
         whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle)).thenReturn(
             false
         )
-        val actual =
-            underTest(
-                megaNode = megaNode,
-            )
+        val actual = underTest(megaNode = megaNode)
         assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
     }
 
@@ -142,18 +136,16 @@ class NodeMapperTest {
         whenever(megaApiGateway.isPendingShare(node)).thenReturn(true)
         whenever(megaLocalRoomGateway.getOfflineInformation(node.handle)).thenReturn(null)
         whenever(megaLocalRoomGateway.isOfflineInformationAvailable(node.handle)).thenReturn(true)
-        val actual = underTest(
-            megaNode = node,
-        )
+        val actual = underTest(megaNode = node,)
 
-        assertThat(actual.name).isEqualTo(expectedName)
-        assertThat(actual.label).isEqualTo(expectedLabel)
-        assertThat(actual.versionCount).isEqualTo(expectedNumberVersion - 1)
-        assertThat(actual.id).isEqualTo(NodeId(expectedId))
-        assertThat(actual.parentId).isEqualTo(NodeId(expectedParentId))
-        assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
-        assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
-        assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
+        assertThat(actual?.name).isEqualTo(expectedName)
+        assertThat(actual?.label).isEqualTo(expectedLabel)
+        assertThat(actual?.versionCount).isEqualTo(expectedNumberVersion - 1)
+        assertThat(actual?.id).isEqualTo(NodeId(expectedId))
+        assertThat(actual?.parentId).isEqualTo(NodeId(expectedParentId))
+        assertThat(actual?.base64Id).isEqualTo(expectedBase64Id)
+        assertThat(actual?.isFavourite).isEqualTo(node.isFavourite)
+        assertThat(actual?.isTakenDown).isEqualTo(node.isTakenDown)
         assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
         val actualAsFolder = actual as DefaultFolderNode
         assertThat(actualAsFolder.isInRubbishBin).isTrue()
@@ -166,7 +158,7 @@ class NodeMapperTest {
         val megaNode = getMockNode(isFile = true)
         whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(false)
         val actual = underTest(megaNode, requireSerializedData = true)
-        assertThat(actual.serializedData).isEqualTo(expectedSerializedString)
+        assertThat(actual?.serializedData).isEqualTo(expectedSerializedString)
     }
 
     @Test
@@ -174,7 +166,7 @@ class NodeMapperTest {
         val megaNode = getMockNode(isFile = true)
         whenever(offlineAvailabilityMapper(megaNode, offline)).thenReturn(true)
         val actual = underTest(megaNode, requireSerializedData = false)
-        assertThat(actual.serializedData).isNull()
+        assertThat(actual?.serializedData).isNull()
     }
 
     @Nested
@@ -192,9 +184,9 @@ class NodeMapperTest {
             )
             val actual = mappedNode(megaNode)
             if (exported) {
-                assertThat(actual.exportedData).isNotNull()
+                assertThat(actual?.exportedData).isNotNull()
             } else {
-                assertThat(actual.exportedData).isNull()
+                assertThat(actual?.exportedData).isNull()
             }
         }
 
@@ -205,7 +197,7 @@ class NodeMapperTest {
                 false
             )
             val actual = mappedNode(megaNode)
-            assertThat(actual.exportedData?.publicLink).isEqualTo(expectedPublicLink)
+            assertThat(actual?.exportedData?.publicLink).isEqualTo(expectedPublicLink)
         }
 
         @Test
@@ -215,7 +207,7 @@ class NodeMapperTest {
                 false
             )
             val actual = mappedNode(megaNode)
-            assertThat(actual.exportedData?.publicLinkCreationTime).isEqualTo(
+            assertThat(actual?.exportedData?.publicLinkCreationTime).isEqualTo(
                 expectedPublicLinkCreationTime
             )
         }
@@ -241,13 +233,10 @@ class NodeMapperTest {
             on { get(0) }.thenReturn(sync)
         }
         whenever(megaApiGateway.getSyncs()).thenReturn(syncList)
-        val actual =
-            underTest(
-                megaNode = megaNode,
-            )
+        val actual = underTest(megaNode = megaNode,)
         assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
-        val actualAsFolder = actual as DefaultFolderNode
-        assertThat(actualAsFolder.isSynced).isTrue()
+        val actualAsFolder = actual as? DefaultFolderNode
+        assertThat(actualAsFolder?.isSynced).isTrue()
     }
 
     private fun getMockNode(

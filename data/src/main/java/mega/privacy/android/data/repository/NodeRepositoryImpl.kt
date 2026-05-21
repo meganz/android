@@ -152,8 +152,13 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val sharedNodeUpdates: SharedFlow<NodeUpdate> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnNodesUpdate>()
         .mapNotNull {
-            it.nodeList?.map { megaNode ->
-                convertToUnTypedNode(megaNode) to nodeUpdateMapper(megaNode)
+            it.nodeList?.mapNotNull { megaNode ->
+                val unTypedNode = convertToUnTypedNode(megaNode)
+                if (unTypedNode != null) {
+                    unTypedNode to nodeUpdateMapper(megaNode)
+                } else {
+                    null
+                }
             }
         }
         .map { nodes -> NodeUpdate(nodes.toMap()) }
@@ -339,6 +344,7 @@ internal class NodeRepositoryImpl @Inject constructor(
                 )
             }
         }.awaitAll()
+            .filterNotNull()
     }
 
     override suspend fun getNodeChildrenFileTypes(
@@ -361,7 +367,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getNodeHistoryVersions(handle: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle.longValue)?.let { megaNode ->
-            megaApiGateway.getVersions(megaNode).map { version ->
+            megaApiGateway.getVersions(megaNode).mapNotNull { version ->
                 convertToUnTypedNode(node = version, offline = getOfflineNode(version.handle))
             }
         } ?: throw SynchronisationException("Non null node found be null when fetched from api")
@@ -487,14 +493,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    private suspend fun convertToUnTypedNode(
-        node: MegaNode,
-        offline: Offline? = null,
-    ): UnTypedNode {
-        return nodeMapper(
-            megaNode = node, offline = offline,
-        )
-    }
+    private suspend fun convertToUnTypedNode(node: MegaNode, offline: Offline? = null) =
+        nodeMapper(megaNode = node, offline = offline)
 
 
     override suspend fun stopSharingNode(nodeId: NodeId): Unit = withContext(ioDispatcher) {
@@ -555,7 +555,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getInShares(email: String): List<UnTypedNode> = withContext(ioDispatcher) {
         runCatching {
             megaApiGateway.getContact(email)?.let {
-                megaApiGateway.getInShares(it).map { node ->
+                megaApiGateway.getInShares(it).mapNotNull { node ->
                     convertToUnTypedNode(node)
                 }
             }
@@ -730,7 +730,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaApiGateway.getNodesByOriginalFingerprint(
                 originalFingerprint = originalFingerprint,
                 parentNode = parentNode,
-            )?.let { megaNodeList -> nodeListMapper(megaNodeList) }.orEmpty()
+            )?.let { nodeListMapper(it) }
+                .orEmpty()
         }
 
     override suspend fun getNodeByFingerprintAndParentNode(
@@ -1085,7 +1086,7 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun getNodesByFingerprint(fingerprint: String): List<UnTypedNode> {
         return withContext(ioDispatcher) {
-            megaApiGateway.getNodesByFingerprint(fingerprint).map {
+            megaApiGateway.getNodesByFingerprint(fingerprint).mapNotNull {
                 convertToUnTypedNode(it)
             }
         }
@@ -1327,7 +1328,7 @@ internal class NodeRepositoryImpl @Inject constructor(
                 folderTypeData = folderTypeData,
                 offline = offlineItems[megaNode.handle.toString()]
             )
-        }
+        }.filterNotNull()
     }
 
     override suspend fun getTypedNodesByIdInChunks(
@@ -1354,7 +1355,7 @@ internal class NodeRepositoryImpl @Inject constructor(
                     folderTypeData = folderTypeData,
                     offline = offlineItems[megaNode.handle.toString()]
                 )
-            }
+            }.filterNotNull()
         emit(initialTypedNodes to (allChildren.size > initialBatchSize))
 
         // If there are more nodes, process them and emit the complete list
@@ -1368,7 +1369,7 @@ internal class NodeRepositoryImpl @Inject constructor(
                         folderTypeData = folderTypeData,
                         offline = offlineItems[megaNode.handle.toString()]
                     )
-                }
+                }.filterNotNull()
             }
             // Second emit: Complete list (initial + remaining) with hasMore = false
             emit(initialTypedNodes + remainingTypedNodes to false)

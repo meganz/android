@@ -31,7 +31,7 @@ internal class RecentActionBucketMapper @Inject constructor(private val nodeMapp
             parentNodeId = NodeId(megaRecentActionBucket.parentHandle),
             isUpdate = megaRecentActionBucket.isUpdate,
             isMedia = megaRecentActionBucket.isMedia,
-            nodes = megaNodes.mapAsync { nodeMapper(it) },
+            nodes = megaNodes.mapAsync { nodeMapper(it) }.filterNotNull(),
         )
     }
 }

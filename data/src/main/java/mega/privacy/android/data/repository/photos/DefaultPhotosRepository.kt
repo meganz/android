@@ -292,7 +292,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                         megaNode = megaNode,
                         folderTypeData = null,
                         offline = offlineNodesCache[megaNode.handle.toString()]
-                    )
+                    ) ?: return@forEach
                     val existing = currentNodes[node.id]
                     if (existing != mapped) {
                         currentNodes[node.id] = mapped

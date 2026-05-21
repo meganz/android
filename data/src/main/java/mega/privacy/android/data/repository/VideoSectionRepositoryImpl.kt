@@ -85,14 +85,17 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 tag = tag,
                 description = description,
                 order = order
-            ).map { megaNode ->
-                val isOutShared =
-                    megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
-                typedVideoNodeMapper(
-                    fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
-                    duration = megaNode.duration,
-                    isOutShared = isOutShared
-                )
+            ).mapNotNull { megaNode ->
+                megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()])
+                    ?.let { fileNode ->
+                        val isOutShared =
+                            megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
+                        typedVideoNodeMapper(
+                            fileNode = fileNode,
+                            duration = megaNode.duration,
+                            isOutShared = isOutShared
+                        )
+                    }
             }
         }
 
@@ -142,15 +145,19 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         val favouriteVideos =
             getAllVideoMegaNodes(
                 order = sortOrder
-            ).filter { it.isFavourite }.map { megaNode ->
-                val isOutShared =
-                    megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
-                typedVideoNodeMapper(
-                    fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
-                    duration = megaNode.duration,
-                    isOutShared = isOutShared
-                )
-            }
+            ).filter { it.isFavourite }
+                .mapNotNull { megaNode ->
+                    megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()])
+                        ?.let { fileNode ->
+                            val isOutShared =
+                                megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
+                            typedVideoNodeMapper(
+                                fileNode = fileNode,
+                                duration = megaNode.duration,
+                                isOutShared = isOutShared
+                            )
+                        }
+                }
         return favouritesVideoPlaylistMapper(favouriteVideos)
     }
 
@@ -192,15 +199,17 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 val isInRubbish = megaApiGateway.isInRubbish(megaNode)
                 if (isInRubbish) return@mapNotNull null
 
-                videoSetsMap.getOrPut(NodeId(elementNode)) { mutableSetOf() }
-                    .add(element.setId())
-                typedVideoNodeMapper(
-                    fileNode = megaNode.convertToFileNode(
-                        offlineMap?.get(megaNode.handle.toString())
-                    ),
-                    duration = megaNode.duration,
-                    elementID = element.id()
-                )
+                megaNode.convertToFileNode(
+                    offlineMap?.get(megaNode.handle.toString())
+                )?.let { fileNode ->
+                    videoSetsMap.getOrPut(NodeId(elementNode)) { mutableSetOf() }
+                        .add(element.setId())
+                    typedVideoNodeMapper(
+                        fileNode = fileNode,
+                        duration = megaNode.duration,
+                        elementID = element.id()
+                    )
+                }
             }
         }.sortedBy { it.name }
         return userVideoPlaylistMapper(
@@ -410,14 +419,19 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 val offlineItems = getAllOfflineNodeHandle()
                 list.mapNotNull { item ->
                     megaApiGateway.getMegaNodeByHandle(item.videoHandle)?.let { megaNode ->
-                        val title =
-                            megaNode.getCollectionTitle(item.collectionId, item.collectionTitle)
-                        typedVideoNodeMapper(
-                            fileNode = megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()]),
-                            duration = megaNode.duration,
-                            watchedTimestamp = item.watchedTimestamp,
-                            collectionTitle = title
-                        )
+                        megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()])
+                            ?.let { fileNode ->
+                                val title = megaNode.getCollectionTitle(
+                                    item.collectionId,
+                                    item.collectionTitle
+                                )
+                                typedVideoNodeMapper(
+                                    fileNode = fileNode,
+                                    duration = megaNode.duration,
+                                    watchedTimestamp = item.watchedTimestamp,
+                                    collectionTitle = title
+                                )
+                            }
                     }
                 }.sortedByDescending { it.watchedTimestamp }
             }

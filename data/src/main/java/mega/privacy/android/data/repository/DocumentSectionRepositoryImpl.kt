@@ -41,7 +41,7 @@ internal class DocumentSectionRepositoryImpl @Inject constructor(
                 filter,
                 sortOrderIntMapper(order),
                 megaCancelToken,
-            ).filter { !megaApiGateway.isInBackups(it) }.map { megaNode ->
+            ).filter { !megaApiGateway.isInBackups(it) }.mapNotNull { megaNode ->
                 convertToUnTypedNode(
                     node = megaNode,
                     offline = offlineItems?.get(megaNode.handle.toString())
@@ -55,9 +55,5 @@ internal class DocumentSectionRepositoryImpl @Inject constructor(
     private suspend fun convertToUnTypedNode(
         node: MegaNode,
         offline: Offline? = null,
-    ): UnTypedNode {
-        return nodeMapper(
-            megaNode = node, offline = offline
-        )
-    }
+    ): UnTypedNode? = nodeMapper(megaNode = node, offline = offline)
 }

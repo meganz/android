@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.videosection.FavouritesVideoPlaylistMapp
 import mega.privacy.android.data.mapper.videosection.UserVideoPlaylistMapper
 import mega.privacy.android.data.mapper.videosection.VideoRecentlyWatchedItemMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.VideoRecentlyWatchedItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
@@ -133,7 +134,7 @@ class VideoSectionRepositoryImplTest {
             on { isFolder }.thenReturn(false)
             on { duration }.thenReturn(100)
         }
-        val fileNode = mock<FileNode>()
+        val fileNode = mock<DefaultFileNode>()
         val filter = mock<MegaSearchFilter>()
         val token = mock<MegaCancelToken>()
         val typedVideoNode = mock<TypedVideoNode> {
@@ -301,6 +302,7 @@ class VideoSectionRepositoryImplTest {
                 on { videos }.thenReturn(listOf(mock(), mock(), mock()))
             }
 
+            whenever(fileNodeMapper(any(), any(), anyOrNull())).thenReturn(mock<DefaultFileNode>())
             whenever(
                 typedVideoNodeMapper(
                     anyOrNull(),
@@ -729,7 +731,7 @@ class VideoSectionRepositoryImplTest {
                 initMegaNode(it, it != 2L)
             }
             val fileNodes = megaNodes.map {
-                mock<TypedFileNode>()
+                mock<DefaultFileNode>()
             }
             val typedVideoNodes = megaNodes.map {
                 initTypedVideoNode(it.handle, 100, null, it.handle != 2L)
@@ -863,7 +865,7 @@ class VideoSectionRepositoryImplTest {
                 initMegaNode(handle)
             }
             val testFileNodes = testHandles.map {
-                mock<TypedFileNode>()
+                mock<DefaultFileNode>()
             }
             val testTypedVideoNodes = testHandles.mapIndexed { index, handle ->
                 initTypedVideoNode(

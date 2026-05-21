@@ -12,8 +12,8 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.audios.TypedAudioNodeMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
+import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
@@ -86,7 +86,7 @@ class AudioSectionRepositoryImplTest {
             on { isFolder }.thenReturn(false)
             on { duration }.thenReturn(100)
         }
-        val fileNode = mock<FileNode>()
+        val fileNode = mock<DefaultFileNode>()
         val filter = mock<MegaSearchFilter>()
         val token = mock<MegaCancelToken>()
         val typedVideoNode = mock<TypedAudioNode> {

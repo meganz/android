@@ -139,10 +139,10 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
             val filter = megaSearchFilterMapper(parentHandle = NodeId(handle))
             val orderInt = order?.let { sortOrderIntMapper(it) } ?: MegaApiJava.ORDER_NONE
             megaApiFolderGateway.getChildren(filter, orderInt, token)
-                .map { convertToUntypedNode(it) }
+                .mapNotNull { convertToUntypedNode(it) }
         }
 
-    private suspend fun convertToUntypedNode(node: MegaNode): UnTypedNode =
+    private suspend fun convertToUntypedNode(node: MegaNode): UnTypedNode? =
         nodeMapper(node, fromFolderLink = true)
 
     override suspend fun getPublicLinkInformation(folderLink: String): FolderInfo =

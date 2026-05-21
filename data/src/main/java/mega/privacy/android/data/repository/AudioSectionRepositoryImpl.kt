@@ -43,13 +43,19 @@ internal class AudioSectionRepositoryImpl @Inject constructor(
                 filter,
                 sortOrderIntMapper(order),
                 megaCancelToken,
-            ).filter { !megaApiGateway.isInBackups(it) }.map { megaNode ->
-                typedAudioNodeMapper(
-                    fileNode = megaNode.convertToFileNode(
-                        offlineItems?.get(megaNode.handle.toString())
-                    ),
-                    duration = megaNode.duration,
+            ).filter { !megaApiGateway.isInBackups(it) }.mapNotNull { megaNode ->
+                val fileNode = megaNode.convertToFileNode(
+                    offlineItems?.get(megaNode.handle.toString())
                 )
+
+                if (fileNode != null) {
+                    typedAudioNodeMapper(
+                        fileNode = fileNode,
+                        duration = megaNode.duration,
+                    )
+                } else {
+                    null
+                }
             }
         }
 

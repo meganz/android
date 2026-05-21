@@ -115,11 +115,11 @@ internal class SearchRepositoryImpl @Inject constructor(
             megaNode = it,
             offline = offlineItems?.get(it.handle.toString())
         )
-    }
+    }.filterNotNull()
 
     override suspend fun getInShares() = withContext(ioDispatcher) {
         megaApiGateway.getInShares(sortOrderIntMapper(getOthersSortOrder())).let { list ->
-            list.map { nodeMapper(it) }
+            list.mapNotNull { nodeMapper(it) }
         }
     }
 
@@ -140,7 +140,7 @@ internal class SearchRepositoryImpl @Inject constructor(
                 }
             }
         }
-        searchNodes.map { nodeMapper(it) }
+        searchNodes.mapNotNull { nodeMapper(it) }
     }
 
     override suspend fun getPublicLinks() =
@@ -151,7 +151,7 @@ internal class SearchRepositoryImpl @Inject constructor(
                 )
             )
                 .let { list ->
-                    list.map { nodeMapper(it) }
+                    list.mapNotNull { nodeMapper(it) }
                 }
         }
 

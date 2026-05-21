@@ -85,7 +85,7 @@ class FileLinkRepositoryImplTest {
         }
         val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
-        whenever(nodeMapper(publicNode)).thenReturn(untypedPublicNode)
+        whenever(nodeMapper(publicNode, requireSerializedData = true)).thenReturn(untypedPublicNode)
         whenever(megaApiGateway.getPublicNode(any(), any())).thenAnswer {
             ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                 mock(),
@@ -133,6 +133,27 @@ class FileLinkRepositoryImplTest {
         val node = underTest.getPublicNode(url)
         assertThat(node).isInstanceOf(DefaultFileNode::class.java)
         assertThat((node as DefaultFileNode).previewPath).isEqualTo(expectedPath)
+    }
+
+    @Test
+    fun `test that an exception is thrown when nodeMapper returns null`() = runTest {
+        val url = "https://mega.co.nz/abc"
+        val publicNode = mock<MegaNode>()
+        val megaRequest = mock<MegaRequest> {
+            on { publicMegaNode }.thenReturn(publicNode)
+        }
+        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+
+        whenever(nodeMapper(publicNode, requireSerializedData = true)).thenReturn(null)
+        whenever(megaApiGateway.getPublicNode(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError
+            )
+        }
+
+        assertThrows<NullPointerException> { underTest.getPublicNode(url) }
     }
 
     @Test

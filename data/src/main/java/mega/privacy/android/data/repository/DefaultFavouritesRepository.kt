@@ -70,7 +70,7 @@ internal class DefaultFavouritesRepository @Inject constructor(
      * @return FavouriteInfo list
      */
     private suspend fun mapNodesToFavouriteInfo(nodes: List<MegaNode>) =
-        nodes.map { megaNode ->
+        nodes.mapNotNull { megaNode ->
             nodeMapper(
                 megaNode,
             )
