@@ -33,28 +33,16 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View Model for MyAccountUsageComposeFragment.
+ * ViewModel for MyAccountUsageComposeFragment.
  *
- * Initial UI: [MyAccountUsageUiState.isUsageContentReady] stays false until account bootstrap
- * (successful [GetAccountDetailsUseCase]), versions slice, first backup slice, and a non-null
- * [AccountDetail.storageDetail] / [AccountDetail.levelDetail] from [MonitorAccountDetailUseCase] are all
- * available — then this flag becomes true so the UI can show real usage, breakdown, and CTA.
- * If bootstrap or account-detail monitoring fails, [MyAccountUsageUiState.usageLoadFailed] is set
- * so the UI can show a message and navigate back (no retry). A new screen instance gets a fresh ViewModel.
- * The Compose usage screen may still keep skeleton placeholders for a minimum duration before
- * swapping to real content. Later emissions from monitors only patch fields; the ready flag stays true.
+ * Combines bootstrap ([GetAccountDetailsUseCase]), monitored account detail, storage state,
+ * backup folder, and versions into [MyAccountUsageUiState].
  *
- * @property fileSizeStringMapper Mapper to format file size
- * @property getFileVersionsOption UseCase to get file versions option
- * @property checkVersionsUseCase UseCase to check versions
- * @property getAccountDetailsUseCase UseCase to get account details
- * @property monitorAccountDetailUseCase UseCase to monitor account details
- * @property monitorStorageStateUseCase UseCase to monitor storage state
- * @property getUsedTransferStatusUseCase UseCase to get transfer status
- * @property monitorBackupFolder UseCase to monitor backup folder
- * @property getFolderTreeInfo UseCase to get folder tree info
- * @property getNodeByIdUseCase UseCase to get node by ID
- * @property getBusinessStatusUseCase UseCase to get business status
+ * [MyAccountUsageUiState.isUsageContentReady] turns true once all prerequisites are ready.
+ * Paid accounts additionally require transferDetail; FREE/UNKNOWN skip it.
+ *
+ * On bootstrap or account-detail monitoring failure, [MyAccountUsageUiState.usageLoadFailed]
+ * is set; the UI shows a message and navigates back (no retry).
  */
 @HiltViewModel
 internal class MyAccountUsageComposeViewModel @Inject constructor(
@@ -109,11 +97,7 @@ internal class MyAccountUsageComposeViewModel @Inject constructor(
             emit(AccountDetailSlice(detail = AccountDetail(), flowFailed = true))
         }
 
-    /**
-     * One-shot bootstrap from [GetAccountDetailsUseCase] (and business status when applicable).
-     * On success emits flags for business / Pro Flexi UI; on failure emits [AccountUsageBootstrap.loadFailed] true
-     * so downstream state can show [MyAccountUsageUiState.usageLoadFailed].
-     */
+    /** One-shot load of account identity flags (business / Pro Flexi / master) and business status. */
     private fun getAccountBootstrapFlow() = flow {
         runCatching {
             getAccountDetailsUseCase(forceRefresh = false)
@@ -307,25 +291,30 @@ internal class MyAccountUsageComposeViewModel @Inject constructor(
             else -> 0L
         }
 
+        val accountType = levelDetail?.accountType ?: AccountType.FREE
+
         val usedTransferStatus = transferDetail?.usedTransferPercentage?.let {
             getUsedTransferStatusUseCase(it)
         } ?: prev.usedTransferStatus
 
         val usageLoadFailed = bootstrap.loadFailed || inputs.accountDetailFlowFailed
 
+        // Not required for FREE/UNKNOWN where the transfer section is hidden.
+        val requiresTransferDetail = levelDetail?.accountType?.isPaid == true
         val contentReady = bootstrap.isLoaded &&
                 !bootstrap.loadFailed &&
                 !inputs.accountDetailFlowFailed &&
                 inputs.versions.isLoaded &&
-                accountDetail.storageDetail != null &&
-                accountDetail.levelDetail != null
+                storageDetail != null &&
+                levelDetail != null &&
+                (!requiresTransferDetail || transferDetail != null)
 
         return MyAccountUsageUiState(
             usageLoadFailed = usageLoadFailed,
             isUsageContentReady = prev.isUsageContentReady || contentReady,
             isFileVersioningEnabled = inputs.versions.isFileVersioningEnabled,
             versionsInfo = inputs.versions.versionsInfo,
-            accountType = levelDetail?.accountType ?: AccountType.FREE,
+            accountType = accountType,
             storageState = inputs.storageState,
             isBusinessAccount = bootstrap.isBusinessAccount,
             isProFlexiAccount = bootstrap.isProFlexiAccount,

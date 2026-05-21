@@ -10,11 +10,14 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.myAccount.view.MyAccountUsageScreen
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -28,6 +31,9 @@ class MyAccountUsageComposeFragment : Fragment() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +51,13 @@ class MyAccountUsageComposeFragment : Fragment() {
                 OriginalTheme(isDark = isDarkMode) {
                     MyAccountUsageScreen(
                         uiState = uiState,
+                        onUpgradeClick = {
+                            megaNavigator.openUpgradeAccount(
+                                context = requireActivity(),
+                                source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
+                            )
+                        },
+                        onUsageLoadErrorDismiss = { findNavController().popBackStack() },
                     )
                 }
             }

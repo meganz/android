@@ -164,6 +164,53 @@ internal class MyAccountUsageComposeViewModelTest {
     }
 
     @Test
+    fun `test that isUsageContentReady becomes true for free account when transferDetail is null`() =
+        runTest {
+            accountDetailFlow.value = AccountDetail(
+                levelDetail = accountLevelDetail(
+                    accountType = AccountType.FREE,
+                    subscriptionStatus = SubscriptionStatus.INVALID,
+                    subscriptionRenewTime = 0L,
+                    proExpirationTime = 0L,
+                ),
+                storageDetail = emptyStorageDetail(),
+                transferDetail = null,
+            )
+
+            underTest.uiState.test {
+                val state = awaitUntilUsageReady()
+                assertThat(state.isUsageContentReady).isTrue()
+                assertThat(state.isFreeAccount).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isUsageContentReady stays false for paid account when transferDetail is null`() =
+        runTest {
+            accountDetailFlow.value = AccountDetail(
+                levelDetail = accountLevelDetail(
+                    accountType = AccountType.PRO_I,
+                    subscriptionStatus = SubscriptionStatus.VALID,
+                    subscriptionRenewTime = 0L,
+                    proExpirationTime = 0L,
+                ),
+                storageDetail = emptyStorageDetail(),
+                transferDetail = null,
+            )
+
+            val vm = createViewModel()
+
+            vm.uiState.test {
+                advanceUntilIdle()
+                expectMostRecentItem().let { state ->
+                    assertThat(state.isUsageContentReady).isFalse()
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that uiState sets paymentAlertType NONE for business sub-account`() = runTest {
         wheneverBlocking { getAccountDetailsUseCase(any()) }.thenReturn(businessSubUserAccount())
         accountDetailFlow.value = accountDetailForBusinessAccount(AccountType.BUSINESS)
@@ -176,9 +223,74 @@ internal class MyAccountUsageComposeViewModelTest {
             assertThat(state.isBusinessAccount).isTrue()
             assertThat(state.isMasterBusinessAccount).isFalse()
             assertThat(state.paymentAlertType).isEqualTo(PaymentAlertType.None)
+            assertThat(state.showPaymentAlert).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that showPaymentAlert is true when account is pro flexi`() = runTest {
+        wheneverBlocking { getAccountDetailsUseCase(any()) }.thenReturn(proFlexiUserAccount())
+        accountDetailFlow.value = accountDetailForBusinessAccount(AccountType.PRO_FLEXI)
+
+        val vm = createViewModel()
+
+        vm.uiState.test {
+            val state = awaitUntilUsageReady()
+            assertThat(state.isProFlexiAccount).isTrue()
+            assertThat(state.showPaymentAlert).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that showPaymentAlert is true when account is master business`() = runTest {
+        wheneverBlocking { getAccountDetailsUseCase(any()) }.thenReturn(businessMasterUserAccount())
+        accountDetailFlow.value = accountDetailForBusinessAccount(AccountType.BUSINESS)
+
+        val vm = createViewModel()
+
+        vm.uiState.test {
+            val state = awaitUntilUsageReady()
+            assertThat(state.isBusinessAccount).isTrue()
+            assertThat(state.isMasterBusinessAccount).isTrue()
+            assertThat(state.showPaymentAlert).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that showPaymentAlert is false when account is free`() = runTest {
+        underTest.uiState.test {
+            val state = awaitUntilUsageReady()
+            assertThat(state.isFreeAccount).isTrue()
+            assertThat(state.showPaymentAlert).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that showPaymentAlert is true when account is paid with renewable subscription`() =
+        runTest {
+            val renewTime = 9_999L
+            accountDetailFlow.value = AccountDetail(
+                levelDetail = accountLevelDetail(
+                    accountType = AccountType.PRO_I,
+                    subscriptionStatus = SubscriptionStatus.VALID,
+                    subscriptionRenewTime = renewTime,
+                    proExpirationTime = 0L,
+                ),
+                storageDetail = emptyStorageDetail(),
+                transferDetail = defaultTransferDetail(),
+            )
+
+            underTest.uiState.test {
+                val state = awaitUntilUsageReady()
+                assertThat(state.hasRenewableSubscription).isTrue()
+                assertThat(state.showPaymentAlert).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that uiState sets paymentAlertType BUSINESS_EXPIRED when business master account is expired`() =

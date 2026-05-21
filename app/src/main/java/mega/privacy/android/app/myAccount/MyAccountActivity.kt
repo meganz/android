@@ -462,14 +462,23 @@ internal class MyAccountActivity : PasscodeActivity(),
             setDisplayHomeAsUpEnabled(true)
         }
 
-        navController.addOnDestinationChangedListener { _, _, _ ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             refreshMenuOptionsVisibility()
+
+            if (destination.id == R.id.my_account_usage_compose) {
+                // MyAccountUsageScreen is the only destination with a title in this Activity.
+                supportActionBar?.title = getString(R.string.storage_space)
+            } else {
+                // Reset to null when leaving so other destinations remain title-free.
+                supportActionBar?.title = null
+            }
 
             supportActionBar?.setHomeAsUpIndicator(
                 ColorUtils.tintIcon(
                     this,
-                    when (navController.currentDestination?.id) {
-                        R.id.my_account -> R.drawable.ic_arrow_back_white
+                    when (destination.id) {
+                        R.id.my_account,
+                        R.id.my_account_usage_compose -> R.drawable.ic_arrow_back_white
                         else -> R.drawable.ic_close_white
                     }
                 )

@@ -241,6 +241,7 @@ class GetActiveUserUseCase {
 - [ ] `sealed class` used for state/result modeling
 - [ ] Extension functions are placed logically and not overused
 - [ ] Naming follows conventions (camelCase, semantically clear)
+- [ ] Enum entries use PascalCase — **never** `ALL_CAPS` (e.g., `PayWall` not `PAY_WALL`)
 - [ ] No duplicated code (DRY principle)
 - [ ] Functions are reasonably sized (recommended ≤ 40 lines)
 - [ ] Complex logic has explanatory comments

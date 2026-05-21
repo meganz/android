@@ -39,6 +39,8 @@ alwaysApply: true
   - Repositories: `Default{Feature}Repository` (e.g., `DefaultAccountRepository`)
   - Mappers: `{Source}Mapper` (e.g., `TransferMapper`)
 
+- **Enum entries**: Use PascalCase — **never** `ALL_CAPS` (e.g., `PayWall` not `PAY_WALL`)
+
 - **Files**: Use descriptive file names
   - Test files: `{ClassName}Test.kt`
   - Module files: `{module-name}.gradle.kts`
