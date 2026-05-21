@@ -44,7 +44,7 @@ class ContinueWhereLeftOffViewModelTest {
         underTest = ContinueWhereLeftOffViewModel(
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, DurationInSecondsTextMapper()),
+            nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, DurationInSecondsTextMapper(), mock()),
         )
     }
 

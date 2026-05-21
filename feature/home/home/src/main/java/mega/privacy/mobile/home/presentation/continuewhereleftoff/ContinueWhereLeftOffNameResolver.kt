@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeft
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import javax.inject.Inject
 
 /**
@@ -16,6 +17,7 @@ import javax.inject.Inject
 internal class ContinueWhereLeftOffNameResolver @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
 ) {
     private data class ResolvedData(val name: String, val duration: String?)
 
@@ -44,6 +46,8 @@ internal class ContinueWhereLeftOffNameResolver @Inject constructor(
                     name = node.name,
                     duration = duration?.let { durationInSecondsTextMapper(it) },
                 )
+            } else {
+                runCatching { removeRecentlyUsedItemUseCase(item.nodeHandle) }
             }
         }
         return cache.size > sizeBefore

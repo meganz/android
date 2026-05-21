@@ -86,6 +86,7 @@ class ContinueWhereLeftOffListViewModelTest {
             nameResolver = ContinueWhereLeftOffNameResolver(
                 getNodeByIdUseCase,
                 DurationInSecondsTextMapper(),
+                mock(),
             ),
         )
     }

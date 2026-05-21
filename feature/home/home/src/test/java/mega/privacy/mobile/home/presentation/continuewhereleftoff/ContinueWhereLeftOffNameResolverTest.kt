@@ -10,11 +10,14 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 
@@ -22,16 +25,21 @@ class ContinueWhereLeftOffNameResolverTest {
 
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
+    private val removeRecentlyUsedItemUseCase = mock<RemoveRecentlyUsedItemUseCase>()
     private lateinit var underTest: ContinueWhereLeftOffNameResolver
 
     @BeforeEach
     fun setUp() {
-        underTest = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, durationInSecondsTextMapper)
+        underTest = ContinueWhereLeftOffNameResolver(
+            getNodeByIdUseCase,
+            durationInSecondsTextMapper,
+            removeRecentlyUsedItemUseCase,
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        reset(getNodeByIdUseCase)
+        reset(getNodeByIdUseCase, removeRecentlyUsedItemUseCase)
     }
 
     @Test
@@ -89,6 +97,37 @@ class ContinueWhereLeftOffNameResolverTest {
         val result = underTest.resolveBlankNames(items)
 
         assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `test that invalid node is removed from database when node is null`() = runTest {
+        val items = listOf(item(1L, ""))
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+
+        underTest.resolveBlankNames(items)
+
+        verify(removeRecentlyUsedItemUseCase).invoke(1L)
+    }
+
+    @Test
+    fun `test that valid node is not removed from database`() = runTest {
+        val items = listOf(item(1L, ""))
+        stubNode(1L, "resolved.pdf")
+
+        underTest.resolveBlankNames(items)
+
+        verifyNoInteractions(removeRecentlyUsedItemUseCase)
+    }
+
+    @Test
+    fun `test that only invalid nodes are removed when mixed valid and invalid`() = runTest {
+        val items = listOf(item(1L, ""), item(2L, ""))
+        stubNode(1L, "resolved.pdf")
+        whenever(getNodeByIdUseCase(NodeId(2L))).thenReturn(null)
+
+        underTest.resolveBlankNames(items)
+
+        verify(removeRecentlyUsedItemUseCase).invoke(2L)
     }
 
     @Test
