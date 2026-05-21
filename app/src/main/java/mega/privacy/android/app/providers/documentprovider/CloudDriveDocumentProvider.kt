@@ -33,9 +33,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentDataProvider.Companion.CLOUD_DRIVE_ROOT_ID
 import mega.privacy.android.app.providers.documentprovider.model.ChildrenSlot
-import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
+import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
 import mega.privacy.android.app.providers.documentprovider.model.DocumentSlot
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -463,20 +464,9 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
         val result = childDocumentsCursor(parentDocumentId, projection)
         setNotificationUriForChildDocuments(parentDocumentId, result)
-        if (needsChildDocumentsRefresh(parentDocumentId)) {
-            listenForChildDocumentChanges(parentDocumentId)
-        }
+        listenForChildDocumentChanges(parentDocumentId)
         return result
     }
-
-    private fun needsChildDocumentsRefresh(parentDocumentId: String): Boolean =
-        when (val slot = dataProvider.childrenState.value) {
-            is ChildrenSlot.Loaded ->
-                slot.parentDocumentId != parentDocumentId || slot.hasMore
-            is ChildrenSlot.NotFound ->
-                slot.parentDocumentId != parentDocumentId
-            else -> true
-        }
 
     private fun childDocumentsCursor(
         parentDocumentId: String,
@@ -557,15 +547,17 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     private fun listenForChildDocumentChanges(parentDocumentId: String) {
         childDocumentsNotifyJob?.cancel()
         childDocumentsNotifyJob = applicationScope.launch {
-            dataProvider.childrenState.first { slot ->
-                when (slot) {
+            dataProvider.childrenState.collect { slot ->
+                val matches = when (slot) {
                     is ChildrenSlot.Loaded -> slot.parentDocumentId == parentDocumentId
                     is ChildrenSlot.NotFound -> slot.parentDocumentId == parentDocumentId
                     else -> false
                 }
+                if (!matches) return@collect
+                Timber.d("listenForChildDocumentChanges notify parent=$parentDocumentId slot=$slot")
+                delay(NOTIFY_DELAY_MS)
+                notifyChildDocumentsChanged(parentDocumentId)
             }
-            delay(NOTIFY_DELAY_MS)
-            notifyChildDocumentsChanged(parentDocumentId)
         }
     }
 
@@ -583,7 +575,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         val loginIntent = Intent(appContext, MegaActivity::class.java).apply {
             action = Intent.ACTION_VIEW
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            putExtra("open_from_document_provider", true)
+            putExtra(Constants.LAUNCH_INTENT, Intent())
         }
 
         return PendingIntent.getActivity(

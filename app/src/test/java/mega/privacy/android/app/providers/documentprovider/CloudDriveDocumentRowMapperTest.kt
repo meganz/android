@@ -51,7 +51,7 @@ class CloudDriveDocumentRowMapperTest {
         assertThat(row.size).isEqualTo(0L)
         // SDK reports creationTime in seconds; Android's Document.COLUMN_LAST_MODIFIED is millis.
         assertThat(row.lastModified).isEqualTo(2_000_000L)
-        assertThat(row.flags).isEqualTo(Document.FLAG_SUPPORTS_RENAME)
+        assertThat(row.flags).isEqualTo(0)
     }
 
     @Test
@@ -96,6 +96,6 @@ class CloudDriveDocumentRowMapperTest {
         assertThat(row.size).isEqualTo(4096L)
         // SDK reports modificationTime in seconds; Android's Document.COLUMN_LAST_MODIFIED is millis.
         assertThat(row.lastModified).isEqualTo(3_000_000L)
-        assertThat(row.flags).isEqualTo(Document.FLAG_SUPPORTS_RENAME)
+        assertThat(row.flags).isEqualTo(0)
     }
 }

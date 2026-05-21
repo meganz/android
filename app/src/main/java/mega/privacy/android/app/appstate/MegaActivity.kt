@@ -182,8 +182,8 @@ class MegaActivity : FragmentActivity() {
             intent?.parcelable<Intent>(Constants.LAUNCH_INTENT)?.let { originalIntent ->
                 if (originalIntent.component?.packageName == packageName) {
                     startActivity(originalIntent)
-                    finish()
                 }
+                finish()
             }
             intent.removeExtra(Constants.LAUNCH_INTENT)
         }

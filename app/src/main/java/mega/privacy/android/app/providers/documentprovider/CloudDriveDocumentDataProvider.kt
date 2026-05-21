@@ -110,6 +110,13 @@ class CloudDriveDocumentDataProvider @Inject constructor(
 
     private val connectivityState = MutableStateFlow(true)
 
+    /**
+     * Last non-null account name observed in the sessionState upstream. Used to detect account
+     * switches and clear cache
+     */
+    @Volatile
+    private var lastKnownAccountName: String? = null
+
     @VisibleForTesting
     fun updateConnectivity(connected: Boolean) {
         connectivityState.value = connected
@@ -235,7 +242,20 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                         }
                     }
             }
+        }.onEach { state ->
+            handleAccountTransition(state)
         }
+
+    private fun handleAccountTransition(state: CloudDriveSessionState) {
+        val newAccount = (state as? CloudDriveSessionState.Ready)?.accountName ?: return
+        Timber.d("handleAccountTransition")
+        val previous = lastKnownAccountName
+        lastKnownAccountName = newAccount
+        if (previous == null || previous == newAccount) return
+        recentDocumentRows.evictAll()
+        applicationScope.launch { childrenState.first() }
+        applicationScope.launch { documentState.first() }
+    }
 
     private sealed interface AppSession {
         data object NotLoggedIn : AppSession
