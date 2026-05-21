@@ -60,8 +60,8 @@ class MegaNodeUtilFacade @Inject constructor(
     override fun shouldContinueWithoutError(context: Context, nodes: List<MegaNode>?) =
         MegaNodeUtil.shouldContinueWithoutError(context, nodes)
 
-    override fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem) =
-        MegaNodeUtil.getFolderIcon(node, drawerItem)
+    override fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem) =
+        MegaNodeUtil.getFolderIcon(megaApi, node, drawerItem)
 
     override fun isInRootLinksLevel(adapterType: Int, parentHandle: Long) =
         MegaNodeUtil.isInRootLinksLevel(adapterType, parentHandle)

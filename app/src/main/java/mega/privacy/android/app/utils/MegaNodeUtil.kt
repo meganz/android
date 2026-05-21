@@ -270,10 +270,11 @@ object MegaNodeUtil {
      *
      * Note: The content of this method is temporary and will have to be modified when the PR of the CU user attribute be merged.
      *
+     * @param megaApi MegaApiAndroid instance to use.
      * @param n MegaNode to check
      * @return True if the node is "Camera Uploads" or "Media Uploads" folder, false otherwise
      */
-    private fun isCameraUploads(n: MegaNode): Boolean {
+    private fun isCameraUploads(megaApi: MegaApiAndroid, n: MegaNode): Boolean {
         var cameraSyncHandle: String? = null
         var secondaryMediaHandle: String? = null
         val dbH = MegaApplication.getInstance().dbH
@@ -286,7 +287,7 @@ object MegaNodeUtil {
 
         val handle = n.handle
         if (cameraSyncHandle != null && cameraSyncHandle.isNotEmpty()
-            && handle == cameraSyncHandle.toLong() && !isNodeInRubbishOrDeletedInternal(handle)
+            && handle == cameraSyncHandle.toLong() && !isNodeInRubbishOrDeletedInternal(megaApi, handle)
         ) {
             return true
         }
@@ -297,39 +298,40 @@ object MegaNodeUtil {
         }
 
         return (secondaryMediaHandle != null && secondaryMediaHandle.isNotEmpty()
-                && handle == secondaryMediaHandle.toLong() && !isNodeInRubbishOrDeletedInternal(handle))
+                && handle == secondaryMediaHandle.toLong() && !isNodeInRubbishOrDeletedInternal(megaApi, handle))
     }
 
     /**
      * Gets the the icon that has to be displayed for a folder.
      *
+     * @param megaApi       MegaApiAndroid instance to use.
      * @param node          MegaNode referencing the folder to check
      * @param drawerItem    indicates if the icon has to be shown in Outgoing shares section or any other
      * @return The icon of the folder to be displayed.
      */
     @JvmStatic
-    fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem): Int {
+    fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem): Int {
         return if (node.isInShare) {
             IconPackR.drawable.ic_folder_incoming_medium_solid
-        } else if (isCameraUploads(node)) {
-            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(node)) {
+        } else if (isCameraUploads(megaApi, node)) {
+            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
                 IconPackR.drawable.ic_folder_outgoing_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_camera_uploads_medium_solid
             }
         } else if (isMyChatFilesFolder(node)) {
-            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(node)) {
+            if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
                 IconPackR.drawable.ic_folder_outgoing_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_chat_medium_solid
             }
-        } else if (isSynced(node)) {
+        } else if (isSynced(megaApi, node)) {
             IconPackR.drawable.ic_folder_sync_medium_solid
-        } else if (isOutShareInternal(node)) {
+        } else if (isOutShareInternal(megaApi, node)) {
             IconPackR.drawable.ic_folder_outgoing_medium_solid
-        } else if (isRootBackupFolder(node)) {
+        } else if (isRootBackupFolder(megaApi, node)) {
             IconPackR.drawable.ic_backup_medium_solid
-        } else if (isDeviceBackupFolder(node)) {
+        } else if (isDeviceBackupFolder(megaApi, node)) {
             getMyBackupSubFolderIcon(node)
         } else {
             getFolderIconByLabel(node.label)
@@ -353,12 +355,14 @@ object MegaNodeUtil {
     /**
      * Checks if a node is a device folder under the MyBackup folder.
      *
+     * @param megaApi MegaApiAndroid instance to use.
      * @param node MegaNode to check
      * @return True if the node is a device folder, false otherwise
      */
-    private fun isDeviceBackupFolder(node: MegaNode?): Boolean {
+    private fun isDeviceBackupFolder(megaApi: MegaApiAndroid, node: MegaNode?): Boolean {
         Timber.d("MyBackup + isDeviceBackupFolder node.handle = ${node?.handle}")
         return (node?.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank() && !isNodeInRubbishOrDeletedInternal(
+            megaApi,
             node.handle
         ))
     }
@@ -366,12 +370,13 @@ object MegaNodeUtil {
     /**
      * Checks if a node is the MyBackup folder.
      *
+     * @param megaApi MegaApiAndroid instance to use.
      * @param node MegaNode to check
      * @return True if the node is the MyBackup folder, false otherwise
      */
-    private fun isRootBackupFolder(node: MegaNode?): Boolean {
+    private fun isRootBackupFolder(megaApi: MegaApiAndroid, node: MegaNode?): Boolean {
         Timber.d("MyBackup + isRootBackupFolder node.handle = ${node?.handle}")
-        return (node?.handle == myBackupHandle && !isNodeInRubbishOrDeletedInternal(node.handle))
+        return (node?.handle == myBackupHandle && !isNodeInRubbishOrDeletedInternal(megaApi, node.handle))
     }
 
     /**
@@ -405,8 +410,7 @@ object MegaNodeUtil {
         }
     }
 
-    private fun isSynced(megaNode: MegaNode): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
+    private fun isSynced(megaApi: MegaApiAndroid, megaNode: MegaNode): Boolean {
         val syncs = megaApi.syncs
         for (i in 0..syncs.size()) {
             syncs.get(i)?.let { syncNode ->
@@ -448,11 +452,11 @@ object MegaNodeUtil {
     /**
      * Internal helper to detect whether the node has been deleted completely or is in rubbish bin.
      *
+     * @param megaApi MegaApiAndroid instance to use.
      * @param handle node's handle to be detected
      * @return whether the node is in rubbish
      */
-    private fun isNodeInRubbishOrDeletedInternal(handle: Long): Boolean {
-        val megaApi = MegaApplication.getInstance().megaApi
+    private fun isNodeInRubbishOrDeletedInternal(megaApi: MegaApiAndroid, handle: Long): Boolean {
         val node = megaApi.getNodeByHandle(handle)
 
         return node == null || megaApi.isInRubbish(node)
@@ -461,11 +465,12 @@ object MegaNodeUtil {
     /**
      * Internal helper that checks if a node is an outgoing or a pending outgoing share.
      *
+     * @param megaApi MegaApiAndroid instance to use.
      * @param node MegaNode to check
      * @return True if the node is an outgoing or a pending outgoing share, false otherwise
      */
-    private fun isOutShareInternal(node: MegaNode?): Boolean {
-        return node?.isOutShare == true || MegaApplication.getInstance().megaApi.isPendingShare(node)
+    private fun isOutShareInternal(megaApi: MegaApiAndroid, node: MegaNode?): Boolean {
+        return node?.isOutShare == true || megaApi.isPendingShare(node)
     }
 
     /**
@@ -961,7 +966,7 @@ object MegaNodeUtil {
                 megaApi.rootNode?.handle -> {
                     // Check if handleList contains backup root node
                     return handleList.firstOrNull {
-                        isRootBackupFolder(megaApi.getNodeByHandle(it))
+                        isRootBackupFolder(megaApi, megaApi.getNodeByHandle(it))
                     }?.let { BACKUP_ROOT } ?: BACKUP_NONE
                 }
 
@@ -969,7 +974,7 @@ object MegaNodeUtil {
                 myBackupHandle -> {
                     // Check if handleList contains device nodes
                     return handleList.firstOrNull {
-                        isDeviceBackupFolder(megaApi.getNodeByHandle(it))
+                        isDeviceBackupFolder(megaApi, megaApi.getNodeByHandle(it))
                     }?.let { BACKUP_DEVICE } ?: BACKUP_NONE
                 }
 
@@ -1010,7 +1015,7 @@ object MegaNodeUtil {
 
             // First, check if the node exists in Backups.
             // If the node doesn't exist in Backups, or is in Rubbish Bin, return BACKUP_NONE
-            if (!megaApi.isInVault(selectedNode) || isNodeInRubbishOrDeletedInternal(selectedNode.handle)) {
+            if (!megaApi.isInVault(selectedNode) || isNodeInRubbishOrDeletedInternal(megaApi, selectedNode.handle)) {
                 Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_NONE")
                 return BACKUP_NONE
             }

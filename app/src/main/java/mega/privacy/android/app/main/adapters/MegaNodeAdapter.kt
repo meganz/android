@@ -750,12 +750,15 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             setFolderGridSelected(holder, position)
 
             holder.imageViewIcon?.visibility = View.VISIBLE
-            holder.imageViewIcon?.setImageResource(
+            megaApi?.let {
                 getFolderIcon(
+                    it,
                     node,
                     if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
                 )
-            )
+            }?.let {
+                holder.imageViewIcon?.setImageResource(it)
+            }
             holder.imageViewThumb?.visibility = View.GONE
             holder.thumbLayout?.setBackgroundColor(Color.TRANSPARENT)
         } else if (node.isFile) {
@@ -963,14 +966,16 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
                 MegaApiUtils.getMegaNodeFolderInfo(node, context)
             holder.versionsIcon?.visibility = View.GONE
 
-            setFolderListSelected(
-                holder,
-                position,
-                getFolderIcon(
-                    node,
-                    if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
+            megaApi?.let {
+                setFolderListSelected(
+                    holder, position, getFolderIcon(
+                        it,
+                        node,
+                        if (type == NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
+                    )
                 )
-            )
+            }
+
             if (isMultipleSelect) {
                 holder.threeDotsLayout?.visibility = View.INVISIBLE
             } else {

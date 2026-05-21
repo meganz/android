@@ -78,11 +78,12 @@ interface MegaNodeUtilWrapper {
     /**
      * Gets the the icon that has to be displayed for a folder.
      *
+     * @param megaApi       MegaApiAndroid instance to use.
      * @param node          MegaNode referencing the folder to check
      * @param drawerItem    indicates if the icon has to be shown in Outgoing shares section or any other
      * @return The icon of the folder to be displayed.
      */
-    fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem): Int
+    fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem): Int
 
     /**
      * Checks if it is on Links section and in root level.
