@@ -596,7 +596,7 @@ class StartTransfersComponentViewModelTest {
             whenever(shouldAskForResumeTransfersUseCase()).thenReturn(true)
             val triggerEvent =
                 TransferTriggerEvent.StartChatUpload.Files(
-                    chatId = CHAT_ID,
+                    chatIds = listOf(CHAT_ID),
                     uris = listOf(uploadUri),
                     pitagTrigger = PitagTrigger.Picker,
                 )
@@ -1662,7 +1662,7 @@ class StartTransfersComponentViewModelTest {
                 withStartMessage = false,
             ),
             TransferTriggerEvent.StartChatUpload.Files(
-                chatId = CHAT_ID,
+                chatIds = listOf(CHAT_ID),
                 uris = provideListOfUris(),
                 pitagTrigger = PitagTrigger.Picker,
             ),
@@ -1719,7 +1719,7 @@ class StartTransfersComponentViewModelTest {
 
     private fun provideStartChatUploadEvents() = listOf(
         TransferTriggerEvent.StartChatUpload.Files(
-            chatId = CHAT_ID,
+            chatIds = listOf(CHAT_ID),
             uris = listOf(uploadUri),
             pitagTrigger = PitagTrigger.Picker,
         ),

@@ -35,6 +35,7 @@ fun UploadingFiles(
     onUrisConsumed: () -> Unit,
     pitagTrigger: PitagTrigger,
     onStartUpload: (TransferTriggerEvent) -> Unit,
+    chatIds: List<Long>? = null,
     viewModel: UploadFileViewModel = hiltViewModel(),
 ) {
     val megaNavigator = rememberMegaNavigator()
@@ -81,11 +82,15 @@ fun UploadingFiles(
         urisEvent,
         onConsumed = onUrisConsumed,
     ) { uris ->
-        viewModel.proceedUris(
-            uris = uris,
-            parentNodeId = parentNodeId,
-            pitagTrigger = pitagTrigger,
-        )
+        if (chatIds.isNullOrEmpty()) {
+            viewModel.proceedUris(
+                uris = uris,
+                parentNodeId = parentNodeId,
+                pitagTrigger = pitagTrigger,
+            )
+        } else {
+            viewModel.attachFilesToChat(uris, chatIds, pitagTrigger)
+        }
     }
 }
 

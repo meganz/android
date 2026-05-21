@@ -2862,6 +2862,8 @@
     <string name="chat_explorer_all_contacts_header">All contacts, chats and meetings</string>
     <!-- Snackbar shown when the user taps a read-only chat (no write privilege) in the Select destination Chat tab. -->
     <string name="chat_explorer_read_only_chat_warning">This conversation is read-only</string>
+    <!-- Snackbar shown after the user shares content (a file or text) to multiple chats from the Chat explorer. -->
+    <string name="chat_explorer_sent_as_message">Sent as message</string>
     <!-- Text informing there are no contacts -->
     <string name="contacts_empty_title">No contacts found</string>
     <!-- Text informing a new group chat was created -->
@@ -2880,6 +2882,8 @@
         <item quantity="one">Clear viewed link?</item>
         <item quantity="other">Clear viewed links?</item>
     </plurals>
+    <!-- Snackbar shown after the user shares content (a file or text) to multiple chats -->
+    <string name="general_chat_sent_as_message">Sent as message</string>
     <!-- Description for the empty view in Favourites sections where only favourite folders are available. Files are hidden, so no need to mention them here. -->
     <string name="favourite_folders_empty_screen_description">Add folders to Favourites to see them here</string>
 </resources>

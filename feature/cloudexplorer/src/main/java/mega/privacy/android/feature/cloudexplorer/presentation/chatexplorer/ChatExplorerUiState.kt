@@ -2,7 +2,6 @@ package mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer
 
 import androidx.compose.runtime.Stable
 import de.palm.composestateevents.StateEventWithContent
-import de.palm.composestateevents.consumed
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 
 @Stable
@@ -11,15 +10,20 @@ sealed interface ChatExplorerUiState {
     data object Loading : ChatExplorerUiState
 
     data class Data(
-        val noteToSelf: ChatExplorerUiItem?,
-        val recents: List<ChatExplorerUiItem>,
-        val others: List<ChatExplorerUiItem>,
-        val newChatCreatedEvent: StateEventWithContent<Long> = consumed(),
+        val items: Items,
+        val newChatCreatedEvent: StateEventWithContent<Long>,
+        val chatsReadyToShareEvent: StateEventWithContent<List<Long>>,
     ) : ChatExplorerUiState {
 
         val isEmpty: Boolean
-            get() = recents.isEmpty() && others.isEmpty()
+            get() = items.recents.isEmpty() && items.others.isEmpty()
     }
+
+    data class Items(
+        val noteToSelf: ChatExplorerUiItem?,
+        val recents: List<ChatExplorerUiItem>,
+        val others: List<ChatExplorerUiItem>,
+    )
 }
 
 internal fun ChatExplorerUiItem.withSelected(isSelected: Boolean): ChatExplorerUiItem =

@@ -426,6 +426,54 @@ class UploadFileViewModelTest {
     }
 
     @Test
+    fun `test that attachFilesToChat triggers overQuotaEvent when storage state is PayWall`() =
+        runTest {
+            val uris = listOf(
+                mock<Uri> {
+                    on { toString() } doReturn "content://com.example.provider/file.txt"
+                }
+            )
+            val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.PayWall))
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+
+            viewModel.attachFilesToChat(uris, listOf(10L, 11L), PitagTrigger.ShareFromApp)
+
+            val uiState = viewModel.uiState.value
+            assertThat(uiState.overQuotaEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            assertThat(uiState.startUploadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+
+    @Test
+    fun `test that attachFilesToChat triggers a StartChatUpload Files event with the given chat ids and uris`() =
+        runTest {
+            val uris = listOf(
+                mock<Uri> {
+                    on { toString() } doReturn "content://com.example.provider/a.txt"
+                },
+                mock<Uri> {
+                    on { toString() } doReturn "content://com.example.provider/b.txt"
+                }
+            )
+            val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+
+            viewModel.attachFilesToChat(uris, listOf(10L, 11L), PitagTrigger.ShareFromApp)
+
+            val uiState = viewModel.uiState.value
+            assertThat(uiState.startUploadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val event = (uiState.startUploadEvent as StateEventWithContentTriggered).content
+            assertThat(event).isInstanceOf(TransferTriggerEvent.StartChatUpload.Files::class.java)
+            val chatUpload = event as TransferTriggerEvent.StartChatUpload.Files
+            assertThat(chatUpload.chatIds).containsExactly(10L, 11L).inOrder()
+            assertThat(chatUpload.uris.map { it.value })
+                .containsExactly(
+                    "content://com.example.provider/a.txt",
+                    "content://com.example.provider/b.txt",
+                ).inOrder()
+            assertThat(chatUpload.pitagTrigger).isEqualTo(PitagTrigger.ShareFromApp)
+        }
+
+    @Test
     fun `test that proceedUris handles single Uri correctly`() = runTest {
         val uris = listOf(
             mock<Uri> {

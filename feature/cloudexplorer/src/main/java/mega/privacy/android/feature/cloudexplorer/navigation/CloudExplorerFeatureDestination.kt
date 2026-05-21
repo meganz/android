@@ -107,6 +107,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onStartUpload = onStartUpload,
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
+                onChatsSelected = { isProcessingAction = true },
                 onFileUriConsumed = viewModel::onFileUriConsumed,
                 monitorResult = monitorResult,
                 clearResult = clearResult,

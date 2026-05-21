@@ -33,6 +33,7 @@ internal fun CloudExplorerListViewItem(
     showIsVerified: Boolean = false,
     isTakenDown: Boolean = false,
     label: NodeLabel? = null,
+    showLink: Boolean = false,
     isSensitive: Boolean = false,
     enabled: Boolean = true,
     showBlurEffect: Boolean = false,
@@ -60,6 +61,7 @@ internal fun CloudExplorerListViewItem(
         showIsVerified = showIsVerified,
         isTakenDown = isTakenDown,
         label = label,
+        showLink = showLink,
         isSensitive = isSensitive,
         enabled = enabled,
         showBlurEffect = showBlurEffect,
@@ -90,6 +92,7 @@ internal fun CloudExplorerGridViewItem(
     isSensitive: Boolean = false,
     showBlurEffect: Boolean = false,
     isHighlighted: Boolean = false,
+    showLink: Boolean = false,
     label: NodeLabel? = null,
 ) {
     NodeGridViewItem(
@@ -109,6 +112,7 @@ internal fun CloudExplorerGridViewItem(
         isSensitive = isSensitive,
         showBlurEffect = showBlurEffect,
         isHighlighted = isHighlighted,
+        showLink = showLink,
         label = label,
     )
 }

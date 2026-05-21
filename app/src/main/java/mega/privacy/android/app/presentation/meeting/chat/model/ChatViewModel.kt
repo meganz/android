@@ -1218,8 +1218,8 @@ class ChatViewModel @Inject constructor(
             it.copy(
                 downloadEvent = triggered(
                     TransferTriggerEvent.StartChatUpload.Files(
-                        chatId,
-                        files,
+                        chatIds = listOf(chatId),
+                        uris = files,
                         pitagTrigger = pitagTrigger,
                     )
                 )

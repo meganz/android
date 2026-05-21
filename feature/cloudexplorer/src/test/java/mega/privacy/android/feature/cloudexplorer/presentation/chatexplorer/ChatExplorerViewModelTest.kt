@@ -4,11 +4,13 @@ import androidx.compose.ui.graphics.Color
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatRoomPermission
@@ -21,23 +23,31 @@ import mega.privacy.android.domain.entity.contacts.UserContact
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.chat.CreateGroupChatRoomUseCase
+import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.GetActiveChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
+import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+
+private val ChatExplorerUiState.Data.noteToSelf get() = items.noteToSelf
+private val ChatExplorerUiState.Data.recents get() = items.recents
+private val ChatExplorerUiState.Data.others get() = items.others
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -51,6 +61,8 @@ internal class ChatExplorerViewModelTest {
     private val getNoteToSelfChatUseCase = mock<GetNoteToSelfChatUseCase>()
     private val monitorChatListItemUpdates = mock<MonitorChatListItemUpdates>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
+    private val get1On1ChatIdUseCase = mock<Get1On1ChatIdUseCase>()
+    private val sendTextMessageUseCase = mock<SendTextMessageUseCase>()
     private val chatExplorerUiItemMapper = mock<ChatExplorerUiItemMapper>()
 
     @AfterEach
@@ -62,6 +74,8 @@ internal class ChatExplorerViewModelTest {
             getNoteToSelfChatUseCase,
             monitorChatListItemUpdates,
             createGroupChatRoomUseCase,
+            get1On1ChatIdUseCase,
+            sendTextMessageUseCase,
             chatExplorerUiItemMapper,
         )
     }
@@ -73,6 +87,8 @@ internal class ChatExplorerViewModelTest {
         getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
         monitorChatListItemUpdates = monitorChatListItemUpdates,
         createGroupChatRoomUseCase = createGroupChatRoomUseCase,
+        get1On1ChatIdUseCase = get1On1ChatIdUseCase,
+        sendTextMessageUseCase = sendTextMessageUseCase,
         chatExplorerUiItemMapper = chatExplorerUiItemMapper,
     )
 
@@ -992,4 +1008,139 @@ internal class ChatExplorerViewModelTest {
         }
     }
 
+    @Test
+    fun `test that prepareChatsForSharing emits chat ids unchanged for existing chats`() = runTest {
+        val chatA = chatItem(chatId = 10L, title = "Alice", isGroup = false)
+        val chatB = chatItem(chatId = 11L, title = "Group", isGroup = true)
+        stubChatLists(active = listOf(chatA, chatB))
+        stubMapperForChats(listOf(chatA, chatB))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            awaitData()
+            underTest.prepareChatsForSharing(listOf(10L, 11L), message = null)
+            val event = awaitChatsReadyToShare()
+            assertThat(event).containsExactly(10L, 11L).inOrder()
+            verifyNoInteractions(get1On1ChatIdUseCase)
+            verifyNoInteractions(sendTextMessageUseCase)
+        }
+    }
+
+    @Test
+    fun `test that prepareChatsForSharing resolves contact rows via Get1On1ChatIdUseCase`() =
+        runTest {
+            val contact = contactItem(handle = 42L, email = "alice@mega.nz", fullName = "Alice")
+            stubChatLists(contacts = listOf(contact))
+            stubMapperForContacts(listOf(contact))
+            whenever(get1On1ChatIdUseCase(42L)).thenReturn(999L)
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                awaitData()
+                underTest.prepareChatsForSharing(listOf(42L), message = null)
+                val event = awaitChatsReadyToShare()
+                assertThat(event).containsExactly(999L)
+                verify(get1On1ChatIdUseCase).invoke(42L)
+            }
+        }
+
+    @Test
+    fun `test that prepareChatsForSharing drops contacts whose 1to1 chat creation fails`() =
+        runTest {
+            val contact = contactItem(handle = 7L, email = "bob@mega.nz", fullName = "Bob")
+            val chat = chatItem(chatId = 8L, title = "Carol", isGroup = false)
+            stubChatLists(active = listOf(chat), contacts = listOf(contact))
+            stubMapperForChats(listOf(chat))
+            stubMapperForContacts(listOf(contact))
+            whenever(get1On1ChatIdUseCase(7L)).thenThrow(RuntimeException("boom"))
+            val underTest = buildViewModel()
+
+            underTest.uiState.test {
+                awaitData()
+                underTest.prepareChatsForSharing(listOf(7L, 8L), message = null)
+                val event = awaitChatsReadyToShare()
+                assertThat(event).containsExactly(8L)
+            }
+        }
+
+    @Test
+    fun `test that prepareChatsForSharing does nothing for empty selection`() = runTest {
+        stubChatLists()
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            val initial = awaitData()
+            assertThat(initial.chatsReadyToShareEvent).isEqualTo(consumed())
+
+            underTest.prepareChatsForSharing(emptyList(), message = null)
+            advanceUntilIdle()
+
+            expectNoEvents()
+            verifyNoInteractions(get1On1ChatIdUseCase)
+            verifyNoInteractions(sendTextMessageUseCase)
+        }
+    }
+
+    @Test
+    fun `test that prepareChatsForSharing sends the message to each resolved chat id`() = runTest {
+        val chatA = chatItem(chatId = 10L, title = "Alice", isGroup = false)
+        val chatB = chatItem(chatId = 11L, title = "Group", isGroup = true)
+        stubChatLists(active = listOf(chatA, chatB))
+        stubMapperForChats(listOf(chatA, chatB))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            awaitData()
+            underTest.prepareChatsForSharing(listOf(10L, 11L), message = "hello")
+            val event = awaitChatsReadyToShare()
+            assertThat(event).containsExactly(10L, 11L).inOrder()
+            verify(sendTextMessageUseCase).invoke(chatId = 10L, message = "hello")
+            verify(sendTextMessageUseCase).invoke(chatId = 11L, message = "hello")
+        }
+    }
+
+    @Test
+    fun `test that prepareChatsForSharing does not send the message when it is null`() = runTest {
+        val chat = chatItem(chatId = 10L, title = "Alice", isGroup = false)
+        stubChatLists(active = listOf(chat))
+        stubMapperForChats(listOf(chat))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            awaitData()
+            underTest.prepareChatsForSharing(listOf(10L), message = null)
+            awaitChatsReadyToShare()
+            verify(sendTextMessageUseCase, never()).invoke(any(), any())
+        }
+    }
+
+    @Test
+    fun `test that onChatsReadyToShareConsumed clears the chatsReadyToShareEvent`() = runTest {
+        val chat = chatItem(chatId = 10L, title = "Alice", isGroup = false)
+        stubChatLists(active = listOf(chat))
+        stubMapperForChats(listOf(chat))
+        val underTest = buildViewModel()
+
+        underTest.uiState.test {
+            awaitData()
+            underTest.prepareChatsForSharing(listOf(10L), message = null)
+            val triggeredState = awaitItem() as ChatExplorerUiState.Data
+            assertThat(triggeredState.chatsReadyToShareEvent).isEqualTo(triggered(listOf(10L)))
+
+            underTest.onChatsReadyToShareConsumed()
+            val consumedState = awaitItem() as ChatExplorerUiState.Data
+            assertThat(consumedState.chatsReadyToShareEvent).isEqualTo(consumed())
+        }
+    }
+
+    private suspend fun ReceiveTurbine<ChatExplorerUiState>.awaitChatsReadyToShare(): List<Long> {
+        while (true) {
+            val state = awaitItem() as ChatExplorerUiState.Data
+            val event = state.chatsReadyToShareEvent
+            if (event is StateEventWithContentTriggered<*>) {
+                @Suppress("UNCHECKED_CAST")
+                return (event as StateEventWithContentTriggered<List<Long>>).content
+            }
+        }
+    }
 }

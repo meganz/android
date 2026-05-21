@@ -42,18 +42,7 @@ class UploadFileViewModel @Inject constructor(
      */
     fun proceedUris(uris: List<Uri>, parentNodeId: NodeId, pitagTrigger: PitagTrigger) {
         viewModelScope.launch {
-            runCatching {
-                monitorStorageStateEventUseCase().value.storageState
-            }.onSuccess { state ->
-                if (state == StorageState.PayWall) {
-                    _uiState.update {
-                        it.copy(
-                            overQuotaEvent = triggered
-                        )
-                    }
-                    return@launch
-                }
-            }
+            if (isInPayWall()) return@launch
             runCatching {
                 val parentOrRootNodeId = if (parentNodeId.longValue != -1L) parentNodeId
                 else getRootNodeUseCase()?.id ?: NodeId(-1L)
@@ -96,6 +85,41 @@ class UploadFileViewModel @Inject constructor(
                 }
                 Timber.e(e)
             }
+        }
+    }
+
+    /**
+     * Emits a single [TransferTriggerEvent.StartChatUpload.Files] addressed at every chat in
+     * [chatIds] for the upstream transfer handler. Short-circuits with [overQuotaEvent] when the
+     * account is in [StorageState.PayWall].
+     */
+    fun attachFilesToChat(uris: List<Uri>, chatIds: List<Long>, pitagTrigger: PitagTrigger) {
+        viewModelScope.launch {
+            if (isInPayWall()) return@launch
+            _uiState.update {
+                it.copy(
+                    startUploadEvent = triggered(
+                        TransferTriggerEvent.StartChatUpload.Files(
+                            chatIds = chatIds,
+                            uris = uris.map { uri -> UriPath(uri.toString()) },
+                            pitagTrigger = pitagTrigger,
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private fun isInPayWall(): Boolean {
+        val state = runCatching {
+            monitorStorageStateEventUseCase().value.storageState
+        }.getOrNull()
+
+        return if (state == StorageState.PayWall) {
+            _uiState.update { it.copy(overQuotaEvent = triggered) }
+            true
+        } else {
+            false
         }
     }
 

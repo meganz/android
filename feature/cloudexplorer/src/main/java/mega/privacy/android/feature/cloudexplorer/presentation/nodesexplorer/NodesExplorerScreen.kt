@@ -131,6 +131,7 @@ internal fun NodesExplorerScreen(
             uploadUrisEventState = uploadUrisEventState,
             onStartUpload = onStartUpload,
             onCloseExplorerScreen = onCloseExplorerScreen,
+            onNavigate = onNavigate,
         )
     }
 }
@@ -193,6 +194,7 @@ internal fun NodesExplorerScreenContent(
                 showIsVerified = it.showIsVerified,
                 isTakenDown = it.isTakenDown,
                 label = it.nodeLabel,
+                showLink = it.showLink,
                 isSensitive = it.isSensitive && isHiddenNodesEnabled,
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
@@ -215,6 +217,7 @@ internal fun NodesExplorerScreenContent(
                 isSensitive = it.isSensitive && isHiddenNodesEnabled,
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
+                showLink = it.showLink,
                 label = it.nodeLabel,
                 enabled = it.isFolderNode || isSelectionModeEnabled,
             )

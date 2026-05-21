@@ -195,7 +195,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         transferTriggerEvent.uris.size,
                     )
                     startChatUploads(
-                        chatId = transferTriggerEvent.chatId,
+                        chatIds = transferTriggerEvent.chatIds,
                         uris = transferTriggerEvent.uris,
                         isVoiceClip = transferTriggerEvent.isVoiceClip,
                         pitagTrigger = transferTriggerEvent.pitagTrigger,
@@ -733,7 +733,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     private suspend fun startChatUploads(
-        chatId: Long,
+        chatIds: List<Long>,
         uris: List<UriPath>,
         isVoiceClip: Boolean = false,
         pitagTrigger: PitagTrigger,
@@ -742,9 +742,9 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             .onFailure { Timber.e(it) }
         runCatching {
             sendChatAttachmentsUseCase(
-                uris.map { it }.associateWith { null },
+                uris.associateWith { null },
                 isVoiceClip,
-                chatId,
+                chatIds = chatIds.toLongArray(),
                 pitagTrigger = pitagTrigger,
             )
         }.onSuccess {

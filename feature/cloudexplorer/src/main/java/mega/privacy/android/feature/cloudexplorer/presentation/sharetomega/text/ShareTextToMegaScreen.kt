@@ -5,10 +5,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.data.extensions.toUri
@@ -32,6 +37,7 @@ internal fun ShareTextToMegaScreen(
     onStartUpload: (TransferTriggerEvent) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
+    onChatsSelected: () -> Unit,
     onFileUriConsumed: () -> Unit,
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
@@ -46,6 +52,7 @@ internal fun ShareTextToMegaScreen(
             val uploadUrisEventState = rememberUploadUrisEventState()
             var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
             val folderPickedId = NodeId(folderPickedIdLong)
+            var prepareChatsEvent: StateEvent by remember { mutableStateOf(consumed) }
 
             EventEffect(
                 event = uiState.fileUri,
@@ -77,6 +84,12 @@ internal fun ShareTextToMegaScreen(
                         }
                     )
                 },
+                onChatsSelected = {
+                    onChatsSelected()
+                    prepareChatsEvent = triggered
+                },
+                prepareChatsEvent = prepareChatsEvent,
+                onPrepareChatsConsumed = { prepareChatsEvent = consumed },
                 monitorResult = monitorResult,
                 clearResult = clearResult,
             )
@@ -86,6 +99,7 @@ internal fun ShareTextToMegaScreen(
                 uploadUrisEventState = uploadUrisEventState,
                 onStartUpload = onStartUpload,
                 onCloseExplorerScreen = onNavigateBack,
+                onNavigate = onNavigate,
             )
         }
     }

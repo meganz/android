@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer
 
+import android.content.res.Resources
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,6 +29,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -48,6 +50,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CHAT_TAB
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
+import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.chats.components.ChatExplorerListItemView
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import mega.privacy.android.shared.resources.R as sharedR
@@ -108,7 +111,7 @@ private fun EmptyView(
             .padding(top = 8.dp),
     ) {
         NewGroupChatItemView(onClick = onNewGroupChatClick)
-        data.noteToSelf?.let { item ->
+        data.items.noteToSelf?.let { item ->
             ChatExplorerItemView(
                 item = item,
                 isSelected = item.id in selectedChatIds,
@@ -144,7 +147,7 @@ private fun ChatExplorerList(
         item(key = "new_group_chat") {
             NewGroupChatItemView(onClick = onNewGroupChatClick)
         }
-        data.noteToSelf?.let { item ->
+        data.items.noteToSelf?.let { item ->
             item(key = "note_to_self:${item.id}") {
                 ChatExplorerItemView(
                     item = item,
@@ -156,18 +159,18 @@ private fun ChatExplorerList(
         item(key = "header:recent") {
             RecentChatsAndMeetingsHeaderItemView()
         }
-        items(items = data.recents, key = { "${it.id}" }) { item ->
+        items(items = data.items.recents, key = { "${it.id}" }) { item ->
             ChatExplorerItemView(
                 item = item,
                 isSelected = item.id in selectedChatIds,
                 onChatToggled = onChatToggled,
             )
         }
-        if (data.others.isNotEmpty()) {
+        if (data.items.others.isNotEmpty()) {
             item(key = "header:all") {
                 AllContactsChatsAndMeetingsHeaderItemView()
             }
-            items(items = data.others, key = { "${it.id}" }) { item ->
+            items(items = data.items.others, key = { "${it.id}" }) { item ->
                 ChatExplorerItemView(
                     item = item,
                     isSelected = item.id in selectedChatIds,
@@ -237,7 +240,12 @@ private fun NewGroupChatItemView(onClick: () -> Unit) {
 
 @Composable
 internal fun TabsScope.ChatExplorerTab(
+    shareTextToMegaNavKey: ShareTextToMegaNavKey?,
     selectionState: ChatExplorerSelectionState,
+    prepareChatsEvent: StateEvent,
+    onPrepareChatsConsumed: () -> Unit,
+    onChatsReadyToShare: (List<Long>) -> Unit,
+    onCloseExplorerScreen: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     monitorResult: (String) -> Flow<Any?>,
     clearResult: (String) -> Unit,
@@ -249,8 +257,14 @@ internal fun TabsScope.ChatExplorerTab(
     val coroutineScope = rememberCoroutineScope()
     val newChatCreatedEvent =
         (uiState as? ChatExplorerUiState.Data)?.newChatCreatedEvent ?: consumed()
+    val chatsReadyToShareEvent =
+        (uiState as? ChatExplorerUiState.Data)?.chatsReadyToShareEvent ?: consumed()
     val newGroupChatResult by monitorResult(CreateGroupChatNavKey.KEY)
         .collectAsStateWithLifecycle(initialValue = null)
+    val onSharedToChats = rememberOnSharedToChats(
+        onNavigate = onNavigate,
+        onCloseExplorerScreen = onCloseExplorerScreen,
+    )
 
     LaunchedEffect(newGroupChatResult) {
         (newGroupChatResult as? CreateGroupChatNavKey.NewGroupChatResult)?.let { result ->
@@ -271,6 +285,27 @@ internal fun TabsScope.ChatExplorerTab(
                 resources.getString(sharedR.string.general_new_group_chat_created)
             )
         }
+    }
+
+    EventEffect(
+        event = chatsReadyToShareEvent,
+        onConsumed = viewModel::onChatsReadyToShareConsumed,
+    ) { chatIds ->
+        if (shareTextToMegaNavKey != null) {
+            onSharedToChats(chatIds)
+        } else {
+            onChatsReadyToShare(chatIds)
+        }
+    }
+
+    EventEffect(
+        event = prepareChatsEvent,
+        onConsumed = onPrepareChatsConsumed,
+    ) {
+        viewModel.prepareChatsForSharing(
+            selectedIds = selectionState.selectedChatIds.toList(),
+            message = shareTextToMegaNavKey?.buildMessageToShare(resources),
+        )
     }
 
     addTextTabWithScrollableContent(
@@ -315,53 +350,64 @@ private fun SectionHeaderItemView(text: String) {
     }
 }
 
+private fun ShareTextToMegaNavKey.buildMessageToShare(resources: Resources): String {
+    val emailLine = email?.let {
+        "${resources.getString(sharedR.string.new_file_email_when_uploading)}: $it\n\n"
+    }.orEmpty()
+    return "${subject.orEmpty()}\n\n$emailLine$text"
+}
+
 @CombinedThemePreviews
 @Composable
 private fun ChatExplorerContentPreview() {
     AndroidThemeForPreviews {
         ChatExplorerContent(
             uiState = ChatExplorerUiState.Data(
-                noteToSelf = ChatExplorerUiItem.NoteToSelf(
-                    id = 10L,
-                    isHint = false,
-                    isSelected = false,
-                    isEnabled = true,
-                    isArchived = false,
-                    lastTimestamp = 0L,
-                ),
-                recents = listOf(
-                    ChatExplorerUiItem.OneToOneChat(
-                        id = 11L,
-                        contactName = "Elijah Moore",
-                        primaryColor = Color(0xFFE65100),
-                        secondaryColor = Color(0xFFFFB74D),
-                        userStatus = ChatStatus.Online,
-                        isSelected = true,
-                        isEnabled = true,
-                        isArchived = false,
-                        lastTimestamp = 0L,
-                    ),
-                    ChatExplorerUiItem.GroupChat(
-                        id = 12L,
-                        title = "Design Team",
-                        participants = 8,
+                items = ChatExplorerUiState.Items(
+                    noteToSelf = ChatExplorerUiItem.NoteToSelf(
+                        id = 10L,
+                        isHint = false,
                         isSelected = false,
                         isEnabled = true,
                         isArchived = false,
                         lastTimestamp = 0L,
                     ),
-                ),
-                others = listOf(
-                    ChatExplorerUiItem.Contact(
-                        id = 14L,
-                        contactName = "Brielle Nguyen",
-                        primaryColor = Color(0xFF7CB342),
-                        secondaryColor = Color(0xFFC5E1A5),
-                        userStatus = ChatStatus.Busy,
-                        isSelected = false,
-                        isEnabled = true,
+                    recents = listOf(
+                        ChatExplorerUiItem.OneToOneChat(
+                            id = 11L,
+                            contactName = "Elijah Moore",
+                            primaryColor = Color(0xFFE65100),
+                            secondaryColor = Color(0xFFFFB74D),
+                            userStatus = ChatStatus.Online,
+                            isSelected = true,
+                            isEnabled = true,
+                            isArchived = false,
+                            lastTimestamp = 0L,
+                        ),
+                        ChatExplorerUiItem.GroupChat(
+                            id = 12L,
+                            title = "Design Team",
+                            participants = 8,
+                            isSelected = false,
+                            isEnabled = true,
+                            isArchived = false,
+                            lastTimestamp = 0L,
+                        ),
                     ),
+                    others = listOf(
+                        ChatExplorerUiItem.Contact(
+                            id = 14L,
+                            contactName = "Brielle Nguyen",
+                            primaryColor = Color(0xFF7CB342),
+                            secondaryColor = Color(0xFFC5E1A5),
+                            userStatus = ChatStatus.Busy,
+                            isSelected = false,
+                            isEnabled = true,
+                        ),
+                    )
                 ),
+                newChatCreatedEvent = consumed(),
+                chatsReadyToShareEvent = consumed(),
             ),
             selectedChatIds = setOf(11L),
             onNewGroupChatClick = {},
@@ -389,16 +435,20 @@ private fun ChatExplorerEmptyListPreview() {
     AndroidThemeForPreviews {
         ChatExplorerContent(
             uiState = ChatExplorerUiState.Data(
-                noteToSelf = ChatExplorerUiItem.NoteToSelf(
-                    id = 10L,
-                    isHint = false,
-                    isSelected = false,
-                    isEnabled = true,
-                    isArchived = false,
-                    lastTimestamp = 0L,
+                items = ChatExplorerUiState.Items(
+                    noteToSelf = ChatExplorerUiItem.NoteToSelf(
+                        id = 10L,
+                        isHint = false,
+                        isSelected = false,
+                        isEnabled = true,
+                        isArchived = false,
+                        lastTimestamp = 0L,
+                    ),
+                    recents = emptyList(),
+                    others = emptyList()
                 ),
-                recents = emptyList(),
-                others = emptyList(),
+                newChatCreatedEvent = consumed(),
+                chatsReadyToShareEvent = consumed(),
             ),
             selectedChatIds = emptySet(),
             onNewGroupChatClick = {},

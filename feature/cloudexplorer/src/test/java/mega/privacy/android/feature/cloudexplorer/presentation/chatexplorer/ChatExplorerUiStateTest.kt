@@ -2,6 +2,7 @@ package mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer
 
 import androidx.compose.ui.graphics.Color
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import org.junit.jupiter.api.Test
@@ -12,7 +13,7 @@ internal class ChatExplorerUiStateTest {
 
     @Test
     fun `test that Data is empty when recents and others are both empty`() {
-        val data = ChatExplorerUiState.Data(
+        val data = dataWithItems(
             noteToSelf = null,
             recents = emptyList(),
             others = emptyList(),
@@ -23,7 +24,7 @@ internal class ChatExplorerUiStateTest {
 
     @Test
     fun `test that Data is not empty when recents has items`() {
-        val data = ChatExplorerUiState.Data(
+        val data = dataWithItems(
             noteToSelf = null,
             recents = listOf(groupChat(id = 1L)),
             others = emptyList(),
@@ -34,7 +35,7 @@ internal class ChatExplorerUiStateTest {
 
     @Test
     fun `test that Data is not empty when others has items`() {
-        val data = ChatExplorerUiState.Data(
+        val data = dataWithItems(
             noteToSelf = null,
             recents = emptyList(),
             others = listOf(groupChat(id = 1L)),
@@ -45,7 +46,7 @@ internal class ChatExplorerUiStateTest {
 
     @Test
     fun `test that Data is empty even when only noteToSelf is present`() {
-        val data = ChatExplorerUiState.Data(
+        val data = dataWithItems(
             noteToSelf = noteToSelf(id = 10L),
             recents = emptyList(),
             others = emptyList(),
@@ -53,6 +54,20 @@ internal class ChatExplorerUiStateTest {
 
         assertThat(data.isEmpty).isTrue()
     }
+
+    private fun dataWithItems(
+        noteToSelf: ChatExplorerUiItem?,
+        recents: List<ChatExplorerUiItem>,
+        others: List<ChatExplorerUiItem>,
+    ) = ChatExplorerUiState.Data(
+        items = ChatExplorerUiState.Items(
+            noteToSelf = noteToSelf,
+            recents = recents,
+            others = others,
+        ),
+        newChatCreatedEvent = consumed(),
+        chatsReadyToShareEvent = consumed(),
+    )
 
     @Test
     fun `test that withSelected updates NoteToSelf isSelected flag`() {

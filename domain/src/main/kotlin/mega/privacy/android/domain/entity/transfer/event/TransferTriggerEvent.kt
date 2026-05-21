@@ -41,9 +41,9 @@ sealed interface TransferTriggerEvent {
         override val checkPausedTransfers get() = CheckPausedTransfersType.OncePerPausedState
 
         /**
-         * The id of the chat where these files will be attached
+         * The ids of the chats where these files will be attached
          */
-        val chatId: Long
+        val chatIds: List<Long>
 
         /**
          * List of files to be uploaded
@@ -61,7 +61,7 @@ sealed interface TransferTriggerEvent {
          * Upload files to chat
          */
         data class Files(
-            override val chatId: Long,
+            override val chatIds: List<Long>,
             override val uris: List<UriPath>,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
             override val pitagTrigger: PitagTrigger,
@@ -75,10 +75,11 @@ sealed interface TransferTriggerEvent {
          *
          */
         data class VoiceClip(
-            override val chatId: Long,
+            val chatId: Long,
             val file: File,
             override val waitNotificationPermissionResponseToStart: Boolean = false,
         ) : StartChatUpload {
+            override val chatIds = listOf(chatId)
             override val uris get() = listOf(UriPath(file.absolutePath))
             override val isVoiceClip = true
             override val pitagTrigger = PitagTrigger.VoiceClip

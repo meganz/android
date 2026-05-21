@@ -19,6 +19,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
@@ -47,6 +49,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.Nod
 import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
+import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -67,7 +70,10 @@ internal fun ExplorerScreen(
     tabIndex: Int = CLOUD_TAB_INDEX,
     onFolderPicked: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
-    onChatsSelected: (List<Long>) -> Unit = {},
+    onChatsSelected: () -> Unit = {},
+    prepareChatsEvent: StateEvent = consumed,
+    onPrepareChatsConsumed: () -> Unit = {},
+    onChatsReadyToShare: (List<Long>) -> Unit = {},
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
 ) {
@@ -129,7 +135,7 @@ internal fun ExplorerScreen(
                     protectedUserTap {
                         when {
                             explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX ->
-                                onChatsSelected(chatExplorerSelectionState.selectedChatIds.toList())
+                                onChatsSelected()
 
                             explorerMode.isFolderPicker ->
                                 onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
@@ -208,7 +214,12 @@ internal fun ExplorerScreen(
                 }
                 if (!isInnerNavigation && explorerMode.isChatAvailable) {
                     ChatExplorerTab(
+                        shareTextToMegaNavKey = startNavKey as? ShareTextToMegaNavKey,
                         selectionState = chatExplorerSelectionState,
+                        prepareChatsEvent = prepareChatsEvent,
+                        onPrepareChatsConsumed = onPrepareChatsConsumed,
+                        onChatsReadyToShare = onChatsReadyToShare,
+                        onCloseExplorerScreen = onCloseExplorerScreen,
                         onNavigate = onNavigate,
                         monitorResult = monitorResult,
                         clearResult = clearResult,
