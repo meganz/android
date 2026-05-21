@@ -1,494 +1,300 @@
 package mega.privacy.android.app.presentation.videoplayer.view
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.launch
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.components.button.TextOnlyButton
+import mega.android.core.ui.components.inputfields.SearchInputField
+import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.text.SpannableText
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.SelectSubtitleFileViewModel
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
-import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
-import mega.privacy.android.app.presentation.videoplayer.view.Constants.EMPTY_LIST_TEST_TAG
-import mega.privacy.android.app.presentation.videoplayer.view.Constants.EMPTY_TOP_BAR_TEST_TAG
-import mega.privacy.android.app.presentation.videoplayer.view.Constants.PROGRESS_TEST_TAG
-import mega.privacy.android.app.presentation.videoplayer.view.Constants.SELECTED_TOP_BAR_TEST_TAG
-import mega.privacy.android.app.presentation.videoplayer.view.Constants.SUBTITLE_FILES_TEST_TAG
-import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerSubtitleUiState
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.legacy.core.ui.controls.appbar.LegacySearchAppBar
-import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
-import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
+import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchEmptyView
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
-import timber.log.Timber
 
-internal object Constants {
-    /**
-     * Test tag for progress indicator
-     */
-    const val PROGRESS_TEST_TAG = "progress_test_tag"
-
-    /**
-     * Test tag for empty top bar
-     */
-    const val EMPTY_TOP_BAR_TEST_TAG = "empty_top_bar_test_tag"
-
-    /**
-     * Test tag for subtitle files is empty
-     */
-    const val EMPTY_LIST_TEST_TAG = "empty_list_test_tag"
-
-    /**
-     * Test tag for subtitle files
-     */
-    const val SUBTITLE_FILES_TEST_TAG = "subtitle_files_test_tag"
-
-    /**
-     * Test tag for selected top bar
-     */
-    const val SELECTED_TOP_BAR_TEST_TAG = "selected_top_bar_test_tag"
-}
-
-/**
- * The compose for select subtitle file
- *
- * @param onAddSubtitle the function for added subtitle
- * @param onBackPressed the function for back button pressed
- */
 @Composable
 internal fun VideoPlayerSelectSubtitleView(
-    viewModel: SelectSubtitleFileViewModel = hiltViewModel(),
+    uiState: VideoPlayerSubtitleUiState,
+    onLoadSubtitleList: suspend () -> Unit,
+    onSearchTextChange: (String) -> Unit,
+    onItemClicked: (SubtitleFileInfo) -> Unit,
+    onClearSelectedItem: () -> Unit,
     onAddSubtitle: (SubtitleFileInfo?) -> Unit,
     onBackPressed: () -> Unit,
 ) {
-    val selectedSubtitleFileInfo by viewModel.getSelectedSubtitleFileInfoFlow()
-        .collectAsStateWithLifecycle()
-    val query by viewModel.getQueryStateFlow().collectAsStateWithLifecycle()
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
-
     LaunchedEffect(Unit) {
-        viewModel.getSubtitleFileInfoList()
+        onLoadSubtitleList()
     }
 
     BackHandler {
         when {
-            viewModel.searchState == SearchWidgetState.EXPANDED -> viewModel.closeSearch()
-            selectedSubtitleFileInfo != null -> viewModel.clearSelectedItem()
+            uiState.selectedSubtitleFileInfo != null -> onClearSelectedItem()
             else -> onBackPressed()
         }
     }
 
     SelectSubtitleView(
         uiState = uiState,
-        searchState = viewModel.searchState,
-        query = query,
-        selectedSubtitleFileInfo = selectedSubtitleFileInfo,
-        onSearchTextChange = viewModel::searchQuery,
-        onCloseClicked = viewModel::closeSearch,
-        onSearchClicked = viewModel::searchWidgetStateUpdate,
-        itemClicked = viewModel::itemClickedUpdate,
+        onSearchTextChange = onSearchTextChange,
+        itemClicked = onItemClicked,
         onAddSubtitle = onAddSubtitle,
-        onBackPressed = onBackPressed
+        onBackPressed = onBackPressed,
     )
 }
 
-/**
- * Select subtitle view
- *
- * @param uiState SubtitleLoadState
- * @param searchState SearchWidgetState
- * @param query search strings
- * @param selectedSubtitleFileInfo selected SubtitleFileInfo
- * @param onSearchTextChange the function for search test changed
- * @param onCloseClicked the function for close clicked
- * @param onSearchClicked the function for search clicked
- * @param itemClicked the function for item clicked
- * @param onAddSubtitle the function after added subtitle
- * @param onBackPressed the function for back button pressed
- */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SelectSubtitleView(
-    uiState: SubtitleLoadState,
-    searchState: SearchWidgetState,
-    query: String?,
-    selectedSubtitleFileInfo: SubtitleFileInfo?,
+    uiState: VideoPlayerSubtitleUiState,
     onSearchTextChange: (String) -> Unit,
-    onCloseClicked: () -> Unit,
-    onSearchClicked: () -> Unit,
     itemClicked: (SubtitleFileInfo) -> Unit,
     onAddSubtitle: (SubtitleFileInfo?) -> Unit,
     onBackPressed: () -> Unit,
 ) {
-    val isEmpty = uiState is SubtitleLoadState.Empty
-    val isLoading = uiState is SubtitleLoadState.Loading
-    var items = emptyList<SubtitleFileInfoItem>()
-    var accountType: AccountType? by remember {
-        mutableStateOf(null)
-    }
-    var isBusinessAccountExpired by remember {
-        mutableStateOf(false)
-    }
+    val isLoading = uiState.isLoading
+    val items = uiState.items
+    val query = uiState.query
+    val selectedSubtitleFileInfo = uiState.selectedSubtitleFileInfo
 
-    if (uiState is SubtitleLoadState.Success) {
-        items = uiState.items
-        accountType = uiState.accountType
-        isBusinessAccountExpired = uiState.isBusinessAccountExpired
-    }
-    Scaffold(
-        modifier = Modifier.systemBarsPadding(),
+    MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
-            when {
-                (isEmpty || isLoading) && searchState != SearchWidgetState.EXPANDED ->
-                    EmptyTopBar {
-                        onBackPressed()
-                    }
+            MegaTopAppBar(
+                modifier = Modifier.testTag(VIDEO_PLAYER_SELECT_SUBTITLE_SEARCH_BAR_TEST_TAG),
+                navigationType = AppBarNavigationType.Back(onBackPressed),
+                title = stringResource(R.string.media_player_video_select_subtitle_file_title),
+            )
+        },
+        bottomBar = {
+            if (items.isNotEmpty()) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    MegaDivider(dividerType = DividerType.FullSize)
 
-                selectedSubtitleFileInfo != null ->
-                    SelectedTopBar {
-                        onBackPressed()
-                    }
+                    PrimaryFilledButton(
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag(VIDEO_PLAYER_SELECT_SUBTITLE_ADD_BUTTON_TEST_TAG),
+                        text = stringResource(id = sharedR.string.video_player_subtitles_add_subtitles_button),
+                        onClick = { onAddSubtitle(selectedSubtitleFileInfo) },
+                        enabled = selectedSubtitleFileInfo != null
+                    )
 
-                else -> LegacySearchAppBar(
-                    searchWidgetState = searchState,
-                    typedSearch = query ?: "",
-                    onSearchTextChange = onSearchTextChange,
-                    onCloseClicked = onCloseClicked,
-                    onBackPressed = onBackPressed,
-                    onSearchClicked = onSearchClicked,
-                    elevation = false,
-                    title = stringResource(R.string.media_player_video_select_subtitle_file_title),
-                    hintId = R.string.hint_action_search,
-                    isHideAfterSearch = true
-                )
+                    TextOnlyButton(
+                        modifier = Modifier
+                            .padding(bottom = 48.dp)
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag(VIDEO_PLAYER_SELECT_SUBTITLE_CANCEL_BUTTON_TEST_TAG),
+                        text = stringResource(id = sharedR.string.general_dialog_cancel_button),
+                        onClick = onBackPressed,
+                    )
+                }
             }
-        }) { innerPadding ->
+        },
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(color = colorResource(id = R.color.white_dark_grey)),
+                .padding(paddingValues)
+                .fillMaxSize(),
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Box(
+            if (items.isNotEmpty() || query?.isNotEmpty() == true) {
+                SearchInputField(
                     modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    when {
-                        isLoading -> Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
-                            content = {
-                                MegaCircularProgressIndicator(
-                                    modifier = Modifier
-                                        .size(44.dp)
-                                        .testTag(PROGRESS_TEST_TAG),
-                                )
-                            },
-                        )
-
-                        isEmpty || items.isEmpty() -> SubtitleEmptyView(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .testTag(EMPTY_LIST_TEST_TAG),
-                            isSearchMode = searchState == SearchWidgetState.EXPANDED
-                        )
-
-                        else -> SubtitleFileInfoListView(
-                            subtitleInfoList = items,
-                            accountType = accountType,
-                            isBusinessAccountExpired = isBusinessAccountExpired,
-                        ) { index ->
-                            itemClicked(index)
-                        }
-                    }
-                }
+                        .padding(horizontal = 16.dp)
+                        .testTag(VIDEO_PLAYER_SELECT_SUBTITLE_SEARCH_INPUT_TEST_TAG),
+                    text = query ?: "",
+                    placeHolderText = stringResource(id = R.string.hint_action_search),
+                    onValueChanged = onSearchTextChange,
+                    capitalization = KeyboardCapitalization.None,
+                )
             }
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
-            ) {
-                Button(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 24.dp),
-                    elevation = null,
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                    onClick = onBackPressed
-                ) {
-                    Text(
-                        text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                        color = colorResource(id = R.color.grey_060_white_060)
+
+            Box(modifier = Modifier.weight(1f)) {
+                when {
+                    isLoading -> Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                        content = {
+                            MegaCircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .testTag(VIDEO_PLAYER_SELECT_SUBTITLE_PROGRESS_TEST_TAG),
+                            )
+                        },
+                    )
+
+                    items.isEmpty() && query.isNullOrEmpty() -> EmptyStateView(
+                        modifier = Modifier.padding(horizontal = 36.dp).testTag(
+                            VIDEO_PLAYER_SELECT_SUBTITLE_EMPTY_LIST_TEST_TAG
+                        ),
+                        title = stringResource(id = R.string.media_player_video_select_subtitle_file_empty_message),
+                        description = SpannableText(stringResource(sharedR.string.video_player_subtitles_empty_hint_description)),
+                        imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
+                    )
+
+                    items.isEmpty() -> SearchEmptyView(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYER_SELECT_SUBTITLE_SEARCH_EMPTY_TEST_TAG
+                        )
+                    )
+
+                    else -> SubtitleFileInfoListView(
+                        modifier = Modifier
+                            .testTag(VIDEO_PLAYER_SELECT_SUBTITLE_FILES_TEST_TAG)
+                            .fillMaxSize(),
+                        subtitleInfoList = items,
+                        hiddenNodesEnabled = uiState.hiddenNodesEnabled,
+                        onClicked = itemClicked,
                     )
                 }
+            }
+        }
+    }
+}
 
-                Button(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 24.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        backgroundColor = colorResource(id = R.color.teal_300_teal_200),
-                        disabledBackgroundColor = colorResource(id = R.color.grey_038_white_038)
+/** Test tag for the loading progress indicator */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_PROGRESS_TEST_TAG =
+    "video_player_select_subtitle:progress"
+
+/** Test tag for the empty state view shown when no subtitle files are available */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_EMPTY_LIST_TEST_TAG =
+    "video_player_select_subtitle:empty_list"
+
+/** Test tag for the subtitle file list */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_FILES_TEST_TAG =
+    "video_player_select_subtitle:files"
+
+/** Test tag for the top app bar */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_SEARCH_BAR_TEST_TAG =
+    "video_player_select_subtitle:search_bar"
+
+/** Test tag for the search input field */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_SEARCH_INPUT_TEST_TAG =
+    "video_player_select_subtitle:search_input"
+
+/** Test tag for the add subtitles button */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_ADD_BUTTON_TEST_TAG =
+    "video_player_select_subtitle:add_button"
+
+/** Test tag for the cancel button */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_CANCEL_BUTTON_TEST_TAG =
+    "video_player_select_subtitle:cancel_button"
+
+/** Test tag for the empty state view shown when search yields no results */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_SEARCH_EMPTY_TEST_TAG =
+    "video_player_select_subtitle:search_empty"
+
+/** Test tag for the checkbox on a selected subtitle item */
+const val VIDEO_PLAYER_SELECT_SUBTITLE_ITEM_CHECKBOX_TEST_TAG =
+    "video_player_select_subtitle:item_checkbox"
+
+private val previewSubtitleFileInfo = SubtitleFileInfo(
+    id = 1L,
+    name = "subtitle.srt",
+    url = null,
+    parentName = "Movies",
+    isMarkedSensitive = false,
+    isSensitiveInherited = false,
+)
+
+@CombinedThemePreviews
+@Composable
+private fun SelectSubtitleViewLoadingPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        SelectSubtitleView(
+            uiState = VideoPlayerSubtitleUiState(isLoading = true),
+            onSearchTextChange = {},
+            itemClicked = {},
+            onAddSubtitle = {},
+            onBackPressed = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SelectSubtitleViewEmptyPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        SelectSubtitleView(
+            uiState = VideoPlayerSubtitleUiState(isLoading = false),
+            onSearchTextChange = {},
+            itemClicked = {},
+            onAddSubtitle = {},
+            onBackPressed = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SelectSubtitleViewSearchEmptyPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        SelectSubtitleView(
+            uiState = VideoPlayerSubtitleUiState(isLoading = false, query = "no match"),
+            onSearchTextChange = {},
+            itemClicked = {},
+            onAddSubtitle = {},
+            onBackPressed = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SelectSubtitleViewWithItemsPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        SelectSubtitleView(
+            uiState = VideoPlayerSubtitleUiState(
+                isLoading = false,
+                items = listOf(
+                    SubtitleFileInfoItem(subtitleFileInfo = previewSubtitleFileInfo),
+                    SubtitleFileInfoItem(
+                        subtitleFileInfo = previewSubtitleFileInfo.copy(
+                            id = 2L,
+                            name = "subtitles_extended.srt",
+                            parentName = "Downloads",
+                        ),
+                        selected = true,
                     ),
-                    onClick = {
-                        onAddSubtitle(selectedSubtitleFileInfo)
-                    },
-                    enabled = items.firstOrNull { it.selected } != null
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.media_player_video_select_subtitle_file_button_add_subtitles),
-                        color = colorResource(id = R.color.white_dark_grey)
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
- * The item view of subtitle file info list
- *
- * @param subtitleFileInfoItem [SubtitleFileInfoItem]
- * @param onSubtitleFileInfoClicked the callback for subtitle file info item is clicked
- */
-@Composable
-internal fun SubtitleFileInfoListItem(
-    subtitleFileInfoItem: SubtitleFileInfoItem,
-    accountType: AccountType?,
-    isBusinessAccountExpired: Boolean,
-    onSubtitleFileInfoClicked: (SubtitleFileInfo) -> Unit,
-) {
-    val rotation = remember { Animatable(0f) }
-    val scope = rememberCoroutineScope()
-    Column(
-        modifier = Modifier
-            .clickable {
-                if (!subtitleFileInfoItem.selected) {
-                    scope.launch {
-                        rotation.animateTo(
-                            targetValue = 180f,
-                            animationSpec = tween(100, easing = LinearEasing)
-                        )
-                        rotation.snapTo(0f)
-                    }
-                }
-                onSubtitleFileInfoClicked(subtitleFileInfoItem.subtitleFileInfo)
-            }
-            .alpha(1f.takeIf {
-                !isSensitive(accountType, isBusinessAccountExpired, subtitleFileInfoItem)
-            } ?: 0.5f)
-    ) {
-        Row {
-            Image(
-                painter = painterResource(
-                    id = if (subtitleFileInfoItem.selected) {
-                        R.drawable.ic_select_thumbnail
-                    } else {
-                        IconPackR.drawable.ic_text_medium_solid
-                    }
                 ),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(width = 36.dp, height = 40.dp)
-                    .align(Alignment.CenterVertically)
-                    .graphicsLayer {
-                        rotationY = rotation.value
-                    }
-                    .blur(16.dp.takeIf {
-                        isSensitive(
-                            accountType,
-                            isBusinessAccountExpired,
-                            subtitleFileInfoItem
-                        )
-                    } ?: 0.dp)
-            )
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.CenterVertically)
-            ) {
-                Text(
-                    text = subtitleFileInfoItem.subtitleFileInfo.name,
-                    fontSize = 20.sp,
-                    color = colorResource(id = R.color.grey_087_white_087)
-                )
-                Text(
-                    text = subtitleFileInfoItem.subtitleFileInfo.parentName ?: "",
-                    fontSize = 14.sp,
-                    color = colorResource(id = R.color.grey_054_white_054)
-                )
-            }
-        }
-        Divider(
-            color = colorResource(id = R.color.grey_300_alpha_026),
-            thickness = 1.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 52.dp),
-        )
-    }
-}
-
-@Composable
-private fun isSensitive(
-    accountType: AccountType?,
-    isBusinessAccountExpired: Boolean,
-    subtitleFileInfoItem: SubtitleFileInfoItem,
-) = (accountType?.isPaid == true && !isBusinessAccountExpired
-        && (subtitleFileInfoItem.subtitleFileInfo.isMarkedSensitive
-        || subtitleFileInfoItem.subtitleFileInfo.isSensitiveInherited))
-
-/**
- * The empty view of subtitle
- */
-@Composable
-internal fun SubtitleEmptyView(
-    modifier: Modifier,
-    isSearchMode: Boolean,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = if (isSearchMode) {
-                painterResource(id = R.drawable.ic_no_search_results)
-            } else {
-                painterResource(id = R.drawable.ic_subtitles_empty)
-            },
-            contentDescription = null,
-        )
-        Text(
-            text = stringResource(
-                id = if (isSearchMode) {
-                    R.string.no_results_found
-                } else {
-                    R.string.media_player_video_select_subtitle_file_empty_message
-                }
+                selectedSubtitleFileInfo = previewSubtitleFileInfo,
             ),
-            color = colorResource(id = R.color.grey_300)
+            onSearchTextChange = {},
+            itemClicked = {},
+            onAddSubtitle = {},
+            onBackPressed = {},
         )
     }
-}
-
-/**
- * The list view for subtitle file info list
- *
- * @param subtitleInfoList subtitle file info list
- * @param onClicked the callback for item clicked
- */
-@Composable
-internal fun SubtitleFileInfoListView(
-    subtitleInfoList: List<SubtitleFileInfoItem>,
-    accountType: AccountType?,
-    isBusinessAccountExpired: Boolean,
-    onClicked: (SubtitleFileInfo) -> Unit,
-) {
-    Timber.d("render SubtitleFileInfoListView")
-    LazyColumn(
-        modifier = Modifier.testTag(SUBTITLE_FILES_TEST_TAG),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-    ) {
-        itemsIndexed(
-            items = subtitleInfoList,
-            key = { _, item -> item.subtitleFileInfo.id },
-            itemContent = { _, item ->
-                SubtitleFileInfoListItem(
-                    subtitleFileInfoItem = item,
-                    accountType = accountType,
-                    isBusinessAccountExpired = isBusinessAccountExpired,
-                    onSubtitleFileInfoClicked = onClicked
-                )
-            })
-    }
-}
-
-@Composable
-internal fun SelectedTopBar(
-    onBackPressedCallback: () -> Unit,
-) {
-    SelectModeAppBar(
-        modifier = Modifier.testTag(SELECTED_TOP_BAR_TEST_TAG),
-        title = "1",
-        onNavigationPressed = onBackPressedCallback
-    )
-}
-
-@Composable
-internal fun EmptyTopBar(
-    onBackPressedCallback: () -> Unit,
-) {
-    TopAppBar(
-        modifier = Modifier.testTag(EMPTY_TOP_BAR_TEST_TAG),
-        title = {
-            Text(
-                text = stringResource(id = R.string.media_player_video_select_subtitle_file_title),
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackPressedCallback) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back button"
-                )
-            }
-        },
-        backgroundColor = MaterialTheme.colors.surface,
-        elevation = 0.dp
-    )
 }
 
