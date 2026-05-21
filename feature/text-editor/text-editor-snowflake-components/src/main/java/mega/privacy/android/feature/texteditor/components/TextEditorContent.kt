@@ -323,7 +323,6 @@ private fun EditableChunkItem(
             )
         },
     ) {
-        // TODO: revisit accessibility — clearAndSetSemantics strips TalkBack from editor chunks
         val cursorColor = DSTokens.colors.text.primary
         BasicTextField(
             state = textFieldState,
@@ -334,8 +333,7 @@ private fun EditableChunkItem(
                 .then(
                     if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier,
                 )
-                .onFocusChanged { if (it.isFocused) onFocused() }
-                .clearAndSetSemantics { },
+                .onFocusChanged { if (it.isFocused) onFocused() },
             lineLimits = TextFieldLineLimits.MultiLine(),
             onTextLayout = { getResult -> layoutResultState.value = getResult() },
         )
