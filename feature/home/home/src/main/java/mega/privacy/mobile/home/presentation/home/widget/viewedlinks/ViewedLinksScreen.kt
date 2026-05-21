@@ -44,7 +44,8 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.components.list.OneLineListItem
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.surface.BoxSurface
@@ -56,6 +57,7 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -402,9 +404,8 @@ private fun ViewedLinkListItem(
             .testTag(VIEWED_LINKS_ITEM_TEST_TAG),
         surfaceColor = if (isSelected) SurfaceColor.Surface1 else SurfaceColor.PageBackground
     ) {
-        OneLineListItem(
+        GenericListItem(
             modifier = Modifier.fillMaxWidth(),
-            text = item.viewedLink.name,
             leadingElement = {
                 NodeThumbnailView(
                     modifier = Modifier.size(32.dp),
@@ -414,6 +415,29 @@ private fun ViewedLinkListItem(
                     contentDescription = "Thumbnail",
                 )
             },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    MegaText(
+                        text = item.viewedLink.name,
+                        overflow = TextOverflow.MiddleEllipsis,
+                        maxLines = 1,
+                        style = AppTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    MegaIcon(
+                        imageVector = IconPack.Medium.Thin.Outline.Link01,
+                        contentDescription = "Link",
+                        modifier = Modifier
+                            .size(16.dp)
+                            .testTag(VIEWED_LINKS_LIST_ITEM_LINK_ICON_TAG),
+                        tint = IconColor.Secondary,
+                    )
+                }
+            },
+            subtitle = {},
             onLongClickListener = onLongClick,
             onClickListener = onClick,
             trailingElement = if (isInSelectionMode) {
@@ -472,6 +496,24 @@ private fun ViewedLinkGridItem(
                 contentDescription = item.viewedLink.name,
                 contentScale = ContentScale.Crop,
             )
+            BoxSurface(
+                surfaceColor = SurfaceColor.SurfaceTransparent,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .testTag(VIEWED_LINKS_GRID_ITEM_LINK_ICON_TAG),
+                contentAlignment = Alignment.Center,
+            ) {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.Link01,
+                    tint = IconColor.OnColor,
+                    contentDescription = "Link",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .padding(4.dp),
+                )
+            }
         }
 
         Row(
@@ -511,6 +553,8 @@ internal const val VIEWED_LINKS_GRID_ITEM_TEST_TAG = "viewed_links:grid_item"
 internal const val VIEWED_LINKS_SELECTION_TOOLBAR_TAG = "viewed_links:selection_toolbar"
 internal const val VIEWED_LINKS_ITEM_CHECKBOX_TAG = "viewed_links:item_checkbox"
 internal const val VIEWED_LINKS_GRID_ITEM_CHECKBOX_TAG = "viewed_links:grid_item_checkbox"
+internal const val VIEWED_LINKS_LIST_ITEM_LINK_ICON_TAG = "viewed_links:list_item_link_icon"
+internal const val VIEWED_LINKS_GRID_ITEM_LINK_ICON_TAG = "viewed_links:grid_item_link_icon"
 internal const val DELETE_SELECTED_DIALOG_TAG = "viewed_links:delete_selected_dialog"
 internal const val DELETE_SELECTED_ACTION_TAG = "viewed_links:delete_selected_action"
 internal const val SORT_HEADER_KEY = "viewed_links:sort_header"

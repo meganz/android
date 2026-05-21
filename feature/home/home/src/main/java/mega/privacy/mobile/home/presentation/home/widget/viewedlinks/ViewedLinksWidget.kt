@@ -2,6 +2,7 @@ package mega.privacy.mobile.home.presentation.home.widget.viewedlinks
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -25,7 +27,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
-import mega.android.core.ui.components.list.OneLineListItem
+import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
@@ -144,11 +146,10 @@ internal fun ViewedLinksView(
                 val visibleCount = minOf(lazyItems.itemCount, MAX_VISIBLE_VIEWED_LINK)
                 for (index in 0 until visibleCount) {
                     val item = lazyItems[index] ?: continue
-                    OneLineListItem(
+                    GenericListItem(
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag(VIEWED_LINKS_ITEM_TEST_TAG),
-                        text = item.viewedLink.name,
                         leadingElement = {
                             NodeThumbnailView(
                                 modifier = Modifier.size(32.dp),
@@ -158,6 +159,29 @@ internal fun ViewedLinksView(
                                 contentDescription = "Thumbnail",
                             )
                         },
+                        title = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            ) {
+                                MegaText(
+                                    text = item.viewedLink.name,
+                                    overflow = TextOverflow.MiddleEllipsis,
+                                    maxLines = 1,
+                                    style = AppTheme.typography.bodyLarge,
+                                    modifier = Modifier.weight(1f, fill = false),
+                                )
+                                MegaIcon(
+                                    imageVector = IconPack.Medium.Thin.Outline.Link01,
+                                    contentDescription = "Link",
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .testTag(VIEWED_LINKS_LINK_ICON_TEST_TAG),
+                                    tint = IconColor.Secondary,
+                                )
+                            }
+                        },
+                        subtitle = {},
                         onClickListener = {
                             when (item.viewedLink.type) {
                                 RecentlyViewedLinkType.FolderLink -> onFolderLinkClicked(item.viewedLink.linkUrl)
@@ -239,3 +263,4 @@ internal fun ViewedLinksEmptyView(
 
 internal const val VIEWED_LINKS_TITLE_TEST_TAG = "viewed_links_widget:title"
 internal const val VIEWED_LINKS_EMPTY_TEXT_TEST_TAG = "viewed_links_widget:empty_text"
+internal const val VIEWED_LINKS_LINK_ICON_TEST_TAG = "viewed_links_widget:link_icon"
