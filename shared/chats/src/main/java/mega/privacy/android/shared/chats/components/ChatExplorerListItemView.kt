@@ -43,6 +43,7 @@ import java.io.File
 @Composable
 fun ChatExplorerListItemView(
     item: ChatExplorerUiItem,
+    isProcessingAction: Boolean,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -52,6 +53,7 @@ fun ChatExplorerListItemView(
                 modifier = modifier,
                 isSelected = item.isSelected,
                 isEnabled = item.isEnabled,
+                isProcessingAction = isProcessingAction,
                 isHint = item.isHint,
                 hasAvatarIcon = item.hasAvatarIcon,
                 icon = item.icon,
@@ -66,6 +68,7 @@ fun ChatExplorerListItemView(
                 modifier = modifier,
                 isSelected = item.isSelected,
                 isEnabled = item.isEnabled,
+                isProcessingAction = isProcessingAction,
                 hasAvatarIcon = item.hasAvatarIcon,
                 icon = item.icon,
                 title = item.title,
@@ -85,6 +88,7 @@ fun ChatExplorerListItemView(
             modifier = modifier,
             isSelected = item.isSelected,
             isEnabled = item.isEnabled,
+            isProcessingAction = isProcessingAction,
             title = item.contactName,
             subtitle = item.userStatus?.toSubtitleStringRes()?.let { stringResource(it) },
             avatarColor = item.avatarPrimaryColor,
@@ -116,6 +120,7 @@ fun ChatExplorerListItemView(
 internal fun ChatExplorerListItemView(
     isSelected: Boolean,
     isEnabled: Boolean,
+    isProcessingAction: Boolean,
     modifier: Modifier = Modifier,
     title: String? = null,
     subtitle: String? = null,
@@ -217,6 +222,7 @@ internal fun ChatExplorerListItemView(
             ) {
                 Checkbox(
                     checked = isSelected,
+                    enabled = if (isSelected) !isProcessingAction else true,
                     onCheckStateChanged = { },
                     tapTargetArea = false,
                     clickable = false,
@@ -262,6 +268,7 @@ private fun ChatExplorerListItemViewPreview(
     AndroidThemeForPreviews {
         ChatExplorerListItemView(
             item = item,
+            isProcessingAction = true,
             onItemClicked = {},
         )
     }

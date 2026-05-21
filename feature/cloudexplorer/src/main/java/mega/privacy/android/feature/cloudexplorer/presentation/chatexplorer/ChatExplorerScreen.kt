@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +42,7 @@ import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.tabs.TabsScope
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
+import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
@@ -58,6 +60,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 private fun ChatExplorerContent(
     uiState: ChatExplorerUiState,
+    isProcessingAction: Boolean,
     selectedChatIds: Set<Long>,
     onNewGroupChatClick: () -> Unit,
     onChatToggled: (chatId: Long) -> Unit,
@@ -76,6 +79,7 @@ private fun ChatExplorerContent(
         } else {
             ChatExplorerList(
                 data = uiState,
+                isProcessingAction = isProcessingAction,
                 selectedChatIds = selectedChatIds,
                 onNewGroupChatClick = onNewGroupChatClick,
                 onChatToggled = onChatToggled,
@@ -114,6 +118,7 @@ private fun EmptyView(
         data.items.noteToSelf?.let { item ->
             ChatExplorerItemView(
                 item = item,
+                isProcessingAction = false,
                 isSelected = item.id in selectedChatIds,
                 onChatToggled = onChatToggled,
             )
@@ -133,6 +138,7 @@ private fun EmptyView(
 @Composable
 private fun ChatExplorerList(
     data: ChatExplorerUiState.Data,
+    isProcessingAction: Boolean,
     selectedChatIds: Set<Long>,
     onNewGroupChatClick: () -> Unit,
     onChatToggled: (chatId: Long) -> Unit,
@@ -151,6 +157,7 @@ private fun ChatExplorerList(
             item(key = "note_to_self:${item.id}") {
                 ChatExplorerItemView(
                     item = item,
+                    isProcessingAction = isProcessingAction,
                     isSelected = item.id in selectedChatIds,
                     onChatToggled = onChatToggled,
                 )
@@ -162,6 +169,7 @@ private fun ChatExplorerList(
         items(items = data.items.recents, key = { "${it.id}" }) { item ->
             ChatExplorerItemView(
                 item = item,
+                isProcessingAction = isProcessingAction,
                 isSelected = item.id in selectedChatIds,
                 onChatToggled = onChatToggled,
             )
@@ -173,6 +181,7 @@ private fun ChatExplorerList(
             items(items = data.items.others, key = { "${it.id}" }) { item ->
                 ChatExplorerItemView(
                     item = item,
+                    isProcessingAction = isProcessingAction,
                     isSelected = item.id in selectedChatIds,
                     onChatToggled = onChatToggled,
                 )
@@ -184,6 +193,7 @@ private fun ChatExplorerList(
 @Composable
 private fun ChatExplorerItemView(
     item: ChatExplorerUiItem,
+    isProcessingAction: Boolean,
     isSelected: Boolean,
     onChatToggled: (chatId: Long) -> Unit,
 ) {
@@ -193,14 +203,17 @@ private fun ChatExplorerItemView(
     ChatExplorerListItemView(
         modifier = Modifier.testTag(CHAT_EXPLORER_ROW_TAG + item.id),
         item = item.withSelected(isSelected),
+        isProcessingAction = isProcessingAction,
         onItemClicked = {
-            if (item.isEnabled) {
-                onChatToggled(item.id)
-            } else {
-                coroutineScope.launch {
-                    snackbarHostState?.showAutoDurationSnackbar(
-                        resources.getString(sharedR.string.chat_explorer_read_only_chat_warning)
-                    )
+            if (!isProcessingAction) {
+                if (item.isEnabled) {
+                    onChatToggled(item.id)
+                } else {
+                    coroutineScope.launch {
+                        snackbarHostState?.showAutoDurationSnackbar(
+                            resources.getString(sharedR.string.chat_explorer_read_only_chat_warning)
+                        )
+                    }
                 }
             }
         },
@@ -242,6 +255,7 @@ private fun NewGroupChatItemView(onClick: () -> Unit) {
 internal fun TabsScope.ChatExplorerTab(
     shareTextToMegaNavKey: ShareTextToMegaNavKey?,
     selectionState: ChatExplorerSelectionState,
+    isProcessingAction: Boolean,
     prepareChatsEvent: StateEvent,
     onPrepareChatsConsumed: () -> Unit,
     onChatsReadyToShare: (List<Long>) -> Unit,
@@ -316,6 +330,7 @@ internal fun TabsScope.ChatExplorerTab(
     ) { _, modifier ->
         ChatExplorerContent(
             uiState = uiState,
+            isProcessingAction = isProcessingAction,
             selectedChatIds = selectionState.selectedChatIds,
             onNewGroupChatClick = { onNavigate(CreateGroupChatNavKey) },
             onChatToggled = selectionState::toggleSelection,
@@ -359,7 +374,9 @@ private fun ShareTextToMegaNavKey.buildMessageToShare(resources: Resources): Str
 
 @CombinedThemePreviews
 @Composable
-private fun ChatExplorerContentPreview() {
+private fun ChatExplorerContentPreview(
+    @PreviewParameter(BooleanProvider::class) isProcessingAction: Boolean,
+) {
     AndroidThemeForPreviews {
         ChatExplorerContent(
             uiState = ChatExplorerUiState.Data(
@@ -409,6 +426,7 @@ private fun ChatExplorerContentPreview() {
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
             ),
+            isProcessingAction = isProcessingAction,
             selectedChatIds = setOf(11L),
             onNewGroupChatClick = {},
             onChatToggled = {},
@@ -422,6 +440,7 @@ private fun ChatExplorerLoadingPreview() {
     AndroidThemeForPreviews {
         ChatExplorerContent(
             uiState = ChatExplorerUiState.Loading,
+            isProcessingAction = false,
             selectedChatIds = emptySet(),
             onNewGroupChatClick = {},
             onChatToggled = {},
@@ -450,6 +469,7 @@ private fun ChatExplorerEmptyListPreview() {
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
             ),
+            isProcessingAction = false,
             selectedChatIds = emptySet(),
             onNewGroupChatClick = {},
             onChatToggled = {},

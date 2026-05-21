@@ -76,7 +76,9 @@ internal fun ShareToMegaUpload(
         onStartUpload = { transferTriggerEvent ->
             onStartUpload(transferTriggerEvent)
 
-            if (!chatIds.isNullOrEmpty()) {
+            if (chatIds.isNullOrEmpty()) {
+                showMessageAndClose(null)
+            } else {
                 onSharedToChats(chatIds)
             }
         },

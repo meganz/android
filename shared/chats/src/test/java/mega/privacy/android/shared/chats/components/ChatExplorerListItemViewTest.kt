@@ -9,7 +9,6 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import java.io.File
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.icon.pack.IconPack
 import org.junit.Rule
@@ -17,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class ChatExplorerListItemViewTest {
@@ -32,6 +32,7 @@ class ChatExplorerListItemViewTest {
         subtitle: String? = null,
         isSelected: Boolean = false,
         isEnabled: Boolean = true,
+        isProcessingAction: Boolean = false,
         hasAvatarIcon: Boolean = false,
         isHint: Boolean = false,
         avatarColor: Color? = testPeerPrimary,
@@ -45,6 +46,7 @@ class ChatExplorerListItemViewTest {
                 ChatExplorerListItemView(
                     isSelected = isSelected,
                     isEnabled = isEnabled,
+                    isProcessingAction = isProcessingAction,
                     title = title,
                     subtitle = subtitle,
                     isHint = isHint,

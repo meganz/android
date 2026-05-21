@@ -223,10 +223,10 @@ internal class ChatExplorerViewModel @Inject constructor(
         if (selectedIds.isEmpty()) return
 
         val chats = (uiState.value as? ChatExplorerUiState.Data)?.items ?: return
-        val itemsById = (listOfNotNull(chats.noteToSelf) + chats.recents + chats.others)
-            .associateBy { it.id }
 
         viewModelScope.launch {
+            val itemsById = (listOfNotNull(chats.noteToSelf) + chats.recents + chats.others)
+                .associateBy { it.id }
             val chatIds = selectedIds.mapNotNull { id ->
                 when (val item = itemsById[id]) {
                     is ChatExplorerUiItem.Contact -> runCatching { get1On1ChatIdUseCase(id) }

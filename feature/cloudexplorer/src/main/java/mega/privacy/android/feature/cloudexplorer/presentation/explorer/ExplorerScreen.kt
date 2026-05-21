@@ -108,10 +108,10 @@ internal fun ExplorerScreen(
                 } else {
                     AppBarNavigationType.Close { protectedUserTap { onNavigateBack() } }
                 },
-                title = if (isInnerNavigation) {
-                    nodesExplorerUiState.folderName.text
-                } else {
-                    stringResource(explorerMode.titleStringId)
+                title = when {
+                    chatExplorerSelectionState.selectedItemsCount > 0 -> chatExplorerSelectionState.selectedItemsCount.toString()
+                    isInnerNavigation -> nodesExplorerUiState.folderName.text
+                    else -> stringResource(explorerMode.titleStringId)
                 },
                 actions = buildList {
                     if (selectedTabIndex == CLOUD_TAB_INDEX && explorerMode.isFolderPicker) {
@@ -128,33 +128,35 @@ internal fun ExplorerScreen(
             )
         },
         bottomBar = {
-            InlineAnchoredButtonGroup(
-                modifier = Modifier.testTag(ACTION_BUTTONS_VIEW_TAG),
-                primaryButtonText = stringResource(explorerMode.actionStringId),
-                onPrimaryButtonClick = {
-                    protectedUserTap {
-                        when {
-                            explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX ->
-                                onChatsSelected()
+            if (!isProcessingAction) {
+                InlineAnchoredButtonGroup(
+                    modifier = Modifier.testTag(ACTION_BUTTONS_VIEW_TAG),
+                    primaryButtonText = stringResource(explorerMode.actionStringId),
+                    onPrimaryButtonClick = {
+                        protectedUserTap {
+                            when {
+                                explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX ->
+                                    onChatsSelected()
 
-                            explorerMode.isFolderPicker ->
-                                onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
+                                explorerMode.isFolderPicker ->
+                                    onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
 
-                            else ->
-                                //Replace with valid nodeIds list
-                                onFilesPicked(emptyList())
+                                else ->
+                                    //Replace with valid nodeIds list
+                                    onFilesPicked(emptyList())
+                            }
                         }
-                    }
-                },
-                primaryButtonEnabled = when {
-                    !explorerMode.isFolderPicker -> true
-                    selectedTabIndex == CLOUD_TAB_INDEX -> true
-                    selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
-                    else -> false
-                },
-                textOnlyButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
-                onTextOnlyButtonClick = { protectedUserTap { onCloseExplorerScreen() } },
-            )
+                    },
+                    primaryButtonEnabled = when {
+                        !explorerMode.isFolderPicker -> true
+                        selectedTabIndex == CLOUD_TAB_INDEX -> true
+                        selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
+                        else -> false
+                    },
+                    textOnlyButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+                    onTextOnlyButtonClick = { protectedUserTap { onCloseExplorerScreen() } },
+                )
+            }
         }
     ) { paddingValues ->
         MegaCollapsibleTabRow(
@@ -216,6 +218,7 @@ internal fun ExplorerScreen(
                     ChatExplorerTab(
                         shareTextToMegaNavKey = startNavKey as? ShareTextToMegaNavKey,
                         selectionState = chatExplorerSelectionState,
+                        isProcessingAction = isProcessingAction,
                         prepareChatsEvent = prepareChatsEvent,
                         onPrepareChatsConsumed = onPrepareChatsConsumed,
                         onChatsReadyToShare = onChatsReadyToShare,
