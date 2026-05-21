@@ -46,6 +46,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun FavouritesExplorerContent(
     uiStateShared: NodesExplorerSharedUiState,
+    isFolderPicker: Boolean,
     onNavigateBack: () -> Unit,
     consumeNavigateBack: () -> Unit,
     onFolderClick: (NodeId) -> Unit,
@@ -74,7 +75,7 @@ internal fun FavouritesExplorerContent(
         nodeSourceType = uiStateShared.nodeSourceType,
         nodesLoadingState = nodesLoadingState,
         emptyView = {
-            EmptyFolder()
+            EmptyFolder(isFolderPicker)
         },
         itemListView = {
             CloudExplorerListViewItem(
@@ -115,12 +116,20 @@ internal fun FavouritesExplorerContent(
 }
 
 @Composable
-private fun EmptyFolder() {
+private fun EmptyFolder(isFolderPicker: Boolean) {
     EmptyStateView(
         title = stringResource(sharedR.string.homepage_favourites_empty_hint),
         imagePainter = painterResource(iconPackR.drawable.ic_hearts_glass),
         modifier = Modifier.testTag(NODES_EXPLORER_EMPTY_VIEW_TAG),
-        description = SpannableText(stringResource(sharedR.string.favourites_empty_screen_description)),
+        description = SpannableText(
+            stringResource(
+                if (isFolderPicker) {
+                    sharedR.string.favourite_folders_empty_screen_description
+                } else {
+                    sharedR.string.favourites_empty_screen_description
+                }
+            )
+        ),
     )
 }
 
@@ -148,6 +157,7 @@ internal fun TabsScope.FavouritesExplorerTab(
     ) { _, modifier ->
         FavouritesExplorerContent(
             uiStateShared = uiStateShared,
+            isFolderPicker = explorerMode.isFolderPicker,
             onNavigateBack = { protectedUserTap { onNavigateBack() } },
             consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
             onFolderClick = { nodeId ->
@@ -171,7 +181,9 @@ internal fun TabsScope.FavouritesExplorerTab(
 
 @CombinedThemePreviews
 @Composable
-private fun EmptyFolderPreview() {
+private fun EmptyFolderPreview(
+    @PreviewParameter(BooleanProvider::class) isFolderPicker: Boolean,
+) {
     AndroidThemeForPreviews {
         CompositionLocalProvider(
             LocalNodeHeaderPreviewData provides NodeHeaderItemUiState.Data(
@@ -183,6 +195,7 @@ private fun EmptyFolderPreview() {
                 uiStateShared = NodesExplorerSharedUiState(
                     nodesLoadingState = NodesLoadingState.FullyLoaded,
                 ),
+                isFolderPicker = isFolderPicker,
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},
@@ -210,6 +223,7 @@ private fun FavouritesExplorerFolderDestinationScreenPreview(
                     isSelectionModeEnabled = false,
                     items = previewFolders()
                 ),
+                isFolderPicker = true,
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},

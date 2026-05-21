@@ -2880,4 +2880,6 @@
         <item quantity="one">Clear viewed link?</item>
         <item quantity="other">Clear viewed links?</item>
     </plurals>
+    <!-- Description for the empty view in Favourites sections where only favourite folders are available. Files are hidden, so no need to mention them here. -->
+    <string name="favourite_folders_empty_screen_description">Add folders to Favourites to see them here</string>
 </resources>
