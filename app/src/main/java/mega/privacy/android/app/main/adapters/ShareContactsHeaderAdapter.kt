@@ -51,6 +51,7 @@ class ShareContactsHeaderAdapter @VisibleForTesting internal constructor(
     )
 
     var onItemClickListener: OnItemClickListener? = null
+    var onLongItemClickListener: OnLongItemClickListener? = null
 
     fun setContacts(contacts: List<ShareContactInfo>?) {
         shareContacts = contacts
@@ -122,14 +123,15 @@ class ShareContactsHeaderAdapter @VisibleForTesting internal constructor(
         val chatStatus = megaUser?.let { megaChatApi.getUserOnlineStatus(it.handle) } ?: 0
 
         holder.setContact(
-            contactItemUiStateMapper(
+            uiState = contactItemUiStateMapper(
                 info = contact,
                 mail = mail.orEmpty(),
                 avatarFile = avatarFile,
                 avatarColorArgb = avatarColorArgb,
                 chatStatusValue = chatStatus,
                 isVerified = isVerified,
-            )
+            ),
+            isSelected = contact.megaContactAdapter?.isSelected == true,
         )
     }
 
@@ -144,14 +146,15 @@ class ShareContactsHeaderAdapter @VisibleForTesting internal constructor(
         val avatarColorArgb = AvatarUtil.getColorAvatar(null as MegaUser?)
 
         holder.setContact(
-            contactItemUiStateMapper(
+            uiState = contactItemUiStateMapper(
                 info = contact,
                 mail = email,
                 avatarFile = null,
                 avatarColorArgb = avatarColorArgb,
                 chatStatusValue = 0,
                 isVerified = false,
-            )
+            ),
+            isSelected = false,
         )
     }
 
@@ -166,25 +169,49 @@ class ShareContactsHeaderAdapter @VisibleForTesting internal constructor(
         onItemClickListener = listener
     }
 
+    @Suppress("FunctionName")
+    fun SetOnLongItemClickListener(listener: OnLongItemClickListener?) {
+        onLongItemClickListener = listener
+    }
+
     inner class ViewHolderShareContacts(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemProgress: RelativeLayout = itemView.findViewById(R.id.item_progress)
         val itemHeader: RelativeLayout = itemView.findViewById(R.id.header)
         val textHeader: TextView = itemView.findViewById(R.id.text_header)
         val itemLayout: ViewGroup = itemView.findViewById(R.id.item_content)
         val contactComposeView: ComposeView = itemView.findViewById(R.id.contact_compose_view)
-        private val rowState: ShareContactRowState = ShareContactRowState()
+
+        @VisibleForTesting
+        internal val rowState: ShareContactRowState = ShareContactRowState()
         private var contentInstalled: Boolean = false
         var mail: String? = null
         var currentPosition: Int = 0
 
         init {
+            // Route taps on the ComposeView through Compose's own click
+            // handling — its pointer-input handler consumes touches and the
+            // View-level OnClickListener below never fires for taps inside
+            // the ComposeView area.
+            rowState.onClick = {
+                onItemClickListener?.onItemClick(itemView, bindingAdapterPosition)
+            }
+            rowState.onLongClick = {
+                onLongItemClickListener?.onLongItemClick(itemView, bindingAdapterPosition)
+            }
+            // Kept as a fallback for taps that land outside the ComposeView
+            // area of the row.
             itemView.setOnClickListener {
                 onItemClickListener?.onItemClick(it, bindingAdapterPosition)
             }
+            itemView.setOnLongClickListener {
+                onLongItemClickListener?.onLongItemClick(it, bindingAdapterPosition)
+                onLongItemClickListener != null
+            }
         }
 
-        fun setContact(uiState: ContactItemUiState) {
+        fun setContact(uiState: ContactItemUiState, isSelected: Boolean) {
             rowState.uiState = uiState
+            rowState.isSelected = isSelected
             if (!contentInstalled) {
                 bindShareContactRow(contactComposeView, rowState)
                 contentInstalled = true
@@ -205,5 +232,9 @@ class ShareContactsHeaderAdapter @VisibleForTesting internal constructor(
 
     fun interface OnItemClickListener {
         fun onItemClick(view: View, position: Int)
+    }
+
+    fun interface OnLongItemClickListener {
+        fun onLongItemClick(view: View, position: Int)
     }
 }
