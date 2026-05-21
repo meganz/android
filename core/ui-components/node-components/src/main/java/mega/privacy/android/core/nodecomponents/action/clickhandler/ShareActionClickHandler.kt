@@ -12,6 +12,7 @@ import mega.privacy.android.core.nodecomponents.action.MultipleNodesActionProvid
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
 import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -48,10 +49,10 @@ class ShareActionClickHandler @Inject constructor(
 
             withContext(NonCancellable) {
                 try {
-                    if (nodeSourceType == NodeSourceType.OFFLINE) {
-                        handleOfflineShare(node, provider, isConnected)
-                    } else {
-                        handleCloudShare(node, provider)
+                    when (nodeSourceType) {
+                        NodeSourceType.OFFLINE -> handleOfflineShare(node, provider, isConnected)
+                        NodeSourceType.VIDEO_PLAYER_ZIP_FILE -> handleZipFile(node, provider)
+                        else -> handleCloudShare(node, provider)
                     }
                 } finally {
                     provider.viewModel.dismiss()
@@ -128,19 +129,7 @@ class ShareActionClickHandler @Inject constructor(
             null
         }
         if (node is TypedFileNode && path != null && File(path).exists()) {
-            val file = File(path)
-            val shareIntent = nodeShareContentUrisIntentMapper(
-                title = node.name,
-                content = NodeShareContentUri.LocalContentUris(listOf(file)),
-                mimeType = node.type.mimeType
-            )
-            provider.coroutineScope.ensureActive()
-            provider.context.startActivity(
-                Intent.createChooser(
-                    shareIntent,
-                    provider.context.getString(sharedResR.string.general_share)
-                )
-            )
+            shareFile(node, path, provider)
         } else {
             val publicLink = node.exportedData?.publicLink
             if (publicLink != null) {
@@ -167,6 +156,32 @@ class ShareActionClickHandler @Inject constructor(
                     }.onFailure {
                         Timber.e(it)
                     }
+            }
+        }
+    }
+
+    private fun shareFile(node: TypedFileNode, path: String, provider: SingleNodeActionProvider) {
+        val file = File(path)
+        val shareIntent = nodeShareContentUrisIntentMapper(
+            title = node.name,
+            content = NodeShareContentUri.LocalContentUris(listOf(file)),
+            mimeType = node.type.mimeType
+        )
+        provider.coroutineScope.ensureActive()
+        provider.context.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                provider.context.getString(sharedResR.string.general_share)
+            )
+        )
+    }
+
+    private fun handleZipFile(node: TypedNode, provider: SingleNodeActionProvider) {
+        if (node is ZipFileTypedNode) {
+            if (node.file.exists()) {
+                shareFile(node, node.file.absolutePath, provider)
+            } else {
+                Timber.w("handleZipFile: file does not exist for node: ${node.name}")
             }
         }
     }

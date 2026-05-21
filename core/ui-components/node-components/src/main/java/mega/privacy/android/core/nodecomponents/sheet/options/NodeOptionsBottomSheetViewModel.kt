@@ -20,6 +20,7 @@ import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
+import mega.privacy.android.core.nodecomponents.mapper.ZipFileTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
@@ -78,6 +79,8 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
+    private val getFileByPathUseCase: GetFileByPathUseCase,
+    private val zipFileTypedNodeMapper: ZipFileTypedNodeMapper,
     @Assisted private val nodeId: Long,
     @Assisted private val nodeSourceType: NodeSourceType,
     @Assisted private val partiallyExpand: Boolean,
@@ -134,7 +137,8 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             }
             val isInRubbish = runCatching { isNodeInRubbishBinUseCase(nodeId) }.getOrDefault(false)
             val deferredInBackups = async { loadIsInBackups(nodeId, isInRubbish) }
-            val effectiveNode = deferredNode.await() ?: loadOfflineFallbackNode(nodeId)
+            val effectiveNode =
+                deferredNode.await() ?: loadOfflineFallbackNode(nodeId) ?: loadZipFileNode()
 
             if (effectiveNode == null) {
                 uiState.update { it.copy(error = triggered(Exception("Node is null"))) }
@@ -190,6 +194,18 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             else -> getNodeByIdUseCase(nodeId)
         }
     }.getOrNull()
+
+    private suspend fun loadZipFileNode(): TypedNode? {
+        if (nodeSourceType != NodeSourceType.VIDEO_PLAYER_ZIP_FILE) return null
+        return localFilePath?.let { path ->
+            runCatching {
+                val file = getFileByPathUseCase(path) ?: return null
+                zipFileTypedNodeMapper(file)
+            }.onFailure {
+                Timber.e(it, "Failed to load zip file information for nodeId=$nodeId")
+            }.getOrNull()
+        }
+    }
 
     private suspend fun loadOfflineFallbackNode(nodeId: NodeId): TypedNode? {
         if (nodeSourceType != NodeSourceType.OFFLINE) return null

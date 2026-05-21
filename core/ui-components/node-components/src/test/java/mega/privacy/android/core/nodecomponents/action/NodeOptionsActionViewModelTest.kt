@@ -1,6 +1,8 @@
 package mega.privacy.android.core.nodecomponents.action
 
 import android.content.Context
+import android.net.Uri
+import androidx.core.content.FileProvider
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
@@ -18,6 +20,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
 import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
+import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
@@ -110,6 +113,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.never
@@ -1948,6 +1952,54 @@ class NodeOptionsActionViewModelTest {
                 val trigger =
                     (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
                 assertThat(trigger.nodes).containsExactly(mockFileNode)
+            }
+        }
+
+    @Test
+    fun `test that downloadZipFile triggers CopyUri event with correct name and uri path`() =
+        runTest {
+            initViewModel()
+            val mockFile = File("/path/to/video.mp4")
+            val zipNode = ZipFileTypedNode(file = mockFile)
+            val mockUri = mock<Uri>()
+            whenever(mockUri.toString()).thenReturn("content://authority/video.mp4")
+
+            Mockito.mockStatic(FileProvider::class.java).use { mockedProvider ->
+                mockedProvider.`when`<Uri> {
+                    FileProvider.getUriForFile(any(), any(), any())
+                }.thenReturn(mockUri)
+
+                viewModel.downloadZipFile(node = zipNode, withStartMessage = false)
+            }
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.CopyUri
+                assertThat(trigger.name).isEqualTo("video.mp4")
+                assertThat(trigger.withStartMessage).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that downloadZipFile does not update downloadEvent when FileProvider throws`() =
+        runTest {
+            initViewModel()
+            val zipNode = ZipFileTypedNode(file = File("/path/to/video.mp4"))
+
+            Mockito.mockStatic(FileProvider::class.java).use { mockedProvider ->
+                mockedProvider.`when`<Uri> {
+                    FileProvider.getUriForFile(any(), any(), any())
+                }.thenThrow(IllegalArgumentException("test failure"))
+
+                viewModel.downloadZipFile(node = zipNode, withStartMessage = false)
+            }
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
             }
         }
 } 

@@ -9,8 +9,10 @@ import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
+import mega.privacy.android.core.nodecomponents.mapper.ZipFileTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
+import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -21,6 +23,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
@@ -46,6 +49,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -66,6 +70,8 @@ class NodeOptionsBottomSheetViewModelTest {
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val monitorNodeUpdatesById = mock<MonitorNodeUpdatesById>()
     private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
+    private val zipFileTypedNodeMapper = mock<ZipFileTypedNodeMapper>()
+    private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
 
     private val sampleFileNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
@@ -104,12 +110,14 @@ class NodeOptionsBottomSheetViewModelTest {
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             offlineTypedNodeMapper = offlineTypedNodeMapper,
+            zipFileTypedNodeMapper = zipFileTypedNodeMapper,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             monitorNodeUpdatesById = monitorNodeUpdatesById,
             snackbarEventQueue = snackbarEventQueue,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
+            getFileByPathUseCase = getFileByPathUseCase,
             nodeId = nodeId,
             nodeSourceType = nodeSourceType,
             partiallyExpand = partiallyExpand,
@@ -252,7 +260,17 @@ class NodeOptionsBottomSheetViewModelTest {
             whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            whenever(
+                nodeBottomSheetActionMapper(
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
                 .thenReturn(emptyList())
 
             initViewModel(
@@ -286,7 +304,17 @@ class NodeOptionsBottomSheetViewModelTest {
             whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            whenever(
+                nodeBottomSheetActionMapper(
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
                 .thenReturn(emptyList())
 
             initViewModel(
@@ -311,7 +339,17 @@ class NodeOptionsBottomSheetViewModelTest {
             whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            whenever(
+                nodeBottomSheetActionMapper(
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
                 .thenReturn(emptyList())
 
             initViewModel(
@@ -334,7 +372,17 @@ class NodeOptionsBottomSheetViewModelTest {
             whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            whenever(
+                nodeBottomSheetActionMapper(
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
                 .thenReturn(emptyList())
 
             initViewModel(
@@ -356,7 +404,17 @@ class NodeOptionsBottomSheetViewModelTest {
             whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            whenever(
+                nodeBottomSheetActionMapper(
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
                 .thenReturn(emptyList())
 
             initViewModel(
@@ -458,7 +516,17 @@ class NodeOptionsBottomSheetViewModelTest {
             whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+            whenever(
+                nodeBottomSheetActionMapper(
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
                 .thenReturn(emptyList())
 
             initViewModel(
@@ -469,6 +537,112 @@ class NodeOptionsBottomSheetViewModelTest {
 
             verify(getPublicNodeUseCase, never()).invoke(any())
             verify(getNodeByIdUseCase).invoke(sampleFileNode.id)
+        }
+
+    @Test
+    fun `test that init does not monitor node updates for VIDEO_PLAYER_ZIP_FILE source`() =
+        runTest {
+            val localPath = "/data/app/test.mp4"
+            val file = File(localPath)
+            val zipNode = ZipFileTypedNode(file)
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+            whenever(getFileByPathUseCase(localPath)).thenReturn(file)
+            whenever(zipFileTypedNodeMapper(file)).thenReturn(zipNode)
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(
+                nodeBottomSheetActionMapper(
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
+                .thenReturn(emptyList())
+            whenever(
+                nodeUiItemMapper(
+                    any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), any()
+                )
+            ).thenReturn(listOf(mock()))
+
+            initViewModel(
+                nodeSourceType = NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+                localFilePath = localPath,
+            )
+
+            verify(monitorNodeUpdatesById, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that init loads ZipFileTypedNode when source type is VIDEO_PLAYER_ZIP_FILE and localFilePath is provided`() =
+        runTest {
+            val localPath = "/data/app/test.mp4"
+            val file = File(localPath)
+            val zipNode = ZipFileTypedNode(file)
+            val expectedNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+            whenever(getFileByPathUseCase(localPath)).thenReturn(file)
+            whenever(zipFileTypedNodeMapper(file)).thenReturn(zipNode)
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(
+                nodeBottomSheetActionMapper(
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    any()
+                )
+            )
+                .thenReturn(emptyList())
+            whenever(
+                nodeUiItemMapper(
+                    any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), any()
+                )
+            ).thenReturn(listOf(expectedNodeUi))
+
+            initViewModel(
+                nodeSourceType = NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+                localFilePath = localPath,
+            )
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.node).isEqualTo(expectedNodeUi)
+            }
+        }
+
+    @Test
+    fun `test that init does not load ZipFileTypedNode when source type is VIDEO_PLAYER_ZIP_FILE and localFilePath is null`() =
+        runTest {
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+
+            initViewModel(
+                nodeSourceType = NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+                localFilePath = null,
+            )
+
+            verify(zipFileTypedNodeMapper, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that init does not load ZipFileTypedNode when getFileByPathUseCase returns null for VIDEO_PLAYER_ZIP_FILE source`() =
+        runTest {
+            val localPath = "/data/app/test.mp4"
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+            whenever(getFileByPathUseCase(localPath)).thenReturn(null)
+
+            initViewModel(
+                nodeSourceType = NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+                localFilePath = localPath,
+            )
+
+            verify(zipFileTypedNodeMapper, never()).invoke(any())
         }
 
     @Test

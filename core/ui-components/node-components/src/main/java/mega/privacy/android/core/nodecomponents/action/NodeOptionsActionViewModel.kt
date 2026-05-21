@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.action
 
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
@@ -38,6 +39,7 @@ import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRe
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.RestoreData
+import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -63,6 +65,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionRes
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -619,6 +622,39 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     }
 
     /**
+     * Download a local zip file entry by sharing it via a content URI.
+     * Triggers [mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.CopyUri]
+     * using a FileProvider URI for the local file.
+     *
+     * @param node The [ZipFileTypedNode] representing the local file inside the zip archive.
+     * @param withStartMessage Whether to show a start message. Should be true only if the widget is not visible.
+     */
+    fun downloadZipFile(node: ZipFileTypedNode, withStartMessage: Boolean) {
+        runCatching {
+            val uri = FileProvider.getUriForFile(
+                applicationContext,
+                "${applicationContext.packageName}$FILE_PROVIDER_SUFFIX",
+                node.file
+            )
+            UriPath(uri.toString())
+        }.onFailure {
+            Timber.e(it, "get file uri failed")
+        }.onSuccess { uriPath ->
+            uiState.update {
+                it.copy(
+                    downloadEvent = triggered(
+                        TransferTriggerEvent.CopyUri(
+                            name = node.name,
+                            uriPath = uriPath,
+                            withStartMessage = withStartMessage,
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    /**
      * Download node for preview
      * Triggers TransferTriggerEvent.StartDownloadForPreview with parameter [mega.privacy.android.domain.entity.node.TypedFileNode]
      */
@@ -1100,5 +1136,9 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(nodeSourceType: NodeSourceType?): NodeOptionsActionViewModel
+    }
+
+    companion object {
+        private const val FILE_PROVIDER_SUFFIX = ".providers.fileprovider"
     }
 }

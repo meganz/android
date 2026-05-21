@@ -21,7 +21,7 @@ class ShareBottomSheetMenuItemTest {
 
     private val underTest = ShareBottomSheetMenuItem(menuAction = mock<ShareMenuAction>())
 
-    @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - expected {5}")
+    @ParameterizedTest(name = "isNodeInRubbish {0} - accessPermission {1} - isInBackups {2} - node {3} - isConnected {4} - nodeSourceType {5} - expected {6}")
     @MethodSource("provideTestParameters")
     fun `test that share bottom sheet menu item visibility is correct`(
         isNodeInRubbish: Boolean,
@@ -29,6 +29,7 @@ class ShareBottomSheetMenuItemTest {
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
         expected: Boolean,
     ) = runTest {
         val result = underTest.shouldDisplay(
@@ -37,7 +38,7 @@ class ShareBottomSheetMenuItemTest {
             isInBackups,
             node,
             isConnected,
-            NodeSourceType.CLOUD_DRIVE
+            nodeSourceType
         )
         assertEquals(expected, result)
     }
@@ -52,6 +53,7 @@ class ShareBottomSheetMenuItemTest {
                 on { isNodeKeyDecrypted } doReturn true
             },
             false,
+            NodeSourceType.CLOUD_DRIVE,
             true,
         ),
         Arguments.of(
@@ -63,6 +65,7 @@ class ShareBottomSheetMenuItemTest {
                 on { isNodeKeyDecrypted } doReturn true
             },
             false,
+            NodeSourceType.CLOUD_DRIVE,
             false,
         ),
         Arguments.of(
@@ -74,6 +77,7 @@ class ShareBottomSheetMenuItemTest {
                 on { isNodeKeyDecrypted } doReturn true
             },
             false,
+            NodeSourceType.CLOUD_DRIVE,
             false,
         ),
         Arguments.of(
@@ -86,6 +90,7 @@ class ShareBottomSheetMenuItemTest {
                 on { isNodeKeyDecrypted } doReturn true
             },
             false,
+            NodeSourceType.CLOUD_DRIVE,
             false,
         ),
         Arguments.of(
@@ -97,6 +102,29 @@ class ShareBottomSheetMenuItemTest {
                 on { isNodeKeyDecrypted } doReturn false
             },
             false,
+            NodeSourceType.CLOUD_DRIVE,
+            false,
+        ),
+        Arguments.of(
+            false,
+            null,
+            false,
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn false
+            },
+            false,
+            NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+            true,
+        ),
+        Arguments.of(
+            false,
+            null,
+            false,
+            mock<TypedFileNode> {
+                on { isTakenDown } doReturn true
+            },
+            false,
+            NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
             false,
         ),
     )

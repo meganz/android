@@ -35,6 +35,11 @@ class ShareBottomSheetMenuItem @Inject constructor(
                     (node !is TypedFolderNode || isConnected)
         }
 
+        // For zip file nodes, the file is a local archive entry — no ownership check required
+        if (nodeSourceType == NodeSourceType.VIDEO_PLAYER_ZIP_FILE) {
+            return node.isTakenDown.not()
+        }
+
         // For cloud nodes, require owner permission
         return node.isTakenDown.not()
                 && accessPermission == AccessPermission.OWNER
