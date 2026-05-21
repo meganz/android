@@ -82,14 +82,15 @@ class HomeConfigurationViewModel @Inject constructor(
     fun updateWidgetOrder(orderedItems: List<WidgetConfigurationItem>) {
         applicationScope.launch {
             runCatching {
+                val data = state.value as? HomeConfigurationUiState.Data ?: return@runCatching
+                val draggableOffset = (data.fixedWidgets.maxOfOrNull { it.index } ?: -1) + 1
                 val latestEnabledByIdentifier = monitorHomeWidgetConfigurationUseCase()
                     .first()
                     .associate { it.widgetIdentifier to it.enabled }
-
                 val updated = orderedItems.mapIndexed { index, item ->
                     HomeWidgetConfiguration(
                         widgetIdentifier = item.identifier,
-                        widgetOrder = index,
+                        widgetOrder = draggableOffset + index,
                         enabled = latestEnabledByIdentifier[item.identifier] ?: item.enabled,
                     )
                 }

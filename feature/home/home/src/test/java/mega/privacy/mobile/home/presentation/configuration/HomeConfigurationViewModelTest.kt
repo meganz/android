@@ -29,6 +29,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 class HomeConfigurationViewModelTest {
@@ -170,12 +171,19 @@ class HomeConfigurationViewModelTest {
                     awaitCancellation()
                 }
             }
-            underTest.updateWidgetOrder(configurationList.map {
-                WidgetConfigurationItemMapper().invoke(
-                    homeWidget = stubWidget(it.widgetIdentifier, HomeWidgetOrder.Banner),
-                    widgetConfiguration = it,
-                )
-            })
+            stubEmptyWidgetProviders()
+
+            underTest.state.test {
+                awaitItem()
+                underTest.updateWidgetOrder(configurationList.map {
+                    WidgetConfigurationItemMapper().invoke(
+                        homeWidget = stubWidget(it.widgetIdentifier, HomeWidgetOrder.Banner),
+                        widgetConfiguration = it,
+                    )
+                })
+                cancelAndIgnoreRemainingEvents()
+            }
+
             val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
             verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
             val actual = captor.firstValue.associateBy { it.widgetIdentifier }
@@ -197,6 +205,7 @@ class HomeConfigurationViewModelTest {
                     awaitCancellation()
                 }
             }
+            stubEmptyWidgetProviders()
             // Caller passes items with a stale `enabled = true` for both — the VM must
             // ignore that and source enabled from the stored configurations instead.
             val orderedItems = listOf(
@@ -218,7 +227,11 @@ class HomeConfigurationViewModelTest {
                 ),
             )
 
-            underTest.updateWidgetOrder(orderedItems)
+            underTest.state.test {
+                awaitItem()
+                underTest.updateWidgetOrder(orderedItems)
+                cancelAndIgnoreRemainingEvents()
+            }
 
             val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
             verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
@@ -451,14 +464,93 @@ class HomeConfigurationViewModelTest {
                     awaitCancellation()
                 }
             }
+            stubEmptyWidgetProviders()
 
-            underTest.updateWidgetOrder(orderedItems)
+            underTest.state.test {
+                awaitItem()
+                underTest.updateWidgetOrder(orderedItems)
+                cancelAndIgnoreRemainingEvents()
+            }
 
             val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
             verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
             assertThat(captor.firstValue.map { it.widgetIdentifier to it.widgetOrder })
                 .containsExactly("first" to 0, "second" to 1, "third" to 2)
                 .inOrder()
+        }
+
+    @Test
+    fun `test that updateWidgetOrder offsets draggable widget orders past the fixed widgets`() =
+        runTest {
+            val fixedShortcuts = stubWidget(
+                identifier = "fixed_shortcuts",
+                defaultOrder = HomeWidgetOrder.Shortcuts,
+                isDraggable = false,
+            )
+            val fixedBanner = stubWidget(
+                identifier = "fixed_banner",
+                defaultOrder = HomeWidgetOrder.Banner,
+                isDraggable = false,
+            )
+            val draggableA = stubWidget("a", HomeWidgetOrder.MyAccount)
+            val draggableB = stubWidget("b", HomeWidgetOrder.Recents)
+            val draggableC = stubWidget("c", HomeWidgetOrder.ViewedLinks)
+            val staticWidgets = setOf(fixedShortcuts, fixedBanner)
+            val dynamicWidgets = setOf(draggableA, draggableB, draggableC)
+            staticWidgetsProvider.stub {
+                onBlocking { getWidgets() } doReturn staticWidgets
+            }
+            dynamicWidgetsProvider.stub {
+                onBlocking { getWidgets() } doReturn dynamicWidgets
+            }
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            }
+            stubGetEnabledFlaggedItemsUseCase(staticWidgets, dynamicWidgets)
+
+            val mapper = WidgetConfigurationItemMapper()
+            // Simulate the user dragging "c" to the top of the draggable list.
+            val orderedItems = listOf(draggableC, draggableA, draggableB).map {
+                mapper(homeWidget = it, widgetConfiguration = null)
+            }
+
+            underTest.state.test {
+                awaitItem()
+                underTest.updateWidgetOrder(orderedItems)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
+            verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
+            // Draggable orders must start past the highest fixed widget index (1),
+            // so the first draggable widget gets order 2 — not 0, which would collide
+            // with a fixed widget and let the dragged item appear above the fixed row.
+            assertThat(captor.firstValue.map { it.widgetIdentifier to it.widgetOrder })
+                .containsExactly("c" to 2, "a" to 3, "b" to 4)
+                .inOrder()
+        }
+
+    @Test
+    fun `test that updateWidgetOrder does not invoke update use case while state is still loading`() =
+        runTest {
+            // Upstream flow never emits, so state.value stays at Loading and
+            // updateWidgetOrder should short-circuit instead of saving anything.
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow { awaitCancellation() }
+            }
+            val orderedItems = listOf(
+                WidgetConfigurationItemMapper().invoke(
+                    homeWidget = stubWidget("a", HomeWidgetOrder.MyAccount),
+                    widgetConfiguration = null,
+                ),
+            )
+
+            underTest.updateWidgetOrder(orderedItems)
+
+            verifyNoInteractions(updateWidgetConfigurationsUseCase)
         }
 
     private fun stubWidget(
@@ -483,5 +575,20 @@ class HomeConfigurationViewModelTest {
                 on { invoke(set) } doReturn flow { emit(set) }
             }
         }
+    }
+
+    /**
+     * Stubs both widget providers to return empty sets and primes the enabled-flagged
+     * lookup so the state flow can materialise into [HomeConfigurationUiState.Data]
+     * without contributing any items.
+     */
+    private fun stubEmptyWidgetProviders() {
+        dynamicWidgetsProvider.stub {
+            onBlocking { getWidgets() } doReturn emptySet()
+        }
+        staticWidgetsProvider.stub {
+            onBlocking { getWidgets() } doReturn emptySet()
+        }
+        stubGetEnabledFlaggedItemsUseCase(emptySet())
     }
 }
