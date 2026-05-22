@@ -46,6 +46,7 @@ class MegaActivityIntentActionHandlerTest {
 
     private lateinit var underTest: MegaActivityIntentActionHandler
 
+    private val activity = mock<Activity>()
     private val navigationEventQueue = mock<NavigationEventQueue>()
     private val navigationResultManager = mock<NavigationResultManager>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
@@ -67,7 +68,7 @@ class MegaActivityIntentActionHandlerTest {
     @BeforeAll
     fun setUp() {
         underTest = MegaActivityIntentActionHandler(
-            activity = mock<Activity>(),
+            activity = activity,
             navigationEventQueue = navigationEventQueue,
             navigationResultManager = navigationResultManager,
             snackbarEventQueue = snackbarEventQueue,
@@ -79,6 +80,7 @@ class MegaActivityIntentActionHandlerTest {
     @BeforeEach
     fun resetMocks() {
         reset(
+            activity,
             navigationEventQueue,
             navigationResultManager,
             snackbarEventQueue,
@@ -95,7 +97,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Constants.ACTION_REFRESH)
             var refreshedWith: RefreshEvent? = null
 
-            underTest.handleAction(intent, { refreshedWith = it }, { null })
+            underTest.handleAction(intent, { refreshedWith = it })
 
             assertThat(refreshedWith).isEqualTo(RefreshEvent.ManualRefresh)
         }
@@ -107,7 +109,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Constants.ACTION_REFRESH_API_SERVER)
             var refreshedWith: RefreshEvent? = null
 
-            underTest.handleAction(intent, { refreshedWith = it }, { null })
+            underTest.handleAction(intent, { refreshedWith = it })
 
             assertThat(refreshedWith).isEqualTo(RefreshEvent.ChangeEnvironment)
         }
@@ -120,7 +122,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(MegaActivity.ACTION_DEEP_LINKS)
             whenever(intent.dataString).thenReturn(deepLink)
 
-            underTest.handleAction(intent, {}, { null })
+            underTest.handleAction(intent, {})
 
             verify(navigationEventQueue).emit(DeepLinksDialogNavKey(deepLink))
         }
@@ -132,7 +134,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(RefreshEvent.SdkReload.name)
             var refreshedWith: RefreshEvent? = null
 
-            underTest.handleAction(intent, { refreshedWith = it }, { null })
+            underTest.handleAction(intent, { refreshedWith = it })
 
             assertThat(refreshedWith).isEqualTo(RefreshEvent.SdkReload)
         }
@@ -276,7 +278,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Constants.ACTION_SHORTCUT_UPLOAD)
             whenever(getCurrentConnectivityStateUseCase()).thenReturn(ConnectivityState.Connected(isOnWifi = true))
 
-            underTest.handleAction(intent, {}, { null })
+            underTest.handleAction(intent, {})
 
             verify(navigationResultManager).returnResult(
                 HomeFabOptionsBottomSheetNavKey.KEY,
@@ -291,7 +293,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Constants.ACTION_SHORTCUT_UPLOAD)
             whenever(getCurrentConnectivityStateUseCase()).thenReturn(ConnectivityState.Disconnected)
 
-            underTest.handleAction(intent, {}, { null })
+            underTest.handleAction(intent, {})
 
             verify(snackbarEventQueue).queueMessage(R.string.error_server_connection_problem)
             verify(navigationResultManager, never()).returnResult(any(), any<HomeFabOption>())
@@ -304,7 +306,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Constants.ACTION_SHORTCUT_SCAN_DOCUMENT)
             whenever(getCurrentConnectivityStateUseCase()).thenReturn(ConnectivityState.Connected(isOnWifi = true))
 
-            underTest.handleAction(intent, {}, { null })
+            underTest.handleAction(intent, {})
 
             verify(navigationResultManager).returnResult(
                 HomeFabOptionsBottomSheetNavKey.KEY,
@@ -319,7 +321,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Constants.ACTION_SHORTCUT_SCAN_DOCUMENT)
             whenever(getCurrentConnectivityStateUseCase()).thenReturn(ConnectivityState.Disconnected)
 
-            underTest.handleAction(intent, {}, { null })
+            underTest.handleAction(intent, {})
 
             verify(snackbarEventQueue).queueMessage(R.string.error_server_connection_problem)
             verify(navigationResultManager, never()).returnResult(any(), any<HomeFabOption>())
@@ -332,7 +334,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Constants.ACTION_SHORTCUT_CHAT)
             whenever(getCurrentConnectivityStateUseCase()).thenReturn(ConnectivityState.Connected(isOnWifi = true))
 
-            underTest.handleAction(intent, {}, { null })
+            underTest.handleAction(intent, {})
 
             verify(navigationEventQueue).emit(
                 navKey = any(),
@@ -348,7 +350,7 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Constants.ACTION_SHORTCUT_CHAT)
             whenever(getCurrentConnectivityStateUseCase()).thenReturn(ConnectivityState.Disconnected)
 
-            underTest.handleAction(intent, {}, { null })
+            underTest.handleAction(intent, {})
 
             verify(snackbarEventQueue).queueMessage(R.string.error_server_connection_problem)
             verify(navigationEventQueue, never()).emit(
@@ -464,26 +466,6 @@ class MegaActivityIntentActionHandlerTest {
         }
 
     @Test
-    fun `test that handleAction calls launchLegacyPdfViewer when action is ACTION_VIEW with pdf MIME type and compose flag is disabled`() =
-        runTest {
-            val uri = mock<Uri>()
-            val intent = mock<Intent>()
-            whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
-            whenever(intent.type).thenReturn("application/pdf")
-            whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(false)
-            var legacyLaunched = false
-
-            underTest.handleAction(
-                intent = intent,
-                refreshSession = {},
-                launchLegacyPdfViewer = { legacyLaunched = true },
-            )
-
-            assertThat(legacyLaunched).isTrue()
-        }
-
-    @Test
     fun `test that handleAction invokes navigateToComposePdfViewer when action is ACTION_VIEW with pdf path extension and compose flag is enabled`() =
         runTest {
             val fileUriString = "file:///storage/emulated/0/Download/document.pdf"
@@ -517,27 +499,6 @@ class MegaActivityIntentActionHandlerTest {
                 priority = any(),
                 navOptions = anyOrNull(),
             )
-        }
-
-    @Test
-    fun `test that handleAction calls launchLegacyPdfViewer when action is ACTION_VIEW with pdf path extension and compose flag is disabled`() =
-        runTest {
-            val uri = mock<Uri>()
-            whenever(uri.path).thenReturn("/storage/emulated/0/Download/document.pdf")
-            val intent = mock<Intent>()
-            whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
-            whenever(intent.type).thenReturn(null)
-            whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(false)
-            var legacyLaunched = false
-
-            underTest.handleAction(
-                intent = intent,
-                refreshSession = {},
-                launchLegacyPdfViewer = { legacyLaunched = true },
-            )
-
-            assertThat(legacyLaunched).isTrue()
         }
 
     @Test
@@ -583,41 +544,13 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(null)
-            var legacyLaunched = false
 
             underTest.handleAction(
                 intent = intent,
                 refreshSession = {},
-                launchLegacyPdfViewer = { legacyLaunched = true },
             )
 
-            assertThat(legacyLaunched).isFalse()
-            verify(navigationEventQueue, never()).emit(
-                navKey = any(),
-                priority = any(),
-                navOptions = anyOrNull(),
-            )
-        }
-
-    @Test
-    fun `test that handleAction falls back to legacy viewer when feature flag throws exception`() =
-        runTest {
-            val uri = mock<Uri>()
-            val intent = mock<Intent>()
-            whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
-            whenever(intent.type).thenReturn("application/pdf")
-            whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI))
-                .thenThrow(RuntimeException("Feature flag service unavailable"))
-            var legacyLaunched = false
-
-            underTest.handleAction(
-                intent = intent,
-                refreshSession = {},
-                launchLegacyPdfViewer = { legacyLaunched = true },
-            )
-
-            assertThat(legacyLaunched).isTrue()
+            verify(activity, never()).startActivity(any<Intent>())
             verify(navigationEventQueue, never()).emit(
                 navKey = any(),
                 priority = any(),
