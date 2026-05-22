@@ -30,6 +30,12 @@ internal interface RecentlyViewedLinkDao {
     suspend fun deleteByNodeHandles(nodeHandles: Set<Long>)
 
     /**
+     * Delete a recently viewed link by its link URL.
+     */
+    @Query("DELETE FROM $TABLE_RECENTLY_VIEWED_LINK WHERE link_url = :linkUrl")
+    suspend fun deleteByLinkUrl(linkUrl: String)
+
+    /**
      * Delete all recently viewed links.
      */
     @Query("DELETE FROM $TABLE_RECENTLY_VIEWED_LINK")

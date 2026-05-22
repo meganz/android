@@ -44,6 +44,13 @@ interface ViewedLinksRepository {
     suspend fun removeLinks(nodeHandles: Set<Long>)
 
     /**
+     * Removes a viewed link entry by its link URL. No-op if no entry matches.
+     *
+     * @param linkUrl the link URL whose entry should be removed.
+     */
+    suspend fun removeLinkByUrl(linkUrl: String)
+
+    /**
      * Deletes all viewed link entries (both file and folder links).
      */
     suspend fun clearLinks()

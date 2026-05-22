@@ -80,6 +80,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -152,6 +153,7 @@ class FolderLinkViewModelTest {
     private val queryAdsUseCase: QueryAdsUseCase = mock()
     private val getCookieSettingsUseCase = mock<GetCookieSettingsUseCase>()
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
+    private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @BeforeEach
@@ -200,6 +202,7 @@ class FolderLinkViewModelTest {
             getPublicLinkInformationUseCase,
             queryAdsUseCase,
             saveViewedLinkUseCase,
+            removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase
         )
     }
@@ -246,6 +249,7 @@ class FolderLinkViewModelTest {
             queryAdsUseCase = queryAdsUseCase,
             getCookieSettingsUseCase = getCookieSettingsUseCase,
             saveViewedLinkUseCase = saveViewedLinkUseCase,
+            removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
@@ -416,6 +420,90 @@ class FolderLinkViewModelTest {
             underTest.fetchNodes(base64Handle)
 
             verify(saveViewedLinkUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that removeViewedLinkByUrlUseCase is called when fetchNodes fails with LinkRemoved`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.LinkRemoved()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(removeViewedLinkByUrlUseCase).invoke(folderLink)
+        }
+
+    @Test
+    fun `test that removeViewedLinkByUrlUseCase is called when fetchNodes fails with Expired`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.Expired()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(removeViewedLinkByUrlUseCase).invoke(folderLink)
+        }
+
+    @Test
+    fun `test that removeViewedLinkByUrlUseCase is not called when fetchNodes fails with GenericError`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.GenericError()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(removeViewedLinkByUrlUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that removeViewedLinkByUrlUseCase is not called when fetchNodes fails but feature flag is disabled`() =
+        runTest {
+            val folderLink = "https://mega.nz/folder/abc123"
+            val base64Handle = "1234"
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(base64Handle)).thenThrow(
+                FetchFolderNodesException.LinkRemoved()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+                on { dataString }.thenReturn(folderLink)
+            }
+            underTest.handleIntent(intent)
+
+            underTest.fetchNodes(base64Handle)
+
+            verify(removeViewedLinkByUrlUseCase, never()).invoke(any())
         }
 
     @Test

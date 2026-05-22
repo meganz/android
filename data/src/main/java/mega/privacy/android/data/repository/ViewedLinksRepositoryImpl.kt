@@ -81,6 +81,10 @@ internal class ViewedLinksRepositoryImpl @Inject constructor(
         recentlyViewedLinkDao.deleteByNodeHandles(nodeHandles)
     }
 
+    override suspend fun removeLinkByUrl(linkUrl: String) = withContext(ioDispatcher) {
+        recentlyViewedLinkDao.deleteByLinkUrl(linkUrl)
+    }
+
     override suspend fun clearLinks() = withContext(ioDispatcher) {
         recentlyViewedLinkDao.deleteAll()
     }

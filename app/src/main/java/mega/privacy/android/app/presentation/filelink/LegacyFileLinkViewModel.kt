@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameC
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
@@ -86,6 +87,7 @@ class LegacyFileLinkViewModel @Inject constructor(
     val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
     private val queryAdsUseCase: QueryAdsUseCase,
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
+    private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
@@ -178,7 +180,19 @@ class LegacyFileLinkViewModel @Inject constructor(
                             }
                         }
                     }
+                    removeViewedFileLinkEntry(link)
                 }
+        }
+    }
+
+    private fun removeViewedFileLinkEntry(url: String) {
+        viewModelScope.launch {
+            val isEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
+            }.getOrDefault(false)
+            if (!isEnabled) return@launch
+            runCatching { removeViewedLinkByUrlUseCase(url) }
+                .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
         }
     }
 

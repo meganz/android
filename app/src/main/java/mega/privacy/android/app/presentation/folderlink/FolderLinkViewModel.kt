@@ -85,6 +85,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUs
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -143,6 +144,7 @@ class FolderLinkViewModel @Inject constructor(
     private val getPublicLinkInformationUseCase: GetPublicLinkInformationUseCase,
     private val queryAdsUseCase: QueryAdsUseCase,
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
+    private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
@@ -241,6 +243,20 @@ class FolderLinkViewModel @Inject constructor(
                     }
                 }
             }
+            if (result != FolderLoginStatus.SUCCESS) {
+                removeViewedFolderLinkEntry(folderLink)
+            }
+        }
+    }
+
+    private fun removeViewedFolderLinkEntry(url: String) {
+        viewModelScope.launch {
+            val isEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
+            }.getOrDefault(false)
+            if (!isEnabled) return@launch
+            runCatching { removeViewedLinkByUrlUseCase(url) }
+                .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
         }
     }
 
@@ -489,6 +505,9 @@ class FolderLinkViewModel @Inject constructor(
                             isNodesFetched = true,
                             errorState = if (throwable is FetchFolderNodesException.Expired) LinkErrorState.Expired else LinkErrorState.Unavailable,
                         )
+                    }
+                    if (throwable !is FetchFolderNodesException.GenericError) {
+                        state.value.url?.let { removeViewedFolderLinkEntry(it) }
                     }
                 }
         }

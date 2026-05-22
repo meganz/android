@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodes
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -71,6 +72,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val setViewTypeUseCase: SetViewType,
     private val stopAudioService: StopAudioService,
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
+    private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted private val args: Args,
@@ -247,11 +249,27 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                     FolderLoginStatus.ERROR ->
                         _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
                 }
+
+                if (status != FolderLoginStatus.SUCCESS) {
+                    removeViewedFolderLinkEntry(url)
+                }
             }
             .onFailure { error ->
                 Timber.e(error)
                 _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
+                removeViewedFolderLinkEntry(url)
             }
+    }
+
+    private fun removeViewedFolderLinkEntry(url: String) {
+        viewModelScope.launch {
+            val isEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
+            }.getOrDefault(false)
+            if (!isEnabled) return@launch
+            runCatching { removeViewedLinkByUrlUseCase(url) }
+                .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
+        }
     }
 
     private fun onDecryptionKeyEntered(key: String) {
@@ -315,6 +333,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                 } else {
                     _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
                 }
+                _uiState.value.url?.let { removeViewedFolderLinkEntry(it) }
             }
         }
     }

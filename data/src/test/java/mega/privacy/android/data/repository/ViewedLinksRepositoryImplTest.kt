@@ -229,6 +229,15 @@ internal class ViewedLinksRepositoryImplTest {
     }
 
     @Test
+    fun `test that removeLinkByUrl calls deleteByLinkUrl with the url`() = runTest {
+        val url = "https://mega.nz/file/abc"
+
+        underTest.removeLinkByUrl(url)
+
+        verify(recentlyViewedLinkDao).deleteByLinkUrl(url)
+    }
+
+    @Test
     fun `test that clearLinks calls deleteAll`() = runTest {
         underTest.clearLinks()
 

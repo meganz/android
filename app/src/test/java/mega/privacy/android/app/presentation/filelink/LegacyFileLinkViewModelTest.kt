@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -77,6 +78,7 @@ class LegacyFileLinkViewModelTest {
     private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
     private val queryAdsUseCase = mock<QueryAdsUseCase>()
     private val saveViewedLinkUseCase = mock<SaveViewedLinkUseCase>()
+    private val removeViewedLinkByUrlUseCase = mock<RemoveViewedLinkByUrlUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val url = "https://mega.co.nz/abc"
@@ -104,6 +106,7 @@ class LegacyFileLinkViewModelTest {
             getNodePreviewFileUseCase,
             queryAdsUseCase,
             saveViewedLinkUseCase,
+            removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase
         )
         initViewModel()
@@ -128,6 +131,7 @@ class LegacyFileLinkViewModelTest {
             monitorMiscLoadedUseCase = mock(),
             queryAdsUseCase = queryAdsUseCase,
             saveViewedLinkUseCase = saveViewedLinkUseCase,
+            removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }

@@ -16,25 +16,26 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
-import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
-import mega.privacy.android.domain.entity.node.ViewedLink
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -55,6 +56,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -80,6 +82,7 @@ internal class FolderLinkViewModelTest {
     private val setViewTypeUseCase: SetViewType = mock()
     private val stopAudioService: StopAudioService = mock()
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
+    private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private lateinit var underTest: FolderLinkViewModel
@@ -102,6 +105,7 @@ internal class FolderLinkViewModelTest {
             setViewTypeUseCase = setViewTypeUseCase,
             stopAudioService = stopAudioService,
             saveViewedLinkUseCase = saveViewedLinkUseCase,
+            removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
             args = args,
@@ -124,6 +128,7 @@ internal class FolderLinkViewModelTest {
             setViewTypeUseCase,
             stopAudioService,
             saveViewedLinkUseCase,
+            removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase,
         )
         whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
@@ -275,6 +280,81 @@ internal class FolderLinkViewModelTest {
             assertThat(awaitItem().contentState).isEqualTo(FolderLinkContentState.Unavailable)
         }
     }
+
+    @Test
+    fun `test that viewed link is removed when login returns ERROR and ViewedLinks flag is enabled`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.ERROR)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+
+            verify(removeViewedLinkByUrlUseCase).invoke(url)
+        }
+
+    @Test
+    fun `test that viewed link is removed when login returns API_INCOMPLETE and ViewedLinks flag is enabled`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.API_INCOMPLETE)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+
+            verify(removeViewedLinkByUrlUseCase).invoke(url)
+        }
+
+    @Test
+    fun `test that viewed link is removed when login returns INCORRECT_KEY and ViewedLinks flag is enabled`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.INCORRECT_KEY)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+
+            verify(removeViewedLinkByUrlUseCase).invoke(url)
+        }
+
+    @Test
+    fun `test that viewed link is removed when loginToFolderUseCase throws and ViewedLinks flag is enabled`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenThrow(RuntimeException())
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+
+            verify(removeViewedLinkByUrlUseCase).invoke(url)
+        }
+
+    @Test
+    fun `test that viewed link is not removed when login fails but ViewedLinks flag is disabled`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.ERROR)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+
+            verify(removeViewedLinkByUrlUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that viewed link is removed when fetchNodes fails after successful login`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenThrow(
+                FetchFolderNodesException.GenericError()
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(true)
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+
+            verify(removeViewedLinkByUrlUseCase).invoke(url)
+        }
 
     @Test
     fun `test that init emits Unavailable when loginToFolderUseCase throws`() = runTest {

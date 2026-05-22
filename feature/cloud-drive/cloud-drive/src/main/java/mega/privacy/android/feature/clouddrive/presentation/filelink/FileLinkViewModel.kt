@@ -25,6 +25,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkContentState
@@ -39,6 +40,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
+    private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
@@ -125,6 +127,18 @@ internal class FileLinkViewModel @AssistedInject constructor(
             else -> FileLinkContentState.Unavailable
         }
         _uiState.update { it.copy(contentState = nextState) }
+        removeViewedFileLinkEntry(url)
+    }
+
+    private fun removeViewedFileLinkEntry(url: String) {
+        viewModelScope.launch {
+            val isEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)
+            }.getOrDefault(false)
+            if (!isEnabled) return@launch
+            runCatching { removeViewedLinkByUrlUseCase(url) }
+                .onFailure { Timber.e(it, "Failed to remove viewed link for $url") }
+        }
     }
 
     private fun onDecryptionKeyEntered(key: String) {
