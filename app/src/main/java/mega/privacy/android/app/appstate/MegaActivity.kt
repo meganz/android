@@ -61,7 +61,6 @@ import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.passcode.check.PasscodeCheckViewModel
@@ -149,12 +148,6 @@ class MegaActivity : FragmentActivity() {
         intentActionHandler.handleAction(
             intent = intent,
             refreshSession = globalStateViewModel::refreshSession,
-            launchLegacyPdfViewer = {
-                startActivity(
-                    Intent(intent).setClass(this, PdfViewerActivity::class.java)
-                )
-                finish()
-            },
         )
     }
 
