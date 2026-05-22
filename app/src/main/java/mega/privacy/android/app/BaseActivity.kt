@@ -33,6 +33,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.LAUNCH_INTENT
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -52,7 +54,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
-import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE
@@ -866,12 +867,15 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     protected fun refreshSession(keepCurrentActivity: Boolean = false) {
-        val intent = Intent(this, MegaActivity::class.java)
-        intent.action = RefreshEvent.SdkReload.name
-        if (keepCurrentActivity) {
-            intent.putExtra(LAUNCH_INTENT, this.intent)
+        val intent = if (keepCurrentActivity) {
+            MegaActivityInternalLauncher
+                .getIntent(this, action = RefreshEvent.SdkReload.name)
+                .putExtra(LAUNCH_INTENT, this.intent)
         } else {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            Intent(this, MegaActivity::class.java).apply {
+                action = RefreshEvent.SdkReload.name
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
         }
         startActivity(intent)
         finish()

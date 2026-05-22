@@ -40,6 +40,8 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.INTERNAL_ENTRY_COMPONENT
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher.LAUNCH_INTENT
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
@@ -178,14 +180,19 @@ class MegaActivity : FragmentActivity() {
 
     @SuppressLint("UnsafeIntentLaunch")
     private fun launchLastActivityIfNeeded(rootNodeState: RootNodeState) {
-        if (rootNodeState.exists && intent.extras?.containsKey(Constants.LAUNCH_INTENT) == true) {
-            intent?.parcelable<Intent>(Constants.LAUNCH_INTENT)?.let { originalIntent ->
-                if (originalIntent.component?.packageName == packageName) {
-                    startActivity(originalIntent)
-                }
+        if (rootNodeState.exists && intent.extras?.containsKey(LAUNCH_INTENT) == true) {
+            if (intent.component?.className != INTERNAL_ENTRY_COMPONENT) {
+                Timber.w("Rejected LAUNCH_INTENT from non-internal entry point")
                 finish()
+            } else {
+                intent.parcelable<Intent>(LAUNCH_INTENT)?.let { originalIntent ->
+                    if (originalIntent.component?.packageName == packageName) {
+                        startActivity(originalIntent)
+                    }
+                    finish()
+                }
+                intent.removeExtra(LAUNCH_INTENT)
             }
-            intent.removeExtra(Constants.LAUNCH_INTENT)
         }
     }
 

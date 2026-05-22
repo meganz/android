@@ -144,6 +144,10 @@
         <meta-data
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
             android:value="true" />
+        <activity-alias
+            android:name=".appstate.MegaActivityInternal"
+            android:exported="false"
+            android:targetActivity=".appstate.MegaActivity" />
         <activity
             android:name=".appstate.MegaActivity"
             android:configChanges="screenSize"

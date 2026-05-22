@@ -30,13 +30,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.R
-import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
 import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentDataProvider.Companion.CLOUD_DRIVE_ROOT_ID
 import mega.privacy.android.app.providers.documentprovider.model.ChildrenSlot
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
 import mega.privacy.android.app.providers.documentprovider.model.DocumentSlot
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -581,10 +580,12 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     private fun createLoginPendingIntent(): PendingIntent {
         val appContext = requireNotNull(context).applicationContext
 
-        val loginIntent = Intent(appContext, MegaActivity::class.java).apply {
-            action = Intent.ACTION_VIEW
+        val loginIntent = MegaActivityInternalLauncher.getIntent(
+            context = appContext,
+            action = Intent.ACTION_VIEW,
+        ).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            putExtra(Constants.LAUNCH_INTENT, Intent())
+            putExtra(MegaActivityInternalLauncher.LAUNCH_INTENT, Intent())
         }
 
         return PendingIntent.getActivity(

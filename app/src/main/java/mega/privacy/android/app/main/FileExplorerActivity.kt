@@ -54,6 +54,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
@@ -414,12 +415,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             val targetIntent = Intent(intent).apply {
                 setClass(this@FileExplorerActivity, FileExplorerActivity::class.java)
             }
-            val loginIntent = MegaActivity.getIntent(
+            val loginIntent = MegaActivityInternalLauncher.getIntent(
                 context = this@FileExplorerActivity,
                 warningMessage = getString(R.string.login_before_share),
             ).apply {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                putExtra(Constants.LAUNCH_INTENT, targetIntent)
+                putExtra(MegaActivityInternalLauncher.LAUNCH_INTENT, targetIntent)
             }
 
             needLogin = false
@@ -648,12 +649,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     .setAction(intent.action)
                     .setType(Constants.TYPE_TEXT_PLAIN)
                 startActivity(
-                    MegaActivity.getIntent(
+                    MegaActivityInternalLauncher.getIntent(
                         context = this,
                         warningMessage = getString(R.string.login_before_share),
                     ).apply {
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        putExtra(Constants.LAUNCH_INTENT, targetIntent)
+                        putExtra(MegaActivityInternalLauncher.LAUNCH_INTENT, targetIntent)
                     }
                 )
 

@@ -19,9 +19,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
 import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider
@@ -78,16 +77,16 @@ internal fun navigateToRefreshSession(
     context: Context,
 ) {
     context.findActivity()?.let { activity ->
-        val intent = Intent(context, MegaActivity::class.java).apply {
-            action = RefreshEvent.SdkReload.name
-            putExtra(
-                Constants.LAUNCH_INTENT,
-                activity.intent.apply {
-                    // remove flags that may cause issues when navigate from notification
-                    flags = 0
-                }
-            )
-        }
+        val intent = MegaActivityInternalLauncher.getIntent(
+            context = context,
+            action = RefreshEvent.SdkReload.name,
+        ).putExtra(
+            MegaActivityInternalLauncher.LAUNCH_INTENT,
+            activity.intent.apply {
+                // remove flags that may cause issues when navigate from notification
+                flags = 0
+            }
+        )
         context.startActivity(intent)
         activity.finish()
     }

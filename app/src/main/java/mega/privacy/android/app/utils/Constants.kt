@@ -384,7 +384,6 @@ object Constants {
     const val EMAIL: String = "email"
     const val UNKNOWN_USER_NAME_AVATAR: String = "unknown"
     const val VISIBLE_FRAGMENT: String = "VISIBLE_FRAGMENT"
-    const val LAUNCH_INTENT: String = "LAUNCH_INTENT"
     const val SELECTED_CHATS: String = "SELECTED_CHATS"
     const val SELECTED_USERS: String = "SELECTED_USERS"
     const val ID_MESSAGES: String = "ID_MESSAGES"
