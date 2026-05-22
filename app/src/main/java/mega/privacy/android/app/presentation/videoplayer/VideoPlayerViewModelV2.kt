@@ -18,11 +18,12 @@ import android.view.View
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
-import mega.privacy.android.app.presentation.videoplayer.mapper.PlayerErrorTypeMapper
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
@@ -54,6 +55,7 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.videoplayer.mapper.PlayerErrorTypeMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
@@ -78,8 +80,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
@@ -87,8 +87,6 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
-import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
-import mega.privacy.android.app.utils.Constants.URL_LOCAL_FILE_PATH
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -188,15 +186,14 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.Collections
 import java.util.Date
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /**
  * ViewModel for video player.
  */
-@HiltViewModel
-class VideoPlayerViewModelV2 @Inject constructor(
+@HiltViewModel(assistedFactory = VideoPlayerViewModelV2.Factory::class)
+class VideoPlayerViewModelV2 @AssistedInject constructor(
     @ApplicationContext private val context: Context,
     @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -254,38 +251,19 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val playerErrorTypeMapper: PlayerErrorTypeMapper,
-    savedStateHandle: SavedStateHandle,
+    @Assisted private val args: Args,
 ) : ViewModel() {
+
     val uiState: StateFlow<VideoPlayerUiState>
         field: MutableStateFlow<VideoPlayerUiState> = MutableStateFlow(
             VideoPlayerUiState(
-                fileLinkUrl = savedStateHandle[URL_FILE_LINK],
-                localFilePath = savedStateHandle[URL_LOCAL_FILE_PATH],
+                fileLinkUrl = args.fileLinkUrl,
+                localFilePath = args.localFilePath,
             )
         )
 
     private var needStopStreamingServer = false
     private var playerRetry = 0
-
-    private val currentLaunchSources: Int by lazy {
-        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] ?: INVALID_VALUE
-    }
-
-    private val firstPlayingHandle: Long by lazy {
-        savedStateHandle[INTENT_EXTRA_KEY_HANDLE] ?: INVALID_HANDLE
-    }
-
-    private val firstPlayingItemName: String by lazy {
-        savedStateHandle[INTENT_EXTRA_KEY_FILE_NAME] ?: ""
-    }
-
-    private val collectionTitle: String? by lazy {
-        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE]
-    }
-
-    private val collectionId: Long? by lazy {
-        savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID]
-    }
 
     private val snackbarMessage = SingleLiveEvent<Int>()
     private var searchQuery: String = ""
@@ -303,7 +281,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
     init {
         uiState.update {
             it.copy(
-                nodeSourceType = currentLaunchSourcesToNodeSourceType(),
+                nodeSourceType = adapterTypeToNodeSourceType(),
             )
         }
         setupTransferListener()
@@ -326,8 +304,8 @@ class VideoPlayerViewModelV2 @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    private fun currentLaunchSourcesToNodeSourceType(): NodeSourceType =
-        when (currentLaunchSources) {
+    private fun adapterTypeToNodeSourceType(): NodeSourceType =
+        when (args.adapterType) {
             OFFLINE_ADAPTER -> NodeSourceType.OFFLINE
             RUBBISH_BIN_ADAPTER -> NodeSourceType.RUBBISH_BIN
             FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING -> NodeSourceType.FOLDER_LINK
@@ -431,7 +409,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
 
     internal fun initVideoPlayerData(intent: Intent?) {
         currentIntent = intent
-        checkPlaybackPositionBeforePlayback(firstPlayingHandle) {
+        checkPlaybackPositionBeforePlayback(args.handle) {
             initVideoPlaybackSources()
         }
         hasCheckedPlaybackPosition = true
@@ -461,7 +439,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
         playerRetry = 0
 
         val currentPlayingUri =
-            getCurrentPlayingUri(uri, currentLaunchSources, currentPlayingHandle)
+            getCurrentPlayingUri(uri, args.adapterType, currentPlayingHandle)
         if (currentPlayingUri == null) {
             logInvalidParam("folder link uri is null")
             return
@@ -479,17 +457,17 @@ class VideoPlayerViewModelV2 @Inject constructor(
         )
 
         if (!intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
-            setPlayingItem(currentPlayingHandle, currentPlayingFileName, currentLaunchSources)
+            setPlayingItem(currentPlayingHandle, currentPlayingFileName, args.adapterType)
             return
         }
 
-        if (currentLaunchSources != OFFLINE_ADAPTER && currentLaunchSources != ZIP_ADAPTER) {
+        if (args.adapterType != OFFLINE_ADAPTER && args.adapterType != ZIP_ADAPTER) {
             needStopStreamingServer =
-                needStopStreamingServer || setupStreamingServer(currentLaunchSources)
+                needStopStreamingServer || setupStreamingServer(args.adapterType)
         }
 
         withContext(ioDispatcher) {
-            handlePlaybackSourceByLaunchSource(intent, currentLaunchSources, currentPlayingHandle)
+            handlePlaybackSourceByLaunchSource(intent, args.adapterType, currentPlayingHandle)
         }
     }
 
@@ -750,7 +728,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
                 playQueueTitle = title,
                 currentPlayingIndex = currentPlayingIndex,
                 currentPlayingHandle = firstPlayHandle,
-                currentPlayingItemName = firstPlayingItemName
+                currentPlayingItemName = args.fileName
             )
         }
         buildPlaybackSourcesForPlayer(mediaPlaySources)
@@ -1151,7 +1129,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
         if (items.isEmpty()) return
         val playingIndex = items.indexOfFirst { it.nodeHandle == handle }.takeIf { it != -1 } ?: 0
         val playingItemName =
-            items.firstOrNull { it.nodeHandle == handle }?.nodeName ?: firstPlayingItemName
+            items.firstOrNull { it.nodeHandle == handle }?.nodeName ?: args.fileName
 
         val updatedItems = items.mapIndexed { index, item ->
             val newType = when {
@@ -1230,8 +1208,8 @@ class VideoPlayerViewModelV2 @Inject constructor(
                     saveVideoRecentlyWatchedUseCase(
                         handle,
                         watchedAt,
-                        collectionId ?: 0L,
-                        collectionTitle
+                        args.collectionId ?: 0L,
+                        args.collectionTitle
                     )
                 }.onFailure { Timber.e(it, "Failed to save video recently watched") }
             }
@@ -1698,7 +1676,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
     private fun checkPlaybackPositionBeforePlayback(handle: Long, noPlaybackPosition: () -> Unit) {
         playbackPositionJob?.cancel()
         playbackPositionJob = viewModelScope.launch {
-            val currentItemName = uiState.value.currentPlayingItemName ?: firstPlayingItemName
+            val currentItemName = uiState.value.currentPlayingItemName ?: args.fileName
             val playbackPosition =
                 monitorPlaybackTimesUseCase().firstOrNull()?.get(handle)?.currentPosition
 
@@ -1719,7 +1697,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
             getSRTSubtitleFileListUseCase().firstOrNull { subtitleFileInfo ->
                 val subtitleName = subtitleFileInfo.name.substringBeforeLast(".")
                 val currentPlayingItemName =
-                    uiState.value.currentPlayingItemName ?: firstPlayingItemName
+                    uiState.value.currentPlayingItemName ?: args.fileName
                 val mediaItemName = currentPlayingItemName.substringBeforeLast(".")
                 subtitleName == mediaItemName
             }
@@ -1854,7 +1832,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
         uiState.update { it.copy(showSubTitlesOptions = value) }
     }
 
-    internal fun isShowSubtitleIcon() = currentLaunchSources != OFFLINE_ADAPTER
+    internal fun isShowSubtitleIcon() = args.adapterType != OFFLINE_ADAPTER
 
     internal fun clearSubtitleInfo(currentPlayingIndex: Int) {
         if (uiState.value.addedSubtitleInfo != null) {
@@ -1885,5 +1863,20 @@ class VideoPlayerViewModelV2 @Inject constructor(
         private const val SCREENSHOT_NAME_PREFIX = "Screenshot_"
         private const val SCREENSHOT_NAME_SUFFIX = ".jpg"
     }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(args: Args): VideoPlayerViewModelV2
+    }
+
+    data class Args(
+        val fileLinkUrl: String?,
+        val localFilePath: String?,
+        val adapterType: Int,
+        val handle: Long,
+        val fileName: String,
+        val collectionTitle: String?,
+        val collectionId: Long?,
+    )
 }
 

@@ -36,6 +36,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -73,6 +74,14 @@ import mega.privacy.android.app.presentation.videoplayer.navigation.videoPlayerE
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getRequest
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.URL_LOCAL_FILE_PATH
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.domain.entity.ThemeMode
@@ -83,6 +92,7 @@ import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStra
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
 /**
@@ -109,7 +119,32 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
     @Inject
     lateinit var mediaPlayerGateway: MediaPlayerGateway
 
-    private val videoPlayerViewModelV2: VideoPlayerViewModelV2 by viewModels()
+    private val videoPlayerViewModelV2: VideoPlayerViewModelV2 by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<VideoPlayerViewModelV2.Factory> { factory ->
+                factory.create(
+                    VideoPlayerViewModelV2.Args(
+                        fileLinkUrl = intent.getStringExtra(URL_FILE_LINK),
+                        localFilePath = intent.getStringExtra(URL_LOCAL_FILE_PATH),
+                        adapterType = intent.getIntExtra(
+                            INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                            INVALID_VALUE
+                        ),
+                        handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE),
+                        fileName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: "",
+                        collectionTitle = intent.getStringExtra(
+                            INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
+                        ),
+                        collectionId = if (intent.hasExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID))
+                            intent.getLongExtra(
+                                INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID,
+                                -1L
+                            ) else null,
+                    )
+                )
+            }
+        }
+    )
 
     private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {

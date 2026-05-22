@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.view.TextureView
 import android.view.View
-import androidx.lifecycle.SavedStateHandle
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import app.cash.turbine.test
@@ -17,6 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -40,7 +40,6 @@ import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_EMAIL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -51,14 +50,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DI
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
-import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -174,9 +170,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.time.Instant
+import java.util.stream.Stream
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -246,7 +242,7 @@ class VideoPlayerViewModelV2Test {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
     private val isParticipatingInChatCallUseCase = mock<IsParticipatingInChatCallUseCase>()
-    private val savedStateHandle = SavedStateHandle(mapOf())
+    private lateinit var testArgs: VideoPlayerViewModelV2.Args
     private val trackPlaybackPositionUseCase = mock<TrackPlaybackPositionUseCase>()
     private val monitorPlaybackTimesUseCase = mock<MonitorPlaybackTimesUseCase>()
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
@@ -326,23 +322,30 @@ class VideoPlayerViewModelV2Test {
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             playerErrorTypeMapper = playerErrorTypeMapper,
-            savedStateHandle = savedStateHandle,
+            args = testArgs,
         )
     }
 
     @BeforeEach
     fun setUp() {
+        testArgs = VideoPlayerViewModelV2.Args(
+            fileLinkUrl = null,
+            localFilePath = null,
+            adapterType = INVALID_VALUE,
+            handle = INVALID_HANDLE,
+            fileName = "",
+            collectionTitle = null,
+            collectionId = null,
+        )
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
         whenever(monitorSubFolderMediaDiscoverySettingsUseCase()).thenReturn(flowOf(true))
-        wheneverBlocking { monitorNodeUpdatesUseCase() }.thenReturn(fakeMonitorNodeUpdatesFlow)
-        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(fakeMonitorAccountDetailFlow)
-        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(
-            fakeMonitorShowHiddenItemsFlow
-        )
-        wheneverBlocking { isHiddenNodesOnboardedUseCase() }.thenReturn(false)
-        wheneverBlocking {
-            monitorVideoRepeatModeUseCase()
-        }.thenReturn(flowOf(RepeatToggleMode.REPEAT_NONE))
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(fakeMonitorNodeUpdatesFlow)
+        whenever(monitorAccountDetailUseCase()).thenReturn(fakeMonitorAccountDetailFlow)
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(fakeMonitorShowHiddenItemsFlow)
+        runBlocking {
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+        }
+        whenever(monitorVideoRepeatModeUseCase()).thenReturn(flowOf(RepeatToggleMode.REPEAT_NONE))
         whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
         fakeMonitorConnectivityFlow = MutableSharedFlow()
         whenever(monitorConnectivityUseCase()).thenReturn(fakeMonitorConnectivityFlow)
@@ -381,7 +384,6 @@ class VideoPlayerViewModelV2Test {
             getOfflineNodeInformationByIdUseCase,
             getOfflineNodesByParentIdUseCase,
             getLocalLinkFromMegaApiUseCase,
-            getLocalFilePathUseCase,
             getFingerprintUseCase,
             monitorTransferEventsUseCase,
             getFileByPathUseCase,
@@ -476,7 +478,7 @@ class VideoPlayerViewModelV2Test {
             whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)).thenReturn(it)
         }
         launchSource?.let {
-            savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = launchSource
+            testArgs = testArgs.copy(adapterType = launchSource)
         }
         whenever(intent.data).thenReturn(data)
         handle?.let {
@@ -914,13 +916,13 @@ class VideoPlayerViewModelV2Test {
             }
         }
 
-    private fun provideParametersForFolderLink() = listOf(
-        arrayOf<Any>(
+    private fun provideParametersForFolderLink() = Stream.of(
+        Arguments.of(
             INVALID_VALUE,
             suspend { getRootNodeFromMegaApiFolderUseCase() },
             suspend { getLocalFolderLinkUseCase(any()) }
         ),
-        arrayOf<Any>(
+        Arguments.of(
             testHandle,
             suspend { getParentNodeFromMegaApiFolderUseCase(any()) },
             suspend { getLocalFolderLinkUseCase(any()) }
@@ -1278,8 +1280,10 @@ class VideoPlayerViewModelV2Test {
         runTest {
             val expectedId = 1L
             val instant = Instant.ofEpochMilli(2000L)
-            savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
-            savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
+            testArgs = testArgs.copy(
+                collectionId = expectedCollectionId,
+                collectionTitle = expectedCollectionTitle,
+            )
             initViewModel()
             mockStatic(Instant::class.java).use {
                 it.`when`<Instant> { Instant.now() }.thenReturn(instant)
@@ -2004,7 +2008,7 @@ class VideoPlayerViewModelV2Test {
                 on { currentPosition }.thenReturn(100)
             }
             val map = mapOf(testHandle to playbackInfo)
-            savedStateHandle[INTENT_EXTRA_KEY_HANDLE] = testHandle
+            testArgs = testArgs.copy(handle = testHandle)
             whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(map))
             val intent = mock<Intent>()
             val uri: Uri = mock()
@@ -2057,7 +2061,7 @@ class VideoPlayerViewModelV2Test {
             }
         )
         whenever(getSRTSubtitleFileListUseCase()).thenReturn(testInfoList)
-        savedStateHandle[INTENT_EXTRA_KEY_FILE_NAME] = testFileName
+        testArgs = testArgs.copy(fileName = testFileName)
         initViewModel()
         val actual = underTest.getMatchedSubtitleFileInfo()
         assertThat(actual).isNotNull()
@@ -2148,7 +2152,7 @@ class VideoPlayerViewModelV2Test {
     fun `test that isShowSubtitleIcon returns correctly`(
         launchSource: Int,
     ) = runTest {
-        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = launchSource
+        testArgs = testArgs.copy(adapterType = launchSource)
         initViewModel()
         val actual = underTest.isShowSubtitleIcon()
         assertThat(actual).isEqualTo(launchSource != OFFLINE_ADAPTER)
@@ -2632,8 +2636,10 @@ class VideoPlayerViewModelV2Test {
         runTest {
             val expectedId = 1L
             val instant = Instant.ofEpochMilli(2000L)
-            savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
-            savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle
+            testArgs = testArgs.copy(
+                collectionId = expectedCollectionId,
+                collectionTitle = expectedCollectionTitle,
+            )
             initViewModel()
             mockStatic(Instant::class.java).use {
                 it.`when`<Instant> { Instant.now() }.thenReturn(instant)
@@ -2662,7 +2668,7 @@ class VideoPlayerViewModelV2Test {
         adapterType: Int,
         expected: NodeSourceType,
     ) = runTest {
-        savedStateHandle[INTENT_EXTRA_KEY_ADAPTER_TYPE] = adapterType
+        testArgs = testArgs.copy(adapterType = adapterType)
         initViewModel()
         assertThat(underTest.uiState.value.nodeSourceType).isEqualTo(expected)
     }
@@ -2689,13 +2695,25 @@ class VideoPlayerViewModelV2Test {
     )
 
     @Test
-    fun `test that fileLinkUrl in uiState is set when URL_FILE_LINK is present in savedStateHandle`() =
+    fun `test that fileLinkUrl in uiState is set when fileLinkUrl is provided in args`() =
         runTest {
             val expectedUrl = "https://mega.nz/file/abc123"
-            savedStateHandle[URL_FILE_LINK] = expectedUrl
+            testArgs = testArgs.copy(fileLinkUrl = expectedUrl)
             initViewModel()
             underTest.uiState.test {
                 assertThat(awaitItem().fileLinkUrl).isEqualTo(expectedUrl)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that localFilePath in uiState is set when localFilePath is provided in args`() =
+        runTest {
+            val expectedPath = "/storage/emulated/0/archive.zip"
+            testArgs = testArgs.copy(localFilePath = expectedPath)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().localFilePath).isEqualTo(expectedPath)
                 cancelAndIgnoreRemainingEvents()
             }
         }
