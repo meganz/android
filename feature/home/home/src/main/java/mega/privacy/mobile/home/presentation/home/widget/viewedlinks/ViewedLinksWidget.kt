@@ -54,7 +54,7 @@ import mega.privacy.android.navigation.destination.ViewedLinksScreenNavKey
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.ViewedLinksWidget.Companion.MAX_VISIBLE_VIEWED_LINK
+import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.ViewedLinksViewModel.Companion.MAX_PREVIEW_COUNT
 import mega.privacy.mobile.home.presentation.home.widget.viewedlinks.view.ViewedLinkListLoadingItem
 import javax.inject.Inject
 
@@ -80,7 +80,7 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget, Flagged {
     ) {
         FeatureFlagGate(feature = feature) {
             val viewModel: ViewedLinksViewModel = hiltViewModel()
-            val lazyItems = viewModel.pagedItems.collectAsLazyPagingItems()
+            val lazyItems = viewModel.previewItems.collectAsLazyPagingItems()
             val nodeOptionsActionViewModel =
                 hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                     creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
@@ -107,10 +107,6 @@ class ViewedLinksWidget @Inject constructor() : HomeWidget, Flagged {
             )
         }
     }
-
-    companion object {
-        const val MAX_VISIBLE_VIEWED_LINK = 4
-    }
 }
 
 @Composable
@@ -125,7 +121,7 @@ internal fun ViewedLinksView(
     Column(modifier = modifier) {
         ViewedLinksWidgetHeader(
             onViewAllClicked = onViewAllClicked,
-            showMoreButton = !isLoading && lazyItems.itemCount > MAX_VISIBLE_VIEWED_LINK,
+            showMoreButton = !isLoading && lazyItems.itemCount > MAX_PREVIEW_COUNT,
         )
 
         when {
@@ -143,7 +139,7 @@ internal fun ViewedLinksView(
             lazyItems.itemCount == 0 -> ViewedLinksEmptyView()
 
             else -> {
-                val visibleCount = minOf(lazyItems.itemCount, MAX_VISIBLE_VIEWED_LINK)
+                val visibleCount = minOf(lazyItems.itemCount, MAX_PREVIEW_COUNT)
                 for (index in 0 until visibleCount) {
                     val item = lazyItems[index] ?: continue
                     GenericListItem(
@@ -203,7 +199,7 @@ internal fun ViewedLinksWidgetHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onViewAllClicked() }
+            .clickable(enabled = showMoreButton) { onViewAllClicked() }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

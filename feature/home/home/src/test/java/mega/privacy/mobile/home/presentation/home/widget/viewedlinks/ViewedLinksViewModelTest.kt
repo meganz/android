@@ -265,6 +265,79 @@ class ViewedLinksViewModelTest {
     }
 
     @Test
+    fun `test that previewItems emits resolved file link items`() = runTest {
+        val viewedLink = ViewedLink(
+            nodeHandle = 1L,
+            name = "preview.pdf",
+            linkUrl = "https://mega.nz/file/preview",
+            type = RecentlyViewedLinkType.FileLink,
+            accessedTimestamp = 3000L,
+        )
+        val typedFileNode = mock<TypedFileNode> {
+            on { previewPath }.thenReturn("/cache/preview-file.jpg")
+            on { type }.thenReturn(PdfFileTypeInfo)
+        }
+
+        whenever(getPublicNodeUseCase("https://mega.nz/file/preview"))
+            .thenReturn(typedFileNode)
+        whenever(fileTypeIconMapper(any(), any()))
+            .thenReturn(iconPackR.drawable.ic_pdf_medium_solid)
+
+        initViewModel(listOf(viewedLink))
+
+        val items = underTest.previewItems.asSnapshot()
+        assertThat(items).hasSize(1)
+        assertThat(items[0].previewPath).isEqualTo("/cache/preview-file.jpg")
+        assertThat(items[0].iconRes).isEqualTo(iconPackR.drawable.ic_pdf_medium_solid)
+    }
+
+    @Test
+    fun `test that previewItems emits folder link items with folder icon`() = runTest {
+        val folderLink = ViewedLink(
+            nodeHandle = 2L,
+            name = "Preview Folder",
+            linkUrl = "https://mega.nz/folder/preview",
+            type = RecentlyViewedLinkType.FolderLink,
+            accessedTimestamp = 4000L,
+        )
+
+        initViewModel(listOf(folderLink))
+
+        val items = underTest.previewItems.asSnapshot()
+        assertThat(items).hasSize(1)
+        assertThat(items[0].previewPath).isNull()
+        assertThat(items[0].iconRes)
+            .isEqualTo(iconPackR.drawable.ic_folder_users_small_solid)
+        verifyNoMoreInteractions(getPublicNodeUseCase)
+        verifyNoMoreInteractions(fileTypeIconMapper)
+    }
+
+    @Test
+    fun `test that previewItems emits empty snapshot when no viewed links`() = runTest {
+        initViewModel(emptyList())
+
+        val items = underTest.previewItems.asSnapshot()
+        assertThat(items).isEmpty()
+        verifyNoMoreInteractions(getPublicNodeUseCase)
+        verifyNoMoreInteractions(fileTypeIconMapper)
+    }
+
+    @Test
+    fun `test that previewItems uses LastAccessed and Descending regardless of sort preference`() =
+        runTest {
+            initViewModel(
+                links = emptyList(),
+                sortField = ViewedLinksSortField.Name,
+                sortDirection = SortDirection.Ascending,
+            )
+
+            underTest.previewItems.asSnapshot()
+
+            verify(monitorViewedLinksUseCase)
+                .invoke(ViewedLinksSortField.LastAccessed, SortDirection.Descending)
+        }
+
+    @Test
     fun `test that uiState reflects persisted sort preference`() = runTest {
         initViewModel(
             links = emptyList(),

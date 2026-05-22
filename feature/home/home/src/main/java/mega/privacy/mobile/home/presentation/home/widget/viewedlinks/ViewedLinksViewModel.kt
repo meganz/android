@@ -20,11 +20,14 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
@@ -109,7 +112,7 @@ internal class ViewedLinksViewModel @Inject constructor(
         )
     }
 
-    val pagedItems: Flow<PagingData<ViewedLinkUiItem>> =
+    val pagedItems: Flow<PagingData<ViewedLinkUiItem>> by lazy(LazyThreadSafetyMode.NONE) {
         monitorViewedLinksSortPreferenceUseCase()
             .flatMapLatest { (field, direction) ->
                 Pager(
@@ -123,6 +126,31 @@ internal class ViewedLinksViewModel @Inject constructor(
             }
             .map { pagingData -> pagingData.map { it.toUiItem() } }
             .cachedIn(viewModelScope)
+    }
+
+    val previewItems: Flow<PagingData<ViewedLinkUiItem>> by lazy(LazyThreadSafetyMode.NONE) {
+        // The widget displays at most MAX_PREVIEW_COUNT items, but we fetch one extra so we
+        // can tell whether more items exist and decide if the "View more" icon should be shown.
+        // Loading just one additional item keeps this as efficient as possible.
+        val pageSize = MAX_PREVIEW_COUNT + 1
+
+        Pager(
+            config = PagingConfig(
+                pageSize = pageSize,
+                initialLoadSize = pageSize,
+                maxSize = pageSize * 3,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                monitorViewedLinksUseCase(
+                    ViewedLinksSortField.LastAccessed,
+                    SortDirection.Descending
+                )
+            }
+        ).flow
+            .mapLatest { pagingData -> pagingData.map { it.toUiItem() } }
+            .cachedIn(viewModelScope)
+    }
 
     /**
      * Resolves a single [ViewedLink] to its UI item.
@@ -218,11 +246,17 @@ internal class ViewedLinksViewModel @Inject constructor(
                     sortField = viewedLinksSortMapper(configuration.sortOption),
                     sortDirection = configuration.sortDirection,
                 )
-            }.onFailure { Timber.e(it, "Failed to persist viewed-links sort preference") }
+            }.onFailure {
+                Timber.e(
+                    it,
+                    "Failed to persist viewed-links sort preference"
+                )
+            }
         }
     }
 
-    private companion object {
+    companion object {
         private const val PAGE_SIZE = 10
+        internal const val MAX_PREVIEW_COUNT = 4
     }
 }
