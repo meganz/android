@@ -927,12 +927,12 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        val rootView = Util.getRootViewFromContext(this)
+        val rootView = Util.getRootViewFromContext(this) ?: return
         showSnackbar(type = type, view = rootView, s = content, idChat = chatId)
     }
 
     override fun showSnackbar(type: Int, content: String, action: () -> Unit) {
-        val rootView = Util.getRootViewFromContext(this)
+        val rootView = Util.getRootViewFromContext(this) ?: return
         showSnackbar(type = type, view = rootView, s = content, action = action)
     }
 

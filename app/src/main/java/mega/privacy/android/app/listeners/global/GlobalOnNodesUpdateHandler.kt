@@ -18,7 +18,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.toCDATA
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.pdf.CheckIfShouldDeleteLastPageViewedInPdfUseCase
@@ -87,7 +87,7 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
                 "<b>$folderName</b> " +
                         appContext.getString(R.string.incoming_folder_notification) +
                         " " +
-                        Util.toCDATA(userName)
+                        userName.toCDATA()
             val notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY)
             val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID
             val pendingIntent = megaNavigator

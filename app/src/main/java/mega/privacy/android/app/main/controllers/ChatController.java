@@ -19,7 +19,7 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnCalendar;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
-import static mega.privacy.android.app.utils.Util.toCDATA;
+import static mega.privacy.android.app.utils.Util.toCDATAOrNull;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.Context;
@@ -319,7 +319,7 @@ public class ChatController {
                 } else if (message.getType() == MegaChatMessage.TYPE_TRUNCATE) {
                     Timber.d("Message type TRUNCATE");
 
-                    String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATA(megaChatApi.getMyFullname()));
+                    String textToShow = String.format(context.getString(R.string.history_cleared_by), toCDATAOrNull(megaChatApi.getMyFullname()));
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'#060000\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");

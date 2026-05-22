@@ -11,7 +11,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.converterShortCodes
 import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.toCDATA
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
@@ -198,7 +198,7 @@ class GetLastMessageUseCase @Inject constructor(
         lastMessageSender == megaChatApi.myUserHandle
 
     private fun String.cleanHtmlText(): String =
-        Util.toCDATA(this)
+        this.toCDATA()
             .replace("[A]", "")
             .replace("[/A]", "")
             .replace("[B]", "")

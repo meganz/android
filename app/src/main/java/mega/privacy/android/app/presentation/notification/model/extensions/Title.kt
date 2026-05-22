@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.notification.model.extensions
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.toCDATAOrNull
 import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
 import mega.privacy.android.domain.entity.ContactChangeBlockedYouAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
@@ -98,12 +98,12 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
         if (path != null && FileUtil.isFile(path)) {
             String.format(
                 context.getString(R.string.subtitle_file_takedown_notification),
-                Util.toCDATA(name)
+                name.toCDATAOrNull()
             )
         } else {
             String.format(
                 context.getString(R.string.subtitle_folder_takedown_notification),
-                Util.toCDATA(name)
+                name.toCDATAOrNull()
             )
         }
     }
@@ -112,12 +112,12 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
         if (path != null && FileUtil.isFile(path)) {
             String.format(
                 context.getString(R.string.subtitle_file_takedown_reinstated_notification),
-                Util.toCDATA(name)
+                name.toCDATAOrNull()
             )
         } else {
             String.format(
                 context.getString(R.string.subtitle_folder_takedown_reinstated_notification),
-                Util.toCDATA(name)
+                name.toCDATAOrNull()
             )
         }
     }
