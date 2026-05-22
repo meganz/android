@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -109,6 +110,7 @@ internal fun FileLinkScreen(
         onBack = onBack,
     )
 
+    val coroutineScope = rememberCoroutineScope()
     openedFileNode?.let { fileNode ->
         val sourceUrl = uiState.url ?: return@let
         HandleNodeAction3(
@@ -117,6 +119,7 @@ internal fun FileLinkScreen(
             onNavigate = onNavigate,
             onActionHandled = { openedFileNode = null },
             onDownloadEvent = onTransfer,
+            coroutineScope = coroutineScope,
         )
     }
 

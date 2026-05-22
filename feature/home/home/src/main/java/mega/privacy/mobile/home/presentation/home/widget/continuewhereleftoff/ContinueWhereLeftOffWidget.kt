@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -47,6 +48,7 @@ class ContinueWhereLeftOffWidget @Inject constructor() : HomeWidget, Flagged {
             val viewModel: ContinueWhereLeftOffViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
+            val coroutineScope = rememberCoroutineScope()
 
             EventEffect(
                 event = uiState.openNodeEvent,
@@ -71,6 +73,7 @@ class ContinueWhereLeftOffWidget @Inject constructor() : HomeWidget, Flagged {
                     nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
                     onDownloadEvent = transferHandler::setTransferEvent,
                     onNavigate = navigationHandler::navigate,
+                    coroutineScope = coroutineScope,
                 )
             }
         }

@@ -4,7 +4,6 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -133,7 +132,7 @@ fun HandleFileAction(
     isOpenWith: Boolean,
     snackBarHostState: SnackbarHostStateWrapper?,
     onActionHandled: () -> Unit,
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+    coroutineScope: CoroutineScope,
 ) {
     val nodeActionsViewModel: NodeActionsViewModel = hiltViewModel()
     val context = LocalContext.current

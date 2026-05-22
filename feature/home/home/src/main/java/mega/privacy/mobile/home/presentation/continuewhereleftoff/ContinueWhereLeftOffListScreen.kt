@@ -25,15 +25,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -58,19 +59,19 @@ import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.shared.nodes.components.NodeThumbnailView
-import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
+import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -88,6 +89,7 @@ internal fun ContinueWhereLeftOffListScreen(
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val optionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isListView = uiState.currentViewType == ViewType.LIST
+    val coroutineScope = rememberCoroutineScope()
 
     EventEffect(
         event = uiState.openNodeEvent,
@@ -253,6 +255,7 @@ internal fun ContinueWhereLeftOffListScreen(
             nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
             onDownloadEvent = transferHandler::setTransferEvent,
             onNavigate = onNavigate,
+            coroutineScope = coroutineScope,
         )
     }
 }

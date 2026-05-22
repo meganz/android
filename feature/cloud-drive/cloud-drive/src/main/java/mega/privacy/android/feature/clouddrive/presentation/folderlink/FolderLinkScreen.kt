@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -246,6 +247,7 @@ internal fun FolderLinkScreen(
     }
 
 
+    val coroutineScope = rememberCoroutineScope()
     uiState.openedFileNode?.let { fileNode ->
         HandleNodeAction3(
             typedFileNode = fileNode,
@@ -254,6 +256,7 @@ internal fun FolderLinkScreen(
             onActionHandled = { viewModel.processAction(FolderLinkAction.OpenedFileNodeHandled) },
             onDownloadEvent = onTransfer,
             sortOrder = uiState.selectedSortOrder,
+            coroutineScope = coroutineScope
         )
     }
 

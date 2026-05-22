@@ -38,6 +38,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -193,15 +194,16 @@ internal fun StartTransferComponent(
         onResumeTransfers = viewModel::resumeTransfers,
         onAskedResumeTransfers = viewModel::setAskedResumeTransfers,
         snackBarHostState = snackBarHostState.orProvided(),
-        onScanningFinished = onScanningFinished,
         onPreviewFile = viewModel::previewFile,
         onPreviewOpened = viewModel::consumePreviewFileOpened,
         onCancelTransferConfirmed = viewModel::cancelTransferConfirmed,
         onCancelTransferCancelled = viewModel::cancelTransferCancelled,
         onConsumeCancelTransferResult = viewModel::onConsumeCancelTransferFailure,
+        onScanningFinished = onScanningFinished,
         retryTransfers = {
             viewModel.startTransfer(it)
-        }
+        },
+        coroutineScope = coroutineScope,
     )
 }
 
@@ -242,6 +244,7 @@ internal fun createStartTransferView(
 @Composable
 private fun StartTransferComponent(
     uiState: StartTransferViewState,
+    coroutineScope: CoroutineScope,
     onOneOffEventConsumed: () -> Unit,
     onCancelled: () -> Unit,
     onLargeDownloadAnswered: (TransferTriggerEvent.DownloadTriggerEvent?, saveDoNotAskAgain: Boolean) -> Unit,
@@ -263,7 +266,6 @@ private fun StartTransferComponent(
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
-    val coroutineScope = rememberCoroutineScope()
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
     var showResumeChatUploadsAlertDialog by rememberSaveable { mutableStateOf(false) }
     var showResumePreviewDownloadsAlertDialog by rememberSaveable { mutableStateOf<String?>(null) }
@@ -411,6 +413,7 @@ private fun StartTransferComponent(
             isOpenWith = uiState.isOpenWithAction,
             snackBarHostState = snackBarHostState,
             onActionHandled = onPreviewOpened,
+            coroutineScope = coroutineScope,
         )
     }
     showQuotaExceededDialog.value?.let {
