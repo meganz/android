@@ -189,14 +189,14 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
             )
 
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
-                { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
+                { PsaContainer(content = it) },
                 {
                     PasscodeContainer(
                         canLock = { passcodeEnabled },
                         content = it
                     )
                 },
-                { PsaContainer(content = it) }
+                { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
             )
 
             AppContainer(
