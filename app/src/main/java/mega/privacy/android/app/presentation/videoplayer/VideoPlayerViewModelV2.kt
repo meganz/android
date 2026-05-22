@@ -298,6 +298,7 @@ class VideoPlayerViewModelV2 @Inject constructor(
 
     private var isPausedByUser = false
     private var allowUpdatePausedByUser = true
+    private var wasPlayingBeforeSubtitleDialog = false
 
     init {
         uiState.update {
@@ -1841,8 +1842,16 @@ class VideoPlayerViewModelV2 @Inject constructor(
     }
 
     internal fun updateShowSubtitleDialog(value: Boolean) {
+        if (value) {
+            wasPlayingBeforeSubtitleDialog = mediaPlayerGateway.getPlayWhenReady()
+            mediaPlayerGateway.setPlayWhenReady(false)
+        } else {
+            if (wasPlayingBeforeSubtitleDialog) {
+                mediaPlayerGateway.setPlayWhenReady(true)
+            }
+            wasPlayingBeforeSubtitleDialog = false
+        }
         uiState.update { it.copy(showSubTitlesOptions = value) }
-        mediaPlayerGateway.setPlayWhenReady(!value)
     }
 
     internal fun isShowSubtitleIcon() = currentLaunchSources != OFFLINE_ADAPTER

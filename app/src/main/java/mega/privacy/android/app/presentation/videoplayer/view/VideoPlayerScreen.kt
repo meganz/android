@@ -521,6 +521,9 @@ internal fun VideoPlayerScreen(
                             if (isControllerViewVisible) {
                                 systemUiController.isSystemBarsVisible = true
                                 playerComposeView.showController()
+                                if (isPlaying && !uiState.isLocked) {
+                                    scheduleAutoHide(true)
+                                }
                             }
 
                             playerComposeView.controllerAutoShow = false

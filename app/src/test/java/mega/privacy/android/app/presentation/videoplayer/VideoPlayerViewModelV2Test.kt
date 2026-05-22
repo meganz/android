@@ -2064,20 +2064,56 @@ class VideoPlayerViewModelV2Test {
         assertThat(actual?.name).isEqualTo(testFileName)
     }
 
-    @ParameterizedTest(name = "when value is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that showSubtitleDialog is update correctly after updateShowSubtitleDialog is invoked`(
-        value: Boolean,
-    ) = runTest {
-        initViewModel()
-        underTest.updateShowSubtitleDialog(value)
-        testScheduler.advanceUntilIdle()
-        verify(mediaPlayerGateway).setPlayWhenReady(!value)
-        underTest.uiState.test {
-            assertThat(awaitItem().showSubTitlesOptions).isEqualTo(value)
-            cancelAndConsumeRemainingEvents()
+    @Test
+    fun `test that showSubtitleDialog is updated correctly and setPlayWhenReady false is called when updateShowSubtitleDialog is invoked with true`() =
+        runTest {
+            initViewModel()
+            underTest.updateShowSubtitleDialog(true)
+            testScheduler.advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            underTest.uiState.test {
+                assertThat(awaitItem().showSubTitlesOptions).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
+
+    @Test
+    fun `test that showSubtitleDialog is updated correctly when updateShowSubtitleDialog is invoked with false`() =
+        runTest {
+            initViewModel()
+            underTest.updateShowSubtitleDialog(false)
+            testScheduler.advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().showSubTitlesOptions).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that updateShowSubtitleDialog false does not resume playback when user was paused before opening subtitle dialog`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            initViewModel()
+            underTest.updateShowSubtitleDialog(true)
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.updateShowSubtitleDialog(false)
+
+            verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+        }
+
+    @Test
+    fun `test that updateShowSubtitleDialog false resumes playback when video was playing before opening subtitle dialog`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            initViewModel()
+            underTest.updateShowSubtitleDialog(true)
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.updateShowSubtitleDialog(false)
+
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+        }
 
     @Test
     fun `test that state is updated correctly after navigateToSelectSubtitle is invoked`() =
