@@ -75,7 +75,10 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         private const val LOGIN_PENDING_INTENT_REQUEST_CODE = 1001
 
         /** Delay before notifying SAF so it has time to register its ContentObserver on the cursor's notification URI. */
-        private const val NOTIFY_DELAY_MS = 100L
+        private const val NOTIFY_DELAY_MS = 200L
+
+        /** Distinct Root.COLUMN_ROOT_ID returned while NotLoggedIn so SAF treats it as a separate root and forces the picker to back out of any cached navigation when session transitions. */
+        private const val LOGGED_OUT_ROOT_ID = "mega_cloud_drive_root_loggedout"
 
         /** Daemon dispatcher so open work is not on the viewer thread. */
         private val openDocumentDispatcher: CoroutineDispatcher =
@@ -120,7 +123,8 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     }
 
     override fun queryRoots(projection: Array<String>?): Cursor {
-        val summary = when (val session = dataProvider.sessionState.value) {
+        val session = dataProvider.sessionState.value
+        val summary = when (session) {
             is CloudDriveSessionState.Ready -> session.accountName
             is CloudDriveSessionState.PasscodeLockEnabled -> session.accountName
             is CloudDriveSessionState.Offline -> session.accountName
@@ -128,9 +132,14 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             CloudDriveSessionState.NotLoggedIn -> getLoginToMEGAString()
             CloudDriveSessionState.Initialising -> getLoadingString()
         }
+        val rootId = if (session is CloudDriveSessionState.NotLoggedIn) {
+            LOGGED_OUT_ROOT_ID
+        } else {
+            CLOUD_DRIVE_ROOT_ID
+        }
         val result =
             getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false).apply {
-                addRootRow(summary)
+                addRootRow(rootId, summary)
             }
 
         setNotificationUriForRoot(result)
@@ -161,9 +170,9 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                 this is CloudDriveSessionState.PasscodeLockEnabled ||
                 this is CloudDriveSessionState.RootNodeNotLoaded
 
-    private fun MatrixCursor.addRootRow(summary: String) {
+    private fun MatrixCursor.addRootRow(rootId: String, summary: String) {
         newRow().apply {
-            add(Root.COLUMN_ROOT_ID, CLOUD_DRIVE_ROOT_ID)
+            add(Root.COLUMN_ROOT_ID, rootId)
             add(
                 Root.COLUMN_TITLE,
                 getAppNameString()
