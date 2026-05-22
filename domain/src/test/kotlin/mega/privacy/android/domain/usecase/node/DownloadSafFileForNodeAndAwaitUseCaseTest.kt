@@ -26,12 +26,12 @@ import java.io.FileNotFoundException
 import java.nio.file.Files
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
+class DownloadSafFileForNodeAndAwaitUseCaseTest {
 
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase = mock()
     private val downloadNodeUseCase: DownloadNodeUseCase = mock()
 
-    private lateinit var underTest: DownloadPreviewFileForNodeAndAwaitUseCase
+    private lateinit var underTest: DownloadSafFileForNodeAndAwaitUseCase
 
     @BeforeEach
     fun setUp() {
@@ -39,7 +39,7 @@ class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
             getFilePreviewDownloadPathUseCase,
             downloadNodeUseCase,
         )
-        underTest = DownloadPreviewFileForNodeAndAwaitUseCase(
+        underTest = DownloadSafFileForNodeAndAwaitUseCase(
             getFilePreviewDownloadPathUseCase = getFilePreviewDownloadPathUseCase,
             downloadNodeUseCase = downloadNodeUseCase,
         )
@@ -50,7 +50,7 @@ class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
         runTest {
             val node: TypedFileNode = mock()
             whenever(node.name).thenReturn("existing.pdf")
-            val tempDir = Files.createTempDirectory("preview_dest_1").toFile()
+            val tempDir = Files.createTempDirectory("saf_dest_1").toFile()
             try {
                 val dest = File(tempDir, "existing.pdf").apply {
                     createNewFile()
@@ -68,11 +68,11 @@ class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
         }
 
     @Test
-    fun `test that invoke calls download use case with preview app data when no cached file exists`() =
+    fun `test that invoke calls download use case with SafDownload app data when no cached file exists`() =
         runTest {
             val node: TypedFileNode = mock()
             whenever(node.name).thenReturn("new.doc")
-            val tempDir = Files.createTempDirectory("preview_dest_2").toFile()
+            val tempDir = Files.createTempDirectory("saf_dest_2").toFile()
             try {
                 whenever(getFilePreviewDownloadPathUseCase()).thenReturn(tempDir.absolutePath)
                 val finishEvent = TransferEvent.TransferFinishEvent(
@@ -83,7 +83,7 @@ class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
                     downloadNodeUseCase(
                         node = eq(node),
                         destinationPath = eq(tempDir.absolutePath),
-                        appData = eq(listOf(TransferAppData.PreviewDownload)),
+                        appData = eq(listOf(TransferAppData.SafDownload)),
                         isHighPriority = eq(true),
                     )
                 ).thenReturn(
@@ -102,7 +102,7 @@ class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
                 verify(downloadNodeUseCase).invoke(
                     node = eq(node),
                     destinationPath = eq(tempDir.absolutePath),
-                    appData = eq(listOf(TransferAppData.PreviewDownload)),
+                    appData = eq(listOf(TransferAppData.SafDownload)),
                     isHighPriority = eq(true),
                 )
             } finally {
@@ -114,7 +114,7 @@ class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
     fun `test that invoke waits for finish event before returning the file`() = runTest {
         val node: TypedFileNode = mock()
         whenever(node.name).thenReturn("wait.bin")
-        val tempDir = Files.createTempDirectory("preview_dest_3").toFile()
+        val tempDir = Files.createTempDirectory("saf_dest_3").toFile()
         try {
             whenever(getFilePreviewDownloadPathUseCase()).thenReturn(tempDir.absolutePath)
             val updateTransfer: Transfer = mock()
@@ -144,7 +144,7 @@ class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
         runTest {
             val node: TypedFileNode = mock()
             whenever(node.name).thenReturn("failed.bin")
-            val tempDir = Files.createTempDirectory("preview_dest_4").toFile()
+            val tempDir = Files.createTempDirectory("saf_dest_4").toFile()
             try {
                 whenever(getFilePreviewDownloadPathUseCase()).thenReturn(tempDir.absolutePath)
                 val error: MegaException = mock()
@@ -163,7 +163,7 @@ class DownloadPreviewFileForNodeAndAwaitUseCaseTest {
         runTest {
             val node: TypedFileNode = mock()
             whenever(node.name).thenReturn("missing.txt")
-            val tempDir = Files.createTempDirectory("preview_dest_5").toFile()
+            val tempDir = Files.createTempDirectory("saf_dest_5").toFile()
             try {
                 whenever(getFilePreviewDownloadPathUseCase()).thenReturn(tempDir.absolutePath)
                 whenever(downloadNodeUseCase(any(), any(), any(), any())).thenReturn(

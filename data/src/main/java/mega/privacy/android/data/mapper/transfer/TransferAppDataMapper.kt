@@ -8,6 +8,7 @@ import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.GeoLocatio
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OfflineDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.OriginalContentUri
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.PreviewDownload
+import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.SafDownload
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.TransferGroup
 import mega.privacy.android.data.mapper.transfer.AppDataTypeConstants.VoiceClip
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -78,6 +79,8 @@ class TransferAppDataMapper @Inject constructor() {
                     PreviewDownload -> TransferAppData.PreviewDownload
 
                     OfflineDownload -> TransferAppData.OfflineDownload
+
+                    SafDownload -> TransferAppData.SafDownload
 
                     null -> null
                 }

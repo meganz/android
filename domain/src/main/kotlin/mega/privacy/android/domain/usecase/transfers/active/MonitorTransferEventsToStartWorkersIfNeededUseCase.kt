@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.filterNot
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
+import mega.privacy.android.domain.entity.transfer.isSafDownload
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
@@ -41,6 +42,7 @@ class MonitorTransferEventsToStartWorkersIfNeededUseCase @Inject constructor(
                                 || event.transfer.isBackupTransfer
                                 || event.transfer.isSyncTransfer
                                 || event.transfer.transferType == TransferType.CU_UPLOAD
+                                || event.transfer.isSafDownload()
                     },
                 transferRepository.monitorIsDownloadsWorkerFinished(),
                 transferRepository.monitorIsUploadsWorkerFinished(),

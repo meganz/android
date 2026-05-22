@@ -24,7 +24,7 @@ class GetOpenableLocalFileForCloudDriveSafUseCaseTest {
 
     private val getFileNodeContentForFileNodeUseCase: GetFileNodeContentForFileNodeUseCase = mock()
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
-    private val downloadPreviewFileForNodeAndAwaitUseCase: DownloadPreviewFileForNodeAndAwaitUseCase =
+    private val downloadSafFileForNodeAndAwaitUseCase: DownloadSafFileForNodeAndAwaitUseCase =
         mock()
 
     private lateinit var underTest: GetOpenableLocalFileForCloudDriveSafUseCase
@@ -34,12 +34,12 @@ class GetOpenableLocalFileForCloudDriveSafUseCaseTest {
         reset(
             getFileNodeContentForFileNodeUseCase,
             getNodeContentUriUseCase,
-            downloadPreviewFileForNodeAndAwaitUseCase,
+            downloadSafFileForNodeAndAwaitUseCase,
         )
         underTest = GetOpenableLocalFileForCloudDriveSafUseCase(
             getFileNodeContentForFileNodeUseCase = getFileNodeContentForFileNodeUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
-            downloadPreviewFileForNodeAndAwaitUseCase = downloadPreviewFileForNodeAndAwaitUseCase,
+            downloadSafFileForNodeAndAwaitUseCase = downloadSafFileForNodeAndAwaitUseCase,
         )
     }
 
@@ -55,7 +55,7 @@ class GetOpenableLocalFileForCloudDriveSafUseCaseTest {
             val result = underTest(node)
 
             assertThat(result).isEqualTo(local)
-            verify(downloadPreviewFileForNodeAndAwaitUseCase, times(0)).invoke(any())
+            verify(downloadSafFileForNodeAndAwaitUseCase, times(0)).invoke(any())
         }
 
     @Test
@@ -65,12 +65,12 @@ class GetOpenableLocalFileForCloudDriveSafUseCaseTest {
         whenever(getFileNodeContentForFileNodeUseCase(node, false)).thenReturn(
             FileNodeContent.Other(null),
         )
-        whenever(downloadPreviewFileForNodeAndAwaitUseCase(node)).thenReturn(downloaded)
+        whenever(downloadSafFileForNodeAndAwaitUseCase(node)).thenReturn(downloaded)
 
         val result = underTest(node)
 
         assertThat(result).isEqualTo(downloaded)
-        verify(downloadPreviewFileForNodeAndAwaitUseCase).invoke(node)
+        verify(downloadSafFileForNodeAndAwaitUseCase).invoke(node)
     }
 
     @Test
@@ -85,7 +85,7 @@ class GetOpenableLocalFileForCloudDriveSafUseCaseTest {
         val result = underTest(node)
 
         assertThat(result).isEqualTo(local)
-        verify(downloadPreviewFileForNodeAndAwaitUseCase, times(0)).invoke(any())
+        verify(downloadSafFileForNodeAndAwaitUseCase, times(0)).invoke(any())
     }
 
     @Test
@@ -97,12 +97,12 @@ class GetOpenableLocalFileForCloudDriveSafUseCaseTest {
                 NodeContentUri.RemoteContentUri("https://example.com/f", false),
             ),
         )
-        whenever(downloadPreviewFileForNodeAndAwaitUseCase(node)).thenReturn(downloaded)
+        whenever(downloadSafFileForNodeAndAwaitUseCase(node)).thenReturn(downloaded)
 
         val result = underTest(node)
 
         assertThat(result).isEqualTo(downloaded)
-        verify(downloadPreviewFileForNodeAndAwaitUseCase).invoke(node)
+        verify(downloadSafFileForNodeAndAwaitUseCase).invoke(node)
     }
 
     @Test
@@ -117,7 +117,7 @@ class GetOpenableLocalFileForCloudDriveSafUseCaseTest {
         val result = underTest(node)
 
         assertThat(result).isEqualTo(local)
-        verify(downloadPreviewFileForNodeAndAwaitUseCase, times(0)).invoke(any())
+        verify(downloadSafFileForNodeAndAwaitUseCase, times(0)).invoke(any())
     }
 
     private fun fileNode(

@@ -12,7 +12,7 @@ import javax.inject.Inject
 class GetOpenableLocalFileForCloudDriveSafUseCase @Inject constructor(
     private val getFileNodeContentForFileNodeUseCase: GetFileNodeContentForFileNodeUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
-    private val downloadPreviewFileForNodeAndAwaitUseCase: DownloadPreviewFileForNodeAndAwaitUseCase,
+    private val downloadSafFileForNodeAndAwaitUseCase: DownloadSafFileForNodeAndAwaitUseCase,
 ) {
 
     private val downloadMutexes = ConcurrentHashMap<Long, Mutex>()
@@ -40,7 +40,7 @@ class GetOpenableLocalFileForCloudDriveSafUseCase @Inject constructor(
         val mutex = downloadMutexes.computeIfAbsent(node.id.longValue) { Mutex() }
         return try {
             mutex.withLock {
-                downloadPreviewFileForNodeAndAwaitUseCase(node)
+                downloadSafFileForNodeAndAwaitUseCase(node)
             }
         } finally {
             // Only remove if no other coroutine is queued

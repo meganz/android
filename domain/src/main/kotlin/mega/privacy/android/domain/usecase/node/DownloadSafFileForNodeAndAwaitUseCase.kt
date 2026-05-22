@@ -10,7 +10,12 @@ import java.io.File
 import java.io.FileNotFoundException
 import javax.inject.Inject
 
-class DownloadPreviewFileForNodeAndAwaitUseCase @Inject constructor(
+/**
+ * Downloads a node to the preview cache folder and suspends until the transfer finishes, tagging
+ * the transfer with [TransferAppData.SafDownload] so it's filtered out of the user-visible
+ * transfer surfaces (Transfer screen, toolbar widget).
+ */
+class DownloadSafFileForNodeAndAwaitUseCase @Inject constructor(
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
     private val downloadNodeUseCase: DownloadNodeUseCase,
 ) {
@@ -22,21 +27,21 @@ class DownloadPreviewFileForNodeAndAwaitUseCase @Inject constructor(
             return destFile
         }
         destFile.delete()
-        val finishEvent = withTimeout(PREVIEW_DOWNLOAD_TIMEOUT_MS) {
+        val finishEvent = withTimeout(SAF_DOWNLOAD_TIMEOUT_MS) {
             downloadNodeUseCase(
                 node = node,
                 destinationPath = downloadPath,
-                appData = listOf(TransferAppData.PreviewDownload),
+                appData = listOf(TransferAppData.SafDownload),
                 isHighPriority = true,
             ).first { it is TransferEvent.TransferFinishEvent } as TransferEvent.TransferFinishEvent
         }
         if (finishEvent.error != null || !destFile.exists() || destFile.length() == 0L) {
-            throw FileNotFoundException("Preview download failed or was cancelled: ${node.name}")
+            throw FileNotFoundException("SAF download failed or was cancelled: ${node.name}")
         }
         return destFile
     }
 
     private companion object {
-        const val PREVIEW_DOWNLOAD_TIMEOUT_MS = 120_000L // 2 min
+        const val SAF_DOWNLOAD_TIMEOUT_MS = 120_000L // 2 min
     }
 }
