@@ -185,11 +185,11 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         super.onCreate()
         isRunning = true
         runCatching {
-            Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
-            // startForegroundService() requires startForeground() within a short window. The media
-            // notification is posted asynchronously from createPlayerControlNotification(); if that
-            // callback runs late, the system throws ForegroundServiceDidNotStartInTimeException.
+            // startForegroundService() requires startForeground() within a short window. Call it
+            // first, before analytics or any other work that could delay it and trigger
+            // ForegroundServiceDidNotStartInTimeException.
             startForegroundWithMediaPlaybackType(createNotificationForStartForeground())
+            Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
             if (!isNotificationCreated) {
                 createPlayerControlNotification()
                 isNotificationCreated = true
@@ -348,17 +348,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Call startForeground first, before any other work, to satisfy the OS contract on every
+        // onStartCommand invocation and maximise the chance of success regardless of command type.
+        crashReporter.log("onStartCommand: currentNotification is ${if (currentNotification != null) "not null" else "null"}")
+        startForegroundWithMediaPlaybackType(createNotificationForStartForeground())
         mainHandler.removeCallbacks(resumePlayRunnable)
         val command = intent?.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)
-        if (command == COMMAND_PAUSE || command == COMMAND_RESUME || command == COMMAND_STOP) {
-            currentNotification?.let {
-                crashReporter.log("currentNotification is not null")
-                startForegroundWithMediaPlaybackType(it)
-            } ?: run {
-                crashReporter.log("currentNotification is null and create new notification")
-                startForegroundWithMediaPlaybackType(createNotificationForStartForeground())
-            }
-        }
         when (command) {
             COMMAND_PAUSE -> {
                 val userInitiatedPause = isPausedByUser
@@ -775,9 +770,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
         /**
          * Send the command to audio player service.
-         * Checks that [AudioPlayerService] is started before sending the command to avoid
-         * [android.app.ForegroundServiceDidNotStartInTimeException] (duplicate start) and
-         * [android.app.ForegroundServiceStartNotAllowedException] (called from background on Android 12+).
+         * Only sends if [AudioPlayerService] is already started to avoid
+         * [android.app.ForegroundServiceDidNotStartInTimeException] on duplicate starts.
+         * [android.app.ForegroundServiceStartNotAllowedException] is caught below for background
+         * calls from system components (e.g. call handler, video player teardown).
          *
          * @param context
          * @param command

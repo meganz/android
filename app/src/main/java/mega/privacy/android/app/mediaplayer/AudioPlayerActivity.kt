@@ -23,7 +23,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.common.util.Util
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -323,7 +322,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             PermissionUtils.checkNotificationsPermission(this)
             if (rebuildPlaylist) {
                 playerServiceIntent.setDataAndType(intent.data, intent.type)
-                Util.startForegroundService(this, playerServiceIntent)
+                ContextCompat.startForegroundService(this, playerServiceIntent)
             }
         }
 
