@@ -23,10 +23,14 @@ import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.OpenWithMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareDropdownMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
@@ -49,15 +53,20 @@ import java.io.File
 
 /**
  * Returns true when the node options bottom sheet result indicates the editor should close
- * (e.g. user navigated away or triggered a transfer where the current node may no longer be valid).
- * Preview / Open-with downloads do not close the editor.
+ * because the node may no longer be valid (deleted, moved, or access removed).
+ * Non-destructive actions (share, label, download, etc.) keep the editor open.
  */
 internal fun shouldCloseTextEditorOnNodeOptionsResult(
     result: NodeOptionsBottomSheetResult?,
 ): Boolean = when (result?.action) {
-    is LabelMenuAction, is RemoveLinkMenuAction, is OpenWithMenuAction, is EditMenuAction -> false
-    null -> false
-    else -> true
+    is TrashMenuAction,
+    is DeletePermanentlyMenuAction,
+    is RemoveMenuAction,
+    is MoveMenuAction,
+    is LeaveShareMenuAction,
+    is RemoveShareMenuAction,
+    is RemoveShareDropdownMenuAction -> true
+    else -> false
 }
 
 /** True when adapter is rubbish bin, offline, folder link, zip, file link, chat, or versions (hides Get Link and Edit). */
