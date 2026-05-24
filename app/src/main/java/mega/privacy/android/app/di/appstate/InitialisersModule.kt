@@ -9,6 +9,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.Busines
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CheckBusinessStatusInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ClearCompletedTransfersCacheInitializer
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.FileServiceReclaimOptionsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.DeleteOldestCompletedTransfersInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
@@ -194,6 +195,10 @@ class InitialisersModule {
 
     @Provides
     @IntoSet
-    fun provideWhatsNewInitializer(initialiser: WhatsNewInitializer): PostLoginInitialiser =
-        initialiser
+    fun provideFileServiceReclaimOptionsInitialiser(initialiser: FileServiceReclaimOptionsInitialiser): PostLoginInitialiser = initialiser
+
+    @Provides
+    @IntoSet
+    fun provideWhatsNewInitializer(initialiser: WhatsNewInitializer): PostLoginInitialiser = initialiser
+
 }
