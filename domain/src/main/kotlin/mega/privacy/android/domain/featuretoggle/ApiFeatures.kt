@@ -121,7 +121,7 @@ enum class ApiFeatures(
         experimentName = "pdfs",
         description = "Enable PDF Viewer with ComposeUI and single activity",
         singleCheckPerRun = true,
-        defaultValue = false
+        defaultValue = true
     ),
 
     /**
