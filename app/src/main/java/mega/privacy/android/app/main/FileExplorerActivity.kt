@@ -894,8 +894,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                     viewModel.getCopyTargetPath()
                     copyFromHandles?.let { handles ->
-                        parentMoveCopy =
-                            megaApi.getParentNode(megaApi.getNodeByHandle(handles[0]))
+                        if (handles.isNotEmpty()) {
+                            parentMoveCopy =
+                                megaApi.getParentNode(megaApi.getNodeByHandle(handles[0]))
+                        }
                     }
 
                     title = getString(R.string.title_share_folder_explorer)
