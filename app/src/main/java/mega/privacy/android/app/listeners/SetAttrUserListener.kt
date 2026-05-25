@@ -7,7 +7,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.DatabaseEntryPoint
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -139,7 +138,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
      * @param map MegaStringMap which contains the handle of the node set as USER_ATTR_MY_CHAT_FILES_FOLDER.
      */
     private fun updateMyChatFilesFolderHandle(map: MegaStringMap?) {
-        if (map != null && map.size() > 0 && !TextUtil.isTextEmpty(map["h"])) {
+        if (map != null && map.size() > 0 && !map["h"].isNullOrBlank()) {
             val handle = MegaApiJava.base64ToHandle(map["h"])
             if (handle != MegaApiJava.INVALID_HANDLE) {
                 MegaApplication.getInstance().dbH.myChatFilesFolderHandle = handle

@@ -960,10 +960,12 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             holder.imageView?.layoutParams = params
 
             holder.textViewFileSize?.visibility = View.VISIBLE
-            holder.textViewFileSize?.text = if (type == Constants.FOLDER_LINK_ADAPTER)
-                MegaApiUtils.getMegaNodeFolderLinkInfo(node, context)
-            else
-                MegaApiUtils.getMegaNodeFolderInfo(node, context)
+            holder.textViewFileSize?.apply {
+                text = if (type == Constants.FOLDER_LINK_ADAPTER)
+                    MegaApiUtils.getMegaNodeFolderLinkInfo(node, context)
+                else
+                    MegaApiUtils.getMegaNodeFolderInfo(node, context)
+            }
             holder.versionsIcon?.visibility = View.GONE
 
             megaApi?.let {

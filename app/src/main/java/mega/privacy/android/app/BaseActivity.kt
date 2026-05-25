@@ -60,7 +60,6 @@ import mega.privacy.android.app.utils.Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TY
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.toAppInfo
@@ -770,7 +769,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     }
 
     private fun showAccountBlockedDialog(accountBlockedString: String) {
-        if (!TextUtil.isTextEmpty(accountBlockedString)) {
+        if (!accountBlockedString.isNullOrBlank()) {
             val intent = MegaActivity.getIntent(this).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             }

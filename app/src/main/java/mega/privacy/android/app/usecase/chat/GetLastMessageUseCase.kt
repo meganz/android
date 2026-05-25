@@ -9,7 +9,6 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.converterShortCodes
-import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util.toCDATA
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -91,7 +90,7 @@ class GetLastMessageUseCase @Inject constructor(
 
                 TYPE_SET_RETENTION_TIME -> {
                     val timeFormatted = ChatUtil.transformSecondsInString(chatRoom.retentionTime)
-                    if (timeFormatted.isTextEmpty()) {
+                    if (timeFormatted.isBlank()) {
                         String.format(
                             context.getString(R.string.retention_history_disabled),
                             chatListItem.getSenderName(true)

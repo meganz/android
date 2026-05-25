@@ -17,7 +17,6 @@ import static mega.privacy.android.app.utils.ChatUtil.updateRetentionTimeLayout;
 import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
 import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static nz.mega.sdk.MegaChatApi.INIT_ANONYMOUS;
 
@@ -45,7 +44,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.MegaChatParticipant;
@@ -53,6 +51,7 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsLimitWarningView;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -847,6 +846,10 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         }
 
         return avatarBitmap;
+    }
+
+    private boolean isTextEmpty(String text){
+        return text == null || text.trim().isEmpty();
     }
 
     private MegaChatRoom getChat() {

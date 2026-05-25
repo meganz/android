@@ -1,6 +1,5 @@
 package mega.privacy.android.app.getLink
 
-import com.google.android.material.R as MaterialR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,13 +14,13 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.R as MaterialR
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentSetLinkPasswordBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -336,10 +335,10 @@ class LinkPasswordFragment : Fragment(), Scrollable {
         setError(binding.passwordText, passwordError)
         setError(binding.confirmPasswordText, passwordConfirmError)
 
-        if (!isTextEmpty(passwordError)) {
+        if (!passwordError.isNullOrBlank()) {
             binding.passwordText.requestFocus()
             return false
-        } else if (!isTextEmpty(passwordConfirmError)) {
+        } else if (!passwordConfirmError.isNullOrBlank()) {
             binding.confirmPasswordText.requestFocus()
             return false
         }
@@ -355,7 +354,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
      *
      */
     private fun setError(editText: AppCompatEditText, error: String?) {
-        if (isTextEmpty(error)) {
+        if (error.isNullOrBlank()) {
             return
         }
 
@@ -389,7 +388,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
     private fun getPasswordError(): String? {
         val value: String = binding.passwordText.text.toString()
 
-        if (isTextEmpty(value)) {
+        if (value.isNullOrBlank()) {
             return getString(R.string.error_enter_password)
         } else if (!isPasswordValid) {
             binding.containerPasswdElements.visibility = GONE
@@ -408,7 +407,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
         val password: String = binding.passwordText.text.toString()
         val confirm: String = binding.confirmPasswordText.text.toString()
 
-        if (isTextEmpty(confirm)) {
+        if (confirm.isBlank()) {
             return getString(R.string.error_enter_password)
         } else if (password != confirm) {
             return getString(R.string.error_passwords_dont_match)

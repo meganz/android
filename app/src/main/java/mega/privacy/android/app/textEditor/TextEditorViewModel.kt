@@ -58,7 +58,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.constant.CacheFolderConstant
@@ -476,7 +475,7 @@ class TextEditorViewModel @Inject constructor(
             if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
             else getLocalFile(getNode())
 
-        if (isTextEmpty(localFileUri)) {
+        if (localFileUri.isNullOrBlank()) {
             val api = textEditorData.value?.api ?: return
 
             if (api.httpServerIsRunning() == 0) {
@@ -486,7 +485,7 @@ class TextEditorViewModel @Inject constructor(
 
             val uri = api.httpServerGetLocalLink(getNode())
 
-            if (!isTextEmpty(uri)) {
+            if (!uri.isNullOrBlank()) {
                 streamingFileURL = URL(uri)
             }
         }

@@ -34,7 +34,6 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.SHOW_IM_DELAY
 import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
@@ -289,7 +288,7 @@ object MegaNodeDialogUtil {
                         }
 
                         TYPE_NEW_URL_FILE -> {
-                            if (isTextEmpty(defaultURLName)) setHint(R.string.context_new_link_name)
+                            if (defaultURLName.isNullOrBlank()) setHint(R.string.context_new_link_name)
                             else {
                                 setText(defaultURLName)
                                 setSelection(0, getCursorPositionOfName(false, defaultURLName))

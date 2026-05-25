@@ -33,7 +33,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -54,7 +53,6 @@ import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.calculateDateFromTimestamp
 import mega.privacy.android.app.utils.Util.calculateTimestamp
 import mega.privacy.android.app.utils.Util.dp2px
@@ -385,7 +383,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      */
     private fun updatePassword(password: String?) {
         if (binding.passwordProtectionSetText.text == password) return
-        val isPasswordSet = !isTextEmpty(password)
+        val isPasswordSet = !password.isNullOrBlank()
         val visibility = if (isPasswordSet) VISIBLE else GONE
 
         if (isPasswordSet) {

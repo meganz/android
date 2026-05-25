@@ -26,7 +26,6 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.utils.ContactUtil.isContact
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
 import mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected
 import mega.privacy.android.app.utils.TimeUtils.isUntilThisMorning
@@ -367,7 +366,7 @@ object ChatUtil {
         lastGreen: String?,
         contactStateText: MarqueeTextView?,
     ) {
-        if (contactStateText == null || isTextEmpty(lastGreen)) {
+        if (contactStateText == null || lastGreen.isNullOrBlank()) {
             return
         }
 
@@ -840,7 +839,7 @@ object ChatUtil {
     @JvmStatic
     fun updateRetentionTimeLayout(retentionTimeText: TextView, time: Long, context: Context) {
         val timeFormatted = transformSecondsInString(time)
-        if (isTextEmpty(timeFormatted)) {
+        if (timeFormatted.isBlank()) {
             retentionTimeText.visibility = View.GONE
         } else {
             val subtitleText = context.getString(R.string.subtitle_properties_manage_chat) + " " + timeFormatted

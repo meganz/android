@@ -16,7 +16,6 @@ import static mega.privacy.android.app.utils.ContactUtil.getContactEmailDB;
 import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.ContactUtil.getFirstNameDB;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnCalendar;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static mega.privacy.android.app.utils.Util.toCDATAOrNull;
@@ -175,6 +174,10 @@ public class ChatController {
                     showSnackbar(context, context.getString(R.string.success_muting_a_chat_for_specific_time, text));
                 }
         }
+    }
+
+    private boolean isTextEmpty(String text){
+        return text == null || text.trim().isEmpty();
     }
 
     public String createManagementString(MegaChatMessage message, MegaChatRoom chatRoom) {

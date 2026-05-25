@@ -22,7 +22,6 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.navigation.destination.ChatNavKey
@@ -577,7 +576,7 @@ class ChatAdvancedNotificationBuilder(
             .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
 
-        if (!TextUtil.isTextEmpty(chatC.getParticipantEmail(chat.getPeerHandle(0)))) {
+        if (!(chatC.getParticipantEmail(chat.getPeerHandle(0))).isNullOrBlank()) {
             val largeIcon = setUserAvatar(chat)
             notificationBuilderO.setLargeIcon(largeIcon)
         }

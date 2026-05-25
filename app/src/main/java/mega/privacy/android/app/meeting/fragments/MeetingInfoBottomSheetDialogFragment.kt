@@ -25,7 +25,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.listenAction
@@ -34,10 +33,10 @@ import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import timber.log.Timber
 
 /**
@@ -213,7 +212,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private fun changeTitle(input: EmojiEditText) {
         val title = input.text.toString()
         when {
-            TextUtil.isTextEmpty(title) -> {
+            title.isBlank() -> {
                 Timber.w("Input is empty")
                 input.error = getString(sharedR.string.general_invalid_string)
                 input.requestFocus()

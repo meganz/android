@@ -15,7 +15,6 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -152,7 +151,7 @@ class MeetingActivityRepository @Inject constructor(
                 AvatarUtil.getAvatarBitmap(mail)
             }
 
-            TextUtil.isTextEmpty(mail) -> AvatarUtil.getAvatarBitmap(userHandleString)
+            mail.isNullOrBlank() -> AvatarUtil.getAvatarBitmap(userHandleString)
             else -> AvatarUtil.getUserAvatar(
                 userHandleString,
                 mail

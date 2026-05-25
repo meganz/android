@@ -35,10 +35,10 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getUserAvatar
+import mega.privacy.android.app.utils.CallUtil.activateChrono
 import mega.privacy.android.app.utils.ChatUtil.getStatusBitmap
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.ContactUtil.getNicknameContact
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.isScreenInPortrait
@@ -206,7 +206,7 @@ object CallUtil {
         } else {
             intent = Intent(context, MeetingActivity::class.java)
             intent.action = MeetingActivity.MEETING_ACTION_GUEST
-            if (!isTextEmpty(meetingName)) {
+            if (!meetingName.isNullOrBlank()) {
                 intent.putExtra(MeetingActivity.MEETING_NAME, meetingName)
             }
             intent.putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
@@ -811,7 +811,7 @@ object CallUtil {
             return getAvatarBitmap(mail)
         }
 
-        return if (isTextEmpty(mail)) {
+        return if (mail.isNullOrBlank()) {
             getAvatarBitmap(userHandleString)
         } else {
             getUserAvatar(userHandleString, mail)

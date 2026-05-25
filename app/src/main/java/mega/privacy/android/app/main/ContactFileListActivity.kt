@@ -70,7 +70,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
@@ -721,7 +720,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         } else if (requestCode == Constants.REQUEST_CODE_GET_FOLDER_CONTENT) {
             if (intent != null && resultCode == RESULT_OK) {
                 val result = intent.getStringExtra(ExtraConstant.EXTRA_ACTION_RESULT)
-                if (TextUtil.isTextEmpty(result)) {
+                if (result.isNullOrBlank()) {
                     return
                 }
                 showSnackbar(SNACKBAR_TYPE, result)

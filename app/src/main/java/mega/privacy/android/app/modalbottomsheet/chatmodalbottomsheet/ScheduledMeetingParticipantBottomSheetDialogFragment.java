@@ -9,7 +9,6 @@ import static mega.privacy.android.app.utils.Constants.CONTACT_HANDLE;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
 import static mega.privacy.android.app.utils.Constants.NAME;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
@@ -247,6 +246,10 @@ public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBo
                 optionRemoveParticipantChat.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
 
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    private boolean isTextEmpty(String text){
+        return text == null || text.trim().isEmpty();
     }
 
     @Override

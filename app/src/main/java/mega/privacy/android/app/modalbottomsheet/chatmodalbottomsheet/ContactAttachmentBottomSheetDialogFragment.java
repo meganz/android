@@ -8,7 +8,6 @@ import static mega.privacy.android.app.utils.Constants.EMAIL;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
 import static mega.privacy.android.app.utils.Constants.NAME;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
@@ -228,7 +227,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
                 long userHandle = message.getMessage().getUserHandle(position);
                 String name = message.getMessage().getUserName(position);
-                if (isTextEmpty(name)) {
+                if (name == null || name.trim().isEmpty()) {
                     name = chatC.getParticipantFullName(userHandle);
                     if (name.trim().isEmpty()) {
                         name = email;

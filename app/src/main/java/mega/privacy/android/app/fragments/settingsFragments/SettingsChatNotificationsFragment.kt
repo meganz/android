@@ -14,7 +14,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_SOUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_VIBRATE
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_OFF
@@ -118,7 +117,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment(),
         dbH.setVibrationEnabledChat(isVibrationEnabled.toString())
         chatSettings = chatSettings?.copy(vibrationEnabled = isVibrationEnabled.toString())
         chatVibrateSwitch?.isChecked = isVibrationEnabled
-        if (TextUtil.isTextEmpty(chatSettings?.notificationsSound)) {
+        if (chatSettings?.notificationsSound.isNullOrBlank()) {
             val defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(
                 context,
                 RingtoneManager.TYPE_NOTIFICATION

@@ -22,7 +22,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_CHAT_ID
@@ -143,7 +142,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
         if (participantHandle == megaApi.myUser?.handle) {
             var myFullName = chatC?.getMyFullName()
-            if (TextUtil.isTextEmpty(myFullName)) {
+            if (myFullName.isNullOrBlank()) {
                 myFullName = megaChatApi.myEmail
             }
 
@@ -229,7 +228,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
             AvatarUtil.setImageAvatar(
                 participantHandle,
-                if (TextUtil.isTextEmpty(email)) MegaApiAndroid.userHandleToBase64(participantHandle) else email,
+                if (email.isNullOrBlank()) MegaApiAndroid.userHandleToBase64(participantHandle) else email,
                 fullName,
                 contactImageView
             )
@@ -314,7 +313,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
     fun updateContactData() {
         if (participantHandle == megaApi.myUser?.handle) {
             var myFullName = chatC?.getMyFullName()
-            if (TextUtil.isTextEmpty(myFullName)) {
+            if (myFullName.isNullOrBlank()) {
                 myFullName = megaChatApi.myEmail
             }
 
@@ -334,7 +333,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
             AvatarUtil.setImageAvatar(
                 participantHandle,
-                if (TextUtil.isTextEmpty(email)) MegaApiAndroid.userHandleToBase64(participantHandle) else email,
+                if (email.isNullOrBlank()) MegaApiAndroid.userHandleToBase64(participantHandle) else email,
                 fullName,
                 contactImageView
             )

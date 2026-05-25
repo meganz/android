@@ -39,7 +39,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.call.CallCompositionChanges
 import mega.privacy.android.domain.entity.call.ChatCallChanges
@@ -384,7 +383,7 @@ class CallService : LifecycleService() {
                         actionPendingIntent
                     )
 
-                    if (!TextUtil.isTextEmpty(contentText))
+                    if (contentText.isNotBlank())
                         setContentText(contentText)
                 }
                 val newNotification: Notification? = mBuilderCompatO?.build()

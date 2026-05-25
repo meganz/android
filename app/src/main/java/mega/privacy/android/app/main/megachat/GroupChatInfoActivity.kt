@@ -69,7 +69,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -1414,7 +1413,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
         for (positionInAdapter in participantAvatars.keys) {
             val handle = participantAvatars[positionInAdapter]
-            if (!TextUtil.isTextEmpty(handle)) {
+            if (!handle.isNullOrBlank()) {
                 megaApi.getUserAvatar(
                     handle,
                     buildAvatarFile(handle + FileUtil.JPG_EXTENSION)?.absolutePath,
@@ -1514,7 +1513,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      * @return True if the participant was correctly updated, false otherwise.
      */
     fun hasParticipantAttributes(participant: MegaChatParticipant?): Boolean =
-        !TextUtil.isTextEmpty(participant?.email) || !TextUtil.isTextEmpty(participant?.fullName)
+        !participant?.email.isNullOrBlank() || !participant?.fullName.isNullOrBlank()
 
     private fun updateAdapterHeader() = adapter?.notifyItemChanged(0)
 

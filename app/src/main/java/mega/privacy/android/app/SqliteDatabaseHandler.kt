@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.LegacyDatabaseMigration
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_OFFLINE
@@ -1028,8 +1027,8 @@ class SqliteDatabaseHandler @Inject constructor(
     private fun getLongValue(tableName: String, columnName: String, defaultValue: Long): Long {
         try {
             val value = getStringValue(tableName, columnName, defaultValue.toString())
-            if (!TextUtil.isTextEmpty(value)) {
-                return value!!.toLong()
+            if (!value.isNullOrBlank()) {
+                return value.toLong()
             }
         } catch (e: Exception) {
             Timber.w(e, "EXCEPTION - Return default value: %s", defaultValue)
@@ -1045,7 +1044,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param value      Value to set.
      */
     private fun setStringValue(tableName: String, columnName: String, value: String?) {
-        if (TextUtil.isTextEmpty(value)) {
+        if (value.isNullOrBlank()) {
             Timber.w("Set %s with empty value!", columnName)
         }
         val selectQuery = "SELECT * FROM $tableName"

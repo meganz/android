@@ -14,32 +14,40 @@ object MegaApiUtils {
      * Gets the string to show as content of a folder.
      *
      * @param node The folder to get its string content.
+     * @param context
      * @return The string to show as content of the folder.
      */
     @JvmStatic
-    fun getMegaNodeFolderInfo(node: MegaNode, context: Context?): String {
+    fun getMegaNodeFolderInfo(node: MegaNode, context: Context): String {
         val megaApi = MegaApplication.getInstance().megaApi
-        return getFolderInfo(megaApi.getNumChildFolders(node), megaApi.getNumChildFiles(node), context)
+        return getFolderInfo(
+            numFolders = megaApi.getNumChildFolders(node),
+            numFiles = megaApi.getNumChildFiles(node),
+            context = context
+        )
     }
 
     /**
      * Gets the string to show as content of a folder link.
      *
      * @param node The folder to get its string content.
+     * @param context
      * @return The string to show as content of the folder.
      */
     @JvmStatic
-    fun getMegaNodeFolderLinkInfo(node: MegaNode, context: Context?): String {
+    fun getMegaNodeFolderLinkInfo(node: MegaNode, context: Context): String {
         val megaApiFolder = MegaApplication.getInstance().megaApiFolder
         return getFolderInfo(
-            megaApiFolder.getNumChildFolders(node),
-            megaApiFolder.getNumChildFiles(node),
-            context
+            numFolders = megaApiFolder.getNumChildFolders(node),
+            numFiles = megaApiFolder.getNumChildFiles(node),
+            context = context
         )
     }
 
     /**
      * If there is an application that can manage the Intent, returns true. Otherwise, false.
+     * @param ctx
+     * @param intent
      */
     @JvmStatic
     fun isIntentAvailable(ctx: Context, intent: Intent): Boolean {

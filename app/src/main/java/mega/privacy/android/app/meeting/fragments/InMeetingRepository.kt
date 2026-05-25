@@ -11,7 +11,6 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AddContactListener
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiAndroid
@@ -76,7 +75,7 @@ class InMeetingRepository @Inject constructor(
             ChatController(MegaApplication.getInstance().applicationContext).getParticipantFirstName(
                 peerId
             )
-        if (TextUtil.isTextEmpty(name)) {
+        if (name.isBlank()) {
             return megaChatApi.getContactEmail(peerId)
         }
 
@@ -286,7 +285,7 @@ class InMeetingRepository @Inject constructor(
         bitmap = if (userHandleString == myUserHandleEncoded) {
             AvatarUtil.getAvatarBitmap(mail)
         } else {
-            if (TextUtil.isTextEmpty(mail)) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
+            if (mail.isNullOrBlank()) AvatarUtil.getAvatarBitmap(userHandleString) else AvatarUtil.getUserAvatar(
                 userHandleString,
                 mail
             )

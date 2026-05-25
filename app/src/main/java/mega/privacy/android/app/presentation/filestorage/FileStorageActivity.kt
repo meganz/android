@@ -50,7 +50,6 @@ import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.createViewFolderIntent
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
@@ -407,7 +406,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
      * @param pickFolderString the type of pick folder action.
      */
     private fun setPickFolderType(pickFolderString: String?) {
-        if (TextUtil.isTextEmpty(pickFolderString)) {
+        if (pickFolderString.isNullOrBlank()) {
             pickFolderType = PickFolderType.NONE_ONLY_DOWNLOAD
         } else if (pickFolderString == PickFolderType.CAMERA_UPLOADS_FOLDER.folderType) {
             pickFolderType = PickFolderType.CAMERA_UPLOADS_FOLDER

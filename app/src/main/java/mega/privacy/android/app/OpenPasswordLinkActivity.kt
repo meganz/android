@@ -14,7 +14,6 @@ import mega.privacy.android.app.main.DecryptAlertDialog.DecryptDialogListener
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
@@ -101,7 +100,7 @@ class OpenPasswordLinkActivity : PasscodeActivity(), DecryptDialogListener {
         Timber.d("onRequestFinish")
         progressBar?.visibility = View.GONE
 
-        if (e.errorCode == MegaError.API_OK && !TextUtil.isTextEmpty(decryptedLink)) {
+        if (e.errorCode == MegaError.API_OK && !decryptedLink.isNullOrBlank()) {
             var intent: Intent? = null
 
             if (Util.matchRegexs(decryptedLink, Constants.FOLDER_LINK_REGEX_ARRAY)) {
