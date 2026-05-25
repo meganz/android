@@ -6,8 +6,8 @@ package mega.privacy.android.navigation.contract.home
  */
 enum class HomeWidgetOrder {
     Shortcuts,
-    Banner,
     MyAccount,
+    Banner,
     Recents,
     ViewedLinks,
     ContinueWhereLeftOff,

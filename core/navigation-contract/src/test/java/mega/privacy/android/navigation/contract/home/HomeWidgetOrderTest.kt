@@ -9,8 +9,8 @@ class HomeWidgetOrderTest {
     fun `test that HomeWidgetOrder entries are declared in the expected default order`() {
         assertThat(HomeWidgetOrder.entries).containsExactly(
             HomeWidgetOrder.Shortcuts,
-            HomeWidgetOrder.Banner,
             HomeWidgetOrder.MyAccount,
+            HomeWidgetOrder.Banner,
             HomeWidgetOrder.Recents,
             HomeWidgetOrder.ViewedLinks,
             HomeWidgetOrder.ContinueWhereLeftOff,

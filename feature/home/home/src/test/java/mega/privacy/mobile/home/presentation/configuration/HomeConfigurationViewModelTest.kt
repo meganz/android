@@ -492,11 +492,10 @@ class HomeConfigurationViewModelTest {
                 defaultOrder = HomeWidgetOrder.Banner,
                 isDraggable = false,
             )
-            val draggableA = stubWidget("a", HomeWidgetOrder.MyAccount)
             val draggableB = stubWidget("b", HomeWidgetOrder.Recents)
             val draggableC = stubWidget("c", HomeWidgetOrder.ViewedLinks)
             val staticWidgets = setOf(fixedShortcuts, fixedBanner)
-            val dynamicWidgets = setOf(draggableA, draggableB, draggableC)
+            val dynamicWidgets = setOf(draggableB, draggableC)
             staticWidgetsProvider.stub {
                 onBlocking { getWidgets() } doReturn staticWidgets
             }
@@ -513,7 +512,7 @@ class HomeConfigurationViewModelTest {
 
             val mapper = WidgetConfigurationItemMapper()
             // Simulate the user dragging "c" to the top of the draggable list.
-            val orderedItems = listOf(draggableC, draggableA, draggableB).map {
+            val orderedItems = listOf(draggableC, draggableB).map {
                 mapper(homeWidget = it, widgetConfiguration = null)
             }
 
@@ -525,11 +524,8 @@ class HomeConfigurationViewModelTest {
 
             val captor = argumentCaptor<List<HomeWidgetConfiguration>>()
             verify(updateWidgetConfigurationsUseCase).invoke(captor.capture())
-            // Draggable orders must start past the highest fixed widget index (1),
-            // so the first draggable widget gets order 2 — not 0, which would collide
-            // with a fixed widget and let the dragged item appear above the fixed row.
             assertThat(captor.firstValue.map { it.widgetIdentifier to it.widgetOrder })
-                .containsExactly("c" to 2, "a" to 3, "b" to 4)
+                .containsExactly("c" to 3, "b" to 4)
                 .inOrder()
         }
 

@@ -28,7 +28,7 @@ class MyAccountHomeWidget @Inject constructor() : HomeWidget {
     override val defaultOrder: HomeWidgetOrder = HomeWidgetOrder.MyAccount
     override val canDelete: Boolean = false
     override val isConfigurable: Boolean = true
-    override val isDraggable: Boolean = true
+    override val isDraggable: Boolean = false
     override suspend fun getWidgetName() =
         LocalizedText.StringRes(sharedR.string.home_configuration_widget_my_account_widget_name)
 
