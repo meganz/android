@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.util.regex.Pattern
@@ -146,14 +145,12 @@ class CheckForValidNameUseCaseTest {
             val textType = TextFileTypeInfo("whatever", "")
             val fileNode = mock<FileNode> {
                 on { type } doReturn textType
+                on { parentId } doReturn parentNodeId
             }
             val providedName = "File"
 
             whenever(
-                nodeExistsInCurrentLocationUseCase(
-                    fileNode.id,
-                    providedName
-                )
+                nodeExistsInCurrentLocationUseCase(parentNodeId, providedName)
             ).thenReturn(false)
 
             assertThat(
@@ -163,8 +160,50 @@ class CheckForValidNameUseCaseTest {
                     isRenameAction = true
                 )
             ).isEqualTo(InvalidNameType.VALID)
+        }
 
-            verifyNoInteractions(nodeExistsInCurrentLocationUseCase)
+    @Test
+    fun `test that during rename file returns NAME_ALREADY_EXISTS when parent already contains the new name`() =
+        runTest {
+            val fileNode = mock<FileNode> {
+                on { type } doReturn PdfFileTypeInfo
+                on { parentId } doReturn parentNodeId
+            }
+            val providedName = "Proper rename.pdf"
+
+            whenever(
+                nodeExistsInCurrentLocationUseCase(parentNodeId, providedName)
+            ).thenReturn(true)
+
+            assertThat(
+                underTest(
+                    newName = providedName,
+                    node = fileNode,
+                    isRenameAction = true
+                )
+            ).isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
+        }
+
+    @Test
+    fun `test that during rename file returns VALID when parent has no match and extension is preserved`() =
+        runTest {
+            val fileNode = mock<FileNode> {
+                on { type } doReturn PdfFileTypeInfo
+                on { parentId } doReturn parentNodeId
+            }
+            val providedName = "Proper rename.pdf"
+
+            whenever(
+                nodeExistsInCurrentLocationUseCase(parentNodeId, providedName)
+            ).thenReturn(false)
+
+            assertThat(
+                underTest(
+                    newName = providedName,
+                    node = fileNode,
+                    isRenameAction = true
+                )
+            ).isEqualTo(InvalidNameType.VALID)
         }
 
     private fun provideParams() =

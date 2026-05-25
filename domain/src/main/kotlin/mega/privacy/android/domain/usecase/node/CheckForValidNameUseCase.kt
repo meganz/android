@@ -37,10 +37,12 @@ class CheckForValidNameUseCase @Inject constructor(
             regexRepository.invalidNamePattern.matcher(newName)
                 .find() -> InvalidNameType.INVALID_NAME
 
-            node is FolderNode && nodeExistsInCurrentLocationUseCase(
-                if (isRenameAction) node.parentId else node.id,
-                newName
-            ) -> InvalidNameType.NAME_ALREADY_EXISTS
+            isRenameAction && nodeExistsInCurrentLocationUseCase(node.parentId, newName) ->
+                InvalidNameType.NAME_ALREADY_EXISTS
+
+            !isRenameAction && node is FolderNode
+                    && nodeExistsInCurrentLocationUseCase(node.id, newName) ->
+                InvalidNameType.NAME_ALREADY_EXISTS
 
             node is FileNode -> {
                 val extension = newName.substringAfterLast('.', "")
