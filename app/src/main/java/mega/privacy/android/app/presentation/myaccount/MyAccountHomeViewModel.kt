@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.domain.entity.AccountType
@@ -30,8 +29,8 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
+import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
@@ -46,6 +45,7 @@ import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -93,6 +93,7 @@ class MyAccountHomeViewModel @Inject constructor(
 
     init {
         refreshAccountInfo()
+        refreshExtendedAccountDetail()
         refreshUserName(false)
         refreshCurrentUserEmail()
         getVisibleContacts()
@@ -248,6 +249,15 @@ class MyAccountHomeViewModel @Inject constructor(
                         businessProFlexiStatus = businessStatus
                     )
                 }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    private fun refreshExtendedAccountDetail() {
+        viewModelScope.launch {
+            runCatching {
                 getExtendedAccountDetail(
                     forceRefresh = true,
                     sessions = true,
