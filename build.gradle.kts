@@ -91,7 +91,7 @@ tasks.register("clean", Delete::class) {
 
 // Define versions in a single place
 // App
-extra["appVersion"] = "16.6"
+extra["appVersion"] = "16.6.1"
 
 // Sdk and tools
 extra["compileSdkVersion"] = 36
