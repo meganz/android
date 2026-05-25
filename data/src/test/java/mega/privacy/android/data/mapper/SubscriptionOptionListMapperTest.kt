@@ -27,6 +27,7 @@ internal class SubscriptionOptionListMapperTest {
         on { getAmount(0) }.thenReturn(13)
         on { getAndroidID(0) }.thenReturn("com.mega.pro1.monthly")
         on { hasMobileOffers(0) }.thenReturn(false)
+        on { getMobileOfferLabel(0) }.thenReturn("World Backup Day Sale")
     }
 
     private val currency = mock<MegaCurrency> {
@@ -49,6 +50,7 @@ internal class SubscriptionOptionListMapperTest {
         currency = currencyMapper("EUR"),
         sku = "com.mega.pro1.monthly",
         hasOffer = false,
+        discountName = "World Backup Day Sale",
     )
 
     private val underTest = SubscriptionOptionListMapper(

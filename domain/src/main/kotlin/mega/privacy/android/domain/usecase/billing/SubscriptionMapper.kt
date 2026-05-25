@@ -46,6 +46,7 @@ class SubscriptionMapper @Inject constructor(
             offerId = offerDetail?.offerId,
             offerPeriod = offerDetail?.offerPeriod,
             sku = plan.sku,
+            discountName = plan.discountName,
         )
     }
 }

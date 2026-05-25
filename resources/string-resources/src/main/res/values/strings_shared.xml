@@ -2854,10 +2854,6 @@
     <string name="home_configuration_widget_shortcuts_widget_name">Shortcuts</string>
     <!-- Widget display name for "My account" in home configuration -->
     <string name="home_configuration_widget_my_account_widget_name">My account</string>
-    <!-- Text that indicates that there’s no subtitle files to show. -->
-    <string name="video_player_subtitles_empty_hint_description">Upload subtitles in SRT format to your Cloud drive</string>
-    <!-- Button text for adding the selected subtitle. -->
-    <string name="video_player_subtitles_add_subtitles_button">Add subtitle</string>
     <!-- General new group chat label -->
     <string name="general_new_group_chat">New group chat</string>
     <!-- Section header in Chat explorer grouping the most recent chats and meetings -->
@@ -2890,4 +2886,10 @@
     <string name="general_chat_sent_as_message">Sent as a message</string>
     <!-- General view button -->
     <string name="general_view_button">View</string>
+    <!-- Text that indicates that there’s no subtitle files to show. -->
+    <string name="video_player_subtitles_empty_hint_description">Upload subtitles in SRT format to your Cloud drive</string>
+    <!-- Button text for adding the selected subtitle. -->
+    <string name="video_player_subtitles_add_subtitles_button">Add subtitle</string>
+    <!-- Campaign name format with a localised label from the SDK. %1$s is the localised campaign label provided by the API, %2$d is the discount percentage. -->
+    <string name="campaign_name_with_discount">%1$s: %2$d%% off</string>
 </resources>

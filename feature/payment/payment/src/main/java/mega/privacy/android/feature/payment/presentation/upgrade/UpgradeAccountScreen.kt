@@ -376,19 +376,15 @@ fun getOfferPeriodLabel(discountedPrice: String, period: OfferPeriod) = when (pe
     }
 }
 
-fun getCampaignName(context: Context, offerId: String?, discountPercentage: Int): String =
-    when (offerId) {
-        CAMPAIGN_BLACK_FRIDAY -> context.getString(
-            sharedR.string.campaign_name_black_friday,
-            discountPercentage
+fun getCampaignName(context: Context, discountName: String?, discountPercentage: Int): String =
+    if (discountName.isNullOrBlank()) {
+        context.getString(sharedR.string.campaign_name_special_offer, discountPercentage)
+    } else {
+        context.getString(
+            sharedR.string.campaign_name_with_discount,
+            discountName,
+            discountPercentage,
         )
-
-        CAMPAIGN_CYBER_MONDAY -> context.getString(
-            sharedR.string.campaign_name_cyber_monday,
-            discountPercentage
-        )
-
-        else -> context.getString(sharedR.string.campaign_name_special_offer, discountPercentage)
     }
 
 @CombinedThemePreviews
@@ -434,9 +430,6 @@ internal fun UpgradeAccountScreenPreview(
         )
     }
 }
-
-private const val CAMPAIGN_BLACK_FRIDAY = "black-friday"
-private const val CAMPAIGN_CYBER_MONDAY = "cyber-monday"
 
 /**
  * Test tag for the yearly chip selector

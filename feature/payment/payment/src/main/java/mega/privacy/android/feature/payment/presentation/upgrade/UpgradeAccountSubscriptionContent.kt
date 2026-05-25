@@ -191,7 +191,7 @@ internal fun LazyListScope.subscriptionAvailableContent(
                 offerName = discountPercentage?.takeIf { !isCurrentPlan }?.let {
                     getCampaignName(
                         context = context,
-                        offerId = currentSubscription.offerId,
+                        discountName = currentSubscription.discountName,
                         discountPercentage = discountPercentage
                     )
                 },

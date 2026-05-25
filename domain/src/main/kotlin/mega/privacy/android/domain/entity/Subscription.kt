@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.account.OfferPeriod
  * @property discountedPercentage  Discount percentage for the subscription option
  * @property offerId         Unique identifier for the offer
  * @property offerPeriod     Period of the offer (Day, Month, or Year)
+ * @property discountName    Localised campaign name from the SDK, or null/empty when none
  */
 data class Subscription(
     val sku: String,
@@ -27,4 +28,5 @@ data class Subscription(
     val discountedAmountMonthly: CurrencyAmount? = null,
     val discountedPercentage: Int? = null,
     val offerPeriod: OfferPeriod? = null,
+    val discountName: String? = null,
 )

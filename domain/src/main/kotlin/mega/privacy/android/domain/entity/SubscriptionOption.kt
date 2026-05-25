@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
  * @property amount          Price amount of the subscription plan
  * @property currency        Currency of the subscription plan
  * @property hasOffer        Flag to indicate if the subscription option has a mobile offer
+ * @property discountName    Localised campaign name for an active discount, or null/empty when none
  */
 data class SubscriptionOption(
     val sku: String,
@@ -24,4 +25,5 @@ data class SubscriptionOption(
     val amount: CurrencyPoint.SystemCurrencyPoint,
     val currency: Currency,
     val hasOffer: Boolean,
+    val discountName: String? = null,
 )
