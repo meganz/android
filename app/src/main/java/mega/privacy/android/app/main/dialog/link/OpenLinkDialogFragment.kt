@@ -14,6 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.OpenPasswordLinkActivity
@@ -67,7 +68,16 @@ internal class OpenLinkDialogFragment : DialogFragment() {
     @Inject
     lateinit var applicationScope: CoroutineScope
 
-    private val viewModel: OpenLinkViewModel by viewModels()
+    private val viewModel: OpenLinkViewModel by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<OpenLinkViewModel.Factory> { factory ->
+                factory.create(
+                    isChatScreen = requireArguments().getBoolean(IS_CHAT_SCREEN),
+                    isJoinMeeting = requireArguments().getBoolean(IS_JOIN_MEETING),
+                )
+            }
+        }
+    )
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
