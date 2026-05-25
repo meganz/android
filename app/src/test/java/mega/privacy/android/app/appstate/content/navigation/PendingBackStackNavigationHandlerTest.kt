@@ -886,5 +886,40 @@ class PendingBackStackNavigationHandlerTest {
         assertThat(emptyBackStack.pending.count { it == DialogDestination1 }).isEqualTo(1)
     }
 
+    @Test
+    fun `test that navigate prepends defaultLandingScreen when backstack would only contain dialogs`() {
+        backStack.clear()
+        backStack.add(DialogDestination1)
+        underTest.navigate(DialogDestination2)
+        assertThat(backStack)
+            .containsExactly(DefaultLandingScreen, DialogDestination1, DialogDestination2)
+            .inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearBackStack prepends defaultLandingScreen when destination is a dialog`() {
+        underTest.navigateAndClearBackStack(DialogDestination1)
+        assertThat(backStack).containsExactly(DefaultLandingScreen, DialogDestination1).inOrder()
+    }
+
+    @Test
+    fun `test that back prepends defaultLandingScreen when only dialogs remain after popping`() {
+        backStack.clear()
+        backStack.addAll(listOf(DialogDestination1, DialogDestination2))
+        underTest.back()
+        assertThat(backStack).containsExactly(DefaultLandingScreen, DialogDestination1).inOrder()
+    }
+
+    @Test
+    fun `test that init prepends defaultLandingScreen when restored backstack contains only dialogs`() {
+        val restoredBackStack = PendingBackStack(NavBackStack<NavKey>())
+        restoredBackStack.add(DialogDestination1)
+        initHandler(backStack = restoredBackStack)
+        assertThat(restoredBackStack)
+            .containsExactly(DefaultLandingScreen, DialogDestination1)
+            .inOrder()
+    }
+
     private data object DialogDestination1 : DialogNavKey
+    private data object DialogDestination2 : DialogNavKey
 }

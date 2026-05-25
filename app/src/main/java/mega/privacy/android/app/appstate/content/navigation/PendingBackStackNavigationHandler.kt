@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationResultsHandler
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
@@ -45,7 +46,7 @@ class PendingBackStackNavigationHandler(
             val authRequiredDestinations = replaceAuthRequiredDestinations(initialLoginDestination)
             backstack.pending = authRequiredDestinations + backstack.pending
         }
-        if (backstack.isEmpty()) backstack.add(defaultLandingScreen)
+        ensureNotEmpty()
         onPasscodeStateChanged(isPasscodeLocked)
 
         logBackStack("init isLoggedIn: ${currentAuthStatus.isLoggedIn} hasRootNode: $hasRootNode")
@@ -57,6 +58,7 @@ class PendingBackStackNavigationHandler(
         if (backstack.isEmpty()) {
             navigate(defaultLandingScreen)
         }
+        ensureNotEmpty()
         logBackStack("back")
     }
 
@@ -115,6 +117,7 @@ class PendingBackStackNavigationHandler(
                 backstack.addAll(destinations)
             }
         }
+        ensureNotEmpty()
         logBackStack("navigate : $destinations")
     }
 
@@ -257,7 +260,11 @@ class PendingBackStackNavigationHandler(
     }
 
     private fun ensureNotEmpty() {
-        if (backstack.isEmpty()) backstack.add(defaultLandingScreen)
+        // Topmost dialog has no non-dialog entry behind it. Covers both the empty
+        // backstack (vacuous true) and the all-DialogNavKey case in one check.
+        if (backstack.all { it is DialogNavKey }) {
+            backstack.add(0, defaultLandingScreen)
+        }
     }
 
     private fun isLoggedOut() = currentAuthStatus.isLoggedIn.not()
