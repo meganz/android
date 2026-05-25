@@ -1308,9 +1308,13 @@ internal class NodeRepositoryImpl @Inject constructor(
         nodeId: NodeId,
         order: SortOrder?,
         folderTypeData: FolderTypeData?,
+        sensitivityFilter: SensitivityFilterOption?,
     ): List<TypedNode> = withContext(ioDispatcher) {
         val token = cancelTokenProvider.getOrCreateCancelToken()
-        val filter = megaSearchFilterMapper(parentHandle = nodeId)
+        val filter = megaSearchFilterMapper(
+            parentHandle = nodeId,
+            sensitivityFilter = sensitivityFilter,
+        )
         val offlineItemsDiffer = async { getAllOfflineNodeHandle() }
         val megaNodesDiffer = async {
             megaApiGateway.getChildren(
@@ -1336,9 +1340,13 @@ internal class NodeRepositoryImpl @Inject constructor(
         order: SortOrder?,
         initialBatchSize: Int,
         folderTypeData: FolderTypeData?,
+        sensitivityFilter: SensitivityFilterOption?,
     ): Flow<Pair<List<TypedNode>, Boolean>> = flow {
         val token = cancelTokenProvider.getOrCreateCancelToken()
-        val filter = megaSearchFilterMapper(parentHandle = nodeId)
+        val filter = megaSearchFilterMapper(
+            parentHandle = nodeId,
+            sensitivityFilter = sensitivityFilter,
+        )
         val offlineItems = getAllOfflineNodeHandle()
         val allChildren = megaApiGateway.getChildren(
             filter,

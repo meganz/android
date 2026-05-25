@@ -62,6 +62,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
@@ -186,10 +187,21 @@ class CloudDriveViewModelTest {
             on { isNodeKeyDecrypted }.thenReturn(true)
         }
         whenever(getNodeInfoByIdUseCase(eq(folderNodeId))).thenReturn(nodeInfo)
-        whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
+        whenever(
+            getFileBrowserNodeChildrenUseCase(
+                parentHandle = any(),
+                excludeSensitives = any(),
+            )
+        ).thenReturn(items)
 
         // Set up the new chunked use case to return a flow with the items and hasMore flag
-        whenever(fetchNodesByIdInChunkUseCase.invoke(folderNodeId)).thenReturn(
+        whenever(
+            fetchNodesByIdInChunkUseCase.invoke(
+                nodeId = any(),
+                initialBatchSize = any(),
+                excludeSensitives = any(),
+            )
+        ).thenReturn(
             flowOf(
                 NodeFetchResult(
                     loadingState = NodesLoadingState.FullyLoaded,
@@ -242,7 +254,7 @@ class CloudDriveViewModelTest {
         val underTest = createViewModel()
 
         fetchNodesByIdInChunkUseCase.stub {
-            onBlocking { invoke(any(), any()) } doReturn flow { awaitCancellation() }
+            onBlocking { invoke(any(), any(), any()) } doReturn flow { awaitCancellation() }
         }
 
         underTest.uiState.test {
@@ -325,7 +337,12 @@ class CloudDriveViewModelTest {
 
             // Ensure that getFileBrowserNodeChildrenUseCase is mocked for the node update scenario
             // This will be called when getNodeUiItems() is invoked during the node update
-            whenever(getFileBrowserNodeChildrenUseCase(any())).thenReturn(
+            whenever(
+                getFileBrowserNodeChildrenUseCase(
+                    parentHandle = any(),
+                    excludeSensitives = any(),
+                )
+            ).thenReturn(
                 listOf(
                     node1,
                     node2
@@ -368,7 +385,10 @@ class CloudDriveViewModelTest {
             // Verify that getFileBrowserNodeChildrenUseCase was called for the node update
             // The call should happen when NodeChanges.Attributes is processed
             // called twice after reload
-            verify(getFileBrowserNodeChildrenUseCase, times(2)).invoke(folderNodeHandle)
+            verify(getFileBrowserNodeChildrenUseCase, times(2)).invoke(
+                parentHandle = eq(folderNodeHandle),
+                excludeSensitives = any(),
+            )
         }
 
     @Test
@@ -592,36 +612,29 @@ class CloudDriveViewModelTest {
         }
 
     @Test
-    fun `test that sensitive items are filtered when hidden nodes enabled and show hidden items is false`() =
+    fun `test that fetch use case is called with excludeSensitives true when hidden nodes enabled and show hidden items is false`() =
         runTest {
-            val sensitiveNode = mock<TypedNode> {
-                on { id } doReturn NodeId(1L)
-                on { name } doReturn "Sensitive Node"
-                on { isMarkedSensitive } doReturn true
-            }
             val normalNode = mock<TypedNode> {
                 on { id } doReturn NodeId(2L)
                 on { name } doReturn "Normal Node"
             }
 
             setupTestData(
-                listOf(sensitiveNode, normalNode),
+                listOf(normalNode),
                 isHiddenNodesEnabled = true
             )
 
-            // Override mapper to return items with sensitivity info
-            val sensitiveViewItem = NodeViewItem(node = sensitiveNode, isSensitive = true)
             val normalViewItem = NodeViewItem(node = normalNode, isSensitive = false)
             whenever(
                 nodeViewItemMapper(
-                    nodeList = listOf(sensitiveNode, normalNode),
+                    nodeList = listOf(normalNode),
                     nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                     highlightedNodeId = null,
                     isHiddenNodesEnabled = true,
                     highlightedNames = null,
                     isContactVerificationOn = false,
                 )
-            ).thenReturn(listOf(sensitiveViewItem, normalViewItem))
+            ).thenReturn(listOf(normalViewItem))
 
             val underTest = createViewModel()
 
@@ -630,6 +643,12 @@ class CloudDriveViewModelTest {
                 assertThat(finalState.items).hasSize(1)
                 assertThat(finalState.items[0].node.id).isEqualTo(NodeId(2L))
             }
+
+            verify(fetchNodesByIdInChunkUseCase).invoke(
+                nodeId = any(),
+                initialBatchSize = any(),
+                excludeSensitives = eq(true),
+            )
         }
 
     // Root Node Fallback Logic Tests
@@ -858,8 +877,14 @@ class CloudDriveViewModelTest {
                 assertThat(state.items).hasSize(2) // Should remain the same
             }
 
-            // Verify that getNodesByIdInChunkUseCase was called (the new use case)
-            verify(fetchNodesByIdInChunkUseCase).invoke(folderNodeId)
+            // Verify that getNodesByIdInChunkUseCase was called (the new use case).
+            // It may be called more than once because the excludeSensitives flag changes
+            // alongside the hidden-nodes setting and drives a re-fetch through the SDK.
+            verify(fetchNodesByIdInChunkUseCase, atLeastOnce()).invoke(
+                nodeId = any(),
+                initialBatchSize = any(),
+                excludeSensitives = any(),
+            )
             // getFileBrowserNodeChildrenUseCase is only called on node updates, not during initial loading
         }
 
@@ -963,7 +988,10 @@ class CloudDriveViewModelTest {
         // Verify that getCloudSortOrderUseCase was called at least twice:
         // 1. During initialization
         // 2. After setting the sort order (refetch)
-        verify(getFileBrowserNodeChildrenUseCase).invoke(any())
+        verify(getFileBrowserNodeChildrenUseCase).invoke(
+            parentHandle = any(),
+            excludeSensitives = any(),
+        )
         verify(setCloudSortOrderUseCase).invoke(expectedSortOrder)
     }
 

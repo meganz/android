@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNot
@@ -153,43 +154,43 @@ class CloudDriveViewModel @AssistedInject constructor(
     }
 
     private fun stateDataFlow(): Flow<StateData> = currentFolderIdFlow.flatMapLatest { folderId ->
-        combine(
-            monitorNodeUpdatesFlow.filterNot { it == NodeChanges.Remove }
-                .map { getLatestTitle() to hasWritePermission(folderId) }
-                .onStart { emit(getLatestTitle() to hasWritePermission(folderId)) },
-            getHiddenNodesSettingsFlow(),
-            fetchNodesByIdInChunkUseCase(folderId)
-                .catch { Timber.e(it) }
-                .takeWhileInclusive { it.loadingState == NodesLoadingState.PartiallyLoaded }
-                .onCompletion {
-                    emitAll(getMonitoredNodesFlow(folderId))
-                },
-            flowOf(runCatching { getContactVerificationWarningUseCase() }.getOrDefault(false))
-        ) { (title, hasWritePermission), (isHiddenNodesEnabled, showHiddenNodes), fetchResult, contactVerificationEnabled ->
-            val nodeUiItems = nodeViewItemMapper(
-                nodeList = fetchResult.typedNodes,
-                nodeSourceType = args.nodeSourceType,
-                highlightedNodeId = args.highlightedNodeId,
-                highlightedNames = args.highlightedNodeNames,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                isContactVerificationOn = contactVerificationEnabled,
-            )
-
-            val nodes = if (isHiddenNodesEnabled && showHiddenNodes.not()) {
-                nodeUiItems.filter { !it.isSensitive }
-            } else {
-                nodeUiItems
+        getHiddenNodesSettingsFlow()
+            .map { (isHiddenNodesEnabled, showHiddenNodes) ->
+                isHiddenNodesEnabled to (isHiddenNodesEnabled && !showHiddenNodes && !isSharedSourceType) // Hidden nodes are shown in shares screen
             }
+            .distinctUntilChanged()
+            .flatMapLatest { (isHiddenNodesEnabled, excludeSensitives) ->
+                combine(
+                    monitorNodeUpdatesFlow.filterNot { it == NodeChanges.Remove }
+                        .map { getLatestTitle() to hasWritePermission(folderId) }
+                        .onStart { emit(getLatestTitle() to hasWritePermission(folderId)) },
+                    fetchNodesByIdInChunkUseCase(folderId, excludeSensitives = excludeSensitives)
+                        .catch { Timber.e(it) }
+                        .takeWhileInclusive { it.loadingState == NodesLoadingState.PartiallyLoaded }
+                        .onCompletion {
+                            emitAll(getMonitoredNodesFlow(folderId, excludeSensitives))
+                        },
+                    flowOf(runCatching { getContactVerificationWarningUseCase() }.getOrDefault(false))
+                ) { (title, hasWritePermission), fetchResult, contactVerificationEnabled ->
+                    val nodeUiItems = nodeViewItemMapper(
+                        nodeList = fetchResult.typedNodes,
+                        nodeSourceType = args.nodeSourceType,
+                        highlightedNodeId = args.highlightedNodeId,
+                        highlightedNames = args.highlightedNodeNames,
+                        isHiddenNodesEnabled = isHiddenNodesEnabled,
+                        isContactVerificationOn = contactVerificationEnabled,
+                    )
 
-            StateData(
-                currentFolderId = folderId,
-                title = title,
-                hasWritePermission = hasWritePermission,
-                loadingState = fetchResult.loadingState,
-                hasMediaItems = fetchResult.hasMediaItems,
-                nodeUiItems = nodes
-            )
-        }
+                    StateData(
+                        currentFolderId = folderId,
+                        title = title,
+                        hasWritePermission = hasWritePermission,
+                        loadingState = fetchResult.loadingState,
+                        hasMediaItems = fetchResult.hasMediaItems,
+                        nodeUiItems = nodeUiItems
+                    )
+                }
+            }
     }
 
     private val currentFolderIdFlow: Flow<NodeId> by lazy(LazyThreadSafetyMode.NONE) {
@@ -300,18 +301,23 @@ class CloudDriveViewModel @AssistedInject constructor(
         ::Pair
     )
 
-    private fun getMonitoredNodesFlow(folderId: NodeId) =
-        monitorFolderUpdatesFlow
-            .mapLatest {
-                val nodes = getFileBrowserNodeChildrenUseCase(folderId.longValue)
-                val hasMediaItems = containsMediaItemUseCase(nodes)
+    private fun getMonitoredNodesFlow(
+        folderId: NodeId,
+        excludeSensitives: Boolean,
+    ) = monitorFolderUpdatesFlow
+        .mapLatest {
+            val nodes = getFileBrowserNodeChildrenUseCase(
+                parentHandle = folderId.longValue,
+                excludeSensitives = excludeSensitives,
+            )
+            val hasMediaItems = containsMediaItemUseCase(nodes)
 
-                NodeFetchResult(
-                    loadingState = NodesLoadingState.FullyLoaded,
-                    hasMediaItems = hasMediaItems,
-                    typedNodes = nodes
-                )
-            }
+            NodeFetchResult(
+                loadingState = NodesLoadingState.FullyLoaded,
+                hasMediaItems = hasMediaItems,
+                typedNodes = nodes
+            )
+        }
 
     private suspend fun shouldShowContactNotVerifiedBanner(folderId: NodeId) = runCatching {
         return if (isSharedSourceType

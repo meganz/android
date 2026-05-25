@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 
@@ -148,12 +149,15 @@ interface NodeRepository {
      * @param nodeId [NodeId]
      * @param order [SortOrder]
      * @param folderTypeData [FolderTypeData] Optional data for folder type determination
+     * @param sensitivityFilter [SensitivityFilterOption] Optional filter to include or
+     *   exclude sensitive (hidden) nodes via the SDK search filter
      * @return
      */
     suspend fun getTypedNodesById(
         nodeId: NodeId,
         order: SortOrder? = null,
         folderTypeData: FolderTypeData? = null,
+        sensitivityFilter: SensitivityFilterOption? = null,
     ): List<TypedNode>
 
     /**
@@ -167,6 +171,8 @@ interface NodeRepository {
      * @param order [SortOrder] Optional sorting order
      * @param initialBatchSize [Int] Size of initial batch
      * @param folderTypeData [FolderTypeData] Optional data for folder type determination
+     * @param sensitivityFilter [SensitivityFilterOption] Optional filter to include or
+     *   exclude sensitive (hidden) nodes via the SDK search filter
      * @return Flow of pairs containing typed node lists and hasMore flag for progressive loading
      */
     suspend fun getTypedNodesByIdInChunks(
@@ -174,6 +180,7 @@ interface NodeRepository {
         order: SortOrder? = null,
         initialBatchSize: Int,
         folderTypeData: FolderTypeData? = null,
+        sensitivityFilter: SensitivityFilterOption? = null,
     ): Flow<Pair<List<TypedNode>, Boolean>>
 
     /**

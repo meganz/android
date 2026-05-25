@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFolderTypeDataUseCase
@@ -68,6 +69,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                     order = any(),
                     initialBatchSize = any(),
                     folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
                 )
             ).thenReturn(flowOf(Pair(nodes, true)))
 
@@ -91,6 +93,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                     order = any(),
                     initialBatchSize = any(),
                     folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
                 )
             ).thenReturn(flowOf(Pair(nodes, false)))
 
@@ -114,6 +117,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                     order = any(),
                     initialBatchSize = any(),
                     folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
                 )
             ).thenReturn(flowOf(Pair(nodes, false)))
 
@@ -136,6 +140,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 order = any(),
                 initialBatchSize = any(),
                 folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
             )
         ).thenReturn(flowOf(Pair(nodes, false)))
 
@@ -158,6 +163,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 order = any(),
                 initialBatchSize = any(),
                 folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
             )
         ).thenReturn(flowOf(Pair(emptyList(), false)))
 
@@ -171,6 +177,7 @@ class FetchNodesByIdInChunkUseCaseTest {
             order = anyOrNull(),
             initialBatchSize = eq(batchSize),
             folderTypeData = anyOrNull(),
+            sensitivityFilter = anyOrNull(),
         )
     }
 
@@ -186,6 +193,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 order = any(),
                 initialBatchSize = any(),
                 folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
             )
         ).thenReturn(flowOf(Pair(emptyList(), false)))
 
@@ -199,6 +207,7 @@ class FetchNodesByIdInChunkUseCaseTest {
             order = eq(sortOrder),
             initialBatchSize = any(),
             folderTypeData = anyOrNull(),
+            sensitivityFilter = anyOrNull(),
         )
     }
 
@@ -215,6 +224,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                     order = any(),
                     initialBatchSize = any(),
                     folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
                 )
             ).thenReturn(flowOf(Pair(emptyList(), false)))
 
@@ -228,6 +238,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 order = anyOrNull(),
                 initialBatchSize = any(),
                 folderTypeData = eq(folderTypeData),
+                sensitivityFilter = anyOrNull(),
             )
         }
 
@@ -241,6 +252,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 order = any(),
                 initialBatchSize = any(),
                 folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
             )
         ).thenReturn(flow { throw RuntimeException("error") })
 
@@ -264,6 +276,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 order = any(),
                 initialBatchSize = any(),
                 folderTypeData = any(),
+                sensitivityFilter = anyOrNull(),
             )
         ).thenReturn(flowOf(Pair(emptyList(), false)))
 
@@ -277,6 +290,70 @@ class FetchNodesByIdInChunkUseCaseTest {
             order = anyOrNull(),
             initialBatchSize = eq(500),
             folderTypeData = anyOrNull(),
+            sensitivityFilter = anyOrNull(),
         )
     }
+
+    @Test
+    fun `test that invoke forwards NonSensitiveOnly filter to repository when excludeSensitives is true`() =
+        runTest {
+            whenever(getCloudSortOrder()).thenReturn(mock())
+            whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            whenever(
+                nodeRepository.getTypedNodesByIdInChunks(
+                    nodeId = any(),
+                    order = any(),
+                    initialBatchSize = any(),
+                    folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
+                )
+            ).thenReturn(flowOf(Pair(emptyList(), false)))
+
+            underTest(
+                nodeId = NodeId(1L),
+                excludeSensitives = true,
+            ).test {
+                awaitItem()
+                awaitComplete()
+            }
+
+            verify(nodeRepository).getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = anyOrNull(),
+                initialBatchSize = any(),
+                folderTypeData = anyOrNull(),
+                sensitivityFilter = eq(SensitivityFilterOption.NonSensitiveOnly),
+            )
+        }
+
+    @Test
+    fun `test that invoke passes null filter to repository when excludeSensitives defaults to false`() =
+        runTest {
+            whenever(getCloudSortOrder()).thenReturn(mock())
+            whenever(getFolderTypeDataUseCase()).thenReturn(mock())
+            whenever(containsMediaItemUseCase(any())).thenReturn(false)
+            whenever(
+                nodeRepository.getTypedNodesByIdInChunks(
+                    nodeId = any(),
+                    order = any(),
+                    initialBatchSize = any(),
+                    folderTypeData = any(),
+                    sensitivityFilter = anyOrNull(),
+                )
+            ).thenReturn(flowOf(Pair(emptyList(), false)))
+
+            underTest(NodeId(1L)).test {
+                awaitItem()
+                awaitComplete()
+            }
+
+            verify(nodeRepository).getTypedNodesByIdInChunks(
+                nodeId = any(),
+                order = anyOrNull(),
+                initialBatchSize = any(),
+                folderTypeData = anyOrNull(),
+                sensitivityFilter = eq(null),
+            )
+        }
 }

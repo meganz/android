@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.clouddrive.NodeFetchResult
+import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFolderTypeDataUseCase
@@ -33,11 +34,14 @@ class FetchNodesByIdInChunkUseCase @Inject constructor(
      *
      * @param nodeId The parent node ID
      * @param initialBatchSize The initial batch size for loading nodes, default is 500
+     * @param excludeSensitives When true, the SDK search filter excludes sensitive (hidden) nodes
+     *   so the UI never sees them. Defaults to false.
      * @return Flow that emits pairs containing typed node lists and hasMore flag progressively
      */
     suspend operator fun invoke(
         nodeId: NodeId,
         initialBatchSize: Int = 500,
+        excludeSensitives: Boolean = false,
     ): Flow<NodeFetchResult> = coroutineScope {
         val sortOrderDiffer = async { getCloudSortOrder() }
         val folderTypeDataDiffer = async { getFolderTypeDataUseCase() }
@@ -46,6 +50,7 @@ class FetchNodesByIdInChunkUseCase @Inject constructor(
             order = sortOrderDiffer.await(),
             initialBatchSize = initialBatchSize,
             folderTypeData = folderTypeDataDiffer.await(),
+            sensitivityFilter = SensitivityFilterOption.NonSensitiveOnly.takeIf { excludeSensitives },
         ).map { (nodes, hasMore) ->
             val hasMediaItems = containsMediaItemUseCase(nodes)
             NodeFetchResult(
