@@ -121,7 +121,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private fun loadFileExplorerFeatureFlag() {
         viewModelScope.launch {
             val enabled =
-                runCatching { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }.getOrElse { false }
+                runCatching { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }.getOrElse { false }
             _state.update { it.copy(isFileExplorerEnabled = enabled) }
         }
     }

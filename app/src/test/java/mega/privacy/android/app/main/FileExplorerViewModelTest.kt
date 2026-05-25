@@ -42,7 +42,6 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -588,7 +587,7 @@ internal class FileExplorerViewModelTest {
     fun `test that checkFeatureFlag updates state correctly`(
         isFeatureFlagEnabled: Boolean,
     ) = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.FileExplorer)) doReturn isFeatureFlagEnabled
+        whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn isFeatureFlagEnabled
 
         underTest.checkFeatureFlag()
         testScheduler.advanceUntilIdle()

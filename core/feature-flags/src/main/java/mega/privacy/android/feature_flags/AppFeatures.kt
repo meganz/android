@@ -129,10 +129,10 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Feature flag to control the migration of FileExplorerFragment to ComposeUI and single activity.
+     * Feature flag to control the migration of FileExplorerActivity to ComposeUI and single activity.
      */
-    FileExplorer(
-        "Enable file explorer revamp with ComposeUI and single activity",
+    CloudExplorer(
+        "Enable Cloud explorer revamp with ComposeUI and single activity",
         false
     );
 

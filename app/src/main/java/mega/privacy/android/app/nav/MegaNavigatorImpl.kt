@@ -881,7 +881,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     ) {
         applicationScope.launch {
             val singleActivityDestination =
-                if (runCatching { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }
+                if (runCatching { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }
                         .getOrDefault(false)
                 ) {
                     SaveScannedDocumentsNavKey(

@@ -50,7 +50,7 @@ private fun EntryProviderScope<NavKey>.FileExplorerShareGate(
 ) {
     val context = LocalContext.current
     FeatureFlagGate(
-        feature = AppFeatures.FileExplorer,
+        feature = AppFeatures.CloudExplorer,
         disabled = {
             LaunchedOnceEffect {
                 val intent = Intent(context, FileExplorerActivity::class.java).apply {

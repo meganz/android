@@ -122,7 +122,7 @@ class PdfViewerViewModelTest {
         whenever(getLastPageViewedInPdfUseCase(12345L)).thenReturn(1)
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
-        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }.thenReturn(false)
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }.thenReturn(false)
     }
 
     private fun initViewModel(
@@ -152,7 +152,7 @@ class PdfViewerViewModelTest {
     @Test
     fun `test that isFileExplorerEnabled is true when FileExplorer feature flag is enabled`() =
         runTest {
-            wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }
+            wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }
                 .thenReturn(true)
             underTest = initViewModel()
             advanceUntilIdle()
@@ -160,14 +160,14 @@ class PdfViewerViewModelTest {
                 assertThat(awaitItem().isFileExplorerEnabled).isTrue()
             }
             verifyBlocking(getFeatureFlagValueUseCase) {
-                invoke(AppFeatures.FileExplorer)
+                invoke(AppFeatures.CloudExplorer)
             }
         }
 
     @Test
     fun `test that isFileExplorerEnabled is false when FileExplorer feature flag is disabled`() =
         runTest {
-            wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }
+            wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }
                 .thenReturn(false)
             underTest = initViewModel()
             advanceUntilIdle()
@@ -175,7 +175,7 @@ class PdfViewerViewModelTest {
                 assertThat(awaitItem().isFileExplorerEnabled).isFalse()
             }
             verifyBlocking(getFeatureFlagValueUseCase) {
-                invoke(AppFeatures.FileExplorer)
+                invoke(AppFeatures.CloudExplorer)
             }
         }
 

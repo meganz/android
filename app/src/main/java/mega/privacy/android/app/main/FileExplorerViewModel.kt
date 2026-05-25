@@ -254,7 +254,7 @@ class FileExplorerViewModel @Inject constructor(
     fun checkFeatureFlag() {
         viewModelScope.launch {
             val isFeatureFlagEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.FileExplorer)
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
             }.getOrDefault(false)
 
             _uiState.update { state -> state.copy(isFeatureFlagEnabled = isFeatureFlagEnabled) }
