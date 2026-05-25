@@ -63,6 +63,7 @@ import mega.privacy.android.shared.original.core.ui.controls.camera.CameraTimer
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
+import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -126,12 +127,17 @@ internal fun CameraCaptureScreen(
         rememberLauncherForActivityResult(
             contract = persistablePickVisualMedia()
         ) {
-            it?.let {
-                context.contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-                onFinish(it)
+            it?.let { uri ->
+                runCatching {
+                    // On older device, the system does not guarantee that FLAG_GRANT_PERSISTABLE_URI_PERMISSION is honored
+                    context.contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }.onFailure { e ->
+                    Timber.w(e, "Persistable permission not granted for $uri")
+                }
+                onFinish(uri)
             }
         }
 
