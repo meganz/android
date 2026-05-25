@@ -68,12 +68,10 @@ import androidx.navigation.NavController
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
-import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
-import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
-import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.meeting.view.dialog.ChangeSFUIdDialog
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
@@ -109,12 +107,14 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
-import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.ImageIconItem
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
@@ -450,9 +450,9 @@ private fun PaymentAlertSection(
             value = stringResource(
                 if (hasRenewableSubscription) R.string.account_info_renews_on else R.string.account_info_expires_on,
                 TimeUtils.formatDate(
-                    if (hasRenewableSubscription) renewTime else expirationTime,
-                    TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                    LocalContext.current
+                    timestamp = if (hasRenewableSubscription) renewTime else expirationTime,
+                    format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                    context = LocalContext.current
                 )
             ),
             baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.black_white),

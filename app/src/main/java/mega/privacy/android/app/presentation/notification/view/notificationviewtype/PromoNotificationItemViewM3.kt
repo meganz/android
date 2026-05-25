@@ -49,9 +49,9 @@ internal fun PromoNotificationItemViewM3(
     val description = notification.description
     val timeText = TimeUtils.formatTime(notification.endTimeStamp)
     val dateText = TimeUtils.formatDate(
-        notification.endTimeStamp,
-        TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-        LocalContext.current,
+        timestamp = notification.endTimeStamp,
+        format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+        context = LocalContext.current,
     )
     val dateAndTimeString = stringResource(
         id = R.string.notifications_screen_notification_promo_expiration_time,

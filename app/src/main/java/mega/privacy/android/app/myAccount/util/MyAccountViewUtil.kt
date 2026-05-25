@@ -211,6 +211,8 @@ object MyAccountViewUtil {
     /**
      * Updates the views related to payments for all type of accounts.
      *
+     * @param renewTime
+     * @param expirationTime
      * @param renewable True if the subscriptions is renewable, false otherwise.
      * @param fragment  Value from `ActiveFragment` enum indicating what is the active fragment.
      */
@@ -227,9 +229,9 @@ object MyAccountViewUtil {
             text = context.getString(
                 if (renewable) R.string.account_info_renews_on else R.string.account_info_expires_on,
                 TimeUtils.formatDate(
-                    if (renewable) renewTime else expirationTime,
-                    TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                    context
+                    timestamp = if (renewable) renewTime else expirationTime,
+                    format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                    context = context,
                 )
             )
 

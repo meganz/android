@@ -41,6 +41,13 @@ import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body2medium
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_020_grey_800
 
+/**
+ * Promo notification item view
+ *
+ * @param modifier
+ * @param notification
+ * @param onClick
+ */
 @Composable
 internal fun PromoNotificationItemView(
     modifier: Modifier,
@@ -52,9 +59,9 @@ internal fun PromoNotificationItemView(
     val description = notification.description
     val timeText = TimeUtils.formatTime(notification.endTimeStamp)
     val dateText = TimeUtils.formatDate(
-        notification.endTimeStamp,
-        TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-        LocalContext.current,
+        timestamp = notification.endTimeStamp,
+        format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+        context = LocalContext.current,
     )
     val dateAndTimeString = stringResource(
         id = R.string.notifications_screen_notification_promo_expiration_time,
@@ -62,14 +69,15 @@ internal fun PromoNotificationItemView(
         timeText
     )
 
-    Column(modifier = modifier
-        .clickable { onClick() }
-        .background(
-            color = MaterialTheme.colors.grey_020_grey_800
-        )
-        .testTag(PROMO_NOTIFICATION_TEST_TAG)
-        .fillMaxWidth()
-        .wrapContentHeight()) {
+    Column(
+        modifier = modifier
+            .clickable { onClick() }
+            .background(
+                color = MaterialTheme.colors.grey_020_grey_800
+            )
+            .testTag(PROMO_NOTIFICATION_TEST_TAG)
+            .fillMaxWidth()
+            .wrapContentHeight()) {
 
         MegaText(
             text = stringResource(id = R.string.notifications_screen_notification_section_title),

@@ -20,6 +20,12 @@ import mega.privacy.android.app.myAccount.PaymentAlertType
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.formatter.stripLinkAnnotations
 
+/**
+ * Payment alert section
+ *
+ * @param uiState
+ * @param modifier
+ */
 @Composable
 internal fun PaymentAlertSection(
     uiState: MyAccountUsageUiState,
@@ -37,9 +43,9 @@ internal fun PaymentAlertSection(
 
         PaymentAlertType.AccountRenewsOn -> {
             val date = TimeUtils.formatDate(
-                uiState.paymentAlertDate,
-                TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                LocalContext.current
+                timestamp = uiState.paymentAlertDate,
+                format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                context = LocalContext.current,
             )
             stringResource(R.string.account_info_renews_on, date)
                 .stripLinkAnnotations() to TextColor.Secondary
@@ -47,9 +53,9 @@ internal fun PaymentAlertSection(
 
         PaymentAlertType.AccountExpiresOn -> {
             val date = TimeUtils.formatDate(
-                uiState.paymentAlertDate,
-                TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                LocalContext.current
+                timestamp = uiState.paymentAlertDate,
+                format = TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                context = LocalContext.current,
             )
             stringResource(R.string.account_info_expires_on, date)
                 .stripLinkAnnotations() to TextColor.Secondary
@@ -62,10 +68,19 @@ internal fun PaymentAlertSection(
         text = text,
         style = AppTheme.typography.bodyMedium,
         textColor = textColor,
-        modifier = modifier.fillMaxWidth().padding(bottom = 8.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp)
     )
 }
 
+/**
+ * Storage detail item
+ *
+ * @param title
+ * @param value
+ * @param modifier
+ */
 @Composable
 internal fun StorageDetailItem(
     title: String,
