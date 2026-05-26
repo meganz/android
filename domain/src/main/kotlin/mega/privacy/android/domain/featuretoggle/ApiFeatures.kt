@@ -238,6 +238,18 @@ enum class ApiFeatures(
         description = "Enable MEGA Cloud Drive as a SAF root in the Android system file picker",
         singleCheckPerRun = true,
         defaultValue = false,
+    ),
+
+    /**
+     * Text editor long-line chunking fix (AND-23707).
+     * When enabled, splits very long lines into smaller segments to prevent ANRs
+     * caused by native text measurement blocking the main thread.
+     */
+    TextEditorLongLineChunking(
+        experimentName = "tellc",
+        description = "Split long lines in text editor to prevent ANRs",
+        singleCheckPerRun = true,
+        defaultValue = true,
     );
 
     companion object : FeatureFlagValueProvider {

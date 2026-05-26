@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFileLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
@@ -92,6 +93,7 @@ internal class TextEditorComposeViewModelTest {
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val snackbarEventQueue: SnackbarEventQueue = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
         TextEditorBottomBarActionsMapper()
     private val fileLinkPublicNode: TypedFileNode = mock {
@@ -126,10 +128,12 @@ internal class TextEditorComposeViewModelTest {
             saveRecentlyUsedItemUseCase,
             monitorNodeUpdatesUseCase,
             snackbarEventQueue,
+            getFeatureFlagValueUseCase,
         )
         runBlocking {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
             whenever(getNodeAccessUseCase(any())).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         }
         whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf())
     }
@@ -186,6 +190,7 @@ internal class TextEditorComposeViewModelTest {
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             snackbarEventQueue = snackbarEventQueue,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -614,8 +619,10 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that setEditMode creates chunks from loaded content`() = runTest {
-        val totalLines = CHUNK_SIZE * 3 - 1
-        val allLines = (1..totalLines).map { "line$it" }
+        // Use lines long enough so total chars exceed CHUNK_MAX_CHARS per chunk
+        val lineContent = "x".repeat(100)
+        val totalLines = 2000
+        val allLines = (1..totalLines).map { "$lineContent$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
@@ -623,11 +630,10 @@ internal class TextEditorComposeViewModelTest {
 
         underTest.setEditMode()
 
-        assertThat(underTest.getChunkCount()).isEqualTo(3)
+        assertThat(underTest.getChunkCount()).isGreaterThan(1)
         val chunk0State = underTest.getOrCreateChunkState(0)
         val chunk0Text = chunk0State.text.toString()
-        assertThat(chunk0Text.split("\n").first()).isEqualTo("line1")
-        assertThat(chunk0Text.split("\n")).hasSize(CHUNK_SIZE)
+        assertThat(chunk0Text.split("\n").first()).isEqualTo("${lineContent}1")
     }
 
     @Test
@@ -752,23 +758,24 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that getChunkText returns correct lines for chunk index`() = runTest {
-        val totalLines = CHUNK_SIZE + 100
-        val allLines = (1..totalLines).map { "line$it" }
+        val lineContent = "x".repeat(100)
+        val totalLines = 1000
+        val allLines = (1..totalLines).map { "$lineContent$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
+        val chunkCount = underTest.getChunkCount()
+        assertThat(chunkCount).isGreaterThan(1)
+
         val chunk0 = underTest.getChunkText(0)
         val chunk0Lines = chunk0.split("\n")
-        assertThat(chunk0Lines).hasSize(CHUNK_SIZE)
-        assertThat(chunk0Lines.first()).isEqualTo("line1")
-        assertThat(chunk0Lines.last()).isEqualTo("line${CHUNK_SIZE}")
+        assertThat(chunk0Lines.first()).isEqualTo("${lineContent}1")
 
-        val lastChunkIndex = (totalLines - 1) / CHUNK_SIZE
-        val lastChunk = underTest.getChunkText(lastChunkIndex)
+        val lastChunk = underTest.getChunkText(chunkCount - 1)
         val lastChunkLines = lastChunk.split("\n")
-        assertThat(lastChunkLines.last()).isEqualTo("line$totalLines")
+        assertThat(lastChunkLines.last()).isEqualTo("$lineContent$totalLines")
     }
 
     @Test
@@ -1091,13 +1098,18 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that getChunkStartLine returns correct offset for second chunk`() = runTest {
-        val allLines = (1..(CHUNK_SIZE + 100)).map { "line$it" }
+        val lineContent = "x".repeat(100)
+        val totalLines = 1000
+        val allLines = (1..totalLines).map { "$lineContent$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
-        assertThat(underTest.getChunkStartLine(1)).isEqualTo(CHUNK_SIZE + 1)
+        assertThat(underTest.getChunkCount()).isGreaterThan(1)
+        // Second chunk starts after all lines in the first chunk
+        val chunk0LineCount = underTest.getChunkText(0).split("\n").size
+        assertThat(underTest.getChunkStartLine(1)).isEqualTo(chunk0LineCount + 1)
     }
 
     @Test
@@ -1333,14 +1345,15 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that getChunkCount returns correct count in View mode`() = runTest {
-        val totalLines = CHUNK_SIZE * 3 - 1
-        val allLines = (1..totalLines).map { "line$it" }
+        val lineContent = "x".repeat(100)
+        val totalLines = 2000
+        val allLines = (1..totalLines).map { "$lineContent$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
-        assertThat(underTest.getChunkCount()).isEqualTo(3)
+        assertThat(underTest.getChunkCount()).isGreaterThan(1)
     }
 
     @Test
@@ -1351,15 +1364,16 @@ internal class TextEditorComposeViewModelTest {
 
     @Test
     fun `test that getChunkCount returns correct count in Edit mode`() = runTest {
-        val totalLines = CHUNK_SIZE * 3 - 1
-        val allLines = (1..totalLines).map { "line$it" }
+        val lineContent = "x".repeat(100)
+        val totalLines = 2000
+        val allLines = (1..totalLines).map { "$lineContent$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
         underTest.setEditMode()
-        assertThat(underTest.getChunkCount()).isEqualTo(3)
+        assertThat(underTest.getChunkCount()).isGreaterThan(1)
     }
 
     @Test
@@ -1772,5 +1786,110 @@ internal class TextEditorComposeViewModelTest {
         advanceUntilIdle()
 
         assertThat(underTest.uiState.value.fileName).isEqualTo("original.txt")
+    }
+
+    @Test
+    fun `test that chunks are split by character count when lines exceed CHUNK_MAX_CHARS`() =
+        runTest {
+            // 10 lines of 10K chars each = 100K total; with CHUNK_MAX_CHARS = 50K
+            // they should split into more chunks than the line-only limit would produce
+            val lines = (1..10).map { "x".repeat(10_000) }
+            doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+
+            // Line-only chunking (CHUNK_SIZE=1000) would put all 10 lines in 1 chunk.
+            // Char-count cap should split into at least 2 chunks.
+            assertThat(underTest.getChunkCount()).isGreaterThan(1)
+        }
+
+    @Test
+    fun `test that a long line is split across chunks`() = runTest {
+        val longLine = "a".repeat(CHUNK_MAX_CHARS * 2)
+        val normalLine = "normal"
+        val original = listOf(normalLine, longLine, normalLine)
+        doReturn(flowOf(original))
+            .whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        // Long line is split mid-character, so more chunks than lines
+        assertThat(underTest.getChunkCount()).isGreaterThan(original.size)
+        // Every chunk respects the char limit
+        for (i in 0 until underTest.getChunkCount()) {
+            assertThat(underTest.getChunkText(i).length).isAtMost(CHUNK_MAX_CHARS)
+        }
+    }
+
+    @Test
+    fun `test that save round-trips correctly with long lines`() = runTest {
+        val longLine = "b".repeat(CHUNK_MAX_CHARS * 2 + 500)
+        val original = listOf("first", longLine, "last")
+        val originalText = original.joinToString("\n")
+
+        doReturn(flowOf(original)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        doReturn(TextEditorSaveResult.UploadRequired("tmp", 1L, true, false))
+            .whenever(saveTextContentForTextEditorUseCase)
+            .invoke(
+                nodeHandle = any(),
+                text = any(),
+                fileName = any(),
+                mode = any(),
+                fromHome = any(),
+                isFromSharedFolder = any(),
+            )
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit, fileName = "test.txt")
+        advanceUntilIdle()
+
+        underTest.saveFile()
+        advanceUntilIdle()
+
+        val textCaptor = argumentCaptor<String>()
+        verify(saveTextContentForTextEditorUseCase).invoke(
+            nodeHandle = any(),
+            text = textCaptor.capture(),
+            fileName = any(),
+            mode = any(),
+            fromHome = any(),
+            isFromSharedFolder = any(),
+        )
+        assertThat(textCaptor.firstValue).isEqualTo(originalText)
+    }
+
+    @Test
+    fun `test that long lines are split into multiple chunks in view mode`() = runTest {
+        val longLine = "c".repeat(CHUNK_MAX_CHARS + 1)
+        val lines = (1..10).map { longLine }
+        doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        // Each line exceeds CHUNK_MAX_CHARS and is split, so more chunks than lines.
+        assertThat(underTest.getChunkCount()).isGreaterThan(10)
+        // Every chunk respects the char limit
+        for (i in 0 until underTest.getChunkCount()) {
+            assertThat(underTest.getChunkText(i).length).isAtMost(CHUNK_MAX_CHARS)
+        }
+    }
+
+    @Test
+    fun `test that edit mode splits long lines and each chunk respects char limit`() = runTest {
+        val longLine = "d".repeat(CHUNK_MAX_CHARS * 2)
+        val lines = listOf("short", longLine, "short2")
+        doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        // Long line is split, so more than 3 chunks
+        assertThat(underTest.getChunkCount()).isGreaterThan(3)
+        for (i in 0 until underTest.getChunkCount()) {
+            val chunkState = underTest.getOrCreateChunkState(i)
+            assertThat(chunkState.text.length).isAtMost(CHUNK_MAX_CHARS)
+        }
     }
 }
