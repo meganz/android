@@ -14,9 +14,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
@@ -36,6 +40,7 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsed
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
@@ -91,6 +96,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase,
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
 
@@ -143,6 +149,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             val saved = runCatching { getShowLineNumbersPreferenceUseCase() }.getOrDefault(false)
             _uiState.update { it.copy(showLineNumbers = saved) }
         }
+        monitorNodeRename()
         if (args.mode != TextEditorMode.Create) {
             viewModelScope.launch {
                 _uiState.update { it.copy(isFullyLoaded = false) }
@@ -897,6 +904,27 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 bottomBarActions = actions,
             )
         }
+    }
+
+    /**
+     * Keeps the displayed file name in sync when the open node is renamed elsewhere
+     * (Node options bottom sheet, another device). The Compose editor reads the file name
+     * once at load, so without this the toolbar title would go stale after a rename.
+     */
+    private fun monitorNodeRename() {
+        monitorNodeUpdatesUseCase()
+            .mapNotNull { update ->
+                val handle = resolvedNodeHandle
+                if (handle == INVALID_NODE_HANDLE) return@mapNotNull null
+                update.changes.entries
+                    .firstOrNull { (node, changes) ->
+                        node.id.longValue == handle && NodeChanges.Name in changes
+                    }
+                    ?.key?.name
+            }
+            .onEach { newName -> _uiState.update { it.copy(fileName = newName) } }
+            .catch { Timber.e(it, "Text editor: node updates flow failed") }
+            .launchIn(viewModelScope)
     }
 
     private suspend fun saveRecentlyUsed() {

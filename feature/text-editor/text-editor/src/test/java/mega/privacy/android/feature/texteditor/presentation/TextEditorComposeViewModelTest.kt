@@ -16,7 +16,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -26,6 +29,7 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
@@ -86,6 +90,7 @@ internal class TextEditorComposeViewModelTest {
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase = mock()
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase = mock()
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase = mock()
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
         TextEditorBottomBarActionsMapper()
@@ -119,12 +124,14 @@ internal class TextEditorComposeViewModelTest {
             saveTextEditorScrollUseCase,
             getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase,
+            monitorNodeUpdatesUseCase,
             snackbarEventQueue,
         )
         runBlocking {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
             whenever(getNodeAccessUseCase(any())).thenReturn(null)
         }
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf())
     }
 
     private fun initUnderTest(
@@ -177,6 +184,7 @@ internal class TextEditorComposeViewModelTest {
             saveTextEditorScrollUseCase = saveTextEditorScrollUseCase,
             getTextEditorScrollUseCase = getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             snackbarEventQueue = snackbarEventQueue,
         )
     }
@@ -1711,4 +1719,58 @@ internal class TextEditorComposeViewModelTest {
             assertThat(downloadEvent.nodes).hasSize(1)
             assertThat(downloadEvent.nodes.first()).isInstanceOf(PublicLinkFile::class.java)
         }
+
+    @Test
+    fun `test that fileName is updated when current node is renamed`() = runTest {
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        val renamedNode = mock<Node> {
+            on { id }.thenReturn(NodeId(1L))
+            on { name }.thenReturn("renamed.txt")
+        }
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(
+            flowOf(NodeUpdate(mapOf(renamedNode to listOf(NodeChanges.Name))))
+        )
+
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "original.txt")
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.fileName).isEqualTo("renamed.txt")
+    }
+
+    @Test
+    fun `test that fileName is unchanged when a different node is renamed`() = runTest {
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        val otherNode = mock<Node> {
+            on { id }.thenReturn(NodeId(2L))
+            on { name }.thenReturn("other.txt")
+        }
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(
+            flowOf(NodeUpdate(mapOf(otherNode to listOf(NodeChanges.Name))))
+        )
+
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "original.txt")
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.fileName).isEqualTo("original.txt")
+    }
+
+    @Test
+    fun `test that fileName is unchanged when current node update has no Name change`() = runTest {
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        val sameNode = mock<Node> {
+            on { id }.thenReturn(NodeId(1L))
+            on { name }.thenReturn("renamed.txt")
+        }
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(
+            flowOf(NodeUpdate(mapOf(sameNode to listOf(NodeChanges.Favourite))))
+        )
+
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "original.txt")
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.fileName).isEqualTo("original.txt")
+    }
 }
