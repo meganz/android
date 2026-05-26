@@ -21,6 +21,13 @@ data class ShareTextToMegaNavKey(
 ) : ExplorerNavKey
 
 @Serializable
+data class UploadScannedDocumentNavKey(
+    val uriPath: UriPath,
+    val nodeSourceType: NodeSourceType,
+    val hasMultipleScans: Boolean = false,
+) : ExplorerNavKey
+
+@Serializable
 data class NodesExplorerNavKey(
     val nodeId: NodeId,
     val nodeSourceType: NodeSourceType,

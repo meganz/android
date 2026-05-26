@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -43,9 +44,12 @@ import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDo
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.data.extensions.toUriPath
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
-import mega.privacy.android.navigation.destination.ExplorerNavKey
-import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.navigation.destination.NodesExplorerNavKey
+import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -58,6 +62,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
+import timber.log.Timber
 
 /**
  * A Composable that holds views displaying the main Save Scanned Documents screen
@@ -87,7 +92,7 @@ internal fun SaveScannedDocumentsView(
     onSnackbarMessageConsumed: () -> Unit,
     onUploadScansEventConsumed: () -> Unit,
     onBackToChat: (Uri) -> Unit,
-    onNavigate: (List<ExplorerNavKey>) -> Unit,
+    onNavigate: (List<NavKey>) -> Unit,
 ) {
     val resources = LocalResources.current
     val activity = LocalActivity.current
@@ -146,7 +151,14 @@ internal fun SaveScannedDocumentsView(
                 }
 
                 uiState.isCloudExplorerAvailable -> {
-                    onNavigate(listOf(ShareFilesToMegaNavKey(shareUris = listOf(uriToUpload.toUriPath()))))
+                    onNavigate(
+                        getCloudExplorerNavKeys(
+                            parentsList = uiState.parentsList,
+                            nodeSourceType = uiState.nodeSourceType,
+                            uriToUpload = uriToUpload,
+                            hasMultipleScans = !uiState.canSelectScanFileType,
+                        )
+                    )
                 }
 
                 else -> {
@@ -283,11 +295,44 @@ internal fun navigateToFileExplorer(
         } else {
             action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CHAT
         }
-        type = activity.contentResolver.getType(uriToUpload)
+        type = runCatching { activity.contentResolver.getType(uriToUpload) }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
     }
 
     activity.startActivity(intent)
     activity.finish()
+}
+
+private fun getCloudExplorerNavKeys(
+    parentsList: List<NodeId>,
+    nodeSourceType: NodeSourceType,
+    uriToUpload: Uri,
+    hasMultipleScans: Boolean,
+) = buildList {
+    val startNavKey = UploadScannedDocumentNavKey(
+        uriPath = uriToUpload.toUriPath(),
+        nodeSourceType = nodeSourceType,
+        hasMultipleScans = hasMultipleScans,
+    )
+
+    add(startNavKey)
+
+    if (parentsList.isNotEmpty()) {
+        val shareUris = listOf(uriToUpload.toUriPath())
+
+        parentsList.forEach { nodeId ->
+            add(
+                NodesExplorerNavKey(
+                    nodeId = nodeId,
+                    nodeSourceType = nodeSourceType,
+                    explorerMode = ExplorerMode.SaveScannedDocument,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris
+                )
+            )
+        }
+    }
 }
 
 /**

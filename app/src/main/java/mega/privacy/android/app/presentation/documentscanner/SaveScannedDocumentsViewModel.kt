@@ -20,10 +20,16 @@ import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDo
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
@@ -47,6 +53,10 @@ internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
     private val validateScanFilenameUseCase: ValidateScanFilenameUseCase,
     private val renameFileAndDeleteOriginalUseCase: RenameFileAndDeleteOriginalUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
+    private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -59,6 +69,7 @@ internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
 
     init {
         checkFeatureFlags()
+        loadParentsList()
         _uiState.update { state: SaveScannedDocumentsUiState ->
             val formattedDateTime = String.format(
                 Locale.getDefault(),
@@ -95,6 +106,37 @@ internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
             _uiState.update { state ->
                 state.copy(isCloudExplorerAvailable = isCloudExplorerAvailable)
             }
+        }
+    }
+
+    private fun loadParentsList() {
+        val parentHandle = args.cloudDriveParentHandle?.takeIf { it != -1L } ?: return
+        viewModelScope.launch {
+            runCatching {
+                val parentNodeId = NodeId(parentHandle)
+                if (getRootNodeIdUseCase() == parentNodeId) {
+                    return@runCatching
+                }
+                val parentNode = getNodeByIdUseCase(parentNodeId)
+                    ?: return@runCatching
+                val sourceType = if (isNodeInCloudDriveUseCase(parentHandle)) {
+                    NodeSourceType.CLOUD_DRIVE
+                } else {
+                    NodeSourceType.INCOMING_SHARES
+                }
+                val ancestors = getAncestorsIdsUseCase(parentNode).reversed()
+                val parentsList = when (sourceType) {
+                    NodeSourceType.CLOUD_DRIVE -> ancestors.drop(1)
+                    else -> ancestors
+                } + parentNodeId
+
+                _uiState.update { state ->
+                    state.copy(
+                        parentsList = parentsList,
+                        nodeSourceType = sourceType
+                    )
+                }
+            }.onFailure { Timber.e(it) }
         }
     }
 

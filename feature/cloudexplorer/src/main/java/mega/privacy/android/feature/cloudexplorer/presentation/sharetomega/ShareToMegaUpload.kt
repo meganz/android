@@ -31,6 +31,7 @@ import mega.privacy.android.shared.transfers.components.UploadingFiles
 @Composable
 internal fun ShareToMegaUpload(
     parentNodeId: NodeId,
+    pitagTrigger: PitagTrigger,
     uploadUrisEventState: UploadUrisEventState,
     onStartUpload: (TransferTriggerEvent) -> Unit,
     onCloseExplorerScreen: () -> Unit,
@@ -72,7 +73,7 @@ internal fun ShareToMegaUpload(
         chatIds = chatIds,
         urisEvent = uploadUrisEventState.event,
         onUrisConsumed = uploadUrisEventState::consume,
-        pitagTrigger = PitagTrigger.ShareFromApp,
+        pitagTrigger = pitagTrigger,
         onStartUpload = { transferTriggerEvent ->
             onStartUpload(transferTriggerEvent)
 

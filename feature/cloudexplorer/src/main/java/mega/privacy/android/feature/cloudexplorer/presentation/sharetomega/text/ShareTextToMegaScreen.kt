@@ -20,6 +20,7 @@ import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
@@ -96,6 +97,7 @@ internal fun ShareTextToMegaScreen(
 
             ShareToMegaUpload(
                 parentNodeId = folderPickedId,
+                pitagTrigger = PitagTrigger.ShareFromApp,
                 uploadUrisEventState = uploadUrisEventState,
                 onStartUpload = onStartUpload,
                 onCloseExplorerScreen = onNavigateBack,

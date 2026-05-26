@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
@@ -23,9 +24,9 @@ import mega.privacy.android.app.presentation.documentscanner.groups.SAVE_SCANNED
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.navigation.destination.ExplorerNavKey
-import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
+import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
 import org.junit.Rule
@@ -204,12 +205,12 @@ internal class SaveScannedDocumentsViewTest {
     }
 
     @Test
-    fun `test that onNavigate is invoked with ShareFilesToMegaNavKey when cloud explorer is available`() {
+    fun `test that onNavigate is invoked with UploadScannedDocumentNavKey when cloud explorer is available`() {
         val uploadUriString = "/data/user/0/app_location/cache/scanned.pdf"
         val uriToUpload = mock<Uri> {
             on { toString() } doReturn uploadUriString
         }
-        val onNavigate = mock<(List<ExplorerNavKey>) -> Unit>()
+        val onNavigate = mock<(List<NavKey>) -> Unit>()
 
         composeTestRule.setContent {
             SaveScannedDocumentsView(
@@ -232,7 +233,13 @@ internal class SaveScannedDocumentsViewTest {
         composeTestRule.waitForIdle()
 
         verify(onNavigate).invoke(
-            listOf(ShareFilesToMegaNavKey(shareUris = listOf(UriPath(uploadUriString))))
+            listOf(
+                UploadScannedDocumentNavKey(
+                    uriPath = UriPath(uploadUriString),
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                    hasMultipleScans = true,
+                )
+            )
         )
     }
 

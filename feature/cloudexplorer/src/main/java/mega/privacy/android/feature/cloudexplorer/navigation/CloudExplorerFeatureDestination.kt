@@ -19,12 +19,15 @@ import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.uploadscanneddocument.UploadScannedDocumentScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.uploadscanneddocument.UploadScannedDocumentsViewModel
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
+import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 
 class CloudExplorerFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
@@ -41,6 +44,12 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = navigationHandler::navigate,
                 onStartUpload = transferHandler::setTransferEvent,
                 monitorResult = navigationHandler::monitorResult,
+                clearResult = navigationHandler::clearResult,
+            )
+            uploadScannedDocumentDestination(
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
+                onStartUpload = transferHandler::setTransferEvent,
                 clearResult = navigationHandler::clearResult,
             )
             nodeExplorerDestination(
@@ -73,6 +82,29 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onStartUpload = onStartUpload,
                 onNavigate = onNavigate,
                 monitorResult = monitorResult,
+                clearResult = clearResult,
+            )
+        }
+    }
+
+    fun EntryProviderScope<NavKey>.uploadScannedDocumentDestination(
+        onNavigateBack: (NavKey) -> Unit,
+        onNavigate: (NavKey) -> Unit,
+        onStartUpload: (TransferTriggerEvent) -> Unit,
+        clearResult: (String) -> Unit,
+    ) {
+        entry<UploadScannedDocumentNavKey> { key ->
+            val viewModel =
+                hiltViewModel<UploadScannedDocumentsViewModel, UploadScannedDocumentsViewModel.Factory> { factory ->
+                    factory.create(UploadScannedDocumentsViewModel.Args(uriPath = key.uriPath))
+                }
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            UploadScannedDocumentScreen(
+                uiState = uiState,
+                startNavKey = key,
+                onNavigateBack = { onNavigateBack(key) },
+                onStartUpload = onStartUpload,
+                onNavigate = onNavigate,
                 clearResult = clearResult,
             )
         }

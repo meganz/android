@@ -21,10 +21,17 @@ import mega.privacy.android.app.presentation.documentscanner.model.ScanDestinati
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
@@ -62,6 +69,10 @@ internal class SaveScannedDocumentsViewModelTest {
     private val validateScanFilenameUseCase = spy<ValidateScanFilenameUseCase>()
     private val renameFileAndDeleteOriginalUseCase = mock<RenameFileAndDeleteOriginalUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val isNodeInCloudDriveUseCase = mock<IsNodeInCloudDriveUseCase>()
+    private val getAncestorsIdsUseCase = mock<GetAncestorsIdsUseCase>()
     private var savedStateHandle = SavedStateHandle(mapOf())
 
     private val cloudDriveParentHandle = 123456L
@@ -82,6 +93,10 @@ internal class SaveScannedDocumentsViewModelTest {
             validateScanFilenameUseCase = validateScanFilenameUseCase,
             renameFileAndDeleteOriginalUseCase = renameFileAndDeleteOriginalUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getRootNodeIdUseCase = getRootNodeIdUseCase,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            isNodeInCloudDriveUseCase = isNodeInCloudDriveUseCase,
+            getAncestorsIdsUseCase = getAncestorsIdsUseCase,
             args = SaveScannedDocumentsViewModel.Args(
                 originatedFromChat = savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] ?: false,
                 savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] ?: -1,
@@ -95,7 +110,14 @@ internal class SaveScannedDocumentsViewModelTest {
     @BeforeEach
     fun reset() {
         savedStateHandle = SavedStateHandle(mapOf())
-        reset(renameFileAndDeleteOriginalUseCase, getFeatureFlagValueUseCase)
+        reset(
+            renameFileAndDeleteOriginalUseCase,
+            getFeatureFlagValueUseCase,
+            getRootNodeIdUseCase,
+            getNodeByIdUseCase,
+            isNodeInCloudDriveUseCase,
+            getAncestorsIdsUseCase,
+        )
     }
 
     @AfterEach
@@ -658,6 +680,116 @@ internal class SaveScannedDocumentsViewModelTest {
                 assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
             }
         }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that parentsList stays empty when cloudDriveParentHandle is not provided`() =
+        runTest {
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().parentsList).isEmpty()
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that parentsList stays empty when cloudDriveParentHandle equals root node`() =
+        runTest {
+            savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] = cloudDriveParentHandle
+            whenever(getRootNodeIdUseCase()).thenReturn(NodeId(cloudDriveParentHandle))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().parentsList).isEmpty()
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that parentsList drops the root from the ancestor chain for a cloud drive folder`() =
+        runTest {
+            val parentNodeId = NodeId(cloudDriveParentHandle)
+            val ancestorImmediate = NodeId(20L)
+            val ancestorRoot = NodeId(10L)
+            val parentNode = mock<TypedNode>()
+
+            savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] = cloudDriveParentHandle
+            whenever(getRootNodeIdUseCase()).thenReturn(ancestorRoot)
+            whenever(getNodeByIdUseCase(parentNodeId)).thenReturn(parentNode)
+            whenever(isNodeInCloudDriveUseCase(cloudDriveParentHandle)).thenReturn(true)
+            whenever(getAncestorsIdsUseCase(parentNode)).thenReturn(
+                listOf(ancestorImmediate, ancestorRoot)
+            )
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.parentsList).containsExactly(
+                    ancestorImmediate,
+                    parentNodeId,
+                ).inOrder()
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.CLOUD_DRIVE)
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that parentsList keeps the full ancestor chain marked as incoming shares when node is not in cloud drive`() =
+        runTest {
+            val parentNodeId = NodeId(cloudDriveParentHandle)
+            val topShare = NodeId(30L)
+            val parentNode = mock<TypedNode>()
+
+            savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] = cloudDriveParentHandle
+            whenever(getRootNodeIdUseCase()).thenReturn(NodeId(99L))
+            whenever(getNodeByIdUseCase(parentNodeId)).thenReturn(parentNode)
+            whenever(isNodeInCloudDriveUseCase(cloudDriveParentHandle)).thenReturn(false)
+            whenever(getAncestorsIdsUseCase(parentNode)).thenReturn(listOf(topShare))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.parentsList).containsExactly(topShare, parentNodeId).inOrder()
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.INCOMING_SHARES)
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that parentsList stays empty when getNodeByIdUseCase returns null`() = runTest {
+        savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] = cloudDriveParentHandle
+        whenever(getRootNodeIdUseCase()).thenReturn(NodeId(99L))
+        whenever(getNodeByIdUseCase(NodeId(cloudDriveParentHandle))).thenReturn(null)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().parentsList).isEmpty()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that parentsList stays empty when use case throws`() = runTest {
+        savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] = cloudDriveParentHandle
+        whenever(getRootNodeIdUseCase()).thenThrow(RuntimeException("boom"))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().parentsList).isEmpty()
+        }
+    }
 
     companion object {
         @JvmField

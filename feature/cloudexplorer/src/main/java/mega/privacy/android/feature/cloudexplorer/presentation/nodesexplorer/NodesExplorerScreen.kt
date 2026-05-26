@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -72,9 +73,10 @@ internal fun NodesExplorerScreen(
     val uploadUrisEventState = rememberUploadUrisEventState()
     var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
     val folderPickedId = NodeId(folderPickedIdLong)
-    val isShareToMega = explorerMode == ExplorerMode.ShareFilesToMega
+    val isUploading = explorerMode == ExplorerMode.ShareFilesToMega
             || explorerMode == ExplorerMode.ShareTextToMega
             || explorerMode == ExplorerMode.ShareURLToMega
+            || explorerMode == ExplorerMode.SaveScannedDocument
 
     EventEffect(
         event = fileUriEvent,
@@ -93,15 +95,18 @@ internal fun NodesExplorerScreen(
         onCloseExplorerScreen = onCloseExplorerScreen,
         isProcessingAction = isProcessingAction,
         onFolderPicked = { nodeId ->
-            when (explorerMode) {
-                ExplorerMode.ShareFilesToMega if shareUris != null -> {
+            when {
+                (explorerMode == ExplorerMode.ShareFilesToMega
+                        || explorerMode == ExplorerMode.SaveScannedDocument)
+                        && shareUris != null -> {
                     folderPickedIdLong = nodeId.longValue
                     uploadUrisEventState.trigger(
                         shareUris.map { it.toUri() }
                     )
                 }
 
-                ExplorerMode.ShareTextToMega, ExplorerMode.ShareURLToMega -> {
+                explorerMode == ExplorerMode.ShareTextToMega
+                        || explorerMode == ExplorerMode.ShareURLToMega -> {
                     folderPickedIdLong = nodeId.longValue
                     onNavigate(
                         if (explorerMode == ExplorerMode.ShareURLToMega) {
@@ -125,9 +130,14 @@ internal fun NodesExplorerScreen(
         clearResult = clearResult,
     )
 
-    if (isShareToMega) {
+    if (isUploading) {
         ShareToMegaUpload(
             parentNodeId = folderPickedId,
+            pitagTrigger = if (explorerMode == ExplorerMode.SaveScannedDocument) {
+                PitagTrigger.Scanner
+            } else {
+                PitagTrigger.ShareFromApp
+            },
             uploadUrisEventState = uploadUrisEventState,
             onStartUpload = onStartUpload,
             onCloseExplorerScreen = onCloseExplorerScreen,

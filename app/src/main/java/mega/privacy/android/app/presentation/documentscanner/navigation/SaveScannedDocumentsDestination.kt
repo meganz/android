@@ -57,7 +57,10 @@ class SaveScannedDocumentsDestination : FeatureDestination {
                 onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
                 onUploadScansEventConsumed = viewModel::onUploadScansEventConsumed,
                 onBackToChat = { removeDestination(key) },
-                onNavigate = navigate,
+                onNavigate = { navKeys ->
+                    navigate(navKeys)
+                    removeDestination(key)
+                },
             )
         }
     }
