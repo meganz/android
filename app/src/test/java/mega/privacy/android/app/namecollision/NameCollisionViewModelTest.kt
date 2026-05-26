@@ -413,53 +413,6 @@ internal class NameCollisionViewModelTest {
     }
 
     @Test
-    fun `test that getUploadedFilesCount resets to 0 when setSingleData is called`() = runTest {
-        val path1 = UriPath("/cacheFolder/Mega/file1.txt")
-        val nameCollision1 = mock<FileNameCollision> {
-            on { this.path } doReturn path1
-            on { this.isFile } doReturn true
-            on { this.parentHandle } doReturn 123L
-            on { this.name } doReturn "file1.txt"
-            on { this.renameName } doReturn null
-            on { this.pitagTrigger } doReturn PitagTrigger.NotApplicable
-        }
-        val collisionResult1 = mock<NodeNameCollisionResult> {
-            on { this.nameCollision } doReturn nameCollision1
-        }
-        whenever(getNodeNameCollisionResultUseCase(nameCollision1)) doReturn collisionResult1
-        whenever(getFileVersionsOption(any())).thenReturn(false)
-
-        initUnderTest()
-        underTest.setSingleData(nameCollision1)
-        advanceUntilIdle()
-
-        underTest.replaceUpdateOrMerge(false)
-        advanceUntilIdle()
-
-        assertThat(underTest.getUploadedFilesCount()).isEqualTo(1)
-
-        val path2 = UriPath("/cacheFolder/Mega/file2.txt")
-        val nameCollision2 = mock<FileNameCollision> {
-            on { this.path } doReturn path2
-            on { this.isFile } doReturn true
-            on { this.parentHandle } doReturn 123L
-            on { this.name } doReturn "file2.txt"
-            on { this.renameName } doReturn null
-            on { this.pitagTrigger } doReturn PitagTrigger.NotApplicable
-        }
-        val collisionResult2 = mock<NodeNameCollisionResult> {
-            on { this.nameCollision } doReturn nameCollision2
-        }
-        whenever(getNodeNameCollisionResultUseCase(nameCollision2)) doReturn collisionResult2
-
-        underTest.setSingleData(nameCollision2)
-        advanceUntilIdle()
-
-        assertThat(underTest.getUploadedFilesCount()).isEqualTo(0)
-    }
-
-
-    @Test
     fun `test that cancelAll clears pendingCollisions for non-folder-upload context`() =
         runTest {
             val paths = listOf(

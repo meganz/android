@@ -103,6 +103,7 @@ class NameCollisionViewModel @Inject constructor(
     var isCopyToOrigin = false
     var pitagTrigger = PitagTrigger.NotApplicable
     private var uploadedFilesCount = 0
+    private var isLoadingOrLoaded = false
 
     init {
         viewModelScope.launch {
@@ -157,6 +158,8 @@ class NameCollisionViewModel @Inject constructor(
      * @param collision [NameCollision] to resolve.
      */
     fun setSingleData(collision: NameCollision) {
+        if (isLoadingOrLoaded) return
+        isLoadingOrLoaded = true
         pitagTrigger = collision.pitagTrigger
         uploadedFilesCount = 0
         viewModelScope.launch {
@@ -165,7 +168,10 @@ class NameCollisionViewModel @Inject constructor(
                     checkCopyToOrigin(collision)
                 }
                 updateCurrentCollision(collision, true)
-            }.onFailure { Timber.e("Exception setting single data $it") }
+            }.onFailure {
+                isLoadingOrLoaded = false
+                Timber.e("Exception setting single data $it")
+            }
         }
     }
 
@@ -201,6 +207,8 @@ class NameCollisionViewModel @Inject constructor(
      * @param collisions    ArrayList of [NameCollision] to resolve.
      */
     fun setData(collisions: List<NameCollision>) {
+        if (isLoadingOrLoaded) return
+        isLoadingOrLoaded = true
         pitagTrigger = collisions.first().pitagTrigger
         uploadedFilesCount = 0
         viewModelScope.launch {
@@ -223,6 +231,7 @@ class NameCollisionViewModel @Inject constructor(
                 }
             }.onFailure {
                 Timber.e(it, "Exception setting data")
+                isLoadingOrLoaded = false
                 currentCollision.value = null
             }
         }

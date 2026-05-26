@@ -12,7 +12,6 @@ import javax.inject.Singleton
 
 /**
  * Auth initialiser handles initialisation tasks during user auth.
- * It's an abstraction that simplifies the logic in the [mega.privacy.android.app.appstate.global.GlobalStateViewModel].
  *
  * @property coroutineScope
  * @property appStartInitialisers

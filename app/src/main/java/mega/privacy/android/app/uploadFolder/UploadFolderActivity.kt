@@ -6,7 +6,6 @@ import android.animation.AnimatorSet
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.DocumentsContract
@@ -25,14 +24,17 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.databinding.ActivityUploadFolderBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -52,6 +54,7 @@ import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -131,27 +134,23 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        if (shouldRefreshSessionDueToSDK(true)) return
         onBackPressedDispatcher.addCallback(onBackPressedCallback)
 
         collisionsForResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 when (result.resultCode) {
                     Activity.RESULT_OK -> {
-                        val collisionsResult =
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                result.data?.getParcelableArrayListExtra(
-                                    INTENT_EXTRA_COLLISION_RESULTS,
-                                    NameCollisionResultUiEntity::class.java
-                                )
-                            } else {
-                                @Suppress("DEPRECATION")
-                                result.data?.getParcelableArrayListExtra(
+                        val key = result.data?.getStringExtra(NameCollisionActivity.EXTRA_COLLISIONS_KEY)
+                        lifecycleScope.launch {
+                            val collisionsResult = key
+                                ?.let { largeBundleHolder.get(it) }
+                                ?.parcelableArrayList<NameCollisionResultUiEntity>(
                                     INTENT_EXTRA_COLLISION_RESULTS
                                 )
-                            }
-
-                        viewModel.proceedWithUpload(collisionsResult)
+                            viewModel.proceedWithUpload(collisionsResult)
+                            key?.let { largeBundleHolder.release(it) }
+                        }
                     }
 
                     Activity.RESULT_CANCELED -> {

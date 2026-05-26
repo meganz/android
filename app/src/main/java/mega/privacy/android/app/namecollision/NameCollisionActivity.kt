@@ -9,16 +9,20 @@ import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import coil3.load
 import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.databinding.ActivityNameCollisionBinding
 import mega.privacy.android.app.databinding.ViewNameCollisionOptionBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
@@ -61,14 +65,21 @@ class NameCollisionActivity : PasscodeActivity() {
 
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
 
+    private val isRefreshingSession by lazy(LazyThreadSafetyMode.NONE) {
+        shouldRefreshSessionDueToSDK(true)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState == null) {
-            val collisionsList =
-                intent.parcelableArrayList<NameCollisionUiEntity>(INTENT_EXTRA_COLLISION_RESULTS)
+        if (isRefreshingSession) return
+        viewModel.isFolderUploadContext = UPLOAD_FOLDER_CONTEXT == intent.action
+        val singleCollision =
+            intent.parcelable<NameCollisionUiEntity>(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
+        val collisionsKey = intent.getStringExtra(EXTRA_COLLISIONS_KEY)
 
-            val singleCollision =
-                intent.parcelable<NameCollisionUiEntity>(INTENT_EXTRA_SINGLE_COLLISION_RESULT)
+        lifecycleScope.launch {
+            val collisionsList = collisionsKey?.let { largeBundleHolder.get(it) }
+                ?.parcelableArrayList<NameCollisionUiEntity>(INTENT_EXTRA_COLLISION_RESULTS)
 
             when {
                 collisionsList != null -> viewModel.setData(
@@ -84,8 +95,6 @@ class NameCollisionActivity : PasscodeActivity() {
                     finish()
                 }
             }
-
-            viewModel.isFolderUploadContext = UPLOAD_FOLDER_CONTEXT == intent.action
         }
 
         if (!viewModel.isCopyToOrigin) {
@@ -531,14 +540,25 @@ class NameCollisionActivity : PasscodeActivity() {
     }
 
     private fun manageCollisionsResolution(collisionsResolution: ArrayList<NodeNameCollisionResult>) {
-        setResult(
-            Activity.RESULT_OK,
-            Intent().putParcelableArrayListExtra(
-                INTENT_EXTRA_COLLISION_RESULTS,
-                collisionsResolution.map { it.toUiEntity() }.toCollection(ArrayList())
+        val key = largeBundleHolder.put(
+            bundleOf(
+                INTENT_EXTRA_COLLISION_RESULTS to collisionsResolution
+                    .map { it.toUiEntity() }
+                    .toCollection(ArrayList())
             )
         )
+        setResult(
+            Activity.RESULT_OK,
+            Intent().putExtra(EXTRA_COLLISIONS_KEY, key)
+        )
         finish()
+    }
+
+    override fun onDestroy() {
+        if (isFinishing && !isRefreshingSession) {
+            intent.getStringExtra(EXTRA_COLLISIONS_KEY)?.let { largeBundleHolder.release(it) }
+        }
+        super.onDestroy()
     }
 
 
@@ -549,15 +569,24 @@ class NameCollisionActivity : PasscodeActivity() {
         private const val UPLOAD_FOLDER_CONTEXT = "UPLOAD_FOLDER_CONTEXT"
         const val MESSAGE_RESULT = "MESSAGE_RESULT"
 
+        /** Intent extra carrying the [largeBundleHolder] key for the collisions payload. */
+        const val EXTRA_COLLISIONS_KEY = "EXTRA_COLLISIONS_KEY"
+
         @JvmStatic
         fun getIntentForList(
             context: Context,
             collisions: ArrayList<NameCollision>,
-        ): Intent = Intent(context, NameCollisionActivity::class.java).apply {
-            putParcelableArrayListExtra(
-                INTENT_EXTRA_COLLISION_RESULTS,
-                collisions.map { it.toUiEntity() }.toCollection(ArrayList())
+        ): Intent {
+            val key = context.largeBundleHolder.put(
+                bundleOf(
+                    INTENT_EXTRA_COLLISION_RESULTS to collisions
+                        .map { it.toUiEntity() }
+                        .toCollection(ArrayList())
+                )
             )
+            return Intent(context, NameCollisionActivity::class.java).apply {
+                putExtra(EXTRA_COLLISIONS_KEY, key)
+            }
         }
 
         @JvmStatic

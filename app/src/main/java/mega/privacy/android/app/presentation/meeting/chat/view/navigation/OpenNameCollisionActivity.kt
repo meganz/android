@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.meeting.chat.view.navigation
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.os.bundleOf
+import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.namecollision.NameCollisionActivity
 import mega.privacy.android.app.namecollision.data.NameCollisionUiEntity
 import mega.privacy.android.app.utils.Constants
@@ -17,10 +19,12 @@ internal fun openNameCollisionActivity(
             if (collisions.size == 1) {
                 putExtra(Constants.INTENT_EXTRA_SINGLE_COLLISION_RESULT, collisions.first())
             } else {
-                putParcelableArrayListExtra(
-                    Constants.INTENT_EXTRA_COLLISION_RESULTS,
-                    ArrayList(collisions)
+                val key = context.largeBundleHolder.put(
+                    bundleOf(
+                        Constants.INTENT_EXTRA_COLLISION_RESULTS to ArrayList(collisions)
+                    )
                 )
+                putExtra(NameCollisionActivity.EXTRA_COLLISIONS_KEY, key)
             }
         }
 
