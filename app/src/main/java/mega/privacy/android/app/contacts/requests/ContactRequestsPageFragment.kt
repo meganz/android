@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.material.ExperimentalMaterialApi
@@ -24,7 +22,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -32,29 +29,26 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
-import coil3.asImage
-import coil3.load
-import coil3.request.transformations
-import coil3.transform.CircleCropTransformation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.MarqueeTextView
-import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment.Companion.EXTRA_IS_OUTGOING
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestListAdapter
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.contacts.requests.data.ContactRequestsState
+import mega.privacy.android.app.contacts.requests.mapper.ContactRequestItemToContactItemUiStateMapper
 import mega.privacy.android.app.databinding.PageContactRequestsBinding
+import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactRequestAction
-import mega.privacy.android.domain.entity.user.ContactAvatar
-import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.contact.components.ContactItemView
 import mega.privacy.android.icon.pack.R.drawable as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -74,6 +68,13 @@ class ContactRequestsPageFragment : Fragment() {
      */
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    /**
+     * Maps a contact-request row to the presentational UI state consumed by
+     * `ContactItemView` (used for the row in the list and the bottom-sheet preview).
+     */
+    @Inject
+    lateinit var contactRequestItemToContactItemUiStateMapper: ContactRequestItemToContactItemUiStateMapper
 
     private lateinit var binding: PageContactRequestsBinding
 
@@ -235,28 +236,15 @@ class ContactRequestsPageFragment : Fragment() {
         item: ContactRequestItem,
         actions: List<ComposableBottomSheetAction>,
     ) {
-        AndroidView(
-            factory = { context ->
-                LayoutInflater.from(context)
-                    .inflate(R.layout.item_contact_request, null)
-            },
-            update = { view ->
-                view.findViewById<EmojiTextView>(R.id.txt_title).text =
-                    item.email
-                view.findViewById<MarqueeTextView>(R.id.txt_subtitle).text =
-                    item.createdTime
-                view.findViewById<ImageView>(R.id.img_thumbnail).load(
-                    data = ContactAvatar(
-                        email = item.email,
-                        id = UserId(item.handle)
-                    )
-                ) {
-                    transformations(CircleCropTransformation())
-                    placeholder(item.placeholder.asImage())
-                }
-                view.findViewById<ImageButton>(R.id.btn_more).isVisible =
-                    false
-            }
+        val avatarFile = buildAvatarFile(item.email + FileUtil.JPG_EXTENSION)
+        val avatarColorArgb = AvatarUtil.getColorAvatar(item.handle)
+        ContactItemView(
+            contactItemUiState = contactRequestItemToContactItemUiStateMapper(
+                item = item,
+                avatarFile = avatarFile,
+                avatarColorArgb = avatarColorArgb,
+            ),
+            showDivider = false,
         )
         MegaDivider(dividerType = DividerType.SmallStartPadding)
         actions.forEachIndexed { index, action ->

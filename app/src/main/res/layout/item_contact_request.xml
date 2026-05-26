@@ -1,56 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
-    android:minHeight="72dp"
-    android:padding="16dp">
+    android:minHeight="72dp">
 
-    <ImageView
-        android:id="@+id/img_thumbnail"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/contact_compose_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_more"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:placeholderImage="@android:drawable/ic_menu_camera" />
-
-    <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
-        android:id="@+id/txt_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textAppearance="@style/TextAppearance.Mega.Body1"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toStartOf="@id/btn_more"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@id/img_thumbnail"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="@tools:sample/full_names" />
-
-    <mega.privacy.android.app.components.MarqueeTextView
-        android:id="@+id/txt_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-        app:layout_constraintEnd_toStartOf="@id/btn_more"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/txt_title"
-        app:layout_constraintTop_toBottomOf="@id/txt_title"
-        tools:text="Last seen Yesterday at 11:45" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/btn_more"
         android:layout_width="32dp"
         android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
         android:background="?selectableItemBackgroundBorderless"
         android:src="@drawable/ic_dots_vertical_grey"
-        app:layout_constraintBottom_toBottomOf="@id/txt_subtitle"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/txt_title" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
