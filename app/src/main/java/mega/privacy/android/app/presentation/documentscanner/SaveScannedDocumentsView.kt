@@ -1,13 +1,18 @@
 package mega.privacy.android.app.presentation.documentscanner
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.rememberScaffoldState
@@ -27,7 +32,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsDestinationGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFileTypeGroup
@@ -35,7 +42,10 @@ import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedD
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.navigation.destination.ExplorerNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -46,6 +56,8 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as SharedR
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
+import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
 
 /**
  * A Composable that holds views displaying the main Save Scanned Documents screen
@@ -58,7 +70,7 @@ import mega.privacy.android.shared.resources.R as SharedR
  * @param onScanDestinationSelected Lambda when a new Scan Destination is selected
  * @param onScanFileTypeSelected Lambda when a new Scan File Type is selected
  * @param onSnackbarMessageConsumed Lambda when the Snackbar has been shown with the specific message
- * @param onUploadScansStarted Lambda to indicate that the scanned document/s (through the provided
+ * @param onUploadScans Lambda to indicate that the scanned document/s (through the provided
  * Uri) should begin uploading
  * @param onUploadScansEventConsumed Lambda when the State Event to upload the scanned document/s has
  * been triggered
@@ -73,10 +85,12 @@ internal fun SaveScannedDocumentsView(
     onScanDestinationSelected: (ScanDestination) -> Unit,
     onScanFileTypeSelected: (ScanFileType) -> Unit,
     onSnackbarMessageConsumed: () -> Unit,
-    onUploadScansStarted: (Uri) -> Unit,
     onUploadScansEventConsumed: () -> Unit,
+    onBackToChat: (Uri) -> Unit,
+    onNavigate: (List<ExplorerNavKey>) -> Unit,
 ) {
     val resources = LocalResources.current
+    val activity = LocalActivity.current
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -119,7 +133,38 @@ internal fun SaveScannedDocumentsView(
         event = uiState.uploadScansEvent,
         onConsumed = { onUploadScansEventConsumed() },
         action = { uriToUpload ->
-            onUploadScansStarted(uriToUpload)
+            when {
+                uiState.originatedFromChat -> {
+                    Analytics.tracker.trackEvent(
+                        if (uiState.scanFileType == ScanFileType.Pdf) {
+                            DocumentScannerUploadingPDFToChatEvent
+                        } else {
+                            DocumentScannerUploadingImageToChatEvent
+                        }
+                    )
+                    onBackToChat(uriToUpload)
+                }
+
+                uiState.isCloudExplorerAvailable -> {
+                    onNavigate(listOf(ShareFilesToMegaNavKey(shareUris = listOf(uriToUpload.toUriPath()))))
+                }
+
+                else -> {
+                    activity?.let {
+                        navigateToFileExplorer(
+                            activity = activity,
+                            uriToUpload = uriToUpload,
+                            cloudDriveParentHandle = if (uiState.scanDestination == ScanDestination.CloudDrive) {
+                                uiState.cloudDriveParentHandle
+                            } else {
+                                null
+                            },
+                            scanFileType = uiState.scanFileType,
+                            canSelectScanFileType = uiState.canSelectScanFileType,
+                        )
+                    }
+                }
+            }
         },
     )
 
@@ -139,7 +184,11 @@ internal fun SaveScannedDocumentsView(
     }
 
     MegaScaffold(
-        modifier = Modifier.semantics { testTagsAsResourceId = true },
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+            .imePadding()
+            .semantics { testTagsAsResourceId = true },
         scaffoldState = scaffoldState,
         topBar = {
             MegaAppBar(
@@ -191,18 +240,54 @@ internal fun SaveScannedDocumentsView(
                         dividerType = DividerType.FullSize,
                     )
                 }
-                SaveScannedDocumentsDestinationGroup(
-                    originatedFromChat = uiState.originatedFromChat,
-                    selectedScanDestination = uiState.scanDestination,
-                    onScanDestinationSelected = onScanDestinationSelected,
-                )
-                MegaDivider(
-                    modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_DIVIDER),
-                    dividerType = DividerType.FullSize,
-                )
+                if (!uiState.isCloudExplorerAvailable) {
+                    SaveScannedDocumentsDestinationGroup(
+                        originatedFromChat = uiState.originatedFromChat,
+                        selectedScanDestination = uiState.scanDestination,
+                        onScanDestinationSelected = onScanDestinationSelected,
+                    )
+                    MegaDivider(
+                        modifier = Modifier.testTag(SAVE_SCANNED_DOCUMENTS_DESTINATION_DIVIDER),
+                        dividerType = DividerType.FullSize,
+                    )
+                }
             }
         }
     }
+}
+
+/**
+ * When the Activity is accessed from anywhere other than Cloud Drive and the Document Scanning
+ * finishes, this creates an [Intent] to [FileExplorerActivity] with the [Uri] containing the
+ * scans to be uploaded. This Activity gets finished afterwards
+ *
+ * @param uriToUpload The [Uri] containing the scans to be uploaded
+ */
+internal fun navigateToFileExplorer(
+    activity: Activity,
+    uriToUpload: Uri,
+    cloudDriveParentHandle: Long?,
+    scanFileType: ScanFileType,
+    canSelectScanFileType: Boolean,
+) {
+    val intent = Intent(activity, FileExplorerActivity::class.java).apply {
+        putExtra(Intent.EXTRA_STREAM, uriToUpload)
+        putExtra(FileExplorerActivity.EXTRA_SCAN_FILE_TYPE, scanFileType.ordinal)
+        putExtra(FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS, !canSelectScanFileType)
+        if (cloudDriveParentHandle != null) {
+            action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CLOUD
+            putExtra(
+                FileExplorerActivity.EXTRA_PARENT_HANDLE,
+                cloudDriveParentHandle,
+            )
+        } else {
+            action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CHAT
+        }
+        type = activity.contentResolver.getType(uriToUpload)
+    }
+
+    activity.startActivity(intent)
+    activity.finish()
 }
 
 /**
@@ -228,8 +313,9 @@ private fun SaveScannedDocumentsViewPreview(
             onScanFileTypeSelected = {},
             onScanDestinationSelected = {},
             onSnackbarMessageConsumed = {},
-            onUploadScansStarted = {},
             onUploadScansEventConsumed = {},
+            onBackToChat = {},
+            onNavigate = {},
         )
     }
 }

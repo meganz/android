@@ -7,6 +7,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.DATE_TIME_FORMAT
@@ -21,7 +23,9 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToChatEvent
@@ -57,6 +61,7 @@ internal class SaveScannedDocumentsViewModelTest {
 
     private val validateScanFilenameUseCase = spy<ValidateScanFilenameUseCase>()
     private val renameFileAndDeleteOriginalUseCase = mock<RenameFileAndDeleteOriginalUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private var savedStateHandle = SavedStateHandle(mapOf())
 
     private val cloudDriveParentHandle = 123456L
@@ -76,6 +81,7 @@ internal class SaveScannedDocumentsViewModelTest {
         underTest = SaveScannedDocumentsViewModel(
             validateScanFilenameUseCase = validateScanFilenameUseCase,
             renameFileAndDeleteOriginalUseCase = renameFileAndDeleteOriginalUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             args = SaveScannedDocumentsViewModel.Args(
                 originatedFromChat = savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] ?: false,
                 savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] ?: -1,
@@ -89,7 +95,7 @@ internal class SaveScannedDocumentsViewModelTest {
     @BeforeEach
     fun reset() {
         savedStateHandle = SavedStateHandle(mapOf())
-        reset(renameFileAndDeleteOriginalUseCase)
+        reset(renameFileAndDeleteOriginalUseCase, getFeatureFlagValueUseCase)
     }
 
     @AfterEach
@@ -609,6 +615,49 @@ internal class SaveScannedDocumentsViewModelTest {
         Arguments.of(ScanFileType.Jpg, ScanDestination.CloudDrive),
         Arguments.of(ScanFileType.Jpg, ScanDestination.Chat),
     )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that isCloudExplorerAvailable is true when CloudExplorer feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(true)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isTrue()
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that isCloudExplorerAvailable is false when CloudExplorer feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(false)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that isCloudExplorerAvailable defaults to false when the feature flag lookup throws`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
+                .thenThrow(RuntimeException("boom"))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
 
     companion object {
         @JvmField

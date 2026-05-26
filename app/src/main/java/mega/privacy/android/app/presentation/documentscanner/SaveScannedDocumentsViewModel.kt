@@ -19,11 +19,12 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToChatEvent
@@ -45,6 +46,7 @@ import java.util.Locale
 internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
     private val validateScanFilenameUseCase: ValidateScanFilenameUseCase,
     private val renameFileAndDeleteOriginalUseCase: RenameFileAndDeleteOriginalUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -56,6 +58,7 @@ internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        checkFeatureFlags()
         _uiState.update { state: SaveScannedDocumentsUiState ->
             val formattedDateTime = String.format(
                 Locale.getDefault(),
@@ -80,6 +83,18 @@ internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
                 },
                 soloImageUri = args.soloImageUri,
             )
+        }
+    }
+
+    private fun checkFeatureFlags() {
+        viewModelScope.launch {
+            val isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+
+            _uiState.update { state ->
+                state.copy(isCloudExplorerAvailable = isCloudExplorerAvailable)
+            }
         }
     }
 
@@ -133,12 +148,8 @@ internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
                             )
                         }.onSuccess { renamedFile ->
                             logDocumentScanEvent(uiState.scanFileType, uiState.scanDestination)
-                            _uiState.update {
-                                val uri = renamedFile.toUri()
-                                it.copy(
-                                    uploadScansEvent = triggered(uri),
-                                    uploadScanUri = uri.toUriPath(),
-                                )
+                            _uiState.update { state ->
+                                state.copy(uploadScansEvent = triggered(renamedFile.toUri()))
                             }
                         }.onFailure { exception ->
                             Timber.e("Unable to upload the scan/s due to a renaming issue:\n ${exception.printStackTrace()}")

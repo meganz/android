@@ -13,13 +13,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.passcode.rememberPasscodeAwareLauncher
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 
@@ -28,14 +28,14 @@ import timber.log.Timber
  *
  * @param parentNodeId The parent node ID where scanned documents will be saved
  * @param originatedFromChat Whether the scan originated from chat, defaults to false
- * @param megaNavigator Optional navigator, defaults to rememberMegaNavigator()
+ * @param navigate
  * @param viewModel Optional ViewModel, defaults to hiltViewModel()
  */
 @Composable
 fun ScanDocumentHandler(
     parentNodeId: NodeId,
     originatedFromChat: Boolean = false,
-    megaNavigator: MegaNavigator = rememberMegaNavigator(),
+    navigate: (NavKey) -> Unit,
     viewModel: ScanDocumentViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -54,12 +54,13 @@ fun ScanDocumentHandler(
 
                     // The PDF URI must exist before moving to the Scan Confirmation page
                     pdf?.uri?.let { pdfUri ->
-                        megaNavigator.openSaveScannedDocumentsActivity(
-                            context = context,
-                            originatedFromChat = false,
-                            cloudDriveParentHandle = parentNodeId.longValue,
-                            scanPdfUri = pdfUri,
-                            scanSoloImageUri = if (imageUris.size == 1) imageUris[0] else null,
+                        navigate(
+                            SaveScannedDocumentsNavKey(
+                                originatedFromChat = false,
+                                cloudDriveParentHandle = parentNodeId.longValue,
+                                scanPdfUri = pdfUri.toString(),
+                                scanSoloImageUri = if (imageUris.size == 1) imageUris[0].toString() else null,
+                            )
                         )
                     } ?: run {
                         Timber.e("The PDF file could not be retrieved after scanning")

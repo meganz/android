@@ -262,7 +262,7 @@ fun CloudDriveScreen(
         @SuppressLint("ComposeViewModelForwarding")
         ScanDocumentHandler(
             parentNodeId = it,
-            megaNavigator = megaNavigator,
+            navigate = navigationHandler::navigate,
             viewModel = scanDocumentViewModel
         )
     }

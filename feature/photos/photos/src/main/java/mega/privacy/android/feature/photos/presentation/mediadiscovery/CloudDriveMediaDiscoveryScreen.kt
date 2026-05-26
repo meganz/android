@@ -285,6 +285,7 @@ fun CloudDriveMediaDiscoveryRoute(
     @SuppressLint("ComposeViewModelForwarding")
     ScanDocumentHandler(
         parentNodeId = parentId,
+        navigate = navigationHandler::navigate,
         viewModel = scanDocumentViewModel
     )
 }

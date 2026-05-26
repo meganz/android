@@ -296,7 +296,7 @@ internal fun HomeScreen(
 
     ScanDocumentHandler(
         parentNodeId = rootFolderId,
-        megaNavigator = megaNavigator,
+        navigate = navigationHandler::navigate,
         viewModel = scanDocumentViewModel
     )
 

@@ -83,7 +83,6 @@ import mega.privacy.android.feature.payment.presentation.cancelaccountplan.Cance
 import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountActivity
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -106,8 +105,6 @@ import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
-import mega.privacy.android.navigation.destination.SaveScannedDocumentsActivityNavKey
-import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -870,39 +867,6 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     override fun launchUrl(context: Context?, url: String?, appendNoPlansParam: Boolean) {
         context?.launchUrl(url, appendNoPlansParam)
-    }
-
-    override fun openSaveScannedDocumentsActivity(
-        context: Context,
-        originatedFromChat: Boolean,
-        cloudDriveParentHandle: Long,
-        scanPdfUri: Uri,
-        scanSoloImageUri: Uri?,
-    ) {
-        applicationScope.launch {
-            val singleActivityDestination =
-                if (runCatching { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }
-                        .getOrDefault(false)
-                ) {
-                    SaveScannedDocumentsNavKey(
-                        originatedFromChat = originatedFromChat,
-                        cloudDriveParentHandle = cloudDriveParentHandle,
-                        scanPdfUri = scanPdfUri.toString(),
-                        scanSoloImageUri = scanSoloImageUri?.toString(),
-                    )
-                } else {
-                    SaveScannedDocumentsActivityNavKey(
-                        originatedFromChat = originatedFromChat,
-                        cloudDriveParentHandle = cloudDriveParentHandle,
-                        scanPdfUri = scanPdfUri.toString(),
-                        scanSoloImageUri = scanSoloImageUri?.toString(),
-                    )
-                }
-            navigateForSingleActivity(
-                context = context,
-                singleActivityDestination = singleActivityDestination
-            )
-        }
     }
 
     override fun openSearchActivity(

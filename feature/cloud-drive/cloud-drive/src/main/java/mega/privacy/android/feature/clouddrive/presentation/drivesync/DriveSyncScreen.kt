@@ -340,7 +340,7 @@ internal fun DriveSyncScreen(
         @SuppressLint("ComposeViewModelForwarding")
         ScanDocumentHandler(
             parentNodeId = it,
-            megaNavigator = megaNavigator,
+            navigate = navigationHandler::navigate,
             viewModel = scanDocumentViewModel
         )
     }
