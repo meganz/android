@@ -225,6 +225,9 @@ data class AlbumContentPreviewNavKey(
 ) : NavKey
 
 @Serializable
+data class AlbumImportPreviewNavKey(val photoId: Long) : NavKey
+
+@Serializable
 data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {
     companion object Companion {
         const val MESSAGE = "extra_message"

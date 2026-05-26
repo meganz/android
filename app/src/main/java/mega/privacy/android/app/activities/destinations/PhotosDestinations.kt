@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPL
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
+import mega.privacy.android.navigation.destination.AlbumImportPreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
@@ -54,6 +55,37 @@ fun EntryProviderScope<NavKey>.legacyAlbumContentPreview(
                     this[AlbumContentImageNodeFetcher.ALBUM_SORT_TYPE] = args.sortType
                     this[AlbumContentImageNodeFetcher.ALBUM_TITLE] = args.title
                 },
+            )
+
+            context.startActivity(intent)
+
+            // Immediately pop this destination from the back stack
+            removeDestination()
+        }
+    }
+}
+
+/**
+ * Registers the legacy album import preview destination.
+ * Launches [ImagePreviewActivity] for album sharing photo previews and immediately pops the destination.
+ *
+ * @param removeDestination Callback to pop this destination from the back stack.
+ */
+
+fun EntryProviderScope<NavKey>.legacyAlbumImportPreview(
+    removeDestination: () -> Unit,
+) {
+    entry<AlbumImportPreviewNavKey>(
+        metadata = transparentMetadata()
+    ) { args ->
+        val context = LocalContext.current
+
+        LaunchedEffect(Unit) {
+            val intent = ImagePreviewActivity.createIntent(
+                context = context,
+                imageSource = ImagePreviewFetcherSource.ALBUM_SHARING,
+                menuOptionsSource = ImagePreviewMenuSource.ALBUM_SHARING,
+                anchorImageNodeId = NodeId(args.photoId),
             )
 
             context.startActivity(intent)

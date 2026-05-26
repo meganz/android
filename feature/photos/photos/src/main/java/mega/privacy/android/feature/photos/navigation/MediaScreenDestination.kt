@@ -65,6 +65,7 @@ import mega.privacy.android.navigation.destination.AlbumDecryptionKeyNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import mega.privacy.android.navigation.destination.AlbumImportNavKey
+import mega.privacy.android.navigation.destination.AlbumImportPreviewNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
@@ -496,13 +497,7 @@ fun EntryProviderScope<NavKey>.albumImports(
                 }
             },
             onPreviewPhoto = {
-                navigationHandler.navigate(
-                    LegacyImageViewerNavKey(
-                        nodeHandle = it.id,
-                        parentNodeHandle = -1L,
-                        nodeIds = listOf(it.id)
-                    )
-                )
+                navigationHandler.navigate(AlbumImportPreviewNavKey(photoId = it.id))
             },
             onNavigateFileExplorer = {
                 navigationHandler.navigate(

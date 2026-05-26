@@ -93,6 +93,7 @@ class LegacyCoreActivityFeatureGraph(
             )
             videoSectionLegacyDestination(navigationHandler::back)
             legacyAlbumContentPreview(navigationHandler::back)
+            legacyAlbumImportPreview(navigationHandler::back)
             legacyMediaTimelinePhotoPreview(navigationHandler::back)
             legacyAddToAlbumActivityNavKey(navigationHandler::returnResult)
             legacyMeetingScreen(
