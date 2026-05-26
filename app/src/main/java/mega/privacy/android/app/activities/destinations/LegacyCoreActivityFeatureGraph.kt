@@ -33,7 +33,6 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.me
 import mega.privacy.android.app.presentation.search.navigation.searchLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
-import mega.privacy.android.app.presentation.settings.settingsCameraUploadsNavigationDestination
 import mega.privacy.android.app.presentation.settings.startscreen.startScreenPreferenceScreen
 import mega.privacy.android.app.presentation.testpassword.navigation.testPasswordLegacyDestination
 import mega.privacy.android.app.presentation.videosection.legacyVideoToPlaylistDestination
@@ -64,7 +63,6 @@ class LegacyCoreActivityFeatureGraph(
             achievement(navigationHandler::back)
             webDestinations(navigationHandler::back)
             cookieSettingsNavigationDestination(navigationHandler::back)
-            settingsCameraUploadsNavigationDestination(navigationHandler::back)
             startScreenPreferenceScreen(navigationHandler::back)
             searchLegacyDestination(navigationHandler::back)
             contactsLegacyDestination(navigationHandler::back)

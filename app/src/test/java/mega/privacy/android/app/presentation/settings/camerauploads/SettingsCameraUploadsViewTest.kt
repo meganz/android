@@ -6,7 +6,12 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.FILE_UPLOAD_DIALOG
@@ -31,6 +36,8 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.REQUIR
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.UPLOAD_ONLY_WHILE_CHARGING_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_COMPRESSION_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_QUALITY_TILE
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -345,6 +352,115 @@ internal class SettingsCameraUploadsViewTest {
         composeTestRule.onNodeWithTag(HOW_TO_UPLOAD_DIALOG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that clicking the camera uploads folder tile navigates to SelectCUFolderNavKey when cloud explorer is available`() {
+        val navigated = mutableListOf<NavKey>()
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            isCloudExplorerAvailable = true,
+            onNavigate = { navigated += it },
+        )
+
+        composeTestRule.onNodeWithTag(CAMERA_UPLOADS_FOLDER_NODE_TILE).apply {
+            performScrollTo()
+            performClick()
+        }
+
+        assertThat(navigated).containsExactly(SelectCUFolderNavKey)
+    }
+
+    @Test
+    fun `test that clicking the camera uploads folder tile does not navigate when cloud explorer is unavailable`() {
+        val navigated = mutableListOf<NavKey>()
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            isCloudExplorerAvailable = false,
+            onNavigate = { navigated += it },
+        )
+
+        composeTestRule.onNodeWithTag(CAMERA_UPLOADS_FOLDER_NODE_TILE).apply {
+            performScrollTo()
+            performClick()
+        }
+
+        assertThat(navigated).isEmpty()
+    }
+
+    @Test
+    fun `test that clicking the media uploads folder tile navigates to SelectCUFolderNavKey when cloud explorer is available`() {
+        val navigated = mutableListOf<NavKey>()
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            isMediaUploadsEnabled = true,
+            isCloudExplorerAvailable = true,
+            onNavigate = { navigated += it },
+        )
+
+        composeTestRule.onNodeWithTag(MEDIA_UPLOADS_FOLDER_NODE_TILE).apply {
+            performScrollTo()
+            performClick()
+        }
+
+        assertThat(navigated).containsExactly(SelectCUFolderNavKey)
+    }
+
+    @Test
+    fun `test that picking a folder for the primary tile forwards the node id to onPrimaryFolderNodeSelected`() {
+        val resultFlow = MutableStateFlow<Any?>(null)
+        val primarySelections = mutableListOf<NodeId>()
+        val secondarySelections = mutableListOf<NodeId>()
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            isCloudExplorerAvailable = true,
+            onNavigate = {},
+            monitorResult = { key ->
+                if (key == SelectCUFolderNavKey.RESULT) resultFlow else emptyFlow()
+            },
+            clearResult = { resultFlow.value = null },
+            onPrimaryFolderNodeSelected = { primarySelections += it },
+            onSecondaryFolderNodeSelected = { secondarySelections += it },
+        )
+
+        composeTestRule.onNodeWithTag(CAMERA_UPLOADS_FOLDER_NODE_TILE).apply {
+            performScrollTo()
+            performClick()
+        }
+        resultFlow.value = NodeId(42L)
+        composeTestRule.waitForIdle()
+
+        assertThat(primarySelections).containsExactly(NodeId(42L))
+        assertThat(secondarySelections).isEmpty()
+    }
+
+    @Test
+    fun `test that picking a folder for the secondary tile forwards the node id to onSecondaryFolderNodeSelected`() {
+        val resultFlow = MutableStateFlow<Any?>(null)
+        val primarySelections = mutableListOf<NodeId>()
+        val secondarySelections = mutableListOf<NodeId>()
+        initializeComposeContent(
+            isCameraUploadsEnabled = true,
+            isMediaUploadsEnabled = true,
+            isCloudExplorerAvailable = true,
+            onNavigate = {},
+            monitorResult = { key ->
+                if (key == SelectCUFolderNavKey.RESULT) resultFlow else emptyFlow()
+            },
+            clearResult = { resultFlow.value = null },
+            onPrimaryFolderNodeSelected = { primarySelections += it },
+            onSecondaryFolderNodeSelected = { secondarySelections += it },
+        )
+
+        composeTestRule.onNodeWithTag(MEDIA_UPLOADS_FOLDER_NODE_TILE).apply {
+            performScrollTo()
+            performClick()
+        }
+        resultFlow.value = NodeId(99L)
+        composeTestRule.waitForIdle()
+
+        assertThat(secondarySelections).containsExactly(NodeId(99L))
+        assertThat(primarySelections).isEmpty()
+    }
+
     private fun initializeComposeContent(
         isCameraUploadsEnabled: Boolean = false,
         isMediaUploadsEnabled: Boolean = false,
@@ -356,11 +472,18 @@ internal class SettingsCameraUploadsViewTest {
         uploadOptionUiItem: UploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
         videoQualityUiItem: VideoQualityUiItem = VideoQualityUiItem.Original,
         isShowHowToUploadPrompt: Boolean = false,
+        isCloudExplorerAvailable: Boolean = false,
+        onNavigate: (NavKey) -> Unit = {},
+        monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+        clearResult: (String) -> Unit = {},
+        onPrimaryFolderNodeSelected: (NodeId) -> Unit = {},
+        onSecondaryFolderNodeSelected: (NodeId) -> Unit = {},
     ) {
         composeTestRule.setContent {
             SettingsCameraUploadsView(
                 uiState = SettingsCameraUploadsUiState(
                     isCameraUploadsEnabled = isCameraUploadsEnabled,
+                    isCloudExplorerAvailable = isCloudExplorerAvailable,
                     isMediaUploadsEnabled = isMediaUploadsEnabled,
                     primaryFolderName = primaryFolderName,
                     requireChargingDuringVideoCompression = requireChargingDuringVideoCompression,
@@ -386,16 +509,19 @@ internal class SettingsCameraUploadsViewTest {
                 onMediaPermissionsGranted = {},
                 onMediaUploadsStateChanged = {},
                 onNewVideoCompressionSizeLimitProvided = {},
-                onPrimaryFolderNodeSelected = {},
+                onPrimaryFolderNodeSelected = onPrimaryFolderNodeSelected,
                 onRegularBusinessAccountSubUserPromptAcknowledged = {},
                 onRelatedNewLocalFolderWarningDismissed = {},
                 onRequestLocationPermissionStateChanged = {},
                 onRequestMediaPermissionsStateChanged = {},
-                onSecondaryFolderNodeSelected = {},
+                onSecondaryFolderNodeSelected = onSecondaryFolderNodeSelected,
                 onSnackbarMessageConsumed = {},
                 onUploadOptionUiItemSelected = {},
                 onVideoQualityUiItemSelected = {},
                 onDisableCameraUploads = {},
+                onNavigate = onNavigate,
+                monitorResult = monitorResult,
+                clearResult = clearResult,
             )
         }
     }

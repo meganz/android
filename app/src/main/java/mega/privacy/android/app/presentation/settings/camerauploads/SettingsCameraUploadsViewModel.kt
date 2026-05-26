@@ -80,11 +80,13 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
@@ -225,6 +227,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val folderConflictMessageFormatter: FolderConflictMessageFormatter,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
@@ -235,10 +238,23 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        checkFeatureFlags()
         initializeSettings()
         monitorCameraUploadsFolderDestination()
         monitorCameraUploadsSettingsActions()
         monitorCameraUploadsStatusInfo()
+    }
+
+    private fun checkFeatureFlags() {
+        viewModelScope.launch {
+            val isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+
+            _uiState.update { state ->
+                state.copy(isCloudExplorerAvailable = isCloudExplorerAvailable)
+            }
+        }
     }
 
     /**

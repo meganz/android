@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.camerauploads
 
 import android.app.Activity.RESULT_OK
+import android.os.Parcelable
 import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -14,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,8 +33,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -65,6 +72,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoC
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VideoQualityTile
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -151,6 +159,9 @@ internal fun SettingsCameraUploadsView(
     onUploadOptionUiItemSelected: (UploadOptionUiItem) -> Unit,
     onVideoQualityUiItemSelected: (VideoQualityUiItem) -> Unit,
     onDisableCameraUploads: () -> Unit,
+    onNavigate: (NavKey) -> Unit = {},
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -163,6 +174,9 @@ internal fun SettingsCameraUploadsView(
     var showVideoCompressionSizeInputPrompt by rememberSaveable { mutableStateOf(false) }
     var showVideoQualityPrompt by rememberSaveable { mutableStateOf(false) }
     var showDisableCameraUploads by rememberSaveable { mutableStateOf(isShowDisableCameraUploads) }
+    var cloudExplorerPickerTarget by rememberSaveable {
+        mutableStateOf<CameraUploadsFolderPickerTarget?>(null)
+    }
 
     val cameraUploadsLocalFolderLauncher = launchFolderPicker(
         onFolderSelected = { uri ->
@@ -211,6 +225,19 @@ internal fun SettingsCameraUploadsView(
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    val cloudExplorerResult by monitorResult(SelectCUFolderNavKey.RESULT)
+        .collectAsStateWithLifecycle(null)
+    val pickedNodeId = cloudExplorerResult as? NodeId
+    LaunchedEffect(pickedNodeId) {
+        val nodeId = pickedNodeId ?: return@LaunchedEffect
+        when (cloudExplorerPickerTarget) {
+            CameraUploadsFolderPickerTarget.Primary -> onPrimaryFolderNodeSelected(nodeId)
+            CameraUploadsFolderPickerTarget.Secondary -> onSecondaryFolderNodeSelected(nodeId)
+            null -> Unit
+        }
+        cloudExplorerPickerTarget = null
+        clearResult(SelectCUFolderNavKey.RESULT)
     }
     EventEffect(
         event = uiState.snackbarMessage,
@@ -368,10 +395,15 @@ internal fun SettingsCameraUploadsView(
                         primaryFolderName = uiState.primaryFolderName.takeIf { !it.isNullOrBlank() }
                             ?: stringResource(R.string.section_photo_sync),
                         onItemClicked = {
-                            openFolderNodePicker(
-                                context = context,
-                                launcher = cameraUploadsFolderNodeLauncher,
-                            )
+                            if (uiState.isCloudExplorerAvailable) {
+                                cloudExplorerPickerTarget = CameraUploadsFolderPickerTarget.Primary
+                                onNavigate(SelectCUFolderNavKey)
+                            } else {
+                                openFolderNodePicker(
+                                    context = context,
+                                    launcher = cameraUploadsFolderNodeLauncher,
+                                )
+                            }
                         },
                     )
                     MediaUploadsTile(
@@ -390,10 +422,16 @@ internal fun SettingsCameraUploadsView(
                             secondaryFolderName = uiState.secondaryFolderName.takeIf { !it.isNullOrBlank() }
                                 ?: stringResource(R.string.section_secondary_media_uploads),
                             onItemClicked = {
-                                openFolderNodePicker(
-                                    context = context,
-                                    launcher = mediaUploadsFolderNodeLauncher,
-                                )
+                                if (uiState.isCloudExplorerAvailable) {
+                                    cloudExplorerPickerTarget =
+                                        CameraUploadsFolderPickerTarget.Secondary
+                                    onNavigate(SelectCUFolderNavKey)
+                                } else {
+                                    openFolderNodePicker(
+                                        context = context,
+                                        launcher = mediaUploadsFolderNodeLauncher,
+                                    )
+                                }
                             },
                         )
                     }
@@ -467,6 +505,12 @@ private class SettingsCameraUploadsViewParameterProvider
                 videoQualityUiItem = VideoQualityUiItem.High,
             ),
         )
+}
+
+@Parcelize
+private enum class CameraUploadsFolderPickerTarget : Parcelable {
+    Primary,
+    Secondary,
 }
 
 /**

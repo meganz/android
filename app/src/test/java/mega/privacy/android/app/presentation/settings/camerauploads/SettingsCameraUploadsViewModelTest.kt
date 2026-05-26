@@ -81,11 +81,13 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
@@ -197,6 +199,7 @@ internal class SettingsCameraUploadsViewModelTest {
         mock<IsFolderUsedBySyncOrBackupAcrossDevicesUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val folderConflictMessageFormatter = mock<FolderConflictMessageFormatter>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val fakeMonitorCameraUploadsSettingsActionsFlow =
         MutableSharedFlow<CameraUploadsSettingsAction>()
@@ -265,7 +268,8 @@ internal class SettingsCameraUploadsViewModelTest {
             getPathByDocumentContentUriUseCase,
             hasLocalFolderConflictWithSyncUseCase,
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
-            getNodeByIdUseCase
+            getNodeByIdUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -390,6 +394,7 @@ internal class SettingsCameraUploadsViewModelTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             folderConflictMessageFormatter = folderConflictMessageFormatter,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -2193,6 +2198,52 @@ internal class SettingsCameraUploadsViewModelTest {
 
                 underTest.uiState.test {
                     assertThat(awaitItem().secondaryFolderName).isEqualTo(folderName)
+                }
+            }
+    }
+
+    /**
+     * The Test Group that verifies behaviors when checking the Cloud Explorer feature flag
+     */
+    @Nested
+    @DisplayName("Cloud Explorer Feature Flag")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    internal inner class CloudExplorerFeatureFlagTestGroup {
+
+        @Test
+        fun `test that isCloudExplorerAvailable is true when the feature flag is enabled`() =
+            runTest {
+                whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(true)
+
+                initializeUnderTest()
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().isCloudExplorerAvailable).isTrue()
+                }
+            }
+
+        @Test
+        fun `test that isCloudExplorerAvailable is false when the feature flag is disabled`() =
+            runTest {
+                whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(false)
+
+                initializeUnderTest()
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+                }
+            }
+
+        @Test
+        fun `test that isCloudExplorerAvailable falls back to false when the use case throws`() =
+            runTest {
+                whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
+                    .thenThrow(RuntimeException())
+
+                initializeUnderTest()
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
                 }
             }
     }

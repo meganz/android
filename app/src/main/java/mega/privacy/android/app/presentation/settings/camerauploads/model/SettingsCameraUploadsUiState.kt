@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
  * @property businessAccountPromptType The type of prompt to be shown when a Business Account User
  * attempts to enable Camera Uploads
  * @property isCameraUploadsEnabled true if Camera Uploads is enabled
+ * @property isCloudExplorerAvailable true if the Cloud Explorer feature flag is enabled
  * @property isMediaUploadsEnabled true if Media Uploads is enabled
  * @property maximumNonChargingVideoCompressionSize The maximum aggregated Video Size that can be
  * compressed without having to charge the Device
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 internal data class SettingsCameraUploadsUiState(
     val businessAccountPromptType: EnableCameraUploadsStatus? = null,
     val isCameraUploadsEnabled: Boolean = false,
+    val isCloudExplorerAvailable: Boolean = false,
     val isMediaUploadsEnabled: Boolean = false,
     val maximumNonChargingVideoCompressionSize: Int = 200,
     val primaryFolderName: String? = null,

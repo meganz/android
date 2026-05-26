@@ -10,9 +10,9 @@ import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatur
 import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderImpl
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.appstate.content.navigation.PermissionFeatureDestination
-import mega.privacy.android.app.main.ads.AdsFreeIntroFeatureDestination
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.main.ads.AdsFreeIntroFeatureDestination
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.documentscanner.navigation.SaveScannedDocumentsDestination
@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.logout.LogoutFeatureDestination
 import mega.privacy.android.app.presentation.meeting.navigation.MeetingFeatureDestination
 import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
 import mega.privacy.android.app.presentation.psa.PsaFeatureDestinations
+import mega.privacy.android.app.presentation.settings.SettingsCameraUploadsFeatureDestination
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -98,6 +99,11 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideScanDestination(): FeatureDestination = SaveScannedDocumentsDestination()
+
+    @Provides
+    @IntoSet
+    fun provideSettingsCameraUploadsFeatureDestination(): FeatureDestination =
+        SettingsCameraUploadsFeatureDestination()
 
     @Provides
     @IntoSet
