@@ -49,10 +49,8 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
@@ -583,19 +581,6 @@ object Util {
         cal.timeInMillis = timestamp * 1000
         Timber.d("Calendar: %d %d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH))
         return cal
-    }
-
-    @JvmStatic
-    fun canVoluntaryVerifyPhoneNumber(): Boolean {
-        // If account is in ODQ Paywall state avoid ask for SMS verification because request will fail.
-        if (getStorageState() == StorageState.PayWall) {
-            return false
-        }
-
-        val api = MegaApplication.getInstance().megaApi
-        val hasNotVerified = api.smsVerifiedPhoneNumber() == null
-        val allowVerify = api.smsAllowedState() == 2
-        return hasNotVerified && allowVerify
     }
 
     @JvmStatic

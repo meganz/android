@@ -67,7 +67,6 @@ import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.checkTakePicture
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.showAlert
@@ -553,8 +552,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     private fun setupPhoneNumber(
-        alreadyRegistered: Boolean = viewModel.isAlreadyRegisteredPhoneNumber(),
-        canVerify: Boolean = canVoluntaryVerifyPhoneNumber(),
+        alreadyRegistered: Boolean,
+        canVerify: Boolean,
     ) {
 
         binding.addPhoneNumber.text = getString(
