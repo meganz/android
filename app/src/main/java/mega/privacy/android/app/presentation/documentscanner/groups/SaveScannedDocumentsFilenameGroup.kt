@@ -37,7 +37,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.icon.pack.IconPack
@@ -94,7 +93,7 @@ internal fun SaveScannedDocumentsFilenameGroup(
             modifier = Modifier
                 .padding(top = 8.dp, start = 16.dp, end = 16.dp)
                 .testTag(SAVE_SCANNED_DOCUMENTS_FILENAME_GROUP_HEADER),
-            text = stringResource(R.string.scan_file_name),
+            text = stringResource(SharedR.string.general_file_name),
             textColor = TextColor.Secondary,
         )
         Row(
@@ -192,7 +191,7 @@ private fun getFilenameErrorMessage(
     filenameValidationStatus: ScanFilenameValidationStatus?,
     scanFileType: ScanFileType,
 ) = when (filenameValidationStatus) {
-    ScanFilenameValidationStatus.EmptyFilename -> stringResource(R.string.scan_incorrect_name)
+    ScanFilenameValidationStatus.EmptyFilename -> stringResource(SharedR.string.general_error_invalid_name)
     ScanFilenameValidationStatus.DotFileName -> stringResource(SharedR.string.general_invalid_dot_name_warning)
     ScanFilenameValidationStatus.DoubleDotFileName -> stringResource(SharedR.string.general_invalid_double_dot_name_warning)
     ScanFilenameValidationStatus.InvalidFilename -> stringResource(

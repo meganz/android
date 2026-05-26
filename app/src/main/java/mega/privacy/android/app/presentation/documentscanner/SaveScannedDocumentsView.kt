@@ -106,7 +106,7 @@ internal fun SaveScannedDocumentsView(
         action = { filenameValidationStatus ->
             val message = when (filenameValidationStatus) {
                 ScanFilenameValidationStatus.EmptyFilename -> {
-                    resources.getString(R.string.scan_snackbar_incorrect_name)
+                    resources.getString(SharedR.string.general_error_incorrect_name)
                 }
 
                 ScanFilenameValidationStatus.DotFileName -> {

@@ -2902,4 +2902,16 @@
     <string name="scan_dialog_discard_all_confirmation_body">The current document will be lost</string>
     <!-- Action text shown on document scanner dialog to discard scans -->
     <string name="scan_dialog_discard_confirmation_action">Discard</string>
+    <!-- Screen title for saving current scan (Document scanner) -->
+    <string name="scan_title_save_scan">Save scan</string>
+    <!-- General error informing the typed name is invalid -->
+    <string name="general_error_incorrect_name">Correct your filename before proceeding</string>
+    <!-- General destination label -->
+    <string name="general_destination">Destination</string>
+    <!-- General file type label -->
+    <string name="general_file_type">File type</string>
+    <!-- General file name label-->
+    <string name="general_file_name">File name</string>
+    <!-- General error text for invalid name -->
+    <string name="general_error_invalid_name">Invalid name</string>
 </resources>

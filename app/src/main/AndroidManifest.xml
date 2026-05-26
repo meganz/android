@@ -433,7 +433,7 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".presentation.documentscanner.SaveScannedDocumentsActivity"
-            android:label="@string/scan_title_save_scan"
+            android:label="@string/document_scanning_settings_toolbar_title"
             android:launchMode="singleTop" />
         <activity
             android:name="mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity"
