@@ -2,6 +2,7 @@ package mega.privacy.android.navigation.destination
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 
 
 /**
@@ -19,3 +20,9 @@ data class SaveScannedDocumentsNavKey(
     val scanPdfUri: String,
     val scanSoloImageUri: String? = null,
 ) : NavKey
+
+@Serializable
+data class DiscardScanWarningDialogNavKey(
+    val hasMultipleScans: Boolean,
+    val startNavKey: UploadScannedDocumentNavKey,
+) : DialogNavKey

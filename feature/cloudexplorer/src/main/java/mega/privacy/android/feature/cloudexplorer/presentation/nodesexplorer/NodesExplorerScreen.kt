@@ -38,9 +38,11 @@ import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudE
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.DiscardScanWarningDialogNavKey
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.NewURLFileDialogNavKey
+import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
@@ -85,6 +87,19 @@ internal fun NodesExplorerScreen(
         uploadUrisEventState.trigger(listOf(uri.toUri()))
     }
 
+    val onCancelExplorerScreen: () -> Unit = if (explorerMode == ExplorerMode.SaveScannedDocument
+        && startNavKey is UploadScannedDocumentNavKey
+    ) {
+        {
+            onNavigate(
+                DiscardScanWarningDialogNavKey(
+                    hasMultipleScans = startNavKey.hasMultipleScans,
+                    startNavKey = startNavKey,
+                )
+            )
+        }
+    } else onCloseExplorerScreen
+
     ExplorerScreen(
         explorerMode = explorerMode,
         startNavKey = startNavKey,
@@ -92,7 +107,7 @@ internal fun NodesExplorerScreen(
         nodeExplorerId = nodeExplorerId,
         nodeSourceType = nodeSourceType,
         shareUris = shareUris,
-        onCloseExplorerScreen = onCloseExplorerScreen,
+        onCloseExplorerScreen = onCancelExplorerScreen,
         isProcessingAction = isProcessingAction,
         onFolderPicked = { nodeId ->
             when {

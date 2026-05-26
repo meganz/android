@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.uploadscanneddocument
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -18,6 +19,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CLOUD_TA
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_INDEX
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
+import mega.privacy.android.navigation.destination.DiscardScanWarningDialogNavKey
 import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 
@@ -42,6 +44,16 @@ internal fun UploadScannedDocumentScreen(
         } else {
             CLOUD_TAB_INDEX
         }
+        val showDiscardScanWarning: () -> Unit = {
+            onNavigate(
+                DiscardScanWarningDialogNavKey(
+                    hasMultipleScans = startNavKey.hasMultipleScans,
+                    startNavKey = startNavKey,
+                )
+            )
+        }
+
+        BackHandler { showDiscardScanWarning() }
 
         ExplorerScreen(
             explorerMode = ExplorerMode.SaveScannedDocument,
@@ -51,8 +63,8 @@ internal fun UploadScannedDocumentScreen(
             nodeSourceType = startNavKey.nodeSourceType,
             shareUris = shareUris,
             tabIndex = tabIndex,
-            onCloseExplorerScreen = onNavigateBack,
-            onNavigateBack = onNavigateBack,
+            onCloseExplorerScreen = showDiscardScanWarning,
+            onNavigateBack = showDiscardScanWarning,
             onNavigate = onNavigate,
             isProcessingAction = isProcessingAction,
             onFolderPicked = { nodeId ->

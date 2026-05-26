@@ -87,7 +87,6 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.menu.presentation.MenuHomeScreen
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
-import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -135,6 +134,7 @@ import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.shared.nodes.dialog.DiscardScanWarningDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
@@ -750,13 +750,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
 
                 if (state.isUploadingScans && state.isScanUploadingAborted) {
-                    DiscardScanUploadingWarningDialog(
+                    DiscardScanWarningDialog(
                         hasMultipleScans = state.hasMultipleScans,
-                        onWarningAcknowledged = {
+                        onDiscard = {
                             viewModel.setIsScanUploadingAborted(false)
                             viewModel.setShouldFinishScreen(true)
                         },
-                        onWarningDismissed = {
+                        onCancel = {
                             viewModel.setIsScanUploadingAborted(false)
                         },
                     )

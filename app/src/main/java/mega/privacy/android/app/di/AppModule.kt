@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.business.BusinessGraceDialogDestina
 import mega.privacy.android.app.presentation.contact.link.dialog.ContactLinkDialogDestinations
 import mega.privacy.android.app.presentation.contact.navigation.ContactsDeepLinkHandler
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
+import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanWarningDialogDestinations
 import mega.privacy.android.app.presentation.filelink.FileLinkDeepLinkHandler
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogDestinations
 import mega.privacy.android.app.presentation.folderlink.FolderLinkDeepLinkHandler
@@ -160,6 +161,7 @@ internal class AppModule {
             WhatsNewDialogDestinations,
             OpenLinkDialogDestinations,
             NewTextFileDialogDestinations,
+            DiscardScanWarningDialogDestinations,
         )
 
     @Provides

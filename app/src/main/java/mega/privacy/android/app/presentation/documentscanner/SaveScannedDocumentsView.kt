@@ -36,7 +36,6 @@ import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsDestinationGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFileTypeGroup
 import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedDocumentsFilenameGroup
@@ -50,6 +49,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
+import mega.privacy.android.shared.nodes.dialog.DiscardScanWarningDialog
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -62,7 +62,6 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
-import timber.log.Timber
 
 /**
  * A Composable that holds views displaying the main Save Scanned Documents screen
@@ -185,13 +184,13 @@ internal fun SaveScannedDocumentsView(
     }
 
     if (showWarningDialog) {
-        DiscardScanUploadingWarningDialog(
+        DiscardScanWarningDialog(
             hasMultipleScans = !uiState.canSelectScanFileType,
-            onWarningAcknowledged = {
+            onDiscard = {
                 showWarningDialog = false
                 onBackPressedDispatcher?.onBackPressed()
             },
-            onWarningDismissed = { showWarningDialog = false },
+            onCancel = { showWarningDialog = false },
         )
     }
 
@@ -295,9 +294,7 @@ internal fun navigateToFileExplorer(
         } else {
             action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CHAT
         }
-        type = runCatching { activity.contentResolver.getType(uriToUpload) }
-            .onFailure { Timber.e(it) }
-            .getOrNull()
+        type = runCatching { activity.contentResolver.getType(uriToUpload) }.getOrNull()
     }
 
     activity.startActivity(intent)

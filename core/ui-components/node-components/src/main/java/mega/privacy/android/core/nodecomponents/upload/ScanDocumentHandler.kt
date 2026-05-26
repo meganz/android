@@ -59,7 +59,7 @@ fun ScanDocumentHandler(
                                 originatedFromChat = false,
                                 cloudDriveParentHandle = parentNodeId.longValue,
                                 scanPdfUri = pdfUri.toString(),
-                                scanSoloImageUri = if (imageUris.size == 1) imageUris[0].toString() else null,
+                                scanSoloImageUri = imageUris.singleOrNull().toString(),
                             )
                         )
                     } ?: run {
