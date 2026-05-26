@@ -6,6 +6,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -485,4 +487,66 @@ class HomeViewModelTest {
 
         verifyNoInteractions(setHomeConfigurationTooltipShownUseCase)
     }
+
+    @Test
+    fun `test that isHomeCustomizationEnabled is re-evaluated when connectivity is restored`() =
+        runTest {
+            val connectivityFlow = MutableStateFlow(true)
+            monitorConnectivityUseCase.stub {
+                on { invoke() } doReturn connectivityFlow
+            }
+            var currentFlagValue = false
+            getFeatureFlagValueUseCase.stub {
+                onBlocking { invoke(ApiFeatures.HomeConfiguration) } doAnswer { currentFlagValue }
+            }
+            stubHasOfflineFiles(hasOfflineFiles = false)
+            stubTooltipShown(shown = true)
+            stubWidgetProviders()
+            monitorHomeWidgetConfigurationUseCase.stub {
+                on { invoke() } doReturn flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            }
+            underTest = HomeViewModel(
+                widgetProviders = homeWidgetProviders,
+                monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
+                monitorConnectivityUseCase = monitorConnectivityUseCase,
+                hasOfflineFilesUseCase = hasOfflineFilesUseCase,
+                getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+                monitorHomeConfigurationTooltipShownUseCase = monitorHomeConfigurationTooltipShownUseCase,
+                setHomeConfigurationTooltipShownUseCase = setHomeConfigurationTooltipShownUseCase,
+            )
+
+            underTest.state.test {
+                // Initial state: online with flag = false
+                var item: HomeUiState = awaitItem()
+                while (item is HomeUiState.Loading) {
+                    item = awaitItem()
+                }
+                assertThat(item).isInstanceOf(HomeUiState.Data::class.java)
+                assertThat((item as HomeUiState.Data).isHomeCustomizationEnabled).isFalse()
+
+                // Drop connectivity
+                currentFlagValue = true
+                connectivityFlow.update { false }
+                val offline = awaitItem()
+                assertThat(offline).isInstanceOf(HomeUiState.Offline::class.java)
+                assertThat((offline as HomeUiState.Offline).hasOfflineFiles).isFalse()
+
+                // Restore connectivity — skip one stale Data if present, then assert re-resolved flag
+                connectivityFlow.update { true }
+                var afterReconnect = awaitItem()
+                assertThat(afterReconnect).isInstanceOf(HomeUiState.Data::class.java)
+                if (!(afterReconnect as HomeUiState.Data).isHomeCustomizationEnabled) {
+                    afterReconnect = awaitItem()
+                    assertThat(afterReconnect).isInstanceOf(HomeUiState.Data::class.java)
+                }
+                assertThat((afterReconnect as HomeUiState.Data).isHomeCustomizationEnabled).isTrue()
+
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getFeatureFlagValueUseCase, atLeast(2)).invoke(ApiFeatures.HomeConfiguration)
+        }
 }

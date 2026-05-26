@@ -7,9 +7,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorHomeConfigurationTooltipShownUseCase
@@ -84,9 +85,17 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    private fun monitorHomeCustomizationFeatureFlag() = flow {
-        emit(getFeatureFlagValueUseCase(ApiFeatures.HomeConfiguration))
-    }
+    private fun monitorHomeCustomizationFeatureFlag() =
+        monitorConnectivityUseCase()
+            .runningFold(false) { previous, isOnline ->
+                if (isOnline) {
+                    getFeatureFlagValueUseCase(ApiFeatures.HomeConfiguration)
+                } else {
+                    previous
+                }
+            }
+            .distinctUntilChanged()
+
 
     fun onHomeConfigurationTooltipDismissed() {
         viewModelScope.launch {
