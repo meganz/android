@@ -29,6 +29,7 @@ internal fun VideoPlayerTopBar(
         onNavigationPressed = onBackPressed,
         actions = listOf(VideoPlayerMoreActionsMenuAction),
         onActionPressed = { onMoreActionsClicked() },
+        backgroundAlpha = 0.5f
     )
 }
 

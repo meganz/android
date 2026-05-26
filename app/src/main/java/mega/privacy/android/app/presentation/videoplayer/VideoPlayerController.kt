@@ -36,6 +36,7 @@ import mega.privacy.mobile.analytics.event.VideoPlayerRotateToLandscapePressedEv
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToPortraitPressedEvent
 import timber.log.Timber
 
+@OptIn(UnstableApi::class)
 class VideoPlayerController(
     private val context: Context,
     private val uiState: VideoPlayerUiState,
@@ -73,6 +74,7 @@ class VideoPlayerController(
     private var playQueueInOverflowMenu = mutableStateOf(uiState.items.size > SINGLE_PLAYLIST_SIZE)
 
     init {
+        playerComposeView.setControllerAnimationEnabled(false)
         setupRepeatToggleButton(uiState.repeatToggleMode)
         setupMoreOptionButton()
         updatePlayQueueOverflowMenuItems(uiState.items.size)
@@ -256,7 +258,6 @@ class VideoPlayerController(
                     return true
                 }
 
-                @OptIn(UnstableApi::class)
                 override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                     playerViewClicked()
                     return true
@@ -270,7 +271,6 @@ class VideoPlayerController(
         }
     }
 
-    @OptIn(UnstableApi::class)
     private fun updateTransformations() {
         (playerComposeView.videoSurfaceView as? TextureView)?.let { textureView ->
             val matrix = Matrix()
@@ -284,7 +284,6 @@ class VideoPlayerController(
         }
     }
 
-    @OptIn(UnstableApi::class)
     private fun enforceBoundaries() {
         playerComposeView.videoSurfaceView?.let { textureView ->
             val maxTranslationX = (zoomLevel - 1) * textureView.width / 2

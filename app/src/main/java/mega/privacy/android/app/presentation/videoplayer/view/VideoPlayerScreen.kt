@@ -14,8 +14,12 @@ import android.widget.ImageButton
 import android.widget.ProgressBar
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -72,6 +76,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.R as Media3R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import de.palm.composestateevents.EventEffect
@@ -274,7 +279,7 @@ internal fun VideoPlayerScreen(
                 if (hideSystemBars) {
                     systemUiController.isSystemBarsVisible = false
                 }
-                playerView?.hideController()
+                playerView?.hideWithFade()
             }
         }
     }
@@ -400,7 +405,7 @@ internal fun VideoPlayerScreen(
                             }
 
                             fun applyPlayPauseIcon() {
-                                playerComposeView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_play_pause)
+                                playerComposeView.findViewById<ImageButton>(Media3R.id.exo_play_pause)
                                     ?.setImageDrawable(
                                         ContextCompat.getDrawable(
                                             context,
@@ -411,13 +416,33 @@ internal fun VideoPlayerScreen(
 
                             fun applyControlIcons() {
                                 playerComposeView.findViewById<ImageButton>(R.id.exo_prev)
-                                    ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_prev))
+                                    ?.setImageDrawable(
+                                        ContextCompat.getDrawable(
+                                            context,
+                                            R.drawable.media_player_prev
+                                        )
+                                    )
                                 playerComposeView.findViewById<ImageButton>(R.id.exo_rew)
-                                    ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_15_minus))
+                                    ?.setImageDrawable(
+                                        ContextCompat.getDrawable(
+                                            context,
+                                            R.drawable.media_player_15_minus
+                                        )
+                                    )
                                 playerComposeView.findViewById<ImageButton>(R.id.exo_next)
-                                    ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_next))
+                                    ?.setImageDrawable(
+                                        ContextCompat.getDrawable(
+                                            context,
+                                            R.drawable.media_player_next
+                                        )
+                                    )
                                 playerComposeView.findViewById<ImageButton>(R.id.exo_ffwd)
-                                    ?.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.media_player_15_plus))
+                                    ?.setImageDrawable(
+                                        ContextCompat.getDrawable(
+                                            context,
+                                            R.drawable.media_player_15_plus
+                                        )
+                                    )
                             }
 
                             videoPlayerController = VideoPlayerController(
@@ -457,12 +482,12 @@ internal fun VideoPlayerScreen(
                                     if (isLock) {
                                         isControllerViewVisible = true
                                         systemUiController.isSystemBarsVisible = false
-                                        playerComposeView.showController()
+                                        playerComposeView.showWithFade()
                                         scheduleAutoHide(false)
                                     } else {
                                         isControllerViewVisible = true
                                         systemUiController.isSystemBarsVisible = true
-                                        playerComposeView.showController()
+                                        playerComposeView.showWithFade()
                                         if (isPlaying) {
                                             scheduleAutoHide(true)
                                         }
@@ -475,13 +500,13 @@ internal fun VideoPlayerScreen(
                                         if (!uiState.isLocked) {
                                             systemUiController.isSystemBarsVisible = false
                                         }
-                                        playerComposeView.hideController()
+                                        playerComposeView.hideWithFade()
                                     } else {
                                         isControllerViewVisible = true
                                         if (!uiState.isLocked) {
                                             systemUiController.isSystemBarsVisible = true
                                         }
-                                        playerComposeView.showController()
+                                        playerComposeView.showWithFade()
                                         if (uiState.isLocked) {
                                             scheduleAutoHide(false)
                                         } else if (isPlaying) {
@@ -520,7 +545,7 @@ internal fun VideoPlayerScreen(
                             autoHideJob?.cancel()
                             if (isControllerViewVisible) {
                                 systemUiController.isSystemBarsVisible = true
-                                playerComposeView.showController()
+                                playerComposeView.showWithFade()
                                 if (isPlaying && !uiState.isLocked) {
                                     scheduleAutoHide(true)
                                 }
@@ -555,7 +580,7 @@ internal fun VideoPlayerScreen(
 
                 root.findViewById<View>(R.id.exo_play_pause).isVisible =
                     playbackState > STATE_BUFFERING
-                root.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_play_pause)
+                root.findViewById<ImageButton>(Media3R.id.exo_play_pause)
                     ?.setImageDrawable(
                         ContextCompat.getDrawable(
                             context,
@@ -564,7 +589,21 @@ internal fun VideoPlayerScreen(
                     )
             }
 
-            if (isControllerViewVisible && !uiState.isLocked) {
+            AnimatedVisibility(
+                visible = isControllerViewVisible && !uiState.isLocked,
+                enter = fadeIn(
+                    animationSpec = tween(
+                        CONTROLLER_FADE_DURATION_MS.toInt(),
+                        easing = LinearEasing
+                    )
+                ),
+                exit = fadeOut(
+                    animationSpec = tween(
+                        CONTROLLER_FADE_DURATION_MS.toInt(),
+                        easing = LinearEasing
+                    )
+                ),
+            ) {
                 val horizontalPadding = when (orientation) {
                     ORIENTATION_LANDSCAPE if navigationBarPosition == NavigationBarPosition.Left ->
                         PaddingValues(start = navigationBarHeight)
@@ -819,6 +858,32 @@ fun rememberRevampNavigationBarInsets(
     }
 
     return navInsets
+}
+
+private const val CONTROLLER_FADE_DURATION_MS = 300L
+
+@androidx.annotation.OptIn(UnstableApi::class)
+private fun PlayerView.showWithFade() {
+    val controllerView = findViewById<View>(Media3R.id.exo_controller)
+    controllerView?.apply {
+        animate().cancel()
+        alpha = 0f
+    }
+    showController()
+    controllerView?.animate()?.alpha(1f)?.setDuration(CONTROLLER_FADE_DURATION_MS)?.start()
+}
+
+@androidx.annotation.OptIn(UnstableApi::class)
+private fun PlayerView.hideWithFade() {
+    val controllerView = findViewById<View>(Media3R.id.exo_controller)
+    if (controllerView != null) {
+        controllerView.animate().cancel()
+        controllerView.animate().alpha(0f).setDuration(CONTROLLER_FADE_DURATION_MS).withEndAction {
+            if (isAttachedToWindow && controllerView.alpha == 0f) hideController()
+        }.start()
+    } else {
+        hideController()
+    }
 }
 
 private fun updateControllerViewPadding(
