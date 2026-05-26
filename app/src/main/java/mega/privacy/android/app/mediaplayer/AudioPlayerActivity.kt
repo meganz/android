@@ -90,6 +90,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccess
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
@@ -123,6 +124,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
     @Inject
     lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
@@ -362,19 +366,24 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
             renameUpdate.observe(this@AudioPlayerActivity) { node ->
                 node?.let {
+                    val actionNodeCallback = object : ActionNodeCallback {
+                        override fun finishRenameActionWithSuccess(newName: String) {
+                            playerServiceGateway?.updateItemName(it.handle, newName)
+                            //Avoid the dialog is shown repeatedly when screen is rotated.
+                            viewModel.renameUpdate(null)
+                        }
+                    }
                     MegaNodeDialogUtil.showRenameNodeDialog(
                         context = this@AudioPlayerActivity,
                         node = it,
                         snackbarShower = this@AudioPlayerActivity,
-                        actionNodeCallback = object : ActionNodeCallback {
-                            override fun finishRenameActionWithSuccess(newName: String) {
-                                playerServiceGateway?.updateItemName(it.handle, newName)
-                                //Avoid the dialog is shown repeatedly when screen is rotated.
-                                viewModel.renameUpdate(null)
-                            }
+                        actionNodeCallback = actionNodeCallback,
+                        onRenameConfirmed = { handle, newName ->
+                            renameNode(handle, newName, actionNodeCallback)
                         },
                         getRootNodeUseCase = getRootNodeUseCase,
-                        getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,)
+                        getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                    )
                 }
             }
         }
@@ -897,6 +906,24 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             throwable.message?.let { errorMessage ->
                 showSnackbar(errorMessage)
             }
+        }
+    }
+
+    private fun renameNode(
+        nodeHandle: Long,
+        newName: String,
+        actionNodeCallback: ActionNodeCallback,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                    actionNodeCallback.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    showSnackbar(getString(R.string.context_no_renamed))
+                }
         }
     }
 

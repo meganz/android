@@ -14,14 +14,17 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentContactSharedFolderListBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.ContactFileBaseFragment
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
@@ -34,6 +37,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -56,6 +60,9 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
 
     @Inject
     lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     private var _binding: FragmentContactSharedFolderListBinding? = null
     private val binding: FragmentContactSharedFolderListBinding
@@ -422,9 +429,14 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                 R.id.cab_menu_rename -> {
                     if (documents.isNotEmpty()) {
                         val node = documents[0]
+                        val snackbarShower = requireActivity() as SnackbarShower
+                        val actionNodeCallback = requireActivity() as ActionNodeCallback
                         MegaNodeDialogUtil.showRenameNodeDialog(
-                            context, node, (requireActivity() as SnackbarShower),
-                            (requireActivity() as ActionNodeCallback),
+                            context, node, snackbarShower,
+                            actionNodeCallback,
+                            onRenameConfirmed = { handle, newName ->
+                                renameNode(handle, newName, snackbarShower, actionNodeCallback)
+                            },
                             getRootNodeUseCase = getRootNodeUseCase,
                             getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                         )
@@ -464,5 +476,24 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
+    }
+
+    private fun renameNode(
+        nodeHandle: Long,
+        newName: String,
+        snackbarShower: SnackbarShower,
+        actionNodeCallback: ActionNodeCallback,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    snackbarShower.showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                    actionNodeCallback.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    snackbarShower.showSnackbar(getString(R.string.context_no_renamed))
+                }
+        }
     }
 }

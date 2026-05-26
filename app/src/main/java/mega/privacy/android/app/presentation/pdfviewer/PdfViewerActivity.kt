@@ -58,6 +58,7 @@ import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.isHttpScheme
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
@@ -95,6 +96,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.resources.R as sharedR
@@ -137,6 +139,9 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
 
     @Inject
     lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     /**
      * Application scope
@@ -916,6 +921,20 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         //No update needed
     }
 
+    private fun renameNode(nodeHandle: Long, newName: String) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                    finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    showSnackbar(getString(R.string.context_no_renamed))
+                }
+        }
+    }
+
     override fun createFolder(folderName: String) {
         //No action needed
     }
@@ -1541,6 +1560,9 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                     node = megaApi.getNodeByHandle(handle),
                     snackbarShower = this,
                     actionNodeCallback = this,
+                    onRenameConfirmed = { nodeHandle, newName ->
+                        renameNode(nodeHandle, newName)
+                    },
                     getRootNodeUseCase = getRootNodeUseCase,
                     getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                 )

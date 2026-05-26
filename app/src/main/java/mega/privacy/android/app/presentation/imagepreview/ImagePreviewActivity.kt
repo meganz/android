@@ -48,6 +48,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToImportActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -91,6 +92,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
@@ -128,6 +130,9 @@ class ImagePreviewActivity : BaseActivity() {
 
     @Inject
     lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
@@ -490,9 +495,29 @@ class ImagePreviewActivity : BaseActivity() {
                 node = node,
                 snackbarShower = snackbarShower,
                 actionNodeCallback = null,
+                onRenameConfirmed = { handle, newName ->
+                    performRename(handle, newName, snackbarShower)
+                },
                 getRootNodeUseCase = getRootNodeUseCase,
                 getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
             )
+        }
+    }
+
+    private fun performRename(
+        nodeHandle: Long,
+        newName: String,
+        snackbarShower: SnackbarShower,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    snackbarShower.showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    snackbarShower.showSnackbar(getString(R.string.context_no_renamed))
+                }
         }
     }
 

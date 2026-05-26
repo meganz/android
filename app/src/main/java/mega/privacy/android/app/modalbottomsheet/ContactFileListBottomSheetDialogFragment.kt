@@ -11,6 +11,8 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import coil3.SingletonImageLoader
 import coil3.asDrawable
 import coil3.asImage
@@ -22,6 +24,8 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -31,13 +35,19 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest.Companion.fromHandle
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
+import javax.inject.Inject
 
+@dagger.hilt.android.AndroidEntryPoint
 class ContactFileListBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
     View.OnClickListener {
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
     private var node: MegaNode? = null
 
     private var contactFileListActivity: ContactFileListActivity? = null
@@ -246,12 +256,17 @@ class ContactFileListBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
 
             val getRootNodeUseCase = contactFileListActivity?.getRootNodeUseCase ?: contactInfoActivity?.getRootNodeUseCase ?: return
             val getTypedChildrenNodeUseCase = contactFileListActivity?.getTypedChildrenNodeUseCase ?: contactInfoActivity?.getTypedChildrenNodeUseCase ?: return
+            val snackbarShower = activity as? SnackbarShower
+            val actionNodeCallback = activity as? ActionNodeCallback
 
             showRenameNodeDialog(
                 context = requireActivity(),
                 node = node,
-                snackbarShower = activity as? SnackbarShower,
-                actionNodeCallback = activity as? ActionNodeCallback,
+                snackbarShower = snackbarShower,
+                actionNodeCallback = actionNodeCallback,
+                onRenameConfirmed = { handle, newName ->
+                    renameNode(handle, newName, snackbarShower, actionNodeCallback)
+                },
                 getRootNodeUseCase = getRootNodeUseCase,
                 getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
             )
@@ -280,5 +295,24 @@ class ContactFileListBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
         super.onSaveInstanceState(outState)
         val handle = node?.handle ?: MegaApiJava.INVALID_HANDLE
         outState.putLong(Constants.HANDLE, handle)
+    }
+
+    private fun renameNode(
+        nodeHandle: Long,
+        newName: String,
+        snackbarShower: SnackbarShower?,
+        actionNodeCallback: ActionNodeCallback?,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    snackbarShower?.showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                    actionNodeCallback?.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    snackbarShower?.showSnackbar(getString(R.string.context_no_renamed))
+                }
+        }
     }
 }

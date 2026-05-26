@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.navOptions
@@ -129,6 +130,9 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var isOutShareUseCase: IsOutShareUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
@@ -511,9 +515,23 @@ class FileInfoActivity : BaseActivity() {
             node = viewModel.node,
             snackbarShower = this,
             actionNodeCallback = null,
+            onRenameConfirmed = { handle, newName -> renameNode(handle, newName) },
             getRootNodeUseCase = getRootNodeUseCase,
             getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
         )
+
+    private fun renameNode(nodeHandle: Long, newName: String) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    showSnackbar(content = getString(sharedR.string.context_correctly_renamed))
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    showSnackbar(content = getString(R.string.context_no_renamed))
+                }
+        }
+    }
 
     private suspend fun consumeEvent(
         event: FileInfoOneOffViewEvent,

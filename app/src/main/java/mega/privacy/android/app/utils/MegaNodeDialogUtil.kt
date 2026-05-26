@@ -19,14 +19,12 @@ import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
@@ -89,10 +87,17 @@ object MegaNodeDialogUtil {
     /**
      * Creates and shows a TYPE_RENAME dialog to rename a node.
      *
+     * The dialog handles validation only; the actual SDK rename call is delegated to the
+     * [onRenameConfirmed] callback so that callers can drive it through a Hilt-injected
+     * `RenameNodeUseCase`.
+     *
      * @param context            Current context.
      * @param node               A valid node.
      * @param snackbarShower     Interface to show snackbar.
      * @param actionNodeCallback Callback to finish the rename action if needed, null otherwise.
+     * @param onRenameConfirmed  Invoked with `(nodeHandle, newName)` when the user confirms a
+     *                           valid new name. The caller is responsible for performing the
+     *                           rename via `RenameNodeUseCase` and surfacing any result UI.
      * @param getRootNodeUseCase
      * @param getTypedChildrenNodeUseCase
      * @return The rename dialog.
@@ -103,6 +108,7 @@ object MegaNodeDialogUtil {
         node: MegaNode?,
         snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?,
+        onRenameConfirmed: (nodeHandle: Long, newName: String) -> Unit,
         getRootNodeUseCase: GetRootNodeUseCase,
         getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ): AlertDialog {
@@ -123,6 +129,7 @@ object MegaNodeDialogUtil {
             fromHome = false,
             builder = renameDialogBuilder,
             dialogType = TYPE_RENAME,
+            onRenameConfirmed = onRenameConfirmed,
             getRootNodeUseCase = getRootNodeUseCase,
             getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
         )
@@ -255,6 +262,7 @@ object MegaNodeDialogUtil {
         fromHome: Boolean,
         builder: AlertDialog.Builder,
         dialogType: Int,
+        onRenameConfirmed: ((nodeHandle: Long, newName: String) -> Unit)? = null,
         getRootNodeUseCase: GetRootNodeUseCase,
         getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ): AlertDialog {
@@ -319,6 +327,7 @@ object MegaNodeDialogUtil {
                                 fromHome = fromHome,
                                 dialog = dialog,
                                 dialogType = dialogType,
+                                onRenameConfirmed = onRenameConfirmed,
                                 getRootNodeUseCase = getRootNodeUseCase,
                                 getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                             )
@@ -343,6 +352,7 @@ object MegaNodeDialogUtil {
                             fromHome = fromHome,
                             dialog = dialog,
                             dialogType = dialogType,
+                            onRenameConfirmed = onRenameConfirmed,
                             getRootNodeUseCase = getRootNodeUseCase,
                             getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                         )
@@ -389,6 +399,7 @@ object MegaNodeDialogUtil {
         fromHome: Boolean,
         dialog: AlertDialog,
         dialogType: Int,
+        onRenameConfirmed: ((nodeHandle: Long, newName: String) -> Unit)? = null,
         getRootNodeUseCase: GetRootNodeUseCase,
         getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
     ) {
@@ -492,8 +503,8 @@ object MegaNodeDialogUtil {
                                         context,
                                         node,
                                         typedString,
-                                        snackbarShower,
-                                        actionNodeCallback
+                                        actionNodeCallback,
+                                        onRenameConfirmed,
                                     )
                                 }
 
@@ -501,8 +512,8 @@ object MegaNodeDialogUtil {
                                     confirmRenameAction(
                                         node,
                                         typedString,
-                                        snackbarShower,
-                                        actionNodeCallback
+                                        actionNodeCallback,
+                                        onRenameConfirmed,
                                     )
                                 }
                             }
@@ -548,34 +559,21 @@ object MegaNodeDialogUtil {
     }
 
     /**
-     * Confirms the rename action.
+     * Confirms the rename action by delegating the SDK call to the caller.
      *
-     * @param node               A valid node if needed to confirm the action, null otherwise.
-     * @param typedString        Typed name.
-     * @param snackbarShower     Interface to show snackbar.
+     * @param node              A valid node to be renamed.
+     * @param typedString       Typed name.
      * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
+     * @param onRenameConfirmed Invoked with `(nodeHandle, newName)` so the caller can run the
+     *                          rename via its Hilt-injected `RenameNodeUseCase`.
      */
     private fun confirmRenameAction(
         node: MegaNode,
         typedString: String,
-        snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?,
+        onRenameConfirmed: ((nodeHandle: Long, newName: String) -> Unit)?,
     ) {
-        val app = MegaApplication.getInstance()
-        val megaApi = app.megaApi
-
-        megaApi.renameNode(
-            node,
-            typedString,
-            RenameListener(
-                snackbarShower = snackbarShower,
-                showSnackbar = true,
-                isMyChatFilesFolder = false,
-                actionNodeCallback = actionNodeCallback,
-                context = app,
-            )
-        )
-
+        onRenameConfirmed?.invoke(node.handle, typedString)
         actionNodeCallback?.actionConfirmed()
     }
 
@@ -601,25 +599,26 @@ object MegaNodeDialogUtil {
     /**
      * Shows a warning dialog informing the file extension changed after rename a file.
      *
-     * @param context            Current context.
-     * @param node               A valid node if needed to confirm the action, null otherwise.
-     * @param typedString        Typed name.
-     * @param snackbarShower     Interface to show snackbar.
+     * @param context           Current context.
+     * @param node              A valid node to be renamed.
+     * @param typedString       Typed name.
      * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
+     * @param onRenameConfirmed Invoked with `(nodeHandle, newName)` so the caller can run the
+     *                          rename via its Hilt-injected `RenameNodeUseCase`.
      */
     private fun showFileExtensionWarning(
         context: Context,
         node: MegaNode,
         typedString: String,
-        snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?,
+        onRenameConfirmed: ((nodeHandle: Long, newName: String) -> Unit)?,
     ) {
         MaterialAlertDialogBuilder(context)
             .setTitle(context.getString(R.string.file_extension_change_title))
             .setMessage(context.getString(R.string.file_extension_change_warning))
             .setPositiveButton(context.getString(sharedR.string.general_dialog_cancel_button), null)
             .setNegativeButton(context.getString(R.string.action_change_anyway)) { _, _ ->
-                confirmRenameAction(node, typedString, snackbarShower, actionNodeCallback)
+                confirmRenameAction(node, typedString, actionNodeCallback, onRenameConfirmed)
             }
             .show()
     }

@@ -36,6 +36,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.components.legacyfab.LegacyFabButtonAdd
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity.Companion.createSecondaryIntent
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.StartUpload
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
@@ -90,6 +92,9 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
     @Inject
     lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     /**
      * [MegaNavigator] injection
@@ -145,11 +150,16 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 (context as ContactFileListActivity).askConfirmationMoveToRubbish(handleList)
             } else if (itemId == R.id.cab_menu_rename) {
                 val node = documents[0]
+                val snackbarShower = activity as SnackbarShower?
+                val actionNodeCallback = activity as ActionNodeCallback?
                 showRenameNodeDialog(
                     context = context,
                     node = node,
-                    snackbarShower = activity as SnackbarShower?,
-                    actionNodeCallback = activity as ActionNodeCallback?,
+                    snackbarShower = snackbarShower,
+                    actionNodeCallback = actionNodeCallback,
+                    onRenameConfirmed = { handle, newName ->
+                        renameNode(handle, newName, snackbarShower, actionNodeCallback)
+                    },
                     getRootNodeUseCase = getRootNodeUseCase,
                     getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
                 )
@@ -929,6 +939,25 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             fab!!.hide()
         } else {
             fab!!.show()
+        }
+    }
+
+    private fun renameNode(
+        nodeHandle: Long,
+        newName: String,
+        snackbarShower: SnackbarShower?,
+        actionNodeCallback: ActionNodeCallback?,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    snackbarShower?.showSnackbar(getString(SharedR.string.context_correctly_renamed))
+                    actionNodeCallback?.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    snackbarShower?.showSnackbar(getString(R.string.context_no_renamed))
+                }
         }
     }
 

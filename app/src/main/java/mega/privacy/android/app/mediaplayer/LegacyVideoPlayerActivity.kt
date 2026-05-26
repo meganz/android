@@ -126,6 +126,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
@@ -162,6 +163,9 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
 
     @Inject
     lateinit var exportNodeUseCase: ExportNodeUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     private val legacyVideoPlayerViewModel: LegacyVideoPlayerViewModel by viewModels()
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
@@ -487,20 +491,26 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
                             }
                         }
 
-                    is MenuOptionClickedContent.Rename ->
+                    is MenuOptionClickedContent.Rename -> {
+                        val actionNodeCallback = object : ActionNodeCallback {
+                            override fun finishRenameActionWithSuccess(newName: String) {
+                                val newMetadata =
+                                    legacyVideoPlayerViewModel.uiState.value.metadata.copy(nodeName = newName)
+                                legacyVideoPlayerViewModel.updateMetadata(newMetadata)
+                            }
+                        }
                         MegaNodeDialogUtil.showRenameNodeDialog(
                             context = this,
                             node = content.node,
                             snackbarShower = this,
-                            actionNodeCallback = object : ActionNodeCallback {
-                                override fun finishRenameActionWithSuccess(newName: String) {
-                                    val newMetadata =
-                                        legacyVideoPlayerViewModel.uiState.value.metadata.copy(nodeName = newName)
-                                    legacyVideoPlayerViewModel.updateMetadata(newMetadata)
-                                }
+                            actionNodeCallback = actionNodeCallback,
+                            onRenameConfirmed = { handle, newName ->
+                                renameNode(handle, newName, actionNodeCallback)
                             },
                             getRootNodeUseCase = getRootNodeUseCase,
-                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,)
+                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                        )
+                    }
                 }
                 legacyVideoPlayerViewModel.clearMenuOptionClickedContent()
             }
@@ -524,6 +534,24 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
             throwable.message?.let { errorMessage ->
                 legacyVideoPlayerViewModel.updateSnackBarMessage(errorMessage)
             }
+        }
+    }
+
+    private fun renameNode(
+        nodeHandle: Long,
+        newName: String,
+        actionNodeCallback: ActionNodeCallback,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    showSnackbar(content = getString(sharedR.string.context_correctly_renamed))
+                    actionNodeCallback.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    showSnackbar(content = getString(R.string.context_no_renamed))
+                }
         }
     }
 

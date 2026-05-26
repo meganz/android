@@ -38,7 +38,9 @@ import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_I
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -97,6 +99,7 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
@@ -140,6 +143,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     @Inject
     lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+
+    @Inject
+    lateinit var renameNodeUseCase: RenameNodeUseCase
 
     companion object {
         private const val SCROLL_TEXT = "SCROLL_TEXT"
@@ -1092,16 +1098,38 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
             return
         }
 
+        val actionNodeCallback = object : ActionNodeCallback {
+            override fun finishRenameActionWithSuccess(newName: String) {
+                binding.nameText.text = newName
+            }
+        }
         renameDialog = showRenameNodeDialog(
             context = this, node = viewModel.getNode(), snackbarShower = this,
-            actionNodeCallback = object : ActionNodeCallback {
-                override fun finishRenameActionWithSuccess(newName: String) {
-                    binding.nameText.text = newName
-                }
+            actionNodeCallback = actionNodeCallback,
+            onRenameConfirmed = { handle, newName ->
+                performRename(handle, newName, actionNodeCallback)
             },
             getRootNodeUseCase = getRootNodeUseCase,
             getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
         )
+    }
+
+    private fun performRename(
+        nodeHandle: Long,
+        newName: String,
+        actionNodeCallback: ActionNodeCallback,
+    ) {
+        lifecycleScope.launch {
+            runCatching { renameNodeUseCase(nodeHandle, newName) }
+                .onSuccess {
+                    showSnackbar(getString(sharedR.string.context_correctly_renamed))
+                    actionNodeCallback.finishRenameActionWithSuccess(newName)
+                }
+                .onFailure {
+                    Timber.e(it, "Error renaming node")
+                    showSnackbar(getString(R.string.context_no_renamed))
+                }
+        }
     }
 
     /**
