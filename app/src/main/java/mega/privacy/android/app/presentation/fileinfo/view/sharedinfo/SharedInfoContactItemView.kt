@@ -1,24 +1,15 @@
 package mega.privacy.android.app.presentation.fileinfo.view.sharedinfo
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.contact.state.ContactItemStatus
-import mega.android.core.ui.components.image.MegaIcon
-import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED
-import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED_DOTS
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.contact.components.ContactItemView
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
@@ -44,37 +35,20 @@ internal fun SharedInfoContactItemView(
     onLongClick: () -> Unit,
     onMoreOptionsClick: () -> Unit,
     modifier: Modifier = Modifier,
-) = Row(
-    verticalAlignment = Alignment.CenterVertically,
-    modifier = modifier
-        .fillMaxWidth()
-        .testTag(TEST_TAG_CONTACT_ITEM_SHARED),
-) {
-    ContactItemView(
-        displayName = contactItem.contactItemUiState.displayName,
-        statusText = contactItem.permission.description()?.let {
-            stringResource(id = it)
-        } ?: "",
-        onClick = onClick,
-        onLongClick = onLongClick,
-        modifier = Modifier.weight(1f),
-        selected = selected,
-        avatar = contactItem.contactItemUiState.avatar,
-        status = contactItem.contactItemUiState.status,
-        isVerified = contactItem.contactItemUiState.isVerified
-    )
-    IconButton(
-        modifier = Modifier
-            .testTag(TEST_TAG_CONTACT_ITEM_SHARED_DOTS),
-        onClick = onMoreOptionsClick,
-    ) {
-        MegaIcon(
-            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
-            contentDescription = "More options",
-            tint = IconColor.Secondary,
-        )
-    }
-}
+) = ContactItemView(
+    displayName = contactItem.contactItemUiState.displayName,
+    statusText = contactItem.permission.description()?.let {
+        stringResource(id = it)
+    } ?: "",
+    avatar = contactItem.contactItemUiState.avatar,
+    status = contactItem.contactItemUiState.status,
+    isVerified = contactItem.contactItemUiState.isVerified,
+    modifier = modifier.testTag(TEST_TAG_CONTACT_ITEM_SHARED),
+    onClick = onClick,
+    onLongClick = onLongClick,
+    onMoreClicked = onMoreOptionsClick,
+    selected = selected,
+)
 
 @CombinedTextAndThemePreviews
 @Composable

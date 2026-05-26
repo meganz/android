@@ -1,10 +1,16 @@
 package mega.privacy.android.shared.contact.components
 
 import android.text.format.DateFormat
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -13,16 +19,18 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import mega.android.core.ui.components.contact.component.ContactStatusDot
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.divider.SubtleDivider
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.resources.R
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 
 /**
@@ -31,6 +39,9 @@ import java.util.Locale
  * @param contactItemUiState
  * @param modifier
  * @param onClick
+ * @param onLongClick
+ * @param onAvatarClick When non-null, taps on the avatar fire this instead of bubbling up to [onClick].
+ * @param onMoreClicked When non-null, a trailing kebab icon is rendered and fires this on tap.
  * @param selected
  * @param showDivider
  */
@@ -40,6 +51,8 @@ fun ContactItemView(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
+    onAvatarClick: (() -> Unit)? = null,
+    onMoreClicked: (() -> Unit)? = null,
     selected: Boolean = false,
     showDivider: Boolean = true,
 ) {
@@ -60,6 +73,8 @@ fun ContactItemView(
         modifier = modifier,
         onClick = onClick,
         onLongClick = onLongClick,
+        onAvatarClick = onAvatarClick,
+        onMoreClicked = onMoreClicked,
         selected = selected,
         showDivider = showDivider,
     )
@@ -79,6 +94,9 @@ fun ContactItemView(
  * @param isVerified Whether to overlay the "verified contact" badge on the avatar.
  * @param modifier Modifier applied to the row container.
  * @param onClick Click handler; pass `null` to render a non-interactive row.
+ * @param onLongClick Optional long-click handler on the row.
+ * @param onAvatarClick When non-null, taps on the avatar fire this instead of bubbling up to [onClick].
+ * @param onMoreClicked When non-null, a trailing kebab icon is rendered and fires this on tap.
  * @param selected When true, replaces the avatar with a brand-coloured check tile (multi-select pickers).
  * @param showDivider Toggles the bottom divider.
  */
@@ -92,6 +110,8 @@ fun ContactItemView(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
+    onAvatarClick: (() -> Unit)? = null,
+    onMoreClicked: (() -> Unit)? = null,
     selected: Boolean = false,
     showDivider: Boolean = true,
 ) {
@@ -106,18 +126,48 @@ fun ContactItemView(
             onClickListener = onClick ?: {},
             onLongClickListener = onLongClick ?: {},
             leadingElement = {
-                ContactAvatar(
-                    avatar = avatar,
-                    displayName = displayName,
-                    isVerified = isVerified,
-                    selected = selected
-                )
+                if (onAvatarClick != null) {
+                    Box(
+                        modifier = Modifier
+                            .testTag(CONTACT_ITEM_VIEW_AVATAR_CLICK)
+                            .clip(CircleShape)
+                            .clickable(onClick = onAvatarClick)
+                    ) {
+                        ContactAvatar(
+                            avatar = avatar,
+                            displayName = displayName,
+                            isVerified = isVerified,
+                            selected = selected,
+                        )
+                    }
+                } else {
+                    ContactAvatar(
+                        avatar = avatar,
+                        displayName = displayName,
+                        isVerified = isVerified,
+                        selected = selected,
+                    )
+                }
             },
             titleTrailingElement = if (status == ContactItemStatus.Unknown) {
                 null
             } else {
                 { ContactStatusDot(status) }
             },
+            trailingElement = if (onMoreClicked != null) {
+                {
+                    IconButton(
+                        onClick = onMoreClicked,
+                        modifier = Modifier.testTag(CONTACT_ITEM_VIEW_MORE),
+                    ) {
+                        MegaIcon(
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
+                            contentDescription = stringResource(R.string.more_options),
+                            tint = IconColor.Secondary,
+                        )
+                    }
+                }
+            } else null,
         )
         if (showDivider) SubtleDivider()
     }
@@ -202,6 +252,8 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
 
 internal const val CONTACT_ITEM_VIEW_ROW = "contact_item_view:row"
 internal const val CONTACT_ITEM_VIEW_VERIFIED_BADGE = "contact_item_view:verified_badge"
+internal const val CONTACT_ITEM_VIEW_AVATAR_CLICK = "contact_item_view:avatar_click"
+internal const val CONTACT_ITEM_VIEW_MORE = "contact_item_view:more"
 
 private class ContactItemPreviewProvider :
     CollectionPreviewParameterProvider<ContactItemUiState>(

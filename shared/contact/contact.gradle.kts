@@ -8,6 +8,11 @@ plugins {
 android {
     namespace = "mega.privacy.android.shared.contact"
     experimentalProperties["android.experimental.enableScreenshotTest"] = true
+    testOptions {
+        unitTests {
+            targetSdk = 34
+        }
+    }
 }
 
 dependencies {
@@ -31,6 +36,7 @@ dependencies {
     implementation(lib.javax.inject)
 
     testImplementation(platform(testlib.junit5.bom))
+    testImplementation(project(":core-ui-test"))
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)

@@ -12,7 +12,6 @@ import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.list.mapper.ContactItemDataToContactItemUiStateMapper
 import mega.privacy.android.app.databinding.ItemContactDataBinding
 import mega.privacy.android.app.databinding.ItemContactHeaderBinding
-import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 /**
  * RecyclerView's ListAdapter to show ContactItem.
@@ -23,7 +22,7 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
  */
 class ContactListAdapter(
     private val itemCallback: (Long) -> Unit,
-    @Suppress("unused") private val itemInfoCallback: (String) -> Unit,
+    private val itemInfoCallback: (String) -> Unit,
     private val itemMoreCallback: (Long) -> Unit,
 ) : ListAdapter<ContactItem, RecyclerView.ViewHolder>(ContactItem.DiffCallback()),
     SectionTitleProvider {
@@ -54,22 +53,13 @@ class ContactListAdapter(
                 binding.contactComposeView.setViewCompositionStrategy(
                     DisposeOnViewTreeLifecycleDestroyed
                 )
-                ContactListDataViewHolder(binding, mapper).apply {
-                    binding.root.setOnClickListener {
-                        if (isValidPosition(bindingAdapterPosition)) {
-                            val handle =
-                                (getItem(bindingAdapterPosition) as ContactItem.Data).handle
-                            itemCallback.invoke(handle)
-                        }
-                    }
-                    binding.btnMore.setOnClickListener {
-                        if (isValidPosition(bindingAdapterPosition)) {
-                            val handle =
-                                (getItem(bindingAdapterPosition) as ContactItem.Data).handle
-                            itemMoreCallback.invoke(handle)
-                        }
-                    }
-                }
+                ContactListDataViewHolder(
+                    binding = binding,
+                    contactItemUiStateMapper = mapper,
+                    itemCallback = itemCallback,
+                    itemInfoCallback = itemInfoCallback,
+                    itemMoreCallback = itemMoreCallback,
+                )
             }
         }
     }
