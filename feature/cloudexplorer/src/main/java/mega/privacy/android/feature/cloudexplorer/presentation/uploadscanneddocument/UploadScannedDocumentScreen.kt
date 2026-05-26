@@ -31,7 +31,6 @@ internal fun UploadScannedDocumentScreen(
     onStartUpload: (TransferTriggerEvent) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
-    clearResult: (String) -> Unit = {},
 ) {
     if (uiState is UploadScannedDocumentsUiState.Data) {
         val uploadUrisEventState = rememberUploadUrisEventState()
@@ -72,7 +71,6 @@ internal fun UploadScannedDocumentScreen(
                 folderPickedIdLong = nodeId.longValue
                 uploadUrisEventState.trigger(shareUris.map { it.toUri() })
             },
-            clearResult = clearResult,
         )
 
         ShareToMegaUpload(

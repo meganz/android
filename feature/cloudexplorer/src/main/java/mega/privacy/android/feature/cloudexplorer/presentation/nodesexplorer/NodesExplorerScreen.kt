@@ -69,6 +69,7 @@ internal fun NodesExplorerScreen(
     shareUris: List<UriPath>? = null,
     onStartUpload: (TransferTriggerEvent) -> Unit = {},
     onFileUriConsumed: () -> Unit = {},
+    onSelectFolder: (NodeId) -> Unit = {},
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
 ) {
@@ -133,6 +134,11 @@ internal fun NodesExplorerScreen(
                             )
                         }
                     )
+                }
+
+                explorerMode == ExplorerMode.SelectCUFolder -> {
+                    onSelectFolder(nodeId)
+                    onCloseExplorerScreen()
                 }
 
                 else -> {}
