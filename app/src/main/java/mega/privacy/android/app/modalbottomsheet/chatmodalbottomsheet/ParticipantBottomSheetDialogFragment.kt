@@ -136,7 +136,9 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
         val userStatus =
             if (participantHandle == megaChatApi.myUserHandle) megaChatApi.onlineStatus else ChatUtil.getUserStatus(
-                participantHandle
+                participantHandle,
+                megaApi,
+                megaChatApi,
             )
         ChatUtil.setContactStatus(userStatus, stateIcon, StatusIconLocation.DRAWER)
 

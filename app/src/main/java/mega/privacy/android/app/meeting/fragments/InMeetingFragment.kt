@@ -123,6 +123,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import timber.log.Timber
@@ -136,6 +137,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
     @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
@@ -2813,7 +2817,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
             val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
-        } else if (ChatUtil.areAllMyContactsChatParticipants(inMeetingViewModel.state.value.currentChatId)) {
+        } else if (ChatUtil.areAllMyContactsChatParticipants(
+                inMeetingViewModel.state.value.currentChatId,
+                megaChatApi,
+                megaApi
+            )) {
             val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
         } else {

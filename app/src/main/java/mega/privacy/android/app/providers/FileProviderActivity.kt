@@ -61,7 +61,6 @@ import mega.privacy.android.app.main.providers.IncomingSharesProviderFragment
 import mega.privacy.android.app.main.providers.ProviderPageAdapter
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
 import mega.privacy.android.app.presentation.provider.FileProviderViewModel
-import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -77,6 +76,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialo
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -343,7 +343,10 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                     }
                     lifecycleScope.launch {
                         loginMutex.lock()
-                        ChatUtil.initMegaChatApi(gSession)
+                        ChatUtil.initMegaChatApi(
+                            gSession,
+                            megaChatApi
+                        )
                         megaApi.fastLogin(gSession, this@FileProviderActivity)
                     }
                 }

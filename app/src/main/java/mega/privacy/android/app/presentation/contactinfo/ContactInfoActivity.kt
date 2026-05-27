@@ -1318,7 +1318,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             } else {
                 ChatUtil.updateRetentionTimeLayout(
                     retentionTimeText,
-                    ChatUtil.getUpdatedRetentionTimeFromAChat(chatId),
+                    ChatUtil.getUpdatedRetentionTimeFromAChat(
+                        chatId,
+                        megaChatApi
+                    ),
                     this@ContactInfoActivity
                 )
                 if (viewModel.isOnline()) {
@@ -1344,7 +1347,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun chatNotificationsChange() {
         val chatId = viewModel.chatId ?: return
         if (contentContactProperties.notificationSwitch.isChecked) {
-            ChatUtil.createMuteNotificationsAlertDialogOfAChat(this, chatId)
+            ChatUtil.createMuteNotificationsAlertDialogOfAChat(
+                this,
+                chatId,
+                megaChatApi
+            )
         } else {
             getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
                 this,

@@ -21,20 +21,21 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.getLink.BaseLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.meeting.model.MeetingState
+import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantUiStateMapper
 import mega.privacy.android.app.presentation.meeting.model.ChatInfoUiState
+import mega.privacy.android.app.presentation.meeting.model.ChatParticipantUiState
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
-import mega.privacy.android.app.presentation.meeting.mapper.ChatParticipantUiStateMapper
-import mega.privacy.android.app.presentation.meeting.model.ChatParticipantUiState
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
@@ -53,6 +54,7 @@ import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
+import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
@@ -70,11 +72,12 @@ import mega.privacy.android.domain.usecase.meeting.SetWaitingRoomUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeetingEvent
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 
 /**
  * ChatInfoActivity view model.
@@ -144,6 +147,8 @@ class ChatInfoViewModel @Inject constructor(
     private val archiveChatUseCase: ArchiveChatUseCase,
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
     private val chatParticipantUiStateMapper: ChatParticipantUiStateMapper,
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val megaChatApi: MegaChatApiAndroid,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -676,7 +681,11 @@ class ChatInfoViewModel @Inject constructor(
                         }
                     }
 
-                    ChatUtil.areAllMyContactsChatParticipants(uiState.value.chatId) -> {
+                    ChatUtil.areAllMyContactsChatParticipants(
+                        uiState.value.chatId,
+                        megaChatApi,
+                        megaApi
+                    ) -> {
                         _uiState.update {
                             it.copy(
                                 addParticipantsNoContactsLeftToAddDialog = true,

@@ -53,8 +53,8 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActiv
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_TITLE_TAG
 import mega.privacy.android.app.presentation.meeting.model.ChatInfoAction
+import mega.privacy.android.app.presentation.meeting.model.ChatParticipantUiState
 import mega.privacy.android.app.presentation.meeting.view.ChatInfoView
-import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat
 import mega.privacy.android.app.utils.Constants
@@ -65,10 +65,10 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_CREATED
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
+import mega.privacy.android.core.passcode.PasscodeCheck
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.app.presentation.meeting.model.ChatParticipantUiState
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.ChatNavKey
@@ -459,7 +459,8 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
         if (enabledChatNotification) {
             createMuteNotificationsAlertDialogOfAChat(
                 this@ChatInfoActivity,
-                chatRoomId
+                chatRoomId,
+                megaChatApi
             )
         } else {
             MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(

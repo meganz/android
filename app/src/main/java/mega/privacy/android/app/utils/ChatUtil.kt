@@ -25,7 +25,6 @@ import mega.privacy.android.app.components.MarqueeTextView
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
-import mega.privacy.android.app.utils.ContactUtil.isContact
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
 import mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected
 import mega.privacy.android.app.utils.TimeUtils.isUntilThisMorning
@@ -36,6 +35,7 @@ import mega.privacy.android.shared.original.core.ui.controls.controlssliders.Meg
 import mega.privacy.android.thirdpartylib.twemoji.EmojiManager
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatListItem
@@ -506,9 +506,11 @@ object ChatUtil {
      * @param chatId  Chat ID.
      */
     @JvmStatic
-    fun createMuteNotificationsAlertDialogOfAChat(context: Activity, chatId: Long) {
+    fun createMuteNotificationsAlertDialogOfAChat(
+        context: Activity, chatId: Long, megaChatApi: MegaChatApiAndroid
+    ) {
         val chats = ArrayList<MegaChatListItem>()
-        val chat = MegaApplication.getInstance().megaChatApi.getChatListItem(chatId)
+        val chat = megaChatApi.getChatListItem(chatId)
         if (chat != null) {
             chats.add(chat)
             createMuteNotificationsChatAlertDialog(context, chats)
@@ -522,10 +524,12 @@ object ChatUtil {
      * @param chatIds Chat IDs.
      */
     @JvmStatic
-    fun createMuteNotificationsAlertDialogOfChats(context: Activity, chatIds: List<Long>) {
+    fun createMuteNotificationsAlertDialogOfChats(
+        context: Activity, chatIds: List<Long>, megaChatApi: MegaChatApiAndroid
+    ) {
         val chats = ArrayList(
             chatIds.mapNotNull { chatId ->
-                MegaApplication.getInstance().megaChatApi.getChatListItem(chatId)
+                megaChatApi.getChatListItem(chatId)
             }
         )
         if (chats.isNotEmpty()) {
@@ -717,14 +721,25 @@ object ChatUtil {
      * Gets the user's online status.
      *
      * @param userHandle handle of the user
+     * @param megaApi
+     * @param megaChatApiAndroid
      * @return The user's status.
      */
     @JvmStatic
-    fun getUserStatus(userHandle: Long): Int =
-        if (isContact(userHandle))
-            MegaApplication.getInstance().megaChatApi.getUserOnlineStatus(userHandle)
-        else
+    fun getUserStatus(
+        userHandle: Long, megaApi: MegaApiAndroid, megaChatApiAndroid: MegaChatApiAndroid,
+    ): Int {
+        if (userHandle == MegaApiJava.INVALID_HANDLE) {
+            return MegaChatApi.STATUS_INVALID
+        }
+        val contact = megaApi
+            .getContact(MegaApiJava.userHandleToBase64(userHandle))
+        return if (contact != null && contact.visibility == VISIBILITY_VISIBLE) {
+            megaChatApiAndroid.getUserOnlineStatus(userHandle)
+        } else {
             MegaChatApi.STATUS_INVALID
+        }
+    }
 
     /**
      * Method for obtaining the contact status bitmap.
@@ -777,8 +792,8 @@ object ChatUtil {
      * @return The retention time in seconds.
      */
     @JvmStatic
-    fun getUpdatedRetentionTimeFromAChat(idChat: Long): Long {
-        val chat = MegaApplication.getInstance().megaChatApi.getChatRoom(idChat)
+    fun getUpdatedRetentionTimeFromAChat(idChat: Long, megaChatApi: MegaChatApiAndroid): Long {
+        val chat = megaChatApi.getChatRoom(idChat)
         if (chat != null) {
             return chat.retentionTime
         }
@@ -919,8 +934,8 @@ object ChatUtil {
      * @return True, if I am joined to the chat. False, if not
      */
     @JvmStatic
-    fun amIParticipatingInAChat(chatId: Long): Boolean {
-        val chatRoom = MegaApplication.getInstance().megaChatApi.getChatRoom(chatId)
+    fun amIParticipatingInAChat(chatId: Long, megaChatApi: MegaChatApiAndroid): Boolean {
+        val chatRoom = megaChatApi.getChatRoom(chatId)
             ?: return false
 
         if (chatRoom.isPreview) {
@@ -937,8 +952,8 @@ object ChatUtil {
      * @param session User session
      */
     @JvmStatic
-    fun initMegaChatApi(session: String?) {
-        initMegaChatApi(session, null)
+    fun initMegaChatApi(session: String?, megaChatApi: MegaChatApiAndroid) {
+        initMegaChatApi(session, null, megaChatApi)
     }
 
     /**
@@ -948,9 +963,11 @@ object ChatUtil {
      * @param listener MegaChat listener for logout request.
      */
     @JvmStatic
-    fun initMegaChatApi(session: String?, listener: MegaChatRequestListenerInterface?) {
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
-
+    fun initMegaChatApi(
+        session: String?,
+        listener: MegaChatRequestListenerInterface?,
+        megaChatApi: MegaChatApiAndroid
+    ) {
         var state = megaChatApi.initState
         if (state == MegaChatApi.INIT_NOT_DONE || state == MegaChatApi.INIT_ERROR) {
             state = megaChatApi.init(session)
@@ -965,6 +982,7 @@ object ChatUtil {
                         megaChatApi.logout()
                     }
                 }
+
                 else -> Timber.d("Chat correctly initialized")
             }
         }
@@ -977,9 +995,11 @@ object ChatUtil {
      * @return True if all user's contacts are participants of the chat room or false otherwise.
      */
     @JvmStatic
-    fun areAllMyContactsChatParticipants(chatId: Long): Boolean {
-        val chat = MegaApplication.getInstance().megaChatApi.getChatRoom(chatId)
-        return areAllMyContactsChatParticipants(chat)
+    fun areAllMyContactsChatParticipants(
+        chatId: Long, megaChatApi: MegaChatApiAndroid, megaApi: MegaApiAndroid
+    ): Boolean {
+        val chat = megaChatApi.getChatRoom(chatId)
+        return areAllMyContactsChatParticipants(chat, megaApi)
     }
 
     /**
@@ -990,12 +1010,14 @@ object ChatUtil {
      */
     @Deprecated("Use AreAllParticipantsInContactUseCase instead")
     @JvmStatic
-    fun areAllMyContactsChatParticipants(chatRoom: MegaChatRoom?): Boolean {
+    fun areAllMyContactsChatParticipants(
+        chatRoom: MegaChatRoom?, megaApi: MegaApiAndroid
+    ): Boolean {
         if (chatRoom == null) {
             return false
         }
 
-        val contacts = MegaApplication.getInstance().megaApi.contacts
+        val contacts = megaApi.contacts
         val peerCount = chatRoom.peerCount
         var areAllMyContactsChatParticipants = true
 

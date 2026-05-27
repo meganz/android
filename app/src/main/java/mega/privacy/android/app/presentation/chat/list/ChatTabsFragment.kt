@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.LaunchedEffect
@@ -96,6 +95,7 @@ import mega.privacy.mobile.analytics.event.OpenNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScheduleMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingShareMeetingLinkButtonEvent
 import mega.privacy.mobile.analytics.event.SendMeetingLinkToChatScheduledMeetingEvent
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -107,6 +107,9 @@ import javax.inject.Inject
 class ChatTabsFragment : Fragment() {
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
     companion object {
         private const val EXTRA_SHOW_MEETING_TAB = "EXTRA_SHOW_MEETING_TAB"
@@ -738,7 +741,8 @@ class ChatTabsFragment : Fragment() {
                     R.id.menu_chat_mute -> {
                         ChatUtil.createMuteNotificationsAlertDialogOfChats(
                             requireActivity(),
-                            viewModel.getState().value.selectedIds
+                            viewModel.getState().value.selectedIds,
+                            megaChatApi
                         )
                         viewModel.clearSelection()
                         true

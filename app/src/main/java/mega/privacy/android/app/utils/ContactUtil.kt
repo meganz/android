@@ -8,8 +8,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
 import mega.privacy.android.domain.entity.Contact
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaUser
 
 object ContactUtil {
@@ -144,37 +142,6 @@ object ContactUtil {
             .putExtra(EXTRA_USER_HANDLE, userHandle)
             .setPackage(context.applicationContext.packageName)
         context.sendBroadcast(intent)
-    }
-
-    /**
-     * Checks if the user who their handle is received by parameter is a contact.
-     *
-     * @param userHandle handle of the user
-     * @return true if the user is a contact, false otherwise.
-     */
-    @JvmStatic
-    fun isContact(userHandle: Long): Boolean {
-        if (userHandle == INVALID_HANDLE) {
-            return false
-        }
-
-        return isContact(MegaApiJava.userHandleToBase64(userHandle))
-    }
-
-    /**
-     * Checks if the user who their email of handle in base64 is received by parameter is a contact.
-     *
-     * @param emailOrUserHandleBase64 email or user's handle in base64
-     * @return true if the user is a contact, false otherwise.
-     */
-    @JvmStatic
-    fun isContact(emailOrUserHandleBase64: String?): Boolean {
-        if (emailOrUserHandleBase64.isNullOrBlank()) {
-            return false
-        }
-
-        val contact = MegaApplication.getInstance().megaApi.getContact(emailOrUserHandleBase64)
-        return contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE
     }
 
     /**

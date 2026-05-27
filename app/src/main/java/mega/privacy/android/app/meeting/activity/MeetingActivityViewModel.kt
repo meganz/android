@@ -116,6 +116,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
@@ -224,6 +225,7 @@ class MeetingActivityViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getUserAvatarUseCase: GetUserAvatarUseCase,
     private val megaChatRequestHandler: MegaChatRequestHandler,
+    private val megaChatApi: MegaChatApiAndroid,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         MeetingState(
@@ -1326,7 +1328,10 @@ class MeetingActivityViewModel @Inject constructor(
      */
     fun isChatCreatedAndIParticipating(): Boolean =
         (_state.value.chatId != MEGACHAT_INVALID_HANDLE &&
-                amIParticipatingInAChat(_state.value.chatId) &&
+                amIParticipatingInAChat(
+                    _state.value.chatId,
+                    megaChatApi
+                ) &&
                 CallUtil.amIParticipatingInThisMeeting(_state.value.chatId))
 
     /**

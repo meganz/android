@@ -367,7 +367,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 val peerHandle = chatRoom.getPeerHandle(i)
                 val participant = MegaChatParticipant(peerHandle, peerPrivilege)
                 participants.add(participant)
-                val userStatus = ChatUtil.getUserStatus(peerHandle)
+                val userStatus = ChatUtil.getUserStatus(peerHandle, megaApi, megaChatApi)
                 if (userStatus != MegaChatApi.STATUS_ONLINE && userStatus != MegaChatApi.STATUS_BUSY && userStatus != MegaChatApi.STATUS_INVALID) {
                     megaChatApi.requestLastGreen(participant.handle)
                 }
@@ -457,7 +457,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
                 val dialog = AddParticipantsNoContactsDialogFragment.newInstance()
                 dialog.show(supportFragmentManager, dialog.tag)
-            } else if (ChatUtil.areAllMyContactsChatParticipants(chat)) {
+            } else if (ChatUtil.areAllMyContactsChatParticipants(
+                    chat,
+                    megaApi
+                )) {
                 val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
                 dialog.show(supportFragmentManager, dialog.tag)
             } else {

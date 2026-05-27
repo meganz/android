@@ -704,7 +704,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 val gSession = credentials?.session
                 lifecycleScope.launch {
                     loginMutex.lock()
-                    ChatUtil.initMegaChatApi(gSession, this@FileExplorerActivity)
+                    ChatUtil.initMegaChatApi(
+                        gSession,
+                        this@FileExplorerActivity,
+                        megaChatApi
+                    )
                     megaApi.fastLogin(gSession, this@FileExplorerActivity)
                 }
             } else {

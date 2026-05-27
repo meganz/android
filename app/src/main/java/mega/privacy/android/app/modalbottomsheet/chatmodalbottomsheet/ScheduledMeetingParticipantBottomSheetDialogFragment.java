@@ -145,7 +145,7 @@ public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBo
             titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND));
         }
 
-        int userStatus = participantHandle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(participantHandle);
+        int userStatus = participantHandle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(participantHandle, megaApi, megaChatApi);
         setContactStatus(userStatus, stateIcon, StatusIconLocation.DRAWER);
 
         if (participantHandle == megaApi.getMyUser().getHandle()) {

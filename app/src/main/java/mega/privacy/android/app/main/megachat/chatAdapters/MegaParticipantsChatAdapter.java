@@ -413,7 +413,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                             }
                         }
 
-                        updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()), groupChatInfoActivity);
+                        updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId(), megaChatApi), groupChatInfoActivity);
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);
                         holderHeader.dividerClearLayout.setVisibility(View.GONE);
@@ -488,7 +488,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 holderParticipantsList.textViewContactName.setText(participant.getFullName());
                 MegaUser contact = participant.isEmpty() ? null : megaApi.getContact(participant.getEmail());
                 holderParticipantsList.verifiedIcon.setVisibility(contact != null && megaApi.areCredentialsVerified(contact) ? View.VISIBLE : View.GONE);
-                int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle);
+                int userStatus = handle == megaChatApi.getMyUserHandle() ? megaChatApi.getOnlineStatus() : getUserStatus(handle, megaApi, megaChatApi);
                 setContactStatusParticipantList(userStatus, ((ViewHolderParticipantsList) holder).textViewContactIcon, ((ViewHolderParticipantsList) holder).textViewContent, StatusIconLocation.STANDARD);
                 setContactLastGreen(groupChatInfoActivity, userStatus, participant.getLastGreen(), ((ViewHolderParticipantsList) holder).textViewContent);
 
@@ -656,7 +656,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         } else if (id == R.id.chat_group_contact_properties_layout) {
             if (holderHeader != null) {
                 if (holderHeader.notificationsSwitch.isChecked()) {
-                    createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
+                    createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId, megaChatApi);
                 } else {
                     MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
                 }

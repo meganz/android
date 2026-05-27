@@ -44,6 +44,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ArchiveNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingCancelMenuItemEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuItemEvent
+import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Inject
 
 /**
@@ -65,6 +66,9 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
     private val viewModel by viewModels<ChatTabsViewModel>({ requireParentFragment() })
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>(
@@ -215,7 +219,11 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun onMuteClick(mute: Boolean) {
         if (mute) {
-            ChatUtil.createMuteNotificationsAlertDialogOfAChat(requireActivity(), chatId)
+            ChatUtil.createMuteNotificationsAlertDialogOfAChat(
+                requireActivity(),
+                chatId,
+                megaChatApi
+            )
         } else {
             MegaApplication.getPushNotificationSettingManagement()
                 .controlMuteNotificationsOfAChat(
