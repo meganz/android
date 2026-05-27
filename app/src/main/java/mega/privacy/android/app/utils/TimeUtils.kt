@@ -10,7 +10,6 @@ import mega.privacy.android.app.utils.TimeUtils.DATE
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.TIME
 import mega.privacy.android.app.utils.TimeUtils.lastGreenDate
-import nz.mega.sdk.MegaChatMessage
 import timber.log.Timber
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -99,76 +98,6 @@ object TimeUtils {
                 return c1.get(Calendar.DAY_OF_MONTH) - c2.get(Calendar.DAY_OF_MONTH)
             }
             return -1
-        }
-    }
-
-    /**
-     * Formats the timestamp of a [MegaChatMessage] as a short, locale-aware time string.
-     *
-     * @param lastMessage The chat message whose timestamp will be formatted.
-     * @return The formatted time string (e.g. "10:23 AM").
-     */
-    @JvmStatic
-    fun formatTime(lastMessage: MegaChatMessage): String {
-        val df: DateFormat =
-            SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, getUserLocale())
-        val cal = Util.calculateDateFromTimestamp(lastMessage.timestamp)
-        val tz = cal.timeZone
-        df.timeZone = tz
-        val date = cal.time
-        return df.format(date)
-    }
-
-    /**
-     * Formats the timestamp of a [MegaChatMessage] as a humanized date and time string.
-     *
-     * Renders the date as "Today", "Yesterday", a day of the week (when within a week) or a
-     * locale-specific full date, followed by the formatted time.
-     *
-     * @param context Context used to retrieve localized strings.
-     * @param lastMessage The chat message whose timestamp will be formatted.
-     * @param format Either [DATE_LONG_FORMAT] (date and time) or any other value (date only).
-     * @return The formatted date and time string.
-     */
-    @JvmStatic
-    fun formatDateAndTime(context: Context, lastMessage: MegaChatMessage, format: Int): String {
-        val df: DateFormat = if (format == DATE_LONG_FORMAT) {
-            SimpleDateFormat.getDateTimeInstance(
-                SimpleDateFormat.LONG,
-                SimpleDateFormat.SHORT,
-                getUserLocale()
-            )
-        } else {
-            SimpleDateFormat.getDateInstance(SimpleDateFormat.LONG, getUserLocale())
-        }
-
-        val cal = Util.calculateDateFromTimestamp(lastMessage.timestamp)
-
-        //Compare to yesterday
-        val calToday = Calendar.getInstance()
-        val calYesterday = Calendar.getInstance()
-        calYesterday.add(Calendar.DATE, -1)
-        val tc = CalendarComparator(DATE)
-        return if (tc.compare(cal, calToday) == 0) {
-            val time = formatTime(lastMessage)
-            context.getString(R.string.label_today) + " " + time
-        } else if (tc.compare(cal, calYesterday) == 0) {
-            val time = formatTime(lastMessage)
-            context.getString(R.string.label_yesterday) + " " + time
-        } else {
-            if (tc.calculateDifferenceDays(cal, calToday) < 7) {
-                val date = cal.time
-                val dayWeek = SimpleDateFormat(
-                    getBestDateTimePattern(getUserLocale(), "EEEE"), getUserLocale()
-                ).format(date)
-                val time = formatTime(lastMessage)
-                "$dayWeek $time"
-            } else {
-                val tz = cal.timeZone
-                df.timeZone = tz
-                val date = cal.time
-                df.format(date)
-            }
         }
     }
 
