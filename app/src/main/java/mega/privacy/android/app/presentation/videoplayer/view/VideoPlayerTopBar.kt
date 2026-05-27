@@ -3,11 +3,11 @@ package mega.privacy.android.app.presentation.videoplayer.view
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.BlurMegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionString
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 
 internal data object VideoPlayerMoreActionsMenuAction : MenuActionString(
     icon = IconPack.Medium.Thin.Outline.MoreVertical,
@@ -22,14 +22,14 @@ internal fun VideoPlayerTopBar(
     onMoreActionsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    MegaAppBar(
+    BlurMegaTopAppBar(
         modifier = modifier.testTag(VIDEO_PLAYER_TOP_BAR_TEST_TAG),
         title = title,
-        appBarType = AppBarType.BACK_NAVIGATION,
-        onNavigationPressed = onBackPressed,
+        navigationType = AppBarNavigationType.Back(onBackPressed),
         actions = listOf(VideoPlayerMoreActionsMenuAction),
-        onActionPressed = { onMoreActionsClicked() },
-        backgroundAlpha = 0.5f
+        onActionPressed = {
+            onMoreActionsClicked()
+        },
     )
 }
 
