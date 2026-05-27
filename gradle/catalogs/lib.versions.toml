@@ -31,6 +31,7 @@ slack-compose-lints = "1.4.3"
 profileinstaller = "1.4.1"
 okhttp3 = "5.3.2"
 okio = "3.17.0"
+litert = "1.4.2"
 
 [libraries]
 bannerviewpager = { module = "com.github.zhpanvip:BannerViewPager", version.ref = "bannerviewpager" }
@@ -87,6 +88,8 @@ commonmark-java = { module = "org.commonmark:commonmark", version.ref = "commonm
 ucropnedit = { module = "com.github.jens-muenker.mega:ucropnedit", version.ref = "ucropnedit" }
 sqlcipher = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher" }
 slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slack-compose-lints" }
+litert = { module = "com.google.ai.edge.litert:litert", version.ref = "litert" }
+litert-gpu = { module = "com.google.ai.edge.litert:litert-gpu", version.ref = "litert" }
 profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "profileinstaller" }
 okhttp3 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp3" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
