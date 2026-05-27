@@ -2802,6 +2802,29 @@ class VideoPlayerViewModelV2Test {
             }
         }
 
+    @Test
+    fun `test that isInPipMode is set to true when updateIsInPipMode is called with true`() =
+        runTest {
+            initViewModel()
+            underTest.updateIsInPipMode(true)
+            underTest.uiState.test {
+                assertThat(awaitItem().isInPipMode).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isInPipMode is set to false when updateIsInPipMode is called with false`() =
+        runTest {
+            initViewModel()
+            underTest.updateIsInPipMode(true)
+            underTest.updateIsInPipMode(false)
+            underTest.uiState.test {
+                assertThat(awaitItem().isInPipMode).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
     companion object {
         @JvmField
         @RegisterExtension

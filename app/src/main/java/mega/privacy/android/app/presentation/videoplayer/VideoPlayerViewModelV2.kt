@@ -1331,6 +1331,9 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         }.getOrDefault(false)
     }
 
+    internal fun updateIsInPipMode(isInPipMode: Boolean) =
+        uiState.update { it.copy(isInPipMode = isInPipMode) }
+
     internal fun updateIsMoreOptionShown(value: Boolean) {
         uiState.update { it.copy(isMoreOptionShown = value) }
     }

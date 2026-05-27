@@ -19,6 +19,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerEntryProvider(
     featureDestinations: Set<FeatureDestination>,
     onRetry: () -> Unit,
     onFinish: () -> Unit,
+    onEnterPip: () -> Unit,
 ) {
     videoPlayerScreen(
         navigationHandler = navigationHandler,
@@ -31,6 +32,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerEntryProvider(
         onTransfer = onTransfer,
         onRetry = onRetry,
         onFinish = onFinish,
+        onEnterPip = onEnterPip,
         onMoreActionsClicked = {
             val uiState = viewModel.uiState.value
             navigationHandler.navigate(

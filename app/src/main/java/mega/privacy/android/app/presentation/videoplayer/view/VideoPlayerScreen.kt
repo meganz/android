@@ -134,6 +134,7 @@ internal fun VideoPlayerScreen(
     onMoreActionsClicked: () -> Unit,
     onRetry: () -> Unit,
     onFinish: () -> Unit,
+    onEnterPip: () -> Unit,
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -362,6 +363,18 @@ internal fun VideoPlayerScreen(
 
     LaunchedEffect(uiState.isLocked) {
         videoPlayerController?.updateLockView(uiState.isLocked)
+    }
+
+    LaunchedEffect(uiState.isInPipMode) {
+        if (uiState.isInPipMode) {
+            autoHideJob?.cancel()
+            isControllerViewVisible = false
+            systemUiController.isSystemBarsVisible = false
+            playerView?.hideController()
+        } else {
+            isControllerViewVisible = true
+            playerView?.showController()
+        }
     }
 
     LaunchedEffect(uiState.currentSpeedPlayback) {
@@ -773,9 +786,7 @@ internal fun VideoPlayerScreen(
                                                 VideoPlayerMoreOption.Lock ->
                                                     videoPlayerController?.onLockOptionSelected()
 
-                                                VideoPlayerMoreOption.PIP -> {
-                                                    // TODO will implement in next ticket
-                                                }
+                                                VideoPlayerMoreOption.PIP -> onEnterPip()
                                             }
                                             viewModel.updateIsMoreOptionShown(false)
                                         }

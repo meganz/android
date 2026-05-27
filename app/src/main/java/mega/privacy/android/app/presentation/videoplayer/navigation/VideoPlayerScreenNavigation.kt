@@ -29,6 +29,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
     onRetry: () -> Unit,
     onFinish: () -> Unit,
+    onEnterPip: () -> Unit,
 ) {
     entry<VideoPlayerScreenNavKey> {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -67,6 +68,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             onMoreActionsClicked = onMoreActionsClicked,
             onRetry = onRetry,
             onFinish = onFinish,
+            onEnterPip = onEnterPip,
         )
     }
 }

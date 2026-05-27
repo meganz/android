@@ -4,10 +4,10 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
-import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
@@ -67,11 +67,13 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  *   via GetPublicNodeUseCase when the video player displays bottom-sheet options.
  * @property localFilePath the absolute path to a local file; non-null only when [nodeSourceType] is
  *   [mega.privacy.android.domain.entity.node.NodeSourceType.VIDEO_PLAYER_ZIP_FILE]. Used to build
- *   a synthetic [ZipFileTypedNode] when displaying bottom-sheet options.
+ *   a synthetic ZipFileTypedNode when displaying bottom-sheet options.
  * @property isConnected whether the device is connected to the internet
  * @property playerErrorType the type of player error, null if no error
  * @property moveOrRemoveNodeEvent one-shot event emitted while moving or removing the
- *   current playing node, used to drive confirmation dialogs and snackbars from the activity.
+ *   current playing node, used to drive confirmation dialogs and snack bars from the activity.
+ * @property isPipEnabled whether the Picture in Picture feature is enabled via feature flag
+ * @property isInPipMode whether the video player is currently displayed in PIP mode
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -124,4 +126,5 @@ data class VideoPlayerUiState(
     val playerErrorType: PlayerErrorType? = null,
     val moveOrRemoveNodeEvent: StateEventWithContent<MoveOrRemoveNodeResult> = consumed(),
     val isPipEnabled: Boolean = false,
+    val isInPipMode: Boolean = false,
 )

@@ -410,7 +410,8 @@
             android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".presentation.videoplayer.VideoPlayerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:supportsPictureInPicture="true"
             android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
             android:windowSoftInputMode="adjustNothing" />
         <activity

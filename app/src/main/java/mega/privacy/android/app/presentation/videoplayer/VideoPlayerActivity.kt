@@ -1,13 +1,17 @@
 package mega.privacy.android.app.presentation.videoplayer
 
+import android.app.PictureInPictureParams
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Rational
 import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
 import androidx.activity.compose.setContent
@@ -93,6 +97,8 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import timber.log.Timber
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
@@ -156,6 +162,10 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
         }
     }
 
+    private var exoPlayer: ExoPlayer? = null
+    private var pipParams: PictureInPictureParams.Builder? = null
+    private var isExitingPipMode = false
+    private var isBeingReplacedByNewInstance = false
     private lateinit var mediaSessionHelper: MediaSessionHelper
     private var audioManager: AudioManager? = null
     private var audioFocusRequest: AudioFocusRequest? = null
@@ -189,8 +199,11 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
         super.onCreate(savedInstanceState)
         Analytics.tracker.trackEvent(VideoPlayerScreenEvent)
         enableEdgeToEdge()
+        initializePipParams()
+        finishExistingPipInstanceIfNeeded()
+        activePipInstance = WeakReference(this)
         setupImmersiveMode()
-        val player = createPlayer()
+        exoPlayer = createPlayer()
         videoPlayerViewModelV2.initRepeatToggleMode()
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -251,12 +264,13 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                             videoPlayerEntryProvider(
                                 navigationHandler = navigationHandler,
                                 viewModel = videoPlayerViewModelV2,
-                                player = player,
+                                player = exoPlayer,
                                 handleAutoReplayIfPaused = videoPlayerViewModelV2::handleAutoReplayIfPaused,
                                 onTransfer = appTransferViewModel::setTransferEvent,
                                 featureDestinations = featureDestinations,
                                 onRetry = { mediaPlayerGateway.mediaPlayerRetry(true) },
                                 onFinish = { if (!isFinishing) finish() },
+                                onEnterPip = ::enterPipModeIfPossible,
                             )
                         },
                     )
@@ -273,6 +287,72 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
         setupObserver()
         initMediaSession()
+    }
+
+    private fun finishExistingPipInstanceIfNeeded() {
+        activePipInstance?.get()?.let { existing ->
+            if (existing !== this && existing.videoPlayerViewModelV2.uiState.value.isInPipMode) {
+                // Mark old instance so its onDestroy skips player cleanup.
+                existing.isBeingReplacedByNewInstance = true
+                // Stop and release the old ExoPlayer now, before the new one is created.
+                // The gateway still holds the old player reference at this point.
+                mediaPlayerGateway.playerStop()
+                mediaPlayerGateway.playerRelease()
+                existing.finish()
+            }
+        }
+    }
+
+    private fun initializePipParams() {
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
+            pipParams = PictureInPictureParams.Builder().also { builder ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    builder.setSeamlessResizeEnabled(false)
+                    builder.setAutoEnterEnabled(false)
+                }
+            }
+        }
+    }
+
+    private fun enterPipModeIfPossible() {
+        val params = pipParams ?: return
+        if (!videoPlayerViewModelV2.uiState.value.isPipEnabled) return
+        try {
+            val videoSize = videoPlayerViewModelV2.uiState.value.currentPlayingVideoSize
+            val rational = if (videoSize != null && videoSize.width > 0 && videoSize.height > 0) {
+                computePipAspectRatio(videoSize.width, videoSize.height)
+            } else {
+                Rational(PIP_DEFAULT_WIDTH_RATIO, PIP_DEFAULT_HEIGHT_RATIO)
+            }
+            params.setAspectRatio(rational)
+            enterPictureInPictureMode(params.build())
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to enter PIP mode")
+        }
+    }
+
+    private fun computePipAspectRatio(width: Int, height: Int): Rational {
+        // PIP aspect ratio must be between 1:2.39 and 2.39:1 (Android requirement)
+        return when {
+            width * PIP_MAX_ASPECT_RATIO_DENOM > height * PIP_MAX_ASPECT_RATIO_NUM ->
+                Rational(PIP_MAX_ASPECT_RATIO_NUM, PIP_MAX_ASPECT_RATIO_DENOM)
+
+            height * PIP_MAX_ASPECT_RATIO_DENOM > width * PIP_MAX_ASPECT_RATIO_NUM ->
+                Rational(PIP_MAX_ASPECT_RATIO_DENOM, PIP_MAX_ASPECT_RATIO_NUM)
+
+            else -> Rational(width, height)
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration,
+    ) {
+        if (!isInPictureInPictureMode) {
+            isExitingPipMode = true
+        }
+        videoPlayerViewModelV2.updateIsInPipMode(isInPictureInPictureMode)
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
     }
 
     private fun setupImmersiveMode() {
@@ -329,7 +409,8 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                     videoPlayerViewModelV2.onPlaybackStateChanged(state)
                 }
 
-                override fun onPlayerErrorCallback(errorCode: Int) = videoPlayerViewModelV2.onPlayerError(errorCode)
+                override fun onPlayerErrorCallback(errorCode: Int) =
+                    videoPlayerViewModelV2.onPlayerError(errorCode)
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
                     if (videoWidth == 0 || videoHeight == 0) return
@@ -380,17 +461,48 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
 
     override fun onStop() {
         super.onStop()
+        if (isExitingPipMode) {
+            // PIP window was dismissed (not expanded back to full screen)
+            isExitingPipMode = false
+            if (isTaskRoot) {
+                // PIP moved activity to a separate task; launch main app so user returns to it
+                packageManager.getLaunchIntentForPackage(packageName)?.let { startActivity(it) }
+            }
+            finish()
+            return
+        }
+        if (isBeingReplacedByNewInstance) {
+            // New VideoPlayerActivity has taken over the shared player; do not pause it
+            return
+        }
         videoPlayerViewModelV2.pauseForBackground()
     }
 
     override fun onStart() {
         super.onStart()
+        // Reset flag: activity came to foreground, meaning PIP was expanded (not dismissed)
+        isExitingPipMode = false
         videoPlayerViewModelV2.handleAutoReplayIfPaused()
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (videoPlayerViewModelV2.uiState.value.isInPipMode) {
+            // Exit PIP mode so the new video replaces the current one in full screen
+            videoPlayerViewModelV2.updateIsInPipMode(false)
+        }
+        this@VideoPlayerActivity.intent = intent
+        videoPlayerViewModelV2.initVideoPlayerData(intent)
+    }
+
     override fun onDestroy() {
-        mediaPlayerGateway.playerStop()
-        mediaPlayerGateway.playerRelease()
+        if (activePipInstance?.get() == this) {
+            activePipInstance = null
+        }
+        if (!isBeingReplacedByNewInstance) {
+            mediaPlayerGateway.playerStop()
+            mediaPlayerGateway.playerRelease()
+        }
         AudioPlayerService.resumeAudioPlayer(this)
         unregisterReceiver(headsetPlugReceiver)
         if (audioManager != null) {
@@ -426,6 +538,18 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
     companion object {
         private const val INTENT_KEY_STATE = "state"
         private const val STATE_HEADSET_UNPLUGGED = 0
+        private const val PIP_DEFAULT_WIDTH_RATIO = 16
+        private const val PIP_DEFAULT_HEIGHT_RATIO = 9
+        private const val PIP_MAX_ASPECT_RATIO_NUM = 239
+        private const val PIP_MAX_ASPECT_RATIO_DENOM = 100
+
+        /**
+         * Holds the [VideoPlayerActivity] currently in PIP mode. Stored in the companion object
+         * (not an instance field) because two activities can coexist briefly — when the user opens
+         * a second video while one is in PIP, the new instance uses this reference to [finish] the
+         * old one before taking over. [WeakReference] prevents blocking garbage collection.
+         */
+        private var activePipInstance: WeakReference<VideoPlayerActivity>? = null
     }
 }
 
