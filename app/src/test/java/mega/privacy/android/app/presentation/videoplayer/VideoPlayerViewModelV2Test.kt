@@ -83,6 +83,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
@@ -98,6 +99,7 @@ import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
@@ -250,6 +252,7 @@ class VideoPlayerViewModelV2Test {
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private var fakeMonitorConnectivityFlow = MutableSharedFlow<Boolean>()
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
@@ -322,6 +325,7 @@ class VideoPlayerViewModelV2Test {
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             playerErrorTypeMapper = playerErrorTypeMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             args = testArgs,
         )
     }
@@ -407,7 +411,44 @@ class VideoPlayerViewModelV2Test {
             getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase,
             monitorConnectivityUseCase,
+            getFeatureFlagValueUseCase,
         )
+    }
+
+    @Test
+    fun `test that isPipEnabled is set to true when feature flag returns true`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerPictureInPicture)).thenReturn(
+            true
+        )
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isPipEnabled).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isPipEnabled is set to false when feature flag returns false`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerPictureInPicture)).thenReturn(
+            false
+        )
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isPipEnabled).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isPipEnabled remains false when feature flag throws an exception`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerPictureInPicture)).thenThrow(
+            RuntimeException("flag error")
+        )
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isPipEnabled).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test

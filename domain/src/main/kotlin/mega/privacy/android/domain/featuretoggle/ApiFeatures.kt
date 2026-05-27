@@ -20,6 +20,15 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Enables Picture in Picture (PIP) in Video Player
+     */
+    VideoPlayerPictureInPicture(
+        "vppip",
+        "Enable Picture in Picture in Video Player",
+        false,
+    ),
+
+    /**
      * File link revamp
      */
     FileLinkRevamp(

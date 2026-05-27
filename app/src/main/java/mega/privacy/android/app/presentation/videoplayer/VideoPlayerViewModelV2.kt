@@ -110,6 +110,7 @@ import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -128,6 +129,7 @@ import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
@@ -252,6 +254,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val playerErrorTypeMapper: PlayerErrorTypeMapper,
     @Assisted private val args: Args,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<VideoPlayerUiState>
@@ -291,6 +294,18 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
 
         updateNameWhenNodeUpdates()
         monitorConnectivity()
+        loadPipFeatureFlag()
+    }
+
+    private fun loadPipFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                val enabled = getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerPictureInPicture)
+                uiState.update { it.copy(isPipEnabled = enabled) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     private fun monitorConnectivity() {

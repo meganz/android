@@ -141,6 +141,7 @@ interface IconPackInterface {
                 val CloudDownload: ImageVector
                 val Copy01: ImageVector
                 val CornerUpRight: ImageVector
+                val Contract: ImageVector
                 val Database: ImageVector
                 val Devices: ImageVector
                 val Download: ImageVector

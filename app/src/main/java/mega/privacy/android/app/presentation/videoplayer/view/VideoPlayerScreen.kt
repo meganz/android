@@ -224,7 +224,8 @@ internal fun VideoPlayerScreen(
 
     val isShowSubtitleIcon = viewModel.isShowSubtitleIcon()
     val isShowPlaylistOption = uiState.items.size > SINGLE_PLAYLIST_SIZE
-    val moreOptionActions = remember(isShowSubtitleIcon, isShowPlaylistOption) {
+    val isShowPIP = uiState.isPipEnabled
+    val moreOptionActions = remember(isShowSubtitleIcon, isShowPlaylistOption, isShowPIP) {
         buildList {
             add(VideoPlayerMoreOption.Snapshot)
             if (isShowSubtitleIcon) {
@@ -234,6 +235,9 @@ internal fun VideoPlayerScreen(
                 add(VideoPlayerMoreOption.Playlist)
             }
             add(VideoPlayerMoreOption.Lock)
+            if (isShowPIP) {
+                add(VideoPlayerMoreOption.PIP)
+            }
         }
     }
 
@@ -768,6 +772,10 @@ internal fun VideoPlayerScreen(
 
                                                 VideoPlayerMoreOption.Lock ->
                                                     videoPlayerController?.onLockOptionSelected()
+
+                                                VideoPlayerMoreOption.PIP -> {
+                                                    // TODO will implement in next ticket
+                                                }
                                             }
                                             viewModel.updateIsMoreOptionShown(false)
                                         }

@@ -40,6 +40,12 @@ sealed class VideoPlayerMoreOption(
         sharedR.string.video_player_more_options_lock_option,
         VIDEO_PLAYER_MORE_OPTIONS_LOCK_TILE_TEST_TAG,
     )
+
+    data object PIP : VideoPlayerMoreOption(
+        IconPack.Medium.Thin.Outline.Contract,
+        sharedR.string.video_player_more_options_pip_option,
+        VIDEO_PLAYER_MORE_OPTIONS_PIP_TILE_TEST_TAG,
+    )
 }
 
 const val VIDEO_PLAYER_MORE_OPTIONS_SNAPSHOT_TILE_TEST_TAG =
@@ -53,3 +59,6 @@ const val VIDEO_PLAYER_MORE_OPTIONS_PLAYLIST_TILE_TEST_TAG =
 
 const val VIDEO_PLAYER_MORE_OPTIONS_LOCK_TILE_TEST_TAG =
     "video_player_more_options:bottom_sheet_tile_lock"
+
+const val VIDEO_PLAYER_MORE_OPTIONS_PIP_TILE_TEST_TAG =
+    "video_player_more_options:bottom_sheet_tile_pip"

@@ -2892,6 +2892,8 @@
     <string name="video_player_subtitles_add_subtitles_button">Add subtitle</string>
     <!-- Campaign name format with a localised label from the SDK. %1$s is the localised campaign label provided by the API, %2$d is the discount percentage. -->
     <string name="campaign_name_with_discount">%1$s: %2$d%% off</string>
+    <!-- Title for the PIP option in video player more options -->
+    <string name="video_player_more_options_pip_option">Picture in picture</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_confirmation_title">Discard scan?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->

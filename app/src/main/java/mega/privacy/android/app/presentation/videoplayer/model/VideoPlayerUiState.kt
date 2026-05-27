@@ -123,4 +123,5 @@ data class VideoPlayerUiState(
     val isConnected: Boolean = true,
     val playerErrorType: PlayerErrorType? = null,
     val moveOrRemoveNodeEvent: StateEventWithContent<MoveOrRemoveNodeResult> = consumed(),
+    val isPipEnabled: Boolean = false,
 )
