@@ -11,9 +11,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -28,6 +30,7 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
@@ -72,6 +75,7 @@ class MenuViewModel @Inject constructor(
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
     private val avatarContentMapper: AvatarContentMapper,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
     private val currentPlanSubtitleFlow = MutableStateFlow<String?>(null)
@@ -261,9 +265,10 @@ class MenuViewModel @Inject constructor(
                     }
                 }
             }
-        ).catch { e ->
-            Timber.e(e, "Error loading avatar data")
-        }.launchIn(viewModelScope)
+        ).flowOn(ioDispatcher)
+            .catch { e ->
+                Timber.e(e, "Error loading avatar data")
+            }.launchIn(viewModelScope)
     }
 
 

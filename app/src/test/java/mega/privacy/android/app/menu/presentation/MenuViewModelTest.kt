@@ -913,6 +913,7 @@ class MenuViewModelTest {
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
             avatarContentMapper = avatarContentMapper,
+            ioDispatcher = testDispatcher,
         )
     }
 
