@@ -2921,4 +2921,6 @@
         <item quantity="one">Because you didn’t log in for over %1$d month, your files were removed as per our inactivity policy.</item>
         <item quantity="other">Because you didn’t log in for over %1$d months, your files were removed as per our inactivity policy.</item>
     </plurals>
+    <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
+    <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
 </resources>

@@ -244,6 +244,7 @@ internal fun FileLinkContent(
                     sharedR.string.file_link_unavailable_deleted,
                     sharedR.string.file_link_unavailable_disabled,
                     sharedR.string.general_link_unavailable_invalid_url,
+                    sharedR.string.file_link_unavaible_ToS_violation,
                 ),
                 modifier = Modifier.testTag(FILE_LINK_UNAVAILABLE_TAG),
             )
