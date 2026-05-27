@@ -1,19 +1,19 @@
-package mega.privacy.android.app.appstate.global.initialisation.postlogin
+package mega.privacy.android.app.appstate.global.initialisation.appstart
 
 import mega.privacy.android.domain.entity.fileservice.FileServiceReclaimOptions
 import mega.privacy.android.domain.usecase.fileservice.SetFileServiceReclaimOptionsUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
+import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiserAction
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
 /**
- * Post-login initialiser that configures file service reclaim options.
+ * App start initialiser that configures file service reclaim options.
  * @property setFileServiceReclaimOptionsUseCase
  */
 class FileServiceReclaimOptionsInitialiser @Inject constructor(
     private val setFileServiceReclaimOptionsUseCase: SetFileServiceReclaimOptionsUseCase,
-) : PostLoginInitialiserAction(action = { _, _ ->
+) : AppStartInitialiserAction(action = {
     runCatching {
         setFileServiceReclaimOptionsUseCase(
             options = FileServiceReclaimOptions(
