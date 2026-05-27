@@ -23,6 +23,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -67,6 +68,7 @@ import javax.inject.Inject
 /**
  * MediaPlayer Fragment
  */
+@androidx.annotation.OptIn(UnstableApi::class)
 @AndroidEntryPoint
 class AudioPlayerFragment : Fragment() {
     /**
@@ -402,6 +404,7 @@ class AudioPlayerFragment : Fragment() {
         mediaPlayerServiceGateway: MediaPlayerServiceGateway,
         playerView: PlayerView,
     ) {
+        playerView.setControllerAnimationEnabled(false)
         mediaPlayerServiceGateway.setupPlayerView(
             playerView = playerView,
             isAudioPlayer = true,
