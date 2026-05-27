@@ -28,6 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
@@ -38,6 +39,8 @@ import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessi
 import mega.privacy.android.app.providers.documentprovider.model.DocumentSlot
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.CloudDriveDocumentProviderFileOpenedEvent
+import mega.privacy.mobile.analytics.event.CloudDriveDocumentProviderFolderOpenedEvent
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -114,6 +117,9 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     private var rootNotifyJob: Job? = null
     private var documentNotifyJob: Job? = null
     private var childDocumentsNotifyJob: Job? = null
+
+    private var lastFolderOpenParent: String? = null
+    private var lastFileOpenDocumentId: String? = null
 
     override fun onCreate(): Boolean {
         Timber.d("CloudDriveDocumentProvider onCreate called")
@@ -343,8 +349,16 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             }
         }
 
+        trackFileOpenIfNew(documentId)
         val file = resolveLocalFile(documentId, signal)
         return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+    }
+
+    @Synchronized
+    private fun trackFileOpenIfNew(documentId: String) {
+        if (documentId == lastFileOpenDocumentId) return
+        lastFileOpenDocumentId = documentId
+        Analytics.tracker.trackEvent(CloudDriveDocumentProviderFileOpenedEvent)
     }
 
     private fun resolveScratchFile(documentId: String, signal: CancellationSignal?): File = try {
@@ -470,10 +484,18 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
         }
 
+        trackFolderOpenIfNew(parentDocumentId)
         val result = childDocumentsCursor(parentDocumentId, projection)
         setNotificationUriForChildDocuments(parentDocumentId, result)
         listenForChildDocumentChanges(parentDocumentId)
         return result
+    }
+
+    @Synchronized
+    private fun trackFolderOpenIfNew(parentDocumentId: String) {
+        if (parentDocumentId == lastFolderOpenParent) return
+        lastFolderOpenParent = parentDocumentId
+        Analytics.tracker.trackEvent(CloudDriveDocumentProviderFolderOpenedEvent)
     }
 
     private fun childDocumentsCursor(

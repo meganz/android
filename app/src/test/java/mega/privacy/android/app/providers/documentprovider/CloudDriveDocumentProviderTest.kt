@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.providers.documentprovider.model.ChildrenSlot
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
@@ -29,6 +30,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.runner.RunWith
@@ -57,6 +59,9 @@ class CloudDriveDocumentProviderTest {
 
     private val mockDataProvider: CloudDriveDocumentDataProvider = mock()
     private val mockEntryPoint: CloudDriveDocumentProviderEntryPoint = mock()
+
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
 
     private val sessionState =
         MutableStateFlow<CloudDriveSessionState>(CloudDriveSessionState.Initialising)
