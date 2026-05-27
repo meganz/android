@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -32,6 +33,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.banner.InlineErrorBanner
+import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
@@ -189,8 +192,10 @@ internal fun CloudDriveContent(
         val showOverQuotaWarning = (uiState as? CloudDriveUiState.Data)?.let {
             overQuotaUiState.overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && overQuotaUiState.shouldShowWarning
         } ?: false
+        val inactivityBannerData = (uiState as? CloudDriveUiState.Data)
+            ?.takeIf { it.showInactivityBanner && !isInSelectionMode }
         val topPadding =
-            if ((showContactVerificationBanner || isTabContent) && !showOverQuotaWarning) 12.dp else 0.dp
+            if ((showContactVerificationBanner || inactivityBannerData != null || isTabContent) && !showOverQuotaWarning) 12.dp else 0.dp
 
         if (showContactVerificationBanner) {
             UnverifiedContactShareBanner(
@@ -198,6 +203,30 @@ internal fun CloudDriveContent(
                     id = sharedR.string.incoming_shared_folder_contact_not_approved_alert_text,
                     uiState.title.text
                 ),
+            )
+        }
+
+        inactivityBannerData?.inactivityMonths?.let { months ->
+            InlineErrorBanner(
+                modifier = Modifier.fillMaxWidth(),
+                showCancelButton = true,
+                title = SpannableText(
+                    text = stringResource(sharedR.string.cloud_drive_inactivity_banner_title)
+                ),
+                body = SpannableText(
+                    text = pluralStringResource(
+                        sharedR.plurals.cloud_drive_inactivity_banner_message,
+                        months,
+                        months,
+                    )
+                ),
+                actionButtonText = stringResource(sharedR.string.general_learn_more),
+                onActionButtonClick = {
+                    // Todo: Add action
+                },
+                onCancelButtonClick = {
+                    // Todo: Close and update
+                },
             )
         }
 
@@ -210,6 +239,7 @@ internal fun CloudDriveContent(
                     delay = NodeSkeletons.defaultDelay,
                 )
             }
+
             is CloudDriveUiState.Data -> {
                 if (uiState.items.isEmpty()) {
                     CloudDriveEmptyView(
@@ -376,8 +406,9 @@ internal fun CloudDriveContent(
                             )
                         },
                         onOpenLinkClicked = {
-                    navigationHandler.navigate(OpenLinkDialogNavKey)
-                },onDismissSheet = {
+                            navigationHandler.navigate(OpenLinkDialogNavKey)
+                        },
+                        onDismissSheet = {
                             onToggleShowUploadOptionsBottomSheet(false)
                         },
                     )

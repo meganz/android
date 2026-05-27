@@ -2892,8 +2892,6 @@
     <string name="video_player_subtitles_add_subtitles_button">Add subtitle</string>
     <!-- Campaign name format with a localised label from the SDK. %1$s is the localised campaign label provided by the API, %2$d is the discount percentage. -->
     <string name="campaign_name_with_discount">%1$s: %2$d%% off</string>
-    <!-- Title for the PIP option in video player more options -->
-    <string name="video_player_more_options_pip_option">Picture in picture</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_confirmation_title">Discard scan?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->
@@ -2904,8 +2902,6 @@
     <string name="scan_dialog_discard_all_confirmation_body">The current document will be lost</string>
     <!-- Action text shown on document scanner dialog to discard scans -->
     <string name="scan_dialog_discard_confirmation_action">Discard</string>
-    <!-- Screen title for saving current scan (Document scanner) -->
-    <string name="scan_title_save_scan">Save scan</string>
     <!-- General error informing the typed name is invalid -->
     <string name="general_error_incorrect_name">Correct your filename before proceeding</string>
     <!-- General destination label -->
@@ -2916,4 +2912,13 @@
     <string name="general_file_name">File name</string>
     <!-- General error text for invalid name -->
     <string name="general_error_invalid_name">Invalid name</string>
+    <!-- Title for the PIP option in video player more options -->
+    <string name="video_player_more_options_pip_option">Picture-in-picture</string>
+    <!-- Title of an inline banner shown on the Cloud Drive screen when the user's files were removed because the account had been inactive for too long. -->
+    <string name="cloud_drive_inactivity_banner_title">Your account was inactive for too long</string>
+    <!-- Body text of the inactivity banner on the Cloud Drive screen. %1$d is the number of months of inactivity, e.g. "Because you didn't log in for over 24 months, your files and messages were removed as per our inactivity policy." -->
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one">Because you didn’t log in for over %1$d month, your files were removed as per our inactivity policy.</item>
+        <item quantity="other">Because you didn’t log in for over %1$d months, your files were removed as per our inactivity policy.</item>
+    </plurals>
 </resources>

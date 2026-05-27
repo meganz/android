@@ -58,6 +58,7 @@ sealed interface CloudDriveUiState {
      * @property showContactNotVerifiedBanner
      * @property nodeSourceType
      * @property hasWritePermission
+     * @property inactivityMonths
      */
     data class Data(
         override val title: LocalizedText,
@@ -73,7 +74,13 @@ sealed interface CloudDriveUiState {
         val showContactNotVerifiedBanner: Boolean,
         override val nodeSourceType: NodeSourceType,
         val hasWritePermission: Boolean,
+        val inactivityMonths: Int? = null,
     ) : CloudDriveUiState {
+
+        /**
+         * Flag to determine if inactivity banner should be shown
+         */
+        val showInactivityBanner = (inactivityMonths ?: 0) > 0
 
         /**
          * True if upload is allowed in the current folder
