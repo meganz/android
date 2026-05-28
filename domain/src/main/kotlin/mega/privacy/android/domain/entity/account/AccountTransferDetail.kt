@@ -1,7 +1,5 @@
 package mega.privacy.android.domain.entity.account
 
-import kotlin.math.roundToInt
-
 /**
  * Account transfer detail
  *
@@ -17,6 +15,6 @@ data class AccountTransferDetail(
      */
     val usedTransferPercentage: Int
         get() = if (totalTransfer > 0) {
-            ((usedTransfer.toDouble() / totalTransfer.toDouble()) * 100).roundToInt()
+            ((usedTransfer.toDouble() / totalTransfer.toDouble()) * 100).toInt()
         } else 0
 }
