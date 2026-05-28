@@ -13,6 +13,7 @@ import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -472,4 +473,17 @@ internal class SyncWorkerTest {
             assertThat(foregroundCompletedWorkerResult).isEqualTo(Result.success())
             verify(setSyncWorkerForegroundPreferenceUseCase).invoke(false)
         }
+
+    @Test
+    fun `test that a cancelled sync worker rethrows cancellation instead of retrying`() = runTest {
+        // Simulate the worker being cancelled while it is doing its work.
+        whenever(syncPermissionsManager.isNotificationsPermissionGranted()).thenReturn(true)
+        whenever(getSyncWorkerForegroundPreferenceUseCase())
+            .thenThrow(CancellationException("Worker stopped"))
+
+        val outcome = runCatching { underTest.doWork() }
+
+        // Cancellation must propagate so WorkManager treats it as a stop, not silently retry.
+        assertThat(outcome.exceptionOrNull()).isInstanceOf(CancellationException::class.java)
+    }
 }

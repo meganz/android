@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.coroutine.logAndSwallowExceptions
 import mega.privacy.android.core.passcode.check.model.PasscodeCheckState
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeLockStateUseCase
 import timber.log.Timber
@@ -28,17 +29,15 @@ class PasscodeCheckViewModel @Inject constructor(
     init {
         Timber.d("PasscodeCheckViewModel initialized")
         viewModelScope.launch {
-            try {
-                monitorPasscodeLockStateUseCase()
-                    .onEach { Timber.d("Passcode lock state changed: $it") }
-                    .mapLatest { locked ->
-                        if (locked) PasscodeCheckState.Locked else PasscodeCheckState.UnLocked
-                    }.collectLatest {
-                        _state.emit(it)
-                    }
-            } catch (e: Exception) {
-                Timber.e(e)
-            }
+            monitorPasscodeLockStateUseCase()
+                .onEach { Timber.d("Passcode lock state changed: $it") }
+                .mapLatest { locked ->
+                    if (locked) PasscodeCheckState.Locked else PasscodeCheckState.UnLocked
+                }
+                .logAndSwallowExceptions()
+                .collectLatest {
+                    _state.emit(it)
+                }
         }
     }
 }

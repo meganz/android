@@ -39,6 +39,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegr
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.core.coroutine.logAndSwallowExceptions
 import mega.privacy.mobile.analytics.event.SyncWorkerForegroundExecutionStartedEvent
 import timber.log.Timber
 import kotlin.time.Duration.Companion.hours
@@ -112,12 +113,12 @@ internal class SyncWorker @AssistedInject constructor(
                 crashReporter.log("${SyncWorker::class.java.simpleName} finished with login failure")
                 return@coroutineScope Result.retry()
             }
-        }.getOrElse {
-            Timber.e(it)
-            cancelNotificationJob()
-            crashReporter.log("${SyncWorker::class.java.simpleName} finished with exception: ${it.message}")
-            return@coroutineScope Result.retry()
-        }
+        }.logAndSwallowExceptions()
+            .getOrElse {
+                cancelNotificationJob()
+                crashReporter.log("${SyncWorker::class.java.simpleName} finished with exception: ${it.message}")
+                return@coroutineScope Result.retry()
+            }
     }
 
     private suspend fun tryPromoteToForeground(): Boolean {

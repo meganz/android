@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.coroutine.logAndSwallowExceptions
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -49,7 +50,7 @@ class GlobalNetworkStateHandler @Inject constructor(
                     }
                     runCatching {
                         startCameraUploadUseCase()
-                    }.onFailure { Timber.e(it) }
+                    }.logAndSwallowExceptions()
                 } else {
                     Timber.d("Network state: DISCONNECTED")
                     (application as MegaApplication).localIpAddress = null

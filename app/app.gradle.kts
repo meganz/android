@@ -248,6 +248,7 @@ dependencies {
     implementation(project(":core:ui-components:achievement-snowflake-components"))
     implementation(project(":core:navigation-snowflake-components"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":core:feature-flags"))
     implementation(project(":feature:cloud-drive:cloud-drive"))
     implementation(project(":feature:document-scanner:document-scanner"))

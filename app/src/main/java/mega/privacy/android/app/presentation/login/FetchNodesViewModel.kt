@@ -8,6 +8,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -27,6 +28,7 @@ import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.newError
 import mega.privacy.android.app.presentation.login.model.FetchNodesUiState
 import mega.privacy.android.app.presentation.login.model.LoginState
+import mega.privacy.android.core.coroutine.logAndSwallowExceptions
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -138,9 +140,7 @@ class FetchNodesViewModel @AssistedInject constructor(
                             it.copy(requestStatusProgress = progress)
                         }
                     }
-            }.onFailure {
-                Timber.e(it)
-            }
+            }.logAndSwallowExceptions()
         }
     }
 
@@ -324,17 +324,24 @@ class FetchNodesViewModel @AssistedInject constructor(
                     }
                 }
             }.onFailure { exception ->
-                Timber.e(exception)
-                if (exception !is FetchNodesException) return@launch
+                when (exception) {
+                    is CancellationException -> return@launch
+                    !is FetchNodesException -> {
+                        Timber.e(exception)
+                        return@launch
+                    }
 
-                _state.update { state ->
-                    val messageId =
-                        exception.takeUnless { exception is FetchNodesErrorAccess }
+                    else -> {
+                        _state.update { state ->
+                            val messageId =
+                                exception.takeUnless { exception is FetchNodesErrorAccess }
 
-                    state.copy(
-                        snackbarMessage = messageId?.let { triggered(exception.error) }
-                            ?: consumed()
-                    )
+                            state.copy(
+                                snackbarMessage = messageId?.let { triggered(exception.error) }
+                                    ?: consumed()
+                            )
+                        }
+                    }
                 }
             }
         }

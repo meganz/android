@@ -22,6 +22,7 @@ android {
 dependencies {
     implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:feature-flags"))
     testImplementation(project(":core-test"))
