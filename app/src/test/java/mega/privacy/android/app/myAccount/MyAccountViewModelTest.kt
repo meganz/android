@@ -776,6 +776,7 @@ internal class MyAccountViewModelTest {
                 transferDetail = AccountTransferDetail(
                     totalTransfer = 100L,
                     usedTransfer = usedTransferPercentage.toLong(),
+                    usedTransferPercentage = usedTransferPercentage,
                 ),
             )
         )

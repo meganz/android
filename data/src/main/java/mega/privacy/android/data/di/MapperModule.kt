@@ -9,7 +9,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.mapper.AccountSessionDetailMapper
 import mega.privacy.android.data.mapper.AccountStorageDetailMapper
-import mega.privacy.android.data.mapper.AccountTransferDetailMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
@@ -45,7 +44,6 @@ import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.toAccountSessionDetail
 import mega.privacy.android.data.mapper.toAccountStorageDetail
-import mega.privacy.android.data.mapper.toAccountTransferDetail
 import mega.privacy.android.data.mapper.toAchievementsOverview
 import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toContactRequest
@@ -210,13 +208,6 @@ internal abstract class MapperModule {
         @Provides
         fun provideChatFilesFolderUserAttributeMapper(): ChatFilesFolderUserAttributeMapper =
             ::toChatFilesFolderUserAttribute
-
-        /**
-         * Provide account transfer detail mapper
-         */
-        @Provides
-        fun provideAccountTransferDetailMapper(): AccountTransferDetailMapper =
-            ::toAccountTransferDetail
 
         /**
          * Provide account session detail mapper

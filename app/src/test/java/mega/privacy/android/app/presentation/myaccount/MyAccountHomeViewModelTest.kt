@@ -304,15 +304,18 @@ class MyAccountHomeViewModelTest {
         usedTransferStatus: UsedTransferStatus,
     ) =
         runTest {
-            val accountDetail =
-                AccountDetail(transferDetail = AccountTransferDetail(totalTransfer, usedTransfer))
-            whenever(accountDetail.transferDetail?.usedTransferPercentage?.let {
-                getUsedTransferStatusUseCase(
-                    it
+            val usedTransferPercentage = if (totalTransfer > 0) {
+                ((usedTransfer.toDouble() / totalTransfer.toDouble()) * 100).toInt()
+            } else 0
+            val accountDetail = AccountDetail(
+                transferDetail = AccountTransferDetail(
+                    totalTransfer = totalTransfer,
+                    usedTransfer = usedTransfer,
+                    usedTransferPercentage = usedTransferPercentage,
                 )
-            }).thenReturn(
-                usedTransferStatus
             )
+            whenever(getUsedTransferStatusUseCase(usedTransferPercentage))
+                .thenReturn(usedTransferStatus)
             accountDetailFlow.emit(accountDetail)
 
             advanceUntilIdle()

@@ -546,6 +546,7 @@ private fun emptyStorageDetail() = AccountStorageDetail(
 private fun defaultTransferDetail() = AccountTransferDetail(
     totalTransfer = 1L,
     usedTransfer = 0L,
+    usedTransferPercentage = 0,
 )
 
 private fun defaultFreeAccountDetail() = AccountDetail(
@@ -655,5 +656,6 @@ private fun accountDetailWithStorage(
     transferDetail = AccountTransferDetail(
         totalTransfer = 1L,
         usedTransfer = 0L,
+        usedTransferPercentage = 0,
     ),
 )
