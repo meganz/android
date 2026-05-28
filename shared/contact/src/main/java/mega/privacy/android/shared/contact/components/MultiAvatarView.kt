@@ -45,7 +45,6 @@ fun MultiAvatarView(
                     avatar = avatars.first(),
                     displayName = "",
                     isVerified = false,
-                    selected = false,
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -55,7 +54,6 @@ fun MultiAvatarView(
                         avatar = avatars[1],
                         displayName = "",
                         isVerified = false,
-                        selected = false,
                         modifier = Modifier
                             .size(26.dp)
                             .align(Alignment.BottomEnd)
@@ -65,7 +63,6 @@ fun MultiAvatarView(
                         avatar = avatars[0],
                         displayName = "",
                         isVerified = false,
-                        selected = false,
                         modifier = Modifier
                             .size(26.dp)
                             .align(Alignment.TopStart)

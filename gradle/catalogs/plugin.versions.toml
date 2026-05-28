@@ -14,7 +14,7 @@ megagradle = "0.88.20260519024856"
 jfrog-artifactory = "6.0.4"
 serialisation = "2.3.21"
 benchmark-baseline-profile = "1.5.0-alpha06"
-compose-screenshot = "0.0.1-alpha14"
+compose-screenshot = "0.0.1-alpha15"
 
 [libraries]
 build-tools = { module = "com.android.tools.build:gradle", version.ref = "gradle" }

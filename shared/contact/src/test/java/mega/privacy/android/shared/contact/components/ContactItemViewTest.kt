@@ -1,8 +1,11 @@
 package mega.privacy.android.shared.contact.components
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
@@ -43,6 +46,7 @@ class ContactItemViewTest {
         onLongClick: (() -> Unit)? = this.onLongClick,
         onAvatarClick: (() -> Unit)? = this.onAvatarClick,
         onMoreClicked: (() -> Unit)? = this.onMoreClicked,
+        inSelectionMode: Boolean = false,
     ) {
         composeTestRule.setContent {
             ContactItemView(
@@ -51,6 +55,7 @@ class ContactItemViewTest {
                 onLongClick = onLongClick,
                 onAvatarClick = onAvatarClick,
                 onMoreClicked = onMoreClicked,
+                inSelectionMode = inSelectionMode,
             )
         }
     }
@@ -120,5 +125,30 @@ class ContactItemViewTest {
         setContent(contact = contact.copy(isVerified = false))
         composeTestRule.onNodeWithTag(CONTACT_ITEM_VIEW_VERIFIED_BADGE, useUnmergedTree = true)
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that checkbox is shown when inSelectionMode is true`() {
+        setContent(inSelectionMode = true)
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_CHECKBOX, useUnmergedTree = true)
+            .onFirst()
+            .assertExists()
+    }
+
+    @Test
+    fun `test that kebab is hidden when inSelectionMode is true`() {
+        setContent(inSelectionMode = true)
+        composeTestRule.onNodeWithTag(CONTACT_ITEM_VIEW_MORE, useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_CHECKBOX, useUnmergedTree = true)
+            .onFirst()
+            .assertExists()
+    }
+
+    @Test
+    fun `test that checkbox is not shown when inSelectionMode is false`() {
+        setContent(inSelectionMode = false)
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_CHECKBOX, useUnmergedTree = true)
+            .assertCountEquals(0)
     }
 }

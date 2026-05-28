@@ -48,7 +48,6 @@ fun bindShareContactRow(composeView: ComposeView, state: ShareContactRowState) {
             state.uiState?.let { uiState ->
                 ContactItemView(
                     contactItemUiState = uiState,
-                    showDivider = false,
                     selected = state.isSelected,
                     onClick = state.onClick,
                     onLongClick = state.onLongClick,

@@ -38,7 +38,6 @@ fun bindContactListRow(composeView: ComposeView, state: ContactListRowState) {
                     onClick = state.onClick,
                     onAvatarClick = state.onAvatarClick,
                     onMoreClicked = state.onMoreClicked,
-                    showDivider = true,
                 )
             }
         }

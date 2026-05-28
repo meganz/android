@@ -71,7 +71,6 @@ internal fun ShareRecipientView(
         isVerified = shareRecipient.isVerified,
         modifier = modifier.testTag(SHARE_RECIPIENT_CONTACT_ITEM),
         selected = selected,
-        showDivider = false,
     )
 }
 

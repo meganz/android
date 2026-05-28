@@ -61,24 +61,7 @@ class ContactItemViewScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
-    fun ContactItemViewSelected() {
-        AndroidThemeForPreviews {
-            ContactItemView(
-                displayName = "Diana",
-                statusText = "Online",
-                status = ContactItemStatus.Online,
-                avatar = AvatarData.Initials(initials = "D", avatarColor = Color(0xFFE65100)),
-                isVerified = false,
-                onClick = {},
-                selected = true,
-            )
-        }
-    }
-
-    @PreviewTest
-    @CombinedThemePreviews
-    @Composable
-    fun ContactItemViewNoDivider() {
+    fun ContactItemViewSelectionModeUnselected() {
         AndroidThemeForPreviews {
             ContactItemView(
                 displayName = "Eve",
@@ -87,7 +70,43 @@ class ContactItemViewScreenshotTest {
                 avatar = AvatarData.Initials(initials = "E", avatarColor = Color(0xFFAD1457)),
                 isVerified = true,
                 onClick = {},
-                showDivider = false,
+                inSelectionMode = true,
+                selected = false,
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ContactItemViewSelectionModeSelected() {
+        AndroidThemeForPreviews {
+            ContactItemView(
+                displayName = "Eve",
+                statusText = "Busy",
+                status = ContactItemStatus.Busy,
+                avatar = AvatarData.Initials(initials = "E", avatarColor = Color(0xFFAD1457)),
+                isVerified = true,
+                onClick = {},
+                inSelectionMode = true,
+                selected = true,
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ContactItemViewMoreMenu() {
+        AndroidThemeForPreviews {
+            ContactItemView(
+                displayName = "Eve",
+                statusText = "Busy",
+                status = ContactItemStatus.Busy,
+                avatar = AvatarData.Initials(initials = "E", avatarColor = Color(0xFFAD1457)),
+                isVerified = true,
+                onClick = {},
+                onMoreClicked = {},
             )
         }
     }

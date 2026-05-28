@@ -244,7 +244,6 @@ class ContactRequestsPageFragment : Fragment() {
                 avatarFile = avatarFile,
                 avatarColorArgb = avatarColorArgb,
             ),
-            showDivider = false,
         )
         MegaDivider(dividerType = DividerType.SmallStartPadding)
         actions.forEachIndexed { index, action ->

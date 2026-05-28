@@ -3,10 +3,11 @@ package mega.privacy.android.shared.contact.components
 import android.text.format.DateFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -16,9 +17,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
+import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.contact.component.ContactStatusDot
 import mega.android.core.ui.components.contact.state.ContactItemStatus
-import mega.android.core.ui.components.divider.SubtleDivider
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -43,7 +45,7 @@ import java.util.Calendar
  * @param onAvatarClick When non-null, taps on the avatar fire this instead of bubbling up to [onClick].
  * @param onMoreClicked When non-null, a trailing kebab icon is rendered and fires this on tap.
  * @param selected
- * @param showDivider
+ * @param inSelectionMode
  */
 @Composable
 fun ContactItemView(
@@ -54,7 +56,7 @@ fun ContactItemView(
     onAvatarClick: (() -> Unit)? = null,
     onMoreClicked: (() -> Unit)? = null,
     selected: Boolean = false,
-    showDivider: Boolean = true,
+    inSelectionMode: Boolean = false,
 ) {
     val statusString = stringResource(id = statusText(contactItemUiState.status))
     val lastSeenText =
@@ -76,7 +78,7 @@ fun ContactItemView(
         onAvatarClick = onAvatarClick,
         onMoreClicked = onMoreClicked,
         selected = selected,
-        showDivider = showDivider,
+        inSelectionMode = inSelectionMode,
     )
 }
 
@@ -84,8 +86,8 @@ fun ContactItemView(
  * Renders a single contact row with an avatar, display name, optional
  * subtitle, an inline status indicator, and an optional verified badge.
  *
- * Uses the design-system primitives `FlexibleLineListItem`,
- * `MediumProfilePicture`, and `SubtleDivider`.
+ * Uses the design-system primitives `FlexibleLineListItem` and
+ * `MediumProfilePicture`.
  *
  * @param displayName Name to render as the row title.
  * @param statusText Pre-resolved subtitle (status label or "Last seen …"); null hides the subtitle.
@@ -98,7 +100,7 @@ fun ContactItemView(
  * @param onAvatarClick When non-null, taps on the avatar fire this instead of bubbling up to [onClick].
  * @param onMoreClicked When non-null, a trailing kebab icon is rendered and fires this on tap.
  * @param selected When true, replaces the avatar with a brand-coloured check tile (multi-select pickers).
- * @param showDivider Toggles the bottom divider.
+ * @param inSelectionMode When true, renders a trailing checkbox in place of the kebab.
  */
 @Composable
 fun ContactItemView(
@@ -113,48 +115,63 @@ fun ContactItemView(
     onAvatarClick: (() -> Unit)? = null,
     onMoreClicked: (() -> Unit)? = null,
     selected: Boolean = false,
-    showDivider: Boolean = true,
+    inSelectionMode: Boolean = false,
 ) {
-    Column(modifier = modifier) {
-        FlexibleLineListItem(
-            modifier = Modifier.testTag(CONTACT_ITEM_VIEW_ROW),
-            title = displayName,
-            subtitle = statusText,
-            titleMaxLines = 1,
-            subtitleMaxLines = 1,
-            enableClick = onClick != null || onLongClick != null,
-            onClickListener = onClick ?: {},
-            onLongClickListener = onLongClick ?: {},
-            leadingElement = {
-                if (onAvatarClick != null) {
-                    Box(
-                        modifier = Modifier
-                            .testTag(CONTACT_ITEM_VIEW_AVATAR_CLICK)
-                            .clip(CircleShape)
-                            .clickable(onClick = onAvatarClick)
-                    ) {
-                        ContactAvatar(
-                            avatar = avatar,
-                            displayName = displayName,
-                            isVerified = isVerified,
-                            selected = selected,
-                        )
-                    }
-                } else {
+    FlexibleLineListItem(
+        modifier = modifier.testTag(CONTACT_ITEM_VIEW_ROW),
+        title = displayName,
+        subtitle = statusText,
+        titleMaxLines = 1,
+        subtitleMaxLines = 1,
+        enableClick = onClick != null || onLongClick != null,
+        onClickListener = onClick ?: {},
+        onLongClickListener = onLongClick ?: {},
+        leadingElement = {
+            if (onAvatarClick != null) {
+                Box(
+                    modifier = Modifier
+                        .testTag(CONTACT_ITEM_VIEW_AVATAR_CLICK)
+                        .clip(CircleShape)
+                        .clickable(onClick = onAvatarClick)
+                ) {
                     ContactAvatar(
                         avatar = avatar,
                         displayName = displayName,
                         isVerified = isVerified,
-                        selected = selected,
                     )
                 }
-            },
-            titleTrailingElement = if (status == ContactItemStatus.Unknown) {
-                null
             } else {
-                { ContactStatusDot(status) }
-            },
-            trailingElement = if (onMoreClicked != null) {
+                ContactAvatar(
+                    avatar = avatar,
+                    displayName = displayName,
+                    isVerified = isVerified,
+                )
+            }
+        },
+        titleTrailingElement = if (status == ContactItemStatus.Unknown) {
+            null
+        } else {
+            { ContactStatusDot(status) }
+        },
+        trailingElement = when {
+            inSelectionMode -> {
+                {
+                    Box(
+                        modifier = Modifier.size(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Checkbox(
+                            checked = selected,
+                            onCheckStateChanged = {},
+                            tapTargetArea = false,
+                            clickable = false,
+                            modifier = Modifier.testTag(CONTACT_ITEM_VIEW_CHECKBOX),
+                        )
+                    }
+                }
+            }
+
+            onMoreClicked != null -> {
                 {
                     IconButton(
                         onClick = onMoreClicked,
@@ -167,10 +184,11 @@ fun ContactItemView(
                         )
                     }
                 }
-            } else null,
-        )
-        if (showDivider) SubtleDivider()
-    }
+            }
+
+            else -> null
+        },
+    )
 }
 
 
@@ -254,6 +272,7 @@ internal const val CONTACT_ITEM_VIEW_ROW = "contact_item_view:row"
 internal const val CONTACT_ITEM_VIEW_VERIFIED_BADGE = "contact_item_view:verified_badge"
 internal const val CONTACT_ITEM_VIEW_AVATAR_CLICK = "contact_item_view:avatar_click"
 internal const val CONTACT_ITEM_VIEW_MORE = "contact_item_view:more"
+internal const val CONTACT_ITEM_VIEW_CHECKBOX = "contact_item_view:checkbox"
 
 private class ContactItemPreviewProvider :
     CollectionPreviewParameterProvider<ContactItemUiState>(
@@ -300,7 +319,7 @@ private fun ContactItemViewPreview(
 
 @CombinedThemePreviews
 @Composable
-private fun ContactItemViewSelectedPreview() {
+private fun ContactItemViewSelectionModeUnselectedPreview() {
     AndroidThemeForPreviews {
         ContactItemView(
             displayName = "Diana",
@@ -309,7 +328,41 @@ private fun ContactItemViewSelectedPreview() {
             avatar = AvatarData.Initials(initials = "D", avatarColor = Color(0xFFE65100)),
             isVerified = false,
             onClick = {},
+            inSelectionMode = true,
+            selected = false,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ContactItemViewSelectionModeSelectedPreview() {
+    AndroidThemeForPreviews {
+        ContactItemView(
+            displayName = "Diana",
+            statusText = "Online",
+            status = ContactItemStatus.Online,
+            avatar = AvatarData.Initials(initials = "D", avatarColor = Color(0xFFE65100)),
+            isVerified = false,
+            onClick = {},
+            inSelectionMode = true,
             selected = true,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ContactItemViewMoreMenuPreview() {
+    AndroidThemeForPreviews {
+        ContactItemView(
+            displayName = "Diana",
+            statusText = "Online",
+            status = ContactItemStatus.Online,
+            avatar = AvatarData.Initials(initials = "D", avatarColor = Color(0xFFE65100)),
+            isVerified = false,
+            onClick = {},
+            onMoreClicked = {},
         )
     }
 }
