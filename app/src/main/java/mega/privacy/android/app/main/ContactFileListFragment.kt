@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -70,6 +71,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
+import java.io.Serializable
 import java.util.Stack
 import javax.inject.Inject
 
@@ -322,9 +324,14 @@ class ContactFileListFragment : ContactFileBaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        if (savedInstanceState != null) {
-            parentHandleStack =
-                savedInstanceState.getSerializable(PARENT_HANDLE_STACK) as Stack<Long>?
+        // After process death `getSerializable` may return an ArrayList instead of the
+        // original Stack — copy into a fresh Stack rather than casting.
+        val bundle = savedInstanceState ?: return
+        val restored = BundleCompat.getSerializable(
+            bundle, PARENT_HANDLE_STACK, Serializable::class.java,
+        ) as? Collection<*> ?: return
+        parentHandleStack = Stack<Long>().apply {
+            restored.filterIsInstance<Long>().forEach { push(it) }
         }
     }
 

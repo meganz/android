@@ -8,8 +8,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -17,18 +15,10 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.ui.NavDisplay
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
-import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
-import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_CLOUD_DRIVE_PARENT_HANDLE
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_ORIGINATED_FROM_CHAT
@@ -36,18 +26,11 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_SOLO_IMAGE_URI
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.INITIAL_FILENAME_FORMAT
 import mega.privacy.android.app.presentation.documentscanner.navigation.SaveScannedDocumentsDestination
-import mega.privacy.android.app.presentation.documentscanner.navigation.SaveScannedDocumentsNavigationHandler
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
-import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
-import mega.privacy.android.navigation.contract.shared.rememberSharedViewModelStoreNavEntryDecorator
-import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.shared.resources.R as SharedR
 import javax.inject.Inject
@@ -81,7 +64,8 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val themeMode by monitorThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = themeMode.isDarkMode().not()
             systemUiController.setSystemBarsColor(
@@ -89,107 +73,56 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
                 darkIcons = useDarkIcons
             )
 
-            MegaAppContainer(
-                themeMode = themeMode,
-            ) {
-                val initialNavKey = remember { buildInitialNavKey() }
-                val backStack = rememberPendingBackStack(initialNavKey)
-                val navigationHandler = remember {
-                    SaveScannedDocumentsNavigationHandler(
-                        backStack = backStack,
-                        navigationResultManager = navigationResultManager,
-                        onEmptyBackStack = { if (!isFinishing) finish() },
+            val initialNavKey = remember { buildInitialNavKey() }
+            LegacyActivityScaffold(
+                container = { content ->
+                    MegaAppContainer(
+                        themeMode = themeMode,
+                        finishOnSessionRefresh = false,
+                        content = content
                     )
-                }
-                val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
-                val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
-                val transferHandler = remember(appTransferViewModel) {
-                    object : TransferHandler {
-                        override fun setTransferEvent(event: TransferTriggerEvent) {
-                            appTransferViewModel.setTransferEvent(event)
+                },
+                initialKey = initialNavKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
+                excludeOwnDestination = SaveScannedDocumentsDestination::class,
+                onEmptyBackStack = { if (!isFinishing) finish() },
+            ) { navigationHandler, _ ->
+                entry<SaveScannedDocumentsNavKey> { key ->
+                    val resources = LocalResources.current
+                    val viewModel =
+                        hiltViewModel<SaveScannedDocumentsViewModel, SaveScannedDocumentsViewModel.Factory> { factory ->
+                            factory.create(
+                                SaveScannedDocumentsViewModel.Args(
+                                    originatedFromChat = key.originatedFromChat,
+                                    cloudDriveParentHandle = key.cloudDriveParentHandle
+                                        ?.takeIf { it != -1L },
+                                    pdfUri = key.scanPdfUri.takeIf { it.isNotEmpty() }
+                                        ?.toUri(),
+                                    soloImageUri = key.scanSoloImageUri?.toUri(),
+                                    fileFormat = resources.getString(
+                                        SharedR.string.document_scanning_default_file_name
+                                    ),
+                                )
+                            )
                         }
-                    }
-                }
-                val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
-                val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
-                val snackbarHostState = remember { SnackbarHostState() }
+                    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-                CompositionLocalProvider(
-                    LocalSnackBarHostState provides snackbarHostState
-                ) {
-                    SnackbarLifetimeController()
-                    NavDisplay(
-                        backStack = backStack,
-                        onBack = { navigationHandler.back() },
-                        sceneStrategies = listOf(dialogStrategy, bottomSheetStrategy),
-                        entryDecorators = listOf(
-                            rememberSaveableStateHolderNavEntryDecorator(),
-                            rememberSharedViewModelStoreNavEntryDecorator(),
-                        ),
-                        transitionSpec = { fadeTransition },
-                        popTransitionSpec = { fadeTransition },
-                        predictivePopTransitionSpec = { fadeTransition },
-                        entryProvider = entryProvider {
-                            entry<SaveScannedDocumentsNavKey> { key ->
-                                val resources = LocalResources.current
-                                val viewModel =
-                                    hiltViewModel<SaveScannedDocumentsViewModel, SaveScannedDocumentsViewModel.Factory> { factory ->
-                                        factory.create(
-                                            SaveScannedDocumentsViewModel.Args(
-                                                originatedFromChat = key.originatedFromChat,
-                                                cloudDriveParentHandle = key.cloudDriveParentHandle
-                                                    ?.takeIf { it != -1L },
-                                                pdfUri = key.scanPdfUri.takeIf { it.isNotEmpty() }
-                                                    ?.toUri(),
-                                                soloImageUri = key.scanSoloImageUri?.toUri(),
-                                                fileFormat = resources.getString(
-                                                    SharedR.string.document_scanning_default_file_name
-                                                ),
-                                            )
-                                        )
-                                    }
-                                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-                                SaveScannedDocumentsView(
-                                    uiState = uiState,
-                                    onFilenameChanged = viewModel::onFilenameChanged,
-                                    onFilenameConfirmed = viewModel::onFilenameConfirmed,
-                                    onSaveButtonClicked = viewModel::onSaveButtonClicked,
-                                    onScanDestinationSelected = viewModel::onScanDestinationSelected,
-                                    onScanFileTypeSelected = viewModel::onScanFileTypeSelected,
-                                    onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
-                                    onUploadScansEventConsumed = viewModel::onUploadScansEventConsumed,
-                                    onBackToChat = ::redirectBackToChat,
-                                    onNavigate = { navKeys ->
-                                        navigationHandler.navigate(navKeys)
-                                        navigationHandler.remove(key)
-                                    },
-                                )
-                            }
-
-                            featureDestinations
-                                .filterNot { it is SaveScannedDocumentsDestination }
-                                .forEach { destination ->
-                                    destination.navigationGraph(
-                                        this,
-                                        navigationHandler,
-                                        transferHandler,
-                                    )
-                                }
-
-                            appDialogDestinations.forEach { destination ->
-                                destination.navigationGraph(
-                                    this,
-                                    navigationHandler,
-                                    {},
-                                )
-                            }
+                    SaveScannedDocumentsView(
+                        uiState = uiState,
+                        onFilenameChanged = viewModel::onFilenameChanged,
+                        onFilenameConfirmed = viewModel::onFilenameConfirmed,
+                        onSaveButtonClicked = viewModel::onSaveButtonClicked,
+                        onScanDestinationSelected = viewModel::onScanDestinationSelected,
+                        onScanFileTypeSelected = viewModel::onScanFileTypeSelected,
+                        onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+                        onUploadScansEventConsumed = viewModel::onUploadScansEventConsumed,
+                        onBackToChat = ::redirectBackToChat,
+                        onNavigate = { navKeys ->
+                            navigationHandler.navigate(navKeys)
+                            navigationHandler.remove(key)
                         },
-                    )
-
-                    StartTransferComponent(
-                        event = transferState.transferEvent,
-                        onConsumeEvent = appTransferViewModel::consumedTransferEvent,
                     )
                 }
             }

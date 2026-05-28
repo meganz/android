@@ -27,6 +27,7 @@ data class UploadScannedDocumentNavKey(
     val hasMultipleScans: Boolean = false,
 ) : ExplorerNavKey
 
+@Serializable
 data object SelectCUFolderNavKey : ExplorerNavKey {
     const val RESULT = "SelectCUFolderNavKey::result"
 }

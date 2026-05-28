@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.settings.camerauploads.navigation
+package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
@@ -6,15 +6,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
-import mega.privacy.android.app.appstate.content.navigation.PendingBackStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class SettingsCameraUploadsNavigationHandlerTest {
+internal class LegacyActivityNavigationHandlerTest {
 
-    private lateinit var underTest: SettingsCameraUploadsNavigationHandler
+    private lateinit var underTest: LegacyActivityNavigationHandler
 
     private val navigationResultManager = NavigationResultManager()
     private val backStack = PendingBackStack(NavBackStack<NavKey>())
@@ -34,7 +32,7 @@ internal class SettingsCameraUploadsNavigationHandlerTest {
         backStack.clear()
         backStack.add(Root)
         onEmptyBackStackCalls = 0
-        underTest = SettingsCameraUploadsNavigationHandler(
+        underTest = LegacyActivityNavigationHandler(
             backStack = backStack,
             navigationResultManager = navigationResultManager,
             onEmptyBackStack = { onEmptyBackStackCalls++ },
@@ -171,5 +169,18 @@ internal class SettingsCameraUploadsNavigationHandlerTest {
         navigationResultManager.monitorResult<String>("key").test {
             assertThat(awaitItem()).isNull()
         }
+    }
+
+    @Test
+    fun `test that default onEmptyBackStack keeps the bottom entry pinned`() {
+        underTest = LegacyActivityNavigationHandler(
+            backStack = backStack,
+            navigationResultManager = navigationResultManager,
+        )
+
+        underTest.back()
+        underTest.backTo(Root, inclusive = true)
+
+        assertThat(backStack.toList()).containsExactly(Root)
     }
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.components.chatsession
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -42,7 +42,7 @@ internal fun ChatSessionContainer(
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
+    val context = LocalActivity.current
 
     LaunchedEffect(state) {
         if (state.sessionState is ChatSessionState.Invalid) {

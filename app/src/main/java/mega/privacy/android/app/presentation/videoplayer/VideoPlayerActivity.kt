@@ -18,9 +18,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,11 +31,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import de.palm.composestateevents.EventEffect
@@ -54,9 +46,8 @@ import mega.android.core.ui.model.SnackbarDuration
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
-import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackStack
-import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
@@ -69,10 +60,8 @@ import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
-import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerNavigationHandler
 import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerScreenNavKey
 import mega.privacy.android.app.presentation.videoplayer.navigation.videoPlayerEntryProvider
 import mega.privacy.android.app.utils.ChatUtil
@@ -92,7 +81,6 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
-import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
@@ -206,80 +194,61 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
         exoPlayer = createPlayer()
         videoPlayerViewModelV2.initRepeatToggleMode()
         setContent {
-            val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val mode by monitorThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             var passcodeEnabled by remember { mutableStateOf(true) }
-            val backStack = rememberPendingBackStack(VideoPlayerScreenNavKey)
-            val navigationHandler = remember {
-                VideoPlayerNavigationHandler(backStack, navigationResultManager)
-            }
-            val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
-            val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
             val uiState by videoPlayerViewModelV2.uiState.collectAsStateWithLifecycle()
-            val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
-            val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
-            val snackbarHostState = remember { SnackbarHostState() }
             val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
-            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
+            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState
+                .collectAsStateWithLifecycle()
 
-            LaunchedEffect(uiState.snackBarMessage) {
-                uiState.snackBarMessage?.let { message ->
-                    snackbarHostState.showAutoDurationSnackbar(message)
-                    videoPlayerViewModelV2.updateSnackBarMessage(null)
-                }
-            }
-
-            EventEffect(
-                event = snackbarEventsState,
-                onConsumed = snackbarEventsViewModel::consumeEvent,
-                action = { event ->
-                    snackbarHostState.showAutoDurationSnackbar(event.attributes.message.orEmpty())
-                }
-            )
-
-            val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
-                { PsaContainer(content = it) },
-                {
-                    PasscodeContainer(
-                        canLock = { passcodeEnabled },
-                        content = it
+            LegacyActivityScaffold(
+                container = { content ->
+                    AppContainer(
+                        containers = listOf(
+                            { PsaContainer(content = it) },
+                            { PasscodeContainer(canLock = { passcodeEnabled }, content = it) },
+                            { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
+                        ),
+                        content = content,
                     )
                 },
-                { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
-            )
-
-            AppContainer(
-                containers = containers
-            ) {
-                CompositionLocalProvider(
-                    LocalSnackBarHostState provides snackbarHostState
-                ) {
-                    NavDisplay(
-                        backStack = backStack,
-                        onBack = { navigationHandler.back() },
-                        sceneStrategies = listOf(dialogStrategy, bottomSheetStrategy),
-                        entryDecorators = listOf(
-                            rememberSaveableStateHolderNavEntryDecorator(),
-                        ),
-                        entryProvider = entryProvider {
-                            videoPlayerEntryProvider(
-                                navigationHandler = navigationHandler,
-                                viewModel = videoPlayerViewModelV2,
-                                player = exoPlayer,
-                                handleAutoReplayIfPaused = videoPlayerViewModelV2::handleAutoReplayIfPaused,
-                                onTransfer = appTransferViewModel::setTransferEvent,
-                                featureDestinations = featureDestinations,
-                                onRetry = { mediaPlayerGateway.mediaPlayerRetry(true) },
-                                onFinish = { if (!isFinishing) finish() },
-                                onEnterPip = ::enterPipModeIfPossible,
+                initialKey = VideoPlayerScreenNavKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                overlayContent = {
+                    // LegacyActivityScaffold always installs LocalSnackBarHostState before
+                    // composing overlayContent — fail fast if that invariant ever breaks.
+                    val snackbarHostState = requireNotNull(LocalSnackBarHostState.current) {
+                        "LocalSnackBarHostState not provided"
+                    }
+                    LaunchedEffect(uiState.snackBarMessage) {
+                        uiState.snackBarMessage?.let { message ->
+                            snackbarHostState.showAutoDurationSnackbar(message)
+                            videoPlayerViewModelV2.updateSnackBarMessage(null)
+                        }
+                    }
+                    EventEffect(
+                        event = snackbarEventsState,
+                        onConsumed = snackbarEventsViewModel::consumeEvent,
+                        action = { event ->
+                            snackbarHostState.showAutoDurationSnackbar(
+                                event.attributes.message.orEmpty()
                             )
-                        },
+                        }
                     )
-
-                    StartTransferComponent(
-                        event = transferState.transferEvent,
-                        onConsumeEvent = appTransferViewModel::consumedTransferEvent,
-                    )
-                }
+                },
+            ) { navigationHandler, transferHandler ->
+                videoPlayerEntryProvider(
+                    navigationHandler = navigationHandler,
+                    viewModel = videoPlayerViewModelV2,
+                    player = exoPlayer,
+                    handleAutoReplayIfPaused = videoPlayerViewModelV2::handleAutoReplayIfPaused,
+                    onTransfer = transferHandler::setTransferEvent,
+                    onRetry = { mediaPlayerGateway.mediaPlayerRetry(true) },
+                    onFinish = { if (!isFinishing) finish() },
+                    onEnterPip = ::enterPipModeIfPossible,
+                )
             }
         }
         videoPlayerViewModelV2.initVideoPlayerData(intent)

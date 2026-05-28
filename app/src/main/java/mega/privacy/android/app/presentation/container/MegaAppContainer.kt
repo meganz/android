@@ -19,6 +19,7 @@ val LocalIsDarkTheme = staticCompositionLocalOf { false }
  * Mega app container
  *
  * @param themeMode
+ * @param finishOnSessionRefresh forwarded to [SessionContainer]
  * @param content
  *
  * *** IMPORTANT PLEASE NOTE ***
@@ -27,6 +28,7 @@ val LocalIsDarkTheme = staticCompositionLocalOf { false }
 @Composable
 fun MegaAppContainer(
     themeMode: ThemeMode,
+    finishOnSessionRefresh: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
@@ -45,7 +47,7 @@ fun MegaAppContainer(
                 OriginalTheme(isDark = darkMode, content = it)
             }
         },
-        { SessionContainer(content = it) },
+        { SessionContainer(finishOnSessionRefresh = finishOnSessionRefresh, content = it) },
     )
 
     AppContainer(
@@ -61,6 +63,7 @@ fun MegaAppContainer(
  * @param themeMode
  * @param useLegacyStatusBarColor
  * @param includePsa
+ * @param finishOnSessionRefresh forwarded to [SessionContainer]
  * @param content
  *
  */
@@ -69,6 +72,7 @@ fun SharedAppContainer(
     themeMode: ThemeMode,
     useLegacyStatusBarColor: Boolean = true,
     includePsa: Boolean = true,
+    finishOnSessionRefresh: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val containers: List<@Composable (@Composable () -> Unit) -> Unit> = buildList {
@@ -94,7 +98,7 @@ fun SharedAppContainer(
                 }
             }
         )
-        add({ SessionContainer(content = it) })
+        add({ SessionContainer(finishOnSessionRefresh = finishOnSessionRefresh, content = it) })
     }
 
     AppContainer(
