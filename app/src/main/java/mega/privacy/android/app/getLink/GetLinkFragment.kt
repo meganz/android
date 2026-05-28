@@ -57,12 +57,14 @@ import mega.privacy.android.app.utils.Util.calculateDateFromTimestamp
 import mega.privacy.android.app.utils.Util.calculateTimestamp
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -105,6 +107,10 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @MegaApi
+    @Inject
+    lateinit var megaApi: MegaApiAndroid
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -180,7 +186,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         val node = viewModel.getNode()
         binding.nodeName.text = node?.name
         binding.nodeInfo.text =
-            if (node?.isFolder == true) getMegaNodeFolderInfo(node, requireContext())
+            if (node?.isFolder == true) getMegaNodeFolderInfo(node, megaApi, requireContext())
             else getSizeString(node?.size ?: 0, requireContext())
 
         binding.learnMoreTextButton.setOnClickListener {

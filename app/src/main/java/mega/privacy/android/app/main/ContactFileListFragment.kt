@@ -36,6 +36,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.components.legacyfab.LegacyFabButtonAdd
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_LIST
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
@@ -436,7 +437,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                     _parentHandle,
                     listView as RecyclerView,
                     Constants.CONTACT_FILE_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                    ITEM_VIEW_TYPE_LIST
                 )
             } else {
                 adapter.setNodes(contactNodes)

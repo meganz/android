@@ -3,8 +3,8 @@ package mega.privacy.android.app.utils
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.utils.TextUtil.getFolderInfo
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
@@ -13,36 +13,33 @@ object MegaApiUtils {
     /**
      * Gets the string to show as content of a folder.
      *
-     * @param node The folder to get its string content.
-     * @param context
+     * @param node    The folder to get its string content.
+     * @param megaApi The [MegaApiAndroid] instance to query the folder's children.
+     * @param context Context used to format the resulting string.
      * @return The string to show as content of the folder.
      */
     @JvmStatic
-    fun getMegaNodeFolderInfo(node: MegaNode, context: Context): String {
-        val megaApi = MegaApplication.getInstance().megaApi
-        return getFolderInfo(
-            numFolders = megaApi.getNumChildFolders(node),
-            numFiles = megaApi.getNumChildFiles(node),
-            context = context
-        )
-    }
+    fun getMegaNodeFolderInfo(node: MegaNode, megaApi: MegaApiAndroid, context: Context): String =
+        getFolderInfo(megaApi.getNumChildFolders(node), megaApi.getNumChildFiles(node), context)
 
     /**
      * Gets the string to show as content of a folder link.
      *
-     * @param node The folder to get its string content.
-     * @param context
+     * @param node          The folder to get its string content.
+     * @param megaApiFolder The folder-link [MegaApiAndroid] instance to query the folder's children.
+     * @param context       Context used to format the resulting string.
      * @return The string to show as content of the folder.
      */
     @JvmStatic
-    fun getMegaNodeFolderLinkInfo(node: MegaNode, context: Context): String {
-        val megaApiFolder = MegaApplication.getInstance().megaApiFolder
-        return getFolderInfo(
-            numFolders = megaApiFolder.getNumChildFolders(node),
-            numFiles = megaApiFolder.getNumChildFiles(node),
-            context = context
-        )
-    }
+    fun getMegaNodeFolderLinkInfo(
+        node: MegaNode,
+        megaApiFolder: MegaApiAndroid,
+        context: Context,
+    ): String = getFolderInfo(
+        megaApiFolder.getNumChildFolders(node),
+        megaApiFolder.getNumChildFiles(node),
+        context
+    )
 
     /**
      * If there is an application that can manage the Intent, returns true. Otherwise, false.

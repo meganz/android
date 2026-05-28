@@ -27,6 +27,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.ContactFileBaseFragment
 import mega.privacy.android.app.main.ContactFileListActivity
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_LIST
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.contactinfo.LegacyContactInfoViewModel
@@ -100,7 +101,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                     -1,
                     listView,
                     Constants.CONTACT_SHARED_FOLDER_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                    ITEM_VIEW_TYPE_LIST
                 )
             } else {
                 adapter.setNodes(contactNodes)

@@ -47,6 +47,9 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel.Compani
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.ContactFileListFragment
 import mega.privacy.android.app.main.DrawerItem
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_GRID
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_HEADER
+import mega.privacy.android.app.main.adapters.LegacyAdapterViewType.ITEM_VIEW_TYPE_LIST
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter.ViewHolderBrowser
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.utils.ColorUtils
@@ -960,11 +963,13 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
             holder.imageView?.layoutParams = params
 
             holder.textViewFileSize?.visibility = View.VISIBLE
-            holder.textViewFileSize?.apply {
-                text = if (type == Constants.FOLDER_LINK_ADAPTER)
-                    MegaApiUtils.getMegaNodeFolderLinkInfo(node, context)
-                else
-                    MegaApiUtils.getMegaNodeFolderInfo(node, context)
+            holder.textViewFileSize?.let { txtView ->
+                txtView.text = MegaApplication.getInstance().megaApiFolder.let {
+                    if (type == Constants.FOLDER_LINK_ADAPTER)
+                        MegaApiUtils.getMegaNodeFolderLinkInfo(node, it, txtView.context)
+                    else
+                        MegaApiUtils.getMegaNodeFolderInfo(node, it, txtView.context)
+                }
             }
             holder.versionsIcon?.visibility = View.GONE
 
@@ -1447,9 +1452,5 @@ class MegaNodeAdapter : RecyclerView.Adapter<ViewHolderBrowser?>,
         holder.permissionsIcon?.setImageResource(R.drawable.serious_warning)
     }
 
-    companion object {
-        const val ITEM_VIEW_TYPE_LIST: Int = 0
-        const val ITEM_VIEW_TYPE_GRID: Int = 1
-        const val ITEM_VIEW_TYPE_HEADER: Int = 2
-    }
 }
+

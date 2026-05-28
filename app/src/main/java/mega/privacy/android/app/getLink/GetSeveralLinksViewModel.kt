@@ -96,7 +96,7 @@ class GetSeveralLinksViewModel @Inject constructor(
                         node,
                         node.name,
                         link,
-                        if (node.isFolder) getMegaNodeFolderInfo(node, context) else getSizeString(
+                        if (node.isFolder) getMegaNodeFolderInfo(node, megaApi, context) else getSizeString(
                             node.size,
                             context
                         )
