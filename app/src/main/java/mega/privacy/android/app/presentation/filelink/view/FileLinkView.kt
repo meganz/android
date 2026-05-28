@@ -123,7 +123,7 @@ internal fun FileLinkView(
             ?.let { previewUri ->
                 {
                     PreviewWithShadow(
-                        previewUri = previewUri,
+                        model = previewUri,
                     )
                 }
             },

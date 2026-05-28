@@ -153,7 +153,7 @@ internal fun FileInfoScreen(
                         //looks like automation tool (appium) doesn't see anything behind a scaffold,
                         // so we need to draw [FileInfoHeader] below the Scaffold. The preview needs to be drawn here to don't overlap other views.
                         PreviewWithShadow(
-                            previewUri = previewUri,
+                            model = previewUri,
                         )
                     }
                 },

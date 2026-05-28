@@ -3,20 +3,24 @@ package mega.privacy.android.domain.usecase.offline
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import java.io.File
 import javax.inject.Inject
 
 /**
  * Get OfflineFileInformation by OfflineNodeInformation
  *
+ * The returned `thumbnail` is only populated from local sources (the offline file itself
+ * when `useOriginalImageAsThumbnail` is set, or a previously cached thumbnail on disk).
+ * This use case never reaches the network — UIs should fall back to fetching by node handle
+ * via Coil's MegaThumbnailFetcher when `thumbnail` is null.
  */
 class GetOfflineFileInformationUseCase @Inject constructor(
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
-    private val getThumbnailUseCase: GetThumbnailUseCase,
+    private val thumbnailPreviewRepository: ThumbnailPreviewRepository,
     private val getOfflineFolderInformationUseCase: GetOfflineFolderInformationUseCase,
     private val getOfflineFileTotalSizeUseCase: GetOfflineFileTotalSizeUseCase,
     private val isImageFileUseCase: IsImageFileUseCase,
@@ -63,7 +67,7 @@ class GetOfflineFileInformationUseCase @Inject constructor(
     ): String? = when {
         isFolder -> null
         useOriginalImageAsThumbnail && isImageFileUseCase(UriPath.fromFile(offlineFile)) -> offlineFile
-        else -> getThumbnailUseCase(handle)
+        else -> thumbnailPreviewRepository.getThumbnailFromLocal(handle)
     }?.takeIf { it.exists() }?.toURI()?.toString()
 
     private suspend fun getFolderInfoOrNull(

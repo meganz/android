@@ -23,7 +23,7 @@ import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_050
 
 @Composable
 internal fun PreviewWithShadow(
-    previewUri: String,
+    model: Any,
     modifier: Modifier = Modifier,
 ) {
 
@@ -31,7 +31,7 @@ internal fun PreviewWithShadow(
         modifier = modifier
             .testTag(TEST_TAG_PREVIEW)
             .fillMaxSize(),
-        painter = rememberAsyncImagePainter(model = previewUri),
+        painter = rememberAsyncImagePainter(model = model),
         contentDescription = "Preview",
         contentScale = ContentScale.FillWidth,
     )
@@ -75,7 +75,7 @@ internal fun PreviewWithShadow(
 private fun PreviewWithShadowPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         Box(modifier = Modifier.height(120.dp)) {
-            PreviewWithShadow(previewUri = "a")
+            PreviewWithShadow(model = "a")
         }
     }
 }

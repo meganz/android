@@ -9,6 +9,9 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -100,7 +103,17 @@ private fun formatModifiedDate(offlineFileInformation: OfflineFileInformation): 
 }
 
 /**
- * Extension property to get the thumbnail data as [ThumbnailUriRequest] from [OfflineFileInformation]
+ * Resolves the [ThumbnailData] to hand to Coil for an offline node.
+ *
+ * Prefers a locally-known URI (image-as-thumbnail or cached thumbnail file) and falls back
+ * to a [ThumbnailRequest] keyed by node handle so [mega.privacy.android.app.fetcher.MegaThumbnailFetcher]
+ * can lazily resolve the thumbnail (local cache first, server on miss) per visible row.
  */
-val OfflineFileInformation.thumbnailData
-    get() = thumbnail?.let { ThumbnailUriRequest(UriPath(it)) }
+val OfflineFileInformation.thumbnailData: ThumbnailData?
+    get() {
+        if (isFolder) return null
+        return thumbnail?.let { ThumbnailUriRequest(UriPath(it)) }
+            ?: handle.toLongOrNull()
+                ?.takeIf { it != -1L }
+                ?.let { ThumbnailRequest(NodeId(it)) }
+    }

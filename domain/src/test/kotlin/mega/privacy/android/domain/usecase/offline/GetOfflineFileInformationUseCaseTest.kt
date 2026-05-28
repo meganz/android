@@ -8,10 +8,10 @@ import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.file.IsImageFileUseCase
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +31,7 @@ internal class GetOfflineFileInformationUseCaseTest {
 
     private lateinit var underTest: GetOfflineFileInformationUseCase
     private val getOfflineFileUseCase = mock<GetOfflineFileUseCase>()
-    private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
+    private val thumbnailPreviewRepository = mock<ThumbnailPreviewRepository>()
     private val getOfflineFolderInformationUseCase = mock<GetOfflineFolderInformationUseCase>()
     private val getOfflineFileTotalSizeUseCase = mock<GetOfflineFileTotalSizeUseCase>()
     private val isImageFileUseCase = mock<IsImageFileUseCase>()
@@ -44,7 +44,7 @@ internal class GetOfflineFileInformationUseCaseTest {
     fun setUp() {
         underTest = GetOfflineFileInformationUseCase(
             getOfflineFileUseCase,
-            getThumbnailUseCase,
+            thumbnailPreviewRepository,
             getOfflineFolderInformationUseCase,
             getOfflineFileTotalSizeUseCase,
             isImageFileUseCase,
@@ -160,11 +160,49 @@ internal class GetOfflineFileInformationUseCaseTest {
             assertThat(result.thumbnail).isNull()
         }
 
+    @Test
+    fun `test that thumbnail uses cached local file when node is a non-image file`() = runTest {
+        val cachedThumbnail = File(temporaryFolder, "cached_thumbnail.jpg").apply { createNewFile() }
+        val offlineNodeInformation = mock<OtherOfflineNodeInformation> {
+            on { id } doReturn 3
+            on { isFolder } doReturn false
+            on { name } doReturn "title.pdf"
+            on { lastModifiedTime } doReturn 5679
+            on { handle } doReturn "3"
+            on { path } doReturn "path"
+        }
+        whenever(isImageFileUseCase(any())) doReturn (false)
+        whenever(thumbnailPreviewRepository.getThumbnailFromLocal(3L)) doReturn cachedThumbnail
+
+        val result = underTest(offlineNodeInformation)
+
+        assertThat(result.thumbnail).isEqualTo("file:${cachedThumbnail.path}")
+    }
+
+    @Test
+    fun `test that thumbnail is null when node is a non-image file and no cached thumbnail exists`() =
+        runTest {
+            val offlineNodeInformation = mock<OtherOfflineNodeInformation> {
+                on { id } doReturn 3
+                on { isFolder } doReturn false
+                on { name } doReturn "title.pdf"
+                on { lastModifiedTime } doReturn 5679
+                on { handle } doReturn "3"
+                on { path } doReturn "path"
+            }
+            whenever(isImageFileUseCase(any())) doReturn (false)
+            whenever(thumbnailPreviewRepository.getThumbnailFromLocal(3L)) doReturn null
+
+            val result = underTest(offlineNodeInformation)
+
+            assertThat(result.thumbnail).isNull()
+        }
+
     @AfterEach
     fun resetMocks() {
         reset(
             getOfflineFileUseCase,
-            getThumbnailUseCase,
+            thumbnailPreviewRepository,
             getOfflineFolderInformationUseCase,
             getOfflineFileTotalSizeUseCase,
             isImageFileUseCase,

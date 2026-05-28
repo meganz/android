@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.offline.offlinefileinfocompose.mode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
+import mega.privacy.android.feature.clouddrive.presentation.offline.thumbnailData
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarForCollapsibleHeader
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
@@ -51,18 +52,16 @@ internal fun OfflineFileInfoScreen(
     if (!uiState.isLoading && uiState.offlineFileInformation != null) {
         with(uiState.offlineFileInformation) {
             val iconResource = when {
-                thumbnail != null -> null
+                thumbnailData != null -> null
                 isFolder -> IconPackR.drawable.ic_folder_medium_solid
                 else -> MimeTypeThumbnail.typeForName(name).iconResourceId
             }
 
             ScaffoldWithCollapsibleHeader(
                 modifier = modifier,
-                headerIncludingSystemBar = thumbnail?.let { previewUri ->
+                headerIncludingSystemBar = thumbnailData?.let { data ->
                     {
-                        PreviewWithShadow(
-                            previewUri = previewUri,
-                        )
+                        PreviewWithShadow(model = data)
                     }
                 },
                 topBar = {
