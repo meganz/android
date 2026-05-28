@@ -30,6 +30,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.UpdateA
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.WhatsNewInitializer
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
+import mega.privacy.android.app.main.ads.initialiser.MobileAdsInitialiser
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutInitialiser
 import mega.privacy.android.app.sslverification.initialiser.SSLErrorMonitorInitialiser
 import mega.privacy.android.domain.logging.Log
@@ -200,6 +201,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideWhatsNewInitializer(initialiser: WhatsNewInitializer): PostLoginInitialiser = initialiser
+
+    @Provides
+    @IntoSet
+    fun provideMobileAdsInitialiser(initialiser: MobileAdsInitialiser): AppStartInitialiser = initialiser
 
 }
 

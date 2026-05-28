@@ -4,15 +4,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.DocumentsContract
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ProcessLifecycleOwner
-import com.google.android.libraries.ads.mobile.sdk.MobileAds
-import com.google.android.libraries.ads.mobile.sdk.initialization.InitializationConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentProvider
@@ -31,7 +25,6 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.setting.BroadcastMiscStateUseCase
 import nz.mega.sdk.MegaEvent
 import timber.log.Timber
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class GlobalOnEventHandler @Inject constructor(
@@ -45,7 +38,6 @@ class GlobalOnEventHandler @Inject constructor(
     private val updateDomainNameUseCase: UpdateDomainNameUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
 ) {
-    private val isMobileAdsInitializeCalled = AtomicBoolean(false)
 
     operator fun invoke(event: MegaEvent?) {
         if (event == null) return
@@ -79,7 +71,6 @@ class GlobalOnEventHandler @Inject constructor(
                     updateCloudDriveDocumentProviderState()
                 }
                 MegaApplication.getInstance().checkEnabledCookies()
-                initialiseAdsIfNeeded()
             }
 
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
@@ -96,40 +87,6 @@ class GlobalOnEventHandler @Inject constructor(
                 Timber.e(it)
             }
         }
-    }
-
-    /**
-     * Initialise ads if needed
-     */
-    private fun initialiseAdsIfNeeded() {
-        applicationScope.launch {
-            runCatching {
-                val isAdsFeatureEnabled =
-                    getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
-                if (!isAdsFeatureEnabled) return@launch
-
-                if (!isProcessForeground()) {
-                    Timber.d("Skipping MobileAds init: process not in foreground")
-                    return@launch
-                }
-
-                if (!isMobileAdsInitializeCalled.getAndSet(true)) {
-                    Timber.d("Initialising MobileAds")
-                    MobileAds.initialize(
-                        appContext,
-                        InitializationConfig.Builder("ca-app-pub-2135147798858967~2157690671")
-                            .build()
-                    )
-                }
-            }.onFailure {
-                Timber.e(it, "MobileAds initialization failed")
-            }
-        }
-    }
-
-    private suspend fun isProcessForeground(): Boolean = withContext(Dispatchers.Main) {
-        ProcessLifecycleOwner.get().lifecycle.currentState
-            .isAtLeast(Lifecycle.State.STARTED)
     }
 
     /**
