@@ -1104,12 +1104,12 @@ class AudioPlayerServiceViewModel @Inject constructor(
             playingPosition = items.indexOfFirst { (nodeHandle) ->
                 nodeHandle == playingHandle
             }.takeIf { index ->
-                index in originalItems.indices
+                index in items.indices
             } ?: 0
 
             val recreatedItems = mutableListOf<PlaylistItem>()
             // Adjust whether need to build play sources again to avoid playlist is reordered everytime playlist items updated
-            if (isBuildPlaySources && shuffleEnabled.value && shuffleOrder.length == originalItems.size) {
+            if (isBuildPlaySources && shuffleEnabled.value && shuffleOrder.length == items.size) {
                 recreatedItems.add(items[playingPosition])
 
                 var newPlayingIndex = 0
