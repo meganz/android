@@ -80,7 +80,6 @@ fun FetchNodesContent(
     @StringRes currentStatusText: Int,
     requestStatusProgress: Progress?,
     modifier: Modifier = Modifier,
-    startProgress: Float = 0f,
 ) {
     val isInLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -112,7 +111,6 @@ fun FetchNodesContent(
             ) {
                 MegaAnimatedLinearProgressIndicator(
                     indicatorProgress = currentProgress,
-                    startProgress = startProgress,
                     progressAnimDuration = if (currentProgress > 0.5f) 1000 else 3000,
                     modifier = Modifier
                         .testTag(FETCH_NODES_PROGRESS_TEST_TAG)
@@ -232,10 +230,10 @@ private fun LoginInProgressScreenPreview(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FetchNodesContent(
-            isRequestStatusInProgress = state.isRequestStatusInProgress,
+            isRequestStatusInProgress = false,
             currentProgress = state.currentProgress,
             currentStatusText = state.currentStatusText,
-            requestStatusProgress = state.requestStatusProgress,
+            requestStatusProgress = Progress(0.2f),
             modifier = Modifier
                 .fillMaxSize()
         )

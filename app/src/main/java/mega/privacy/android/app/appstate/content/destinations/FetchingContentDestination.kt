@@ -54,7 +54,6 @@ fun EntryProviderScope<NavKey>.fetchingContentDestination(
             isRequestStatusInProgress = state.isRequestStatusInProgress,
             currentProgress = state.currentProgress,
             currentStatusText = state.currentStatusText,
-            startProgress = if (state.isFromLogin) 0.3f else 0f,
             requestStatusProgress = state.requestStatusProgress,
         )
     }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -100,7 +99,7 @@ fun NewLoginView(
     val snackbarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
     val showLoginInProgress =
-        state.isLoginInProgress || state.fetchNodesUpdate != null || state.isRequestStatusInProgress
+        state.fetchNodesUpdate != null || state.isRequestStatusInProgress
     val orientation = LocalConfiguration.current.orientation
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =

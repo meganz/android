@@ -85,12 +85,12 @@ import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
-import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
-import mega.privacy.android.shared.original.core.ui.model.KeyboardState
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.signin.external.ui.GoogleSignInButton
 import mega.privacy.android.feature.signin.external.ui.GoogleSignInButtonPlaceholder
+import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.shared.original.core.ui.model.KeyboardState
 import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.ForgotPasswordButtonPressedEvent
 import mega.privacy.mobile.analytics.event.LoginButtonPressedEvent
@@ -351,7 +351,7 @@ fun RequireLogin(
                     .padding(top = 24.dp, start = 16.dp, end = 16.dp)
                     .align(Alignment.CenterHorizontally),
                 text = stringResource(id = R.string.login_text),
-                isLoading = false,
+                isLoading = state.isLoginInProgress,
                 onClick = {
                     Analytics.tracker.trackEvent(LoginButtonPressedEvent)
                     focusManager.clearFocus(true)

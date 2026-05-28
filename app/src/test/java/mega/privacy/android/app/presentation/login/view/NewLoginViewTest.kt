@@ -80,6 +80,22 @@ class NewLoginViewTest {
     }
 
     @Test
+    fun `test that login form stays visible with a loading button when login is in progress`() {
+        setupRule(
+            state = stateWithLoginRequired.copy(isLoginInProgress = true)
+        )
+
+        // The form remains instead of switching to a full-screen progress screen...
+        composeRule.onNodeWithTag(LoginTestTags.EMAIL_INPUT)
+            .assertExists()
+        composeRule.onNodeWithTag(LoginTestTags.LOGIN_BUTTON)
+            .assertExists()
+        // ...and the button label is replaced by the loading indicator.
+        composeRule.onNodeWithText(fromId(sharedR.string.login_text))
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun `test that invalid email address shows when email is invalid`() {
         setupRule(
             state = stateWithLoginRequired.copy(
