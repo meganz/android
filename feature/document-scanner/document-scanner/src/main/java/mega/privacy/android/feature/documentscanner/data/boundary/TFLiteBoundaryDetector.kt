@@ -1,15 +1,15 @@
 package mega.privacy.android.feature.documentscanner.data.boundary
 
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.feature.documentscanner.domain.boundary.DocumentBoundaryDetector
 import mega.privacy.android.feature.documentscanner.domain.entity.DetectionResult
 import mega.privacy.android.feature.documentscanner.domain.entity.DocumentBoundary
 import mega.privacy.android.feature.documentscanner.domain.entity.Point
+import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelProvider
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
 import timber.log.Timber
+import java.io.File
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -30,7 +30,11 @@ import javax.inject.Singleton
  *  5. Pick the four extreme corners of that component (TL = min(x+y), etc.)
  *  6. Convert pixel coords back to normalised [0,1] in the original frame space
  *
- * The model file lives in the feature module's assets at [MODEL_ASSET].
+ * The model file is downloaded on first scanner entry and cached by
+ * [ScannerModelProvider] — it is not bundled in the APK. Callers must ensure
+ * [ScannerModelProvider.cachedModelFile] returns non-null before invoking
+ * [detect]; the detector treats a present model file as a precondition.
+ *
  * Inference uses the LiteRT GPU delegate when supported (≈ 20–25 ms / frame
  * on a Pixel 6) and falls back to CPU with [NUM_THREADS] threads otherwise.
  *
@@ -40,19 +44,22 @@ import javax.inject.Singleton
  * design, to avoid per-frame allocations. Callers must invoke it from a single
  * background thread — in this feature that is CameraX's `ImageAnalysis`
  * executor — and never from the main thread or concurrently. The interpreter
- * itself is loaded once (`by lazy`, thread-safe) and held for the process
- * lifetime; freeing it is the responsibility of the lifecycle owner
- * (ScanSessionViewModel) in a later MR.
+ * is loaded on the first [detect] call (not at injection time, because the
+ * Hilt-managed singleton is constructed before the model is guaranteed to be
+ * on disk) and held for the process lifetime.
  */
 @Singleton
 class TFLiteBoundaryDetector @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val modelProvider: ScannerModelProvider,
     private val grayFrameRotator: GrayFrameRotator,
     private val largestComponentFinder: LargestComponentFinder,
     private val boundaryGuard: BoundaryGuard,
 ) : DocumentBoundaryDetector {
 
-    private val interpreter: Interpreter? by lazy { loadInterpreter() }
+    // Lazy-loaded on the first detect() call rather than `by lazy { ... }`:
+    // the singleton is constructed before the model is on disk, and a
+    // nullable var leaves room for a future lifecycle-owned release()/reload.
+    private var interpreter: Interpreter? = null
 
     // Held to keep the JNI delegate alive for the interpreter's lifetime.
     private var gpuDelegate: GpuDelegate? = null
@@ -66,13 +73,29 @@ class TFLiteBoundaryDetector @Inject constructor(
         Array(INPUT_SIZE) { Array(INPUT_SIZE) { FloatArray(1) } }
     }
 
-    private fun loadInterpreter(): Interpreter? = try {
+    /**
+     * Returns the ready interpreter, lazy-loading it on the first call.
+     *
+     * Returns null only if interpreter creation itself fails (e.g. the cached
+     * file is corrupt or the GPU delegate construction throws repeatedly).
+     * The presence of the model file is a precondition: callers must call
+     * [ScannerModelProvider.ensureModelReady] before invoking [detect].
+     */
+    private fun obtainInterpreter(): Interpreter? {
+        interpreter?.let { return it }
+        val modelFile = checkNotNull(modelProvider.cachedModelFile()) {
+            "Model file missing — call ensureModelReady() before detect()"
+        }
+        return loadInterpreter(modelFile)?.also { interpreter = it }
+    }
+
+    private fun loadInterpreter(modelFile: File): Interpreter? = try {
         val options = Interpreter.Options()
         val gpuOk = tryAddGpuDelegate(options)
         if (!gpuOk) {
             options.setNumThreads(NUM_THREADS)
         }
-        Interpreter(loadModelFile(), options).also {
+        Interpreter(loadModelFile(modelFile), options).also {
             Timber.d("[DocScanner][load] TFLite interpreter loaded (${if (gpuOk) "GPU" else "CPU x$NUM_THREADS"})")
         }
     } catch (e: Exception) {
@@ -100,17 +123,10 @@ class TFLiteBoundaryDetector @Inject constructor(
         false
     }
 
-    private fun loadModelFile(): MappedByteBuffer {
-        context.assets.openFd(MODEL_ASSET).use { fd ->
-            FileInputStream(fd.fileDescriptor).use { fis ->
-                return fis.channel.map(
-                    FileChannel.MapMode.READ_ONLY,
-                    fd.startOffset,
-                    fd.declaredLength,
-                )
-            }
+    private fun loadModelFile(modelFile: File): MappedByteBuffer =
+        FileInputStream(modelFile).use { fis ->
+            fis.channel.map(FileChannel.MapMode.READ_ONLY, 0, modelFile.length())
         }
-    }
 
     override fun detect(
         grayBytes: ByteArray,
@@ -119,7 +135,7 @@ class TFLiteBoundaryDetector @Inject constructor(
         rotationDegrees: Int,
         timestamp: Long,
     ): DetectionResult? {
-        val interp = interpreter ?: return null
+        val interp = obtainInterpreter() ?: return null
 
         val rotated = grayFrameRotator.rotate(grayBytes, width, height, rotationDegrees)
 
@@ -255,7 +271,6 @@ class TFLiteBoundaryDetector @Inject constructor(
         // 5 Hz without flooding logcat.
         private const val VERBOSE_DETECT = false
 
-        const val MODEL_ASSET = "midv500_unet.tflite"
         const val INPUT_SIZE = 512
         const val NUM_THREADS = 4
         const val MASK_THRESHOLD = 0.5f

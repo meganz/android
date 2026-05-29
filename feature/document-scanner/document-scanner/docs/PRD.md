@@ -39,6 +39,7 @@ MEGA's existing in-app scanner relies on the ML Kit document scanner module, whi
 - A TFLite UNet model (ResNet-34 encoder) runs on every analysis frame.
 - The detected quadrilateral is drawn as a translucent blue overlay with a solid border on top of the camera preview.
 - Detection runs on the GPU delegate when available, CPU fallback otherwise.
+- The ~93 MB model is **downloaded on first use**, not bundled in the APK (keeps install size small). It is cached on device and integrity-checked (size + SHA-256). First scanner launch shows a one-time "preparing" state while it downloads; subsequent launches are instant.
 
 ### F2. Auto-capture
 - When the user holds the camera steady on a detected document for ~400 ms, the shutter fires automatically (manual capture also available via the shutter button).
@@ -91,6 +92,7 @@ For every captured frame the pipeline runs (in order):
 | 4K `ImageAnalysis` not supported on enough devices | Fallback chain to `takePicture` already implemented. |
 | ML Kit OCR latency on long pages | OCR runs post-shutter, off the hot path; downscale to 1500 px max edge before OCR. |
 | Power consumption from continuous inference | GPU delegate; analysis throttled to 200 ms; CameraX unbound when preview is open. |
+| First-use model download (~93 MB) fails or is slow on poor networks | Integrity-checked download with atomic cache; show clear "preparing"/retry UX; model fetched once then cached. Consider Wi-Fi-preferred / background prefetch later. |
 
 ## Rollout
 

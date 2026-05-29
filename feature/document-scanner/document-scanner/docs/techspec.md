@@ -60,6 +60,7 @@ feature/document-scanner/document-scanner/
 │   │   └── entity/        DocumentBoundary, ScannedPage, ScanSession, …
 │   ├── data/
 │   │   ├── boundary/      TFLiteBoundaryDetector, DefaultStabilityTracker
+│   │   ├── model/         DownloadingScannerModelProvider
 │   │   ├── smoother/      ExponentialMovingAverageBoundarySmoother
 │   │   ├── warper/        BitmapPerspectiveWarper
 │   │   ├── splitter/      PassthroughPageSplitter
@@ -83,13 +84,20 @@ feature/document-scanner/document-scanner/
 ## Key components
 
 ### `TFLiteBoundaryDetector` (data layer)
-- Loads UNet+ResNet-34 from `res/raw/<model>.tflite`. Input: 256×256 RGB, ImageNet normalised. Output: binary mask.
-- GPU delegate via `litert-gpu`; falls back to CPU on init failure.
-- Post-process: largest connected component → minAreaRect → 4-corner quad.
-- **Guards**:
+- Loads a UNet+ResNet-34 model. Input: 512×512 RGB, ImageNet normalised. Output: binary mask.
+- The model file is **not bundled in the APK** — it is downloaded on first use and cached by `ScannerModelProvider` (see "Model distribution" below). The detector loads the interpreter from the cached `File` on the first `detect()` call and holds it for the process lifetime. Callers must call `ensureModelReady()` before invoking `detect()` — a present model file is a precondition.
+- GPU delegate via `litert-gpu`; falls back to CPU on init failure. Releasing the interpreter on scan-session teardown lands with the ScanSessionViewModel MR (designed alongside the threading model so the analyzer thread cannot race the close).
+- Post-process: largest connected component → 4 extreme corners (`LargestComponentFinder`) → guard (`BoundaryGuard`).
+- **Guards** (`BoundaryGuard`):
   - `MIN_FILL_RATIO = 0.88` — mask must fill ≥ 88% of the bounding quad (rejects hand-on-page).
   - `MIN_OPPOSITE_SIDE_RATIO = 0.55` — rejects severely trapezoidal detections.
-  - Each rejected reason is logged at `[DocScanner][guard]` for debugging.
+  - Verdict returned as a typed `RejectReason`; the detector logs it at `[DocScanner][guard]`.
+
+### Model distribution
+- The ~93 MB `.tflite` is hosted off-app and fetched at runtime, so it never bloats the APK and is never committed to git.
+- `DownloadingScannerModelProvider` downloads it (OkHttp) into `filesDir/scanner-models/midv500_unet.tflite`, streaming to a `.tmp` sidecar and renaming into place only after it passes integrity checks: exact **size** (97,867,228 bytes) and **SHA-256** (`e0c37a9a…b4e55`), both hardcoded. A cached file that fails verification is deleted and re-downloaded.
+- `cachedModelFile()` is a cheap, non-blocking check for the analysis thread; `ensureModelReady()` is the suspending download. It is driven by a `WorkManager` worker (so the fetch survives process death and respects battery / network constraints) and observed by a dedicated prepare screen that shows progress and routes the user to the legacy scanner if the download fails — both land in follow-up MRs.
+- The current download URL is a **temporary staging link**; before rollout it moves to the production endpoint, ideally via remote config so the model can be swapped without an app update.
 
 ### `DefaultStabilityTracker`
 - Per-frame Euclidean corner drift in normalised coords.

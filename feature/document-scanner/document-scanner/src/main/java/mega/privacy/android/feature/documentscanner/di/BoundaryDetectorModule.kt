@@ -2,18 +2,26 @@ package mega.privacy.android.feature.documentscanner.di
 
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.feature.documentscanner.data.boundary.DefaultStabilityTracker
 import mega.privacy.android.feature.documentscanner.data.boundary.TFLiteBoundaryDetector
+import mega.privacy.android.feature.documentscanner.data.model.DownloadingScannerModelProvider
 import mega.privacy.android.feature.documentscanner.domain.boundary.DocumentBoundaryDetector
 import mega.privacy.android.feature.documentscanner.domain.boundary.StabilityTracker
+import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelProvider
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
 
 /**
  * Hilt bindings for document boundary detection.
  *
  * Installed in [SingletonComponent] to match [TFLiteBoundaryDetector]'s
- * `@Singleton` scope — the TFLite model is loaded once per process and reused.
+ * `@Singleton` scope — the TFLite model is downloaded once per process and
+ * the interpreter is reused. [DownloadingScannerModelProvider] is bound here
+ * as well so the detector and its model provider share the singleton scope.
  *
  * [DefaultStabilityTracker] carries no scope annotation, so its binding is
  * unscoped: every consumer (one per `ScanSessionViewModel`) receives its own
@@ -35,4 +43,27 @@ abstract class BoundaryDetectorModule {
     abstract fun bindStabilityTracker(
         impl: DefaultStabilityTracker,
     ): StabilityTracker
+
+    @Binds
+    internal abstract fun bindScannerModelProvider(
+        impl: DownloadingScannerModelProvider,
+    ): ScannerModelProvider
+
+    companion object {
+        /**
+         * Standalone HTTP client for the model download. Not used for any other
+         * traffic — the read/call budgets are tuned for a single ~93 MB fetch
+         * and would be wrong for typical API calls. Keep this binding qualified
+         * with [ScannerModelHttpClient] so it can't be reused by accident.
+         */
+        @Provides
+        @Singleton
+        @ScannerModelHttpClient
+        internal fun provideScannerModelHttpClient(): OkHttpClient =
+            OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(2, TimeUnit.MINUTES)
+                .callTimeout(10, TimeUnit.MINUTES)
+                .build()
+    }
 }

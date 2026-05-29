@@ -6,13 +6,6 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.feature.documentscanner"
-
-    // Keep .tflite uncompressed so the TFLite Interpreter can memory-map it
-    // via AssetManager.openFd(). AAPT compresses unknown extensions by default,
-    // which makes openFd() throw FileNotFoundException at runtime.
-    androidResources {
-        noCompress += "tflite"
-    }
 }
 
 dependencies {
@@ -40,6 +33,9 @@ dependencies {
     // LiteRT (TFLite) runtime for UNet-based boundary detection
     implementation(lib.litert)
     implementation(lib.litert.gpu)
+
+    // OkHttp to download the model artifact on first use (not bundled in the APK)
+    implementation(lib.okhttp3)
 
     // Testing
     testImplementation(project(":core-test"))
