@@ -21,6 +21,7 @@ import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -41,6 +42,8 @@ import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.model.text
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -52,6 +55,8 @@ internal fun FavouritesExplorerContent(
     onFolderClick: (NodeId) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
+    selectionState: NodeSelectionState = rememberNodeSelectionState(),
+    isSelectionModeEnabled: Boolean = false,
 ) = with(uiStateShared) {
     EventEffect(
         event = navigateBack,
@@ -67,7 +72,12 @@ internal fun FavouritesExplorerContent(
     }
     val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
         when {
-            item.isFolderNode -> onFolderClick(item.id)
+            item.isFolderNode -> {
+                onFolderClick(item.id)
+                selectionState.deselectAll()
+            }
+
+            isSelectionModeEnabled -> selectionState.toggleSelection(item.id)
         }
     }
     NodeViewWithHeader(
@@ -91,7 +101,10 @@ internal fun FavouritesExplorerContent(
                 isSensitive = it.isSensitive && isHiddenNodesEnabled,
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
+                isSelected = selectionState.selectedNodeIds.contains(it.id),
+                isInSelectionMode = isSelectionModeEnabled && (it.node is FileNode),
                 onItemClicked = { onItemClicked(it) },
+                enabled = it.isFolderNode || isSelectionModeEnabled,
             )
         },
         itemGridView = {
@@ -108,6 +121,9 @@ internal fun FavouritesExplorerContent(
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
                 label = it.nodeLabel,
+                isSelected = selectionState.selectedNodeIds.contains(it.id),
+                isInSelectionMode = isSelectionModeEnabled && (it.node is FileNode),
+                enabled = it.isFolderNode || isSelectionModeEnabled,
             )
         },
         onRefreshNodes = onRefreshNodes,
@@ -141,6 +157,8 @@ internal fun TabsScope.FavouritesExplorerTab(
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
+    selectionState: NodeSelectionState = rememberNodeSelectionState(),
+    isSelectionModeEnabled: Boolean = false,
 ) {
     val viewModel =
         hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
@@ -174,6 +192,8 @@ internal fun TabsScope.FavouritesExplorerTab(
                 }
             },
             onRefreshNodes = viewModel::refreshNodes,
+            selectionState = selectionState,
+            isSelectionModeEnabled = isSelectionModeEnabled,
             modifier = modifier,
         )
     }

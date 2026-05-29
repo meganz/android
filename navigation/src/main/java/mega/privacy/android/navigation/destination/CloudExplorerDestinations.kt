@@ -33,6 +33,13 @@ data object SelectCUFolderNavKey : ExplorerNavKey {
 }
 
 @Serializable
+data class ShareFilesToChatNavKey(val chatId: Long) : ExplorerNavKey {
+    companion object {
+        const val RESULT = "ShareFilesToChatNavKey::result"
+    }
+}
+
+@Serializable
 data class NodesExplorerNavKey(
     val nodeId: NodeId,
     val nodeSourceType: NodeSourceType,

@@ -17,6 +17,8 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.selectcufolder.SelectCUFolderScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.selectcufolder.SelectCUFolderViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.sharefilestochat.ShareFilesToChatScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.sharefilestochat.ShareFilesToChatViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaScreen
@@ -29,6 +31,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
@@ -56,7 +59,6 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onStartUpload = transferHandler::setTransferEvent,
             )
             val onSelectCUFolder: (NodeId) -> Unit = { nodeId ->
-                navigationHandler.backTo(SelectCUFolderNavKey, inclusive = false)
                 navigationHandler.returnResult(SelectCUFolderNavKey.RESULT, nodeId)
             }
             selectCUFolderDestination(
@@ -64,12 +66,21 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = navigationHandler::navigate,
                 onSelectFolder = onSelectCUFolder,
             )
+            val onFilesPicked: (List<NodeId>) -> Unit = { nodeIds ->
+                navigationHandler.returnResult(ShareFilesToChatNavKey.RESULT, nodeIds)
+            }
+            shareFilesToChatDestination(
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
+                onFilesPicked = onFilesPicked,
+            )
             nodeExplorerDestination(
                 onCloseExplorerScreen = { navigationHandler.backTo(it, true) },
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
                 onStartUpload = transferHandler::setTransferEvent,
                 onSelectFolder = onSelectCUFolder,
+                onFilesPicked = onFilesPicked,
                 monitorResult = navigationHandler::monitorResult,
                 clearResult = navigationHandler::clearResult,
             )
@@ -177,12 +188,32 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         }
     }
 
+    fun EntryProviderScope<NavKey>.shareFilesToChatDestination(
+        onNavigateBack: (NavKey) -> Unit,
+        onNavigate: (NavKey) -> Unit,
+        onFilesPicked: (List<NodeId>) -> Unit,
+    ) {
+        entry<ShareFilesToChatNavKey> { key ->
+            val viewModel = hiltViewModel<ShareFilesToChatViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            ShareFilesToChatScreen(
+                uiState = uiState,
+                startNavKey = key,
+                onFilesPicked = onFilesPicked,
+                onNavigateBack = { onNavigateBack(key) },
+                onNavigate = onNavigate,
+            )
+        }
+    }
+
     fun EntryProviderScope<NavKey>.nodeExplorerDestination(
         onCloseExplorerScreen: (NavKey) -> Unit,
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (NavKey) -> Unit,
         onStartUpload: (TransferTriggerEvent) -> Unit,
         onSelectFolder: (NodeId) -> Unit,
+        onFilesPicked: (List<NodeId>) -> Unit,
         monitorResult: (String) -> Flow<Any?>,
         clearResult: (String) -> Unit,
     ) {
@@ -222,6 +253,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onStartUpload = onStartUpload,
                 onFileUriConsumed = onFileUriConsumed,
                 onSelectFolder = onSelectFolder,
+                onFilesPicked = onFilesPicked,
                 monitorResult = monitorResult,
                 clearResult = clearResult,
             )

@@ -51,6 +51,7 @@ import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.SelectableNodeItem
 import mega.privacy.android.shared.nodes.model.text
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
@@ -70,6 +71,7 @@ internal fun NodesExplorerScreen(
     onStartUpload: (TransferTriggerEvent) -> Unit = {},
     onFileUriConsumed: () -> Unit = {},
     onSelectFolder: (NodeId) -> Unit = {},
+    onFilesPicked: (List<NodeId>) -> Unit = {},
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
 ) {
@@ -144,7 +146,10 @@ internal fun NodesExplorerScreen(
                 else -> {}
             }
         },
-        onFilesPicked = {},
+        onFilesPicked = { nodeIds ->
+            onFilesPicked(nodeIds)
+            onCloseExplorerScreen()
+        },
         onNavigateBack = onNavigateBack,
         onNavigate = onNavigate,
         monitorResult = monitorResult,
@@ -177,6 +182,8 @@ internal fun NodesExplorerScreenContent(
     onFolderClick: (NodeId) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
+    selectionState: NodeSelectionState = rememberNodeSelectionState(),
+    isSelectionModeEnabled: Boolean = uiStateShared.isSelectionModeEnabled,
 ) = with(uiStateShared) {
     EventEffect(
         event = navigateBack,
@@ -191,7 +198,6 @@ internal fun NodesExplorerScreenContent(
         }
     }
 
-    val selectionState = rememberNodeSelectionState()
     val nodeUiItems = remember(visibleItems, selectionState.selectedNodeIds) {
         visibleItems.map {
             SelectableNodeItem(it, selectionState.selectedNodeIds.contains(it.id))
@@ -200,7 +206,11 @@ internal fun NodesExplorerScreenContent(
 
     val onItemClicked: (SelectableNodeItem<TypedNode>) -> Unit = { item ->
         when {
-            item.isFolderNode -> onFolderClick(item.id)
+            item.isFolderNode -> {
+                onFolderClick(item.id)
+                selectionState.deselectAll()
+            }
+
             isSelectionModeEnabled -> selectionState.toggleSelection(item.id)
         }
     }

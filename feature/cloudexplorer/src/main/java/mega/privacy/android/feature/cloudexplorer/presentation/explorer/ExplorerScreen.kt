@@ -51,6 +51,7 @@ import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,6 +96,8 @@ internal fun ExplorerScreen(
     val nodesExplorerUiState by nodesExplorerViewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
     val nodesExplorerUiStateShared by nodesExplorerViewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
     val chatExplorerSelectionState = rememberChatExplorerSelectionState()
+    val nodeSelectionState = rememberNodeSelectionState()
+    val isFileSelectionEnabled = !explorerMode.isFolderPicker
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -142,13 +145,12 @@ internal fun ExplorerScreen(
                                     onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
 
                                 else ->
-                                    //Replace with valid nodeIds list
-                                    onFilesPicked(emptyList())
+                                    onFilesPicked(nodeSelectionState.selectedNodeIds.toList())
                             }
                         }
                     },
                     primaryButtonEnabled = when {
-                        !explorerMode.isFolderPicker -> true
+                        !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
                         selectedTabIndex == CLOUD_TAB_INDEX -> true
                         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
                         else -> false
@@ -191,6 +193,8 @@ internal fun ExplorerScreen(
                             }
                         },
                         onRefreshNodes = nodesExplorerViewModel::refreshNodes,
+                        selectionState = nodeSelectionState,
+                        isSelectionModeEnabled = isFileSelectionEnabled,
                         modifier = modifier,
                     )
                 }
@@ -212,6 +216,8 @@ internal fun ExplorerScreen(
                         protectedUserTap = protectedUserTap,
                         onNavigate = onNavigate,
                         onNavigateBack = onNavigateBack,
+                        selectionState = nodeSelectionState,
+                        isSelectionModeEnabled = isFileSelectionEnabled,
                     )
                 }
                 if (!isInnerNavigation && explorerMode.isChatAvailable) {
