@@ -20,7 +20,10 @@ class NodeComponentsFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             renameNodeDialogM3(navigationHandler::back)
-            moveToRubbishOrDeleteDialogM3(navigationHandler::back)
+            moveToRubbishOrDeleteDialogM3(
+                onBack = navigationHandler::back,
+                returnResult = navigationHandler::returnResult,
+            )
             removeNodeLinkDialogM3(navigationHandler::back)
             removeShareFolderDialogM3(navigationHandler::back)
             leaveShareDialogM3(navigationHandler::back)

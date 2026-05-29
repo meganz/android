@@ -16,15 +16,31 @@ import kotlinx.serialization.Serializable
 data class MoveToRubbishOrDeleteDialogArgs(
     val isInRubbish: Boolean,
     val nodeHandles: List<Long>
-) : NavKey
+) : NavKey {
+    companion object {
+        /** Result key published when the user confirms the positive action. */
+        const val RESULT = "MoveToRubbishOrDeleteDialogArgs:result"
+    }
+}
+
+/**
+ * Result published by [MoveToRubbishOrDeleteNodeDialogM3] when the user clicks the
+ * positive button. [isInRubbish] mirrors the dialog mode so subscribers can tell
+ * apart a confirmed Move-to-Rubbish from a confirmed Delete-Permanently.
+ */
+@Serializable
+data class MoveToRubbishOrDeleteDialogResult(val isInRubbish: Boolean)
 
 /**
  * Navigation function to add the move to rubbish or delete dialog to the navigation graph
  *
- * @param onBack Callback when navigating back
+ * @param onBack Callback when the dialog is dismissed (cancel, back press, or post-confirm pop)
+ * @param returnResult Callback to publish [MoveToRubbishOrDeleteDialogResult] when the user
+ *   confirms; subscribers monitor [MoveToRubbishOrDeleteDialogArgs.RESULT].
  */
 internal fun EntryProviderScope<NavKey>.moveToRubbishOrDeleteDialogM3(
     onBack: () -> Unit,
+    returnResult: (String, MoveToRubbishOrDeleteDialogResult) -> Unit,
 ) {
     entry<MoveToRubbishOrDeleteDialogArgs>(
         metadata = DialogSceneStrategy.dialog(
@@ -36,7 +52,14 @@ internal fun EntryProviderScope<NavKey>.moveToRubbishOrDeleteDialogM3(
         MoveToRubbishOrDeleteNodeDialogM3(
             nodes = key.nodeHandles,
             isNodeInRubbish = key.isInRubbish,
-            onDismiss = onBack
+            onDismiss = onBack,
+            onConfirm = {
+                returnResult(
+                    MoveToRubbishOrDeleteDialogArgs.RESULT,
+                    MoveToRubbishOrDeleteDialogResult(isInRubbish = key.isInRubbish),
+                )
+                onBack()
+            },
         )
     }
 }

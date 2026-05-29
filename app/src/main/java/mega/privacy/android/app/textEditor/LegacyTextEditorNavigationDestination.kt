@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
@@ -11,6 +12,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.drop
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -22,15 +24,15 @@ import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
+import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogResult
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
-import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareDropdownMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
@@ -53,14 +55,16 @@ import java.io.File
 
 /**
  * Returns true when the node options bottom sheet result indicates the editor should close
- * because the node may no longer be valid (deleted, moved, or access removed).
+ * immediately because the node may no longer be valid (moved, link removed, share removed).
  * Non-destructive actions (share, label, download, etc.) keep the editor open.
+ *
+ * Move-to-Rubbish and Delete-Permanently route through a confirmation dialog and are NOT
+ * closed here — the editor closes when the dialog publishes
+ * [MoveToRubbishOrDeleteDialogArgs.RESULT] (see the monitor in [TextEditorComposeContent]).
  */
 internal fun shouldCloseTextEditorOnNodeOptionsResult(
     result: NodeOptionsBottomSheetResult?,
 ): Boolean = when (result?.action) {
-    is TrashMenuAction,
-    is DeletePermanentlyMenuAction,
     is RemoveMenuAction,
     is MoveMenuAction,
     is LeaveShareMenuAction,
@@ -335,6 +339,25 @@ private fun TextEditorComposeContent(
                 }
             },
         )
+
+        // Close the editor when the user confirms the Move to Rubbish / Delete dialog.
+        // The result key is shared across the app (other screens use the same dialog and may
+        // not clear it after consumption), so we (a) clear any stale value on entry and (b)
+        // drop the StateFlow's sticky replay so the editor only reacts to a value produced
+        // during this composition's lifetime.
+        LaunchedEffect(navigationHandler) {
+            navigationHandler.clearResult(MoveToRubbishOrDeleteDialogArgs.RESULT)
+        }
+        val moveToRubbishResult by remember(navigationHandler) {
+            navigationHandler
+                .monitorResult<MoveToRubbishOrDeleteDialogResult?>(MoveToRubbishOrDeleteDialogArgs.RESULT)
+                .drop(1)
+        }.collectAsStateWithLifecycle(null)
+        LaunchedEffect(moveToRubbishResult) {
+            if (moveToRubbishResult == null) return@LaunchedEffect
+            navigationHandler.clearResult(MoveToRubbishOrDeleteDialogArgs.RESULT)
+            removeDestination()
+        }
     }
     val onOpenNodeOptions: (() -> Unit)? = if (showNodeOptions) {
         remember(

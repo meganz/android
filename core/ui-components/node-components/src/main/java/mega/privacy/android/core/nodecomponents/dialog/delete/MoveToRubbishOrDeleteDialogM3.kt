@@ -14,7 +14,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * Dialog to move nodes to rubbish bin or delete them permanently
  *
  * @param nodes List of node handles to process
- * @param onDismiss Callback when dialog is dismissed
+ * @param onDismiss Callback when the dialog is dismissed (cancel or outside tap)
+ * @param onConfirm Callback invoked after the positive action has been triggered
  * @param viewModel ViewModel to handle the business logic
  * @param isNodeInRubbish Whether the nodes are already in rubbish bin
  */
@@ -22,6 +23,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 fun MoveToRubbishOrDeleteNodeDialogM3(
     nodes: List<Long>,
     onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
     viewModel: MoveToRubbishOrDeleteNodeDialogViewModel = hiltViewModel(),
     isNodeInRubbish: Boolean = false,
 ) {
@@ -44,7 +46,7 @@ fun MoveToRubbishOrDeleteNodeDialogM3(
             } else {
                 viewModel.moveNodesToRubbishBin(nodes)
             }
-            onDismiss()
+            onConfirm()
         },
         onNegativeButtonClicked = onDismiss
     )

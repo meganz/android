@@ -27,16 +27,16 @@ internal class TextEditorNodeOptionsResultHandlerTest {
     }
 
     @Test
-    fun `test that TrashMenuAction returns true`() {
+    fun `test that TrashMenuAction returns false because the confirmation dialog drives the close`() {
         assertThat(
             shouldCloseTextEditorOnNodeOptionsResult(
                 NodeOptionsBottomSheetResult(action = mock<TrashMenuAction>(), node = node)
             )
-        ).isTrue()
+        ).isFalse()
     }
 
     @Test
-    fun `test that DeletePermanentlyMenuAction returns true`() {
+    fun `test that DeletePermanentlyMenuAction returns false because the confirmation dialog drives the close`() {
         assertThat(
             shouldCloseTextEditorOnNodeOptionsResult(
                 NodeOptionsBottomSheetResult(
@@ -44,7 +44,7 @@ internal class TextEditorNodeOptionsResultHandlerTest {
                     node = node
                 )
             )
-        ).isTrue()
+        ).isFalse()
     }
 
     @Test
