@@ -2324,7 +2324,7 @@
     <string name="home_configuration_screen_menu_choose_default_start_screen">选择默认启动屏幕</string>
     <string name="home_configuration_widget_removal_not_allowed_message">至少需要一个首页选项</string>
     <string name="file_link_subtitle">文件链接</string>
-    <string name="favourites_empty_screen_description">将文件夹标记为收藏，以在此处查看</string>
+    <string name="favourites_empty_screen_description">将文件和文件夹添加到收藏夹，以便在此处查看它们</string>
     <string name="name_collision_choose_folder_header">选择要保留的文件夹</string>
     <string name="name_collision_folder_warning_upload_and_rename">您正在上传的文件夹将被重命名为：</string>
     <string name="offline_status">离线</string>
@@ -2341,4 +2341,47 @@
     <string name="home_configuration_widget_my_account_widget_name">我的帐户</string>
     <string name="general_new_group_chat">新建群聊</string>
     <string name="general_new_group_chat_created">已创建新的群聊</string>
+    <string name="node_sort_option_last_accessed_label">日期</string>
+    <string name="general_view_button">查看</string>
+    <string name="scan_dialog_discard_confirmation_title">放弃扫描？</string>
+    <string name="scan_dialog_discard_confirmation_body">当前扫描将会丢失</string>
+    <string name="scan_dialog_discard_all_confirmation_title">放弃所有扫描？</string>
+    <string name="scan_dialog_discard_all_confirmation_body">当前文件将会丢失</string>
+    <string name="scan_dialog_discard_confirmation_action">放弃</string>
+    <string name="general_file_name">文件名</string>
+    <string name="general_error_invalid_name">文件名无效</string>
+    <string name="google_sign_in">使用 Google 登录</string>
+    <string name="google_sign_in_failed">Google 登录失败。请再试一次。</string>
+    <string name="google_sign_in_email_exists">您已经有这个邮箱的账号。请使用您的密码登录。</string>
+    <string name="or_divider">或</string>
+    <string name="error_file_not_supported_title">文件不支持</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">快捷方式</string>
+    <string name="chat_explorer_recent_chats_header">最近的聊天和会议</string>
+    <string name="video_player_subtitles_empty_hint_description">将 SRT 格式的字幕上传到您的云盘</string>
+    <string name="video_player_subtitles_add_subtitles_button">添加字幕</string>
+    <string name="general_file_type">文件类型</string>
+    <string name="more_options">更多选项</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="other">清除已查看的链接？</item>
+    </plurals>
+    <string name="favourite_folders_empty_screen_description">将文件夹添加到收藏夹以便在此处查看</string>
+    <string name="general_chat_sent_as_message">已以消息发送</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% 折扣</string>
+    <string name="general_new_link">新链接</string>
+    <string name="general_error_incorrect_name">继续之前请更正您的文件名</string>
+    <string name="general_destination">目标位置</string>
+    <string name="video_player_more_options_pip_option">画中画</string>
+    <string name="home_configuration_tooltip_description">选择您希望看到的内容，并将其整理以满足您的需求</string>
+    <string name="home_configuration_tooltip_action">探索</string>
+    <string name="error_fail_to_play_video_title">无法播放视频</string>
+    <string name="error_fail_to_play_video_message">抱歉，出错了，我们无法打开该文件。</string>
+    <string name="error_file_not_supported_message">下载此文件以在兼容的应用程序中打开。</string>
+    <string name="error_no_internet_message">由于连接问题，无法打开该文件。请检查您的互联网连接后再试。</string>
+    <string name="chat_explorer_all_contacts_header">所有联系人、聊天和会议</string>
+    <string name="chat_explorer_read_only_chat_warning">该对话为只读</string>
+    <string name="contacts_empty_title">未找到联系人</string>
+    <plurals name="general_number_participants">
+        <item quantity="other">%1$d 位参与者</item>
+    </plurals>
+    <string name="file_link_unavaible_ToS_violation">该文件链接因违反我们的服务条款而被移除。</string>
 </resources>

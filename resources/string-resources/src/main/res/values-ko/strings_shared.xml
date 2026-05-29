@@ -1351,7 +1351,7 @@
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_local_file_explanation">MEGA의 폴더가 [A]%1$s[/A]과/와 교체됩니다. 기존 버전은 휴지통의 SyncDebris 폴더로 옮겨집니다.</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_remote_file_explanation">로컬 파일 [A]%1$s[/A]이/가 .debris 폴더로 옮겨졌습니다</string>
+    <string name="sync_stalled_issue_choose_remote_file_explanation">로컬 파일 [A]%1$s[/A]이/가 .debris 폴더로 옮겨집니다</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">같은 이름을 가졌지만 내용이 다른 파일은 (1) 같은 접미사가 붙게 됩니다</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
@@ -2321,7 +2321,7 @@
     <string name="last_seen_today">[A]최근 접속 시간 [/A]오늘 %1$s</string>
     <string name="last_seen_long_time_ago">[A]최근 접속 시간 [/A]오래 전</string>
     <string name="last_seen_general">[A]최근 접속 시간 [/A]%1$s %2$s</string>
-    <string name="favourites_empty_screen_description">여기에서 폴더를 보려면 폴더를 즐겨찾기로 표시하세요</string>
+    <string name="favourites_empty_screen_description">여기에서 파일과 폴더를 보려면 즐겨찾기에 추가하세요</string>
     <string name="name_collision_choose_folder_header">유지할 폴더를 선택하세요</string>
     <string name="name_collision_folder_warning_upload_and_rename">업로드하는 폴더의 이름이 다음과 같이 변경됩니다:</string>
     <string name="new_file_subject_when_uploading">제목</string>
@@ -2344,4 +2344,38 @@
     <string name="home_configuration_widget_shortcuts_widget_name">바로 가기</string>
     <string name="general_new_group_chat">새 단체 대화</string>
     <string name="general_new_group_chat_created">새 단체 대화 생성됨</string>
+    <string name="node_sort_option_last_accessed_label">날짜</string>
+    <string name="chat_explorer_recent_chats_header">최근 대화와 회의</string>
+    <string name="chat_explorer_all_contacts_header">모든 연락처, 대화와 회의</string>
+    <string name="chat_explorer_read_only_chat_warning">이 대화는 읽기 전용입니다</string>
+    <string name="contacts_empty_title">연락처 없음</string>
+    <plurals name="general_number_participants">
+        <item quantity="other">참여자 %1$d명</item>
+    </plurals>
+    <string name="more_options">더 많은 옵션</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="other">조회한 링크를 지울까요?</item>
+    </plurals>
+    <string name="general_view_button">보기</string>
+    <string name="favourite_folders_empty_screen_description">여기에서 폴더를 보려면 즐겨찾기에 추가하세요</string>
+    <string name="general_chat_sent_as_message">메시지로 보냈습니다</string>
+    <string name="video_player_subtitles_empty_hint_description">클라우드 드라이브에 자막을 SRT 형식으로 업로드하세요</string>
+    <string name="video_player_subtitles_add_subtitles_button">자막 추가</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% 할인</string>
+    <string name="scan_dialog_discard_confirmation_title">스캔을 취소할까요?</string>
+    <string name="scan_dialog_discard_confirmation_body">현재 스캔을 잃게 됩니다</string>
+    <string name="scan_dialog_discard_all_confirmation_title">모든 스캔을 취소할까요?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">현재 문서를 잃게 됩니다</string>
+    <string name="scan_dialog_discard_confirmation_action">취소</string>
+    <string name="general_file_name">파일 이름</string>
+    <string name="general_error_invalid_name">잘못된 이름</string>
+    <string name="general_error_incorrect_name">진행하기 전에 파일 이름을 수정하세요</string>
+    <string name="general_destination">목적지</string>
+    <string name="video_player_more_options_pip_option">픽처 인 픽처</string>
+    <string name="general_file_type">파일 유형</string>
+    <string name="file_link_unavaible_ToS_violation">파일 링크가 이용 약관 위반으로 인해 삭제되었습니다.</string>
+    <string name="cloud_drive_inactivity_banner_title">당신의 계정이 너무 오랜 시간 동안 활동이 없었습니다</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="other">당신이 %1$d개월 이상 로그인하지 않았기 때문에, 당신의 파일은 저희의 비활성 정책에 따라 삭제되었습니다</item>
+    </plurals>
 </resources>

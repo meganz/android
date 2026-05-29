@@ -2325,7 +2325,7 @@
     <string name="home_configuration_screen_menu_choose_default_start_screen">デフォルトのスタート画面を選択する</string>
     <string name="home_configuration_widget_removal_not_allowed_message">ホームセクションには少なくとも1つ項目が必要です</string>
     <string name="file_link_subtitle">ファイルリンク</string>
-    <string name="favourites_empty_screen_description">フォルダをお気に入りに追加すると、ここに表示されます</string>
+    <string name="favourites_empty_screen_description">ここに表示するには、ファイルとフォルダをお気に入りに追加してください</string>
     <string name="name_collision_choose_folder_header">残すフォルダを選択してください</string>
     <string name="name_collision_folder_warning_upload_and_rename">アップロードするフォルダは、以下のように名前が変更されます。</string>
     <string name="offline_status">オフライン</string>
@@ -2362,4 +2362,31 @@
     <plurals name="general_number_participants">
         <item quantity="other">%1$d人の参加者</item>
     </plurals>
+    <string name="node_sort_option_last_accessed_label">日付</string>
+    <string name="more_options">その他のオプション</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="other">閲覧済みのリンクをクリアしますか？</item>
+    </plurals>
+    <string name="favourite_folders_empty_screen_description">フォルダをお気に入りに追加すると、ここに表示されます</string>
+    <string name="general_chat_sent_as_message">メッセージとして送信しました</string>
+    <string name="general_view_button">表示</string>
+    <string name="video_player_subtitles_empty_hint_description">SRT形式の字幕をクラウドドライブにアップロードしてください</string>
+    <string name="video_player_subtitles_add_subtitles_button">字幕を追加</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% OFF</string>
+    <string name="scan_dialog_discard_confirmation_title">スキャンを破棄しますか？</string>
+    <string name="scan_dialog_discard_confirmation_body">現在のスキャンは失われます</string>
+    <string name="scan_dialog_discard_all_confirmation_title">すべてのスキャンを破棄しますか？</string>
+    <string name="scan_dialog_discard_all_confirmation_body">現在のドキュメントは失われます</string>
+    <string name="scan_dialog_discard_confirmation_action">破棄する</string>
+    <string name="general_file_name">ファイル名</string>
+    <string name="general_error_invalid_name">名前が無効です</string>
+    <string name="general_error_incorrect_name">続行する前にファイル名を修正してください</string>
+    <string name="general_destination">保存先</string>
+    <string name="general_file_type">ファイルの種類</string>
+    <string name="video_player_more_options_pip_option">ピクチャー・イン・ピクチャー</string>
+    <string name="cloud_drive_inactivity_banner_title">長期間アカウントの利用（ログイン）がありませんでした</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="other">%1$dか月以上にわたりログインがなかったため、当社の非アクティブポリシーに基づき、お客様のファイルは削除されました。</item>
+    </plurals>
+    <string name="file_link_unavaible_ToS_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました。</string>
 </resources>

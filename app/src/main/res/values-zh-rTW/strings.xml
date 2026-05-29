@@ -189,15 +189,15 @@
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">相機上傳</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
-    <string name="tab_incoming_shares">傳入</string>
+    <string name="tab_incoming_shares">內收</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
-    <string name="tab_outgoing_shares">傳出</string>
+    <string name="tab_outgoing_shares">外發</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">連結</string>
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="title_incoming_shares_explorer">傳入的共享</string>
+    <string name="title_incoming_shares_explorer">內收共享</string>
     <!-- Title of the share with file explorer -->
-    <string name="title_incoming_shares_with_explorer">傳入的共享，來自</string>
+    <string name="title_incoming_shares_with_explorer">內收共享，來自</string>
     <!-- message when there are no files in the Cloud drive -->
     <string name="file_browser_empty_cloud_drive">您的雲端硬碟裡沒有檔案</string>
     <!-- Text that indicates that a folder is currently empty -->
@@ -1325,9 +1325,9 @@
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]沒有[/B][A]聯絡人[/A]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]沒有人[/B][A]共享資料夾給你[/A]</string>
+    <string name="context_empty_incoming">[B]沒有[/B][A]內收共享資料夾[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]沒有[/B][A]共享資料夾給別人[/A]</string>
+    <string name="context_empty_outgoing">[B]沒有[/B][A]外發共享資料夾[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
     <string name="context_empty_links">[B]沒有[/B][A]公開連結[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
@@ -1791,7 +1791,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">如果要壓縮的影片大於</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">要停用自動清空垃圾筒或設定更長的保留期，您需要訂閱我們的其中一項方案。</string>
+    <string name="settings_rb_scheduler_alert_disabling">若要停用垃圾筒自動清理或設定更長的保留期，您需要訂閱我們的方案。</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">日</string>
     <!-- Title of the option to generate a public chat link -->
@@ -1877,9 +1877,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]帳戶[/B][A]%s[/A][B]已刪除。[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]您公開共享的檔案[/A][B]%s[/B]已被下架。</string>
+    <string name="subtitle_file_takedown_notification">[A]您公開共享的檔案[/A][B]%s[/B]已被移除。</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]您公開共享的資料夾[/A][B]%s[/B]已被下架。</string>
+    <string name="subtitle_folder_takedown_notification">[A]您公開共享的資料夾[/A][B]%s[/B]已被移除。</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">侵權移除申訴</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -3177,7 +3177,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被停權。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交恢復存取申請的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法再存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法恢復您儲存資料的存取權限，也無法獲得註冊新MEGA帳戶的授權。</string>
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">會議</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
@@ -3717,9 +3717,9 @@
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]侵權下架指引政策[/A]，此檔案已被下架。</string>
+    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]侵權移除指引政策[/A]，此檔案已被移除。</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]侵權下架指引政策[/A]，此資料夾已被下架。</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]侵權移除指引政策[/A]，此資料夾已被移除。</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">加入</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -3929,9 +3929,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">無法開啟檔案</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description">根據我們的[A]侵權下架指引政策[/A]，此資料夾已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出申訴。</string>
+    <string name="dialog_taken_down_folder_description">此資料夾已根據我們的[A]移除指引政策[/A]遭到移除。若您認為我們處置有誤，可以對此決定提出申訴。</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description">根據我們的[A]侵權下架指引政策[/A]，此檔案已被刪除。如果您認為我們犯了一個錯誤，您可以對這次移除提出申訴。</string>
+    <string name="dialog_taken_down_file_description">此檔案已根據我們的[A]移除指引政策[/A]遭到移除。若您認為我們處置有誤，可以對此決定提出申訴。</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">僅限Pro會員</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->

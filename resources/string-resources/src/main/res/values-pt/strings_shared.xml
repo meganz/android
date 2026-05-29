@@ -2498,7 +2498,7 @@
     <string name="home_configuration_screen_menu_choose_default_start_screen">Escolher a tela inicial predeterminada</string>
     <string name="home_configuration_widget_removal_not_allowed_message">É obrigatório escolher pelo menos uma seção</string>
     <string name="file_link_subtitle">Link de arquivo</string>
-    <string name="favourites_empty_screen_description">Adicione pastas aos Favoritos para que sejam mostradas aqui</string>
+    <string name="favourites_empty_screen_description">Adicione arquivos e pastas aos Favoritos para vê-los aqui</string>
     <string name="offline_status">Offline</string>
     <string name="online_status">Online</string>
     <string name="away_status">Ausente</string>
@@ -2528,4 +2528,38 @@
     <string name="home_configuration_widget_shortcuts_widget_name">Atalhos</string>
     <string name="general_new_group_chat">Novo chat de grupo</string>
     <string name="general_new_group_chat_created">Novo chat de grupo criado</string>
+    <string name="node_sort_option_last_accessed_label">Data</string>
+    <string name="chat_explorer_recent_chats_header">Chats e reuniões recentes</string>
+    <string name="chat_explorer_all_contacts_header">Todos os contatos, chats e reuniões</string>
+    <string name="chat_explorer_read_only_chat_warning">Esta conversa está em modo somente leitura</string>
+    <string name="contacts_empty_title">Não há contatos</string>
+    <plurals name="general_number_participants">
+        <item quantity="one">%1$d participante</item>
+        <item quantity="many">%1$d de participantes</item>
+        <item quantity="other">%1$d participantes</item>
+    </plurals>
+    <string name="more_options">Mais opções</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="one">Deletar o link visualizado?</item>
+        <item quantity="many">Deletar os links visualizados?</item>
+        <item quantity="other">Deletar os links visualizados?</item>
+    </plurals>
+    <string name="general_view_button">Ver</string>
+    <string name="scan_dialog_discard_confirmation_title">Descartar o documento escaneado?</string>
+    <string name="scan_dialog_discard_confirmation_body">O documento escaneado será eliminado</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Descartar todos os documentos escaneados?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">O documento atual será eliminado</string>
+    <string name="scan_dialog_discard_confirmation_action">Descartar</string>
+    <string name="general_file_name">Nome do arquivo</string>
+    <string name="general_error_invalid_name">Nome inválido</string>
+    <string name="video_player_subtitles_empty_hint_description">Faça o upload de legendas no formato SRT para a sua Nuvem de arquivos</string>
+    <string name="video_player_subtitles_add_subtitles_button">Adicionar legenda</string>
+    <string name="general_file_type">Tipo de arquivo</string>
+    <string name="favourite_folders_empty_screen_description">Adicionar pastas aos Favoritos para vê-las aqui</string>
+    <string name="general_chat_sent_as_message">Enviado como mensagem</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% desligado</string>
+    <string name="general_error_incorrect_name">Corrija o nome do arquivo antes de prosseguir</string>
+    <string name="general_destination">Destino</string>
+    <string name="video_player_more_options_pip_option">Imagem em imagem</string>
+    <string name="file_link_unavaible_ToS_violation">O link do arquivo foi removido por infringir os nossos Termos de serviço.</string>
 </resources>

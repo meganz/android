@@ -261,7 +261,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">Loại&#160;bỏ đường liên&#160;kết</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
-    <string name="context_remove_link_warning_text">Đường liên kết này không còn được được công khai nữa.</string>
+    <string name="context_remove_link_warning_text">Đường liên kết này không còn được công khai nữa.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Mở</string>
     <!-- while file provider is downloading a file -->
@@ -651,7 +651,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Kiểm&#160;tra hộp&#160;thư email của bạn để tiếp&#160;tục.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Đã xảy ra lỗi, thử lại sau</string>
+    <string name="general_text_error">Đã phát&#160;sinh lỗi, xin thử lại</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Cần phải đăng nhập vào tài khoản để thực hiện hoạt động này.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
@@ -723,7 +723,7 @@
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Đường liên kết này không còn tồn tại</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ của MEGA.</string>
+    <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">URL vừa nhập này không đúng hoặc bị viết sai. Đường liên&#160;kết bạn đang cố truy&#160;cập không có tồn&#160;tại.</string>
     <!-- Plural of items which contains a folder. 2 items -->
@@ -891,7 +891,7 @@
     <!-- message shown when the status of the user coudn’t be changed -->
     <string name="changing_status_error">Lỗi. Trạng thái hoạt động chưa được thay đổi</string>
     <!-- message shown when a chat has not been created -->
-    <string name="create_chat_error">Có lỗi xảy ra trong qua trình thoát tạo cuộc chat</string>
+    <string name="create_chat_error">Có lỗi phát&#160;sinh ra trong lúc tạo cuộc chat</string>
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Rung</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
@@ -922,7 +922,7 @@
     <string name="error_sharing_folder">Lỗi chia sẻ thư mục. Xin thử lại.</string>
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
-        <item quantity="other">Tất cả dữ liệu liên quan đến đến các tên liên lạc được chọn này sẽ bị xóa bỏ hoàn toàn.</item>
+        <item quantity="other">Tất cả dữ liệu liên quan đến các tên liên lạc được chọn này sẽ bị xóa bỏ hoàn&#160;toàn.</item>
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
@@ -1061,7 +1061,7 @@
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Cảnh&#160;báo bản&#160;quyền cho tất cả người dùng</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA tôn&#160;trọng luật bản&#160;quyền của tất cả đơn&#160;vị và yêu&#160;cầu người sử&#160;dụng dịch&#160;vụ MEGA Cloud nên tuân&#160;theo theo quy&#160;định của pháp&#160;luật về quyền tác&#160;giả.</string>
+    <string name="copyright_alert_first_paragraph">MEGA tôn trọng luật bản&#160;quyền của tất cả đơn&#160;vị và yêu&#160;cầu người sử dụng dịch&#160;vụ MEGA Cloud nên tuân&#160;theo quy&#160;định của pháp&#160;luật về quyền tác&#160;giả.</string>
     <!-- text_copyright_alert_second_paragraph -->
     <string name="copyright_alert_second_paragraph">Quý&#160;vị bị nghiêm&#160;cấm sử&#160;dụng dịch&#160;vụ MEGA Cloud để vi&#160;phạm bản&#160;quyền. Quý&#160;vị không được tải lên, tải xuống, lưu&#160;trữ, chia&#160;sẻ, trình&#160;bày, phát trực&#160;tuyến, phân&#160;phối, gửi bằng email, tạo đường liên&#160;kết đến nội dung, truyền&#160;tải hoặc cung&#160;cấp bất&#160;kỳ tệp&#160;tin, dữ&#160;liệu hoặc nội&#160;dung nào có vi&#160;phạm bất&#160;kỳ bản&#160;quyền hoặc quyền sở&#160;hữu nào khác của bất&#160;kỳ cá&#160;nhân hoặc tổ&#160;chức nào.</string>
     <!-- text of the Agree button -->
@@ -1177,11 +1177,11 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Mời người tham&#160;gia MEGA</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Tải và cài đặt MEGA cho điện thoại</string>
+    <string name="title_install_app">Tải và cài app cho di&#160;động</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Thưởng đăng ký</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Cài app MEGA cho máy&#160;tính</string>
+    <string name="title_install_desktop">Cài app cho máy&#160;tính</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">Còn lại %1$d ngày</string>
     <!-- State to indicate an achievement has expired -->
@@ -1201,9 +1201,9 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Địa&#160;chỉ email không đúng cú&#160;pháp</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Bạn đã nhận được %1$s thêm cho không&#160;gian lưu&#160;trữ từ việc cài app MEGA cho máy&#160;tính</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Bạn đã nhận được %1$s thêm cho không&#160;gian lưu trữ từ việc cài app cho máy&#160;tính</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Bạn đã nhận được %1$s thêm cho không gian lưu trữ từ việc cài app MEGA cho di động</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Bạn đã nhận được %1$s thêm cho không&#160;gian lưu trữ từ việc cài app cho di&#160;động</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Bạn đã nhận được %1$s không&#160;gian lưu&#160;trữ thưởng cho việc đăng&#160;ký của bạn.</string>
     <!-- menu items -->
@@ -1341,7 +1341,7 @@
     <!-- Message shown when a link is being processing -->
     <string name="processing_link">Đang xử&#160;lý đường liên&#160;kết&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
-    <string name="passwd_weak">Mật khẩu này quá dễ đoán. Hãy thử tạo một mật khẩu dài hơn. Bao gồm chữ thường và chữ in HOA. Thêm các ký tự đặc biệt. Đừng dùng tên hay những từ thông dụng.</string>
+    <string name="passwd_weak">Mật khẩu này quá dễ đoán. Hãy thử tạo một mật khẩu dài hơn. Bao gồm chữ thường và chữ in Hoa. Thêm các ký tự đặc biệt. Đừng dùng tên hay những từ thông dụng.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
     <string name="passwd_medium">Mật khẩu của bạn đủ tốt để tiến hành, nhưng khuyên bạn nên làm mật khẩu khó hơn trong tương lai.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
@@ -1595,7 +1595,7 @@
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">App xác&#160;thực 2&#160;yếu&#160;tố</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Bạn có muốn tới CH Google Play để tải về một app lập xác thực hay không?</string>
+    <string name="open_play_store_2fa">Bạn có muốn tới cửa&#160;hàng Google Play để tải về một app lập xác&#160;thực hay không?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -1763,7 +1763,7 @@
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]trong tổng %2$s đang dùng[/B]</string>
     <!-- Text of the alert dialog when the user is changing the API URL to staging -->
-    <string name="staging_api_url_text">Bạn có chắc muốn chuyển sang máy chủ thử nghiệm? Tài khoản có thể sẽ gặp các vấn đề không thể phục hồi được.</string>
+    <string name="staging_api_url_text">Bạn có chắc muốn chuyển sang máy chủ thử&#160;nghiệm? Tài&#160;khoản có thể sẽ gặp các vấn đề không thể phục&#160;hồi được.</string>
     <!-- Title of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
     <string name="title_confirmation_open_camera_on_chat">Bật máy ảnh?</string>
     <!-- Text of the confirmation dialog to open the camera app and lose the relay of the local camera on the in progress call -->
@@ -1981,11 +1981,11 @@
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Bật camêra</string>
     <!-- Subtitle of the screen asking permissions for camera -->
-    <string name="allow_acces_camera_subtitle">Cho phép ứng dụng MEGA sử dụng camêra chủa điện thoại để thao tác các việc như quét tài liệu, chụp ảnh và gọi video khi bạn yêu cầu.</string>
+    <string name="allow_acces_camera_subtitle">Cho phép ứng dụng sử dụng camêra của điện&#160;thoại để thao tác các việc như quét tài liệu, chụp ảnh và gọi video khi bạn yêu&#160;cầu.</string>
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Thực hiện cuộc gọi</string>
     <!-- Subtitle of the screen asking permissions for microphone -->
-    <string name="allow_acces_calls_subtitle_microphone">Cho phép ứng dụng MEGA sử dụng micrôphone của điện thoại để thực hiện cuộc gọi khi bạn yêu cầu.</string>
+    <string name="allow_acces_calls_subtitle_microphone">Cho phép ứng dụng sử dụng micrô của điện&#160;thoại để thực hiện cuộc gọi khi bạn yêu&#160;cầu.</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Chia sẻ tệp tin</string>
     <!-- Message shown when a group call ends. -->
@@ -2011,7 +2011,7 @@
     <!-- String that appears when we show the last activity of a contact, but it’s been a long time ago that we don’t see any activity from that user -->
     <string name="last_seen_long_time_ago">[A]Lần thấy cuối [/A]đã một thời gian rất lâu</string>
     <!-- String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. -->
-    <string name="last_seen_general">[A]Lần thấy cuối [/A] vào lúc %2$s lúc %1$s</string>
+    <string name="last_seen_general">[A]Có mặt lần cuối [/A]%1$s lúc %2$s</string>
     <!-- label today -->
     <string name="label_today">Hôm nay</string>
     <!-- label yesterday -->
@@ -2023,7 +2023,7 @@
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Không thể tham gia vào cuộc gọi do vượt quá số lượng tối đa thành viên tham gia.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Đã xảy ra lỗi và ứng dụng đã chọn không thể mở tệp này.</string>
+    <string name="error_open_file_with">Đã phát&#160;sinh ra lỗi và ứng&#160;dụng đã chọn không thể mở tệp này được.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
     <string name="outgoing_call_starting">Đang gọi&#8230;</string>
     <!-- Content of a invalid meta message -->
@@ -2176,7 +2176,7 @@
     </plurals>
     <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="other">%d videos</item>
+        <item quantity="other">%d&#160;videos</item>
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
@@ -2415,7 +2415,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Tự&#160;động xóa các tin&#160;nhắn đã có lâu hơn:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Bạn có chắc muốn don toàn bộ lịch sử các tin nhắn của cuộc trò chuyện này không?</string>
+    <string name="confirmation_clear_chat_history">Bạn có chắc muốn don toàn bộ lịch sử các tin&#160;nhắn của cuộc trò chuyện này không?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 năm</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -2597,7 +2597,7 @@
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">Năm</string>
     <!-- Text to show as production api server option -->
-    <string name="production_api_server">Production</string>
+    <string name="production_api_server">Chuẩn</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Đổi máy chủ</string>
     <!-- Show line numbers action -->
@@ -2899,7 +2899,7 @@
     <!-- Title of pop-up error message for taken down file -->
     <string name="error_file_not_available">Tệp tin không còn tồn tại</string>
     <!-- Body of pop-up error message for taken down file. -->
-    <string name="error_takendown_file">Tệp tin đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ của MEGA.</string>
+    <string name="error_takendown_file">Tệp tin đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
     <!-- Error shown when download a file that has violated ToS/AUP. String as short as possible. Max characters are 39. -->
     <string name="error_download_takendown_file">Vi phạm Điều Khoản Dịch Vụ</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
@@ -3295,7 +3295,7 @@
     <!-- This is the Body of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads -->
     <string name="settings_camera_uploads_grant_media_permissions_body">Để bật đăng&#160;tải camêra, cấp quyền cho MEGA truy&#160;cập vào kho hình&#160;ảnh và các nội&#160;dung đa phương&#160;tiện khác có trong thiết&#160;bị của bạn.</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Android OS will attempt to request the Media Permission again -->
-    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Cho phép quyền truy&#160;cập</string>
+    <string name="settings_camera_uploads_grant_media_permissions_positive_button">Cấp quyền truy&#160;cập</string>
     <!-- This is the "Positive Button" of the Dialog that appears when the user has denied the Media Permissions in Settings Camera Uploads. Upon click, the Dialog will simply be dismissed. -->
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Không cấp quyền</string>
     <!--  -->
@@ -3709,13 +3709,13 @@
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Không&#160;thể xác&#160;thực tên liên&#160;lạc</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">Bạn không&#160;thể xác&#160;thực %s vì họ không&#160;có trong sổ liên&#160;lạc của bạn. Hãy chờ đến khi họ chấp&#160;nhận lời&#160;mời của bạn trước.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Bạn không thể xác thực %s vì họ không có trong sổ liên&#160;lạc của bạn. Hãy chờ đến khi họ chấp&#160;nhận lời mời của bạn trước.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Bắt&#160;đầu</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">Tệp&#160;tin này đã bị tháo&#160;gỡ theo quy&#160;định có trong [A]Chính&#160;Sách Xử&#160;Lý Gỡ&#160;Bỏ Nội&#160;Dung[/A] của MEGA.</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Tệp tin này đã bị tháo gỡ theo quy&#160;định có trong [A]Chính Sách Xử Lý Gỡ Bỏ Nội Dung[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">Thư&#160;mục này đã bị tháo&#160;gỡ theo quy&#160;định có trong [A]Chính&#160;Sách Xử&#160;Lý Gỡ&#160;Bỏ Nội&#160;Dung[/A] của MEGA.</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">Thư mục này đã bị tháo gỡ theo quy định có trong [A]Chính Sách Xử Lý Gỡ Bỏ Nội Dung[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Tham gia</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -3981,7 +3981,7 @@
     <!-- Confirmation dialog title to clear the meeting history -->
     <string name="meetings_clear_history_confirmation_dialog_title">Dọn lịch&#160;sử cuộc họp</string>
     <!-- Confirmation dialog message to clear the meeting history -->
-    <string name="meetings_clear_history_confirmation_dialog_message">Bạn có chắc muốn dọn toàn&#160;bộ lịch&#160;sử các tin&#160;nhắn của cuộc họp này không?</string>
+    <string name="meetings_clear_history_confirmation_dialog_message">Bạn có chắc muốn dọn toàn bộ lịch&#160;sử các tin&#160;nhắn của cuộc họp này không?</string>
     <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
     <string name="meetings_mute_notifications_dialog_title">Tắt tiếng tất&#160;cả các âm&#160;báo cuộc họp trong</string>
     <!-- Confirmation dialog title to leave a meeting -->
@@ -4157,7 +4157,7 @@
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">Bạn giờ đây có thể đặt lịch cuộc họp một&#160;lần và định&#160;kỳ.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">Bạn có thể bắt&#160;đầu cuộc họp trước thời&#160;gian dự&#160;kiến ​​bằng cách chạm vào [A]Bắt&#160;đầu cuộc họp[/A] khi ở trong phòng họp.</string>
+    <string name="meeting_list_tooltip_sched_description">Bạn có thể bắt đầu cuộc họp trước thời gian dự kiến bằng cách chạm vào [A]Bắt đầu cuộc họp[/A] khi ở trong phòng họp.</string>
     <!-- Meeting list tooltip title for recurring meeting item -->
     <string name="meeting_list_tooltip_recurring_title">Quản&#160;lý các cuộc họp định&#160;kỳ</string>
     <!-- Meeting list tooltip description for recurring meeting item -->
@@ -4245,7 +4245,7 @@
     <!-- Dialog description when waiting room has been inactive for a while -->
     <string name="meetings_waiting_room_inactive_host_dialog_description">Không có phản&#160;hồi cho yêu&#160;cầu của bạn để tham&#160;gia cuộc họp. Bạn sẽ bị loại ra khỏi phòng chờ. Hãy thử tham&#160;gia lại sau.</string>
     <!-- Message after selected albums are deleted (singular) -->
-    <string name="photos_album_deleted_message_singular">Đã xóa %d album</string>
+    <string name="photos_album_deleted_message_singular">“%s” đã bị xóa</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s đang chờ để tham&#160;gia “%2$s”.</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
@@ -4379,7 +4379,7 @@
     <!-- Text content for the chat bottom sheet when gallery permission is not granted -->
     <string name="chat_toolbar_bottom_sheet_allow_gallery_access_title">Cho phép truy&#160;cập vào Kho&#160;ảnh của bạn</string>
     <!-- Button text to grant permission in the chat bottom sheet -->
-    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cho phép quyền truy&#160;cập</string>
+    <string name="chat_toolbar_bottom_sheet_grant_gallery_access_button">Cấp quyền truy&#160;cập</string>
     <!-- The title of the Dialog shown to Update the application from playstore -->
     <string name="meetings_chat_screen_app_update_dialog_title">Cần phải cập&#160;nhật</string>
     <!-- The Body of the Dialog shown to Update the application from playstore -->

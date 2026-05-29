@@ -33,7 +33,7 @@
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
     <string name="api_ekey">Lỗi giải mã</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-    <string name="api_esid">Bad session ID</string>
+    <string name="api_esid">Số ID phiên sai</string>
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Bị chặn</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->

@@ -2503,7 +2503,7 @@
     <string name="home_configuration_screen_toolbar_subtitle">Trage secțiunile pentru a le reordona.</string>
     <string name="home_configuration_screen_menu_reset_to_default">Resetează la valorile implicite.</string>
     <string name="home_configuration_screen_menu_choose_default_start_screen">Alege ecranul de pornire implicit.</string>
-    <string name="favourites_empty_screen_description">Adaugă foldere la Favorite pentru a le vedea aici.</string>
+    <string name="favourites_empty_screen_description">Adaugă fișiere și foldere în Favorite pentru a le vedea aici</string>
     <string name="name_collision_choose_folder_header">Selectează folderul pe care vrei să-l păstrezi.</string>
     <string name="name_collision_folder_warning_upload_and_rename">Folderul pe care îl încarci va fi redenumit ca:</string>
     <string name="home_configuration_widget_removal_not_allowed_message">Este necesară cel puțin o secțiune de acasă.</string>
@@ -2512,4 +2512,46 @@
     <string name="home_configuration_widget_my_account_widget_name">Contul meu</string>
     <string name="general_new_group_chat">Chat de group nou</string>
     <string name="general_new_group_chat_created">A fost creat un nou chat de grup</string>
+    <string name="node_sort_option_last_accessed_label">Dată</string>
+    <string name="general_view_button">Vezi</string>
+    <string name="scan_dialog_discard_confirmation_title">Înlături scanarea?</string>
+    <string name="scan_dialog_discard_confirmation_body">Scanarea actuală va fi pierdută</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Înlături toate scanările?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">Documentul actual va fi pierdut</string>
+    <string name="scan_dialog_discard_confirmation_action">Înlătură</string>
+    <string name="general_file_name">Numele fișierului</string>
+    <string name="general_error_invalid_name">Nume nevalid</string>
+    <string name="error_file_not_supported_title">Fișier nesuportat</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">Comenzi rapide</string>
+    <string name="chat_explorer_recent_chats_header">Chat-urile și întâlnirile recente</string>
+    <string name="video_player_subtitles_empty_hint_description">Încărcați subtitrările în format SRT în drive-ul dvs. din Cloud</string>
+    <string name="video_player_subtitles_add_subtitles_button">Adaugă subtitrare</string>
+    <string name="general_file_type">Tipul fișierului</string>
+    <string name="more_options">Mai multe opțiuni</string>
+    <string name="favourite_folders_empty_screen_description">Adaugă foldere la Favorite pentru a le vedea aici.</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="one">Șterge link-ul vizualizat</item>
+        <item quantity="few">Șterge link-urile vizualizate</item>
+        <item quantity="other">Șterge link-urile vizualizate</item>
+    </plurals>
+    <string name="general_chat_sent_as_message">Trimis ca mesaj</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% oprit</string>
+    <string name="general_error_incorrect_name">Corectează numele fișierului înainte de a continua</string>
+    <string name="general_destination">Destinație</string>
+    <string name="video_player_more_options_pip_option">Imagine în imagine</string>
+    <string name="home_configuration_tooltip_description">Alege ceea ce vezi și organizează-l astfel încât să corespundă nevoilor tale</string>
+    <string name="home_configuration_tooltip_action">Explorează</string>
+    <string name="error_fail_to_play_video_title">Nu se poate reda videoclipul</string>
+    <string name="error_fail_to_play_video_message">Ne pare rău. A intervenit o eroare și nu putem deschide fișierul</string>
+    <string name="error_file_not_supported_message">Descarcă acest fișier pentru a-l deschide într-o aplicație compatibilă</string>
+    <string name="error_no_internet_message">Nu se poate deschide fișierul din cauza problemelor de conectivitate. Verifică conexiunea la internet și încearcă din nou</string>
+    <string name="chat_explorer_all_contacts_header">Toate contactele, conversațiile și întâlnirile</string>
+    <string name="chat_explorer_read_only_chat_warning">Această conversație este doar în modul de citire</string>
+    <string name="contacts_empty_title">Nu au fost găsite contacte</string>
+    <plurals name="general_number_participants">
+        <item quantity="one">%1$d participant</item>
+        <item quantity="few">%1$d participanți</item>
+        <item quantity="other">%1$d participanți</item>
+    </plurals>
+    <string name="file_link_unavaible_ToS_violation">Linkul fișierului a fost eliminat deoarece a încălcat Termenii de utilizare a serviciului.</string>
 </resources>

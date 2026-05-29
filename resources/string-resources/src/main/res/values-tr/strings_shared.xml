@@ -2414,7 +2414,7 @@
     <string name="home_configuration_screen_menu_choose_default_start_screen">Varsayılan başlangıç ekranı seç</string>
     <string name="home_configuration_widget_removal_not_allowed_message">En az bir ana sayfa bölümü gereklidir</string>
     <string name="file_link_subtitle">Dosya bağlantısı</string>
-    <string name="favourites_empty_screen_description">Klasörleri burada görmek için Favoriler’e ekleyin</string>
+    <string name="favourites_empty_screen_description">Burada görmek için Favorilere dosya ve klasör ekleyin</string>
     <string name="name_collision_choose_folder_header">Tutmak istediğiniz klasörü seçin</string>
     <string name="name_collision_folder_warning_upload_and_rename">Yüklediğiniz klasör şu şekilde yeniden adlandırılacak:</string>
     <string name="offline_status">Çevrim dışı</string>
@@ -2444,4 +2444,41 @@
     <string name="home_configuration_widget_shortcuts_widget_name">Kısayollar</string>
     <string name="general_new_group_chat">Yeni grup sohbeti</string>
     <string name="general_new_group_chat_created">Yeni grup sohbeti oluşturuldu</string>
+    <string name="node_sort_option_last_accessed_label">Tarih</string>
+    <string name="chat_explorer_recent_chats_header">Son sohbetler ve toplantılar</string>
+    <string name="chat_explorer_all_contacts_header">Tüm kişiler, sohbetler ve toplantılar</string>
+    <string name="chat_explorer_read_only_chat_warning">Bu sohbet salt okunurdur</string>
+    <string name="contacts_empty_title">Kişi bulunamadı</string>
+    <plurals name="general_number_participants">
+        <item quantity="one">%1$d katılımcı</item>
+        <item quantity="other">%1$d katılımcı</item>
+    </plurals>
+    <string name="more_options">Daha fazla seçenek</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="one">Görüntülenen bağlantı temizlensin mi?</item>
+        <item quantity="other">Görüntülenen bağlantılar temizlensin mi?</item>
+    </plurals>
+    <string name="favourite_folders_empty_screen_description">Burada görmek için Favorilere klasör ekleyin</string>
+    <string name="general_chat_sent_as_message">Mesaj olarak gönderildi</string>
+    <string name="general_view_button">Görüntüle</string>
+    <string name="video_player_subtitles_empty_hint_description">SRT formatındaki altyazıları Bulut depolamanıza yükleyin</string>
+    <string name="video_player_subtitles_add_subtitles_button">Altyazıyı ekle</string>
+    <string name="scan_dialog_discard_confirmation_title">Tarama yok sayılsın mi?</string>
+    <string name="scan_dialog_discard_confirmation_body">Mevcut tarama kaybolacak</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Tüm taramalar yok sayılsın mı?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">Mevcut belge kaybolacak</string>
+    <string name="scan_dialog_discard_confirmation_action">Yok say</string>
+    <string name="campaign_name_with_discount">%1$s: %%%2$d indirim</string>
+    <string name="general_file_name">Dosya adı</string>
+    <string name="general_error_invalid_name">Geçersiz ad</string>
+    <string name="general_file_type">Dosya türü</string>
+    <string name="general_error_incorrect_name">Devam etmeden önce dosya adınızı düzeltin</string>
+    <string name="general_destination">Hedef</string>
+    <string name="video_player_more_options_pip_option">Resim içinde resim</string>
+    <string name="cloud_drive_inactivity_banner_title">Hesabınız çok uzun süredir aktif değil</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one">%1$d aydan uzun süredir giriş yapmadığınız için dosyalarınız, etkinlik dışı kalma politikamız uyarınca silindi</item>
+        <item quantity="other">%1$d aydan uzun süredir giriş yapmadığınız için dosyalarınız, etkinlik dışı kalma politikamız uyarınca silindi</item>
+    </plurals>
+    <string name="file_link_unavaible_ToS_violation">Hizmet Şartlarımızı ihlal ettiği için dosya bağlantısı kaldırıldı.</string>
 </resources>

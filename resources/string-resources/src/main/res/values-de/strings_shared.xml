@@ -2407,7 +2407,7 @@
     <string name="home_configuration_screen_menu_choose_default_start_screen">Standard-Startbildschirm wählen</string>
     <string name="home_configuration_widget_removal_not_allowed_message">Mindestens ein Startbildschirm-Bereich erforderlich</string>
     <string name="file_link_subtitle">Dateilink</string>
-    <string name="favourites_empty_screen_description">Ordner zu Favoriten hinzufügen, um sie hier zu sehen</string>
+    <string name="favourites_empty_screen_description">Dateien und Ordner zu Favoriten hinzufügen, um sie hier zu sehen</string>
     <string name="name_collision_choose_folder_header">Wählen Sie den Ordner aus, den Sie behalten möchten</string>
     <string name="name_collision_folder_warning_upload_and_rename">Der hochgeladene Ordner wird umbenannt in:</string>
     <string name="google_sign_in">Mit Google anmelden</string>
@@ -2428,4 +2428,41 @@
     <string name="home_configuration_widget_shortcuts_widget_name">Verknüpfungen</string>
     <string name="general_new_group_chat">Neuer Gruppenchat</string>
     <string name="general_new_group_chat_created">Neuer Gruppenchat erstellt</string>
+    <string name="chat_explorer_recent_chats_header">Kürzlich verwendete Chats und Meetings</string>
+    <string name="chat_explorer_all_contacts_header">Alle Kontakte, Chats und Meetings</string>
+    <string name="chat_explorer_read_only_chat_warning">Diese Unterhaltung ist schreibgeschützt</string>
+    <string name="contacts_empty_title">Keine Kontakte gefunden</string>
+    <plurals name="general_number_participants">
+        <item quantity="one">%1$d Teilnehmer</item>
+        <item quantity="other">%1$d Teilnehmer</item>
+    </plurals>
+    <string name="node_sort_option_last_accessed_label">Datum</string>
+    <string name="general_view_button">Ansehen</string>
+    <string name="video_player_subtitles_add_subtitles_button">Untertitel hinzufügen</string>
+    <string name="video_player_subtitles_empty_hint_description">Untertitel im SRT-Format in Ihr Cloud Drive hochladen</string>
+    <string name="more_options">Weitere Optionen</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="one">Angesehenen Link löschen?</item>
+        <item quantity="other">Angesehene Links löschen?</item>
+    </plurals>
+    <string name="favourite_folders_empty_screen_description">Fügen Sie Ordner zu Ihren Favoriten hinzu, um sie hier anzuzeigen</string>
+    <string name="general_chat_sent_as_message">Als Nachricht gesendet</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d %% gespart</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Alle Scans verwerfen?</string>
+    <string name="scan_dialog_discard_confirmation_title">Scan verwerfen?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">Das aktuelle Dokument wird nicht gespeichert</string>
+    <string name="scan_dialog_discard_confirmation_action">Verwerfen</string>
+    <string name="scan_dialog_discard_confirmation_body">Der aktuelle Scan wird nicht gespeichert</string>
+    <string name="general_file_name">Dateiname</string>
+    <string name="general_error_invalid_name">Ungültiger Name</string>
+    <string name="video_player_more_options_pip_option">Bild in Bild</string>
+    <string name="general_file_type">Dateityp</string>
+    <string name="general_error_incorrect_name">Korrigieren Sie den Dateinamen, bevor Sie fortfahren</string>
+    <string name="general_destination">Ziel</string>
+    <string name="cloud_drive_inactivity_banner_title">Ihr Account war zu lange inaktiv</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one">Da Sie sich seit mehr als %1$d Monat nicht mehr eingeloggt haben, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht.</item>
+        <item quantity="other">Da Sie sich seit mehr als %1$d Monaten nicht mehr eingeloggt haben, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht.</item>
+    </plurals>
+    <string name="file_link_unavaible_ToS_violation">Der Dateilink wurde entfernt, da er gegen unsere Nutzungsbedingungen verstieß.</string>
 </resources>

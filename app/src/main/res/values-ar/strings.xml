@@ -39,7 +39,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">جاري التحميل</string>
     <!-- state while importing the file -->
-    <string name="general_importing">إضافة</string>
+    <string name="general_importing">جاري الإضافة</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">إعادة توجيه</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->

@@ -853,7 +853,7 @@
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">由於多次侵犯版權的指控，您的MEGA帳戶已被停權。這意味著您無法存取您的帳戶或當中的資料。\n檢查您的電子郵件收件匣，瞭解有關如何提交恢復存取申請的更多資訊。</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
-    <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法再存取您儲存的資料，也無法獲得註冊新MEGA帳戶的授權。</string>
+    <string name="dialog_account_suspended_ToS_non_copyright_message">由於違反MEGA的服務條款，您的帳戶已被終止。\n您將無法恢復您儲存資料的存取權限，也無法獲得註冊新MEGA帳戶的授權。</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">您的帳戶已被您的管理員停用。相關詳細資訊，請與您的商業帳戶管理員聯絡。</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
@@ -1875,10 +1875,10 @@
     <string name="search_placeholder_folder">在%s中搜尋</string>
     <string name="search_placeholder_cloud_drive">在雲端硬碟中搜尋</string>
     <string name="search_placeholder_rubbish_bin">在垃垃筒中搜尋</string>
-    <string name="search_placeholder_incoming_shares">在傳入的共享中搜尋</string>
-    <string name="search_placeholder_outgoing_shares">在傳出的共享中搜尋</string>
+    <string name="search_placeholder_incoming_shares">在內收共享中搜尋</string>
+    <string name="search_placeholder_outgoing_shares">在外發共享中搜尋</string>
     <string name="search_placeholder_links">在連結中搜尋</string>
-    <string name="search_placeholder_favourites">在我的收藏中搜尋</string>
+    <string name="search_placeholder_favourites">在收藏中搜尋</string>
     <string name="search_placeholder_documents">在文件中搜尋</string>
     <string name="search_placeholder_audios">在音訊中搜尋</string>
     <string name="search_placeholder_videos">在影片中搜尋</string>
@@ -1993,11 +1993,11 @@
     <string name="home_recents_options_menu_hide_activity">隱藏近期動態</string>
     <string name="home_recents_empty_button_upload">上傳</string>
     <string name="home_recents_hidden_button_show_activity">顯示動態</string>
-    <string name="shares_screen_incoming_shares_tab_title">傳入</string>
-    <string name="shares_screen_outgoing_shares_tab_title">傳出</string>
+    <string name="shares_screen_incoming_shares_tab_title">內收</string>
+    <string name="shares_screen_outgoing_shares_tab_title">外發</string>
     <string name="shares_screen_links_shares_tab_title">連結</string>
-    <string name="shares_screen_incoming_empty">[B]沒有人[/B][A]共享資料夾給你[/A]</string>
-    <string name="shares_screen_outgoing_empty">[B]沒有[/B][A]共享資料夾給別人[/A]</string>
+    <string name="shares_screen_incoming_empty">[B]無[/B][A]內收共享資料夾[/A]</string>
+    <string name="shares_screen_outgoing_empty">[B]沒有[/B][A]外發共享資料夾[/A]</string>
     <string name="incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未驗證的聯絡人共享。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。 點選您要驗證的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
     <string name="homepage_favourites_empty_hint">[B]未[/B][B]找到[/B][A]收藏[/A]</string>
     <string name="general_create_label">建立</string>
@@ -2158,7 +2158,7 @@
     <plurals name="num_of_folders_num_of_files_2">
         <item quantity="other">%d個檔案</item>
     </plurals>
-    <string name="general_title_incoming_shares">傳入的共享</string>
+    <string name="general_title_incoming_shares">內收共享</string>
     <string name="pdf_viewer_error_no_network">沒有網路連線。請重新連線來開啟檔案。</string>
     <string name="pdf_viewer_dialog_text_enter_password">輸入密碼以開啟檔案</string>
     <string name="pdf_viewer_dialog_error_incorrect_password">密碼錯誤</string>
@@ -2277,7 +2277,7 @@
     <string name="sync_error_folder_conflict">「%1$s」%2$s已包含在%4$s的%3$s內了。請選擇其它。</string>
     <string name="home_widget_continue_where_left_off">從上次中斷的地方繼續</string>
     <string name="settings_transfer_connections_title">傳輸連線數</string>
-    <string name="settings_transfer_connections_text">設定每個檔案傳輸任務的並行連線數。調高數值可提升傳輸速度，但會增加耗電量與傳輸用量。</string>
+    <string name="settings_transfer_connections_text">設定進行中傳輸的最大並行連線數。提高數值可能會加快大檔案的傳輸速度，但會增加耗電量與記憶體使用量。</string>
     <string name="settings_transfer_download_connections">下載連線數</string>
     <string name="settings_transfer_upload_connections">上傳連線數</string>
     <string name="settings_transfer_connections_slow_networs">%1$d（最適合慢速網路）</string>
@@ -2333,7 +2333,7 @@
     <string name="home_configuration_screen_menu_choose_default_start_screen">選擇預設啟動畫面</string>
     <string name="home_configuration_widget_removal_not_allowed_message">主畫面必須包含至少一個區塊</string>
     <string name="file_link_subtitle">檔案連結</string>
-    <string name="favourites_empty_screen_description">將資料夾加入收藏，即可在此查看</string>
+    <string name="favourites_empty_screen_description">將檔案和資料夾加入收藏，即可在此查看</string>
     <string name="name_collision_choose_folder_header">請選擇您想要保留的資料夾</string>
     <string name="name_collision_folder_warning_upload_and_rename">您正在上傳的資料夾將重新命名為：</string>
     <string name="google_sign_in">使用Google帳號登入</string>
@@ -2346,4 +2346,42 @@
     <string name="home_configuration_widget_my_account_widget_name">我的帳戶</string>
     <string name="general_new_group_chat">新群組對話</string>
     <string name="general_new_group_chat_created">已建立群組對話</string>
+    <string name="node_sort_option_last_accessed_label">日期</string>
+    <string name="general_view_button">檢視</string>
+    <string name="home_configuration_tooltip_description">選擇您想查看的內容並依需求調整配置</string>
+    <string name="home_configuration_tooltip_action">瀏覽</string>
+    <string name="error_fail_to_play_video_title">無法播放影片</string>
+    <string name="error_fail_to_play_video_message">抱歉，發生錯誤，無法開啟此檔案。</string>
+    <string name="error_file_not_supported_title">不支援此檔案</string>
+    <string name="error_file_not_supported_message">請下載此檔案以透過相容的應用程式開啟。</string>
+    <string name="error_no_internet_message">因連線問題無法開啟檔案。請檢查您的網路連線並重試。</string>
+    <string name="home_configuration_widget_shortcuts_widget_name">捷徑</string>
+    <string name="chat_explorer_recent_chats_header">近期對話與會議</string>
+    <string name="chat_explorer_all_contacts_header">所有聯絡人、對話與會議</string>
+    <string name="chat_explorer_read_only_chat_warning">此對話為唯讀狀態</string>
+    <string name="contacts_empty_title">找不到聯絡人</string>
+    <plurals name="general_number_participants">
+        <item quantity="other">%1$d個與會者</item>
+    </plurals>
+    <string name="more_options">更多選項</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="other">清除已檢視連結？</item>
+    </plurals>
+    <string name="favourite_folders_empty_screen_description">將資料夾加入收藏，即可在此處顯示</string>
+    <string name="general_chat_sent_as_message">已作為訊息傳送</string>
+    <string name="video_player_subtitles_empty_hint_description">上傳SRT字幕到雲端硬碟</string>
+    <string name="video_player_subtitles_add_subtitles_button">新增字幕</string>
+    <string name="scan_dialog_discard_confirmation_title">捨棄掃描？</string>
+    <string name="scan_dialog_discard_confirmation_body">目前的掃描將遺失</string>
+    <string name="scan_dialog_discard_all_confirmation_title">捨棄所有掃描？</string>
+    <string name="scan_dialog_discard_all_confirmation_body">目前的文件將遺失</string>
+    <string name="scan_dialog_discard_confirmation_action">捨棄</string>
+    <string name="general_file_name">檔案名稱</string>
+    <string name="general_error_invalid_name">無效的名稱</string>
+    <string name="general_file_type">檔案類型</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% 關閉</string>
+    <string name="general_error_incorrect_name">在繼續之前，請先修正您的檔案名稱</string>
+    <string name="general_destination">目的地</string>
+    <string name="video_player_more_options_pip_option">子母畫面</string>
+    <string name="file_link_unavaible_ToS_violation">該檔案連結因違反我們的服務條款而被刪除。</string>
 </resources>

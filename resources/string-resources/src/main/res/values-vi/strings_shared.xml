@@ -172,7 +172,7 @@
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="other">%1$d videos</item>
+        <item quantity="other">%1$d&#160;videos</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
     <string name="chat_click_link_in_message_intent_not_available">Bạn có thể không có ứng&#160;dụng nào đã được cài để mở trang web này</string>
@@ -479,7 +479,7 @@
     <!-- Option in the survey indicating that the user doesn't need all the storage in their plan -->
     <string name="account_cancel_subscription_survey_option_no_storage_need">Tôi không cần tất cả dung lượng trong gói của mình</string>
     <!-- Option in the survey indicating that the user needs features MEGA doesn't have -->
-    <string name="account_cancel_subscription_survey_option_missing_features">Tôi cần sử đụng các tính năng mà MEGA không có có</string>
+    <string name="account_cancel_subscription_survey_option_missing_features">Tôi cần sử đụng các tính năng mà MEGA không có</string>
     <!-- Option in the survey indicating that the user is switching to a different provider -->
     <string name="account_cancel_subscription_survey_option_switch_provider">Tôi muốn chuyển sang một dịch vụ cung cấp mà tôi thích hơn</string>
     <!-- Option in the survey indicating that the user finds MEGA confusing and difficult to use -->
@@ -829,11 +829,11 @@
         <item quantity="other">%2$d tệp tin được thêm vào “%1$s”. Những tệp tin có trùng lặp sẽ không thể thêm lại.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Đang lưu %1$s vào Ổ&#160;Mây...</string>
+    <string name="transfers_start_upload_profile_qr_code_message">Đang lưu %1$s vào Ổ&#160;Mây&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Đang tải lên&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% được tải lên...</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% được tải lên&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Không hoạt động</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -861,7 +861,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Xác nhận email</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Chúng&#160;tôi đã gửi một email đến [P]%s[/P] với đường liên&#160;kết. Nhấn vào đường liên&#160;kết để xác&#160;thực địa&#160;chỉ email của bạn và để kích&#160;hoạt tài&#160;khoản. \n\nNếu bạn không nhận được email, hãy kiểm&#160;tra thư&#160;mục thư rác của bạn hoặc thử lại. Bất kỳ vấn&#160;đề nào khác, xin ghé [A]Trung&#160;Tâm Hướng&#160;Dẫn.[/A]</string>
+    <string name="email_confirmation_content">Chúng&#160;tôi đã gửi một email đến [P]%s[/P] với đường liên&#160;kết. Nhấn vào đường liên&#160;kết để xác&#160;thực địa&#160;chỉ email của bạn và để kích&#160;hoạt tài&#160;khoản. \n\nNếu bạn không nhận được email, hãy kiểm&#160;tra thư&#160;mục thư rác của bạn hoặc thử lại. Bất kỳ vấn&#160;đề nào khác, xin ghé [A]Trung&#160;Tâm Hướng&#160;Dẫn[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Gửi lại</string>
     <!-- General change email address -->
@@ -923,7 +923,7 @@
     <!--Message to be shown when password is considered weak -->
     <string name="sign_up_password_weak_password_error_message">Mật khẩu của bạn quá dễ đoán. Nên thử kết hợp các ký tự phức tạp khác nhau.</string>
     <!--Sign Up page terms and condition content text-->
-    <string name="sign_up_terms_condition_content">Tôi đã đọc và đồng ý với [A]Điều Khoản Dịch Vụ[/A] của MEGA.</string>
+    <string name="sign_up_terms_condition_content">Tôi đã đọc và đồng ý với [A]Điều Khoản Dịch Vụ của MEGA.[/A]</string>
     <!--Sign Up page password hint and suggestion title-->
     <string name="sign_up_password_hint_title_text">Tốt hơn là nên có:</string>
     <!--Sign Up page password hint to suggest a password with upper case and lower case letter-->
@@ -933,7 +933,7 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Bạn đã có tài khoản MEGA rồi? [A]Đăng nhập[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Đang tải tệp tin...</string>
+    <string name="transfers_fake_preview_text">Đang tải tệp tin&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_title">Hủy tải bản xem trước?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
@@ -1207,7 +1207,7 @@
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
     <string name="camera_uploads_notification_title_paused_warning">Đăng tải camêra đã tạm dừng</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
-    <string name="camera_uploads_notification_content_no_wifi_connection">Hãy kết nối với WIFI hoặc cho phép dùng dữ&#160;liệu mạng di&#160;động</string>
+    <string name="camera_uploads_notification_content_no_wifi_connection">Kết&#160;nối Wi-Fi hoặc cho&#160;phép sử&#160;dụng dữ&#160;liệu di&#160;động</string>
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Cho phép dùng mạng di dộng</string>
     <!-- Alert title before download a big file for preview. -->
@@ -1337,7 +1337,7 @@
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Màu xám</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Đã xảy ra lỗi và ứng dụng đã chọn không thể mở tệp này.</string>
+    <string name="error_open_file_with">Đã phát&#160;sinh ra lỗi và ứng&#160;dụng đã chọn không thể mở tệp này được.</string>
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Bạn có thể không có ứng dụng nào đã được cài để xem dạng tệp tin này</string>
     <!-- Text to inform the user when an error occurs -->
@@ -1372,7 +1372,7 @@
     <string name="video_section_playlists_video_empty">Dọn rác</string>
     <!-- Text of video count of playlist in Video Section -->
     <plurals name="video_section_playlists_video_count">
-        <item quantity="other">%1$d videos</item>
+        <item quantity="other">%1$d&#160;videos</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Di chuyển thư mục này vào Ổ Mây của bạn để có được toàn quyền truy cập vào dữ liệu của mình nhưng thư mục sẽ không còn được sao lưu.</string>
@@ -1421,7 +1421,7 @@
     <!-- success message when renaming a node -->
     <string name="context_correctly_renamed">Mục đã được đổi tên</string>
     <!-- Homepage section. -->
-    <string name="general_section_home">Trang Đầu</string>
+    <string name="general_section_home">Trang&#160;Đầu</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
         <item quantity="other">Một số đường liên kết chưa được xóa thành công. Xin thử lại sau.</item>
@@ -1717,7 +1717,7 @@
     <!-- Delete album confirmation dialog positive button text. -->
     <string name="delete_album_confirmation_positive_button_text">Xóa</string>
     <!-- Message after the current album is deleted (singular album). %s should represent the album name-->
-    <string name="delete_singular_album_confirmation_message">Đã xóa %d album</string>
+    <string name="delete_singular_album_confirmation_message">Đã xóa “%s”</string>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
         <item quantity="other">Các albums sẽ bị xóa nhưng các nội dung có bên trong sẽ vẫn giữ lại trên Dòng Thời Gian của bạn.</item>
@@ -1793,9 +1793,9 @@
     <plurals name="album_photos_selection_success_message">
         <item quantity="other">Đã thêm %1$d mục vào “%2$s”</item>
     </plurals>
-    <string name="media_main_screen_camera_uploads_updated">Đăng tải camêra đã được cập nhật</string>
+    <string name="media_main_screen_camera_uploads_updated">Đăng tải camêra đã được cập&#160;nhật</string>
     <string name="camera_uploads_progress_screen_label_transfer_over_quota">Vượt mức băng thông truyền tải</string>
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Vượt mức giới hạn lưu trữ</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Vượt mức giới&#160;hạn lưu&#160;trữ</string>
     <string name="camera_uploads_progress_screen_label_transfer_paused">Đã tạm dừng</string>
     <string name="camera_uploads_progress_screen_label_transfer_queued">Chờ tới lượt</string>
     <string name="camera_uploads_progress_screen_label_transfer_completing">Đang hoàn tất</string>
@@ -1804,36 +1804,36 @@
     <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
     <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
-    <string name="album_decryption_key_title">Chìa khóa giải mã</string>
-    <string name="album_decryption_key_description">Mô hình mã hóa vô kiến thức của chúng tôi tự động yêu cầu phải tạo ra một chìa khóa cho tệp tin hoặc thư mục này. Đường liên kết với chìa khóa này được tạo theo cài đặt mặc định, nhưng bạn có thể xuất chìa khóa giải mã ra riêng để tăng thêm một lớp bảo mật bổ sung.</string>
-    <string name="copyright_screen_title">Cảnh báo bản quyền cho tất cả người dùng</string>
-    <string name="copyright_screen_description_first_paragraph">MEGA tôn trọng luật bản quyền của tất cả đơn vị và yêu cầu người sử dụng dịch vụ MEGA Cloud nên tuân theo theo quy định của pháp luật về quyền tác giả.</string>
-    <string name="copyright_screen_description_second_paragraph">Quý vị bị nghiêm cấm sử dụng dịch vụ MEGA Cloud để vi phạm bản quyền. Quý vị không được tải lên, tải xuống, lưu trữ, chia sẻ, trình bày, phát trực tuyến, phân phối, gửi bằng email, tạo đường liên kết đến nội dung, truyền tải hoặc cung cấp bất kỳ tệp tin, dữ liệu hoặc nội dung nào có vi phạm bất kỳ bản quyền hoặc quyền sở hữu nào khác của bất kỳ cá nhân hoặc tổ chức nào.</string>
+    <string name="album_decryption_key_title">Chìa&#160;khóa giải&#160;mã</string>
+    <string name="album_decryption_key_description">Mô hình mã hóa vô kiến&#160;thức của chúng&#160;tôi tự động yêu&#160;cầu phải tạo ra một chìa&#160;khóa cho tệp tin hoặc thư mục này. Đường liên&#160;kết với chìa khóa này được tạo theo cài đặt mặc định, nhưng bạn có thể xuất chìa&#160;khóa giải&#160;mã ra riêng để tăng thêm một lớp bảo mật bổ&#160;sung.</string>
+    <string name="copyright_screen_title">Cảnh báo bản&#160;quyền cho tất&#160;cả người&#160;dùng</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA tôn trọng luật bản quyền của tất cả đơn vị và yêu cầu người sử dụng dịch vụ MEGA Cloud nên tuân theo quy&#160;định của pháp luật về quyền tác&#160;giả.</string>
+    <string name="copyright_screen_description_second_paragraph">Quý&#160;vị bị nghiêm cấm sử&#160;dụng dịch&#160;vụ MEGA Cloud để vi&#160;phạm bản&#160;quyền. Quý&#160;vị không được tải lên, tải xuống, lưu&#160;trữ, chia&#160;sẻ, trình bày, phát trực&#160;tuyến, phân&#160;phối, gửi bằng email, tạo đường liên&#160;kết đến nội dung, truyền&#160;tải hoặc cung&#160;cấp bất kỳ tệp&#160;tin, dữ&#160;liệu hoặc nội dung nào có vi&#160;phạm bất kỳ bản&#160;quyền hoặc quyền sở&#160;hữu nào khác của bất kỳ cá&#160;nhân hoặc tổ&#160;chức nào.</string>
     <string name="copyright_action_agree">Đồng ý</string>
     <string name="copyright_action_disagree">Không chấp thuận</string>
     <string name="create_new_album_input_album_name_placeholder">Album mới</string>
-    <string name="album_send_decryption_key_separately_title">Gửi chìa khóa giải mã ra riêng</string>
+    <string name="album_send_decryption_key_separately_title">Gửi chìa&#160;khóa giải mã ra riêng</string>
     <string name="album_send_decryption_key_separately_description">Xuất đường liên kết và chìa khóa giải mã ra riêng rẽ.</string>
     <string name="general_learn_more">Tìm hiểu thêm</string>
     <string name="album_get_link_link_section_title">Đường liên kết</string>
-    <string name="album_get_link_requesting_link_placeholder">Đang xử lý&#8230;</string>
-    <string name="album_get_link_decryption_key_section_title">Chìa khóa</string>
-    <string name="album_get_link_copy_link_action">Sao chép đường liên kết</string>
-    <string name="album_get_link_copy_key_action">Sao chép chìa khóa</string>
+    <string name="album_get_link_requesting_link_placeholder">Đang xử&#160;lý&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Chìa&#160;khóa</string>
+    <string name="album_get_link_copy_link_action">Sao chép đường liên&#160;kết</string>
+    <string name="album_get_link_copy_key_action">Sao chép chìa&#160;khóa</string>
     <string name="album_get_link_copy_key_success_message">Chìa khóa đã được ghi vào bảng nhớ tạm</string>
     <string name="album_get_link_share_link_dialog_title">Có muốn chia sẻ chìa khóa giải mã luôn không?</string>
-    <string name="album_get_link_share_link_dialog_description">Chìa khóa giải mã đã được xuất ra và sẽ được chia sẻ với đường liên kết.</string>
-    <string name="album_get_link_share_link_dialog_share_action_only_link">Chỉ chia sẻ đường liên kết</string>
-    <string name="album_get_link_share_link_dialog_share_action_link_key">Chia sẻ đường liên kết và chìa khóa</string>
+    <string name="album_get_link_share_link_dialog_description">Chìa&#160;khóa giải mã đã được xuất ra và sẽ được chia&#160;sẻ với đường liên&#160;kết.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Chỉ chia&#160;sẻ đường liên&#160;kết</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Chia sẻ đường liên&#160;kết và chìa&#160;khóa</string>
     <string name="album_get_link_share_link_with_key">Liên kết: %1$s\n\nChìa khóa: %2$s</string>
     <string name="album_has_hidden_nodes_dialog_description">Có các mục ẩn trong album này. Việc thực&#160;hiện chia&#160;sẻ album sẽ làm các mục ẩn hiển&#160;thị cho những người bạn chia&#160;sẻ. Các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
     <plurals name="album_link_copied_success_message">
-        <item quantity="other">Các đường liên kết đã được ghi vào bảng nhớ tạm</item>
+        <item quantity="other">Các đường liên&#160;kết đã được ghi vào bảng nhớ tạm</item>
     </plurals>
     <plurals name="general_num_items_template">
         <item quantity="other">%1$d mục</item>
     </plurals>
-    <string name="section_saved_for_offline_new">Ngoại Tuyến</string>
+    <string name="section_saved_for_offline_new">Ngoại&#160;Tuyến</string>
     <string name="title_bucket">%1$s và %2$d mục nữa</string>
     <string name="create_action_bucket">[A]tạo bởi [/A]%s</string>
     <string name="update_action_bucket">[A]tải lên bởi [/A]%s</string>
@@ -1844,7 +1844,7 @@
         <item quantity="other">%d hình ảnh</item>
     </plurals>
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="other">%d videos</item>
+        <item quantity="other">%d&#160;videos</item>
     </plurals>
     <plurals name="title_media_bucket_images_and_videos">
         <item quantity="other">%1$d hình ảnh&#160;</item>
@@ -1856,50 +1856,50 @@
         <item quantity="other">[tệp tin chưa giải mã]</item>
     </plurals>
     <plurals name="album_get_link_screen_title">
-        <item quantity="other">Chia sẻ đường liên kết</item>
+        <item quantity="other">Chia sẻ đường liên&#160;kết</item>
     </plurals>
     <string name="free_account">Miễn phí</string>
-    <string name="business_label">Doanh Nghiệp</string>
-    <string name="home_recents_options_menu_hide_activity">Ẩn hoạt động gần đây</string>
+    <string name="business_label">Doanh&#160;Nghiệp</string>
+    <string name="home_recents_options_menu_hide_activity">Ẩn hoạt&#160;động gần&#160;đây</string>
     <string name="home_recents_empty_button_upload">Tải lên</string>
     <string name="home_recents_hidden_button_show_activity">Hiện hoạt động</string>
     <string name="shares_screen_incoming_shares_tab_title">Mục nhận được</string>
-    <string name="shares_screen_outgoing_shares_tab_title">Mục gửi đi</string>
+    <string name="shares_screen_outgoing_shares_tab_title">Mục gửi&#160;đi</string>
     <string name="shares_screen_links_shares_tab_title">Liên kết</string>
     <string name="shares_screen_incoming_empty">[B]Không có [/B][A]thư mục chia sẻ nhận được[/A]</string>
-    <string name="shares_screen_outgoing_empty">[B]Không có [/B][A]thư mục chia sẻ gửI đI[/A]</string>
+    <string name="shares_screen_outgoing_empty">[B]Không có [/B][A]thư mục chia sẻ gửi đi[/A]</string>
     <string name="incoming_shared_folder_contact_not_approved_alert_text">%s là mục được chia sẻ từ một tên liên lạc chưa được bạn xác thực tin tưởng. Để đảm bảo an toàn hơn, chúng tôi khuyên bạn nên xác thực chứng chỉ đăng nhập của họ trong Sổ Liên Lạc. Nhấn vào ba dấu chấm bên cạnh tên liên lạc bạn muốn xác thực và nhấn vào Thông tin.</string>
     <string name="homepage_favourites_empty_hint">[B]Không có[/B] [A]mục ưa thích[/A] [B]nào[/B]</string>
     <string name="general_create_label">Tạo</string>
-    <string name="general_new_text_file">Tệp văn bản mới</string>
-    <string name="general_new_folder">Thư mục mới</string>
+    <string name="general_new_text_file">Tệp văn&#160;bản mới</string>
+    <string name="general_new_folder">Thư&#160;mục mới</string>
     <string name="album_get_multiple_links_list_title">Liên kết</string>
     <string name="album_get_multiple_links_copy_all_action">Sao chép tất cả</string>
-    <string name="section_my_account">Tài Khoản của Tôi</string>
+    <string name="section_my_account">Tài&#160;khoản của&#160;tôi</string>
     <string name="folder_created_success_message">Thư mục đã được tạo</string>
-    <string name="folder_not_created_error_message">Lỗi. Không tạo được thư mục</string>
+    <string name="folder_not_created_error_message">Lỗi. Không tạo được thư&#160;mục</string>
     <string name="unable_to_open_selected_file_message">Không thể mở tệp đã chọn</string>
     <string name="camera_denied_info_message">MEGA cần quyền truy cập vào máy ảnh của bạn để chụp ảnh và quay video.</string>
-    <string name="incoming_share_storage_quota_warning_message">Tệp tin không thể gửi tới người đã chọn vì họ đã dùng hết lượng băng thông lưu trữ của mình.</string>
+    <string name="incoming_share_storage_quota_warning_message">Tệp&#160;tin không thể gửi tới người đã chọn vì họ đã dùng hết lượng&#160;lưu&#160;trữ của&#160;mình.</string>
     <string name="general_ok_only">OK</string>
-    <string name="empty_rubbish_bin_success_message">Thùng Rác đã được dọn</string>
-    <string name="empty_rubbish_bin_error_message">Lỗi phát sinh. Không dọn được Thùng Rác</string>
-    <string name="empty_rubbish_bin_menu">Dọn Thùng Rác</string>
-    <string name="remove_all_rubbish_bin_confirmation">Bạn đang chuẩn bị tiến hành xóa vĩnh viễn các mục ở trong Thùng Rác.</string>
+    <string name="empty_rubbish_bin_success_message">Thùng&#160;Rác đã được dọn</string>
+    <string name="empty_rubbish_bin_error_message">Lỗi phát sinh. Không dọn được Thùng&#160;Rác</string>
+    <string name="empty_rubbish_bin_menu">Dọn Thùng&#160;Rác</string>
+    <string name="remove_all_rubbish_bin_confirmation">Bạn đang chuẩn bị tiến hành xóa vĩnh&#160;viễn các mục ở trong Thùng&#160;Rác.</string>
     <string name="general_clear">Dọn sạch</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]Thùng Rác[/A] [B]trống[/B]</string>
     <string name="annotated_empty_folder">[A]Thư Mục[/A] [B]Trống[/B]</string>
     <string name="general_upload_label">Tải lên</string>
     <string name="empty_file_browser_folder">Thư Mục Rỗng</string>
-    <string name="logout_offline_content_deletion_warning">Đăng xuất tài khoản sẽ xóa các mục đã được lưu về ngoại tuyến.</string>
+    <string name="logout_offline_content_deletion_warning">Đăng xuất tài&#160;khoản sẽ xóa các mục đã được lưu về ngoại&#160;tuyến.</string>
     <string name="offline_screen_title">Ngoại Tuyến</string>
     <string name="offline_screen_remove_from_offline_selection_menu">Xóa khỏi Ngoại Tuyến</string>
     <string name="offline_item_deletion_confirmation_title">Xóa khỏi Lưu Ngoại Tuyến?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="other">%d tệp tin</item>
+        <item quantity="other">%d tệp&#160;tin</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="other">%d thư mục</item>
+        <item quantity="other">%d thư&#160;mục</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">%1$d thư mục&#160;·&#160;</item>
@@ -1907,7 +1907,7 @@
     <string name="general_first_name">Tên</string>
     <string name="general_last_name">Họ</string>
     <string name="meetings_call_recording_consent_dialog_title">Cuộc gọi này đang được ghi lại</string>
-    <string name="meetings_call_recording_consent_dialog_message">Bằng cách tiếp tục tham gia cuộc gọi là bạn có cho phép được ghi âm và hình. Bản ghi chỉ được lưu trữ trong thiết bị của người ghi.</string>
+    <string name="meetings_call_recording_consent_dialog_message">Bằng&#160;cách ở&#160;lại trong cuộc&#160;gọi, bạn đồng&#160;ý cho&#160;phép ghi&#160;âm/hình. Bản&#160;ghi chỉ được lưu&#160;trữ trên thiết&#160;bị của&#160;người thực&#160;hiện bản&#160;ghi.</string>
     <string name="meetings_call_recording_consent_dialog_positive_button">OK, hiểu rồi</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">Rời khỏi cuộc gọi</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Tìm hiểu thêm[/A]</string>
@@ -1920,7 +1920,7 @@
     <string name="album_import_screen_subtitle_album_link_text">Đường liên kết album</string>
     <string name="album_import_error_access_dialog_title">Không thể truy cập album</string>
     <string name="album_import_input_decryption_key_dialog_title">Nhập chìa khóa giải mã</string>
-    <string name="album_import_input_decryption_key_dialog_description">Để truy cập vào album, nhập chìa khóa giải mã. Nếu bạn không có, hãy liên hệ với người đã chia sẻ đường liên kết cho bạn.</string>
+    <string name="album_import_input_decryption_key_dialog_description">Để truy&#160;cập vào album, nhập chìa&#160;khóa giải mã. Nếu bạn không có, hãy liên&#160;hệ với người đã chia&#160;sẻ đường liên&#160;kết cho bạn.</string>
     <string name="album_import_rename_album_dialog_title">Đổi tên album</string>
     <string name="album_import_rename_album_dialog_empty_name_error">Điền tên album</string>
     <string name="album_import_saving_dialog_progress_text">Đang lưu&#8230;</string>
@@ -1931,26 +1931,26 @@
     <string name="photos_save_to_cloud_drive_button_text">Lưu vào Ổ&#160;Mây</string>
     <string name="photos_create_album_duplicate_name_error">Đã có một album với tên này rồi. Nhập một tên khác.</string>
     <string name="photos_create_album_proscribed_name_error">Không được phép sử dụng tên này cho album. Nhập một tên khác.</string>
-    <string name="remove_from_offline_success_message">Tệp đã bị loại khỏi lưu Ngoại Tuyến</string>
-    <string name="create_new_video_playlist_input_title_placeholder">Tạo danh sách phát mới</string>
+    <string name="remove_from_offline_success_message">Tệp đã bị loại khỏi lưu Ngoại&#160;Tuyến</string>
+    <string name="create_new_video_playlist_input_title_placeholder">Tạo danh&#160;sách phát mới</string>
     <string name="text_editor_show_line_numbers">Hiện số dòng</string>
     <string name="text_editor_hide_line_numbers">Ẩn số dòng</string>
-    <string name="settings_help_rate_app">Đánh giá app</string>
+    <string name="settings_help_rate_app">Đánh&#160;giá app</string>
     <string name="general_dialog_discard_button">Hủy bỏ</string>
     <string name="home_screen_audios_chip_title">Âm thanh</string>
-    <string name="node_menu_action_make_available_offline">Lưu sử dụng ngoại tuyến</string>
+    <string name="node_menu_action_make_available_offline">Lưu sử dụng ngoại&#160;tuyến</string>
     <string name="media_discovery_screen_dropdown_action_zoom_in">Phóng ra</string>
     <string name="media_discovery_screen_dropdown_action_zoom_out">Thu vào</string>
-    <string name="media_discovery_filter_all_media">Tất cả phương tiện số</string>
+    <string name="media_discovery_filter_all_media">Tất&#160;cả dạng phương&#160;tiện</string>
     <string name="media_discovery_filter_images">Hình</string>
     <string name="media_discovery_filter_videos">Videos</string>
-    <string name="pdf_viewer_dialog_title_enter_password">Nhập mật khẩu</string>
-    <string name="folder_link_unavailable_tos_violation">Đường liên kết thư mục đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ.</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Nhập mật&#160;khẩu</string>
+    <string name="folder_link_unavailable_tos_violation">Đường liên&#160;kết thư&#160;mục đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
     <string name="link_decryption_key_dialog_title">Nhập chìa khóa giải mã</string>
-    <string name="link_decryption_key_dialog_error_invalid_key">Chìa khóa giải mã không hợp lệ</string>
-    <string name="upload_bottom_sheet_action_upload_files">Tải lên tệp tin</string>
-    <string name="upload_bottom_sheet_action_upload_folder">Tải lên thư mục</string>
-    <string name="upload_bottom_sheet_action_menu_scan_document">Quét tài liệu</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">Chìa&#160;khóa giải&#160;mã không hợp&#160;lệ</string>
+    <string name="upload_bottom_sheet_action_upload_files">Tải lên tệp&#160;tin</string>
+    <string name="upload_bottom_sheet_action_upload_folder">Tải lên thư&#160;mục</string>
+    <string name="upload_bottom_sheet_action_menu_scan_document">Quét tài&#160;liệu</string>
     <string name="upload_bottom_sheet_action_menu_take_picture">Chụp</string>
     <string name="file_browser_folder_empty">Thư&#160;mục rỗng</string>
     <string name="label_file_size_bytes">%s&#160;B</string>
@@ -1961,14 +1961,14 @@
     <plurals name="num_of_folders_num_of_files_2">
         <item quantity="other">%d tệp tin</item>
     </plurals>
-    <string name="general_title_incoming_shares">Mục chia sẻ nhận được</string>
+    <string name="general_title_incoming_shares">Mục chia&#160;sẻ nhận&#160;được</string>
     <string name="pdf_viewer_error_no_network">Không có kết nối mạng. Xin kết nối lại rồi mở tệp tin.</string>
-    <string name="open_link_dialog_title">Mở đường dẫn liên kết</string>
+    <string name="open_link_dialog_title">Mở đường dẫn liên&#160;kết</string>
     <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="cloud_explorer_choose_folder_title">Chọn thư mục</string>
-    <string name="general_transfer_error_not_enough_free_space">Không đủ chỗ trống trong điện thoại</string>
-    <string name="general_transfer_error_temporary_unavaible">Nguồn dữ liệu hiện không khả dụng, xin thử lại sau</string>
-    <string name="rewarded_ad_dialog_upgrade_button">Nâng cấp lên Pro</string>
+    <string name="general_transfer_error_not_enough_free_space">Không đủ dung&#160;lượng trong thiết&#160;bị</string>
+    <string name="general_transfer_error_temporary_unavaible">Nguồn dữ&#160;liệu hiện không khả&#160;dụng, xin thử lại sau</string>
+    <string name="rewarded_ad_dialog_upgrade_button">Nâng&#160;cấp lên Pro</string>
     <string name="shares_screen_links_section_empty">[B]Không có [/B][A]liên&#160;kết công&#160;khai[/A]</string>
     <string name="password_dialog_hint">Nhập mật&#160;khẩu của đường liên&#160;kết</string>
     <string name="video_player_more_options_playlist_option">Danh sách phát</string>
@@ -1979,18 +1979,18 @@
     <string name="storage_usage_format">%1$s trong tổng %2$s đã dùng</string>
     <string name="general_hi">Xin chào</string>
     <string name="delete_albums_multiple_confirmation_dialog_title">Xóa các albums?</string>
-    <string name="video_section_add_to_playlist_success">Đã thêm 1 mục vào %1$d danh sách phát</string>
+    <string name="video_section_add_to_playlist_success">Đã thêm 1 mục vào danh sách phát “%1$s”</string>
     <plurals name="video_section_add_to_playlists_success">
         <item quantity="other">Đã thêm 1 mục vào %1$d danh sách phát</item>
     </plurals>
     <string name="preview_not_available_undecrypted_files">Xem trước không khả dụng cho các tệp chưa được giải mã</string>
-    <string name="external_checkout_button_text">Mua trên trang web của MEGA (Tiết&#160;kiệm lên tới %1$.0f%%)</string>
+    <string name="external_checkout_button_text">Mua trên trực&#160;tiếp trên web (Tiết&#160;kiệm lên tới %1$.0f%%)</string>
     <string name="context_empty_folder_title">Thư mục này trống</string>
     <string name="general_invalid_link">Liên kết không hợp lệ. Vui lòng thử lại hoặc yêu cầu một liên kết mới.</string>
     <string name="rewarded_ad_dialog_title">Tiếp tục sau quảng&#160;cáo</string>
-    <string name="rewarded_ad_dialog_watch_ad_button">Xem quảng cáo</string>
+    <string name="rewarded_ad_dialog_watch_ad_button">Xem quảng&#160;cáo</string>
     <string name="rewarded_ad_dialog_upgrade_subtitle">Hoặc nâng cấp lên gói Pro để truy cập ngay lập tức và không có quảng cáo</string>
-    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA&#160;Pro</string>
     <string name="rewarded_ad_dialog_perk_unlimited_downloads">Tải xuống không giới hạn, bỏ qua quảng&#160;cáo</string>
     <string name="rewarded_ad_dialog_perk_storage">Không&#160;gian lưu&#160;trữ được mã&#160;hóa lên tới 20&#160;TB</string>
     <string name="rewarded_ad_dialog_perk_transfer_speed">Tốc độ truyền tải ưu&#160;tiên</string>
@@ -2003,7 +2003,7 @@
     <string name="sync_label_a_sync_or_backup">một đồng&#160;bộ hoặc sao&#160;lưu</string>
     <string name="sync_label_this_device">thiết bị này</string>
     <string name="sync_label_camera_uploads">Đăng tải camêra</string>
-    <string name="sync_label_media_uploads">Đăng tải phương tiện số</string>
+    <string name="sync_label_media_uploads">Đăng tải phương&#160;tiện số</string>
     <string name="general_error_file_not_found">Không thể tìm thấy tệp này</string>
     <string name="pdf_viewer_error_corrupt_or_missing">Lỗi. Tệp tin pdf bị hư hỏng hoặc không có tồn tại.</string>
     <string name="pdf_viewer_error_streaming">Đã phát&#160;sinh lỗi khi cố mở tệp&#160;tin</string>
@@ -2110,23 +2110,23 @@
     <string name="home_screen_no_network_desc">Bạn đang ngoại&#160;tuyến.\nNếu bạn đã lưu các tệp&#160;tin để dùng ngoại&#160;tuyến, bạn vẫn có&#160;thể truy&#160;cập chúng mà không cần kết&#160;nối.</string>
     <string name="home_screen_no_network_desc_with_offline_files">Bạn đang ngoại&#160;tuyến.\nCác mục bạn đã lưu để dùng ngoại&#160;tuyến vẫn dùng được.</string>
     <plurals name="remove_links_warning_text">
-        <item quantity="other">Các liên kết này sẽ không còn công khai nữa.</item>
+        <item quantity="other">Các đường liên&#160;kết này sẽ không còn công&#160;khai nữa.</item>
     </plurals>
-    <string name="payment_ads_free_intro_title">Muốn dùng MEGA mà không có quảng cáo?</string>
+    <string name="payment_ads_free_intro_title">Muốn dùng MEGA mà không có quảng&#160;cáo?</string>
     <string name="payment_ads_free_intro_description">Nâng cấp lên gói Pro với không gian lưu trữ lớn và nhiều tính năng khác. Các gói Pro của chúng tôi có giá từ chỉ %1$s mỗi tháng.</string>
     <plurals name="alert_remove_several_shares">
-        <item quantity="other">Hủy chia sẻ các thư mục %1$d này?</item>
+        <item quantity="other">Hủy chia&#160;sẻ các thư&#160;mục %1$d này?</item>
     </plurals>
     <plurals name="transfers_retry_feedback_snackbar_message">
-        <item quantity="other">Đang thử lại quá trình truyền, xem tab Hoạt động để theo dõi tiến độ</item>
+        <item quantity="other">Đang thử lại phiên truyền, xem tab Hoạt&#160;động để xem tiến&#160;độ</item>
     </plurals>
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other">[B]%1$s[/B]\nTrong %2$d tháng đầu tiên</item>
+        <item quantity="other">[B]%1$s[/B]\nTrong %2$d tháng đầu&#160;tiên</item>
     </plurals>
     <string name="camera_update_low_battery_banner_description">Việc tải lên đã bị tạm dừng do pin yếu. Hãy sạc thiết&#160;bị để tiếp&#160;tục.</string>
     <string name="camera_update_network_requirement_not_met_banner_description">Đăng&#160;tải camêra đã tạm&#160;dừng, hãy kết&#160;nối Wi-Fi hoặc cho&#160;phép sử&#160;dụng dữ&#160;liệu di&#160;động</string>
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other">[B]%1$s[/B]\nTrong %2$d năm đầu tiên</item>
+        <item quantity="other">[B]%1$s[/B]\nTrong %2$d năm đầu&#160;tiên</item>
     </plurals>
     <string name="cloud_explorer_select_destination_title">Chọn điểm đích</string>
     <string name="cloud_explorer_use_this_folder_button">Sử dụng thư&#160;mục này</string>
@@ -2152,7 +2152,7 @@
     <string name="upgrade_account_successful_starter_monthly">Cảm&#160;ơn quý&#160;khách đã đăng&#160;ký mua gói Starter hằng&#160;tháng</string>
     <string name="upgrade_account_successful_starter_yearly">Cảm&#160;ơn quý&#160;khách đã đăng&#160;ký mua gói Starter hằng&#160;năm</string>
     <string name="basic_account">Gói Cơ&#160;bản</string>
-    <string name="account_upgrade_account_buy_button_title_basic">Mua gói Cơ bản</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Mua gói Cơ&#160;bản</string>
     <string name="upgrade_account_successful_basic_monthly">Cảm&#160;ơn quý&#160;khách đã đăng&#160;ký mua gói Basic hằng&#160;tháng</string>
     <string name="upgrade_account_successful_basic_yearly">Cảm&#160;ơn quý&#160;khách đã đăng&#160;ký mua gói Basic hằng&#160;năm</string>
     <string name="essential_account">Essential</string>
@@ -2246,11 +2246,11 @@
     <string name="album_import_snackbar_error_message">Không thể lưu “%1$s” vào Ổ&#160;Mây được. Xin hãy thử lại sau và nếu sự cố vẫn tiếp diễn, hãy liên hệ với người đã chia sẻ đường liên kết cho bạn.</string>
     <string name="saf_passcode_lock_enabled_message">Để duyệt các tệp&#160;tin MEGA của&#160;bạn, hãy tắt mã số&#160;khóa trong ứng&#160;dụng MEGA. Vào Thiết&#160;đặt, sau đó nhấn Bảo&#160;mật.</string>
     <string name="general_skip">Bỏ qua</string>
-    <string name="settings_passcode_lock">Khóa bằng mã số</string>
-    <string name="action_use_passcode">Dùng mã số</string>
+    <string name="settings_passcode_lock">Khóa bằng mã&#160;số</string>
+    <string name="action_use_passcode">Dùng mã&#160;số</string>
     <string name="settings_passcode_enter_password_title">Nhập mật khẩu</string>
     <string name="unlock_pin_title">Nhập mã số của bạn</string>
-    <string name="unlock_pin_title_2">Nhập lại mã số</string>
+    <string name="unlock_pin_title_2">Nhập lại mã&#160;số</string>
     <string name="pin_lock_alert">Tài khoản sẽ đăng xuất và tất cả tệp tin lưu về ngoại tuyến sẽ xóa khỏi máy sau 10 lần nhập sai mã</string>
     <string name="action_logout">Đăng&#160;xuất</string>
     <string name="settings_passcode_forgot_passcode_button">Quên mất mã số?</string>
@@ -2281,12 +2281,12 @@
     <string name="open_link_dialog_description">Dán bất kỳ liên kết MEGA nào để mở nó</string>
     <string name="home_cwlo_clear_history">Xóa lịch sử “Tiếp tục từ nơi bạn đã dừng”</string>
     <string name="offline_status">Ngoại Tuyến</string>
-    <string name="online_status">Trực tuyến</string>
+    <string name="online_status">Trực&#160;Tuyến</string>
     <string name="away_status">Vắng mặt</string>
-    <string name="busy_status">Đang bận</string>
-    <string name="last_seen_today">[A]Lần thấy cuối [/A]hôm nay lúc %1$s</string>
-    <string name="last_seen_long_time_ago">[A]Lần thấy cuối [/A]đã một thời gian rất lâu</string>
-    <string name="last_seen_general">[A]Lần thấy cuối [/A] vào lúc %2$s lúc %1$s</string>
+    <string name="busy_status">Bận</string>
+    <string name="last_seen_today">[A]Lần thấy cuối [/A]hôm&#160;nay lúc %1$s</string>
+    <string name="last_seen_long_time_ago">[A]Lần thấy cuối [/A]đã một thời&#160;gian rất lâu</string>
+    <string name="last_seen_general">[A]Có mặt lần cuối[/A] %2$s lúc %1$s</string>
     <string name="new_file_subject_when_uploading">Tiêu đề</string>
     <string name="new_file_email_when_uploading">Địa chỉ email</string>
     <string name="home_widget_viewed_links_clear_history">Dọn lịch sử đường liên&#160;kết đã xem</string>
@@ -2307,12 +2307,12 @@
     <string name="home_configuration_screen_menu_reset_to_default">Đặt lại về mặc&#160;định</string>
     <string name="home_configuration_screen_menu_choose_default_start_screen">Chọn màn&#160;hình bắt&#160;đầu mặc&#160;định</string>
     <string name="home_configuration_widget_removal_not_allowed_message">Cần phải&#160;bật ít nhất&#160;là một trang&#160;đầu</string>
-    <string name="favourites_empty_screen_description">Thêm thư&#160;mục vào Ưa&#160;Thích để xem các mục đó ở&#160;đây</string>
+    <string name="favourites_empty_screen_description">Thêm tệp&#160;tin và thư&#160;mục vào Ưa&#160;Thích để xem các mục đó ở&#160;đây</string>
     <string name="name_collision_choose_folder_header">Chọn thư&#160;mục mà bạn muốn giữ lại</string>
     <string name="name_collision_folder_warning_upload_and_rename">Thư&#160;mục bạn đang tải&#160;lên sẽ được đổi tên thành:</string>
     <string name="google_sign_in_failed">Đăng&#160;nhập bằng Google đã không được. Xin thử&#160;lại.</string>
     <string name="google_sign_in_email_exists">Bạn đã có tài&#160;khoản với email này. Hãy đăng&#160;nhập bằng mật&#160;khẩu để tiếp&#160;tục.</string>
-    <string name="home_configuration_tooltip_description">Chọn những gì bạn muốn xem và sắp xếp lại sao cho phù hợp với nhu cầu của bạn.</string>
+    <string name="home_configuration_tooltip_description">Chọn những gì bạn muốn xem và sắp xếp lại sao cho phù hợp với nhu cầu của bạn</string>
     <string name="home_configuration_tooltip_action">Khám phá</string>
     <string name="error_no_internet_title">Không có kết&#160;nối internet</string>
     <string name="error_dialog_confirm_button">OK, hiểu rồi</string>
@@ -2325,4 +2325,34 @@
     <string name="error_fail_to_play_video_title">Không thể phát video</string>
     <string name="general_new_group_chat">Nhóm chat mới</string>
     <string name="general_new_group_chat_created">Nhóm chat mới đã được tạo</string>
+    <string name="node_sort_option_last_accessed_label">Ngày</string>
+    <string name="chat_explorer_all_contacts_header">Toàn&#160;bộ sổ liên&#160;lạc, cuộc&#160;chat và&#160;họp</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="other">Dọn các đường liên&#160;kết đã xem?</item>
+    </plurals>
+    <string name="more_options">Hiện thêm tùy chọn</string>
+    <string name="contacts_empty_title">Không tìm thấy tên liên&#160;lạc nào</string>
+    <plurals name="general_number_participants">
+        <item quantity="other">%1$d người tham&#160;gia</item>
+    </plurals>
+    <string name="general_chat_sent_as_message">Đã gửi bằng tin&#160;nhắn</string>
+    <string name="chat_explorer_recent_chats_header">Cuộc&#160;chat và họp gần&#160;đây</string>
+    <string name="chat_explorer_read_only_chat_warning">Cuộc trò&#160;chuyện này là chỉ-được-xem</string>
+    <string name="favourite_folders_empty_screen_description">Thêm thư&#160;mục vào Ưa&#160;Thích để xem các mục đó ở&#160;đây</string>
+    <string name="general_view_button">Xem</string>
+    <string name="video_player_subtitles_empty_hint_description">Tải tệp phụ&#160;đề định&#160;dạng SRT lên Ổ&#160;Mây của&#160;bạn</string>
+    <string name="video_player_subtitles_add_subtitles_button">Thêm phụ&#160;đề</string>
+    <string name="scan_dialog_discard_confirmation_title">Bỏ bản quét?</string>
+    <string name="scan_dialog_discard_confirmation_body">Bản quét này sẽ bị mất</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Bỏ tất cả bản quét?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">Tài&#160;liệu này sẽ bị mất</string>
+    <string name="scan_dialog_discard_confirmation_action">Hủy bỏ</string>
+    <string name="general_file_name">Tên Tệp Tin</string>
+    <string name="general_error_invalid_name">Tên không hợp lệ</string>
+    <string name="general_file_type">Dạng tệp</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% tắt</string>
+    <string name="general_error_incorrect_name">Vui lòng sửa tên tệp của bạn trước khi tiếp tục</string>
+    <string name="general_destination">Đích đến</string>
+    <string name="video_player_more_options_pip_option">Hình trong hình</string>
+    <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
 </resources>

@@ -2586,7 +2586,7 @@
     <string name="home_configuration_screen_menu_choose_default_start_screen">Wybierz domyślny ekran startowy</string>
     <string name="home_configuration_widget_removal_not_allowed_message">Wymagana jest co najmniej jedna sekcja strony głównej</string>
     <string name="file_link_subtitle">Link do pliku</string>
-    <string name="favourites_empty_screen_description">Dodaj foldery do Ulubionych, aby zobaczyć je tutaj</string>
+    <string name="favourites_empty_screen_description">Dodaj pliki i foldery do Ulubionych, aby zobaczyć je tutaj</string>
     <string name="offline_status">Lokalne</string>
     <string name="online_status">Online</string>
     <string name="away_status">Nieaktywny</string>
@@ -2616,4 +2616,47 @@
     <string name="home_configuration_widget_shortcuts_widget_name">Skróty</string>
     <string name="general_new_group_chat">Nowy czat grupowy</string>
     <string name="general_new_group_chat_created">Utworzono nowy czat grupowy</string>
+    <string name="chat_explorer_recent_chats_header">Ostatnie czaty i spotkania</string>
+    <string name="chat_explorer_all_contacts_header">Wszystkie kontakty, czaty i spotkania</string>
+    <string name="chat_explorer_read_only_chat_warning">Ta konwersacja jest tylko do odczytu</string>
+    <string name="contacts_empty_title">Nie znaleziono kontaktów</string>
+    <plurals name="general_number_participants">
+        <item quantity="one">%1$d uczestnik</item>
+        <item quantity="few">%1$d uczestnicy</item>
+        <item quantity="many">%1$d uczestnicy</item>
+        <item quantity="other">%1$d uczestnicy</item>
+    </plurals>
+    <string name="node_sort_option_last_accessed_label">Data</string>
+    <string name="more_options">Więcej opcji</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="one">Wyczyścić wyświetlony link?</item>
+        <item quantity="few">Wyczyścić wyświetlone linki?</item>
+        <item quantity="many">Wyczyścić wyświetlone linki?</item>
+        <item quantity="other">Wyczyścić wyświetlone linki?</item>
+    </plurals>
+    <string name="general_view_button">Pokaż</string>
+    <string name="favourite_folders_empty_screen_description">Dodaj foldery do Ulubionych, aby zobaczyć je tutaj</string>
+    <string name="general_chat_sent_as_message">Wysłano jako wiadomość</string>
+    <string name="video_player_subtitles_empty_hint_description">Prześlij napisy w formacie SRT na swój dysk w chmurze</string>
+    <string name="video_player_subtitles_add_subtitles_button">Dodaj napisy</string>
+    <string name="scan_dialog_discard_confirmation_title">Anulować skan?</string>
+    <string name="scan_dialog_discard_confirmation_body">Bieżące skanowanie zostanie utracone</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Odrzucić wszystkie skany?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">Bieżący dokument zostanie utracony</string>
+    <string name="scan_dialog_discard_confirmation_action">Odrzuć</string>
+    <string name="general_file_name">Nazwa pliku</string>
+    <string name="general_error_invalid_name">Nieprawidłowa nazwa</string>
+    <string name="general_file_type">Typ pliku</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% wyłączone</string>
+    <string name="general_error_incorrect_name">Popraw nazwę pliku przed kontynuowaniem</string>
+    <string name="general_destination">Miejsce docelowe</string>
+    <string name="video_player_more_options_pip_option">Obraz w obrazie</string>
+    <string name="cloud_drive_inactivity_banner_title">Twoje konto było nieaktywne przez zbyt długi czas</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one">Ponieważ nie zalogowałeś się przez ponad %1$d miesiąc, twoje pliki zostały usunięte zgodnie z naszą polityką dotyczącą braku aktywności</item>
+        <item quantity="few">Ponieważ nie zalogowałeś się przez ponad %1$d miesięcy, twoje pliki zostały usunięte zgodnie z naszą polityką dotyczącą braku aktywności</item>
+        <item quantity="many">Ponieważ nie zalogowałeś się przez ponad %1$d miesięcy, twoje pliki zostały usunięte zgodnie z naszą polityką dotyczącą braku aktywności</item>
+        <item quantity="other">Ponieważ nie zalogowałeś się przez ponad %1$d miesięcy, twoje pliki zostały usunięte zgodnie z naszą polityką dotyczącą braku aktywności</item>
+    </plurals>
+    <string name="file_link_unavaible_ToS_violation">Łącze do pliku zostało usunięte, ponieważ naruszało nasze warunki korzystania z usługi.</string>
 </resources>

@@ -2418,7 +2418,7 @@
     <string name="last_seen_today">[A]Laatst gezien [/A]vandaag %1$s</string>
     <string name="last_seen_long_time_ago">[A]Laatst gezien [/A]een lange tijd geleden</string>
     <string name="last_seen_general">[A]Laatst gezien [/A]%1$s %2$s</string>
-    <string name="favourites_empty_screen_description">Mappen toevoegen tot Favorieten om ze hier weer te geven</string>
+    <string name="favourites_empty_screen_description">Voeg bestanden en mappen toe aan Favorieten om ze hier te zien</string>
     <string name="name_collision_choose_folder_header">Selecteer de map die u wilt houden</string>
     <string name="name_collision_folder_warning_upload_and_rename">De folder die u upload wordt hernoemd als:</string>
     <string name="google_sign_in">Inloggen met Google</string>
@@ -2441,4 +2441,41 @@
     <string name="home_configuration_widget_shortcuts_widget_name">Snelkoppelingen</string>
     <string name="general_new_group_chat">Nieuw groep gesprek</string>
     <string name="general_new_group_chat_created">Nieuw groepsgesprek gecreëerd</string>
+    <string name="node_sort_option_last_accessed_label">Datum</string>
+    <string name="chat_explorer_recent_chats_header">Recente gesprekken en vergaderingen</string>
+    <string name="chat_explorer_all_contacts_header">Alle contacten, chats en vergaderingen</string>
+    <string name="chat_explorer_read_only_chat_warning">Dit gesprek is alleen-lezen</string>
+    <string name="contacts_empty_title">Geen contacten gevonden</string>
+    <plurals name="general_number_participants">
+        <item quantity="one">%1$ddeelnemer</item>
+        <item quantity="other">%1$ddeelnemers</item>
+    </plurals>
+    <string name="more_options">Meer opties</string>
+    <plurals name="viewed_links_remove_selected_links_dialog_title">
+        <item quantity="one">Bekeken link wissen?</item>
+        <item quantity="other">Bekeken links wissen?</item>
+    </plurals>
+    <string name="favourite_folders_empty_screen_description">Mappen toevoegen tot Favorieten om ze hier weer te geven</string>
+    <string name="general_chat_sent_as_message">Verzonden als bericht</string>
+    <string name="general_view_button">Weergeven</string>
+    <string name="video_player_subtitles_empty_hint_description">Upload ondertitels in SRT-formaat naar uw Cloudopslag</string>
+    <string name="video_player_subtitles_add_subtitles_button">Ondertiteling toevoegen</string>
+    <string name="scan_dialog_discard_confirmation_title">Scan weggooien?</string>
+    <string name="scan_dialog_discard_confirmation_body">De huidige scan gaat verloren</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Alle scans weggooien?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">Het huidige document gaat verloren</string>
+    <string name="scan_dialog_discard_confirmation_action">Weggooien</string>
+    <string name="general_file_name">Bestand Naam</string>
+    <string name="general_error_invalid_name">Ongeldige naam</string>
+    <string name="general_file_type">Bestandstype</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% korting</string>
+    <string name="general_error_incorrect_name">Corrigeer uw bestandsnaam voordat u verdergaat</string>
+    <string name="general_destination">Lokatie</string>
+    <string name="video_player_more_options_pip_option">Beeld-in-beeld</string>
+    <string name="cloud_drive_inactivity_banner_title">Uw account is te lang inactief geweest</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one">Omdat u langer dan %1$d maand niet bent ingelogd, zijn uw bestanden verwijderd conform ons inactiviteitsbeleid.</item>
+        <item quantity="other">Omdat u meer dan %1$d maanden niet bent ingelogd, zijn uw bestanden verwijderd conform ons inactiviteitsbeleid.</item>
+    </plurals>
+    <string name="file_link_unavaible_ToS_violation">De bestandslink was verwijderd omdat het one Algemene Voorwaarden schendt.</string>
 </resources>
