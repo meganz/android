@@ -6,6 +6,7 @@ import mega.privacy.android.app.extensions.isHttpScheme
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import timber.log.Timber
@@ -20,6 +21,7 @@ import javax.inject.Singleton
 class ExternalPdfDeepLinkHandler @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getFileNameFromStringUriUseCase: GetFileNameFromStringUriUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) {
 
     /**
@@ -41,9 +43,14 @@ class ExternalPdfDeepLinkHandler @Inject constructor(
             return false
         }
 
-        val isPdfViewerComposeEnabled = runCatching {
-            getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
-        }.getOrDefault(false)
+        val isPdfViewerComposeEnabled = if (!isConnectedToInternetUseCase()) {
+            true
+        } else {
+            // Keep aligned with ApiFeatures.PdfViewerComposeUI's defaultValue (true)
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
+            }.getOrDefault(true)
+        }
 
         if (isPdfViewerComposeEnabled) {
             Timber.d("External PDF open: routing to new Compose PDF Viewer")

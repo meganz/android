@@ -6,12 +6,16 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -19,14 +23,21 @@ class ExternalPdfDeepLinkHandlerTest {
 
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getFileNameFromStringUriUseCase = mock<GetFileNameFromStringUriUseCase>()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
 
     private lateinit var underTest: ExternalPdfDeepLinkHandler
 
     @BeforeEach
     fun setUp() {
+        reset(
+            getFeatureFlagValueUseCase,
+            getFileNameFromStringUriUseCase,
+            isConnectedToInternetUseCase,
+        )
         underTest = ExternalPdfDeepLinkHandler(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getFileNameFromStringUriUseCase = getFileNameFromStringUriUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
         )
     }
 
@@ -81,6 +92,7 @@ class ExternalPdfDeepLinkHandlerTest {
                 on { type }.thenReturn("application/pdf")
                 on { data }.thenReturn(uri)
             }
+            whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("doc.pdf")
             var receivedNavKey: PdfViewerNavKey? = null
@@ -113,6 +125,7 @@ class ExternalPdfDeepLinkHandlerTest {
             on { type }.thenReturn("application/pdf")
             on { data }.thenReturn(uri)
         }
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(false)
         var legacyCalled = false
         var callbackCalled = false
@@ -127,4 +140,34 @@ class ExternalPdfDeepLinkHandlerTest {
         assertThat(legacyCalled).isTrue()
         assertThat(callbackCalled).isFalse()
     }
+
+    @Test
+    fun `test that consume routes to compose viewer without checking feature flag when offline`() =
+        runTest {
+            val contentUriString = "content://authority/doc.pdf"
+            val uri = mock<Uri> {
+                on { scheme }.thenReturn("content")
+                on { toString() }.thenReturn(contentUriString)
+            }
+            val intent = mock<Intent> {
+                on { action }.thenReturn(Intent.ACTION_VIEW)
+                on { type }.thenReturn("application/pdf")
+                on { data }.thenReturn(uri)
+            }
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("doc.pdf")
+            var legacyCalled = false
+            var callbackCalled = false
+
+            val consumed = underTest.consumeExternalActionViewPdfIfApplicable(
+                intent = intent,
+                launchLegacyPdfViewer = { legacyCalled = true },
+                navigateToComposePdfViewer = { callbackCalled = true },
+            )
+
+            assertThat(consumed).isTrue()
+            assertThat(callbackCalled).isTrue()
+            assertThat(legacyCalled).isFalse()
+            verify(getFeatureFlagValueUseCase, never())(ApiFeatures.PdfViewerComposeUI)
+        }
 }

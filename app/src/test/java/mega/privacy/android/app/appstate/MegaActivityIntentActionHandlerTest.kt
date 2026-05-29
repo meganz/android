@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -54,10 +55,12 @@ class MegaActivityIntentActionHandlerTest {
     private val getCurrentConnectivityStateUseCase = mock<GetCurrentConnectivityStateUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getFileNameFromStringUriUseCase = mock<GetFileNameFromStringUriUseCase>()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
 
     private val externalPdfDeepLinkHandler = ExternalPdfDeepLinkHandler(
         getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         getFileNameFromStringUriUseCase = getFileNameFromStringUriUseCase,
+        isConnectedToInternetUseCase = isConnectedToInternetUseCase,
     )
 
     companion object {
@@ -88,7 +91,10 @@ class MegaActivityIntentActionHandlerTest {
             getCurrentConnectivityStateUseCase,
             getFeatureFlagValueUseCase,
             getFileNameFromStringUriUseCase,
+            isConnectedToInternetUseCase,
         )
+        // Default to connected so PDF routing tests exercise the feature flag branch
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
     }
 
     @Test
