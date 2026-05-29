@@ -930,12 +930,15 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         }
 
         if (videoNodes.isNotEmpty()) {
-            val filteredVideoNodes = filterNonSensitiveNodes(videoNodes)
+            val filteredVideoNodes = filterNonSensitiveNodes(videoNodes.filterTakeDownNodes())
             if (filteredVideoNodes.isNotEmpty()) {
                 buildPlaybackSourcesByNodes(title, filteredVideoNodes, playingHandle, launchSource)
             }
         }
     }
+
+    private fun List<TypedVideoNode>.filterTakeDownNodes(): List<TypedVideoNode> =
+        filter { !it.isTakenDown }
 
     private suspend fun filterNonSensitiveNodes(nodes: List<TypedVideoNode>): List<TypedVideoNode> {
         val state = uiState.value

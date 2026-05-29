@@ -55,10 +55,12 @@ import mega.android.core.ui.components.util.normalize
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 
 @SuppressLint("ComposeUnstableCollections")
 @OptIn(ExperimentalFoundationApi::class)
@@ -85,11 +87,19 @@ fun VideoItemView(
     onLongClick: (() -> Unit)? = null,
     onMenuClick: () -> Unit = {},
     isSensitive: Boolean = false,
+    isTakenDown: Boolean = false,
 ) {
+    var showTakenDownDialog by remember { mutableStateOf(false) }
     Row(
         modifier = modifier
             .combinedClickable(
-                onClick = onClick,
+                onClick = {
+                    if (isTakenDown && !isSelectionMode) {
+                        showTakenDownDialog = true
+                    } else {
+                        onClick()
+                    }
+                },
                 onLongClick = onLongClick
             )
             .fillMaxWidth()
@@ -122,6 +132,7 @@ fun VideoItemView(
             description = description,
             tagsRow = tagsRow,
             highlightText = highlightText,
+            isTakenDown = isTakenDown
         )
 
         if (isSelectionMode) {
@@ -150,6 +161,15 @@ fun VideoItemView(
                 )
             }
         }
+    }
+
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = {
+                showTakenDownDialog = false
+            }
+        )
     }
 }
 
@@ -234,12 +254,14 @@ internal fun VideoInfoView(
     labelView: @Composable (() -> Unit)? = null,
     tagsRow: @Composable (() -> Unit)? = null,
     highlightText: String = "",
+    isTakenDown: Boolean = false,
 ) {
     Column(modifier = modifier) {
         VideoNameWithLabel(
             name = name,
             labelView = labelView,
-            highlightText = highlightText
+            highlightText = highlightText,
+            isTakenDown = isTakenDown
         )
 
         collectionTitle?.let {
@@ -282,6 +304,7 @@ fun VideoNameWithLabel(
     labelView: @Composable (() -> Unit)? = null,
     maxLines: Int = 2,
     highlightText: String = "",
+    isTakenDown: Boolean = false,
 ) {
     val inlineContentId = "box"
     val ellipsis = "..."
@@ -355,13 +378,22 @@ fun VideoNameWithLabel(
                     .padding(start = 10.dp)
                     .align(Alignment.CenterVertically)
                     .testTag(VIDEO_ITEM_NAME_VIEW_TEST_TAG),
-                color = DSTokens.colors.text.primary,
+                color = if (isTakenDown) DSTokens.colors.text.error else DSTokens.colors.text.primary,
                 maxLines = maxLines,
                 style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Medium
                 ),
                 inlineContent = inlineContent,
                 onTextLayout = { textLayoutResultState.value = it }
+            )
+        }
+        if (isTakenDown) {
+            MegaIcon(
+                imageVector = IconPack.Medium.Thin.Outline.AlertTriangle,
+                contentDescription = "Dispute taken down",
+                modifier = Modifier
+                    .size(16.dp),
+                tint = SupportColor.Error
             )
         }
     }

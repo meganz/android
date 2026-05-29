@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.BeforeAll
@@ -38,8 +39,6 @@ class VideoUiEntityMapperTest {
     private val expectedWatchedTimestamp = 100L
     private val expectedCollectionTitle = "collection title"
     private val expectedDurationString = "10:00"
-
-    //    TODO: Update tests for new location property
 
     @BeforeAll
     fun setUp() {
@@ -107,10 +106,73 @@ class VideoUiEntityMapperTest {
             )
         }
 
+    @Test
+    fun `test that isTakenDown is mapped to true when typedVideoNode isTakenDown is true`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, false, isTakenDown = true)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.isTakenDown).isTrue()
+        }
+
+    @Test
+    fun `test that isTakenDown is mapped to false when typedVideoNode isTakenDown is false`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, false, isTakenDown = false)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.isTakenDown).isFalse()
+        }
+
+    @Test
+    fun `test that locations contains AllLocations and CloudDrive when parentId is not in syncFolderIds`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, false)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.locations).containsExactly(
+                LocationFilterOption.AllLocations,
+                LocationFilterOption.CloudDrive
+            )
+        }
+
+    @Test
+    fun `test that locations contains AllLocations and CameraUploads when parentId is in syncFolderIds`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, false)
+            val videoUiEntity = underTest(testNode, listOf(expectedParentId.longValue))
+            assertThat(videoUiEntity.locations).containsExactly(
+                LocationFilterOption.AllLocations,
+                LocationFilterOption.CameraUploads
+            )
+        }
+
+    @Test
+    fun `test that locations contains SharedItems when exportedData is not null`() =
+        runTest {
+            val testNode = initTypedVideoNode(expectedExportedData, false)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.locations).containsExactly(
+                LocationFilterOption.AllLocations,
+                LocationFilterOption.CloudDrive,
+                LocationFilterOption.SharedItems
+            )
+        }
+
+    @Test
+    fun `test that locations contains SharedItems when isOutShared is true`() =
+        runTest {
+            val testNode = initTypedVideoNode(null, true)
+            val videoUiEntity = underTest(testNode, emptyList())
+            assertThat(videoUiEntity.locations).containsExactly(
+                LocationFilterOption.AllLocations,
+                LocationFilterOption.CloudDrive,
+                LocationFilterOption.SharedItems
+            )
+        }
+
     private fun initTypedVideoNode(
         exportData: ExportedData?,
         expectedIsOutShared: Boolean,
         elementIDParam: Long? = expectedElementID,
+        isTakenDown: Boolean = false,
     ) = mock<TypedVideoNode> {
         on { id }.thenReturn(expectedId)
         on { parentId }.thenReturn(expectedParentId)
@@ -126,6 +188,7 @@ class VideoUiEntityMapperTest {
         on { isOutShared }.thenReturn(expectedIsOutShared)
         on { watchedTimestamp }.thenReturn(expectedWatchedTimestamp)
         on { collectionTitle }.thenReturn(expectedCollectionTitle)
+        on { this.isTakenDown }.thenReturn(isTakenDown)
     }
 
     private fun assertMappedVideoUiEntity(

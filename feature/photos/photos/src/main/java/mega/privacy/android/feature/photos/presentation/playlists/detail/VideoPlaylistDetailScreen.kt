@@ -433,6 +433,7 @@ internal fun VideoPlaylistDetailScreen(
                                 },
                                 isSensitive = uiState.showHiddenItems &&
                                         (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
+                                isTakenDown = videoItem.isTakenDown
                             )
                         }
                     }

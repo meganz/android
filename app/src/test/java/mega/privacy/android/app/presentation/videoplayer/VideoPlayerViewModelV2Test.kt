@@ -1056,6 +1056,7 @@ class VideoPlayerViewModelV2Test {
         handle: Long,
         isMarkedSensitive: Boolean = false,
         isSensitiveInherited: Boolean = false,
+        isTakenDown: Boolean = false,
     ) =
         mock<TypedVideoNode> {
             on { id }.thenReturn(NodeId(handle))
@@ -1064,6 +1065,7 @@ class VideoPlayerViewModelV2Test {
             on { duration }.thenReturn(testDuration)
             on { this.isMarkedSensitive }.thenReturn(isMarkedSensitive)
             on { this.isSensitiveInherited }.thenReturn(isSensitiveInherited)
+            on { this.isTakenDown }.thenReturn(isTakenDown)
         }
 
     @Test
@@ -2822,6 +2824,125 @@ class VideoPlayerViewModelV2Test {
             underTest.uiState.test {
                 assertThat(awaitItem().isInPipMode).isFalse()
                 cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that filterTakeDownNodes filters out taken down nodes from playlist`() =
+        runTest {
+            val intent = mock<Intent>()
+            val testHandle = 2L
+            val testArray = intArrayOf(1, 2, 3)
+            val playingIndex = 1
+
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(context.getString(any())).thenReturn(testTitle)
+
+            val testVideoNodes = testArray.mapIndexed { index, it ->
+                initVideoNode(handle = it.toLong(), isTakenDown = index == 2)
+            }
+            whenever(getVideoNodesUseCase(any())).thenReturn(testVideoNodes)
+            whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+            whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+
+            val nonTakenDownNodes = testVideoNodes.dropLast(1)
+            val entities = nonTakenDownNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
+            entities.forEach {
+                whenever(it.copy(type = MediaQueueItemType.Playing)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Previous)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Next)).thenReturn(it)
+            }
+            nonTakenDownNodes.forEachIndexed { index, node ->
+                whenever(
+                    videoPlayerItemMapper(
+                        node.id.longValue,
+                        node.name,
+                        null,
+                        getMediaQueueItemType(index, playingIndex),
+                        node.size,
+                        false,
+                        node.duration
+                    )
+                ).thenReturn(entities[index])
+            }
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+
+            initViewModel()
+            mockStatic(Uri::class.java).use {
+                whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+                underTest.initVideoPlayerData(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    assertThat(actual.items.size).isEqualTo(nonTakenDownNodes.size)
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `test that filterTakeDownNodes keeps non taken down nodes in playlist`() =
+        runTest {
+            val intent = mock<Intent>()
+            val testHandle = 2L
+            val testArray = intArrayOf(1, 2, 3)
+            val playingIndex = 1
+
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = testFileName
+            )
+            whenever(context.getString(any())).thenReturn(testTitle)
+
+            val testVideoNodes = testArray.map { initVideoNode(handle = it.toLong()) }
+            whenever(getVideoNodesUseCase(any())).thenReturn(testVideoNodes)
+            whenever(getLocalLinkFromMegaApiUseCase(any())).thenReturn(testAbsolutePath)
+            whenever(httpServerIsRunningUseCase(any())).thenReturn(1)
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(mock()))
+
+            val entities = testVideoNodes.map { initVideoPlayerItem(it.id.longValue, it.name) }
+            entities.forEach {
+                whenever(it.copy(type = MediaQueueItemType.Playing)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Previous)).thenReturn(it)
+                whenever(it.copy(type = MediaQueueItemType.Next)).thenReturn(it)
+            }
+            testVideoNodes.forEachIndexed { index, node ->
+                whenever(
+                    videoPlayerItemMapper(
+                        node.id.longValue,
+                        node.name,
+                        null,
+                        getMediaQueueItemType(index, playingIndex),
+                        node.size,
+                        false,
+                        node.duration
+                    )
+                ).thenReturn(entities[index])
+            }
+            whenever(intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)).thenReturn(true)
+
+            initViewModel()
+            mockStatic(Uri::class.java).use {
+                whenever(Uri.parse(testAbsolutePath)).thenReturn(mock())
+                underTest.initVideoPlayerData(intent)
+                underTest.uiState.test {
+                    val actual = awaitItem()
+                    assertThat(actual.items.size).isEqualTo(testArray.size)
+                    cancelAndConsumeRemainingEvents()
+                }
             }
         }
 

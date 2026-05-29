@@ -2,7 +2,6 @@ package mega.privacy.android.feature.photos.presentation.videos.model
 
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import kotlin.time.Duration
 
@@ -30,6 +29,7 @@ import kotlin.time.Duration
  * @property hasThumbnail the video if has thumbnail
  * @property durationString the video's duration string
  * @property locations the video's locations
+ * @property isTakenDown the video if is taken down
  */
 data class VideoUiEntity(
     val id: NodeId,
@@ -53,4 +53,5 @@ data class VideoUiEntity(
     val hasThumbnail: Boolean = true,
     val durationString: String = "",
     val locations: List<LocationFilterOption>,
+    val isTakenDown: Boolean = false,
 )

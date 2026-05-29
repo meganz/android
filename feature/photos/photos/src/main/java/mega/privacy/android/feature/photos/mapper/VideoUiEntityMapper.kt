@@ -39,6 +39,7 @@ class VideoUiEntityMapper @Inject constructor(
         hasThumbnail = typedVideoNode.hasThumbnail,
         durationString = durationInSecondsTextMapper(typedVideoNode.duration),
         locations = getLocationList(typedVideoNode, syncFolderIds),
+        isTakenDown = typedVideoNode.isTakenDown
     )
 
     private fun getLocationList(
