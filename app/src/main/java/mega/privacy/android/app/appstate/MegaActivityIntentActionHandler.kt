@@ -20,7 +20,6 @@ import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
 import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
-import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
@@ -76,10 +75,17 @@ class MegaActivityIntentActionHandler @Inject constructor(
         val link = pendingDeepLinkUrl
             ?: intent.dataString?.takeIf { isPendingDeepLinkAction(intent) }
         pendingDeepLinkUrl = null
-        if (isPendingDeepLinkAction(intent)) {
+        val isPdfLink = externalPdfDeepLinkHandler.isPdfIntent(intent)
+        if (isPdfLink) {
+            intent.takeIf { isPendingDeepLinkAction(it) }?.data?.let {
+                navigationEventQueue.emit(externalPdfDeepLinkHandler.buildExternalPdfNavKey(it))
+            }
+            intent.action = null
+            intent.data = null
+        } else if (isPendingDeepLinkAction(intent)) {
             intent.action = null
         }
-        link?.let { navigationEventQueue.emit(DeepLinksDialogNavKey(it)) }
+        link?.takeIf { !isPdfLink }?.let { navigationEventQueue.emit(DeepLinksDialogNavKey(it)) }
     }
 
     private fun isPendingDeepLinkAction(intent: Intent): Boolean =
@@ -95,13 +101,7 @@ class MegaActivityIntentActionHandler @Inject constructor(
                 if (externalPdfDeepLinkHandler.consumeExternalActionViewPdfIfApplicable(
                         intent = intent,
                         launchLegacyPdfViewer = { launchLegacyPdfViewer(intent) },
-                        navigateToComposePdfViewer = {
-                            navigationEventQueue.emit(navKey = it, navOptions = navOptions {
-                                popUpToRoot {
-                                    inclusive = true
-                                }
-                            })
-                        },
+                        navigateToComposePdfViewer = { navigationEventQueue.emit(it) },
                     )
                 ) {
                     intent.action = null

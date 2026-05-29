@@ -25,6 +25,7 @@ dependencies {
     // Project modules
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":shared:nodes"))
     implementation(project(":core:feature-flags"))
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))

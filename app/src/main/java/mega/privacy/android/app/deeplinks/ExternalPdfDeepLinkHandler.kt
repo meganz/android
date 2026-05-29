@@ -1,6 +1,7 @@
 package mega.privacy.android.app.deeplinks
 
 import android.content.Intent
+import android.net.Uri
 import mega.privacy.android.app.extensions.isHttpScheme
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -46,18 +47,8 @@ class ExternalPdfDeepLinkHandler @Inject constructor(
 
         if (isPdfViewerComposeEnabled) {
             Timber.d("External PDF open: routing to new Compose PDF Viewer")
-            val isLocal = !uri.isHttpScheme()
-            val rawTitle = getFileNameFromStringUriUseCase(uri.toString()) ?: uri.lastPathSegment
-            val resolvedTitle = rawTitle?.let { FileUtil.addPdfFileExtension(it) }
             // Delegate to the caller so each Activity instance navigates within its own task stack.
-            navigateToComposePdfViewer(
-                PdfViewerNavKey(
-                    contentUri = uri.toString(),
-                    isLocalContent = isLocal,
-                    isExternalFile = true,
-                    title = resolvedTitle,
-                )
-            )
+            navigateToComposePdfViewer(buildExternalPdfNavKey(uri))
         } else {
             Timber.d("External PDF open: routing to legacy PdfViewerActivity")
             launchLegacyPdfViewer()
@@ -65,7 +56,25 @@ class ExternalPdfDeepLinkHandler @Inject constructor(
         return true
     }
 
-    private fun isPdfIntent(intent: Intent): Boolean {
+    /**
+     * Build the [PdfViewerNavKey] for an external `ACTION_VIEW` PDF [uri].
+     *
+     * Public so the same construction logic is reused by replay paths (e.g. after the user
+     * authenticates following "Save to Cloud Drive" from a not-logged-in external PDF)
+     */
+    suspend fun buildExternalPdfNavKey(uri: Uri): PdfViewerNavKey {
+        val isLocal = !uri.isHttpScheme()
+        val rawTitle = getFileNameFromStringUriUseCase(uri.toString()) ?: uri.lastPathSegment
+        val resolvedTitle = rawTitle?.let { FileUtil.addPdfFileExtension(it) }
+        return PdfViewerNavKey(
+            contentUri = uri.toString(),
+            isLocalContent = isLocal,
+            isExternalFile = true,
+            title = resolvedTitle,
+        )
+    }
+
+    internal fun isPdfIntent(intent: Intent): Boolean {
         val type = intent.type?.lowercase()
         if (type == "application/pdf" || type == "application/x-pdf") return true
         val uri = intent.data ?: return false

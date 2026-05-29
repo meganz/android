@@ -18,6 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -75,9 +76,9 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
-import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
@@ -171,7 +172,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
     private val copyPublicNodeUseCase: CopyPublicNodeUseCase,
     private val checkPublicNodesNameCollisionUseCase: CheckPublicNodesNameCollisionUseCase,
-    private val hasCredentialsUseCase: HasCredentialsUseCase,
+    private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
     @ApplicationContext private val applicationContext: Context,
     @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
@@ -189,20 +190,18 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
 
     init {
         getRubbishBinNode()
-        checkIsLoggedIn()
+        monitorIsLoggedIn()
     }
 
-    private fun checkIsLoggedIn() {
+    private fun monitorIsLoggedIn() {
         viewModelScope.launch {
-            runCatching {
-                hasCredentialsUseCase()
-            }.onSuccess { hasCredentials ->
-                uiState.update {
-                    it.copy(isLoggedIn = hasCredentials)
+            monitorUserCredentialsUseCase()
+                .catch { Timber.e(it) }
+                .collect { credentials ->
+                    uiState.update {
+                        it.copy(isLoggedIn = credentials != null)
+                    }
                 }
-            }.onFailure {
-                Timber.e(it)
-            }
         }
     }
 

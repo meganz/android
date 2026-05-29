@@ -12,6 +12,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -70,15 +71,16 @@ import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
-import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
@@ -118,7 +120,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.never
 import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -175,7 +176,7 @@ class NodeOptionsActionViewModelTest {
 
     private val nodeSelectionModeActionMapper = mock<NodeSelectionModeActionMapper>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
-    private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
+    private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
@@ -202,6 +203,14 @@ class NodeOptionsActionViewModelTest {
         on { id } doReturn NodeId(456L)
         on { isTakenDown } doReturn false
     }
+
+    private val fakeUserCredentials = UserCredentials(
+        email = "test@mega.io",
+        session = "session",
+        firstName = null,
+        lastName = null,
+        myHandle = null,
+    )
 
     private val mockNodeSelectionMenuItem = mock<NodeSelectionMenuItem<MenuActionWithIcon>>()
     private val mockNodeSelectionModeMenuItem = mock<NodeSelectionModeMenuItem>()
@@ -251,7 +260,7 @@ class NodeOptionsActionViewModelTest {
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
-            hasCredentialsUseCase = hasCredentialsUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
             applicationContext = mockContext,
             nodeSourceType = nodeSourceType
         )
@@ -267,8 +276,8 @@ class NodeOptionsActionViewModelTest {
         getRubbishNodeUseCase.stub {
             onBlocking { invoke() } doReturn mockRubbishNode
         }
-        hasCredentialsUseCase.stub {
-            onBlocking { invoke() } doReturn true
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() } doReturn flowOf(fakeUserCredentials)
         }
         nodeSelectionModeActionMapper.stub {
             onBlocking {
@@ -319,7 +328,7 @@ class NodeOptionsActionViewModelTest {
             mockMultiNodeActionHandler,
             nodeSelectionModeActionMapper,
             getRubbishNodeUseCase,
-            hasCredentialsUseCase,
+            monitorUserCredentialsUseCase,
             isNodeInBackupsUseCase,
             getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode,
@@ -918,7 +927,7 @@ class NodeOptionsActionViewModelTest {
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
-            hasCredentialsUseCase = hasCredentialsUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -989,7 +998,7 @@ class NodeOptionsActionViewModelTest {
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
-            hasCredentialsUseCase = hasCredentialsUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -1054,7 +1063,7 @@ class NodeOptionsActionViewModelTest {
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
-            hasCredentialsUseCase = hasCredentialsUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -1111,7 +1120,7 @@ class NodeOptionsActionViewModelTest {
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
-            hasCredentialsUseCase = hasCredentialsUseCase,
+            monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
         )
 
         assertThrows<IllegalArgumentException> {
@@ -1308,9 +1317,11 @@ class NodeOptionsActionViewModelTest {
     }
 
     @Test
-    fun `test that checkIsLoggedIn updates isLoggedIn to true when hasCredentialsUseCase returns true`() =
+    fun `test that monitorIsLoggedIn updates isLoggedIn to true when credentials are present`() =
         runTest {
-            hasCredentialsUseCase.stub { onBlocking { invoke() } doReturn true }
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() } doReturn flowOf(fakeUserCredentials)
+            }
             initViewModel()
             advanceUntilIdle()
 
@@ -1321,9 +1332,9 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
-    fun `test that checkIsLoggedIn updates isLoggedIn to false when hasCredentialsUseCase returns false`() =
+    fun `test that monitorIsLoggedIn updates isLoggedIn to false when credentials are null`() =
         runTest {
-            hasCredentialsUseCase.stub { onBlocking { invoke() } doReturn false }
+            monitorUserCredentialsUseCase.stub { on { invoke() } doReturn flowOf(null) }
             initViewModel()
             advanceUntilIdle()
 
@@ -1334,16 +1345,34 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
-    fun `test that checkIsLoggedIn handles hasCredentialsUseCase failure gracefully`() = runTest {
-        hasCredentialsUseCase.stub { onBlocking { invoke() } doThrow RuntimeException("test") }
-        initViewModel()
-        advanceUntilIdle()
+    fun `test that monitorIsLoggedIn updates isLoggedIn to false when credentials become null after logout`() =
+        runTest {
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() } doReturn flowOf(fakeUserCredentials, null)
+            }
+            initViewModel()
+            advanceUntilIdle()
 
-        viewModel.uiState.test {
-            val uiState = awaitItem()
-            assertThat(uiState.isLoggedIn).isFalse()
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.isLoggedIn).isFalse()
+            }
         }
-    }
+
+    @Test
+    fun `test that monitorIsLoggedIn handles monitorUserCredentialsUseCase failure gracefully`() =
+        runTest {
+            monitorUserCredentialsUseCase.stub {
+                on { invoke() } doReturn flow { throw RuntimeException("test") }
+            }
+            initViewModel()
+            advanceUntilIdle()
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.isLoggedIn).isFalse()
+            }
+        }
 
     @Test
     fun `test updateSelectionModeAvailableActions when node cannot be moved to rubbish bin`() =

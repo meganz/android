@@ -111,6 +111,11 @@ internal fun PdfViewerScreen(
         onDeactivateSearch()
     }
 
+    // External opens: route hardware back through onBack so the activity finishes instead of revealing the underlying stack.
+    BackHandler(enabled = uiState.isExternalFile && !searchState.isSearchActive) {
+        onBack()
+    }
+
     val pdfUri = remember(uiState.source) { getPdfUri(uiState.source) }
     val bytes = uiState.pdfBytes?.bytes
     val currentPage = uiState.currentPage

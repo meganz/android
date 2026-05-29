@@ -20,6 +20,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
+import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
@@ -610,4 +611,32 @@ class MegaActivityIntentActionHandlerTest {
 
             verify(getFeatureFlagValueUseCase, never()).invoke(any())
         }
+
+    @Test
+    fun `test that handlePendingDeepLinks emits PdfViewerNavKey when intent carries pending deep link action with PDF uri and root node exists`() =
+        runTest {
+            val contentUriString = "content://x/file.pdf"
+            val uri = mock<Uri> {
+                on { scheme } doReturn "content"
+                on { toString() } doReturn contentUriString
+            }
+            whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("file.pdf")
+            val intent = mock<Intent> {
+                on { action } doReturn ACTION_PENDING_DEEP_LINK
+                on { type } doReturn "application/pdf"
+                on { data } doReturn uri
+            }
+
+            underTest.handlePendingDeepLinks(intent = intent, rootNodeExists = true)
+
+            verify(navigationEventQueue).emit(
+                PdfViewerNavKey(
+                    contentUri = contentUriString,
+                    isLocalContent = true,
+                    isExternalFile = true,
+                    title = "file.pdf",
+                )
+            )
+        }
+
 }

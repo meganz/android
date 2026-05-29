@@ -13,10 +13,11 @@ const val ACTION_PENDING_DEEP_LINK: String = "PENDING_DEEP_LINK"
  * re-emitted after login or account creation completes.
  *
  * @param uriString the deep link URI to reopen after authentication.
+ * @param mimeType optional mime type to preserve for downstream classification.
  */
-fun Activity?.setPendingDeepLink(uriString: String?) {
+fun Activity?.setPendingDeepLink(uriString: String?, mimeType: String? = null) {
     this?.intent?.apply {
         action = ACTION_PENDING_DEEP_LINK
-        data = uriString?.toUri()
+        setDataAndType(uriString?.toUri(), mimeType)
     }
 }

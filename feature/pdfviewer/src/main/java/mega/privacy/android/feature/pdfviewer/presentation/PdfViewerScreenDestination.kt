@@ -1,13 +1,14 @@
 package mega.privacy.android.feature.pdfviewer.presentation
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import android.content.Intent
+import androidx.activity.compose.LocalActivity
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -21,15 +22,14 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
-
-private tailrec fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
-}
+import mega.privacy.android.navigation.setPendingDeepLink
+import mega.privacy.android.shared.nodes.sheet.PublicLinkAuthAlertBottomSheet
+import mega.privacy.android.shared.nodes.sheet.PublicLinkType
 
 /**
  * Extension function to register the PDF viewer screen in the navigation graph.
@@ -39,6 +39,7 @@ private tailrec fun Context.findActivity(): Activity? = when (this) {
  * @param onOpenNodeOptions Callback to open node options bottom sheet
  * @param onTransfer Callback to handle transfer events
  */
+@OptIn(ExperimentalMaterial3Api::class)
 internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
@@ -46,10 +47,10 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<PdfViewerNavKey> { navKey ->
-        val context = LocalContext.current
-        val pdfViewerOnBack: () -> Unit = remember(navKey.isExternalFile, onBack, context) {
+        val activity = LocalActivity.current
+        var showLoginRequiredSheet by rememberSaveable { mutableStateOf(false) }
+        val pdfViewerOnBack: () -> Unit = remember(navKey.isExternalFile, onBack, activity) {
             {
-                val activity = context.findActivity()
                 if (navKey.isExternalFile && activity != null) {
                     activity.finish()
                 } else {
@@ -139,7 +140,12 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             onNavigateToNextMatch = viewModel::navigateToNextMatch,
             onNavigateToPreviousMatch = viewModel::navigateToPreviousMatch,
             onUploadToCloudDrive = {
-                if (uiState.isFileExplorerEnabled) {
+                if (!nodeActionState.isLoggedIn) {
+                    // Not logged in: prompt to log in / sign up. The content URI is stashed via
+                    // setPendingDeepLink so the host re-emits the PDF deep link after
+                    // authentication and the user can tap Save again.
+                    showLoginRequiredSheet = true
+                } else if (uiState.isFileExplorerEnabled) {
                     navigationHandler.navigate(
                         ShareFilesToMegaNavKey(listOf(UriPath(navKey.contentUri)))
                     )
@@ -160,5 +166,22 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
                 .filterNot { it is CommonMenuAction.More },
             singleNodeActionHandler = singleNodeActionHandler,
         )
+
+        if (showLoginRequiredSheet) {
+            PublicLinkAuthAlertBottomSheet(
+                type = PublicLinkType.File,
+                onSignupClicked = {
+                    showLoginRequiredSheet = false
+                    activity.setPendingDeepLink(navKey.contentUri, navKey.mimeType)
+                    navigationHandler.navigate(CreateAccountNavKey())
+                },
+                onLoginClicked = {
+                    showLoginRequiredSheet = false
+                    activity.setPendingDeepLink(navKey.contentUri, navKey.mimeType)
+                    navigationHandler.navigate(LoginNavKey())
+                },
+                onDismissSheet = { showLoginRequiredSheet = false },
+            )
+        }
     }
 }
