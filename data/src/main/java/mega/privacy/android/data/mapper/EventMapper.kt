@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.mapper.account.AccountBlockedTypeMapper
+import mega.privacy.android.data.mapper.meeting.IntegerListMapper
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.AccountConfirmationEvent
 import mega.privacy.android.domain.entity.BusinessStatusEvent
@@ -14,6 +15,7 @@ import mega.privacy.android.domain.entity.NodesCurrentEvent
 import mega.privacy.android.domain.entity.RequestStatusProgressEvent
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.StorageSumChangedEvent
+import mega.privacy.android.domain.entity.TransfersResumedEvent
 import mega.privacy.android.domain.entity.UnknownEvent
 import nz.mega.sdk.MegaEvent
 import javax.inject.Inject
@@ -24,6 +26,7 @@ import javax.inject.Inject
 internal class EventMapper @Inject constructor(
     private val storageStateMapper: StorageStateMapper,
     private val accountBlockedTypeMapper: AccountBlockedTypeMapper,
+    private val integerListMapper: IntegerListMapper,
 ) {
     /**
      * Map [MegaEvent] to [Event].
@@ -105,6 +108,13 @@ internal class EventMapper @Inject constructor(
             RequestStatusProgressEvent(
                 handle = megaEvent.handle,
                 progress = megaEvent.number,
+            )
+        }
+
+        MegaEvent.EVENT_TRANSFERS_RESUMED -> {
+            TransfersResumedEvent(
+                handle = megaEvent.handle,
+                uniqueIds = integerListMapper(megaEvent.integerList),
             )
         }
 

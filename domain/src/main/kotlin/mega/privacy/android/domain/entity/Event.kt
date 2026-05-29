@@ -69,6 +69,11 @@ data class MiscFlagsReadyEvent(
     override val handle: Long,
 ) : Event
 
+data class TransfersResumedEvent(
+    override val handle: Long,
+    val uniqueIds: List<Int>,
+) : Event
+
 data class UnknownEvent(
     override val handle: Long,
 ) : Event

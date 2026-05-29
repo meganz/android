@@ -5,11 +5,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
+import mega.privacy.android.app.appstate.global.initialisation.appstart.FileServiceReclaimOptionsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CheckBusinessStatusInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ClearCompletedTransfersCacheInitializer
-import mega.privacy.android.app.appstate.global.initialisation.appstart.FileServiceReclaimOptionsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.DeleteOldestCompletedTransfersInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser

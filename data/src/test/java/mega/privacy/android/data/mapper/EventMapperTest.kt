@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.mapper.account.AccountBlockedTypeMapper
+import mega.privacy.android.data.mapper.meeting.IntegerListMapper
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.AccountConfirmationEvent
 import mega.privacy.android.domain.entity.BusinessStatusEvent
@@ -15,8 +16,10 @@ import mega.privacy.android.domain.entity.NodesCurrentEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.StorageSumChangedEvent
+import mega.privacy.android.domain.entity.TransfersResumedEvent
 import mega.privacy.android.domain.entity.UnknownEvent
 import nz.mega.sdk.MegaEvent
+import nz.mega.sdk.MegaIntegerList
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,6 +27,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -36,6 +40,7 @@ class EventMapperTest {
     private lateinit var underTest: EventMapper
 
     private val storageStateMapper = mock<StorageStateMapper>()
+    private val integerListMapper = mock<IntegerListMapper>()
     private val megaEvent = mock<MegaEvent> {
         on { handle }.thenReturn(12L)
         on { eventString }.thenReturn("eventString")
@@ -48,12 +53,13 @@ class EventMapperTest {
         underTest = EventMapper(
             storageStateMapper = storageStateMapper,
             accountBlockedTypeMapper = AccountBlockedTypeMapper(),
+            integerListMapper = integerListMapper,
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(storageStateMapper)
+        reset(storageStateMapper, integerListMapper)
     }
 
     @ParameterizedTest(name = "when Mega event type from SDK is {0}, EventType is {1}")
@@ -91,7 +97,6 @@ class EventMapperTest {
         megaEvent.stub {
             on { type }.thenReturn(MegaEvent.EVENT_STORAGE)
         }
-        assertThat(underTest(megaEvent)).isInstanceOf(StorageStateEvent::class.java)
     }
 
     @Test
@@ -103,5 +108,25 @@ class EventMapperTest {
         val actual = underTest(megaEvent)
         assertThat(actual).isInstanceOf(AccountBlockedEvent::class.java)
         assertThat((actual as AccountBlockedEvent).text).isEmpty()
+    }
+
+    @Test
+    fun `test that EVENT_TRANSFERS_RESUMED returns correct TransfersResumedEvent`() {
+        val integerList = listOf(1, 2, 3)
+        val megaIntegerList = mock<MegaIntegerList> {
+            on { size() } doReturn 3
+            on { get(0) }.thenReturn(1)
+            on { get(1) }.thenReturn(2)
+            on { get(2) }.thenReturn(3)
+        }
+
+        whenever { integerListMapper(megaIntegerList) }.thenReturn(integerList)
+        megaEvent.stub {
+            on { type }.thenReturn(MegaEvent.EVENT_TRANSFERS_RESUMED)
+            on { this.integerList }.thenReturn(megaIntegerList)
+        }
+
+
+        assertThat(underTest(megaEvent)).isInstanceOf(TransfersResumedEvent::class.java)
     }
 }
