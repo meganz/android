@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.feature.chat.meeting.call.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
@@ -144,6 +143,8 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.feature.chat.meeting.call.isJoined
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
@@ -294,6 +295,7 @@ class ChatViewModel @Inject constructor(
 
     init {
         getApiFeatureFlag()
+        getCloudExplorerFeatureFlag()
         checkUsersCallLimitReminders()
         getMyUserHandle()
         checkGeolocation()
@@ -324,6 +326,15 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun getCloudExplorerFeatureFlag() {
+        viewModelScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.onFailure { Timber.e(it) }.getOrDefault(false)
+            _state.update { state -> state.copy(isCloudExplorerAvailable = enabled) }
         }
     }
 

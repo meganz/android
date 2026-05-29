@@ -16,6 +16,9 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.Constants
 import java.net.URLEncoder
@@ -45,6 +48,9 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
     onCameraPermissionDenied: () -> Unit,
     enablePasscodeCheck: () -> Unit,
     navigateToWebSite: (String) -> Unit,
+    onNavigate: (NavKey) -> Unit = {},
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     navigation(
         startDestination = ConversationRoute,
@@ -62,6 +68,8 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
             navController = navController,
             bottomSheetNavigator = bottomSheetNavigator,
             scaffoldState = scaffoldState,
+            monitorResult = monitorResult,
+            clearResult = clearResult,
             navigateToFreePlanLimitParticipants = navController::navigateToFreePlanLimitsParticipantsDialog,
             showOptionsModal = navController::navigateToMessageOptionsModal,
             showEmojiModal = navController::navigateToEmojiPickerModal,
@@ -92,12 +100,16 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
             navigateToWebSite = navigateToWebSite,
         )
 
-        chatFileModal(navController = navController) {
-            navController.popBackStack(
-                ConversationRoute,
-                false
-            )
-        }
+        chatFileModal(
+            navController = navController,
+            onNavigate = onNavigate,
+            closeBottomSheets = {
+                navController.popBackStack(
+                    ConversationRoute,
+                    false
+                )
+            },
+        )
 
         messageOptionsModal(
             navController = navController,

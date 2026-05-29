@@ -150,6 +150,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
@@ -3149,6 +3150,40 @@ internal class ChatViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that isCloudExplorerAvailable is true when CloudExplorer feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(true)
+            initTestClass()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that isCloudExplorerAvailable is false when CloudExplorer feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(false)
+            initTestClass()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isCloudExplorerAvailable defaults to false when the feature flag lookup throws`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
+                .thenThrow(RuntimeException("boom"))
+            initTestClass()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
 
     private fun ChatRoom.getNumberParticipants() =
         (peerCount + if (ownPrivilege != ChatRoomPermission.Unknown

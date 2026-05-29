@@ -63,6 +63,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.react
  * @property addingReactionTo The id of the message to which a reaction is being added.
  * @property gmsDocumentScanner The prepared ML Kit Document Scanner
  * @property documentScanningError The specific Error returned when using the modern Document Scanner
+ * @property isCloudExplorerAvailable True if the new Navigation3 cloud explorer can be used to pick files for the chat.
  */
 data class ChatUiState(
     val chat: ChatRoom? = null,
@@ -107,6 +108,7 @@ data class ChatUiState(
     val addingReactionTo: Long? = null,
     val gmsDocumentScanner: StateEventWithContent<GmsDocumentScanner> = consumed(),
     val documentScanningError: DocumentScanningError? = null,
+    val isCloudExplorerAvailable: Boolean = false,
 ) {
 
     /**

@@ -1,15 +1,20 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose
 
 import androidx.compose.material.ScaffoldState
+import androidx.compose.material.navigation.BottomSheetNavigator
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import androidx.compose.material.navigation.BottomSheetNavigator
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 
 internal const val ConversationRoute = "conversation"
 
@@ -40,6 +45,8 @@ internal fun NavGraphBuilder.chatScreen(
     onBackPress: () -> Unit,
     enablePasscodeCheck: () -> Unit,
     navigateToWebSite: (String) -> Unit,
+    monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
+    clearResult: (String) -> Unit = {},
 ) {
     composable(
         route = ConversationRoute
@@ -47,6 +54,16 @@ internal fun NavGraphBuilder.chatScreen(
 
         val viewModel = backStackEntry.sharedViewModel<ChatViewModel>(navController)
         val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+        val shareFilesToChatResult by monitorResult(ShareFilesToChatNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
+        LaunchedEffect(shareFilesToChatResult) {
+            @Suppress("UNCHECKED_CAST")
+            val nodeIds = (shareFilesToChatResult as? List<NodeId>)
+                ?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
+            viewModel.onAttachNodes(nodeIds)
+            clearResult(ShareFilesToChatNavKey.RESULT)
+        }
 
         ChatView(
             bottomSheetNavigator = bottomSheetNavigator,
