@@ -56,9 +56,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.presentation.container.AppContainer
-import mega.privacy.android.app.presentation.psa.PsaContainer
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
@@ -82,7 +80,6 @@ import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.VideoPlayerScreenEvent
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -196,7 +193,6 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
         setContent {
             val mode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            var passcodeEnabled by remember { mutableStateOf(true) }
             val uiState by videoPlayerViewModelV2.uiState.collectAsStateWithLifecycle()
             val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
             val snackbarEventsState by snackbarEventsViewModel.snackbarEventState
@@ -204,12 +200,9 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
 
             LegacyActivityScaffold(
                 container = { content ->
-                    AppContainer(
-                        containers = listOf(
-                            { PsaContainer(content = it) },
-                            { PasscodeContainer(canLock = { passcodeEnabled }, content = it) },
-                            { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
-                        ),
+                    MegaAppContainer(
+                        themeMode = mode,
+                        finishOnSessionRefresh = false,
                         content = content,
                     )
                 },
