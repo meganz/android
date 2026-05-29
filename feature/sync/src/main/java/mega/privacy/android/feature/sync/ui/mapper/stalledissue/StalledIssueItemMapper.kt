@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.mapper.stalledissue
 
-import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -10,6 +9,7 @@ import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.ui.extension.getIcon
 import mega.privacy.android.feature.sync.ui.model.StalledIssueUiItem
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -64,7 +64,7 @@ internal class StalledIssueItemMapper @Inject constructor(
                 stalledIssueEntity.issueType,
                 areAllNodesFolders
             ),
-            displayedName = nameAndPath?.last() ?: "",
+            displayedName = nameAndPath?.lastOrNull() ?: "",
             displayedPath = nameAndPath?.dropLast(1)?.let {
                 if (it.size > 1) {
                     it.joinToString(separator = "/")
