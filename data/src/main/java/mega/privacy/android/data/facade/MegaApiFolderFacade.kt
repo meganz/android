@@ -4,6 +4,7 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
@@ -102,5 +103,9 @@ internal class MegaApiFolderFacade @Inject constructor(
 
     override suspend fun reconnect() {
         megaApiFolder.reconnect()
+    }
+
+    override fun fileServiceSetReclaimOptions(options: MegaFileServiceReclaimOptions?) {
+        megaApiFolder.fileServiceSetReclaimOptions(options)
     }
 }

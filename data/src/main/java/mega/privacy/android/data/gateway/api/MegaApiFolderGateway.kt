@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway.api
 
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSearchFilter
@@ -226,4 +227,14 @@ interface MegaApiFolderGateway {
      * Reconnect.
      */
     suspend fun reconnect()
+
+    /**
+     * @brief Set the options for reclaiming storage used by MegaApiFolder's file services.
+     *
+     * The provided options will be applied to the file services, and they will affect how the
+     * file services reclaim storage.
+     *
+     * @param options Options to set for reclaiming storage used by MegaApiFolder's file services.
+     */
+    fun fileServiceSetReclaimOptions(options: MegaFileServiceReclaimOptions?)
 }

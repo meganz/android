@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.fileservice.FileServiceReclaimOptionsMapper
@@ -30,6 +31,7 @@ class FileServiceRepositoryImplTest {
     private lateinit var underTest: FileServiceRepositoryImpl
 
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val fileServiceReclaimOptionsMapper = mock<FileServiceReclaimOptionsMapper>()
     private val megaFileServiceReclaimOptionsMapper = mock<MegaFileServiceReclaimOptionsMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -38,11 +40,13 @@ class FileServiceRepositoryImplTest {
     fun setUp() {
         reset(
             megaApiGateway,
+            megaApiFolderGateway,
             fileServiceReclaimOptionsMapper,
             megaFileServiceReclaimOptionsMapper,
         )
         underTest = FileServiceRepositoryImpl(
             megaApiGateway = megaApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             fileServiceReclaimOptionsMapper = fileServiceReclaimOptionsMapper,
             megaFileServiceReclaimOptionsMapper = megaFileServiceReclaimOptionsMapper,
             ioDispatcher = testDispatcher,
@@ -76,7 +80,7 @@ class FileServiceRepositoryImplTest {
         }
 
     @Test
-    fun `test that setReclaimOptions calls gateway with mapped options`() =
+    fun `test that setReclaimOptions calls main gateway with mapped options`() =
         runTest(testDispatcher) {
             val domainOptions = mock<FileServiceReclaimOptions>()
             val megaOptions = mock<MegaFileServiceReclaimOptions>()
@@ -86,6 +90,19 @@ class FileServiceRepositoryImplTest {
 
             verify(megaFileServiceReclaimOptionsMapper).invoke(domainOptions)
             verify(megaApiGateway).fileServiceSetReclaimOptions(megaOptions)
+        }
+
+    @Test
+    fun `test that setPublicLinkReclaimOptions calls folder gateway with mapped options`() =
+        runTest(testDispatcher) {
+            val domainOptions = mock<FileServiceReclaimOptions>()
+            val megaOptions = mock<MegaFileServiceReclaimOptions>()
+            whenever(megaFileServiceReclaimOptionsMapper(domainOptions)).thenReturn(megaOptions)
+
+            underTest.setPublicLinkReclaimOptions(domainOptions)
+
+            verify(megaFileServiceReclaimOptionsMapper).invoke(domainOptions)
+            verify(megaApiFolderGateway).fileServiceSetReclaimOptions(megaOptions)
         }
 
     @Test
@@ -159,4 +176,5 @@ class FileServiceRepositoryImplTest {
 
             verify(megaApiGateway).fileServiceReclaim(eq(null), any())
         }
+
 }

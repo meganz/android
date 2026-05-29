@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.fileservice.FileServiceReclaimOptionsMapper
 import mega.privacy.android.data.mapper.fileservice.MegaFileServiceReclaimOptionsMapper
@@ -14,6 +15,7 @@ import javax.inject.Inject
 
 internal class FileServiceRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val fileServiceReclaimOptionsMapper: FileServiceReclaimOptionsMapper,
     private val megaFileServiceReclaimOptionsMapper: MegaFileServiceReclaimOptionsMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -41,5 +43,12 @@ internal class FileServiceRepositoryImpl @Inject constructor(
                 val megaOptions = options?.let(megaFileServiceReclaimOptionsMapper::invoke)
                 megaApiGateway.fileServiceReclaim(megaOptions, listener)
             }
+        }
+
+    override suspend fun setPublicLinkReclaimOptions(options: FileServiceReclaimOptions) =
+        withContext(ioDispatcher) {
+            megaApiFolderGateway.fileServiceSetReclaimOptions(
+                megaFileServiceReclaimOptionsMapper(options)
+            )
         }
 }

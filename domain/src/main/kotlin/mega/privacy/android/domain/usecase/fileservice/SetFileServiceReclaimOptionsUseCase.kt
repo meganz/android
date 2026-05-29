@@ -6,6 +6,11 @@ import javax.inject.Inject
 
 /**
  * Use case to set the file service reclaim options.
+ *
+ * Keeping this orchestration at the use case layer is a deliberate business decision: callers
+ * configure both surfaces with a single invocation, and if the logged-in user's file service
+ * and the public link file service ever need to diverge, the change is local to this class —
+ * the repository stays single-purpose.
  */
 class SetFileServiceReclaimOptionsUseCase @Inject constructor(
     private val fileServiceRepository: FileServiceRepository,
@@ -17,6 +22,7 @@ class SetFileServiceReclaimOptionsUseCase @Inject constructor(
      */
     suspend operator fun invoke(options: FileServiceReclaimOptions) {
         fileServiceRepository.setReclaimOptions(options)
+        fileServiceRepository.setPublicLinkReclaimOptions(options)
     }
 }
 
