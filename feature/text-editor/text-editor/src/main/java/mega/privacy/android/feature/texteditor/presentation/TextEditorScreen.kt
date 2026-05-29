@@ -312,9 +312,16 @@ fun TextEditorScreen(
                 }
 
                 uiState.errorEvent == triggered -> {
+                    val message = uiState.errorMessage?.takeIf { it.isNotBlank() }
+                    val errorMessage = when {
+                        uiState.isNoInternetError ->
+                            stringResource(sharedR.string.error_no_internet_message)
+
+                        message != null -> message
+                        else -> stringResource(sharedR.string.general_request_failed_message)
+                    }
                     TextEditorErrorContent(
-                        message = uiState.errorMessage?.takeIf { it.isNotBlank() }
-                            ?: stringResource(sharedR.string.general_request_failed_message),
+                        message = errorMessage,
                         onDismiss = {
                             viewModel.consumeErrorEvent()
                             onBack()

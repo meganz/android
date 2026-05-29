@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @param contentVersion Monotonically increasing counter; the UI re-reads chunk data when it changes.
  * @param isFullyLoaded True when gradual loading has finished and all content is in memory.
  * @param errorMessage Optional error message when an operation fails; shown in error UI when set, cleared when error is consumed.
+ * @param isNoInternetError True when the current error event was caused by no internet connectivity; UI shows the no-internet message instead of [errorMessage].
  * @param showDiscardDialog True when the discard-changes confirmation dialog should be shown (Edit/Create, unsaved changes).
  * @param exitAfterCreateDiscardEvent One-shot event when Create mode user confirms discard; UI should pop without save.
  * @param isRestoringContent True while content is being reverted/updated in background (e.g. discard); show loading overlay.
@@ -25,6 +26,7 @@ data class TextEditorComposeUiState(
     val isLoading: Boolean = false,
     val errorEvent: StateEvent = consumed,
     val errorMessage: String? = null,
+    val isNoInternetError: Boolean = false,
     val mode: TextEditorMode = TextEditorMode.View,
     val showLineNumbers: Boolean = false,
     val showDiscardDialog: Boolean = false,

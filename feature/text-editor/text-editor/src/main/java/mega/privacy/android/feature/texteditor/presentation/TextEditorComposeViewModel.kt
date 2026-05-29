@@ -11,9 +11,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
@@ -43,6 +45,8 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorSc
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
@@ -111,6 +115,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
@@ -169,6 +175,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     @Volatile
     private var longLineChunkingEnabled: Boolean = true
 
+    /** Active content-load job; cancelled if connectivity drops while loading. */
+    private var loadJob: Job? = null
+
     init {
         viewModelScope.launch {
             val saved = runCatching { getShowLineNumbersPreferenceUseCase() }.getOrDefault(false)
@@ -176,7 +185,20 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
         monitorNodeRename()
         if (args.mode != TextEditorMode.Create) {
-            viewModelScope.launch {
+            loadJob = viewModelScope.launch {
+                // No localPath means the editor must reach the network (Cloud Drive open,
+                // chat-attached file, or public file link). Short-circuit with a no-internet
+                // prompt to avoid kicking off a download that would hang forever.
+                if (args.localPath.isNullOrBlank() && !isConnectedToInternetUseCase()) {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorEvent = triggered,
+                            isNoInternetError = true,
+                        )
+                    }
+                    return@launch
+                }
                 longLineChunkingEnabled = runCatching {
                     getFeatureFlagValueUseCase(ApiFeatures.TextEditorLongLineChunking)
                 }.getOrDefault(true)
@@ -303,6 +325,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 saveRecentlyUsed()
                 fetchBottomBarActions(resolvedNode)
             }
+            monitorConnectivityDuringLoad()
         } else {
             lastSavedContent = ""
             chunkTexts.add("")
@@ -676,7 +699,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun consumeErrorEvent() {
-        _uiState.update { it.copy(errorEvent = consumed, errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                errorEvent = consumed,
+                errorMessage = null,
+                isNoInternetError = false,
+            )
+        }
     }
 
     fun consumeTransferEvent() {
@@ -1066,6 +1095,33 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             .onEach { newName -> _uiState.update { it.copy(fileName = newName) } }
             .catch { Timber.e(it, "Text editor: node updates flow failed") }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * Cancels the content load and surfaces a no-internet error if connectivity drops
+     * while the editor is still loading. The initial offline case is handled by the
+     * synchronous [isConnectedToInternetUseCase] check at the top of the load; the
+     * `.drop(1)` here keeps this monitor focused on *transitions* (mid-load drops)
+     * so it cannot pre-empt a load that is still trying to read a local file.
+     */
+    private fun monitorConnectivityDuringLoad() {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .drop(1)
+                .collect { isConnected ->
+                    if (isConnected) return@collect
+                    if (!_uiState.value.isLoading) return@collect
+                    loadJob?.cancel()
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorEvent = triggered,
+                            errorMessage = null,
+                            isNoInternetError = true,
+                        )
+                    }
+                }
+        }
     }
 
     private suspend fun saveRecentlyUsed() {

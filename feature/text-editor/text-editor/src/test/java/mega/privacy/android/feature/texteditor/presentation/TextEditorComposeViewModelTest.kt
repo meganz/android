@@ -7,7 +7,9 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -29,6 +31,8 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
@@ -92,6 +96,8 @@ internal class TextEditorComposeViewModelTest {
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase = mock()
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
@@ -127,6 +133,8 @@ internal class TextEditorComposeViewModelTest {
             getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase,
             monitorNodeUpdatesUseCase,
+            monitorConnectivityUseCase,
+            isConnectedToInternetUseCase,
             snackbarEventQueue,
             getFeatureFlagValueUseCase,
         )
@@ -136,6 +144,8 @@ internal class TextEditorComposeViewModelTest {
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
         }
         whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf())
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
     }
 
     private fun initUnderTest(
@@ -189,6 +199,8 @@ internal class TextEditorComposeViewModelTest {
             getTextEditorScrollUseCase = getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
@@ -602,6 +614,86 @@ internal class TextEditorComposeViewModelTest {
         assertThat(underTest.uiState.value.errorEvent).isEqualTo(triggered)
         assertThat(underTest.uiState.value.isLoading).isFalse()
         assertThat(underTest.uiState.value.errorMessage).isEqualTo("load failed")
+        assertThat(underTest.uiState.value.isNoInternetError).isFalse()
+    }
+
+    @Test
+    fun `test that offline at start with no localPath sets isNoInternetError without invoking use case`() =
+        runTest {
+            whenever(isConnectedToInternetUseCase()).thenReturn(false)
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, localPath = null)
+            advanceUntilIdle()
+            val state = underTest.uiState.value
+            assertThat(state.errorEvent).isEqualTo(triggered)
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.isNoInternetError).isTrue()
+            verify(getTextContentForTextEditorUseCase, never())
+                .invoke(any<Long>(), anyOrNull(), any())
+        }
+
+    @Test
+    fun `test that offline at start with localPath proceeds with load`() = runTest {
+        whenever(isConnectedToInternetUseCase()).thenReturn(false)
+        doReturn(flowOf(listOf("local content")))
+            .whenever(getTextContentForTextEditorUseCase)
+            .invoke(any<Long>(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, localPath = "/some/local.txt")
+        advanceUntilIdle()
+        val state = underTest.uiState.value
+        assertThat(state.errorEvent).isEqualTo(consumed)
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.isNoInternetError).isFalse()
+    }
+
+    @Test
+    fun `test that consumeErrorEvent clears isNoInternetError`() = runTest {
+        whenever(isConnectedToInternetUseCase()).thenReturn(false)
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, localPath = null)
+        advanceUntilIdle()
+        underTest.consumeErrorEvent()
+        assertThat(underTest.uiState.value.errorEvent).isEqualTo(consumed)
+        assertThat(underTest.uiState.value.isNoInternetError).isFalse()
+    }
+
+    @Test
+    fun `test that connectivity drop during load cancels load and sets isNoInternetError`() =
+        runTest {
+            val connectivity = MutableStateFlow(true)
+            whenever(monitorConnectivityUseCase()).thenReturn(connectivity)
+            val hangingFlow = flow<List<String>> { awaitCancellation() }
+            doReturn(hangingFlow)
+                .whenever(getTextContentForTextEditorUseCase)
+                .invoke(any<Long>(), anyOrNull(), any())
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+            assertThat(underTest.uiState.value.isLoading).isTrue()
+
+            connectivity.value = false
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.errorEvent).isEqualTo(triggered)
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.isNoInternetError).isTrue()
+        }
+
+    @Test
+    fun `test that connectivity drop after load does not trigger error`() = runTest {
+        val connectivity = MutableStateFlow(true)
+        whenever(monitorConnectivityUseCase()).thenReturn(connectivity)
+        doReturn(flowOf(listOf("hello")))
+            .whenever(getTextContentForTextEditorUseCase)
+            .invoke(any<Long>(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.isLoading).isFalse()
+
+        connectivity.value = false
+        advanceUntilIdle()
+
+        val state = underTest.uiState.value
+        assertThat(state.errorEvent).isEqualTo(consumed)
+        assertThat(state.isNoInternetError).isFalse()
     }
 
     @Test
