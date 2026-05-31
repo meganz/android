@@ -162,7 +162,7 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
         ): NodeSortConfiguration = NodeSortConfiguration(
             sortOption = when (this) {
                 ContinueWhereLeftOffSortField.Name -> NodeSortOption.Name
-                ContinueWhereLeftOffSortField.Timestamp -> NodeSortOption.Created
+                ContinueWhereLeftOffSortField.Timestamp -> NodeSortOption.LastAccessed
             },
             sortDirection = direction,
         )

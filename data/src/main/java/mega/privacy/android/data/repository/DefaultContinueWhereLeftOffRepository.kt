@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -41,13 +42,21 @@ internal class DefaultContinueWhereLeftOffRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ContinueWhereLeftOffRepository {
 
-    override fun monitorContinueWhereLeftOffItems(limit: Int): Flow<List<ContinueWhereLeftOffItem>> =
-        sortPreferenceDataStore.monitorSortPreference()
-            .flatMapLatest { (sortField, sortDirection) ->
-                monitorItems(limit, sortField, sortDirection)
-            }
+    override fun monitorContinueWhereLeftOffItems(
+        limit: Int,
+        sortField: ContinueWhereLeftOffSortField?,
+        sortDirection: SortDirection?,
+    ): Flow<List<ContinueWhereLeftOffItem>> {
+        val sortSource = if (sortField != null && sortDirection != null) {
+            flowOf(sortField to sortDirection)
+        } else {
+            sortPreferenceDataStore.monitorSortPreference()
+        }
+        return sortSource
+            .flatMapLatest { (field, direction) -> monitorItems(limit, field, direction) }
             .map { list -> list.map(continueWhereLeftOffItemMapper::invoke) }
             .flowOn(ioDispatcher)
+    }
 
     override fun monitorSortPreference(): Flow<Pair<ContinueWhereLeftOffSortField, SortDirection>> =
         sortPreferenceDataStore.monitorSortPreference().flowOn(ioDispatcher)

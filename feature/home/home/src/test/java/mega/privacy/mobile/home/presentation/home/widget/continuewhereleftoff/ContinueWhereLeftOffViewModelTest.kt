@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -74,7 +77,7 @@ class ContinueWhereLeftOffViewModelTest {
             )
         )
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(any()) } doReturn flow {
+            on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow {
                 emit(items)
                 awaitCancellation()
             }
@@ -102,7 +105,7 @@ class ContinueWhereLeftOffViewModelTest {
         }
         whenever(getNodeByIdUseCase(NodeId(10L))).thenReturn(typedNode)
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(any()) } doReturn flow {
+            on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow {
                 emit(items)
                 awaitCancellation()
             }
@@ -128,7 +131,7 @@ class ContinueWhereLeftOffViewModelTest {
             )
         )
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(any()) } doReturn flow {
+            on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow {
                 emit(items)
                 awaitCancellation()
             }
@@ -146,7 +149,7 @@ class ContinueWhereLeftOffViewModelTest {
     fun `test that resolved name is cached and not fetched again`() = runTest {
         val fakeFlow = MutableSharedFlow<List<ContinueWhereLeftOffItem>>()
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(any()) } doReturn fakeFlow
+            on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn fakeFlow
         }
         val items = listOf(
             ContinueWhereLeftOffItem(
@@ -174,6 +177,23 @@ class ContinueWhereLeftOffViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that use case is invoked with Timestamp Descending so carousel ignores user sort preference`() =
+        runTest {
+            stubEmptyItems()
+
+            underTest.uiState.test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(monitorContinueWhereLeftOffItemsUseCase).invoke(
+                limit = 10,
+                sortField = ContinueWhereLeftOffSortField.Timestamp,
+                sortDirection = SortDirection.Descending,
+            )
+        }
 
     @Test
     fun `test that onItemClicked triggers openNodeEvent when node is resolved`() = runTest {
@@ -229,7 +249,7 @@ class ContinueWhereLeftOffViewModelTest {
 
     private fun stubEmptyItems() {
         monitorContinueWhereLeftOffItemsUseCase.stub {
-            on { invoke(any()) } doReturn flow {
+            on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow {
                 emit(emptyList<ContinueWhereLeftOffItem>())
                 awaitCancellation()
             }

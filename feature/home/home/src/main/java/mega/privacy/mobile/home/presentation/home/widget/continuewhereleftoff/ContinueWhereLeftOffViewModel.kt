@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
@@ -36,7 +38,11 @@ internal class ContinueWhereLeftOffViewModel @Inject constructor(
 
     val uiState: StateFlow<ContinueWhereLeftOffUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            monitorContinueWhereLeftOffItemsUseCase(limit = MAX_CAROUSEL_ITEMS)
+            monitorContinueWhereLeftOffItemsUseCase(
+                limit = MAX_CAROUSEL_ITEMS,
+                sortField = ContinueWhereLeftOffSortField.Timestamp,
+                sortDirection = SortDirection.Descending,
+            )
                 .transformLatest { items ->
                     emit(nameResolver.applyCachedNames(items))
                     if (nameResolver.resolveBlankNames(items)) {

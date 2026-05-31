@@ -5,7 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.repository.ContinueWhereLeftOffRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -43,18 +45,20 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
                 lastAccessedTimestamp = 1000L,
             )
         )
-        whenever(repository.monitorContinueWhereLeftOffItems(10)).thenReturn(flowOf(items))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(items))
 
         underTest(10).test {
             assertThat(awaitItem()).isEqualTo(items)
             cancelAndIgnoreRemainingEvents()
         }
-        verify(repository).monitorContinueWhereLeftOffItems(10)
+        verify(repository).monitorContinueWhereLeftOffItems(10, null, null)
     }
 
     @Test
     fun `test that invoke returns empty list when no items`() = runTest {
-        whenever(repository.monitorContinueWhereLeftOffItems(10)).thenReturn(flowOf(emptyList()))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(emptyList()))
 
         underTest(10).test {
             assertThat(awaitItem()).isEmpty()
@@ -64,12 +68,38 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
 
     @Test
     fun `test that invoke forwards limit to repository`() = runTest {
-        whenever(repository.monitorContinueWhereLeftOffItems(20)).thenReturn(flowOf(emptyList()))
+        whenever(repository.monitorContinueWhereLeftOffItems(20, null, null))
+            .thenReturn(flowOf(emptyList()))
 
         underTest(20).test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
-        verify(repository).monitorContinueWhereLeftOffItems(20)
+        verify(repository).monitorContinueWhereLeftOffItems(20, null, null)
+    }
+
+    @Test
+    fun `test that invoke forwards explicit sort field and direction to repository`() = runTest {
+        whenever(
+            repository.monitorContinueWhereLeftOffItems(
+                10,
+                ContinueWhereLeftOffSortField.Timestamp,
+                SortDirection.Descending,
+            )
+        ).thenReturn(flowOf(emptyList()))
+
+        underTest(
+            limit = 10,
+            sortField = ContinueWhereLeftOffSortField.Timestamp,
+            sortDirection = SortDirection.Descending,
+        ).test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(repository).monitorContinueWhereLeftOffItems(
+            10,
+            ContinueWhereLeftOffSortField.Timestamp,
+            SortDirection.Descending,
+        )
     }
 }

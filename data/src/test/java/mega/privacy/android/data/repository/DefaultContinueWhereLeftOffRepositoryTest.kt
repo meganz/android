@@ -25,6 +25,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -166,6 +167,75 @@ class DefaultContinueWhereLeftOffRepositoryTest {
             assertThat(capturedQuery().sql).isEqualTo(
                 "SELECT * FROM recently_used ORDER BY last_accessed_timestamp DESC LIMIT ?"
             )
+        }
+
+    @Test
+    fun `test that monitorContinueWhereLeftOffItems falls back to preference when only sort field is provided`() =
+        runTest {
+            stubSortPreference(
+                sortField = ContinueWhereLeftOffSortField.Name,
+                sortDirection = SortDirection.Ascending,
+            )
+            whenever(recentlyUsedDao.monitorItems(any()))
+                .thenReturn(flowOf(emptyList()))
+
+            underTest.monitorContinueWhereLeftOffItems(
+                limit = 10,
+                sortField = ContinueWhereLeftOffSortField.Timestamp,
+                sortDirection = null,
+            ).test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(capturedQuery().sql).isEqualTo(
+                "SELECT * FROM recently_used ORDER BY file_name COLLATE NOCASE ASC LIMIT ?"
+            )
+        }
+
+    @Test
+    fun `test that monitorContinueWhereLeftOffItems falls back to preference when only sort direction is provided`() =
+        runTest {
+            stubSortPreference(
+                sortField = ContinueWhereLeftOffSortField.Name,
+                sortDirection = SortDirection.Ascending,
+            )
+            whenever(recentlyUsedDao.monitorItems(any()))
+                .thenReturn(flowOf(emptyList()))
+
+            underTest.monitorContinueWhereLeftOffItems(
+                limit = 10,
+                sortField = null,
+                sortDirection = SortDirection.Descending,
+            ).test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(capturedQuery().sql).isEqualTo(
+                "SELECT * FROM recently_used ORDER BY file_name COLLATE NOCASE ASC LIMIT ?"
+            )
+        }
+
+    @Test
+    fun `test that monitorContinueWhereLeftOffItems uses explicit sort and ignores preference when sort params provided`() =
+        runTest {
+            whenever(recentlyUsedDao.monitorItems(any()))
+                .thenReturn(flowOf(emptyList()))
+
+            underTest.monitorContinueWhereLeftOffItems(
+                limit = 10,
+                sortField = ContinueWhereLeftOffSortField.Timestamp,
+                sortDirection = SortDirection.Descending,
+            ).test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            assertThat(capturedQuery().sql).isEqualTo(
+                "SELECT * FROM recently_used ORDER BY last_accessed_timestamp DESC LIMIT ?"
+            )
+            verify(sortPreferenceDataStore, never()).monitorSortPreference()
         }
 
     @Test
