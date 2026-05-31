@@ -69,8 +69,8 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
@@ -432,7 +432,7 @@ internal class MyAccountActivity : PasscodeActivity(),
                         ACTION_OPEN_USAGE_METER_FROM_MENU -> {
                             val myAccountUsageFragmentComposeUI =
                                 runCatching {
-                                    getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI)
+                                    getFeatureFlagValueUseCase(ApiFeatures.MyAccountUsageFragmentComposeUI)
                                 }.getOrDefault(false)
 
                             if (myAccountUsageFragmentComposeUI) {

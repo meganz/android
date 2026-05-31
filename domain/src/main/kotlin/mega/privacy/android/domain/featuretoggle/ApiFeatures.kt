@@ -259,6 +259,16 @@ enum class ApiFeatures(
         description = "Split long lines in text editor to prevent ANRs",
         singleCheckPerRun = true,
         defaultValue = true,
+    ),
+
+    /**
+     * Feature flag to control the migration of MyAccountUsageFragment to ComposeUI.
+     */
+    MyAccountUsageFragmentComposeUI(
+        experimentName = "myusg",
+        description = "Enable ComposeUI MyAccountUsageFragment",
+        singleCheckPerRun = true,
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

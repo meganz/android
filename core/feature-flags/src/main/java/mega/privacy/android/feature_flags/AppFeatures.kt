@@ -121,14 +121,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Feature flag to control the migration of MyAccountUsageFragment to ComposeUI.
-     */
-    MyAccountUsageFragmentComposeUI(
-        "Convert the MyAccountUsageFragment to ComposeUI",
-        false
-    ),
-
-    /**
      * Feature flag to control the migration of FileExplorerActivity to ComposeUI and single activity.
      */
     CloudExplorer(

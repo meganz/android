@@ -36,9 +36,9 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -153,7 +153,11 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
 
     override fun onClickUsageMeter() {
         lifecycleScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI)) {
+            val myAccountUsageFragmentComposeUI = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.MyAccountUsageFragmentComposeUI)
+            }.getOrDefault(false)
+
+            if (myAccountUsageFragmentComposeUI) {
                 findNavController().navigate(
                     MyAccountFragmentDirections.actionMyAccountToMyAccountUsageCompose()
                 )
