@@ -37,9 +37,14 @@ dependencies {
     // OkHttp to download the model artifact on first use (not bundled in the APK)
     implementation(lib.okhttp3)
 
+    // WorkManager runs the background model download
+    implementation(androidx.work.ktx)
+    implementation(androidx.hilt.work)
+
     // Testing
     testImplementation(project(":core-test"))
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
+    testImplementation(androidx.work.test)
 }

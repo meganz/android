@@ -11,11 +11,12 @@ import java.io.File
  *
  * Two access patterns:
  * - [cachedModelFile] is a cheap, non-blocking check used by the detector on
- *   the analysis thread: it returns the verified file if it's already on disk,
- *   or null if the model still needs downloading (the detector then yields no
- *   detections until it appears).
- * - [ensureModelReady] performs the (suspending) download + verification and is
- *   driven by the presentation layer, which can show progress while it runs.
+ *   the analysis thread to grab the cached file. Returns null only before the
+ *   one-time download; once [ensureModelReady] has succeeded, the file is on
+ *   disk for the rest of the process lifetime.
+ * - [ensureModelReady] performs the (suspending) download + verification.
+ *   Callers must invoke it before any detection path — the detector treats a
+ *   present cached file as a precondition.
  */
 interface ScannerModelProvider {
 
@@ -29,6 +30,13 @@ interface ScannerModelProvider {
      * Ensures the model is downloaded and integrity-verified, returning the
      * local file. No-op when the verified file is already cached. Throws if the
      * download or verification fails so the caller can surface an error state.
+     *
+     * @param onProgress invoked periodically (≈ every 1% of the artifact size)
+     *  during the download with `(bytesDownloaded, totalBytes)`. Not called
+     *  when the file is already cached. Suspending so the worker can forward
+     *  it directly to `setProgress` without an extra coroutine launch.
      */
-    suspend fun ensureModelReady(): File
+    suspend fun ensureModelReady(
+        onProgress: suspend (downloadedBytes: Long, totalBytes: Long) -> Unit,
+    ): File
 }

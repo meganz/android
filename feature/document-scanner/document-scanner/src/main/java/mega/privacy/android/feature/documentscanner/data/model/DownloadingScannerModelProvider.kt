@@ -3,6 +3,7 @@ package mega.privacy.android.feature.documentscanner.data.model
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.documentscanner.di.ScannerModelHttpClient
@@ -11,9 +12,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
 import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 import java.security.MessageDigest
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.coroutineContext
 
 /**
  * Downloads the TFLite boundary-detection model on first use and caches it in
@@ -37,47 +41,115 @@ internal class DownloadingScannerModelProvider @Inject constructor(
     override fun cachedModelFile(): File? =
         modelFile.takeIf { it.isFile && it.length() == MODEL_SIZE_BYTES }
 
-    override suspend fun ensureModelReady(): File = withContext(ioDispatcher) {
+    override suspend fun ensureModelReady(
+        onProgress: suspend (downloadedBytes: Long, totalBytes: Long) -> Unit,
+    ): File = withContext(ioDispatcher) {
         cachedModelFile()?.let { cached ->
             Timber.d("[DocScanner][model] Using cached model at ${cached.absolutePath}")
             return@withContext cached
         }
-        download()
+        download(onProgress)
     }
 
-    private fun download(): File {
+    private suspend fun download(
+        onProgress: suspend (downloadedBytes: Long, totalBytes: Long) -> Unit,
+    ): File {
         val target = modelFile.apply { parentFile?.mkdirs() }
         val tmp = File(target.parentFile, "$MODEL_FILE_NAME.tmp")
         tmp.delete()
 
         Timber.d("[DocScanner][model] Downloading model …")
         val request = Request.Builder().url(MODEL_URL).build()
+        var totalBytes: Long = MODEL_SIZE_BYTES
         client.newCall(request).execute().use { response ->
-            check(response.isSuccessful) {
-                "Model download failed: HTTP ${response.code}"
+            if (!response.isSuccessful) throwHttpFailure(response.code)
+            val body = response.body
+            totalBytes = body.contentLength().takeIf { it > 0 } ?: MODEL_SIZE_BYTES
+            tmp.outputStream().use { out ->
+                copyWithProgress(body.byteStream(), out, totalBytes, onProgress)
             }
-            tmp.outputStream().use { out -> response.body.byteStream().copyTo(out) }
         }
 
         verifyOrThrow(tmp)
 
         if (!tmp.renameTo(target)) {
-            error("Failed to move downloaded model into place")
+            throw ModelDownloadException.Transient(
+                "Failed to move downloaded model into place"
+            )
         }
+        // Final 100% tick so observers see the complete state before SUCCEEDED;
+        // verifyOrThrow has already confirmed totalBytes == MODEL_SIZE_BYTES, so
+        // observers also see a stable denominator across the whole download.
+        onProgress(totalBytes, totalBytes)
         Timber.d("[DocScanner][model] Model ready at ${target.absolutePath}")
         return target
+    }
+
+    /**
+     * Manual byte-chunk copy with throttled progress reporting. Calls [onProgress]
+     * each time the cumulative bytes copied cross a 1% boundary of [total], plus
+     * once at completion. The throttle keeps the worker's `setProgress` writes
+     * (which hit a Room-backed WorkManager DB) at a sane rate — ~100 over a full
+     * download instead of one per 8 KB chunk.
+     *
+     * `InputStream.read` is blocking and not coroutine-aware, so we call
+     * [ensureActive] each iteration to give WorkManager cancellation a chance to
+     * surface promptly instead of waiting for the next 1% suspension point
+     * (~930 KB on the 93 MB artifact).
+     */
+    private suspend fun copyWithProgress(
+        input: InputStream,
+        output: OutputStream,
+        total: Long,
+        onProgress: suspend (Long, Long) -> Unit,
+    ) {
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        // step is bytes-per-1%; coerce guards small inputs where total < 100.
+        val step = (total / 100).coerceAtLeast(1L)
+        var copied = 0L
+        var nextReport = step
+        while (true) {
+            coroutineContext.ensureActive()
+            val n = input.read(buffer)
+            if (n < 0) break
+            output.write(buffer, 0, n)
+            copied += n
+            if (copied >= nextReport) {
+                onProgress(copied, total)
+                nextReport = ((copied / step) + 1) * step
+            }
+        }
+    }
+
+    /**
+     * 4xx responses other than the rate-limit / timeout codes are permanent
+     * (the artifact is gone or the URL is wrong); everything else — including
+     * 5xx and 408/429 — is treated as transient so WorkManager retries.
+     */
+    private fun throwHttpFailure(code: Int): Nothing {
+        val isPermanent = code in 400..499 && code != 408 && code != 429
+        val message = "Model download failed: HTTP $code"
+        throw if (isPermanent) {
+            ModelDownloadException.Permanent(message)
+        } else {
+            ModelDownloadException.Transient(message)
+        }
     }
 
     private fun verifyOrThrow(file: File) {
         val size = file.length()
         if (size != MODEL_SIZE_BYTES) {
             file.delete()
-            error("Model size mismatch: $size != $MODEL_SIZE_BYTES")
+            throw ModelDownloadException.Transient(
+                "Model size mismatch: $size != $MODEL_SIZE_BYTES"
+            )
         }
         val actualSha = file.sha256Hex()
         if (actualSha != MODEL_SHA256) {
             file.delete()
-            error("Model checksum mismatch: $actualSha != $MODEL_SHA256")
+            throw ModelDownloadException.Transient(
+                "Model checksum mismatch: $actualSha != $MODEL_SHA256"
+            )
         }
     }
 
