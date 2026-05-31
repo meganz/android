@@ -160,7 +160,7 @@ internal fun CreateVideoPlaylistDialog(
                         ),
                     cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
                     textStyle = mergedTextStyle,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None),
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                     maxLines = 1,
                     singleLine = singleLine,
                     decorationBox = @Composable { innerTextField ->

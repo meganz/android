@@ -58,6 +58,6 @@ fun EditVideoPlaylistDialog(
             onDismiss()
         },
         errorText = errorText,
-        capitalization = KeyboardCapitalization.None,
+        capitalization = KeyboardCapitalization.Sentences,
     )
 }

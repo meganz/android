@@ -85,7 +85,7 @@ fun NewTextFileNodeDialog(
                 negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                 onNegativeButtonClicked = onDismiss,
                 keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.None,
+                capitalization = KeyboardCapitalization.Sentences,
                 onDismiss = onDismiss,
                 inputTextAlign = TextAlign.End
             )

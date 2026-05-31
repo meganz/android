@@ -64,7 +64,7 @@ internal fun EnterAlbumNameDialog(
         },
         errorText = errorText,
         placeholder = defaultSuggestion(),
-        capitalization = KeyboardCapitalization.None,
+        capitalization = KeyboardCapitalization.Sentences,
     )
 }
 
