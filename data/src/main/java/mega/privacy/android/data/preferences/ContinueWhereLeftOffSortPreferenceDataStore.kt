@@ -47,7 +47,7 @@ internal class ContinueWhereLeftOffSortPreferenceDataStore @Inject constructor(
     companion object {
         private val SORT_FIELD_KEY = stringPreferencesKey("cwlo_sort_field")
         private val SORT_DIRECTION_KEY = stringPreferencesKey("cwlo_sort_direction")
-        private val DEFAULT_SORT_FIELD = ContinueWhereLeftOffSortField.Name
-        private val DEFAULT_SORT_DIRECTION = SortDirection.Ascending
+        private val DEFAULT_SORT_FIELD = ContinueWhereLeftOffSortField.Timestamp
+        private val DEFAULT_SORT_DIRECTION = SortDirection.Descending
     }
 }

@@ -30,8 +30,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -156,7 +158,7 @@ class ContinueWhereLeftOffListViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.sortConfiguration.sortOption).isEqualTo(NodeSortOption.Created)
+            assertThat(state.sortConfiguration.sortOption).isEqualTo(NodeSortOption.LastAccessed)
             assertThat(state.sortConfiguration.sortDirection).isEqualTo(SortDirection.Descending)
             cancelAndIgnoreRemainingEvents()
         }
@@ -180,19 +182,23 @@ class ContinueWhereLeftOffListViewModelTest {
 
         underTest.uiState.test {
             awaitItem()
-            verify(monitorContinueWhereLeftOffItemsUseCase).invoke(eq(50))
+            verify(monitorContinueWhereLeftOffItemsUseCase).invoke(
+                limit = eq(50),
+                sortField = isNull(),
+                sortDirection = isNull(),
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that updateSortConfiguration persists Created descending via use case`() = runTest {
+    fun `test that updateSortConfiguration persists LastAccessed descending via use case`() = runTest {
         stubEmptyItems()
 
         underTest.uiState.test {
             awaitItem() // initial
             underTest.updateSortConfiguration(
-                NodeSortConfiguration(NodeSortOption.Created, SortDirection.Descending)
+                NodeSortConfiguration(NodeSortOption.LastAccessed, SortDirection.Descending)
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -439,14 +445,18 @@ class ContinueWhereLeftOffListViewModelTest {
     }
 
     private fun stubEmptyItems() {
-        whenever(monitorContinueWhereLeftOffItemsUseCase(any())) doReturn flow {
+        whenever(
+            monitorContinueWhereLeftOffItemsUseCase(any(), anyOrNull(), anyOrNull())
+        ) doReturn flow {
             emit(emptyList<ContinueWhereLeftOffItem>())
             awaitCancellation()
         }
     }
 
     private fun stubItems(items: List<ContinueWhereLeftOffItem>) {
-        whenever(monitorContinueWhereLeftOffItemsUseCase(any())) doReturn flow {
+        whenever(
+            monitorContinueWhereLeftOffItemsUseCase(any(), anyOrNull(), anyOrNull())
+        ) doReturn flow {
             emit(items)
             awaitCancellation()
         }
@@ -454,7 +464,9 @@ class ContinueWhereLeftOffListViewModelTest {
 
     private fun stubFakeFlow(): MutableSharedFlow<List<ContinueWhereLeftOffItem>> {
         val fakeFlow = MutableSharedFlow<List<ContinueWhereLeftOffItem>>()
-        whenever(monitorContinueWhereLeftOffItemsUseCase(any())) doReturn fakeFlow
+        whenever(
+            monitorContinueWhereLeftOffItemsUseCase(any(), anyOrNull(), anyOrNull())
+        ) doReturn fakeFlow
         return fakeFlow
     }
 }

@@ -24,11 +24,19 @@ import mega.privacy.android.domain.entity.node.SortDirection
 interface ContinueWhereLeftOffRepository {
 
     /**
-     * Monitor recently used items for the widget carousel.
-     * Items are sorted according to the persisted sort preference; the returned flow
-     * re-emits whenever the preference changes.
+     * Monitor recently used items.
+     *
+     * When both [sortField] and [sortDirection] are non-null, those values are used and
+     * the persisted preference is ignored — pass an explicit sort for views that must
+     * keep a fixed order (e.g. the home carousel always showing most recent first).
+     * Otherwise (either or both null) items are sorted according to the persisted sort
+     * preference and the returned flow re-emits whenever the preference changes.
      */
-    fun monitorContinueWhereLeftOffItems(limit: Int): Flow<List<ContinueWhereLeftOffItem>>
+    fun monitorContinueWhereLeftOffItems(
+        limit: Int,
+        sortField: ContinueWhereLeftOffSortField? = null,
+        sortDirection: SortDirection? = null,
+    ): Flow<List<ContinueWhereLeftOffItem>>
 
     /**
      * Monitor the persisted sort preference (field and direction).
