@@ -576,6 +576,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                         R.string.action_see,
                         SnackbarNavigateOption(
                             context = view.context,
+                            type = type,
                             idChat = idChat,
                             megaNavigator = megaNavigator,
                         )
