@@ -29,6 +29,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.StartTr
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.UpdateActiveTransfersInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.WhatsNewInitializer
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
+import mega.privacy.android.app.initializer.CameraUploadAutoStartInitializer
 import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
 import mega.privacy.android.app.main.ads.initialiser.MobileAdsInitialiser
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutInitialiser
@@ -205,6 +206,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideMobileAdsInitialiser(initialiser: MobileAdsInitialiser): AppStartInitialiser = initialiser
+
+    @Provides
+    @IntoSet
+    fun provideCameraUploadAutoStartInitializer(initialiser: CameraUploadAutoStartInitializer): PostLoginInitialiser =
+        initialiser
 
 }
 
