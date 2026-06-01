@@ -40,6 +40,13 @@ data class ShareFilesToChatNavKey(val chatId: Long) : ExplorerNavKey {
 }
 
 @Serializable
+data class CopyNavKey(val sourceHandles: List<Long>) : ExplorerNavKey {
+    companion object {
+        const val RESULT = "CopyNavKey::result"
+    }
+}
+
+@Serializable
 data class NodesExplorerNavKey(
     val nodeId: NodeId,
     val nodeSourceType: NodeSourceType,
