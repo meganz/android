@@ -920,6 +920,27 @@ class PendingBackStackNavigationHandlerTest {
             .inOrder()
     }
 
+    @Test
+    fun `test that displayDialog does not leave duplicate equal dialog keys when multiple instances of the same dialog class exist`() {
+        backStack.clear()
+        backStack.addAll(
+            listOf(
+                DefaultLandingScreen,
+                ParameterizedDialogDestination("A"),
+                Destination1,
+                ParameterizedDialogDestination("B"),
+            )
+        )
+
+        underTest.displayDialog(ParameterizedDialogDestination("A"))
+
+        assertThat(backStack.count { it == ParameterizedDialogDestination("A") }).isEqualTo(1)
+        assertThat(backStack.last()).isEqualTo(ParameterizedDialogDestination("A"))
+    }
+
     private data object DialogDestination1 : DialogNavKey
     private data object DialogDestination2 : DialogNavKey
+
+    @Serializable
+    private data class ParameterizedDialogDestination(val value: String) : DialogNavKey
 }

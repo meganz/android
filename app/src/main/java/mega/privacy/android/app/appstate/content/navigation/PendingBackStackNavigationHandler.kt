@@ -114,6 +114,10 @@ class PendingBackStackNavigationHandler(
                 if (destinations.any { it.isHomeScreenKey() }) {
                     backstack.removeAll { it.isHomeScreenKey() }
                 }
+                val incomingDialogs = destinations.filterIsInstance<DialogNavKey>().toSet()
+                if (incomingDialogs.isNotEmpty()) {
+                    backstack.removeAll { it in incomingDialogs }
+                }
                 backstack.addAll(destinations)
             }
         }
@@ -217,6 +221,8 @@ class PendingBackStackNavigationHandler(
                 backstack.pending += dialogDestination
             }
         } else {
+            // remove duplicated content and add new one at top
+            backstack.removeAll { it == dialogDestination }
             navigate(
                 dialogDestination,
                 navOptions {
