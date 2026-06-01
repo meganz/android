@@ -4,5 +4,5 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import mega.privacy.android.navigation.contract.queue.QueueEvent
 
 interface AppDialogsEventQueueReceiver {
-    val events: ReceiveChannel<() -> QueueEvent?>
+    val events: ReceiveChannel<suspend () -> QueueEvent?>
 }

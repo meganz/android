@@ -39,7 +39,7 @@ class CombinedEventQueueImpl(
         mapper = { it?.event }
     )
 
-    override val events: ReceiveChannel<() -> QueueEvent?>
+    override val events: ReceiveChannel<suspend () -> QueueEvent?>
         get() = queueChannel.events
 
 

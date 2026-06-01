@@ -11,7 +11,7 @@ class QueuePollingChannel<T, R>(
     private val mapper: (R?) -> T?,
 ) {
     private val mutex = Mutex()
-    val events: Channel<() -> T?> = Channel<() -> T?>(Channel.UNLIMITED)
+    val events: Channel<suspend () -> T?> = Channel<suspend () -> T?>(Channel.UNLIMITED)
 
     suspend fun add(item: R) {
         var sendEvent = false
@@ -30,9 +30,17 @@ class QueuePollingChannel<T, R>(
         }
     }
 
-    private fun pollAndCheckEvents(): T? = mapper(queue.poll())?.also {
-        if (queue.isNotEmpty()) {
-            events.trySend { pollAndCheckEvents() }
+    private suspend fun pollAndCheckEvents(): T? {
+        val polled: R?
+        val hasMore: Boolean
+        mutex.withLock {
+            polled = queue.poll()
+            hasMore = queue.isNotEmpty()
+        }
+        return mapper(polled)?.also {
+            if (hasMore) {
+                events.trySend { pollAndCheckEvents() }
+            }
         }
     }
 }

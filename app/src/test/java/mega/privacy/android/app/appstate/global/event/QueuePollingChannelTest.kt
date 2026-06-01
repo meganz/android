@@ -2,8 +2,13 @@ package mega.privacy.android.app.appstate.global.event
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,7 +22,7 @@ class QueuePollingChannelTest {
     @BeforeEach
     fun setUp() {
         underTest = QueuePollingChannel(
-            queue = PriorityQueue<Int>(),
+            queue = PriorityQueue(),
             mapper = { it }
         )
     }
@@ -79,6 +84,41 @@ class QueuePollingChannelTest {
             }
             assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
         }
+    }
+
+    @Test
+    fun `test that concurrent add and poll on a comparator-backed queue do not crash`() = runTest {
+        val channel = QueuePollingChannel(
+            queue = PriorityQueue<Int>(compareBy { it }),
+            mapper = { it }
+        )
+        val itemCount = 2_000
+        val producers = 8
+
+        val drained = mutableListOf<Int>()
+        val drainJob = launch {
+            for (event in channel.events) {
+                event()?.let { drained += it }
+                if (drained.size >= itemCount) break
+            }
+        }
+
+        withContext(Dispatchers.Default) {
+            (0 until producers).map { producerIndex ->
+                async {
+                    val start = producerIndex * (itemCount / producers)
+                    val end = start + (itemCount / producers)
+                    for (item in start until end) {
+                        channel.add(item)
+                    }
+                }
+            }.awaitAll()
+        }
+
+        drainJob.join()
+
+        assertThat(drained).hasSize(itemCount)
+        assertThat(drained.toSet()).isEqualTo((0 until itemCount).toSet())
     }
 
 }

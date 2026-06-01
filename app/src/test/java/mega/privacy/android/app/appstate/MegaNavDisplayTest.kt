@@ -64,7 +64,7 @@ class MegaNavDisplayTest {
     private data object SuppressableTarget : NavKey, Suppressable
 
     private val emittedEvents = mutableListOf<QueueEvent>()
-    private lateinit var eventChannel: Channel<() -> QueueEvent?>
+    private lateinit var eventChannel: Channel<suspend () -> QueueEvent?>
     private lateinit var receiver: NavigationEventQueueReceiver
     private lateinit var queueEventViewModel: QueueEventViewModel
     private lateinit var navigationHandler: PendingBackStackNavigationHandler
@@ -88,7 +88,7 @@ class MegaNavDisplayTest {
         emittedEvents.clear()
         eventChannel = Channel(Channel.UNLIMITED)
         receiver = object : NavigationEventQueueReceiver {
-            override val events: ReceiveChannel<() -> QueueEvent?> = eventChannel
+            override val events: ReceiveChannel<suspend () -> QueueEvent?> = eventChannel
         }
         queueEventViewModel = spy(QueueEventViewModel(receiver))
         navigationHandler = mock()
