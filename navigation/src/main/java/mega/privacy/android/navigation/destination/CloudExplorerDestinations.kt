@@ -47,6 +47,13 @@ data class CopyNavKey(val sourceHandles: List<Long>) : ExplorerNavKey {
 }
 
 @Serializable
+data class MoveNavKey(val sourceHandles: List<Long>) : ExplorerNavKey {
+    companion object {
+        const val RESULT = "MoveNavKey::result"
+    }
+}
+
+@Serializable
 data class NodesExplorerNavKey(
     val nodeId: NodeId,
     val nodeSourceType: NodeSourceType,
