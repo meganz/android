@@ -73,6 +73,7 @@ import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.TypedAudioNode
@@ -98,6 +99,7 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
@@ -197,6 +199,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val getOfflineNodeInformationByIdUseCase: GetOfflineNodeInformationByIdUseCase,
     private val saveAudioPlaybackInfoUseCase: SaveAudioPlaybackInfoUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -1391,6 +1394,20 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
         cancellableJobs.values.map {
             it.cancel()
+        }
+    }
+
+    override fun removeRecentlyUsedItemIfNearCompletion(
+        handle: Long,
+        duration: Long,
+        position: Long,
+    ) {
+        if (handle == INVALID_HANDLE || duration <= 0L
+            || duration - position >= CWLO_NEAR_COMPLETION_THRESHOLD_MS
+        ) return
+        applicationScope.launch {
+            runCatching { removeRecentlyUsedItemUseCase(handle) }
+                .onFailure { Timber.e(it, "Failed to remove CWLO item near completion") }
         }
     }
 

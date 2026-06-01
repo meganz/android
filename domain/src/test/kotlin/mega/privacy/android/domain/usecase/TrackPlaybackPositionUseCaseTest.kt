@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
 import org.junit.After
 import org.junit.Before
@@ -25,6 +26,7 @@ class TrackPlaybackPositionUseCaseTest {
     private lateinit var underTest: TrackPlaybackPositionUseCase
 
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
+    private val removeRecentlyUsedItemUseCase = mock<RemoveRecentlyUsedItemUseCase>()
 
     private val mediaId: Long = 1234567
 
@@ -35,6 +37,7 @@ class TrackPlaybackPositionUseCaseTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = TrackPlaybackPositionUseCase(
             mediaPlayerRepository = mediaPlayerRepository,
+            removeRecentlyUsedItemUseCase = removeRecentlyUsedItemUseCase,
             getTickerUseCase = getTicker
         )
     }
@@ -116,7 +119,9 @@ class TrackPlaybackPositionUseCaseTest {
 
         verify(getCurrentPlaybackInformation, times(2)).invoke()
         verify(mediaPlayerRepository).deletePlaybackInformation(nextTrackId)
+        verify(removeRecentlyUsedItemUseCase).invoke(nextTrackId)
         verify(mediaPlayerRepository, never()).deletePlaybackInformation(mediaId)
+        verify(removeRecentlyUsedItemUseCase, never()).invoke(mediaId)
         verify(mediaPlayerRepository, never()).updatePlaybackInformation(any())
     }
 }

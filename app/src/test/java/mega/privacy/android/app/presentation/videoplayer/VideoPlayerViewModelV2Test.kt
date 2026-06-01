@@ -98,6 +98,7 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
@@ -230,6 +231,7 @@ class VideoPlayerViewModelV2Test {
     private val monitorVideoRepeatModeUseCase = mock<MonitorVideoRepeatModeUseCase>()
     private val saveVideoRecentlyWatchedUseCase = mock<SaveVideoRecentlyWatchedUseCase>()
     private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
+    private val removeRecentlyUsedItemUseCase = mock<RemoveRecentlyUsedItemUseCase>()
     private val setVideoRepeatModeUseCase = mock<SetVideoRepeatModeUseCase>()
     private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
@@ -307,6 +309,7 @@ class VideoPlayerViewModelV2Test {
             monitorVideoRepeatModeUseCase = monitorVideoRepeatModeUseCase,
             saveVideoRecentlyWatchedUseCase = saveVideoRecentlyWatchedUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
+            removeRecentlyUsedItemUseCase = removeRecentlyUsedItemUseCase,
             setVideoRepeatModeUseCase = setVideoRepeatModeUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
@@ -394,6 +397,7 @@ class VideoPlayerViewModelV2Test {
             monitorVideoRepeatModeUseCase,
             saveVideoRecentlyWatchedUseCase,
             saveRecentlyUsedItemUseCase,
+            removeRecentlyUsedItemUseCase,
             setVideoRepeatModeUseCase,
             monitorAccountDetailUseCase,
             isHiddenNodesOnboardedUseCase,
@@ -2095,6 +2099,38 @@ class VideoPlayerViewModelV2Test {
             }
         }
     }
+
+    @Test
+    fun `test that removeRecentlyUsedItemUseCase is invoked when onPlaybackStateChanged ends within 2 seconds of completion`() =
+        runTest {
+            val handle = 12345L
+            val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
+            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(60_000L)
+            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(59_500L)
+            initViewModel()
+            underTest.updatePlaybackState(MediaPlaybackState.Playing)
+
+            underTest.onPlaybackStateChanged(MEDIA_PLAYER_STATE_ENDED)
+
+            verify(removeRecentlyUsedItemUseCase).invoke(handle)
+        }
+
+    @Test
+    fun `test that removeRecentlyUsedItemUseCase is not invoked when onPlaybackStateChanged ends more than 2 seconds from completion`() =
+        runTest {
+            val handle = 12345L
+            val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
+            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(60_000L)
+            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(50_000L)
+            initViewModel()
+            underTest.updatePlaybackState(MediaPlaybackState.Playing)
+
+            underTest.onPlaybackStateChanged(MEDIA_PLAYER_STATE_ENDED)
+
+            verify(removeRecentlyUsedItemUseCase, never()).invoke(any())
+        }
 
     @Test
     fun `test that getMatchedSubtitleFileInfo function returns correctly`() = runTest {

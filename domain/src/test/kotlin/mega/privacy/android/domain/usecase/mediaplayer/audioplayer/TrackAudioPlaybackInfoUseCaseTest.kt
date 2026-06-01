@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.GetTickerUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -28,6 +29,7 @@ class TrackAudioPlaybackInfoUseCaseTest {
     private lateinit var underTest: TrackAudioPlaybackInfoUseCase
 
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
+    private val removeRecentlyUsedItemUseCase = mock<RemoveRecentlyUsedItemUseCase>()
 
     private val mediaHandle: Long = 1234567
 
@@ -38,6 +40,7 @@ class TrackAudioPlaybackInfoUseCaseTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = TrackAudioPlaybackInfoUseCase(
             mediaPlayerRepository = mediaPlayerRepository,
+            removeRecentlyUsedItemUseCase = removeRecentlyUsedItemUseCase,
             getTickerUseCase = getTicker
         )
     }
@@ -125,7 +128,9 @@ class TrackAudioPlaybackInfoUseCaseTest {
 
         verify(getCurrentPlaybackInfo, times(2)).invoke()
         verify(mediaPlayerRepository).deleteMediaPlaybackInfo(nextTrackId)
+        verify(removeRecentlyUsedItemUseCase).invoke(nextTrackId)
         verify(mediaPlayerRepository, never()).deleteMediaPlaybackInfo(mediaHandle)
+        verify(removeRecentlyUsedItemUseCase, never()).invoke(mediaHandle)
         verify(mediaPlayerRepository, never()).updateAudioPlaybackInfo(any())
     }
 }

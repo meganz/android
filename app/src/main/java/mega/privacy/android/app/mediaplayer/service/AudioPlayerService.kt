@@ -271,7 +271,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
                 override fun onPlaybackStateChangedCallback(state: Int) {
                     when {
-                        state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> setPaused(true)
+                        state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
+                            removeRecentlyUsedItemIfNearCompletion()
+                            setPaused(true)
+                        }
 
                         state == MEDIA_PLAYER_STATE_READY -> {
                             if (!mediaPlayerGateway.getPlayWhenReady() &&
@@ -541,6 +544,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         if (audioManager != null) {
             ChatUtil.abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
         }
+        removeRecentlyUsedItemIfNearCompletion()
         viewModelGateway.clear()
         mediaPlayerGateway.clearPlayerForNotification()
         mediaPlayerGateway.playerRelease()
@@ -558,6 +562,15 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
             stopSelf()
         }
+    }
+
+    private fun removeRecentlyUsedItemIfNearCompletion() {
+        val handle = mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLongOrNull() ?: return
+        viewModelGateway.removeRecentlyUsedItemIfNearCompletion(
+            handle = handle,
+            duration = mediaPlayerGateway.getCurrentItemDuration(),
+            position = mediaPlayerGateway.getCurrentPlayingPosition(),
+        )
     }
 
     /**
