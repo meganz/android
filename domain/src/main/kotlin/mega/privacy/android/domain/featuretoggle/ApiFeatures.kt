@@ -250,6 +250,15 @@ enum class ApiFeatures(
     ),
 
     /**
+     * Display MEGA core features in Home Screen
+     */
+    DoMoreWithMEGA(
+        experimentName = "dmwm",
+        description = "Promotes MEGA’s core features and encourages adoption through progressive onboarding",
+        defaultValue = false
+    ),
+
+    /**
      * Text editor long-line chunking fix (AND-23707).
      * When enabled, splits very long lines into smaller segments to prevent ANRs
      * caused by native text measurement blocking the main thread.
