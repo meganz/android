@@ -50,6 +50,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -109,6 +111,7 @@ class LegacyContactInfoViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
         on { invoke() }.thenReturn(monitorNodeUpdatesFakeFlow)
     }
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorChatRetentionTimeUpdateUseCase =
         mock<MonitorChatRetentionTimeUpdateUseCase>()
     private var checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
@@ -173,6 +176,7 @@ class LegacyContactInfoViewModelTest {
             checkNodesNameCollisionUseCase,
             copyNodesUseCase,
             openOrStartCallUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -209,7 +213,8 @@ class LegacyContactInfoViewModelTest {
             openOrStartCallUseCase = openOrStartCallUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             copyNodesUseCase = copyNodesUseCase,
-            monitorChatRetentionTimeUpdateUseCase = monitorChatRetentionTimeUpdateUseCase
+            monitorChatRetentionTimeUpdateUseCase = monitorChatRetentionTimeUpdateUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -603,6 +608,57 @@ class LegacyContactInfoViewModelTest {
 
         underTest.uiState.test {
             assertThat(awaitItem().leaveFolderNodeIds).isEqualTo(ids)
+        }
+    }
+
+    @Test
+    fun `test that init sets isCloudExplorerAvailable to true when feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(true)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that init sets isCloudExplorerAvailable to false when feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(false)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that init sets isCloudExplorerAvailable to false when feature flag throws`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
+                .thenAnswer { throw RuntimeException("error") }
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that onShareFilesToChatResult sets navigateToChatOnAttachSuccess to true`() =
+        runTest {
+            initViewModel()
+            underTest.onShareFilesToChatResult()
+            underTest.uiState.test {
+                assertThat(awaitItem().navigateToChatOnAttachSuccess).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that onShareFilesToChatNavigated resets navigateToChatOnAttachSuccess`() = runTest {
+        initViewModel()
+        underTest.onShareFilesToChatResult()
+        underTest.onShareFilesToChatNavigated()
+        underTest.uiState.test {
+            assertThat(awaitItem().navigateToChatOnAttachSuccess).isFalse()
         }
     }
 

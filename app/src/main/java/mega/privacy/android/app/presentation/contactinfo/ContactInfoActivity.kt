@@ -37,6 +37,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,6 +50,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityOverlay
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
@@ -110,6 +112,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
@@ -159,6 +162,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     @Inject
     lateinit var navigator: MegaNavigator
+
+    @Inject
+    lateinit var shareFilesToChatOverlay: LegacyActivityOverlay
 
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
@@ -377,6 +383,25 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             Timber.w("Extras is NULL")
         }
         collectFlows()
+        collectShareFilesToChatResult()
+    }
+
+    private fun collectShareFilesToChatResult() {
+        shareFilesToChatOverlay.collectResult<List<NodeId>>(
+            scope = lifecycleScope,
+            lifecycleOwner = this,
+            resultKey = ShareFilesToChatNavKey.RESULT,
+        ) { ids ->
+            if (ids.isNotEmpty()) {
+                viewModel.userEmail?.let { email ->
+                    viewModel.onShareFilesToChatResult()
+                    nodeAttachmentViewModel.attachNodesToChatByEmail(
+                        nodeIds = ids,
+                        email = email,
+                    )
+                }
+            }
+        }
     }
 
     private fun configureActivityLaunchers() {
@@ -505,7 +530,16 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 activity = this,
                 viewModel = nodeAttachmentViewModel,
             ) { message, id ->
-                showSnackbarWithChat(message, id)
+                if (viewModel.uiState.value.navigateToChatOnAttachSuccess) {
+                    viewModel.onShareFilesToChatNavigated()
+                    navigator.openChat(
+                        context = this,
+                        chatId = id,
+                        action = Constants.ACTION_CHAT_SHOW_MESSAGES,
+                    )
+                } else {
+                    showSnackbarWithChat(message, id)
+                }
             }
         )
     }
@@ -818,8 +852,26 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             showOverDiskQuotaPaywallWarning()
             return
         }
-        viewModel.userEmail?.let { selectFileResultLauncher.launch(it) }
-            ?: run { Timber.w("Selected contact NULL") }
+        val email = viewModel.userEmail
+        if (email.isNullOrEmpty()) {
+            Timber.w("Selected contact NULL")
+            return
+        }
+        if (viewModel.uiState.value.isCloudExplorerAvailable) {
+            shareFilesToChatOverlay.show(
+                activity = this,
+                lifecycleOwner = this,
+                viewModelStoreOwner = this,
+                savedStateRegistryOwner = this,
+                themeMode = monitorThemeModeUseCase(),
+                initialKey = ShareFilesToChatNavKey(
+                    chatId = viewModel.chatId ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
+                ),
+                resultKey = ShareFilesToChatNavKey.RESULT,
+            )
+        } else {
+            selectFileResultLauncher.launch(email)
+        }
     }
 
     /**
@@ -1256,6 +1308,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Broadcast receivers are unregistered
      */
     override fun onDestroy() {
+        shareFilesToChatOverlay.hide()
         super.onDestroy()
         drawableArrow?.colorFilter = null
         drawableDots?.colorFilter = null
@@ -1394,7 +1447,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Method responsible for copying files
      */
     fun showCopy(handleList: ArrayList<Long>) {
-        selectFolderToCopyLauncher.launch(handleList.toLongArray())
+        val handles = handleList.toLongArray()
+        selectFolderToCopyLauncher.launch(handles)
     }
 
     private fun setFoldersButtonText(nodes: List<UnTypedNode>) {

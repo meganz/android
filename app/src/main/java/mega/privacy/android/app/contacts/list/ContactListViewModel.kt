@@ -36,6 +36,8 @@ import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as IconPackR
 import timber.log.Timber
 import javax.inject.Inject
@@ -67,6 +69,7 @@ internal class ContactListViewModel @Inject constructor(
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
     private val contactItemDataMapper: ContactItemDataMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val queryString = MutableStateFlow<String?>(null)
@@ -104,6 +107,47 @@ internal class ContactListViewModel @Inject constructor(
                 }
         }
         retrieveContactActions()
+        loadCloudExplorerFeatureFlag()
+    }
+
+    private fun loadCloudExplorerFeatureFlag() {
+        viewModelScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.onFailure { Timber.e(it) }.getOrDefault(false)
+            state.update { it.copy(isCloudExplorerAvailable = enabled) }
+        }
+    }
+
+    /**
+     * Begin a share-files-to-chat flow for the given contact. Persists the contact's
+     * email in [ContactListState.shareFilesToChatEmail] so the result handler can attach
+     * the picked files even across configuration changes.
+     */
+    fun onShareFilesToChatRequested(contactEmail: String) {
+        state.update { it.copy(shareFilesToChatEmail = contactEmail) }
+    }
+
+    /**
+     * Mark that the next successful attach should navigate to the resulting chat instead
+     * of showing the default snackbar.
+     */
+    fun onShareFilesToChatResult() {
+        state.update { it.copy(navigateToChatOnAttachSuccess = true) }
+    }
+
+    /**
+     * Clear the pending share-files-to-chat email once the overlay closes.
+     */
+    fun onShareFilesToChatOverlayHidden() {
+        state.update { it.copy(shareFilesToChatEmail = null) }
+    }
+
+    /**
+     * Reset the navigate-on-success flag after consuming it.
+     */
+    fun onShareFilesToChatNavigated() {
+        state.update { it.copy(navigateToChatOnAttachSuccess = false) }
     }
 
     private fun retrieveContactActions() {

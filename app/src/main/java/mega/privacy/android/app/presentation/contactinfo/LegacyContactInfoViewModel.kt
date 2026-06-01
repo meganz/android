@@ -57,6 +57,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
@@ -65,6 +66,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -121,6 +123,7 @@ class LegacyContactInfoViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val monitorChatRetentionTimeUpdateUseCase: MonitorChatRetentionTimeUpdateUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LegacyContactInfoUiState())
@@ -184,6 +187,31 @@ class LegacyContactInfoViewModel @Inject constructor(
         monitorChatOnlineStatusUpdates()
         monitorChatPresenceGreenUpdates()
         monitorChatConnectionStateUpdates()
+        loadCloudExplorerFeatureFlag()
+    }
+
+    private fun loadCloudExplorerFeatureFlag() {
+        viewModelScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.onFailure { Timber.e(it) }.getOrDefault(false)
+            _uiState.update { it.copy(isCloudExplorerAvailable = enabled) }
+        }
+    }
+
+    /**
+     * Mark that the next successful attach should navigate to the resulting chat instead
+     * of showing the default snackbar.
+     */
+    fun onShareFilesToChatResult() {
+        _uiState.update { it.copy(navigateToChatOnAttachSuccess = true) }
+    }
+
+    /**
+     * Reset the navigate-on-success flag after consuming it.
+     */
+    fun onShareFilesToChatNavigated() {
+        _uiState.update { it.copy(navigateToChatOnAttachSuccess = false) }
     }
 
     internal fun monitorChatRetentionTimeUpdate(chatId: Long) {

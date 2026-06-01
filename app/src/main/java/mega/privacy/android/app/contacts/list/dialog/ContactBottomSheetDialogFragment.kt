@@ -77,6 +77,12 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     var optionSendMessageClick: ((handle: Long) -> Unit)? = null
 
+    /**
+     * Send file button click listener. Receives the contact's email so the host can
+     * launch the new ShareFilesToChat compose flow.
+     */
+    var optionSendFileClick: ((contactEmail: String) -> Unit)? = null
+
     private val viewModel by viewModels<ContactListViewModel>({ requireParentFragment() })
     private val userHandle by lazy {
         arguments?.getLong(USER_HANDLE, INVALID_HANDLE) ?: INVALID_HANDLE
@@ -221,7 +227,12 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionSendFile.setOnClickListener {
-            selectFileLauncher.launch(contactEmail)
+            if (viewModel.state.value.isCloudExplorerAvailable) {
+                optionSendFileClick?.invoke(contactEmail)
+                dismiss()
+            } else {
+                selectFileLauncher.launch(contactEmail)
+            }
         }
 
         binding.optionShareContact.setOnClickListener {
