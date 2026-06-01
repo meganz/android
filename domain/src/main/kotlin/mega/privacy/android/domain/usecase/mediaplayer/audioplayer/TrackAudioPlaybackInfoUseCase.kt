@@ -2,14 +2,17 @@ package mega.privacy.android.domain.usecase.mediaplayer.audioplayer
 
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.usecase.GetTickerUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TrackAudioPlaybackInfoUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
+    private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
     private val getTickerUseCase: GetTickerUseCase,
 ) {
     /**
@@ -24,8 +27,11 @@ class TrackAudioPlaybackInfoUseCase @Inject constructor(
                 it.currentPosition > TimeUnit.SECONDS.toMillis(15)
             }.collect {
                 // When the audio is playing until last 2 seconds, remove playback information
-                if (it.totalDuration - it.currentPosition < TimeUnit.SECONDS.toMillis(2)) {
+                // and drop it from the Continue Where Left Off index so it is not surfaced
+                // back to the user as resumable.
+                if (it.totalDuration - it.currentPosition < CWLO_NEAR_COMPLETION_THRESHOLD_MS) {
                     mediaPlayerRepository.deleteMediaPlaybackInfo(it.mediaHandle)
+                    removeRecentlyUsedItemUseCase(it.mediaHandle)
                 } else {
                     mediaPlayerRepository.updateAudioPlaybackInfo(it)
                 }

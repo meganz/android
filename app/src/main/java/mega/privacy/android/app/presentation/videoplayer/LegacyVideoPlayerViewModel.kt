@@ -112,6 +112,7 @@ import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -151,6 +152,7 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
@@ -274,6 +276,7 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     private val monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     private val saveVideoRecentlyWatchedUseCase: SaveVideoRecentlyWatchedUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
     private val setVideoRepeatModeUseCase: SetVideoRepeatModeUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
@@ -1103,11 +1106,32 @@ class LegacyVideoPlayerViewModel @Inject constructor(
      */
     private fun clear() {
         searchJob?.cancel()
+        removeRecentlyUsedItemIfNearCompletion()
         applicationScope.launch {
             if (needStopStreamingServer) {
                 httpServerStopUseCase()
             }
             savePlaybackTimesUseCase()
+        }
+    }
+
+    /**
+     * If the current item is within [CWLO_NEAR_COMPLETION_THRESHOLD_MS] of its end, drop it from
+     * the Continue Where Left Off index. Covers the case where the user exits before the
+     * 1-second ticker in [trackPlaybackPositionUseCase] gets to delete the entry — including
+     * short videos (<=15s) for which the ticker filter never fires.
+     *
+     * Caveat: in repeat mode ExoPlayer may loop directly without firing STATE_ENDED, or fire
+     * it after position has wrapped to 0. In that case the ticker path is the source of truth.
+     */
+    private fun removeRecentlyUsedItemIfNearCompletion() {
+        val handle = mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLongOrNull() ?: return
+        val duration = mediaPlayerGateway.getCurrentItemDuration()
+        val position = mediaPlayerGateway.getCurrentPlayingPosition()
+        if (duration <= 0L || duration - position >= CWLO_NEAR_COMPLETION_THRESHOLD_MS) return
+        applicationScope.launch {
+            runCatching { removeRecentlyUsedItemUseCase(handle) }
+                .onFailure { Timber.e(it, "Failed to remove CWLO item near completion") }
         }
     }
 
@@ -1242,8 +1266,10 @@ class LegacyVideoPlayerViewModel @Inject constructor(
         val playbackState = uiState.value.mediaPlaybackState
         when {
             state == MEDIA_PLAYER_STATE_ENDED &&
-                    playbackState == MediaPlaybackState.Playing ->
+                    playbackState == MediaPlaybackState.Playing -> {
+                removeRecentlyUsedItemIfNearCompletion()
                 updatePlaybackState(MediaPlaybackState.Paused)
+            }
 
             state == MEDIA_PLAYER_STATE_READY -> {
                 if (playbackState == MediaPlaybackState.Paused

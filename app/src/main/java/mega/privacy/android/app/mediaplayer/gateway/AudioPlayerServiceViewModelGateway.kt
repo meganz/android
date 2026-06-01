@@ -60,4 +60,15 @@ interface AudioPlayerServiceViewModelGateway : PlayerServiceViewModelGateway {
      */
     @OptIn(UnstableApi::class)
     fun newShuffleOrder(): ShuffleOrder
+
+    /**
+     * Drop the given item from the Continue Where Left Off index if it is within 2 seconds
+     * of [duration]. Covers the case where the user exits or playback ends before the
+     * 1-second ticker in TrackAudioPlaybackInfoUseCase gets to delete the entry — including
+     * short clips (<=15s) for which the ticker filter never fires.
+     *
+     * Caveat: in repeat mode ExoPlayer may loop directly without firing STATE_ENDED, or fire
+     * it after position has wrapped to 0. In that case the ticker path is the source of truth.
+     */
+    fun removeRecentlyUsedItemIfNearCompletion(handle: Long, duration: Long, position: Long)
 }
