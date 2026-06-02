@@ -424,7 +424,7 @@ private fun ViewedLinkListItem(
                         text = item.viewedLink.name,
                         overflow = TextOverflow.MiddleEllipsis,
                         maxLines = 1,
-                        style = AppTheme.typography.bodyLarge,
+                        style = AppTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f, fill = false),
                     )
                     MegaIcon(
