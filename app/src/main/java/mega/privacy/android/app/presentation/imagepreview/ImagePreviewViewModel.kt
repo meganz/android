@@ -55,6 +55,8 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
@@ -122,7 +124,22 @@ class ImagePreviewViewModel @Inject constructor(
     private val largeBundleHolder: LargeBundleHolder,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
+    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
+    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
 ) : ViewModel() {
+
+    /** Copy the image currently being viewed (source from `state.currentImageNode`) to [newParentHandle]. */
+    fun copyCurrentNodeTo(context: Context, newParentHandle: Long) {
+        val source = _state.value.currentImageNode?.id?.longValue ?: return
+        copyNode(context = context, copyHandle = source, toHandle = newParentHandle)
+    }
+
+    /** Move counterpart of [copyCurrentNodeTo]. */
+    fun moveCurrentNodeTo(context: Context, newParentHandle: Long) {
+        val source = _state.value.currentImageNode?.id?.longValue ?: return
+        moveNode(context = context, moveHandle = source, toHandle = newParentHandle)
+    }
+
     private val imagePreviewFetcherSource: ImagePreviewFetcherSource
         get() = savedStateHandle[IMAGE_NODE_FETCHER_SOURCE] ?: ImagePreviewFetcherSource.TIMELINE
 
@@ -650,6 +667,10 @@ class ImagePreviewViewModel @Inject constructor(
                 }
 
                 result.moveRequestResult?.let {
+                    if (it.isSuccess) {
+                        runCatching { setCopyLatestTargetPathUseCase(toHandle) }
+                            .onFailure { e -> Timber.e(e) }
+                    }
                     setResultMessage(
                         context.getString(
                             if (it.isSuccess)

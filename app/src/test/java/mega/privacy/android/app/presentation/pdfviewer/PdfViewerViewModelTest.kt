@@ -151,6 +151,8 @@ internal class PdfViewerViewModelTest {
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             exportNodeUseCase = exportNodeUseCase,
             getNodeAccessUseCase = getNodeAccessUseCase,
+            setCopyLatestTargetPathUseCase = mock(),
+            setMoveLatestTargetPathUseCase = mock(),
         )
     }
 

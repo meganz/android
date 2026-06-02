@@ -220,7 +220,9 @@ class ImagePreviewViewModelTest {
             getNodeAccessPermission = getNodeAccessPermission,
             getNodeByHandle = getNodeByHandle,
             largeBundleHolder = largeBundleHolder,
-            context = mock()
+            context = mock(),
+            setCopyLatestTargetPathUseCase = mock(),
+            setMoveLatestTargetPathUseCase = mock(),
         )
     }
 

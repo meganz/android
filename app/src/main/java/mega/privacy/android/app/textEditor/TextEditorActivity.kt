@@ -87,6 +87,12 @@ import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
+import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
@@ -100,7 +106,9 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
@@ -150,6 +158,14 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     @Inject
     lateinit var chatController: ChatController
+
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    private var isCloudExplorerAvailable = false
 
     companion object {
         private const val SCROLL_TEXT = "SCROLL_TEXT"
@@ -245,6 +261,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
         Analytics.tracker.trackEvent(TextEditorScreenEvent)
+
+        setupCloudExplorer()
 
         invalidateOptionsMenu()
 
@@ -389,6 +407,32 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         originalNameTextSize = binding.nameText.textSize / fontScale
     }
 
+    private fun setupCloudExplorer() {
+        lifecycleScope.launch {
+            isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = CopyNavKey.RESULT,
+        ) { result ->
+            viewModel.copyCurrentNodeTo(newParentHandle = result.target.longValue)
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<MoveResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = MoveNavKey.RESULT,
+        ) { result ->
+            viewModel.moveCurrentNodeTo(newParentHandle = result.target.longValue)
+        }
+    }
+
     override fun onDestroy() {
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
@@ -466,12 +510,28 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.action_move -> {
                 Analytics.tracker.trackEvent(TextEditorMoveMenuItemEvent)
-                selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
+                val handles = longArrayOf(viewModel.getNode()!!.handle)
+                if (isCloudExplorerAvailable) {
+                    LegacyOverlayDialogFragment.show(
+                        fragmentManager = supportFragmentManager,
+                        initialKey = MoveNavKey(sourceHandles = handles.toList()),
+                    )
+                } else {
+                    selectFolderToMove(this, handles)
+                }
             }
 
             R.id.action_copy -> {
                 Analytics.tracker.trackEvent(TextEditorCopyMenuItemEvent)
-                selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
+                val handles = longArrayOf(viewModel.getNode()!!.handle)
+                if (isCloudExplorerAvailable) {
+                    LegacyOverlayDialogFragment.show(
+                        fragmentManager = supportFragmentManager,
+                        initialKey = CopyNavKey(sourceHandles = handles.toList()),
+                    )
+                } else {
+                    selectFolderToCopy(this, handles)
+                }
             }
 
             R.id.action_line_numbers -> {

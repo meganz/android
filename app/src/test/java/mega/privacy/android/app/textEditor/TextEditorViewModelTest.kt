@@ -161,6 +161,8 @@ internal class TextEditorViewModelTest {
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             exportNodeUseCase = mock(),
             disableExportUseCase = mock(),
+            setCopyLatestTargetPathUseCase = mock(),
+            setMoveLatestTargetPathUseCase = mock(),
         )
     }
 

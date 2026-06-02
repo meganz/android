@@ -37,6 +37,8 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
@@ -88,7 +90,21 @@ class PdfViewerViewModel @Inject constructor(
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val getNodeAccessUseCase: GetNodeAccessUseCase,
+    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
+    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
 ) : ViewModel() {
+
+    /** Copy the PDF currently being viewed (source handle in [savedStateHandle]) to [newParentHandle]. */
+    fun copyCurrentNodeTo(newParentHandle: Long) {
+        if (handle == INVALID_HANDLE) return
+        copyNode(nodeHandle = handle, newParentHandle = newParentHandle)
+    }
+
+    /** Move counterpart of [copyCurrentNodeTo]. */
+    fun moveCurrentNodeTo(newParentHandle: Long) {
+        if (handle == INVALID_HANDLE) return
+        moveNode(nodeHandle = handle, newParentHandle = newParentHandle)
+    }
 
     private val handle: Long
         get() = savedStateHandle["HANDLE"] ?: INVALID_HANDLE
@@ -254,6 +270,10 @@ class PdfViewerViewModel @Inject constructor(
                     _state.update { it.copy(nameCollision = item) }
                 }
                 result.moveRequestResult?.let { movementResult ->
+                    if (movementResult.isSuccess) {
+                        runCatching { setCopyLatestTargetPathUseCase(newParentHandle) }
+                            .onFailure { Timber.e(it) }
+                    }
                     _state.update {
                         it.copy(
                             snackBarMessage = if (movementResult.isSuccess)
@@ -290,6 +310,10 @@ class PdfViewerViewModel @Inject constructor(
                     _state.update { it.copy(nameCollision = item) }
                 }
                 result.moveRequestResult?.let { movementResult ->
+                    if (movementResult.isSuccess) {
+                        runCatching { setMoveLatestTargetPathUseCase(newParentHandle) }
+                            .onFailure { Timber.e(it) }
+                    }
                     _state.update {
                         it.copy(
                             snackBarMessage = if (movementResult.isSuccess)
