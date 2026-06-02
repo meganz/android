@@ -112,7 +112,7 @@ import javax.inject.Inject
  * @property binding [ActivityGroupChatPropertiesBinding]
  * @property chatLink The chat link
  * @property chat [MegaChatRoom]
- * @property chatC [ChatController]
+ * @property chatController [ChatController]
  * @property chatHandle The chat id
  * @property selectedHandleParticipant The handle of participant selected
  * @property participantsCount Number of participants
@@ -140,11 +140,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     @Inject
     lateinit var navigator: MegaNavigator
 
+    @Inject
+    lateinit var chatController: ChatController
+
     lateinit var binding: ActivityGroupChatPropertiesBinding
     private val viewModel by viewModels<GroupChatInfoViewModel>()
 
     var chatLink: String? = null
-    var chatC: ChatController? = null
     var chatHandle: Long = 0
     var selectedHandleParticipant: Long = 0
     var participantsCount: Long = 0
@@ -175,7 +177,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         Timber.d("onCreate")
 
         groupChatInfoActivity = this
-        chatC = ChatController(this)
 
         if (shouldRefreshSessionDueToKarere()) return
 
@@ -498,7 +499,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             val builder = MaterialAlertDialogBuilder(
                 activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog
             )
-            val name = chatC?.getParticipantFullName(handle)
+            val name = chatController?.getParticipantFullName(handle)
             builder.setMessage(resources.getString(R.string.confirmation_remove_chat_contact, name))
                 .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int -> removeParticipant() }
                 .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
@@ -507,7 +508,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     private fun removeParticipant() =
-        chatC?.removeParticipant(chatHandle, selectedHandleParticipant)
+        chatController?.removeParticipant(chatHandle, selectedHandleParticipant)
 
     /**
      * Shows change permissions dialog
@@ -585,7 +586,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     private fun changePermissions(newPermissions: Int) {
         Timber.d("New permissions: %s", newPermissions)
-        chatC?.alterParticipantsPermissions(chatHandle, selectedHandleParticipant, newPermissions)
+        chatController?.alterParticipantsPermissions(
+            chatHandle,
+            selectedHandleParticipant,
+            newPermissions
+        )
     }
 
     /**
@@ -774,7 +779,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
             else -> {
                 Timber.d("Positive button pressed - change title")
-                chatC?.changeTitle(chatHandle, title)
+                chatController?.changeTitle(chatHandle, title)
                 changeTitleDialog?.dismiss()
             }
         }
@@ -1444,7 +1449,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
         for (i in 0 until handleList.size()) {
             val handle = handleList[i]
-            chatC?.setNonContactAttributesInDB(handle)
+            chatController?.setNonContactAttributesInDB(handle)
 
             for (positionInAdapter in participantUpdates.keys) {
                 positionInAdapter?.let { pos ->
@@ -1453,8 +1458,9 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                             if (positionInArray >= 0 && positionInArray < participants.size && participants[positionInArray]?.handle == handle
                             ) {
                                 participantUpdates[pos]?.let { participant ->
-                                    participant.email = chatC?.getParticipantEmail(handle)
-                                    participant.fullName = chatC?.getParticipantFullName(handle)
+                                    participant.email = chatController?.getParticipantEmail(handle)
+                                    participant.fullName =
+                                        chatController?.getParticipantFullName(handle)
                                     chat?.let { chatRoom ->
                                         participant.privilege =
                                             chatRoom.getPeerPrivilegeByHandle(handle)

@@ -32,6 +32,9 @@ import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.main.controllers.ChatController;
@@ -46,19 +49,22 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private AndroidMegaChatMessage message;
     private long chatId;
     private long messageId;
     private String email;
-    private ChatController chatC;
     private int position;
 
     public EmojiTextView titleNameContactChatPanel;
     public ImageView stateIcon;
     public EmojiTextView titleMailContactChatPanel;
     public RoundedImageView contactImageView;
+
+    @Inject
+    ChatController chatController;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -86,7 +92,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         }
 
         Timber.d("Chat ID: %d, Message ID: %d", chatId, messageId);
-        chatC = new ChatController(requireActivity());
 
         return contentView;
     }
@@ -228,7 +233,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 long userHandle = message.getMessage().getUserHandle(position);
                 String name = message.getMessage().getUserName(position);
                 if (name == null || name.trim().isEmpty()) {
-                    name = chatC.getParticipantFullName(userHandle);
+                    name = chatController.getParticipantFullName(userHandle);
                     if (name.trim().isEmpty()) {
                         name = email;
                     }

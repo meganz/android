@@ -38,6 +38,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.GetUserEmailListener
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -126,6 +127,7 @@ import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.user.MonitorUserAvatarUpdatesUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
@@ -227,6 +229,8 @@ class InMeetingViewModel @Inject constructor(
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     monitorContactCacheUpdates: MonitorContactCacheUpdates,
     monitorUserUpdates: MonitorUserUpdates,
+    private val megaChatApi: MegaChatApiAndroid,
+    private val chatController: ChatController,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(), GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -1473,7 +1477,7 @@ class InMeetingViewModel @Inject constructor(
      * @return The name of a participant
      */
     fun getParticipantFullName(peerId: Long): String? =
-        CallUtil.getUserNameCall(MegaApplication.getInstance().applicationContext, peerId)
+        CallUtil.getUserNameCall(peerId, chatController, megaChatApi)
 
     /**
      * Method to find out if there is a participant in the call

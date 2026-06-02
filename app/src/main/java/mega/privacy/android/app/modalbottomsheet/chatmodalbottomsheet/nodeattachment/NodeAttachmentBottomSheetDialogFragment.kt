@@ -34,7 +34,9 @@ internal class NodeAttachmentBottomSheetDialogFragment : BottomSheetDialogFragme
     private val viewModel: NodeAttachmentBottomSheetViewModel by viewModels()
     private val nodeAttachmentHistoryViewModel: NodeAttachmentHistoryViewModel by activityViewModels()
     private val startDownloadViewModel: StartDownloadViewModel by activityViewModels()
-    private val chatController: ChatController by lazy { ChatController(requireActivity()) }
+
+    @Inject
+    lateinit var chatController: ChatController
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase

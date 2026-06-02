@@ -661,17 +661,6 @@ object ChatUtil {
         }
 
     /**
-     * Method to mute a specific chat or general notifications chat for a specific period of time.
-     *
-     * @param context    Context of Activity.
-     * @param muteOption The selected mute option.
-     */
-    @JvmStatic
-    fun muteChat(context: Context?, muteOption: String?) {
-        ChatController(context).muteChat(muteOption)
-    }
-
-    /**
      * Method to checking when chat notifications are enabled and update the UI elements.
      *
      * @param chatHandle            Chat ID.
@@ -901,11 +890,16 @@ object ChatUtil {
      * @param message  chat message
      */
     @JvmStatic
-    fun removeAttachmentMessage(activity: Activity, chatId: Long, message: MegaChatMessage?) {
+    fun removeAttachmentMessage(
+        activity: Activity,
+        chatId: Long,
+        message: MegaChatMessage,
+        chatController: ChatController,
+    ) {
         MaterialAlertDialogBuilder(activity)
             .setMessage(activity.getString(R.string.confirmation_delete_one_attachment))
             .setPositiveButton(activity.getString(R.string.context_remove)) { _, _ ->
-                ChatController(activity).deleteMessage(message, chatId)
+                chatController.deleteMessage(message, chatId)
                 activity.finish()
             }
             .setNegativeButton(activity.getString(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button), null)

@@ -35,6 +35,7 @@ class MeetingActivityRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
+    private val chatController: ChatController,
 ) {
 
     /**
@@ -143,7 +144,7 @@ class MeetingActivityRepository @Inject constructor(
      * @param peerId user handle of participant
      */
     fun getAvatarBitmapByPeerId(peerId: Long, getRemoteAvatar: () -> Unit): Bitmap? {
-        val mail = ChatController(context).getParticipantEmail(peerId)
+        val mail = chatController.getParticipantEmail(peerId)
         val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
         val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaApi.myUserHandleBinary)
         var bitmap = when {
@@ -160,9 +161,11 @@ class MeetingActivityRepository @Inject constructor(
 
         if (bitmap == null) {
             getRemoteAvatar()
+            val username = CallUtil.getUserNameCall(peerId, chatController, megaChatApi).orEmpty()
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
-                peerId
+                peerId,
+                username
             )
         }
 

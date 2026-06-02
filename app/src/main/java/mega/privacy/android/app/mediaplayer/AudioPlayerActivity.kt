@@ -42,6 +42,7 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -86,9 +87,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
-import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
@@ -127,6 +128,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
+
+    @Inject
+    lateinit var chatController: ChatController
 
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
@@ -588,7 +592,12 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                     if (adapterType == FROM_CHAT) {
                         getChatMessage().let { (chatId, message) ->
                             message?.let {
-                                ChatUtil.removeAttachmentMessage(this, chatId, it)
+                                ChatUtil.removeAttachmentMessage(
+                                    activity = this,
+                                    chatId = chatId,
+                                    message = it,
+                                    chatController = chatController
+                                )
                             }
                         }
                     } else {

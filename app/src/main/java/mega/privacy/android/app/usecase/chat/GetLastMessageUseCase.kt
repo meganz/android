@@ -46,13 +46,12 @@ class GetLastMessageUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaChatApi: MegaChatApiAndroid,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    private val chatController: ChatController,
 ) {
 
     companion object {
         private const val LAST_MSG_LOADING = 255
     }
-
-    private val chatController: ChatController by lazy { ChatController(context) }
 
     /**
      * Get a formatted String with the last message given the chatId
@@ -163,7 +162,7 @@ class GetLastMessageUseCase @Inject constructor(
                         "${chatListItem.getSenderName()}: ${converterShortCodes(chatListItem.lastMessage)}"
                     }
                 }
-            }
+            }.orEmpty()
         }
 
     private fun getChatCallStatusMessage(chatId: Long, isMeeting: Boolean): String? =

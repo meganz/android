@@ -38,7 +38,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -83,6 +82,7 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.navigation.ExtraConstant
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -110,6 +110,9 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
     @Inject
     lateinit var getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase
+
+    @Inject
+    lateinit var chatController: ChatController
 
     private val viewModel by viewModels<NodeAttachmentHistoryViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
@@ -152,8 +155,6 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     var chatId: Long = -1
     private var selectedMessageId: Long = -1
 
-    var chatC: ChatController? = null
-
     private var myChatFilesFolderHandle: Long? = null
     private var preservedMessagesSelected: ArrayList<MegaChatMessage>? = null
     private var preservedMessagesToImport: ArrayList<MegaChatMessage>? = null
@@ -180,8 +181,6 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
-
-        chatC = ChatController(this)
 
         megaChatApi.addNodeHistoryListener(chatId, this)
 
@@ -300,9 +299,10 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                     chatMessages = ArrayList()
 
                     if (adapter == null) {
-                        adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
-                            messages = chatMessages
-                        }
+                        adapter =
+                            NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
+                                messages = chatMessages
+                            }
                     }
 
                     listView?.setAdapter(adapter)
@@ -370,7 +370,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                         )
                     } else {
-                        forwardMessages(preservedMessagesSelected)
+                        preservedMessagesSelected?.let { forwardMessages(it) }
                         preservedMessagesSelected = null
                     }
                 }
@@ -749,8 +749,8 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     }
 
     override fun handleStoredData() {
-        if (preservedMessagesToImport.isNullOrEmpty()) {
-            forwardMessages(preservedMessagesSelected)
+        if (preservedMessagesToImport?.isNotEmpty() == true) {
+            preservedMessagesSelected?.let { forwardMessages(it) }
             preservedMessagesSelected = null
         } else {
             preservedMessagesToImport?.let {
@@ -783,7 +783,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
     private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             Timber.d("onActionItemClicked")
-            val messagesSelected = adapter?.selectedMessages
+            val messagesSelected = adapter?.selectedMessages ?: arrayListOf()
 
             if (viewModel.getStorageState() == StorageState.PayWall && item.itemId != R.id.cab_menu_select_all && item.itemId != R.id.cab_menu_unselect_all) {
                 showOverDiskQuotaPaywallWarning()
@@ -809,7 +809,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 clearSelections()
                 hideMultipleSelect()
                 val messageIds = ArrayList<Long>()
-                messagesSelected?.forEach { message ->
+                messagesSelected.forEach { message ->
                     val megaNodeHandle = message.msgId
                     messageIds.add(megaNodeHandle)
                 }
@@ -821,7 +821,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             } else if (itemId == R.id.chat_cab_menu_import) {
                 clearSelections()
                 hideMultipleSelect()
-                chatC?.importNodesFromMessages(messagesSelected)
+                chatController.importNodesFromMessages(messagesSelected)
             } else if (itemId == R.id.chat_cab_menu_offline) {
                 checkNotificationsPermission(this@NodeAttachmentHistoryActivity)
                 clearSelections()
@@ -875,7 +875,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                 } else {
                     Timber.d("Chat with permissions")
                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(
-                        viewModel.isOnline() && chatC?.isInAnonymousMode == false
+                        viewModel.isOnline() && chatController?.isInAnonymousMode == false
                     )
 
                     val importIcon = menu.findItem(R.id.chat_cab_menu_import)
@@ -889,7 +889,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
                         if (viewModel.isOnline()) {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true)
-                            if (chatC?.isInAnonymousMode == true) {
+                            if (chatController?.isInAnonymousMode == true) {
                                 menu.findItem(R.id.chat_cab_menu_offline).setVisible(false)
                                 importIcon.setVisible(false)
                             } else {
@@ -925,7 +925,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                         }
                         if (viewModel.isOnline()) {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(true)
-                            importIcon.setVisible(chatC?.isInAnonymousMode == false)
+                            importIcon.setVisible(chatController?.isInAnonymousMode == false)
                         } else {
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false)
                             importIcon.setVisible(false)
@@ -933,7 +933,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
                         menu.findItem(R.id.chat_cab_menu_delete).setVisible(showDelete)
                         menu.findItem(R.id.chat_cab_menu_forward).setVisible(
-                            viewModel.isOnline() && chatC?.isInAnonymousMode == false
+                            viewModel.isOnline() && chatController?.isInAnonymousMode == false
                         )
                         // Hide available offline option when multiple attachments are selected
                         menu.findItem(R.id.chat_cab_menu_offline).setVisible(false)
@@ -951,15 +951,14 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         }
     }
 
-    fun showConfirmationDeleteMessages(messages: ArrayList<MegaChatMessage>?, chat: MegaChatRoom) {
+    fun showConfirmationDeleteMessages(messages: ArrayList<MegaChatMessage>, chat: MegaChatRoom) {
         Timber.d("Chat ID: %s", chat.chatId)
 
         val dialogClickListener =
             DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        val cC = ChatController(this)
-                        cC.deleteMessages(messages, chat)
+                        chatController.deleteMessages(messages, chat)
                     }
 
                     DialogInterface.BUTTON_NEGATIVE -> {}
@@ -969,7 +968,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
-        if (messages?.size == 1) {
+        if (messages.size == 1) {
             builder.setMessage(R.string.confirmation_delete_one_message)
         } else {
             builder.setMessage(R.string.confirmation_delete_several_messages)
@@ -981,9 +980,9 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
             ).show()
     }
 
-    fun forwardMessages(messagesSelected: ArrayList<MegaChatMessage>?) {
+    fun forwardMessages(messagesSelected: ArrayList<MegaChatMessage>) {
         Timber.d("forwardMessages")
-        chatC?.forwardMessages(messagesSelected, chatId)
+        chatController.forwardMessages(messagesSelected, chatId)
     }
 
     /**
@@ -1088,8 +1087,14 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                     }
 
                     val listener = CreateChatListener(
-                        CreateChatListener.SEND_MESSAGES, chats, users, this, this, idMessages,
-                        chatId
+                        action = CreateChatListener.SEND_MESSAGES,
+                        chats = chats,
+                        usersNoChat = users,
+                        context = this,
+                        snackbarShower = this,
+                        messageHandles = idMessages,
+                        chatId = chatId,
+                        chatController = chatController
                     )
 
                     for (user in users) {
@@ -1102,7 +1107,13 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
                     Timber.d("Selected: %d chats to send", countChat)
 
                     val forwardChatProcessor =
-                        MultipleForwardChatProcessor(this, chatHandles, idMessages, chatId)
+                        MultipleForwardChatProcessor(
+                            this,
+                            chatHandles,
+                            idMessages,
+                            chatId,
+                            chatController
+                        )
                     forwardChatProcessor.forward(chatRoom)
                 }
             } else {
@@ -1210,7 +1221,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
 
             if (chatMessages?.isNotEmpty() == true) {
                 if (adapter == null) {
-                    adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
+                    adapter = NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
                         messages = chatMessages
                     }
                     listView?.layoutManager = mLayoutManager
@@ -1262,7 +1273,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         //Create adapter
         if (adapter == null) {
             Timber.d("Create adapter")
-            adapter = NodeAttachmentHistoryAdapter(this, listView).apply {
+            adapter = NodeAttachmentHistoryAdapter(this, listView, chatController).apply {
                 messages = chatMessages
             }
             listView?.layoutManager = mLayoutManager

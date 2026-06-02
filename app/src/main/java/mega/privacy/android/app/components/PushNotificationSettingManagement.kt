@@ -3,7 +3,7 @@ package mega.privacy.android.app.components
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.repository.LegacyNotificationRepository
@@ -25,6 +25,7 @@ class PushNotificationSettingManagement @Inject constructor(
     private val notificationsRepository: NotificationsRepository,
     private val legacyNotificationRepository: LegacyNotificationRepository,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val chatController: ChatController,
 ) {
     /**
      * Method for getting the PushNotificationSetting instance.
@@ -101,7 +102,7 @@ class PushNotificationSettingManagement @Inject constructor(
                     }
                 }
             }
-            ChatUtil.muteChat(context, option)
+            option?.let { chatController.muteChat(it) }
         }
     }
 }

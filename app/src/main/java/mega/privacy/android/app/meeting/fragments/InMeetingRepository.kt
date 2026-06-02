@@ -33,6 +33,7 @@ class InMeetingRepository @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
+    private val chatController: ChatController,
 ) {
 
     /**
@@ -71,11 +72,11 @@ class InMeetingRepository @Inject constructor(
      * @return String The contact's name
      */
     fun getContactOneToOneCallName(peerId: Long): String {
-        val name: String =
-            ChatController(MegaApplication.getInstance().applicationContext).getParticipantFirstName(
+        val name: String? =
+            chatController.getParticipantFirstName(
                 peerId
             )
-        if (name.isBlank()) {
+        if (name.isNullOrBlank()) {
             return megaChatApi.getContactEmail(peerId)
         }
 
@@ -117,14 +118,15 @@ class InMeetingRepository @Inject constructor(
      * @param peerId user Handle of a participant
      * @return the avatar the avatar of a participant
      */
-    fun getAvatarBitmap(peerId: Long, getRemoteAvatar: () -> Unit): Bitmap? {
+    fun getAvatarBitmap(peerId: Long, getRemoteAvatar: () -> Unit): Bitmap {
         var avatar = CallUtil.getImageAvatarCall(peerId)
         if (avatar == null) {
             getRemoteAvatar()
 
             avatar = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
-                peerId
+                peerId,
+                CallUtil.getUserNameCall(peerId, chatController, megaChatApi).orEmpty()
             )
         }
 
@@ -147,7 +149,7 @@ class InMeetingRepository @Inject constructor(
      * @return True, if it's. False, otherwise.
      */
     fun isMyContact(peerId: Long): Boolean {
-        val email = ChatController(context).getParticipantEmail(peerId)
+        val email = chatController.getParticipantEmail(peerId)
         val contact = megaApi.getContact(email)
 
         return contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE
@@ -161,7 +163,7 @@ class InMeetingRepository @Inject constructor(
      */
     fun participantName(peerId: Long): String? =
         if (peerId == MEGACHAT_INVALID_HANDLE) null
-        else ChatController(context).getParticipantFullName(peerId)
+        else chatController.getParticipantFullName(peerId)
 
     /**
      * Method of obtaining the remote video
@@ -278,7 +280,7 @@ class InMeetingRepository @Inject constructor(
      */
     fun getAvatarBitmapByPeerId(peerId: Long, getRemoteAvatar: () -> Unit): Bitmap? {
         var bitmap: Bitmap?
-        val mail = ChatController(context).getParticipantEmail(peerId)
+        val mail = chatController.getParticipantEmail(peerId)
 
         val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
         val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaApi.myUserHandleBinary)
@@ -295,7 +297,8 @@ class InMeetingRepository @Inject constructor(
             getRemoteAvatar()
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
-                peerId
+                peerId,
+                CallUtil.getUserNameCall(peerId, chatController, megaChatApi).orEmpty(),
             )
         }
 
@@ -308,7 +311,7 @@ class InMeetingRepository @Inject constructor(
      * @param peerId user handle of participant
      */
     fun getParticipantEmail(peerId: Long): String? =
-        ChatController(context).getParticipantEmail(peerId)
+        chatController.getParticipantEmail(peerId)
 
     /**
      * Determine if I am a guest
@@ -326,7 +329,7 @@ class InMeetingRepository @Inject constructor(
      */
     fun addContact(context: Context, peerId: Long, callback: (String) -> Unit) {
         megaApi.inviteContact(
-            ChatController(context).getParticipantEmail(peerId),
+            chatController.getParticipantEmail(peerId),
             null,
             MegaContactRequest.INVITE_ACTION_ADD,
             AddContactListener(callback, context)

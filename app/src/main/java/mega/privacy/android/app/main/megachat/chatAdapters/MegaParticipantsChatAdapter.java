@@ -79,7 +79,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     private long chatId;
     private boolean isPreview;
 
-    private ChatController chatC;
+    private ChatController chatController;
 
     public MegaParticipantsChatAdapter(GroupChatInfoActivity groupChatInfoActivity, RecyclerView listView) {
         this.groupChatInfoActivity = groupChatInfoActivity;
@@ -94,7 +94,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        chatC = groupChatInfoActivity.getChatC();
+        chatController = groupChatInfoActivity.getChatController();
     }
 
     /*private view holder class*/
@@ -652,7 +652,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         } else if (id == R.id.manage_chat_history_group_info_layout) {
             groupChatInfoActivity.openManageChatHistory(chatId);
         } else if (id == R.id.chat_group_contact_properties_archive_layout) {
-            new ChatController(groupChatInfoActivity).archiveChat(groupChatInfoActivity.getChat());
+            chatController.archiveChat(groupChatInfoActivity.getChat());
         } else if (id == R.id.chat_group_contact_properties_layout) {
             if (holderHeader != null) {
                 if (holderHeader.notificationsSwitch.isChecked()) {
@@ -786,12 +786,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         if (participant.isEmpty()) {
             long handle = participant.getHandle();
 
-            String fullName = chatC.getParticipantFullName(handle);
+            String fullName = chatController.getParticipantFullName(handle);
             if (!isTextEmpty(fullName)) {
                 participant.setFullName(fullName);
             }
 
-            String email = chatC.getParticipantEmail(handle);
+            String email = chatController.getParticipantEmail(handle);
             if (!isTextEmpty(email)) {
                 participant.setEmail(email);
             }

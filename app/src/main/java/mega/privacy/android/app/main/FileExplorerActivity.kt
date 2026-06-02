@@ -73,6 +73,7 @@ import mega.privacy.android.app.main.FileExplorerActivity.Companion.SELECT_CAMER
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CHAT_LINK
@@ -224,6 +225,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase
+
+    @Inject
+    lateinit var chatController: ChatController
 
     private val viewModel by viewModels<FileExplorerViewModel>()
 
@@ -2496,8 +2500,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 chats = chats,
                 usersNoChatSize = users.size,
                 context = this,
-                snackbarShower = this
-            ) { resultChats: List<MegaChatRoom> -> sendToChats(resultChats) }
+                snackbarShower = this,
+                onChatsCreated = { resultChats: List<MegaChatRoom> -> sendToChats(resultChats) },
+                chatController = chatController,
+            )
 
             for (user in users) {
                 val peers = MegaChatPeerList.createInstance()

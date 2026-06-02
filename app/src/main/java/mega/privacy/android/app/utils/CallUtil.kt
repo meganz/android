@@ -47,6 +47,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatRequest
@@ -780,19 +781,23 @@ object CallUtil {
     }
 
     /**
-     * Method to get the default avatar in calls.
+     * Get default avatar call
      *
-     * @param context Context of the Activity.
-     * @param peerId  User handle from whom the avatar is obtained.
-     * @return Bitmap with the default avatar created.
+     * @param context
+     * @param peerId
+     * @param username
      */
     @JvmStatic
-    fun getDefaultAvatarCall(context: Context, peerId: Long): Bitmap = AvatarUtil.getDefaultAvatar(
-        getColorAvatar(peerId),
-        getUserNameCall(context, peerId),
-        dp2px(Constants.AVATAR_SIZE_CALLS.toFloat(), context.resources.displayMetrics),
-        true,
-    )
+    fun getDefaultAvatarCall(context: Context, peerId: Long, username: String): Bitmap =
+        AvatarUtil.getDefaultAvatar(
+            colorAvatar = getColorAvatar(handle = peerId),
+            textAvatar = username,
+            textSize = dp2px(
+                Constants.AVATAR_SIZE_CALLS.toFloat(),
+                context.resources.displayMetrics
+            ),
+            isList = true,
+        )
 
     /**
      * Method to get the image avatar in calls.
@@ -835,15 +840,18 @@ object CallUtil {
     }
 
     /**
-     * Method to get the name from a handle.
+     * Get user name call
      *
-     * @param context Activity context.
-     * @param peerId  User handle from whom the name is obtained.
-     * @return The name.
+     * @param peerId
+     * @param chatController
+     * @param megaChatApi
      */
     @JvmStatic
-    fun getUserNameCall(context: Context, peerId: Long): String {
-        val megaChatApi = MegaApplication.getInstance().megaChatApi
+    fun getUserNameCall(
+        peerId: Long,
+        chatController: ChatController,
+        megaChatApi: MegaChatApiAndroid,
+    ): String? {
         if (peerId == megaChatApi.myUserHandle) {
             return megaChatApi.myFullname
         }
@@ -853,7 +861,7 @@ object CallUtil {
             return nickname
         }
 
-        return ChatController(context).getParticipantFullName(peerId)
+        return chatController.getParticipantFullName(peerId)
     }
 
     /**

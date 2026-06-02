@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.inject.Inject;
+
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
@@ -45,6 +47,7 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.main.CheckScrollInterface;
 import mega.privacy.android.app.main.FileExplorerActivity;
+import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChipChatExplorerAdapter;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaListChatExplorerAdapter;
 import mega.privacy.android.app.main.model.chat.explorer.ChatExplorerUiState;
@@ -57,6 +60,9 @@ import timber.log.Timber;
 public class ChatExplorerFragment extends Fragment implements CheckScrollInterface {
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
+
+    @Inject
+    ChatController chatController;
 
     private ChatExplorerFragment chatExplorerFragment;
 
@@ -240,7 +246,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
                             ArrayList<ChatExplorerListItem> items = new ArrayList<>(itemsList);
                             if (adapterList == null) {
                                 Timber.w("AdapterList is NULL");
-                                adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView);
+                                adapterList = new MegaListChatExplorerAdapter(context, chatExplorerFragment, items, listView, chatController);
                             } else {
                                 adapterList.setItems(items);
                             }

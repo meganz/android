@@ -61,8 +61,10 @@ class ContactAttachmentActivity : PasscodeActivity(), MegaRequestListenerInterfa
     @JvmField
     var selectedEmail: String? = null
 
+    @Inject
+    lateinit var chatController: ChatController
+
     private var inviteAction = false
-    private lateinit var chatController: ChatController
     private var message: AndroidMegaChatMessage? = null
 
     @JvmField
@@ -95,7 +97,6 @@ class ContactAttachmentActivity : PasscodeActivity(), MegaRequestListenerInterfa
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return
         }
-        chatController = ChatController(this)
         if (intent != null) {
             chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
             messageId =

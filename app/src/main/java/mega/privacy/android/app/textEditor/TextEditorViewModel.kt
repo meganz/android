@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -31,7 +32,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.features.CloudDriveFeature
-import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -57,7 +57,6 @@ import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.constant.CacheFolderConstant
@@ -96,6 +95,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.DisableExportUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -171,6 +171,7 @@ class TextEditorViewModel @Inject constructor(
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
+    private val disableExportUseCase: DisableExportUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -1130,18 +1131,21 @@ class TextEditorViewModel @Inject constructor(
      * @param context Current context.
      */
     fun manageLink(context: Context) {
-        if (showTakenDownNodeActionNotAvailableDialog(getNode(), context)) {
+        val node = getNode() ?: return
+        if (showTakenDownNodeActionNotAvailableDialog(node, context)) {
             return
         }
 
-        if (getNode()?.isExported == true) {
+        if (node.isExported) {
             showConfirmRemoveLinkDialog(context) {
-                megaApi.disableExport(
-                    getNode(),
-                    ExportListener(context) { runDelay(500L) { updateNode() } })
+                viewModelScope.launch {
+                    disableExportUseCase(NodeId(node.handle))
+                    delay(500L)
+                    updateNode()
+                }
             }
         } else {
-            showGetLinkActivity(context as Activity, getNode()!!.handle)
+            showGetLinkActivity(context as Activity, node.handle)
         }
     }
 

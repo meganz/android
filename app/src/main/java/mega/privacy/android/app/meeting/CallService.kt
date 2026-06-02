@@ -100,6 +100,9 @@ class CallService : LifecycleService() {
     @Inject
     lateinit var monitorCallScreenOpenedUseCase: MonitorCallScreenOpenedUseCase
 
+    @Inject
+    lateinit var chatController: ChatController
+
     private var monitorChatListItemUpdatesJob: Job? = null
     private var monitorChatCallUpdatesJob: Job? = null
     private var monitorCallScreenOpenedUpdatesJob: Job? = null
@@ -356,16 +359,18 @@ class CallService : LifecycleService() {
                 val largeIcon: Bitmap =
                     if (chat.isGroup)
                         createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
-                    else
+                    else {
+                        val email = chatController.getParticipantEmail(
+                            chat.getPeerHandle(
+                                0
+                            )
+                        )
                         setProfileContactAvatar(
                             chat.getPeerHandle(0),
                             title,
-                            ChatController(this@CallService).getParticipantEmail(
-                                chat.getPeerHandle(
-                                    0
-                                )
-                            )
+                            email.orEmpty()
                         )
+                    }
 
                 val actionIcon = iconPackR.drawable.ic_phone_01_medium_thin_outline
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
@@ -467,16 +472,18 @@ class CallService : LifecycleService() {
                 val largeIcon: Bitmap =
                     if (chat.isGroup)
                         createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
-                    else
+                    else {
+                        val email = chatController.getParticipantEmail(
+                            chat.getPeerHandle(
+                                0
+                            )
+                        )
                         setProfileContactAvatar(
                             chat.getPeerHandle(0),
                             title,
-                            ChatController(this@CallService).getParticipantEmail(
-                                chat.getPeerHandle(
-                                    0
-                                )
-                            )
+                            email.orEmpty()
                         )
+                    }
                 val actionIcon = iconPackR.drawable.ic_phone_01_medium_thin_outline
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
                 val actionTitle =

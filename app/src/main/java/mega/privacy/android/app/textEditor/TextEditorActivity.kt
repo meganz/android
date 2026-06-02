@@ -33,12 +33,12 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -53,6 +53,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
@@ -146,6 +147,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
+
+    @Inject
+    lateinit var chatController: ChatController
 
     companion object {
         private const val SCROLL_TEXT = "SCROLL_TEXT"
@@ -495,11 +499,14 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 }
             }
 
-            R.id.chat_action_remove -> removeAttachmentMessage(
-                this,
-                viewModel.getChatRoom()!!.chatId,
-                viewModel.getMsgChat()
-            )
+            R.id.chat_action_remove -> viewModel.getMsgChat()?.let {
+                removeAttachmentMessage(
+                    activity = this,
+                    chatId = viewModel.getChatRoom()!!.chatId,
+                    message = it,
+                    chatController = chatController,
+                )
+            }
         }
 
         return super.onOptionsItemSelected(item)

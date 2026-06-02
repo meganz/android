@@ -7,24 +7,30 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.presentation.meeting.ChatInfoViewModel
+import mega.privacy.android.app.utils.AvatarUtil.setImageAvatar
+import mega.privacy.android.app.utils.CallUtil.canCallBeStartedFromContactOption
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.ChatUtil.getUserStatus
+import mega.privacy.android.app.utils.ChatUtil.setContactStatus
+import mega.privacy.android.app.utils.Constants.CONTACT_HANDLE
+import mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND
+import mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT
+import mega.privacy.android.app.utils.Constants.NAME
+import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.app.utils.Util.isScreenInPortrait
+import mega.privacy.android.app.utils.Util.scaleHeightPx
+import mega.privacy.android.app.utils.Util.scaleWidthPx
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_CHAT_ID
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -34,13 +40,17 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
-    private var selectedChat: MegaChatRoom? = null
-    private var chatId = MegaApiJava.INVALID_HANDLE
-    private var participantHandle = MegaApiJava.INVALID_HANDLE
+class ScheduledMeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
+    View.OnClickListener {
+
+    private val viewModel by activityViewModels<ChatInfoViewModel>()
 
     @Inject
     lateinit var chatController: ChatController
+
+    private var selectedChat: MegaChatRoom? = null
+    private var chatId = MegaApiJava.INVALID_HANDLE
+    private var participantHandle = MegaApiJava.INVALID_HANDLE
 
     private var titleNameContactChatPanel: EmojiTextView? = null
     private var contactImageView: RoundedImageView? = null
@@ -50,26 +60,32 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        contentView = View.inflate(context, R.layout.bottom_sheet_group_participant, null)
-        itemsLayout = contentView.findViewById<View?>(R.id.items_layout)
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null)
+        itemsLayout = contentView.findViewById(R.id.items_layout)
         titleNameContactChatPanel =
-            contentView.findViewById<EmojiTextView>(R.id.group_participants_chat_name_text)
+            contentView.findViewById(R.id.group_participants_chat_name_text)
 
-        chatId = arguments?.getLong(ChatNavKey.LEGACY_CHAT_ID, MegaApiJava.INVALID_HANDLE)
-            ?: savedInstanceState?.getLong(ChatNavKey.LEGACY_CHAT_ID, MegaApiJava.INVALID_HANDLE)
-                    ?: (requireActivity() as GroupChatInfoActivity).chatHandle
-
-        participantHandle =
-            arguments?.getLong(Constants.CONTACT_HANDLE, MegaApiJava.INVALID_HANDLE)
-                ?: savedInstanceState?.getLong(Constants.CONTACT_HANDLE, MegaApiJava.INVALID_HANDLE)
-                        ?: (requireActivity() as GroupChatInfoActivity).selectedHandleParticipant
+        val arguments = getArguments()
+        if (arguments != null) {
+            chatId =
+                arguments.getLong(ChatNavKey.LEGACY_CHAT_ID, MegaApiJava.INVALID_HANDLE)
+            participantHandle = arguments.getLong(CONTACT_HANDLE, MegaApiJava.INVALID_HANDLE)
+        } else if (savedInstanceState != null) {
+            chatId = savedInstanceState.getLong(
+                ChatNavKey.LEGACY_CHAT_ID,
+                MegaApiJava.INVALID_HANDLE
+            )
+            participantHandle =
+                savedInstanceState.getLong(CONTACT_HANDLE, MegaApiJava.INVALID_HANDLE)
+        }
 
         selectedChat = megaChatApi.getChatRoom(chatId)
+
 
         return contentView
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    public override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         if (selectedChat == null || participantHandle == MegaApiJava.INVALID_HANDLE) {
             Timber.w("Error. Selected chat is NULL or participant handle is -1")
             return
@@ -79,8 +95,8 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
         stateIcon.setVisibility(View.VISIBLE)
 
-        stateIcon.maxWidth = Util.scaleWidthPx(6, resources.displayMetrics)
-        stateIcon.maxHeight = Util.scaleHeightPx(6, resources.displayMetrics)
+        stateIcon.setMaxWidth(scaleWidthPx(6, getResources().getDisplayMetrics()))
+        stateIcon.setMaxHeight(scaleHeightPx(6, getResources().getDisplayMetrics()))
 
         val permissionsIcon =
             contentView.findViewById<ImageView>(R.id.group_participant_list_permissions)
@@ -101,7 +117,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
             contentView.findViewById<TextView>(R.id.contact_list_option_call_layout)
         val optionLeaveChat = contentView.findViewById<TextView>(R.id.leave_group_participants_chat)
         if (megaChatApi.getChatRoom(chatId) != null && megaChatApi.getChatRoom(chatId)
-                .isMeeting
+                .isMeeting()
         ) {
             optionLeaveChat.setText(R.string.meetings_info_leave_option)
         } else {
@@ -121,31 +137,31 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
         optionLeaveChat.setOnClickListener(this)
         optionInvite.setOnClickListener(this)
         optionStartCall.setOnClickListener(this)
-        optionStartCall.visibility = View.GONE
+        optionStartCall.setVisibility(View.GONE)
         val separatorInfo = contentView.findViewById<View>(R.id.separator_info)
         val separatorChat = contentView.findViewById<View>(R.id.separator_chat)
         val separatorOptions = contentView.findViewById<View>(R.id.separator_options)
         val separatorLeave = contentView.findViewById<View>(R.id.separator_leave)
 
-        if (Util.isScreenInPortrait(requireContext())) {
-            titleNameContactChatPanel?.setMaxWidthEmojis(Util.dp2px(Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT.toFloat()))
-            titleMailContactChatPanel.setMaxWidth(Util.dp2px(Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT.toFloat()))
+        if (isScreenInPortrait(requireContext())) {
+            titleNameContactChatPanel?.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT.toFloat()))
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT.toFloat()))
         } else {
-            titleNameContactChatPanel?.setMaxWidthEmojis(Util.dp2px(Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND.toFloat()))
-            titleMailContactChatPanel.setMaxWidth(Util.dp2px(Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND.toFloat()))
+            titleNameContactChatPanel?.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND.toFloat()))
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND.toFloat()))
         }
 
         val userStatus =
-            if (participantHandle == megaChatApi.myUserHandle) megaChatApi.onlineStatus else ChatUtil.getUserStatus(
+            if (participantHandle == megaChatApi.myUserHandle) megaChatApi.onlineStatus else getUserStatus(
                 participantHandle,
                 megaApi,
-                megaChatApi,
+                megaChatApi
             )
-        ChatUtil.setContactStatus(userStatus, stateIcon, StatusIconLocation.DRAWER)
+        setContactStatus(userStatus, stateIcon, StatusIconLocation.DRAWER)
 
         if (participantHandle == megaApi.myUser?.handle) {
             var myFullName = chatController.myFullName
-            if (myFullName.isNullOrBlank()) {
+            if (isTextEmpty(myFullName)) {
                 myFullName = megaChatApi.myEmail
             }
 
@@ -153,7 +169,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
             titleMailContactChatPanel.text = megaChatApi.myEmail
 
-            val permission = selectedChat?.ownPrivilege ?: -1
+            val permission = selectedChat?.ownPrivilege
 
             if (permission == MegaChatRoom.PRIV_STANDARD) {
                 permissionsIcon.setImageResource(R.drawable.ic_permissions_read_write)
@@ -163,13 +179,13 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
                 permissionsIcon.setImageResource(R.drawable.ic_permissions_read_only)
             }
 
-            if (permission < MegaChatRoom.PRIV_RO) {
+            optionEditProfileChat.visibility = View.VISIBLE
+            val privateRoom = permission?.let { it < MegaChatRoom.PRIV_RO }
+            if (privateRoom == true) {
                 optionLeaveChat.visibility = View.GONE
             } else {
                 optionLeaveChat.visibility = View.VISIBLE
             }
-
-            optionEditProfileChat.visibility = View.VISIBLE
 
             optionContactInfoChat.visibility = View.GONE
             optionStartConversationChat.visibility = View.GONE
@@ -178,18 +194,18 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
             optionInvite.visibility = View.GONE
 
-            megaApi.myUser?.handle?.let {
-                AvatarUtil.setImageAvatar(
-                    it,
+            megaApi.myUser?.let {
+                setImageAvatar(
+                    it.handle,
                     megaChatApi.myEmail,
                     myFullName,
                     contactImageView
                 )
             }
         } else {
-            val fullName = chatController?.getParticipantFullName(participantHandle)
+            val fullName = chatController.getParticipantFullName(participantHandle)
             titleNameContactChatPanel?.text = fullName
-            val email = chatController?.getParticipantEmail(participantHandle)
+            val email = chatController.getParticipantEmail(participantHandle)
 
             val permission = selectedChat?.getPeerPrivilegeByHandle(participantHandle)
 
@@ -213,8 +229,10 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
             } else {
                 optionContactInfoChat.visibility = View.GONE
                 optionStartConversationChat.visibility = View.GONE
-                optionInvite.visibility =
-                    if (chatController?.getParticipantEmail(participantHandle) == null) View.GONE else View.VISIBLE
+                optionInvite.visibility = if (chatController.getParticipantEmail(
+                        participantHandle
+                    ) == null
+                ) View.GONE else View.VISIBLE
                 titleMailContactChatPanel.visibility = View.GONE
             }
 
@@ -229,129 +247,92 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
                 optionRemoveParticipantChat.visibility = View.GONE
             }
 
-            AvatarUtil.setImageAvatar(
+            setImageAvatar(
                 participantHandle,
-                if (email.isNullOrBlank()) MegaApiAndroid.userHandleToBase64(participantHandle) else email,
+                if (isTextEmpty(email)) MegaApiAndroid.userHandleToBase64(participantHandle) else email,
                 fullName,
                 contactImageView
             )
         }
 
-        separatorInfo.visibility = if ((optionContactInfoChat.isVisible ||
-                    optionEditProfileChat.isVisible) &&
-            (optionStartCall.isVisible ||
-                    optionStartConversationChat.isVisible)
+        separatorInfo.setVisibility(
+            if ((optionContactInfoChat.getVisibility() == View.VISIBLE ||
+                        optionEditProfileChat.getVisibility() == View.VISIBLE) &&
+                (optionStartCall.getVisibility() == View.VISIBLE ||
+                        optionStartConversationChat.getVisibility() == View.VISIBLE)
+            )
+                View.VISIBLE
+            else
+                View.GONE
         )
-            View.VISIBLE
-        else
-            View.GONE
 
-        separatorChat.visibility = if ((optionStartCall.isVisible ||
-                    optionStartConversationChat.isVisible) &&
-            (optionChangePermissionsChat.isVisible ||
-                    optionInvite.isVisible)
+        separatorChat.visibility = if ((optionStartCall.visibility == View.VISIBLE ||
+                    optionStartConversationChat.visibility == View.VISIBLE) &&
+            (optionChangePermissionsChat.visibility == View.VISIBLE ||
+                    optionInvite.visibility == View.VISIBLE)
         ) View.VISIBLE else View.GONE
 
-        separatorOptions.visibility = if ((optionChangePermissionsChat.isVisible ||
-                    optionInvite.isVisible) && optionLeaveChat.isVisible
+        separatorOptions.visibility = if ((optionChangePermissionsChat.visibility == View.VISIBLE ||
+                    optionInvite.visibility == View.VISIBLE) && optionLeaveChat.visibility == View.VISIBLE
         ) View.VISIBLE else View.GONE
 
-        separatorLeave.visibility = if (optionLeaveChat.isVisible &&
-            optionRemoveParticipantChat.isVisible
+        separatorLeave.visibility = if (optionLeaveChat.visibility == View.VISIBLE &&
+            optionRemoveParticipantChat.visibility == View.VISIBLE
         ) View.VISIBLE else View.GONE
 
         super.onViewCreated(view, savedInstanceState)
     }
 
+    private fun isTextEmpty(text: String?): Boolean {
+        return text == null || text.trim { it <= ' ' }.isEmpty()
+    }
+
     override fun onClick(v: View) {
-        val id = v.id
+        val id = v.getId()
         if (id == R.id.contact_info_group_participants_chat) {
-            val email = chatController?.getParticipantEmail(participantHandle) ?: run {
-                Timber.w("Cannot open contact info. Selected email is NULL")
-                return
-            }
-            val i = Intent(context, ContactInfoActivity::class.java)
-            i.putExtra(Constants.NAME, email)
-            requireContext().startActivity(i)
+            val intent = Intent(requireActivity(), ContactInfoActivity::class.java)
+            intent.putExtra(NAME, chatController.getParticipantEmail(participantHandle))
+            startActivity(
+                intent
+            )
         } else if (id == R.id.start_chat_group_participants_chat) {
-            (requireActivity() as GroupChatInfoActivity).startConversation(participantHandle)
+            viewModel.onSendMsgTap()
         } else if (id == R.id.contact_list_option_call_layout) {
             userWaitingForCall = participantHandle
-            if (CallUtil.canCallBeStartedFromContactOption(requireActivity())) {
-                (requireActivity() as GroupChatInfoActivity).startCall()
+            if (canCallBeStartedFromContactOption(requireActivity())) {
+                viewModel.onStartCallTap()
             }
         } else if (id == R.id.change_permissions_group_participants_chat) {
-            selectedChat?.let {
-                (requireActivity() as GroupChatInfoActivity).showChangePermissionsDialog(
-                    participantHandle,
-                    it
-                )
-            }
+            viewModel.onChangePermissionsTap()
         } else if (id == R.id.remove_group_participants_chat) {
-            (requireActivity() as GroupChatInfoActivity).showRemoveParticipantConfirmation(
-                participantHandle
-            )
+            viewModel.onRemoveParticipantTap(true)
         } else if (id == R.id.edit_profile_group_participants_chat) {
             val editProfile = Intent(requireActivity(), MyAccountActivity::class.java)
             startActivity(editProfile)
         } else if (id == R.id.leave_group_participants_chat) {
-            (requireActivity() as GroupChatInfoActivity).showConfirmationLeaveChat()
+            viewModel.onLeaveGroupTap()
         } else if (id == R.id.invite_group_participants_chat) {
-            (requireActivity() as GroupChatInfoActivity).inviteContact(
-                chatController?.getParticipantEmail(
-                    participantHandle
-                )
-            )
+            viewModel.onInviteContactTap()
         }
 
         dismissAllowingStateLoss()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
+    public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putLong(ChatNavKey.LEGACY_CHAT_ID, chatId)
-        outState.putLong(Constants.CONTACT_HANDLE, participantHandle)
-    }
-
-    fun updateContactData() {
-        if (participantHandle == megaApi.myUser?.handle) {
-            var myFullName = chatController?.myFullName
-            if (myFullName.isNullOrBlank()) {
-                myFullName = megaChatApi.myEmail
-            }
-
-            titleNameContactChatPanel?.text = myFullName
-            megaApi.myUser?.handle?.let {
-                AvatarUtil.setImageAvatar(
-                    it,
-                    megaChatApi.myEmail,
-                    myFullName,
-                    contactImageView
-                )
-            }
-        } else {
-            val fullName = chatController?.getParticipantFullName(participantHandle)
-            titleNameContactChatPanel?.text = fullName
-            val email = chatController?.getParticipantEmail(participantHandle)
-
-            AvatarUtil.setImageAvatar(
-                participantHandle,
-                if (email.isNullOrBlank()) MegaApiAndroid.userHandleToBase64(participantHandle) else email,
-                fullName,
-                contactImageView
-            )
-        }
+        outState.putLong(CONTACT_HANDLE, participantHandle)
     }
 
     companion object {
         fun newInstance(
             chatId: Long,
             participantHandle: Long,
-        ): ParticipantBottomSheetDialogFragment {
-            val fragment = ParticipantBottomSheetDialogFragment()
+        ): ScheduledMeetingParticipantBottomSheetDialogFragment {
+            val fragment = ScheduledMeetingParticipantBottomSheetDialogFragment()
             val arguments = Bundle()
-            arguments.putLong(LEGACY_CHAT_ID, chatId)
-            arguments.putLong(Constants.CONTACT_HANDLE, participantHandle)
+            arguments.putLong(ChatNavKey.LEGACY_CHAT_ID, chatId)
+            arguments.putLong(CONTACT_HANDLE, participantHandle)
             fragment.setArguments(arguments)
             return fragment
         }

@@ -154,18 +154,20 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var chatController: ChatController
+
     private lateinit var binding: ActivityPdfviewerBinding
 
     private var menu: Menu? = null
-
     var password: String? = null
     var maxIntents = 3
     var pdfFileName: String? = null
     var isToolbarVisible = true
     var takenDownDialog: AlertDialog? = null
+
     val progressBar
         get() = binding.pdfViewerProgressBar
-
     private var isUrl = false
     private var defaultScrollHandle: DefaultScrollHandle? = null
     private var uri: Uri? = null
@@ -177,8 +179,8 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
     private var statusDialog: AlertDialog? = null
     private var renamed = false
     private var path: String? = null
-    private var pathNavigation: String? = null
 
+    private var pathNavigation: String? = null
     // it's only used for enter animation
     private val dragToExit = DragToExitSupport(this, lifecycleScope, null, null)
     private var nC: NodeController? = null
@@ -186,7 +188,6 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
     private var fromChat = false
     private var isDeleteDialogShow = false
     private var fromDownload = false
-    private var chatC: ChatController? = null
     private var msgId: Long = -1
     private var chatId: Long = -1
     private var msgChat: MegaChatMessage? = null
@@ -294,7 +295,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                     msgChat = megaChatApi.getMessageFromNodeHistory(chatId, msgId)
                 }
                 msgChat?.apply {
-                    node = chatC?.authorizeNodeIfPreview(
+                    node = chatController?.authorizeNodeIfPreview(
                         megaNodeList[0],
                         megaChatApi.getChatRoom(chatId)
                     )
@@ -790,7 +791,6 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             pathNavigation = null
             if (type == Constants.FROM_CHAT) {
                 fromChat = true
-                chatC = ChatController(this)
                 msgId = intent.getLongExtra("msgId", -1)
                 chatId = intent.getLongExtra("chatId", -1)
             } else {
@@ -1229,7 +1229,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                             && msgChat!!.isDeletable)
                 } else if (node != null) {
                     downloadMenuItem.isVisible = true
-                    if (chatC!!.isInAnonymousMode) {
+                    if (chatController!!.isInAnonymousMode) {
                         importMenuItem.isVisible = false
                         saveForOfflineMenuItem.isVisible = false
                     } else {
@@ -1633,10 +1633,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        if (chatC == null) {
-                            chatC = ChatController(this@PdfViewerActivity)
-                        }
-                        chatC?.deleteMessage(message, chatId)
+                        message?.let { chatController?.deleteMessage(it, chatId) }
                         isDeleteDialogShow = false
                         finish()
                     }
