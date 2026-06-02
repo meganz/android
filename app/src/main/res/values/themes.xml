@@ -22,6 +22,16 @@
         <item name="android:windowIsTranslucent">false</item>
     </style>
 
+    <!--Full-bleed DialogFragment theme used by LegacyOverlayDialogFragment.-->
+    <!--windowIsFloating=false stops the dialog from defaulting to floating-card sizing,-->
+    <!--so the ComposeView fills the window the same way the legacy decor-view overlay did.-->
+    <style name="Theme.Mega.LegacyOverlayDialog" parent="Theme.Mega">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
     <!--Base custom theme which will be shared between both light and dark theme variants-->
     <style name="Base.Theme.Mega" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!--Material color attributes (light theme) -->

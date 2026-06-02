@@ -50,7 +50,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
-import mega.privacy.android.app.appstate.content.navigation.LegacyActivityOverlay
+import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
@@ -164,7 +165,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     lateinit var navigator: MegaNavigator
 
     @Inject
-    lateinit var shareFilesToChatOverlay: LegacyActivityOverlay
+    lateinit var navigationResultManager: NavigationResultManager
 
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
@@ -387,9 +388,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun collectShareFilesToChatResult() {
-        shareFilesToChatOverlay.collectResult<List<NodeId>>(
+        LegacyOverlayDialogFragment.collectResultAndDismiss<List<NodeId>>(
+            fragmentManager = supportFragmentManager,
             scope = lifecycleScope,
-            lifecycleOwner = this,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
             resultKey = ShareFilesToChatNavKey.RESULT,
         ) { ids ->
             if (ids.isNotEmpty()) {
@@ -858,16 +861,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             return
         }
         if (viewModel.uiState.value.isCloudExplorerAvailable) {
-            shareFilesToChatOverlay.show(
-                activity = this,
-                lifecycleOwner = this,
-                viewModelStoreOwner = this,
-                savedStateRegistryOwner = this,
-                themeMode = monitorThemeModeUseCase(),
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = supportFragmentManager,
                 initialKey = ShareFilesToChatNavKey(
                     chatId = viewModel.chatId ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
                 ),
-                resultKey = ShareFilesToChatNavKey.RESULT,
             )
         } else {
             selectFileResultLauncher.launch(email)
@@ -1308,7 +1306,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Broadcast receivers are unregistered
      */
     override fun onDestroy() {
-        shareFilesToChatOverlay.hide()
         super.onDestroy()
         drawableArrow?.colorFilter = null
         drawableDots?.colorFilter = null
