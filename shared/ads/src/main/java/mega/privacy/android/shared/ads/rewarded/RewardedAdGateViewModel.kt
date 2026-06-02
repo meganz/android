@@ -105,17 +105,28 @@ class RewardedAdGateViewModel @Inject constructor(
     }
 
     /**
+     * Update whether ads are allowed for the current screen. For link screens this is the per-link
+     * `QueryAdsUseCase` result — a link created by a Pro user is not eligible for ads, so the gate
+     * skips the dialog and runs the pending action immediately.
+     */
+    fun setAdsAllowedForScreen(allowed: Boolean) {
+        uiState.update { it.copy(isAdsAllowedForScreen = allowed) }
+    }
+
+    /**
      * Check if the user is eligible for rewarded ads based on the current [state].
      *
-     * All three conditions must be met:
+     * All conditions must be met:
      * - Feature flags ([ApiFeatures.GoogleAdsFeatureFlag] and [ApiFeatures.RewardedAds]) are enabled
      * - Google consent has been loaded
      * - The user has consented to ads
+     * - Ads are allowed for the current screen (e.g. per-link `QueryAdsUseCase` result)
      * Else rewarded ad dialog won't be shown and pendingAction will be executed instantly.
      * Ad will be skipped in case eligibility check takes too long or fails.
      */
     private fun isEligible(state: RewardedAdGateUiState): Boolean =
-        state.isFeatureFlagEnabled && state.isGoogleConsentLoaded && state.canRequestAds
+        state.isFeatureFlagEnabled && state.isGoogleConsentLoaded &&
+                state.canRequestAds && state.isAdsAllowedForScreen
 
     /**
      * Check whether the ad dialog should be shown. If the user is not eligible,

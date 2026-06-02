@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.advertisements
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import com.google.android.ump.ConsentInformation
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
@@ -171,6 +172,78 @@ class AdsViewModelTest {
 
         assertThat(underTest.uiState.value.request).isNull()
         assertThat(underTest.uiState.value.isAdsFeatureEnabled).isFalse()
+    }
+
+    @Test
+    fun `test that feature flag is not cached as disabled when the fetch is cancelled`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag))
+            .doThrow(CancellationException("cancelled"))
+        whenever(consentInformation.canRequestAds()).thenReturn(true)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
+        initTestClass()
+
+        underTest.scheduleRefreshAds()
+        delay(1000L)
+        underTest.cancelRefreshAds()
+
+        assertThat(underTest.uiState.value.isAdsFeatureEnabled).isNull()
+        assertThat(underTest.uiState.value.request).isNull()
+    }
+
+    @Test
+    fun `test scheduleRefreshAds when ads not allowed for screen should not create ad request`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
+            whenever(consentInformation.canRequestAds()).thenReturn(true)
+            whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+            whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
+            initTestClass()
+
+            underTest.setAdsAllowedForScreen(false)
+            underTest.scheduleRefreshAds()
+            delay(1000L)
+            underTest.cancelRefreshAds()
+
+            assertThat(underTest.uiState.value.request).isNull()
+        }
+
+    @Test
+    fun `test setAdsAllowedForScreen false clears existing ad request`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
+        whenever(consentInformation.canRequestAds()).thenReturn(true)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
+        initTestClass()
+
+        underTest.scheduleRefreshAds()
+        delay(1000L)
+        assertThat(underTest.uiState.value.request).isNotNull()
+
+        underTest.setAdsAllowedForScreen(false)
+        underTest.cancelRefreshAds()
+
+        assertThat(underTest.uiState.value.request).isNull()
+    }
+
+    @Test
+    fun `test setAdsAllowedForScreen true re-enables ad request after being disabled`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
+        whenever(consentInformation.canRequestAds()).thenReturn(true)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
+        initTestClass()
+
+        underTest.setAdsAllowedForScreen(false)
+        underTest.scheduleRefreshAds()
+        delay(1000L)
+        assertThat(underTest.uiState.value.request).isNull()
+
+        underTest.setAdsAllowedForScreen(true)
+        delay(1000L)
+        underTest.cancelRefreshAds()
+
+        assertThat(underTest.uiState.value.request).isNotNull()
     }
 
     @Test

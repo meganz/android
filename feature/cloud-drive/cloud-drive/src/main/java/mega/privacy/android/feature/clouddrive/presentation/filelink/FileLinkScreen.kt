@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
@@ -84,15 +83,16 @@ import mega.privacy.android.shared.resources.R as sharedR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun FileLinkScreen(
-    viewModel: FileLinkViewModel,
+    uiState: FileLinkUiState,
+    onProcessAction: (FileLinkAction) -> Unit,
     singleNodeActionHandler: SingleNodeActionHandler,
     onNavigate: (NavKey) -> Unit,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     FileLinkScreenContent(
         uiState = uiState,
@@ -106,11 +106,10 @@ internal fun FileLinkScreen(
         onOpenClicked = { uiState.fileNode?.let { openedFileNode = it } },
         onTransfersClicked = { onNavigate(TransfersNavKey()) },
         onAdsNavigate = onNavigate,
-        onAction = viewModel::processAction,
+        onAction = onProcessAction,
         onBack = onBack,
     )
 
-    val coroutineScope = rememberCoroutineScope()
     openedFileNode?.let { fileNode ->
         val sourceUrl = uiState.url ?: return@let
         HandleNodeAction3(
@@ -168,6 +167,7 @@ internal fun FileLinkScreenContent(
                     NewAdsContainer(
                         modifier = Modifier.fillMaxWidth(),
                         onNavigate = onAdsNavigate,
+                        showAdsForScreen = uiState.shouldShowAdsForLink,
                     ) { adsContentModifier ->
                         Column(
                             modifier = adsContentModifier

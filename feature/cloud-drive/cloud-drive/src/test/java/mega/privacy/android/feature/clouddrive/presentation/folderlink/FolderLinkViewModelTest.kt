@@ -28,6 +28,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
@@ -84,6 +85,7 @@ internal class FolderLinkViewModelTest {
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val queryAdsUseCase: QueryAdsUseCase = mock()
 
     private lateinit var underTest: FolderLinkViewModel
 
@@ -107,6 +109,7 @@ internal class FolderLinkViewModelTest {
             saveViewedLinkUseCase = saveViewedLinkUseCase,
             removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            queryAdsUseCase = queryAdsUseCase,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
             args = args,
         )
@@ -130,6 +133,7 @@ internal class FolderLinkViewModelTest {
             saveViewedLinkUseCase,
             removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase,
+            queryAdsUseCase,
         )
         whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
@@ -214,6 +218,58 @@ internal class FolderLinkViewModelTest {
             assertThat(state.contentState).isInstanceOf(FolderLinkContentState.Loaded::class.java)
             assertThat(state.hasCredentials).isTrue()
         }
+    }
+
+    @Test
+    fun `test that shouldShowAdsForLink reflects queryAdsUseCase result when fetchNodes succeeds`() =
+        runTest {
+            val url = "https://mega.nz/folder/abc"
+            val publicHandle = 55L
+            val rootNode = mockFolderNode(id = 99L)
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+                FetchFolderNodesResult(currentNodeId = NodeId(publicHandle), rootNode = rootNode)
+            )
+            whenever(queryAdsUseCase(publicHandle)).thenReturn(true)
+            stubNodeUiItemMapper()
+            initViewModel(FolderLinkViewModel.Args(uriString = url))
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldShowAdsForLink).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldShowAdsForLink is false when queryAdsUseCase returns false`() = runTest {
+        val url = "https://mega.nz/folder/abc"
+        val publicHandle = 55L
+        val rootNode = mockFolderNode(id = 99L)
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(
+            FetchFolderNodesResult(currentNodeId = NodeId(publicHandle), rootNode = rootNode)
+        )
+        whenever(queryAdsUseCase(publicHandle)).thenReturn(false)
+        stubNodeUiItemMapper()
+        initViewModel(FolderLinkViewModel.Args(uriString = url))
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().shouldShowAdsForLink).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that queryAdsUseCase is not called when login fails`() = runTest {
+        val url = "https://mega.nz/folder/abc"
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.ERROR)
+        initViewModel(FolderLinkViewModel.Args(uriString = url))
+        advanceUntilIdle()
+
+        verifyNoInteractions(queryAdsUseCase)
     }
 
     @Test

@@ -61,8 +61,10 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
                 hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                     creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
                 )
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val rewardedAdGate = rememberRewardedAdGate(
                 onNavigate = navigationHandler::navigate,
+                isAdsAllowedForScreen = uiState.shouldShowAdsForLink,
             )
             val singleNodeActionHandler = rememberSingleNodeActionHandler(
                 viewModel = nodeOptionsActionViewModel,
@@ -79,7 +81,8 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
             val activity = LocalActivity.current
 
             FolderLinkScreen(
-                viewModel = viewModel,
+                uiState = uiState,
+                onProcessAction = viewModel::processAction,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
                 navigationHandler = navigationHandler,
                 singleNodeActionHandler = singleNodeActionHandler,

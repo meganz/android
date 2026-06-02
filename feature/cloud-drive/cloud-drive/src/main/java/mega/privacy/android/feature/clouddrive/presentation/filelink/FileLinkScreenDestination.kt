@@ -60,8 +60,10 @@ fun EntryProviderScope<NavKey>.fileLinkScreen(
                 hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                     creationCallback = { it.create(NodeSourceType.FILE_LINK) }
                 )
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val rewardedAdGate = rememberRewardedAdGate(
                 onNavigate = navigationHandler::navigate,
+                isAdsAllowedForScreen = uiState.shouldShowAdsForLink,
             )
             val singleNodeActionHandler = rememberSingleNodeActionHandler(
                 viewModel = nodeOptionsActionViewModel,
@@ -73,7 +75,8 @@ fun EntryProviderScope<NavKey>.fileLinkScreen(
             val activity = LocalActivity.current
 
             FileLinkScreen(
-                viewModel = viewModel,
+                uiState = uiState,
+                onProcessAction = viewModel::processAction,
                 singleNodeActionHandler = singleNodeActionHandler,
                 onBack = navigationHandler::back,
                 onNavigate = navigationHandler::navigate,

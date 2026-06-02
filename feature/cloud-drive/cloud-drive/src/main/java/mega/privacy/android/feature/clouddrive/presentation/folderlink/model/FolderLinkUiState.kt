@@ -29,6 +29,7 @@ data class FolderLinkUiState(
     val openedFileNode: TypedFileNode? = null,
     val hasMediaItems: Boolean = false,
     val isGuestBannerDismissed: Boolean = false,
+    val shouldShowAdsForLink: Boolean = false,
 ) {
     /**
      * True when the guest banner should be shown: the user is not authenticated,

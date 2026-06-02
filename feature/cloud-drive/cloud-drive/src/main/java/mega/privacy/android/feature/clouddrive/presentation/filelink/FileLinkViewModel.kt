@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
@@ -42,6 +43,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val queryAdsUseCase: QueryAdsUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     @Assisted private val args: Args,
@@ -98,10 +100,25 @@ internal class FileLinkViewModel @AssistedInject constructor(
                         )
                     }
                     saveViewedFileLink(url, node)
+                    queryAds(node.id.longValue)
                 }
                 .onFailure { error ->
                     handleFetchError(error, url, decryptionIntroduced)
                 }
+        }
+    }
+
+    /**
+     * Query whether ads should be shown for this link. A link created by a Pro user is not
+     * eligible for ads, so the result gates both the banner and the rewarded ad gate.
+     */
+    private fun queryAds(handle: Long) {
+        viewModelScope.launch {
+            runCatching { queryAdsUseCase(handle) }
+                .onSuccess { shouldShow ->
+                    _uiState.update { it.copy(shouldShowAdsForLink = shouldShow) }
+                }
+                .onFailure { Timber.e(it) }
         }
     }
 

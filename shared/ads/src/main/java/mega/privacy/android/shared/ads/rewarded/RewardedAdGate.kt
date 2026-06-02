@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -81,15 +82,24 @@ class RewardedAdGateHandler(
  * Returns a [RewardedAdGateHandler] so the caller can trigger it via [RewardedAdGateHandler.requestAction].
  *
  * @param onNavigate Called to navigate to a destination (e.g., upgrade account).
+ * @param isAdsAllowedForScreen Whether ads are allowed for the current screen. Defaults to `true`
+ * for callers with no extra constraint. For link screens this is the per-link `QueryAdsUseCase`
+ * result; when `false` (e.g. a link created by a Pro user) the gate skips the dialog and runs the
+ * action immediately.
  */
 @Composable
 fun rememberRewardedAdGate(
     onNavigate: (NavKey) -> Unit,
+    isAdsAllowedForScreen: Boolean = true,
 ): RewardedAdGateHandler {
     val viewModel: RewardedAdGateViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val handler = remember(viewModel) {
         RewardedAdGateHandler(viewModel::requestShowDialog)
+    }
+
+    LaunchedEffect(isAdsAllowedForScreen) {
+        viewModel.setAdsAllowedForScreen(isAdsAllowedForScreen)
     }
 
     EventEffect(
