@@ -44,6 +44,7 @@ import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.chat.list.toolbar.ChatListToolBar
+import mega.privacy.android.app.presentation.chat.list.toolbar.SelectionModeToolbar
 import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingDialog
@@ -99,6 +100,12 @@ fun ChatTabsView(
     onOpenLinkActionClick: () -> Unit = {},
     onArchivedActionClick: () -> Unit = {},
     onTitleChatArchivedEventConsumed: () -> Unit = {},
+    onClearSelection: () -> Unit = {},
+    onSelectAll: () -> Unit = {},
+    onMuteSelected: () -> Unit = {},
+    onUnmuteSelected: () -> Unit = {},
+    onArchiveSelected: () -> Unit = {},
+    onLeaveSelected: () -> Unit = {},
 ) {
     val initialPage = if (showMeetingTab) ChatTab.MEETINGS.ordinal else ChatTab.CHATS.ordinal
     val context = LocalContext.current
@@ -115,23 +122,49 @@ fun ChatTabsView(
     LaunchedOnceEffect(pagerState.currentPage) {
         scrollToHideBehavior.reset()
     }
+    val currentItems = if (pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
+        state.meetings
+    } else {
+        state.chats
+    }
+    val selectedItems = remember(state.selectedIds, currentItems) {
+        if (state.selectedIds.isEmpty()) {
+            emptyList()
+        } else {
+            val selectedSet = state.selectedIds.toHashSet()
+            currentItems.filter { it.chatId in selectedSet }
+        }
+    }
     MegaScaffold(
         modifier = if (isNewSingleActivity) Modifier.systemBarsPadding() else Modifier,
         scaffoldState = scaffoldState,
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             if (isNewSingleActivity) {
-                ChatListToolBar(
-                    state = state,
-                    noteToSelfChatState = noteToSelfChatState,
-                    onNavigationClick = onNavigationClick,
-                    onChangeUserStatus = onChangeUserStatus,
-                    onSearchTextChange = onSearchTextChange,
-                    onSearchCloseClicked = onSearchCloseClicked,
-                    onOpenLinkActionClick = onOpenLinkActionClick,
-                    onDoNotDisturbActionClick = onDoNotDisturbActionClick,
-                    onArchivedActionClick = onArchivedActionClick
-                )
+                if (selectedItems.isNotEmpty()) {
+                    SelectionModeToolbar(
+                        selectedItems = selectedItems,
+                        currentItems = currentItems,
+                        onClearSelection = onClearSelection,
+                        onSelectAll = onSelectAll,
+                        onMuteSelected = onMuteSelected,
+                        onUnmuteSelected = onUnmuteSelected,
+                        onArchiveSelected = onArchiveSelected,
+                        onLeaveSelected = onLeaveSelected,
+                    )
+                } else {
+                    ChatListToolBar(
+                        state = state,
+                        noteToSelfChatState = noteToSelfChatState,
+                        onNavigationClick = onNavigationClick,
+                        onChangeUserStatus = onChangeUserStatus,
+                        onSearchTextChange = onSearchTextChange,
+                        onSearchCloseClicked = onSearchCloseClicked,
+                        onOpenLinkActionClick = onOpenLinkActionClick,
+                        onDoNotDisturbActionClick = onDoNotDisturbActionClick,
+                        onArchivedActionClick = onArchivedActionClick,
+                    )
+                }
             }
         },
         floatingActionButton = {

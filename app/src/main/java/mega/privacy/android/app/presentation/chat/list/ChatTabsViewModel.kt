@@ -724,4 +724,19 @@ class ChatTabsViewModel @Inject constructor(
      * Reset and notify that snackbarMessage is consumed
      */
     fun onSnackbarMessageConsumed() = state.update { it.copy(snackbarMessageContent = consumed()) }
+
+    /**
+     * Trigger the Compose Open-Link dialog. Used by host activities (ChatActivity /
+     * ManagerActivity) to drive the dialog through state instead of directly showing
+     * a `DialogFragment`.
+     *
+     * @param isJoinMeeting `true` to render the dialog in "join meeting" mode.
+     */
+    fun triggerOpenLink(isJoinMeeting: Boolean) =
+        state.update { it.copy(openLinkEvent = triggered(isJoinMeeting)) }
+
+    /**
+     * Mark the [ChatsTabState.openLinkEvent] as consumed.
+     */
+    fun onOpenLinkConsumed() = state.update { it.copy(openLinkEvent = consumed()) }
 }

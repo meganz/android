@@ -6,24 +6,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.commit
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
-import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
-import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
 import timber.log.Timber
 
 /**
  * Host Activity for new chat room
  */
 @AndroidEntryPoint
-class ChatActivity : AppCompatActivity(), MeetingBottomSheetDialogActionListener {
+class ChatActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,25 +66,6 @@ class ChatActivity : AppCompatActivity(), MeetingBottomSheetDialogActionListener
         } else {
             openChatFragment(this, chatId = chatId, chatLink = link, action = action)
         }
-    }
-
-    override fun onJoinMeeting() {
-        Analytics.tracker.trackEvent(JoinMeetingPressedEvent)
-        if (CallUtil.participatingInACall()) {
-            CallUtil.showConfirmationInACall(
-                this,
-                getString(sharedR.string.can_only_join_one_call_error_message),
-            )
-        } else {
-            (supportFragmentManager.findFragmentById(android.R.id.content) as? ChatTabsFragment)
-                ?.showOpenLinkDialog(true)
-        }
-    }
-
-    override fun onCreateMeeting() {
-        Analytics.tracker.trackEvent(StartMeetingNowPressedEvent)
-        (supportFragmentManager.findFragmentById(android.R.id.content) as? ChatTabsFragment)
-            ?.onCreateMeeting()
     }
 
     companion object {

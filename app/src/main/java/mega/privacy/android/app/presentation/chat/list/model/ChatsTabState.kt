@@ -52,6 +52,7 @@ data class ChatsTabState(
     val areChatsOrMeetingLoading: Boolean = true,
     val isEmptyChatsOrMeetings: Boolean = false,
     val titleChatArchivedEvent: StateEventWithContent<String> = consumed(),
+    val openLinkEvent: StateEventWithContent<Boolean> = consumed(),
 ) {
     /**
      * Check if the chats list is empty
