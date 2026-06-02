@@ -1,15 +1,12 @@
 package mega.privacy.android.shared.contact.components
 
 import android.text.format.DateFormat
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalLocale
@@ -127,26 +124,12 @@ fun ContactItemView(
         onClickListener = onClick ?: {},
         onLongClickListener = onLongClick ?: {},
         leadingElement = {
-            if (onAvatarClick != null) {
-                Box(
-                    modifier = Modifier
-                        .testTag(CONTACT_ITEM_VIEW_AVATAR_CLICK)
-                        .clip(CircleShape)
-                        .clickable(onClick = onAvatarClick)
-                ) {
-                    ContactAvatar(
-                        avatar = avatar,
-                        displayName = displayName,
-                        isVerified = isVerified,
-                    )
-                }
-            } else {
-                ContactAvatar(
-                    avatar = avatar,
-                    displayName = displayName,
-                    isVerified = isVerified,
-                )
-            }
+            ContactAvatar(
+                avatar = avatar,
+                displayName = displayName,
+                isVerified = isVerified,
+                onAvatarClick = onAvatarClick,
+            )
         },
         titleTrailingElement = if (status == ContactItemStatus.Unknown) {
             null
@@ -270,7 +253,6 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
 
 internal const val CONTACT_ITEM_VIEW_ROW = "contact_item_view:row"
 internal const val CONTACT_ITEM_VIEW_VERIFIED_BADGE = "contact_item_view:verified_badge"
-internal const val CONTACT_ITEM_VIEW_AVATAR_CLICK = "contact_item_view:avatar_click"
 internal const val CONTACT_ITEM_VIEW_MORE = "contact_item_view:more"
 internal const val CONTACT_ITEM_VIEW_CHECKBOX = "contact_item_view:checkbox"
 

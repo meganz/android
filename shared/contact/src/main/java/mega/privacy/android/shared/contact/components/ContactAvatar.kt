@@ -1,13 +1,16 @@
 package mega.privacy.android.shared.contact.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -26,6 +29,9 @@ import mega.privacy.android.shared.contact.model.AvatarData
  * @param displayName Used as the image content description.
  * @param isVerified When true, overlays the verified-contact badge.
  * @param modifier
+ * @param onAvatarClick When non-null, the avatar circle becomes clickable. The
+ * clickable area is clipped to the avatar circle only so the verified badge
+ * (which is offset outside the circle) is not clipped.
  */
 @Composable
 fun ContactAvatar(
@@ -33,14 +39,27 @@ fun ContactAvatar(
     displayName: String,
     isVerified: Boolean,
     modifier: Modifier = Modifier,
+    onAvatarClick: (() -> Unit)? = null,
 ) {
     Box(modifier = modifier.testTag(CONTACT_ITEM_VIEW_AVATAR)) {
+        val avatarModifier = Modifier
+            .fillMaxSize()
+            .let { mod ->
+                if (onAvatarClick != null) {
+                    mod
+                        .clip(CircleShape)
+                        .clickable(onClick = onAvatarClick)
+                        .testTag(CONTACT_ITEM_VIEW_AVATAR_CLICK)
+                } else {
+                    mod
+                }
+            }
         when (avatar) {
             is AvatarData.Image -> MediumProfilePicture(
                 imageFile = avatar.file,
                 name = null,
                 contentDescription = displayName,
-                modifier = Modifier.fillMaxSize(),
+                modifier = avatarModifier,
             )
 
             is AvatarData.Initials -> MediumProfilePicture(
@@ -48,7 +67,7 @@ fun ContactAvatar(
                 name = avatar.initials,
                 contentDescription = displayName,
                 avatarColor = avatar.avatarColor,
-                modifier = Modifier.fillMaxSize(),
+                modifier = avatarModifier,
             )
         }
         if (isVerified) {
@@ -66,6 +85,7 @@ fun ContactAvatar(
 }
 
 internal const val CONTACT_ITEM_VIEW_AVATAR = "contact_item_view:avatar"
+internal const val CONTACT_ITEM_VIEW_AVATAR_CLICK = "contact_item_view:avatar_click"
 
 @CombinedThemePreviews
 @Composable
