@@ -6,6 +6,7 @@ import com.google.android.libraries.ads.mobile.sdk.banner.AdSize
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import com.google.android.ump.ConsentInformation
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +47,13 @@ class AdsViewModel @Inject constructor(
     private var lastFetchTime = -1L
     private val mutex = Mutex()
 
+    /**
+     * Whether ads are allowed for the current screen. For link screens this is the per-link
+     * `QueryAdsUseCase` result; a link created by a Pro user is not eligible, so no request is made.
+     * Defaults to `true` for callers with no extra constraint (e.g. the home screen).
+     */
+    private var isAdsAllowedForScreen = true
+
     init {
         viewModelScope.launch {
             monitorGoogleConsentLoadedUseCase().collect { isLoaded ->
@@ -74,7 +82,7 @@ class AdsViewModel @Inject constructor(
         if (refreshAdsJob?.isActive == true) return
         refreshAdsJob?.cancel()
         refreshAdsJob = viewModelScope.launch {
-            if (isAdsEnabled() && consentInformation.canRequestAds()) {
+            if (isAdsAllowedForScreen && isAdsEnabled() && consentInformation.canRequestAds()) {
                 createNewAdRequestIfNeeded()
                 while (isActive) {
                     delay(MINIMUM_AD_REFRESH_INTERVAL)
@@ -89,6 +97,23 @@ class AdsViewModel @Inject constructor(
 
     fun cancelRefreshAds() {
         refreshAdsJob?.cancel()
+    }
+
+    /**
+     * Update whether ads are allowed for the current screen. When set to `false` any pending
+     * request is cleared and no new request is made; when set back to `true` refreshing resumes.
+     *
+     * @param allowed whether ads are allowed for the current screen
+     */
+    fun setAdsAllowedForScreen(allowed: Boolean) {
+        if (isAdsAllowedForScreen == allowed) return
+        isAdsAllowedForScreen = allowed
+        cancelRefreshAds()
+        if (allowed) {
+            scheduleRefreshAds()
+        } else {
+            _uiState.update { it.copy(request = null) }
+        }
     }
 
     private fun createNewAdRequestIfNeeded() {
@@ -119,14 +144,18 @@ class AdsViewModel @Inject constructor(
      */
     private suspend fun checkForAdsAvailability() {
         runCatching {
-            _uiState.update {
-                it.copy(isAdsFeatureEnabled = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag))
-            }
-            Timber.d("Ads feature enabled: ${_uiState.value.isAdsFeatureEnabled}")
+            getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)
+        }.onSuccess { isEnabled ->
+            _uiState.update { it.copy(isAdsFeatureEnabled = isEnabled) }
+            Timber.d("Ads feature enabled: $isEnabled")
         }.onFailure { e ->
-            _uiState.update {
-                it.copy(isAdsFeatureEnabled = false)
+            if (e is CancellationException) {
+                // Job was cancelled (e.g. screen paused/disposed); leave the flag unresolved so it
+                // is re-checked next time instead of being cached as disabled.
+                throw e
             }
+
+            _uiState.update { it.copy(isAdsFeatureEnabled = false) }
             Timber.e(e, "Error getting feature flag value")
         }
     }

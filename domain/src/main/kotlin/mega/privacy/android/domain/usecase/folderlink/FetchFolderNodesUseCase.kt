@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.folderlink
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.repository.FolderLinkRepository
@@ -33,6 +34,7 @@ class FetchFolderNodesUseCase @Inject constructor(
         runCatching { folderLinkRepository.fetchNodes() }
             .onSuccess { result ->
                 folderLinkRepository.updateLastPublicHandle(result.nodeHandle)
+                folderNodesResult.currentNodeId = NodeId(result.nodeHandle)
                 val rootNode = folderLinkRepository.getRootNode()
                 if (rootNode != null) {
                     if (result.flag) {

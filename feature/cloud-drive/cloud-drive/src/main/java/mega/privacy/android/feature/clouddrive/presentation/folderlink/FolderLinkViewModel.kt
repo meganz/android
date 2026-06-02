@@ -34,6 +34,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.StopAudioService
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
@@ -74,6 +75,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase,
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val queryAdsUseCase: QueryAdsUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted private val args: Args,
 ) : ViewModel() {
@@ -327,6 +329,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                         saveViewedFolderLink(url, rootNode)
                     }
                 }
+                result.currentNodeId?.let { queryAds(it.longValue) }
             }.onFailure { throwable ->
                 if (throwable is FetchFolderNodesException.Expired) {
                     _uiState.update { it.copy(contentState = FolderLinkContentState.Expired) }
@@ -357,6 +360,20 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    /**
+     * Query whether ads should be shown for this folder link. A link created by a Pro user is
+     * not eligible for ads, so the result gates both the banner and the rewarded ad gate.
+     */
+    private fun queryAds(handle: Long) {
+        viewModelScope.launch {
+            runCatching { queryAdsUseCase(handle) }
+                .onSuccess { shouldShow ->
+                    _uiState.update { it.copy(shouldShowAdsForLink = shouldShow) }
+                }
+                .onFailure { Timber.e(it) }
         }
     }
 

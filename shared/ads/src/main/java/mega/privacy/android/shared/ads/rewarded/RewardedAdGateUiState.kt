@@ -12,6 +12,7 @@ data class RewardedAdGateUiState(
     val isFeatureFlagEnabled: Boolean = false,
     val isGoogleConsentLoaded: Boolean = false,
     val canRequestAds: Boolean = false,
+    val isAdsAllowedForScreen: Boolean = true,
     val currentAttemptCount: Int = 0,
     val skipAdEvent: StateEvent = consumed,
 )

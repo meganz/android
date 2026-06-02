@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseCase
@@ -50,6 +51,7 @@ internal class FileLinkViewModelTest {
     private val saveViewedLinkUseCase: SaveViewedLinkUseCase = mock()
     private val removeViewedLinkByUrlUseCase: RemoveViewedLinkByUrlUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val queryAdsUseCase: QueryAdsUseCase = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
 
@@ -63,6 +65,7 @@ internal class FileLinkViewModelTest {
             saveViewedLinkUseCase,
             removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase,
+            queryAdsUseCase,
             fileTypeIconMapper,
         )
     }
@@ -74,6 +77,7 @@ internal class FileLinkViewModelTest {
             saveViewedLinkUseCase = saveViewedLinkUseCase,
             removeViewedLinkByUrlUseCase = removeViewedLinkByUrlUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            queryAdsUseCase = queryAdsUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             args = FileLinkViewModel.Args(uriString = uriString),
@@ -465,6 +469,50 @@ internal class FileLinkViewModelTest {
         initViewModel(uriString = url)
 
         verify(removeViewedLinkByUrlUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that shouldShowAdsForLink reflects queryAdsUseCase result when getPublicNode succeeds`() =
+        runTest {
+            val url = "https://mega.nz/file/abc#key"
+            val node = mockFileNode(id = 99L)
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            whenever(getPublicNodeUseCase(url)).thenReturn(node)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+            whenever(queryAdsUseCase(99L)).thenReturn(true)
+            initViewModel(uriString = url)
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().shouldShowAdsForLink).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldShowAdsForLink is false when queryAdsUseCase returns false`() = runTest {
+        val url = "https://mega.nz/file/abc#key"
+        val node = mockFileNode(id = 99L)
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(getPublicNodeUseCase(url)).thenReturn(node)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+        whenever(queryAdsUseCase(99L)).thenReturn(false)
+        initViewModel(uriString = url)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().shouldShowAdsForLink).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that queryAdsUseCase is not called when getPublicNode fails`() = runTest {
+        val url = "https://mega.nz/file/abc"
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(getPublicNodeUseCase(url)).thenThrow(PublicNodeException.GenericError())
+        initViewModel(uriString = url)
+        advanceUntilIdle()
+
+        verifyNoInteractions(queryAdsUseCase)
     }
 
     @Test

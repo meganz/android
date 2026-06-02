@@ -154,6 +154,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                                 )
                             }
                         },
+                        isAdsAllowedForScreen = uiState.shouldShowAdsForLink,
                     )
                     FileLinkView(
                         viewState = uiState,

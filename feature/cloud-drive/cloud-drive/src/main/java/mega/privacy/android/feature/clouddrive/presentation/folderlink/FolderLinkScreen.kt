@@ -84,7 +84,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun FolderLinkScreen(
-    viewModel: FolderLinkViewModel,
+    uiState: FolderLinkUiState,
+    onProcessAction: (FolderLinkAction) -> Unit,
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
     navigationHandler: NavigationHandler,
     singleNodeActionHandler: SingleNodeActionHandler,
@@ -96,7 +97,6 @@ internal fun FolderLinkScreen(
     onCreateAccountClicked: () -> Unit,
     onLoginClicked: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
@@ -117,7 +117,7 @@ internal fun FolderLinkScreen(
         event = nodeOptionsActionUiState.actionTriggeredEvent,
         onConsumed = nodeOptionsActionViewModel::resetActionTriggered,
         action = {
-            viewModel.processAction(FolderLinkAction.DeselectAllItems)
+            onProcessAction(FolderLinkAction.DeselectAllItems)
         }
     )
 
@@ -128,8 +128,8 @@ internal fun FolderLinkScreen(
                     count = uiState.selectedItemsCount,
                     isAllSelected = uiState.isAllSelected,
                     isSelecting = false,
-                    onSelectAllClicked = { viewModel.processAction(FolderLinkAction.SelectAllItems) },
-                    onCancelSelectionClicked = { viewModel.processAction(FolderLinkAction.DeselectAllItems) },
+                    onSelectAllClicked = { onProcessAction(FolderLinkAction.SelectAllItems) },
+                    onCancelSelectionClicked = { onProcessAction(FolderLinkAction.DeselectAllItems) },
                 )
             } else {
                 MegaTopAppBar(
@@ -138,11 +138,11 @@ internal fun FolderLinkScreen(
                     subtitle = uiState.subTitle?.text,
                     navigationType = if (uiState.isRootFolder) {
                         AppBarNavigationType.Close {
-                            viewModel.processAction(FolderLinkAction.BackPressed)
+                            onProcessAction(FolderLinkAction.BackPressed)
                         }
                     } else {
                         AppBarNavigationType.Back {
-                            viewModel.processAction(FolderLinkAction.BackPressed)
+                            onProcessAction(FolderLinkAction.BackPressed)
                         }
                     },
                     trailingIcons = {
@@ -174,6 +174,7 @@ internal fun FolderLinkScreen(
                 NewAdsContainer(
                     modifier = Modifier.fillMaxWidth(),
                     onNavigate = navigationHandler::navigate,
+                    showAdsForScreen = uiState.shouldShowAdsForLink,
                 ) { modifier ->
                     if (uiState.isInSelectionMode) {
                         NodeSelectionModeBottomBar(
@@ -221,9 +222,9 @@ internal fun FolderLinkScreen(
                     && action.nodeUiItem.node is TypedFileNode
                     && !uiState.isInSelectionMode
                 ) {
-                    rewardedAdGate.requestAction { viewModel.processAction(action) }
+                    rewardedAdGate.requestAction { onProcessAction(action) }
                 } else {
-                    viewModel.processAction(action)
+                    onProcessAction(action)
                 }
             },
             modifier = Modifier
@@ -232,7 +233,7 @@ internal fun FolderLinkScreen(
             bottomPadding = contentPadding.calculateBottomPadding(),
             onShowSortBottomSheet = { showSortBottomSheet = true },
             onMediaDiscoveryClicked = {
-                viewModel.processAction(FolderLinkAction.DeselectAllItems)
+                onProcessAction(FolderLinkAction.DeselectAllItems)
                 val mediaHandle = uiState.currentFolderNode?.id?.longValue ?: -1
                 megaNavigator.openMediaDiscoveryActivity(
                     context = context,
@@ -253,7 +254,7 @@ internal fun FolderLinkScreen(
             typedFileNode = fileNode,
             nodeSourceData = NodeSourceData.FolderLink,
             onNavigate = onNavigate,
-            onActionHandled = { viewModel.processAction(FolderLinkAction.OpenedFileNodeHandled) },
+            onActionHandled = { onProcessAction(FolderLinkAction.OpenedFileNodeHandled) },
             onDownloadEvent = onTransfer,
             sortOrder = uiState.selectedSortOrder,
             coroutineScope = coroutineScope
@@ -271,7 +272,7 @@ internal fun FolderLinkScreen(
             ),
             onSortOptionSelected = { result ->
                 result?.let {
-                    viewModel.processAction(
+                    onProcessAction(
                         FolderLinkAction.SortOrderChanged(
                             NodeSortConfiguration(
                                 sortOption = it.sortOptionItem,
@@ -287,11 +288,11 @@ internal fun FolderLinkScreen(
         )
     }
 
-    BackHandler { viewModel.processAction(FolderLinkAction.BackPressed) }
+    BackHandler { onProcessAction(FolderLinkAction.BackPressed) }
 
     EventEffect(
         event = uiState.navigateBackEvent,
-        onConsumed = { viewModel.processAction(FolderLinkAction.NavigateBackEventConsumed) },
+        onConsumed = { onProcessAction(FolderLinkAction.NavigateBackEventConsumed) },
         action = onBack,
     )
 }

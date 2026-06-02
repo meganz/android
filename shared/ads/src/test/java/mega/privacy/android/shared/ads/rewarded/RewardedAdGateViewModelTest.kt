@@ -459,6 +459,37 @@ class RewardedAdGateViewModelTest {
                 .doesNotContain(RewardedAdGateActionRequestedEvent)
         }
 
+    @Test
+    fun `test that setAdsAllowedForScreen updates state`() = runTest {
+        commonStub()
+        initViewModel()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isAdsAllowedForScreen).isTrue()
+
+            underTest.setAdsAllowedForScreen(false)
+            assertThat(awaitItem().isAdsAllowedForScreen).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that requestShowDialog skips when ads are not allowed for the screen even when eligible`() =
+        runTest {
+            commonStub(attemptCount = 10)
+            initViewModel()
+            underTest.setAdsAllowedForScreen(false)
+
+            underTest.uiState.test {
+                awaitItem() // settled init state
+                underTest.requestShowDialog()
+
+                val state = awaitItem()
+                assertThat(state.showDialog).isFalse()
+                assertThat(state.skipAdEvent).isEqualTo(triggered)
+                verify(incrementRewardedAdAttemptCountUseCase, never()).invoke()
+            }
+        }
+
     companion object {
         @JvmField
         @RegisterExtension

@@ -11,6 +11,7 @@ data class FileLinkUiState(
     val contentState: FileLinkContentState = FileLinkContentState.Loading,
     val fileNode: PublicLinkFile? = null,
     val hasCredentials: Boolean = false,
+    val shouldShowAdsForLink: Boolean = false,
 ) {
 
     /**
