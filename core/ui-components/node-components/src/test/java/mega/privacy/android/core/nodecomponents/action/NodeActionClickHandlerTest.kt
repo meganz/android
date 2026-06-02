@@ -121,6 +121,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
@@ -395,6 +396,46 @@ class NodeActionClickHandlerTest {
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
         verify(mockCopyLauncher).launch(longArrayOf(123L, 456L))
+    }
+
+    @Test
+    fun `test CopyAction single node navigates to CopyNavKey when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockNavigationHandler).navigate(CopyNavKey(sourceHandles = listOf(123L)))
+    }
+
+    @Test
+    fun `test CopyAction multiple nodes navigates to CopyNavKey when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockNavigationHandler).navigate(CopyNavKey(sourceHandles = listOf(123L, 456L)))
+    }
+
+    @Test
+    fun `test CopyAction uses copyLauncher when cloud explorer enabled but navigationHandler is null`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = CopyActionClickHandler()
+        val menuAction = mock<CopyMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockCopyLauncher).launch(longArrayOf(123L))
     }
 
     // SaveToMegaAction Tests

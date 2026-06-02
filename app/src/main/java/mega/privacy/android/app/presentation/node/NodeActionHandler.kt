@@ -3,8 +3,12 @@ package mega.privacy.android.app.presentation.node
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuAction
+import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
+import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragmentEntryPoint
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.app.activities.contract.HiddenNodeOnboardingActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
@@ -30,6 +34,10 @@ import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAct
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
 
 /**
  * Node bottom sheet action handler
@@ -135,6 +143,77 @@ class NodeActionHandler(
             }
         }
 
+    private val appCompatActivity get() = activity as? AppCompatActivity
+
+    private val overlayEntryPoint by lazy {
+        EntryPointAccessors.fromApplication(
+            activity.applicationContext,
+            LegacyOverlayDialogFragmentEntryPoint::class.java,
+        )
+    }
+
+    private var isCloudExplorerAvailable = false
+
+    init {
+        appCompatActivity?.let { activity ->
+            activity.lifecycleScope.launch {
+                isCloudExplorerAvailable = runCatching {
+                    overlayEntryPoint.getFeatureFlagValueUseCase()(AppFeatures.CloudExplorer)
+                }.getOrDefault(false)
+            }
+            LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
+                fragmentManager = activity.supportFragmentManager,
+                scope = activity.lifecycleScope,
+                lifecycle = activity.lifecycle,
+                navigationResultManager = overlayEntryPoint.navigationResultManager(),
+                resultKey = CopyNavKey.RESULT,
+            ) { result ->
+                nodeActionsViewModel.checkNodesNameCollision(
+                    nodes = result.sourceHandles,
+                    targetNode = result.target.longValue,
+                    type = NodeNameCollisionType.COPY,
+                )
+            }
+            LegacyOverlayDialogFragment.collectResultAndDismiss<MoveResult>(
+                fragmentManager = activity.supportFragmentManager,
+                scope = activity.lifecycleScope,
+                lifecycle = activity.lifecycle,
+                navigationResultManager = overlayEntryPoint.navigationResultManager(),
+                resultKey = MoveNavKey.RESULT,
+            ) { result ->
+                nodeActionsViewModel.checkNodesNameCollision(
+                    nodes = result.sourceHandles,
+                    targetNode = result.target.longValue,
+                    type = NodeNameCollisionType.MOVE,
+                )
+            }
+        }
+    }
+
+    private fun launchCopy(handles: LongArray) {
+        val activity = appCompatActivity
+        if (activity != null && isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = activity.supportFragmentManager,
+                initialKey = CopyNavKey(sourceHandles = handles.toList()),
+            )
+        } else {
+            selectCopyNodeActivityLauncher?.launch(handles)
+        }
+    }
+
+    private fun launchMove(handles: LongArray) {
+        val activity = appCompatActivity
+        if (activity != null && isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = activity.supportFragmentManager,
+                initialKey = MoveNavKey(sourceHandles = handles.toList()),
+            )
+        } else {
+            selectMoveNodeActivityLauncher?.launch(handles)
+        }
+    }
+
     /**
      * handles actions from bottom sheet
      *
@@ -145,8 +224,8 @@ class NodeActionHandler(
         nodeActionsViewModel.updateSelectedNodes(listOf(node))
         when (action) {
             is VersionsMenuAction -> versionsActivityLauncher?.launch(node.id.longValue)
-            is MoveMenuAction -> selectMoveNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
-            is CopyMenuAction -> selectCopyNodeActivityLauncher?.launch(longArrayOf(node.id.longValue))
+            is MoveMenuAction -> launchMove(longArrayOf(node.id.longValue))
+            is CopyMenuAction -> launchCopy(longArrayOf(node.id.longValue))
             is ShareFolderMenuAction -> shareFolderActivityLauncher?.launch(longArrayOf(node.id.longValue))
             is RestoreMenuAction -> restoreFromRubbishLauncher?.launch(longArrayOf(node.id.longValue))
             is SendToChatMenuAction -> sendToChatLauncher?.launch(longArrayOf(node.id.longValue))
@@ -202,12 +281,12 @@ class NodeActionHandler(
 
             is CopyMenuAction -> {
                 val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
-                selectCopyNodeActivityLauncher?.launch(nodeHandleArray)
+                launchCopy(nodeHandleArray)
             }
 
             is MoveMenuAction -> {
                 val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
-                selectMoveNodeActivityLauncher?.launch(nodeHandleArray)
+                launchMove(nodeHandleArray)
             }
 
             is SendToChatMenuAction -> {
