@@ -24,6 +24,13 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
+import mega.privacy.android.feature_flags.AppFeatures
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
@@ -134,6 +141,11 @@ class FileInfoActivity : BaseActivity() {
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
 
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    private var isCloudExplorerAvailable = false
+
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
     private lateinit var copyLauncher: ActivityResultLauncher<LongArray>
@@ -180,6 +192,7 @@ class FileInfoActivity : BaseActivity() {
             return
         })
         configureActivityResultLaunchers()
+        setupCloudExplorer()
         initFileBackupManager()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         Analytics.tracker.trackEvent(NodeInfoScreenEvent)
@@ -467,8 +480,53 @@ class FileInfoActivity : BaseActivity() {
         startActivity(i)
     }
 
-    private fun navigateToCopy() = copyLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
-    private fun navigateToMove() = moveLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
+    private fun setupCloudExplorer() {
+        lifecycleScope.launch {
+            isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = CopyNavKey.RESULT,
+        ) { result ->
+            viewModel.copyNodeCheckingCollisions(parentHandle = result.target)
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<MoveResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = MoveNavKey.RESULT,
+        ) { result ->
+            viewModel.moveNodeCheckingCollisions(parentHandle = result.target)
+        }
+    }
+
+    private fun navigateToCopy() {
+        if (isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = supportFragmentManager,
+                initialKey = CopyNavKey(sourceHandles = listOf(viewModel.nodeId.longValue)),
+            )
+        } else {
+            copyLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
+        }
+    }
+
+    private fun navigateToMove() {
+        if (isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = supportFragmentManager,
+                initialKey = MoveNavKey(sourceHandles = listOf(viewModel.nodeId.longValue)),
+            )
+        } else {
+            moveLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
+        }
+    }
 
     private fun navigateToGetLink() {
         if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {

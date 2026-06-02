@@ -41,6 +41,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.call.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.call.OpenOrStartCallUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
@@ -124,6 +125,7 @@ class LegacyContactInfoViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val monitorChatRetentionTimeUpdateUseCase: MonitorChatRetentionTimeUpdateUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LegacyContactInfoUiState())
@@ -772,6 +774,9 @@ class LegacyContactInfoViewModel @Inject constructor(
     private suspend fun copyNodes(nodes: Map<Long, Long>) {
         val result = runCatching {
             copyNodesUseCase(nodes)
+        }.onSuccess {
+            runCatching { setCopyLatestTargetPathUseCase(nodes.values.first()) }
+                .onFailure { Timber.e(it) }
         }.onFailure { error ->
             Timber.e(error)
         }

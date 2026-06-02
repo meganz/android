@@ -34,6 +34,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -148,6 +155,11 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     @Inject
     lateinit var nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper
+
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    private var isCloudExplorerAvailable = false
     private val viewModel: ContactFileListViewModel by viewModels()
     private val startDownloadViewModel: StartDownloadViewModel by viewModels()
     private lateinit var fragmentContainer: FrameLayout
@@ -384,6 +396,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             setParentHandle(savedInstanceState.getLong(PARENT_HANDLE, -1))
         }
         megaApi.addGlobalListener(this)
+        setupCloudExplorer()
         val extras = intent.extras
         if (extras != null) {
             userEmail = extras.getString(Constants.NAME)
@@ -690,14 +703,64 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     }
 
     fun showMove(handleList: ArrayList<Long>) {
-        val intent = Intent(this, FileExplorerActivity::class.java)
-        intent.action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-        intent.putExtra("MOVE_FROM", handleList.toLongArray())
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
+        val handles = handleList.toLongArray()
+        if (isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = supportFragmentManager,
+                initialKey = MoveNavKey(sourceHandles = handles.toList()),
+            )
+        } else {
+            val intent = Intent(this, FileExplorerActivity::class.java)
+            intent.action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
+            intent.putExtra("MOVE_FROM", handles)
+            startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
+        }
+    }
+
+    private fun setupCloudExplorer() {
+        lifecycleScope.launch {
+            isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = CopyNavKey.RESULT,
+        ) { result ->
+            viewModel.copyOrMoveNodes(
+                nodes = result.sourceHandles,
+                targetNode = result.target.longValue,
+                type = NodeNameCollisionType.COPY,
+            )
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<MoveResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = MoveNavKey.RESULT,
+        ) { result ->
+            viewModel.copyOrMoveNodes(
+                nodes = result.sourceHandles,
+                targetNode = result.target.longValue,
+                type = NodeNameCollisionType.MOVE,
+            )
+        }
     }
 
     fun showCopy(handleList: ArrayList<Long>) {
-        selectFolderToCopyLauncher.launch(handleList.toLongArray())
+        val handles = handleList.toLongArray()
+        if (isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = supportFragmentManager,
+                initialKey = CopyNavKey(sourceHandles = handles.toList()),
+            )
+        } else {
+            selectFolderToCopyLauncher.launch(handles)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {

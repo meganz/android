@@ -215,6 +215,7 @@ class LegacyContactInfoViewModelTest {
             copyNodesUseCase = copyNodesUseCase,
             monitorChatRetentionTimeUpdateUseCase = monitorChatRetentionTimeUpdateUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            setCopyLatestTargetPathUseCase = mock(),
         )
     }
 

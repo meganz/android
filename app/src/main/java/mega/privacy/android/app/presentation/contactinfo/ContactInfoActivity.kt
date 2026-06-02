@@ -107,13 +107,15 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
@@ -385,6 +387,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
         collectFlows()
         collectShareFilesToChatResult()
+        collectCopyResult()
     }
 
     private fun collectShareFilesToChatResult() {
@@ -404,6 +407,21 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     )
                 }
             }
+        }
+    }
+
+    private fun collectCopyResult() {
+        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = CopyNavKey.RESULT,
+        ) { result ->
+            actionConfirmed()
+            viewModel.checkCopyNameCollision(
+                handles = result.sourceHandles.toLongArray() to result.target.longValue,
+            )
         }
     }
 
@@ -1445,7 +1463,14 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     fun showCopy(handleList: ArrayList<Long>) {
         val handles = handleList.toLongArray()
-        selectFolderToCopyLauncher.launch(handles)
+        if (viewModel.uiState.value.isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = supportFragmentManager,
+                initialKey = CopyNavKey(sourceHandles = handles.toList()),
+            )
+        } else {
+            selectFolderToCopyLauncher.launch(handles)
+        }
     }
 
     private fun setFoldersButtonText(nodes: List<UnTypedNode>) {
