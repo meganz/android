@@ -20,6 +20,15 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Enables video editor
+     */
+    VideoEditor(
+        "ff_vdedt",
+        "Enable video editor",
+        false,
+    ),
+
+    /**
      * Enables Picture in Picture (PIP) in Video Player
      */
     VideoPlayerPictureInPicture(
