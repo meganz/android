@@ -409,6 +409,8 @@ class LegacyVideoPlayerViewModelTest {
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
             moveNodeToRubbishBinUseCase = moveNodeToRubbishBinUseCase,
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
+            setCopyLatestTargetPathUseCase = mock(),
+            setMoveLatestTargetPathUseCase = mock(),
         )
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID] = expectedCollectionId
         savedStateHandle[INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE] = expectedCollectionTitle

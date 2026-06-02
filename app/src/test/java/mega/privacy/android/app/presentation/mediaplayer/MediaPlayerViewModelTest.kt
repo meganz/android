@@ -92,6 +92,8 @@ internal class MediaPlayerViewModelTest {
             getFileUriUseCase = getFileUriUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
+            setCopyLatestTargetPathUseCase = mock(),
+            setMoveLatestTargetPathUseCase = mock(),
         )
     }
 

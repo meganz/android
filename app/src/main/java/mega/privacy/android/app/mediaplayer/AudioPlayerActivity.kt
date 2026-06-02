@@ -41,6 +41,12 @@ import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
@@ -90,8 +96,10 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
@@ -132,6 +140,14 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     @Inject
     lateinit var chatController: ChatController
 
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    private var isCloudExplorerAvailable = false
+
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
     private var serviceBound = false
@@ -144,6 +160,34 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private var isShareMenuVisible: Boolean = false
     private var lastShareCheckedHandle: Long = INVALID_HANDLE
     private var lastShareCheckedAdapter: Int = INVALID_VALUE
+
+    private fun setupCloudExplorer() {
+        lifecycleScope.launch {
+            isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = CopyNavKey.RESULT,
+        ) { result ->
+            val source = result.sourceHandles.firstOrNull() ?: return@collectResultAndDismiss
+            viewModel.copyNode(nodeHandle = source, newParentHandle = result.target.longValue)
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<MoveResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = MoveNavKey.RESULT,
+        ) { result ->
+            val source = result.sourceHandles.firstOrNull() ?: return@collectResultAndDismiss
+            viewModel.moveNode(nodeHandle = source, newParentHandle = result.target.longValue)
+        }
+    }
 
     private fun shareCurrentNode(node: MegaNode) {
         val localPath = FileUtil.getLocalFile(node)
@@ -291,6 +335,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         }
 
         super.onCreate(savedInstanceState)
+
+        setupCloudExplorer()
 
         // Set up the Back Press dispatcher to receive Back Press events
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
@@ -567,17 +613,29 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
 
                 R.id.move -> {
-                    selectFolderToMoveLauncher.launch(
-                        Intent(this, FileExplorerActivity::class.java).apply {
-                            action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-                            putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
-                        }
-                    )
+                    if (isCloudExplorerAvailable) {
+                        LegacyOverlayDialogFragment.show(
+                            fragmentManager = supportFragmentManager,
+                            initialKey = MoveNavKey(sourceHandles = listOf(playingHandle)),
+                        )
+                    } else {
+                        selectFolderToMoveLauncher.launch(
+                            Intent(this, FileExplorerActivity::class.java).apply {
+                                action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
+                                putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
+                            }
+                        )
+                    }
                 }
 
                 R.id.copy -> {
                     if (getStorageState() == StorageState.PayWall) {
                         AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                    } else if (isCloudExplorerAvailable) {
+                        LegacyOverlayDialogFragment.show(
+                            fragmentManager = supportFragmentManager,
+                            initialKey = CopyNavKey(sourceHandles = listOf(playingHandle)),
+                        )
                     } else {
                         selectFolderToCopyLauncher.launch(
                             Intent(this, FileExplorerActivity::class.java).apply {

@@ -150,6 +150,8 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.call.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.chat.message.delete.DeleteNodeAttachmentMessageByIdsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
@@ -309,8 +311,11 @@ class LegacyVideoPlayerViewModel @Inject constructor(
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     private val moveNodeToRubbishBinUseCase: MoveNodeToRubbishBinUseCase,
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
+    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
+    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+
     val uiState: StateFlow<VideoPlayerUiState>
         field: MutableStateFlow<VideoPlayerUiState> = MutableStateFlow(VideoPlayerUiState())
 
@@ -1625,6 +1630,8 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                 }
                 it.moveRequestResult?.let { result ->
                     if (result.isSuccess) {
+                        runCatching { setMoveLatestTargetPathUseCase(newParentHandle) }
+                            .onFailure { e -> Timber.e(e) }
                         snackbarMessage.value = sharedR.string.node_moved_success_message
                     } else {
                         snackbarMessage.value = R.string.context_no_moved
@@ -1664,6 +1671,8 @@ class LegacyVideoPlayerViewModel @Inject constructor(
                 }
                 it.moveRequestResult?.let { result ->
                     snackbarMessage.value = if (result.isSuccess) {
+                        runCatching { setCopyLatestTargetPathUseCase(newParentHandle) }
+                            .onFailure { Timber.e(it) }
                         R.string.context_correctly_copied
                     } else {
                         R.string.context_no_copied

@@ -52,6 +52,12 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -126,6 +132,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
@@ -165,6 +172,11 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
+
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    private var isCloudExplorerAvailable = false
 
     private val legacyVideoPlayerViewModel: LegacyVideoPlayerViewModel by viewModels()
     private val nodeAttachmentViewModel: NodeAttachmentViewModel by viewModels()
@@ -277,6 +289,7 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
         setupImmersiveMode()
         val player = createPlayer()
         legacyVideoPlayerViewModel.initRepeatToggleMode()
+        setupCloudExplorer()
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             var passcodeEnabled by remember { mutableStateOf(true) }
@@ -713,17 +726,63 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
     }
 
     private fun handleMoveAction(playingHandle: Long) {
-        selectFolderToMoveLauncher.launch(
-            Intent(this, FileExplorerActivity::class.java).apply {
-                action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-                putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
-            }
-        )
+        if (isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = supportFragmentManager,
+                initialKey = MoveNavKey(sourceHandles = listOf(playingHandle)),
+            )
+        } else {
+            selectFolderToMoveLauncher.launch(
+                Intent(this, FileExplorerActivity::class.java).apply {
+                    action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
+                    putExtra(INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
+                }
+            )
+        }
+    }
+
+    private fun setupCloudExplorer() {
+        lifecycleScope.launch {
+            isCloudExplorerAvailable = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = CopyNavKey.RESULT,
+        ) { result ->
+            val source = result.sourceHandles.firstOrNull() ?: return@collectResultAndDismiss
+            legacyVideoPlayerViewModel.copyNode(
+                nodeHandle = source,
+                newParentHandle = result.target.longValue,
+            )
+        }
+        LegacyOverlayDialogFragment.collectResultAndDismiss<MoveResult>(
+            fragmentManager = supportFragmentManager,
+            scope = lifecycleScope,
+            lifecycle = lifecycle,
+            navigationResultManager = navigationResultManager,
+            resultKey = MoveNavKey.RESULT,
+        ) { result ->
+            val source = result.sourceHandles.firstOrNull() ?: return@collectResultAndDismiss
+            legacyVideoPlayerViewModel.moveNode(
+                nodeHandle = source,
+                newParentHandle = result.target.longValue,
+            )
+        }
     }
 
     private fun handleCopyAction(playingHandle: Long) {
         if (getStorageState() == StorageState.PayWall) {
             AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+        } else if (isCloudExplorerAvailable) {
+            LegacyOverlayDialogFragment.show(
+                fragmentManager = supportFragmentManager,
+                initialKey = CopyNavKey(sourceHandles = listOf(playingHandle)),
+            )
         } else {
             selectFolderToCopyLauncher.launch(
                 Intent(this, FileExplorerActivity::class.java).apply {

@@ -30,6 +30,8 @@ import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
@@ -60,6 +62,8 @@ class MediaPlayerViewModel @Inject constructor(
     private val getFileUriUseCase: GetFileUriUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
+    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
+    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
 ) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -164,6 +168,9 @@ class MediaPlayerViewModel @Inject constructor(
                 }
                 it.moveRequestResult?.let { result ->
                     snackbarMessage.value = if (result.isSuccess) {
+                        // Remember the chosen folder so the next copy resumes there.
+                        runCatching { setCopyLatestTargetPathUseCase(newParentHandle) }
+                            .onFailure { Timber.e(it) }
                         R.string.context_correctly_copied
                     } else {
                         R.string.context_no_copied
@@ -235,6 +242,8 @@ class MediaPlayerViewModel @Inject constructor(
                 }
                 result.moveRequestResult?.let {
                     if (it.isSuccess) {
+                        runCatching { setMoveLatestTargetPathUseCase(newParentHandle) }
+                            .onFailure { e -> Timber.e(e) }
                         _itemToRemove.value =
                             result.firstNodeCollisionOrNull?.nodeHandle ?: nodeHandle
                         snackbarMessage.value = sharedResR.string.node_moved_success_message
