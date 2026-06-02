@@ -59,7 +59,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.login.model.LoginState
+import mega.privacy.android.app.presentation.login.model.FetchNodesUiState
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
@@ -226,7 +226,7 @@ private fun LoginInProgressText(
 @CombinedThemePreviews
 @Composable
 private fun LoginInProgressScreenPreview(
-    @PreviewParameter(LoginInProgressStateProvider::class) state: LoginState,
+    @PreviewParameter(LoginInProgressStateProvider::class) state: FetchNodesUiState,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FetchNodesContent(
@@ -243,20 +243,20 @@ private fun LoginInProgressScreenPreview(
 /**
  * LoginInProgressState parameter provider for compose previews.
  */
-private class LoginInProgressStateProvider : PreviewParameterProvider<LoginState> {
+private class LoginInProgressStateProvider : PreviewParameterProvider<FetchNodesUiState> {
     override val values = listOf(
-        LoginState(
-            isLoginInProgress = true,
+        FetchNodesUiState(
+            isFastLoginInProgress = true,
         ),
-        LoginState(
-            isLoginInProgress = true,
+        FetchNodesUiState(
+            isFastLoginInProgress = true,
             requestStatusProgress = Progress(0.2f)
         ),
-        LoginState(
-            isLoginInProgress = true,
+        FetchNodesUiState(
+            isFastLoginInProgress = true,
             requestStatusProgress = Progress(0.7f)
         ),
-        LoginState(
+        FetchNodesUiState(
             fetchNodesUpdate = FetchNodesUpdate(
                 progress = Progress(0.5F),
                 temporaryError = TemporaryWaitingError.ConnectivityIssues

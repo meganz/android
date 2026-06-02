@@ -101,8 +101,7 @@ fun LoginScreen(
         Constants.ACTION_REFRESH == activity?.intent?.action ||
                 Constants.ACTION_REFRESH_API_SERVER == activity?.intent?.action ||
                 is2FARequired || multiFactorAuthState != null ||
-                viewModel.loginMutex.isLocked || isLoginInProgress ||
-                isFastLoginInProgress || fetchNodesUpdate != null
+                viewModel.loginMutex.isLocked || isLoginInProgress
     }
 
     BackHandler(enabled = needsBackOverride) {
@@ -115,7 +114,7 @@ fun LoginScreen(
                     viewModel.stopLogin()
                 }
 
-                viewModel.loginMutex.isLocked || isLoginInProgress || isFastLoginInProgress || fetchNodesUpdate != null ->
+                viewModel.loginMutex.isLocked || isLoginInProgress ->
                     activity?.moveTaskToBack(true)
             }
         }

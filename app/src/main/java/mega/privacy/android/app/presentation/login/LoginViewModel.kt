@@ -10,7 +10,6 @@ import javax.inject.Inject
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -52,7 +51,6 @@ import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.GoogleSignInResult
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
-import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginException
@@ -90,7 +88,6 @@ import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
-import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
@@ -102,8 +99,6 @@ import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
-import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
-import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -141,7 +136,6 @@ class LoginViewModel @Inject constructor(
     private val localLogoutUseCase: LocalLogoutUseCase,
     private val loginUseCase: LoginUseCase,
     private val loginWith2FAUseCase: LoginWith2FAUseCase,
-    private val fastLoginUseCase: FastLoginUseCase,
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
@@ -154,8 +148,6 @@ class LoginViewModel @Inject constructor(
     @LoginMutex val loginMutex: Mutex,
     private val clearUserCredentialsUseCase: ClearUserCredentialsUseCase,
     private val getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase,
-    private val enableRequestStatusMonitorUseCase: EnableRequestStatusMonitorUseCase,
-    private val monitorRequestStatusProgressEventUseCase: MonitorRequestStatusProgressEventUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val resendVerificationEmailUseCase: ResendVerificationEmailUseCase,
@@ -207,13 +199,10 @@ class LoginViewModel @Inject constructor(
 
     private var pendingAction: String? = null
 
-    private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
-
     private val handledLinks = mutableSetOf<HandledLinks>()
 
     init {
         Timber.d("LoginViewModel init $this")
-        enableAndMonitorRequestStatusProgressEvent()
         viewModelScope.launch {
             runCatching {
                 getHistoricalProcessExitReasonsUseCase()
@@ -260,29 +249,7 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(initialEmail = null) }
     }
 
-    private fun enableAndMonitorRequestStatusProgressEvent() {
-        viewModelScope.launch {
-            runCatching {
-                enableRequestStatusMonitorUseCase()
-                monitorRequestStatusProgressEventUseCase()
-                    .catch { throwable ->
-                        Timber.e(throwable)
-                        // Hide progress bar on error
-                        _state.update {
-                            it.copy(requestStatusProgress = null)
-                        }
-                    }.collect { progress ->
-                        _state.update {
-                            it.copy(requestStatusProgress = progress)
-                        }
-                    }
-            }.onFailure {
-                Timber.e(it)
-            }
-        }
-    }
-
-    /**
+/**
      * Reset some states values.
      */
     private fun setupInitialState() {
@@ -421,7 +388,6 @@ class LoginViewModel @Inject constructor(
     fun resetLoginState() {
         _state.update {
             it.copy(
-                fetchNodesUpdate = null,
                 isLoginInProgress = false,
                 isLoginRequired = true
             )
@@ -439,7 +405,6 @@ class LoginViewModel @Inject constructor(
             it.copy(
                 accountSession = null,
                 password = null,
-                fetchNodesUpdate = null,
                 isFirstTime = false,
                 isAlreadyLoggedIn = false,
                 pressedBackWhileLogin = true,
@@ -909,57 +874,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Fast login.
-     */
-    fun fastLogin(refreshChatUrl: Boolean) {
-        _state.update {
-            it.copy(
-                isLoginInProgress = false,
-                isLoginRequired = false,
-                is2FARequired = false,
-                isAlreadyLoggedIn = true,
-                isFastLoginInProgress = true,
-                fetchNodesUpdate = cleanFetchNodesUpdate
-            )
-        }
-
-        viewModelScope.launch {
-            getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
-            var retry = 1
-            while (loginMutex.isLocked && retry <= 3) {
-                Timber.d("Wait for the isLoggingIn lock to be available")
-                delay(1000L * retry)
-                if (rootNodeExistsUseCase()) {
-                    Timber.d("Root node exists")
-                    _state.update { it.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
-                    return@launch
-                }
-                retry++
-            }
-            if (loginMutex.isLocked) {
-                Timber.w("Another login is processing")
-                pendingAction = ACTION_OPEN_APP
-                return@launch
-            }
-
-            performFastLogin(refreshChatUrl)
-        }
-    }
-
-    private fun performFastLogin(refreshChatUrl: Boolean) = viewModelScope.launch {
-        runCatching {
-            fastLoginUseCase(
-                state.value.accountSession?.session ?: return@launch,
-                refreshChatUrl,
-                DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
-            ).collectLatest { status -> status.checkStatus(isFastLogin = true) }
-        }.onFailure { exception ->
-            if (exception !is LoginException) return@onFailure
-            exception.loginFailed()
-        }
-    }
-
     private fun LoginException.loginFailed(is2FARequest: Boolean = false) =
         _state.update { loginState ->
             //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
@@ -975,14 +889,12 @@ class LoginViewModel @Inject constructor(
                 isLoginRequired = true,
                 is2FAEnabled = is2FARequest,
                 is2FARequired = false,
-                fetchNodesUpdate = null,
                 loginException = this.takeUnless { this is LoginLoggedOutFromOtherLocation },
                 snackbarMessage = snackbarMessage ?: consumed()
             )
         }
 
     private suspend fun LoginStatus.checkStatus(
-        isFastLogin: Boolean = false,
         email: String? = null,
     ) = when (this) {
         LoginStatus.LoginStarted -> {
@@ -993,34 +905,19 @@ class LoginViewModel @Inject constructor(
         }
 
         LoginStatus.LoginSucceed -> {
-            // If fast login, state already updated.
             Timber.d("Login finished")
-            if (isFastLogin) {
-                _state.update {
-                    it.copy(
-                        loginTemporaryError = null,
-                        isFastLoginInProgress = false
-                    )
-                }
-                getUserData()
-            } else {
-                ephemeralCredentialManager.setEphemeralCredential(null)
-                _state.update {
-                    it.copy(
-                        loginTemporaryError = null,
-                        isLoginInProgress = false,
-                        isLoginRequired = false,
-                        is2FARequired = false,
-                        isAlreadyLoggedIn = true,
-                        isFastLoginInProgress = false,
-                        fetchNodesUpdate = cleanFetchNodesUpdate,
-                        multiFactorAuthState = null
-                    )
-                }
+            ephemeralCredentialManager.setEphemeralCredential(null)
+            _state.update {
+                it.copy(
+                    loginTemporaryError = null,
+                    isLoginInProgress = false,
+                    isLoginRequired = false,
+                    is2FARequired = false,
+                    isAlreadyLoggedIn = true,
+                    multiFactorAuthState = null
+                )
             }
-            if (!isFastLogin) {
-                shouldShowUpgradeAccount()
-            }
+            shouldShowUpgradeAccount()
             sendAnalyticsEventIfFirstTimeLogin(email)
         }
 
@@ -1030,7 +927,6 @@ class LoginViewModel @Inject constructor(
                 it.copy(
                     loginTemporaryError = null,
                     isLoginInProgress = false,
-                    isFastLoginInProgress = false,
                     isLoginRequired = true,
                     is2FAEnabled = false,
                     is2FARequired = false
@@ -1047,13 +943,8 @@ class LoginViewModel @Inject constructor(
 
         is LoginStatus.LoginWaiting -> {
             Timber.d("Login waiting")
-            // Ignore the temporary error if request status event is in progress
-            if (!state.value.isRequestStatusInProgress) {
-                _state.update {
-                    it.copy(loginTemporaryError = this.error)
-                }
-            } else {
-                Unit
+            _state.update {
+                it.copy(loginTemporaryError = this.error)
             }
         }
     }

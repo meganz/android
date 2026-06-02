@@ -50,12 +50,8 @@ import mega.privacy.android.app.presentation.apiserver.view.NewChangeApiServerDi
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
-import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
-import mega.privacy.android.domain.entity.login.FetchNodesUpdate
-import mega.privacy.android.domain.entity.login.TemporaryWaitingError
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LoginHelpButtonPressedEvent
 
@@ -98,8 +94,6 @@ fun NewLoginView(
     val focusManager = LocalFocusManager.current
     val snackbarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
-    val showLoginInProgress =
-        state.fetchNodesUpdate != null || state.isRequestStatusInProgress
     val orientation = LocalConfiguration.current.orientation
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =
@@ -115,15 +109,13 @@ fun NewLoginView(
         modifier = modifier
             .fillMaxSize()
             .imePadding()
-            .conditional(!showLoginInProgress) {
-                statusBarsPadding()
-            }
+            .statusBarsPadding()
             .semantics { testTagsAsResourceId = true },
         snackbarHost = {
             MegaSnackbar(snackbarHostState)
         },
         topBar = {
-            if (state.is2FARequired && !showLoginInProgress) {
+            if (state.is2FARequired) {
                 AnimatedVisibility(
                     visible = !isPhoneLandscape || !twoFactorAuthScrollState.canScrollBackward,
                     enter = slideInVertically(initialOffsetY = { -it }),
@@ -134,7 +126,7 @@ fun NewLoginView(
                         title = stringResource(sharedR.string.settings_2fa),
                     )
                 }
-            } else if (!showLoginInProgress) {
+            } else {
                 AnimatedVisibility(
                     visible = !isPhoneLandscape || !requiredLoginScrollState.canScrollBackward,
                     enter = slideInVertically(initialOffsetY = { -it }),
@@ -167,13 +159,6 @@ fun NewLoginView(
     ) { paddingValues ->
         with(state) {
             when {
-                showLoginInProgress -> FetchNodesContent(
-                    isRequestStatusInProgress = state.isRequestStatusInProgress,
-                    currentProgress = state.currentProgress,
-                    currentStatusText = state.currentStatusText,
-                    requestStatusProgress = state.requestStatusProgress
-                )
-
                 isLoginRequired -> RequireLogin(
                     state = this,
                     paddingValues = paddingValues,
@@ -349,20 +334,6 @@ private class LoginStateProvider : PreviewParameterProvider<LoginState> {
         ),
         LoginState(
             isLoginInProgress = true,
-        ),
-        LoginState(
-            isLoginInProgress = true,
-            requestStatusProgress = Progress(0.2f)
-        ),
-        LoginState(
-            isLoginInProgress = true,
-            requestStatusProgress = Progress(0.7f)
-        ),
-        LoginState(
-            fetchNodesUpdate = FetchNodesUpdate(
-                progress = Progress(0.5F),
-                temporaryError = TemporaryWaitingError.ConnectivityIssues
-            ),
         ),
         LoginState(
             is2FARequired = true,

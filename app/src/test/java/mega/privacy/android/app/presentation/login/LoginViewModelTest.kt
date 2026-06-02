@@ -34,7 +34,6 @@ import mega.privacy.android.app.presentation.login.model.RkLink
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountBlockedEvent
-import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
@@ -70,7 +69,6 @@ import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitR
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
-import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
@@ -83,8 +81,6 @@ import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
-import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
-import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -135,7 +131,6 @@ internal class LoginViewModelTest {
     private val localLogoutUseCase: LocalLogoutUseCase = mock()
     private val loginUseCase: LoginUseCase = mock()
     private val loginWith2FAUseCase: LoginWith2FAUseCase = mock()
-    private val fastLoginUseCase: FastLoginUseCase = mock()
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase = mock()
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase = mock()
@@ -149,10 +144,6 @@ internal class LoginViewModelTest {
     private val clearUserCredentialsUseCase = mock<ClearUserCredentialsUseCase>()
     private val getHistoricalProcessExitReasonsUseCase =
         mock<GetHistoricalProcessExitReasonsUseCase>()
-    private val enableRequestStatusMonitorUseCase = mock<EnableRequestStatusMonitorUseCase>()
-    private val requestStatusProgressFakeFlow = MutableSharedFlow<Progress>()
-    private val monitorRequestStatusProgressEventUseCase =
-        mock<MonitorRequestStatusProgressEventUseCase>()
     private val isFirstLaunchUseCase = mock<IsFirstLaunchUseCase>()
     private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
     private val resendVerificationEmailUseCase = mock<ResendVerificationEmailUseCase>()
@@ -206,7 +197,6 @@ internal class LoginViewModelTest {
             localLogoutUseCase = localLogoutUseCase,
             loginUseCase = loginUseCase,
             loginWith2FAUseCase = loginWith2FAUseCase,
-            fastLoginUseCase = fastLoginUseCase,
             ongoingTransfersExistUseCase = ongoingTransfersExistUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
@@ -220,8 +210,6 @@ internal class LoginViewModelTest {
             installReferrerHandler = installReferrerHandler,
             clearUserCredentialsUseCase = clearUserCredentialsUseCase,
             getHistoricalProcessExitReasonsUseCase = getHistoricalProcessExitReasonsUseCase,
-            enableRequestStatusMonitorUseCase = enableRequestStatusMonitorUseCase,
-            monitorRequestStatusProgressEventUseCase = monitorRequestStatusProgressEventUseCase,
             isFirstLaunchUseCase = isFirstLaunchUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             resendVerificationEmailUseCase = resendVerificationEmailUseCase,
@@ -247,9 +235,6 @@ internal class LoginViewModelTest {
     }
 
     private suspend fun stubCommon() {
-        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
-            requestStatusProgressFakeFlow
-        )
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
         whenever(monitorEphemeralCredentialsUseCase()).thenReturn(emptyFlow())
         whenever(monitorUserCredentialsUseCase()).thenReturn(monitorUserCredentialsFlow)
@@ -279,7 +264,6 @@ internal class LoginViewModelTest {
     @AfterEach
     fun resetMocks() {
         reset(
-            monitorRequestStatusProgressEventUseCase,
             isFirstLaunchUseCase,
             resendVerificationEmailUseCase,
             checkRecoveryKeyUseCase,
@@ -308,7 +292,6 @@ internal class LoginViewModelTest {
                 assertThat(password).isNull()
                 assertThat(passwordError).isNull()
                 assertThat(accountConfirmationLink).isNull()
-                assertThat(fetchNodesUpdate).isNull()
                 assertThat(isFirstTime).isFalse()
                 assertThat(isAlreadyLoggedIn).isTrue()
                 assertThat(pressedBackWhileLogin).isFalse()
@@ -518,30 +501,7 @@ internal class LoginViewModelTest {
         verify(getHistoricalProcessExitReasonsUseCase).invoke()
     }
 
-    @Test
-    fun `test that requestStatusProgress is updated when event is received`() = runTest {
-        val newProgress = 0.5f
-        requestStatusProgressFakeFlow.emit(Progress(newProgress))
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.requestStatusProgress?.floatValue).isEqualTo(newProgress)
-        }
-    }
-
-    @Test
-    fun `test that requestStatusProgress is set to null when exception is thrown`() = runTest {
-        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
-            flow {
-                throw MegaException(1, "error")
-            }
-        )
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.requestStatusProgress).isNull()
-        }
-    }
-
-    @Test
+@Test
     fun `test that resend Verification Email UseCase should be triggered when resend email is clicked`() =
         runTest {
             underTest.resendVerificationEmail()
@@ -589,30 +549,6 @@ internal class LoginViewModelTest {
         advanceUntilIdle()
         verify(resumeCreateAccountUseCase).invoke("session")
     }
-
-    @Test
-    fun `test that loginFailed with LoginLoggedOutFromOtherLocation then fetchNodesUpdate is null`() =
-        runTest {
-            whenever(fastLoginUseCase(any(), any(), any())).thenThrow(
-                LoginLoggedOutFromOtherLocation()
-            )
-            whenever(getAccountCredentialsUseCase()).thenReturn(
-                UserCredentials(
-                    email = "email",
-                    session = "session",
-                    firstName = "firstName",
-                    lastName = "lastName",
-                    myHandle = "myHandle"
-                )
-            )
-            underTest.fastLogin(false)
-            advanceUntilIdle()
-            underTest.state.test {
-                val item = awaitItem()
-                assertThat(item.fetchNodesUpdate).isNull()
-                assertThat(item.isLoginInProgress).isFalse()
-            }
-        }
 
     @Test
     fun `test that checkRecoveryKey triggers success event when use case succeeds`() = runTest {
