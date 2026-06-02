@@ -20,11 +20,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.barteksc.pdfviewer.PDFView
-import mega.android.core.ui.theme.notificationsColor
 import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.theme.notificationsColor
 import mega.android.core.ui.theme.supportColor
-import mega.android.core.ui.theme.values.NotificationsColor
 import mega.android.core.ui.theme.surfaceColor
+import mega.android.core.ui.theme.values.NotificationsColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
@@ -50,6 +50,8 @@ import java.io.File
  * @param onLoadComplete Callback when PDF finishes loading
  * @param onError Callback when an error occurs
  * @param onTap Callback when the PDF is tapped (for toggling toolbar)
+ * @param onChromeVisibilityChange Toggles the chrome based on scroll position (hidden away from
+ *        the top); suppressed during scrub/zoom.
  * @param modifier Modifier for the composable
  */
 @Composable
@@ -67,6 +69,7 @@ internal fun PdfViewerContent(
     onLoadComplete: (Int) -> Unit,
     onError: (PdfViewerError) -> Unit,
     onTap: () -> Unit,
+    onChromeVisibilityChange: (visible: Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Keep reference to prevent recreation
@@ -89,6 +92,14 @@ internal fun PdfViewerContent(
 
     // Track source identity to detect document changes requiring full reload
     val lastSourceSignature = remember { mutableStateOf<String?>(null) }
+
+    // Refs let the load-time onPageScroll closure read the latest callback / scrub state.
+    val scrollToHideBehavior = rememberPdfScrollToHideBehavior()
+    val onChromeVisibilityRef = remember { mutableStateOf(onChromeVisibilityChange) }
+    val scrubbingRef = remember { mutableStateOf(false) }
+    // Swallows the library's initial jumpTo(defaultPage) scroll so opening on a restored page
+    // doesn't hide the chrome before any user scroll. Re-armed on every (re)load.
+    val awaitingInitialPositionRef = remember { mutableStateOf(true) }
 
     // Paint for the currently-selected match (brighter) and all other matches (lighter).
     // Keyed on their respective colors so they update on theme changes.
@@ -131,6 +142,9 @@ internal fun PdfViewerContent(
             highlightRectsRef.value = highlightPdfRects
             allMatchRectsByPageRef.value = allMatchRectsByPage
 
+            onChromeVisibilityRef.value = onChromeVisibilityChange
+            scrubbingRef.value = isScrubPressed || scrubProgress != null
+
             // Trigger redraw when current-match highlights change
             if (highlightPdfRects !== lastHighlightIdentity.value) {
                 lastHighlightIdentity.value = highlightPdfRects
@@ -170,6 +184,8 @@ internal fun PdfViewerContent(
                 return@AndroidView
             }
             lastSourceSignature.value = currentSignature
+            // Re-arm the initial-scroll swallow for the upcoming load.
+            awaitingInitialPositionRef.value = true
 
             // Determine source - bytes take precedence (for encrypted/linked files)
             val config = when {
@@ -186,6 +202,16 @@ internal fun PdfViewerContent(
                 .onPageChange { page, pageCount ->
                     // page is 0-indexed from library, convert to 1-indexed
                     onPageChanged(page + 1, pageCount)
+                }
+                .onPageScroll { _, _ ->
+                    if (awaitingInitialPositionRef.value) {
+                        awaitingInitialPositionRef.value = false
+                        return@onPageScroll
+                    }
+                    val atTop = !pdfView.canScrollVertically(-1)
+                    val suppressed = scrubbingRef.value || pdfView.isZooming
+                    scrollToHideBehavior.onScroll(atTop, suppressed)
+                        ?.let { visible -> onChromeVisibilityRef.value(visible) }
                 }
                 .onLoad { pageCount ->
                     Timber.d("PDF loaded with $pageCount pages")

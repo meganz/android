@@ -46,6 +46,9 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     private boolean scaling = false;
     private boolean enabled = false;
 
+    // A tap that halted a fling should only stop the fling, not be reported as a UI tap.
+    private boolean stoppedFlingWithTouch = false;
+
     DragPinchManager(PDFView pdfView, AnimationManager animationManager) {
         this.pdfView = pdfView;
         this.animationManager = animationManager;
@@ -66,6 +69,13 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     public boolean onSingleTapConfirmed(MotionEvent e) {
         // Ignore taps on recycled or null PDFView
         if (pdfView == null || pdfView.isRecycled() || pdfView.pdfFile == null) {
+            return true;
+        }
+
+        boolean consumedToStopFling = stoppedFlingWithTouch;
+        stoppedFlingWithTouch = false;
+        if (consumedToStopFling) {
+            pdfView.performClick();
             return true;
         }
 
@@ -134,6 +144,8 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
 
     @Override
     public boolean onDown(MotionEvent e) {
+        // Capture before stopFling() clears it.
+        stoppedFlingWithTouch = animationManager.isFlinging();
         animationManager.stopFling();
         return true;
     }
