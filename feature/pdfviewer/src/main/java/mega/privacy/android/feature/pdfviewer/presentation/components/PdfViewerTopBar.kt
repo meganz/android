@@ -11,10 +11,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 
 /**
- * Top app bar for the PDF Viewer.
- *
- * Always visible at the top of the screen with the PDF content below it.
- * The [onSearch] icon triggers search mode.
+ * Top app bar for the PDF Viewer. Overlays the page; toggled by tapping the document.
  *
  * @param title The title to display (file name)
  * @param onBack Callback for back navigation

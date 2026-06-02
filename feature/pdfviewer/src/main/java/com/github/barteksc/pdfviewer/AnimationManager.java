@@ -116,6 +116,10 @@ class AnimationManager {
         scroller.forceFinished(true);
     }
 
+    public boolean isFlinging() {
+        return flinging;
+    }
+
     class XAnimation implements AnimatorUpdateListener {
 
         @Override

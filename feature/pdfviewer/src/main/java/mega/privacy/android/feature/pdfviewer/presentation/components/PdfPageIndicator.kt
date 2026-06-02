@@ -131,7 +131,9 @@ private fun PdfPageIndicatorContent(
         label = "pdfPageIndicatorY",
     )
 
-    val visible = isVisible || state.isPressed
+    // Wait for track measurement; otherwise the first frame computes against trackHeightPx==0
+    // and visibly snaps into position when restoring a page far from the top.
+    val visible = (isVisible || state.isPressed) && hasCompletedInitialTrackPlacement
 
     Box(
         modifier = modifier

@@ -18,12 +18,8 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Bottom bar shown in the scaffold's bottomBar slot when the PDF was opened from an
- * external intent (file explorer, browser, share menu). Exposes a single primary action
- * for uploading the file to the user's Cloud drive.
- *
- * Because the host scaffold reserves space for this composable, no IME / overlay padding
- * tricks are needed here — the PDF content sits above the bar instead of underneath it.
+ * Bottom bar shown when the PDF was opened from an external intent. Exposes the upload-to-Cloud
+ * action. Overlays the page and applies its own [navigationBarsPadding].
  *
  * @param onUploadToCloudDrive Callback invoked when the upload button is pressed
  * @param modifier Modifier for the composable

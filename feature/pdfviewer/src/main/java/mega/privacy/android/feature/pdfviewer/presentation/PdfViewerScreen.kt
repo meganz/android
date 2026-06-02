@@ -1,6 +1,12 @@
 package mega.privacy.android.feature.pdfviewer.presentation
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +23,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import kotlinx.coroutines.delay
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
@@ -153,6 +164,34 @@ internal fun PdfViewerScreen(
             && bottomBarActions.isNotEmpty()
             && uiState.currentNode != null
 
+    // Toggled by tapping the document while reading. Starts visible.
+    var chromeVisible by rememberSaveable { mutableStateOf(true) }
+
+    // Hide system bars with the chrome; swipe restores them transiently.
+    val view = LocalView.current
+    val activity = LocalActivity.current
+    LaunchedEffect(chromeVisible, activity, view) {
+        val window = activity?.window ?: return@LaunchedEffect
+        WindowCompat.getInsetsController(window, view).apply {
+            systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            if (chromeVisible) {
+                show(WindowInsetsCompat.Type.systemBars())
+            } else {
+                hide(WindowInsetsCompat.Type.systemBars())
+            }
+        }
+    }
+    // Restore system bars on exit so the next screen isn't left immersive.
+    DisposableEffect(activity, view) {
+        onDispose {
+            activity?.window?.let { window ->
+                WindowCompat.getInsetsController(window, view)
+                    .show(WindowInsetsCompat.Type.systemBars())
+            }
+        }
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         MegaScaffoldWithTopAppBarScrollBehavior(
             modifier = Modifier.fillMaxSize(),
@@ -166,45 +205,54 @@ internal fun PdfViewerScreen(
                             modifier = Modifier.fillMaxWidth(),
                         )
                     } else {
-                        PdfViewerTopBar(
-                            title = uiState.title,
-                            onBack = onBack,
-                            onSearch = onActivateSearch,
-                            onOpenNodeOptions = onMoreClicked,
-                            showMoreAction = !uiState.isExternalFile,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        AnimatedVisibility(
+                            visible = chromeVisible,
+                            enter = slideInVertically { -it } + fadeIn(),
+                            exit = slideOutVertically { -it } + fadeOut(),
+                        ) {
+                            PdfViewerTopBar(
+                                title = uiState.title,
+                                onBack = onBack,
+                                onSearch = onActivateSearch,
+                                onOpenNodeOptions = onMoreClicked,
+                                showMoreAction = !uiState.isExternalFile,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                     }
                 }
             },
             bottomBar = {
-                // Using the scaffold's bottomBar slot (instead of a floating overlay inside
-                // the content Box) reserves layout space so PdfViewerContent renders above
-                // the button instead of being covered by it.
                 if (uiState.isExternalFile && !searchState.isSearchActive) {
-                    ExternalFileBottomBar(onUploadToCloudDrive = onUploadToCloudDrive)
+                    AnimatedVisibility(
+                        visible = chromeVisible,
+                        enter = slideInVertically { it } + fadeIn(),
+                        exit = slideOutVertically { it } + fadeOut(),
+                    ) {
+                        ExternalFileBottomBar(onUploadToCloudDrive = onUploadToCloudDrive)
+                    }
                 } else {
-                    // Floating toolbar (Download / Get Link / Share / Trash). Mirrors how
-                    // Cloud Drive hosts NodeSelectionModeBottomBar in the Scaffold's
-                    // bottomBar slot so AnimatedVisibility can slide it from the bottom.
-                    SelectionModeBottomBar(
-                        visible = showFloatingToolbar,
-                        actions = bottomBarActions,
-                        onActionPressed = { action ->
-                            uiState.currentNode?.let { node ->
-                                singleNodeActionHandler(action, node)
-                            }
-                        },
-                    )
+                    AnimatedVisibility(
+                        visible = chromeVisible,
+                        enter = slideInVertically { it } + fadeIn(),
+                        exit = slideOutVertically { it } + fadeOut(),
+                    ) {
+                        SelectionModeBottomBar(
+                            visible = showFloatingToolbar,
+                            actions = bottomBarActions,
+                            onActionPressed = { action ->
+                                uiState.currentNode?.let { node ->
+                                    singleNodeActionHandler(action, node)
+                                }
+                            },
+                        )
+                    }
                 }
             },
             content = { innerPadding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
+                Box(modifier = Modifier.fillMaxSize()) {
 
+                    // PDF deliberately ignores innerPadding so the page doesn't resize/jump when chrome toggles.
                     when {
                         showLoading -> {
                             InfiniteProgressBarIndicator(
@@ -240,35 +288,53 @@ internal fun PdfViewerScreen(
                                 onPageChanged = onPageChanged,
                                 onLoadComplete = onLoadComplete,
                                 onError = onError,
-                                onTap = { /* toolbar is always visible */ },
+                                // Suppressed during search so a tap doesn't pull the search bar away.
+                                onTap = {
+                                    if (!searchState.isSearchActive) {
+                                        chromeVisible = !chromeVisible
+                                    }
+                                },
+                                // Suppressed during search so the search bar stays put.
+                                onChromeVisibilityChange = { visible ->
+                                    if (!searchState.isSearchActive) {
+                                        chromeVisible = visible
+                                    }
+                                },
                                 modifier = Modifier.fillMaxSize(),
                             )
                         }
                     }
 
-                    // Fast-scroll page indicator — draggable thumb on the right edge that
-                    // also reflects the current scroll position of the document.
-                    if (currentPage != null) {
-                        PdfPageIndicator(
-                            currentPage = currentPage,
-                            totalPages = uiState.totalPages,
-                            // scrubProgress != null / isScrubPressed guard the race window where the
-                            // auto-hide timer fires (e.g. jump to next search result) before
-                            // LaunchedEffect re-runs when a press or drag begins.
-                            isVisible = indicatorVisible || scrubProgress != null || isScrubPressed,
-                            onScrub = { scrubProgress = it },
-                            onScrubPressed = { isScrubPressed = it },
-                        )
-                    }
+                    // Overlays use innerPadding so they stay clear of chrome / system bars.
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    ) {
+                        // Fast-scroll page indicator — draggable thumb on the right edge that
+                        // also reflects the current scroll position of the document.
+                        if (currentPage != null) {
+                            PdfPageIndicator(
+                                currentPage = currentPage,
+                                totalPages = uiState.totalPages,
+                                // scrubProgress != null / isScrubPressed guard the race window where the
+                                // auto-hide timer fires (e.g. jump to next search result) before
+                                // LaunchedEffect re-runs when a press or drag begins.
+                                isVisible = indicatorVisible || scrubProgress != null || isScrubPressed,
+                                onScrub = { scrubProgress = it },
+                                onScrubPressed = { isScrubPressed = it },
+                            )
+                        }
 
-                    // Floating search results bar (bottom-center)
-                    if (searchState.isSearchActive && searchState.hasResults) {
-                        PdfSearchResultsBar(
-                            label = uiState.searchState.label,
-                            onPrev = onNavigateToPreviousMatch,
-                            onNext = onNavigateToNextMatch,
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                        )
+                        // Floating search results bar (bottom-center)
+                        if (searchState.isSearchActive && searchState.hasResults) {
+                            PdfSearchResultsBar(
+                                label = uiState.searchState.label,
+                                onPrev = onNavigateToPreviousMatch,
+                                onNext = onNavigateToNextMatch,
+                                modifier = Modifier.align(Alignment.BottomCenter),
+                            )
+                        }
                     }
                 }
             }
