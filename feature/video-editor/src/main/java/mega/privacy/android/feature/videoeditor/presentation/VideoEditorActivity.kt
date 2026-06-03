@@ -26,18 +26,22 @@ class VideoEditorActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
 
+        val nodeHandle = intent.getLongExtra(EXTRA_NODE_HANDLE, INVALID_NODE_HANDLE)
+
         setContentView(
             appContainerProvider.buildSharedAppContainer(
                 context = this,
                 useLegacyStatusBarColor = false,
                 includePsa = false,
             ) {
-                VideoEditorScreen()
+                VideoEditorRoute(nodeHandle = nodeHandle)
             }
         )
     }
 
     companion object {
+        private const val INVALID_NODE_HANDLE = -1L
+
         /**
          * Extra carrying the MEGA node handle of the video to edit.
          */

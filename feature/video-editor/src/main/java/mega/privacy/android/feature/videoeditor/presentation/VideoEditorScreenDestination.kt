@@ -10,7 +10,7 @@ fun EntryProviderScope<NavKey>.videoEditorScreen(
     navigationHandler: NavigationHandler,
     transferHandler: TransferHandler,
 ) {
-    entry<VideoEditorScreenNavKey> {
-        VideoEditorScreen()
+    entry<VideoEditorScreenNavKey> { navKey ->
+        VideoEditorRoute(nodeHandle = navKey.nodeHandle)
     }
 }

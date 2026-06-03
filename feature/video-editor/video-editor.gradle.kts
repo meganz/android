@@ -27,10 +27,13 @@ dependencies {
     implementation(project(":resources:string-resources"))
 
     implementation(lib.mega.core.ui)
+    implementation(lib.logging.timber)
 
     implementation(androidx.appcompat)
     implementation(androidx.compose.activity)
     implementation(androidx.hilt.navigation)
+    implementation(androidx.lifecycle.viewmodel)
+    implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.navigation3.runtime)
     implementation(androidx.navigation3.ui)
 
