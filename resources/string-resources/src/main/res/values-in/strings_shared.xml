@@ -2315,7 +2315,7 @@
     <string name="home_widget_viewed_links_clear_history_dialog_message">Anda yakin ingin menghapus semua riwayat tautan yang telah dilihat? Ini tidak bisa dibatalkan.</string>
     <string name="home_widget_viewed_links_clear_history_success_message">Riwayat tautan yang telah dilihat telah dihapus</string>
     <string name="home_widget_viewed_links_empty_state">Tautan yang telah dilihat akan muncul di sini</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% mati</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% diskon</string>
     <string name="general_new_link">Tautan baru</string>
     <string name="general_error_incorrect_name">Perbaiki nama berkas Anda sebelum melanjutkan</string>
     <string name="general_destination">Tujuan</string>

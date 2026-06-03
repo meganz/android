@@ -2379,7 +2379,7 @@
     <string name="general_file_name">檔案名稱</string>
     <string name="general_error_invalid_name">無效的名稱</string>
     <string name="general_file_type">檔案類型</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% 關閉</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% 折扣</string>
     <string name="general_error_incorrect_name">在繼續之前，請先修正您的檔案名稱</string>
     <string name="general_destination">目的地</string>
     <string name="video_player_more_options_pip_option">子母畫面</string>

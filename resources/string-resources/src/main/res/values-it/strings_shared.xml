@@ -2129,7 +2129,7 @@
     </plurals>
     <string name="general_title_incoming_shares">Condivisioni in arrivo</string>
     <string name="pdf_viewer_error_no_network">Nessuna connessione. Per favore, connettiti per aprire il file.</string>
-    <string name="open_link_dialog_hint">Incolla link</string>
+    <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
     <string name="open_link_dialog_title">Apri link</string>
     <plurals name="num_of_folders_num_of_files">
         <item quantity="one">%d cartella&#160;·&#160;</item>
@@ -2405,9 +2405,9 @@
     <string name="video_player_more_options_lock_option">Blocca il lettore video</string>
     <string name="video_section_add_to_playlist_success">Aggiunto 1 elemento a “%1$s”</string>
     <plurals name="video_section_add_to_playlists_success">
-        <item quantity="one">Aggiunto 1 elemento alla playlist %1$d</item>
-        <item quantity="many"></item>
-        <item quantity="other">Aggiunto 1 elemento alle playlist %1$d</item>
+        <item quantity="one">1 elemento aggiunto alla playlist %1$d</item>
+        <item quantity="many">1 elemento aggiunto a %1$d di playlist</item>
+        <item quantity="other">1 elemento aggiunto a %1$d playlist</item>
     </plurals>
     <string name="rewarded_ad_dialog_title">Continua dopo la pubblicità</string>
     <string name="rewarded_ad_dialog_watch_ad_button">Guarda la pubblicità</string>
@@ -2497,7 +2497,7 @@
     <string name="more_options">Altre opzioni</string>
     <plurals name="viewed_links_remove_selected_links_dialog_title">
         <item quantity="one">Rimuovere il link visualizzato?</item>
-        <item quantity="many"></item>
+        <item quantity="many">Rimuovere i link visualizzati?</item>
         <item quantity="other">Rimuovere i link visualizzati?</item>
     </plurals>
     <string name="google_sign_in">Accedi con Google</string>
@@ -2507,40 +2507,46 @@
     <string name="general_chat_sent_as_message">Inviato come messaggio</string>
     <string name="video_player_subtitles_empty_hint_description">Carica i sottotitoli in formato SRT sul tuo Cloud Drive</string>
     <string name="video_player_subtitles_add_subtitles_button">Aggiungi sottotitolo</string>
-    <string name="home_cwlo_empty_state">Gli elementi che hai lasciato incompleti appariranno qui.</string>
+    <string name="home_cwlo_empty_state">Gli elementi che hai lasciato incompleti appariranno qui</string>
     <string name="home_widget_viewed_links_clear_history">Svuota la cronologia dei collegamenti visualizzati</string>
     <string name="home_widget_viewed_links_clear_history_dialog_message">Sei sicuro di voler cancellare tutta la cronologia dei collegamenti visualizzati? Questo non può essere annullato.</string>
-    <string name="home_widget_viewed_links_clear_history_success_message">La cronologia dei collegamenti visualizzati è stata cancellata.</string>
-    <string name="home_widget_viewed_links_empty_state">I collegamenti visualizzati appariranno qui.</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% spento</string>
+    <string name="home_widget_viewed_links_clear_history_success_message">La cronologia dei link visualizzati è stata cancellata</string>
+    <string name="home_widget_viewed_links_empty_state">I link visualizzati appariranno qui</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% di sconto</string>
     <string name="general_new_link">Nuovo link</string>
     <string name="general_error_incorrect_name">Correggi il nome del file prima di procedere</string>
     <string name="general_destination">Destinazione</string>
     <string name="video_player_more_options_pip_option">Immagine in immagine</string>
-    <string name="folder_link_guest_banner_title">Salva nel tuo cloud MEGA.</string>
+    <string name="folder_link_guest_banner_title">Salva nel tuo cloud MEGA</string>
     <string name="folder_link_guest_banner_description">Non perdere questo link. Crea un account gratuito per salvare questa cartella e accedervi in qualsiasi momento.</string>
     <string name="folder_link_guest_banner_create_account">Crea un account gratuito</string>
     <string name="folder_link_guest_banner_dismiss_content_description">Chiudi banner</string>
     <string name="home_configuration_tooltip_description">Scegli cosa vedere e organizza questo per adattarlo alle tue esigenze</string>
     <string name="home_configuration_tooltip_action">Esplora</string>
     <string name="error_fail_to_play_video_title">Impossibile riprodurre il video</string>
-    <string name="error_fail_to_play_video_message">Mi dispiace. Si è verificato un problema e non siamo in grado di aprire il file</string>
-    <string name="error_file_not_supported_message">Scarica questo file per aprirlo in un\’app compatibile</string>
-    <string name="error_no_internet_message">Impossibile aprire il file a causa di problemi di connettività. Controlla la tua connessione Internet e riprova</string>
+    <string name="error_fail_to_play_video_message">Mi dispiace. Qualcosa è andato storto e non siamo in grado di aprire il file.</string>
+    <string name="error_file_not_supported_message">Scarica questo file per aprirlo in un\’app compatibile.</string>
+    <string name="error_no_internet_message">Impossibile aprire il file a causa di problemi di connessione. Controlla la tua connessione Internet e riprova.</string>
     <string name="chat_explorer_all_contacts_header">Tutti i contatti, le chat e le riunioni</string>
     <string name="chat_explorer_read_only_chat_warning">Questa conversazione è di sola lettura</string>
     <string name="contacts_empty_title">Nessun contatto trovato</string>
     <plurals name="general_number_participants">
         <item quantity="one">%1$d partecipante</item>
-        <item quantity="many"></item>
+        <item quantity="many">%1$d di partecipanti</item>
         <item quantity="other">%1$d partecipanti</item>
     </plurals>
     <string name="home_configuration_screen_toolbar_title">Personalizza la Home</string>
     <string name="home_configuration_screen_toolbar_subtitle">Trascina le sezioni per riordinarle</string>
     <string name="home_configuration_screen_menu_reset_to_default">Ripristina predefinito</string>
-    <string name="home_configuration_screen_menu_choose_default_start_screen">Scegli la schermata iniziale predefinita.</string>
-    <string name="name_collision_choose_folder_header">Seleziona la cartella che vuoi conservare.</string>
+    <string name="home_configuration_screen_menu_choose_default_start_screen">Scegli la schermata iniziale predefinita</string>
+    <string name="name_collision_choose_folder_header">Seleziona la cartella che vuoi conservare</string>
     <string name="name_collision_folder_warning_upload_and_rename">La cartella che stai caricando verrà rinominata in:</string>
-    <string name="home_configuration_widget_removal_not_allowed_message">È richiesta almeno una sezione iniziale.</string>
+    <string name="home_configuration_widget_removal_not_allowed_message">È richiesta almeno una sezione iniziale</string>
     <string name="file_link_unavaible_ToS_violation">Il link del file è stato rimosso in quanto violava i nostri Termini di servizio.</string>
+    <string name="cloud_drive_inactivity_banner_title">Il tuo account è rimasto inattivo per troppo a lungo</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one">Dato che non effettui l\’acceso da più di %1$d mese, i tuoi file sono stati rimossi come da nostra politica riguardo l’inattività</item>
+        <item quantity="many">Dato che non effettui l\’acceso da più di %1$d di mesi, i tuoi file sono stati rimossi come da nostra politica riguardo l’inattività</item>
+        <item quantity="other">Dato che non effettui l\’acceso da più di %1$d mesi, i tuoi file sono stati rimossi come da nostra politica riguardo l’inattività</item>
+    </plurals>
 </resources>

@@ -2630,7 +2630,7 @@
     <string name="google_sign_in_email_exists">У этого адреса электронной почты уже есть учетная запись. Войдите по паролю.</string>
     <string name="favourite_folders_empty_screen_description">Добавляйте папки в Избранное, чтобы видеть их здесь.</string>
     <string name="general_chat_sent_as_message">Отправлено как сообщение.</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% выключено</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% скидки</string>
     <string name="general_new_link">Новая ссылка</string>
     <string name="general_error_incorrect_name">Исправьте имя файла перед продолжением.</string>
     <string name="general_destination">Пункт назначения</string>

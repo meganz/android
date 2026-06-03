@@ -2647,7 +2647,7 @@
     <string name="general_file_name">Nazwa pliku</string>
     <string name="general_error_invalid_name">Nieprawidłowa nazwa</string>
     <string name="general_file_type">Typ pliku</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% wyłączone</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% zniżki</string>
     <string name="general_error_incorrect_name">Popraw nazwę pliku przed kontynuowaniem</string>
     <string name="general_destination">Miejsce docelowe</string>
     <string name="video_player_more_options_pip_option">Obraz w obrazie</string>
