@@ -23,8 +23,6 @@ import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
@@ -50,10 +48,7 @@ class ContactFileListViewModel @Inject constructor(
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
     private val scannerHandler: ScannerHandler,
-    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
-    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(ContactFileListUiState())
 
     /**
@@ -163,9 +158,6 @@ class ContactFileListViewModel @Inject constructor(
     private suspend fun moveNodes(nodes: Map<Long, Long>) {
         val result = runCatching {
             moveNodesUseCase(nodes)
-        }.onSuccess {
-            runCatching { setMoveLatestTargetPathUseCase(nodes.values.first()) }
-                .onFailure { Timber.e(it) }
         }.onFailure { Timber.e(it) }
         _state.update { state -> state.copy(moveRequestResult = result) }
     }
@@ -173,9 +165,6 @@ class ContactFileListViewModel @Inject constructor(
     private suspend fun copyNodes(nodes: Map<Long, Long>) {
         val result = runCatching {
             copyNodesUseCase(nodes)
-        }.onSuccess {
-            runCatching { setCopyLatestTargetPathUseCase(nodes.values.first()) }
-                .onFailure { Timber.e(it) }
         }.onFailure { Timber.e(it) }
         _state.update {
             it.copy(moveRequestResult = result, copyMoveAlertTextId = null)

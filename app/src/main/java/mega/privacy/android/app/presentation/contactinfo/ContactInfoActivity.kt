@@ -37,7 +37,6 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,8 +49,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
-import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
-import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
@@ -107,9 +104,6 @@ import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.navigation.destination.CopyNavKey
-import mega.privacy.android.navigation.destination.CopyResult
-import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -165,9 +159,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     @Inject
     lateinit var navigator: MegaNavigator
-
-    @Inject
-    lateinit var navigationResultManager: NavigationResultManager
 
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
@@ -386,43 +377,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             Timber.w("Extras is NULL")
         }
         collectFlows()
-        collectShareFilesToChatResult()
-        collectCopyResult()
-    }
-
-    private fun collectShareFilesToChatResult() {
-        LegacyOverlayDialogFragment.collectResultAndDismiss<List<NodeId>>(
-            fragmentManager = supportFragmentManager,
-            scope = lifecycleScope,
-            lifecycle = lifecycle,
-            navigationResultManager = navigationResultManager,
-            resultKey = ShareFilesToChatNavKey.RESULT,
-        ) { ids ->
-            if (ids.isNotEmpty()) {
-                viewModel.userEmail?.let { email ->
-                    viewModel.onShareFilesToChatResult()
-                    nodeAttachmentViewModel.attachNodesToChatByEmail(
-                        nodeIds = ids,
-                        email = email,
-                    )
-                }
-            }
-        }
-    }
-
-    private fun collectCopyResult() {
-        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
-            fragmentManager = supportFragmentManager,
-            scope = lifecycleScope,
-            lifecycle = lifecycle,
-            navigationResultManager = navigationResultManager,
-            resultKey = CopyNavKey.RESULT,
-        ) { result ->
-            actionConfirmed()
-            viewModel.checkCopyNameCollision(
-                handles = result.sourceHandles.toLongArray() to result.target.longValue,
-            )
-        }
     }
 
     private fun configureActivityLaunchers() {
@@ -878,16 +832,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             Timber.w("Selected contact NULL")
             return
         }
-        if (viewModel.uiState.value.isCloudExplorerAvailable) {
-            LegacyOverlayDialogFragment.show(
-                fragmentManager = supportFragmentManager,
-                initialKey = ShareFilesToChatNavKey(
-                    chatId = viewModel.chatId ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
-                ),
-            )
-        } else {
-            selectFileResultLauncher.launch(email)
-        }
+        selectFileResultLauncher.launch(email)
     }
 
     /**
@@ -1463,14 +1408,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     fun showCopy(handleList: ArrayList<Long>) {
         val handles = handleList.toLongArray()
-        if (viewModel.uiState.value.isCloudExplorerAvailable) {
-            LegacyOverlayDialogFragment.show(
-                fragmentManager = supportFragmentManager,
-                initialKey = CopyNavKey(sourceHandles = handles.toList()),
-            )
-        } else {
-            selectFolderToCopyLauncher.launch(handles)
-        }
+        selectFolderToCopyLauncher.launch(handles)
     }
 
     private fun setFoldersButtonText(nodes: List<UnTypedNode>) {

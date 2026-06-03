@@ -70,8 +70,6 @@ import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.business.IsBusinessAccountActiveUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -208,8 +206,6 @@ class FileInfoViewModel @Inject constructor(
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
     private val contactItemStatusMapper: ContactItemStatusMapper,
     private val contactPermissionUiStateMapper: ContactPermissionUiStateMapper,
-    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
-    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -401,10 +397,6 @@ class FileInfoViewModel @Inject constructor(
                     )
                     return@performBlockSettingProgress null
                 }
-                if (it.moveRequestResult?.isSuccess == true) {
-                    runCatching { setMoveLatestTargetPathUseCase(parentHandle.longValue) }
-                        .onFailure { e -> Timber.e(e) }
-                }
             }
         }
 
@@ -431,10 +423,6 @@ class FileInfoViewModel @Inject constructor(
                         FileInfoOneOffViewEvent.CollisionDetected(collision)
                     )
                     return@performBlockSettingProgress null
-                }
-                if (it.moveRequestResult?.isSuccess == true) {
-                    runCatching { setCopyLatestTargetPathUseCase(parentHandle.longValue) }
-                        .onFailure { e -> Timber.e(e) }
                 }
             }
         }

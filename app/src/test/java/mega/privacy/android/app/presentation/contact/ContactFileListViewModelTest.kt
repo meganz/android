@@ -105,8 +105,6 @@ internal class ContactFileListViewModelTest {
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
             filePrepareUseCase = filePrepareUseCase,
             scannerHandler = scannerHandler,
-            setCopyLatestTargetPathUseCase = mock(),
-            setMoveLatestTargetPathUseCase = mock(),
         )
     }
 

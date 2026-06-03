@@ -38,13 +38,6 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
-import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
-import mega.privacy.android.navigation.destination.CopyNavKey
-import mega.privacy.android.navigation.destination.CopyResult
-import mega.privacy.android.navigation.destination.MoveNavKey
-import mega.privacy.android.navigation.destination.MoveResult
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -143,11 +136,6 @@ class ImagePreviewActivity : BaseActivity() {
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
 
-    @Inject
-    lateinit var navigationResultManager: NavigationResultManager
-
-    private var isCloudExplorerAvailable = false
-
     private val selectMoveFolderLauncher: ActivityResultLauncher<LongArray> =
         registerForActivityResult(
             SelectFolderToMoveActivityContract(),
@@ -197,7 +185,6 @@ class ImagePreviewActivity : BaseActivity() {
         setupImmersiveMode()
         super.onCreate(savedInstanceState)
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
-        setupCloudExplorer()
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val snackbarHostState: SnackbarHostState = remember {
@@ -585,51 +572,11 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun moveNode(imageNode: ImageNode) {
-        if (isCloudExplorerAvailable) {
-            LegacyOverlayDialogFragment.show(
-                fragmentManager = supportFragmentManager,
-                initialKey = MoveNavKey(sourceHandles = listOf(imageNode.id.longValue)),
-            )
-        } else {
-            selectMoveFolderLauncher.launch(longArrayOf(imageNode.id.longValue))
-        }
-    }
-
-    private fun setupCloudExplorer() {
-        lifecycleScope.launch {
-            isCloudExplorerAvailable = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
-            }.getOrDefault(false)
-        }
-        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
-            fragmentManager = supportFragmentManager,
-            scope = lifecycleScope,
-            lifecycle = lifecycle,
-            navigationResultManager = navigationResultManager,
-            resultKey = CopyNavKey.RESULT,
-        ) { result ->
-            viewModel.copyCurrentNodeTo(context = this, newParentHandle = result.target.longValue)
-        }
-        LegacyOverlayDialogFragment.collectResultAndDismiss<MoveResult>(
-            fragmentManager = supportFragmentManager,
-            scope = lifecycleScope,
-            lifecycle = lifecycle,
-            navigationResultManager = navigationResultManager,
-            resultKey = MoveNavKey.RESULT,
-        ) { result ->
-            viewModel.moveCurrentNodeTo(context = this, newParentHandle = result.target.longValue)
-        }
+        selectMoveFolderLauncher.launch(longArrayOf(imageNode.id.longValue))
     }
 
     private fun copyNode(imageNode: ImageNode) {
-        if (isCloudExplorerAvailable) {
-            LegacyOverlayDialogFragment.show(
-                fragmentManager = supportFragmentManager,
-                initialKey = CopyNavKey(sourceHandles = listOf(imageNode.id.longValue)),
-            )
-        } else {
-            selectCopyFolderLauncher.launch(longArrayOf(imageNode.id.longValue))
-        }
+        selectCopyFolderLauncher.launch(longArrayOf(imageNode.id.longValue))
     }
 
     private fun restoreNode(imageNode: ImageNode) {

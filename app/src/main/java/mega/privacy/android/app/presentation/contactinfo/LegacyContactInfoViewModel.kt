@@ -67,7 +67,6 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -189,16 +188,6 @@ class LegacyContactInfoViewModel @Inject constructor(
         monitorChatOnlineStatusUpdates()
         monitorChatPresenceGreenUpdates()
         monitorChatConnectionStateUpdates()
-        loadCloudExplorerFeatureFlag()
-    }
-
-    private fun loadCloudExplorerFeatureFlag() {
-        viewModelScope.launch {
-            val enabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
-            }.onFailure { Timber.e(it) }.getOrDefault(false)
-            _uiState.update { it.copy(isCloudExplorerAvailable = enabled) }
-        }
     }
 
     /**

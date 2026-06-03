@@ -2,6 +2,7 @@ package mega.privacy.android.app.main
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,9 +10,11 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,13 +24,17 @@ import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.appcompat.widget.SearchView
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation3.runtime.NavKey
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -41,6 +48,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -55,6 +63,8 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.appstate.MegaActivityInternalLauncher
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
@@ -88,6 +98,7 @@ import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
 import mega.privacy.android.app.menu.presentation.MenuHomeScreen
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
+import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -108,12 +119,14 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -129,12 +142,21 @@ import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
+import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
+import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
+import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 import mega.privacy.android.shared.nodes.dialog.DiscardScanWarningDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -228,6 +250,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var chatController: ChatController
+
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
+
+    @Inject
+    lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
 
     private val viewModel by viewModels<FileExplorerViewModel>()
 
@@ -813,13 +844,24 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             .distinctUntilChanged()) { isEnabled ->
             isEnabled?.let {
                 if (isEnabled) {
-                    intent.setClass(
-                        this@FileExplorerActivity,
-                        MegaActivity::class.java
-                    ).also {
-                        startActivity(it)
+                    val cloudExplorerKey = cloudExplorerInitialKey()
+
+                    when {
+                        intent.action == Intent.ACTION_SEND ||
+                                intent.action == Intent.ACTION_SEND_MULTIPLE -> {
+                            intent.setClass(
+                                this@FileExplorerActivity,
+                                MegaActivity::class.java
+                            ).also {
+                                startActivity(it)
+                            }
+                            finish()
+                        }
+
+                        cloudExplorerKey != null -> showCloudExplorer(cloudExplorerKey)
+
+                        else -> proceedWithInitialization(savedInstanceState)
                     }
-                    finish()
                 } else {
                     proceedWithInitialization(savedInstanceState)
                 }
@@ -838,6 +880,128 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             if (it != null) {
                 setView(SHOW_TABS, true)
                 viewModel.resetMoveTargetPathState()
+            }
+        }
+    }
+
+    /**
+     * Maps the launching intent action to the matching `:feature:cloudexplorer` destination, or null
+     * when the action has no compose destination (then the legacy fragment UI is used).
+     */
+    private fun cloudExplorerInitialKey(): NavKey? = when (intent.action) {
+        ACTION_PICK_COPY_FOLDER ->
+            CopyNavKey(sourceHandles = intent.getLongArrayExtra("COPY_FROM")?.toList().orEmpty())
+
+        ACTION_PICK_MOVE_FOLDER ->
+            MoveNavKey(sourceHandles = intent.getLongArrayExtra("MOVE_FROM")?.toList().orEmpty())
+
+        ACTION_CHOOSE_MEGA_FOLDER_SYNC -> SelectCUFolderNavKey
+
+        ACTION_MULTISELECT_FILE ->
+            ShareFilesToChatNavKey(chatId = MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+
+        ACTION_UPLOAD_SCAN_TO_CLOUD ->
+            IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
+                ?.let { uri ->
+                    UploadScannedDocumentNavKey(
+                        uriPath = uri.toUriPath(),
+                        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                        hasMultipleScans = intent.getBooleanExtra(EXTRA_HAS_MULTIPLE_SCANS, false),
+                    )
+                }
+
+        else -> null
+    }
+
+    /**
+     * Hosts the new `:feature:cloudexplorer` flow rooted at [initialKey] and bridges its result back to
+     * the legacy `setResult` contract that callers expect, then finishes.
+     */
+    private fun showCloudExplorer(initialKey: NavKey) {
+        // onCreate's consumeInsetsWithToolbar (for the legacy XML layout) consumes window insets and
+        // margins the content view, which clips the compose explorer under the status bar and short
+        // of the navigation bar. Pass insets through untouched (clearing the stale margins) so the
+        // explorer's MegaScaffold handles edge-to-edge exactly like in MegaActivity.
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { view, insets ->
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = 0
+                topMargin = 0
+                rightMargin = 0
+                bottomMargin = 0
+            }
+            insets
+        }
+        collectCloudExplorerResults()
+        setContent {
+            val themeMode by monitorThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            LegacyActivityScaffold(
+                container = { content ->
+                    MegaAppContainer(
+                        themeMode = themeMode,
+                        content = content
+                    )
+                },
+                initialKey = initialKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                appDialogDestinations = appDialogDestinations,
+                onEmptyBackStack = {
+                    if (!isFinishing) {
+                        setResult(RESULT_CANCELED)
+                        finishAndRemoveTask()
+                    }
+                },
+            ) { _, _ -> }
+        }
+    }
+
+    private fun collectCloudExplorerResults() {
+        collectCloudExplorerResult<CopyResult>(CopyNavKey.RESULT) { result ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra("COPY_TO", result.target.longValue)
+                putExtra("COPY_HANDLES", result.sourceHandles.toLongArray())
+            })
+            finishAndRemoveTask()
+        }
+        collectCloudExplorerResult<MoveResult>(MoveNavKey.RESULT) { result ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra("MOVE_TO", result.target.longValue)
+                putExtra("MOVE_HANDLES", result.sourceHandles.toLongArray())
+            })
+            finishAndRemoveTask()
+        }
+        collectCloudExplorerResult<NodeId>(SelectCUFolderNavKey.RESULT) { nodeId ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra(EXTRA_MEGA_SELECTED_FOLDER, nodeId.longValue)
+                putExtra(EXTRA_IS_FOLDER_FROM_INCOMING, false)
+            })
+            finishAndRemoveTask()
+        }
+        collectCloudExplorerResult<List<NodeId>>(ShareFilesToChatNavKey.RESULT) { nodeIds ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra(Constants.NODE_HANDLES, nodeIds.map { it.longValue }.toLongArray())
+                putStringArrayListExtra(
+                    Constants.SELECTED_CONTACTS,
+                    intent.getStringArrayListExtra(Constants.SELECTED_CONTACTS),
+                )
+            })
+            finishAndRemoveTask()
+        }
+    }
+
+    private inline fun <reified T> collectCloudExplorerResult(
+        resultKey: String,
+        crossinline onResult: (T) -> Unit,
+    ) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                navigationResultManager.monitorResult<T>(resultKey)
+                    .filterNotNull()
+                    .collect { result ->
+                        navigationResultManager.clearResult(resultKey)
+                        onResult(result)
+                    }
             }
         }
     }

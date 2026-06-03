@@ -12,14 +12,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
-import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.SpaceBetweenAdaptersDecoration
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -39,10 +36,7 @@ import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.permission.PermissionUtils
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
-import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
 /**
@@ -52,9 +46,6 @@ import javax.inject.Inject
 class ContactListFragment : Fragment() {
     @Inject
     lateinit var navigator: MegaNavigator
-
-    @Inject
-    lateinit var navigationResultManager: NavigationResultManager
 
     private lateinit var binding: FragmentContactListBinding
 
@@ -105,34 +96,6 @@ class ContactListFragment : Fragment() {
         setupView()
         setupObservers()
         collectFlows()
-        collectShareFilesToChatResult()
-    }
-
-    private fun collectShareFilesToChatResult() {
-        LegacyOverlayDialogFragment.collectResultAndDismiss<List<NodeId>>(
-            fragmentManager = childFragmentManager,
-            scope = viewLifecycleOwner.lifecycleScope,
-            lifecycle = viewLifecycleOwner.lifecycle,
-            navigationResultManager = navigationResultManager,
-            resultKey = ShareFilesToChatNavKey.RESULT,
-        ) { ids ->
-            val email = viewModel.state.value.shareFilesToChatEmail
-            if (ids.isNotEmpty() && !email.isNullOrEmpty()) {
-                viewModel.onShareFilesToChatResult()
-                nodeAttachmentViewModel.attachNodesToChatByEmail(
-                    nodeIds = ids,
-                    email = email,
-                )
-            }
-            viewModel.onShareFilesToChatOverlayHidden()
-        }
-    }
-
-    private fun showShareFilesToChatOverlay() {
-        LegacyOverlayDialogFragment.show(
-            fragmentManager = childFragmentManager,
-            initialKey = ShareFilesToChatNavKey(chatId = MegaChatApiJava.MEGACHAT_INVALID_HANDLE),
-        )
     }
 
     /**
@@ -267,10 +230,6 @@ class ContactListFragment : Fragment() {
         contactSheet = ContactBottomSheetDialogFragment.newInstance(userHandle).apply {
             optionSendMessageClick = { handle ->
                 viewModel.getChatRoomId(handle)
-            }
-            optionSendFileClick = { contactEmail ->
-                viewModel.onShareFilesToChatRequested(contactEmail)
-                showShareFilesToChatOverlay()
             }
         }
 

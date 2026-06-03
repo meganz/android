@@ -36,8 +36,6 @@ import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as IconPackR
 import timber.log.Timber
 import javax.inject.Inject
@@ -69,7 +67,6 @@ internal class ContactListViewModel @Inject constructor(
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
     private val contactItemDataMapper: ContactItemDataMapper,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val queryString = MutableStateFlow<String?>(null)
@@ -107,16 +104,6 @@ internal class ContactListViewModel @Inject constructor(
                 }
         }
         retrieveContactActions()
-        loadCloudExplorerFeatureFlag()
-    }
-
-    private fun loadCloudExplorerFeatureFlag() {
-        viewModelScope.launch {
-            val enabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
-            }.onFailure { Timber.e(it) }.getOrDefault(false)
-            state.update { it.copy(isCloudExplorerAvailable = enabled) }
-        }
     }
 
     /**

@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
+import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -33,7 +34,6 @@ import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.app.presentation.node.model.MoveOrRemoveNodeResult
 import mega.privacy.android.domain.exception.BlockedMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -151,8 +151,6 @@ internal class PdfViewerViewModelTest {
             deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             exportNodeUseCase = exportNodeUseCase,
             getNodeAccessUseCase = getNodeAccessUseCase,
-            setCopyLatestTargetPathUseCase = mock(),
-            setMoveLatestTargetPathUseCase = mock(),
         )
     }
 

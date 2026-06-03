@@ -20,7 +20,6 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -31,9 +30,11 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -45,7 +46,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
-import mega.privacy.android.shared.resources.R as sharedResR
 
 @ExperimentalCoroutinesApi
 @ExtendWith(InstantTaskExecutorExtension::class)
@@ -92,8 +92,6 @@ internal class MediaPlayerViewModelTest {
             getFileUriUseCase = getFileUriUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
-            setCopyLatestTargetPathUseCase = mock(),
-            setMoveLatestTargetPathUseCase = mock(),
         )
     }
 

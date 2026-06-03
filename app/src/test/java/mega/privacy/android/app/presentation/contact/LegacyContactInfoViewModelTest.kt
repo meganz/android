@@ -59,7 +59,6 @@ import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -611,37 +610,6 @@ class LegacyContactInfoViewModelTest {
             assertThat(awaitItem().leaveFolderNodeIds).isEqualTo(ids)
         }
     }
-
-    @Test
-    fun `test that init sets isCloudExplorerAvailable to true when feature flag is enabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(true)
-            initViewModel()
-            underTest.uiState.test {
-                assertThat(awaitItem().isCloudExplorerAvailable).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that init sets isCloudExplorerAvailable to false when feature flag is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)).thenReturn(false)
-            initViewModel()
-            underTest.uiState.test {
-                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that init sets isCloudExplorerAvailable to false when feature flag throws`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
-                .thenAnswer { throw RuntimeException("error") }
-            initViewModel()
-            underTest.uiState.test {
-                assertThat(awaitItem().isCloudExplorerAvailable).isFalse()
-            }
-        }
 
     @Test
     fun `test that onShareFilesToChatResult sets navigateToChatOnAttachSuccess to true`() =

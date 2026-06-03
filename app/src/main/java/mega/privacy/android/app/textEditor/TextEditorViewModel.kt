@@ -85,8 +85,6 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -174,21 +172,7 @@ class TextEditorViewModel @Inject constructor(
     private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
     private val disableExportUseCase: DisableExportUseCase,
-    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
-    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
 ) : ViewModel() {
-
-    /** Copy the file currently being edited (source taken from [getNode]) to [newParentHandle]. */
-    fun copyCurrentNodeTo(newParentHandle: Long) {
-        val source = getNode()?.handle ?: return
-        copyNode(nodeHandle = source, newParentHandle = newParentHandle)
-    }
-
-    /** Move counterpart of [copyCurrentNodeTo]. */
-    fun moveCurrentNodeTo(newParentHandle: Long) {
-        val source = getNode()?.handle ?: return
-        moveNode(nodeHandle = source, newParentHandle = newParentHandle)
-    }
 
     companion object {
         const val MODE = "MODE"
@@ -971,8 +955,6 @@ class TextEditorViewModel @Inject constructor(
                 }
                 result.moveRequestResult?.let {
                     snackBarMessage.value = if (it.isSuccess) {
-                        runCatching { setCopyLatestTargetPathUseCase(newParentHandle) }
-                            .onFailure { e -> Timber.e(e) }
                         R.string.context_correctly_copied
                     } else {
                         R.string.context_no_copied
@@ -1007,8 +989,6 @@ class TextEditorViewModel @Inject constructor(
                 }
                 result.moveRequestResult?.let {
                     snackBarMessage.value = if (it.isSuccess) {
-                        runCatching { setMoveLatestTargetPathUseCase(newParentHandle) }
-                            .onFailure { e -> Timber.e(e) }
                         sharedResR.string.node_moved_success_message
                     } else {
                         R.string.context_no_moved

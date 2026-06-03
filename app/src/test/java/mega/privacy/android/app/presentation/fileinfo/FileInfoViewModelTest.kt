@@ -272,8 +272,6 @@ internal class FileInfoViewModelTest {
             nodeDestinationMapper = nodeDestinationMapper,
             contactItemStatusMapper = contactItemStatusMapper,
             contactPermissionUiStateMapper = contactPermissionUiStateMapper,
-            setCopyLatestTargetPathUseCase = mock(),
-            setMoveLatestTargetPathUseCase = mock(),
         )
     }
 

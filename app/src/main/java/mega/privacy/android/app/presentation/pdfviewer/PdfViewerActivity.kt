@@ -60,12 +60,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.appstate.content.navigation.LegacyOverlayDialogFragment
-import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
-import mega.privacy.android.navigation.destination.CopyNavKey
-import mega.privacy.android.navigation.destination.CopyResult
-import mega.privacy.android.navigation.destination.MoveNavKey
-import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
@@ -102,7 +96,6 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.ExtraConstant
@@ -152,12 +145,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
     lateinit var renameNodeUseCase: RenameNodeUseCase
 
     @Inject
-    lateinit var navigationResultManager: NavigationResultManager
-
-    @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    private var isCloudExplorerAvailable = false
 
     /**
      * Application scope
@@ -257,8 +245,6 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         }
 
         binding = ActivityPdfviewerBinding.inflate(layoutInflater)
-
-        setupCloudExplorer()
 
         invalidateOptionsMenu()
 
@@ -1670,46 +1656,13 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         builder.setOnDismissListener { isDeleteDialogShow = false }
     }
 
-    private fun setupCloudExplorer() {
-        lifecycleScope.launch {
-            isCloudExplorerAvailable = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
-            }.getOrDefault(false)
-        }
-        LegacyOverlayDialogFragment.collectResultAndDismiss<CopyResult>(
-            fragmentManager = supportFragmentManager,
-            scope = lifecycleScope,
-            lifecycle = lifecycle,
-            navigationResultManager = navigationResultManager,
-            resultKey = CopyNavKey.RESULT,
-        ) { result ->
-            viewModel.copyCurrentNodeTo(newParentHandle = result.target.longValue)
-        }
-        LegacyOverlayDialogFragment.collectResultAndDismiss<MoveResult>(
-            fragmentManager = supportFragmentManager,
-            scope = lifecycleScope,
-            lifecycle = lifecycle,
-            navigationResultManager = navigationResultManager,
-            resultKey = MoveNavKey.RESULT,
-        ) { result ->
-            viewModel.moveCurrentNodeTo(newParentHandle = result.target.longValue)
-        }
-    }
-
     private fun showCopy() {
         Timber.d("showCopy")
         val handles = longArrayOf(handle)
-        if (isCloudExplorerAvailable) {
-            LegacyOverlayDialogFragment.show(
-                fragmentManager = supportFragmentManager,
-                initialKey = CopyNavKey(sourceHandles = handles.toList()),
-            )
-        } else {
-            val intent = Intent(this, FileExplorerActivity::class.java)
-            intent.action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_COPY_FROM, handles)
-            startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY)
-        }
+        val intent = Intent(this, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
+        intent.putExtra(Constants.INTENT_EXTRA_KEY_COPY_FROM, handles)
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY)
     }
 
     private fun performCopy(toHandle: Long) {
@@ -1737,17 +1690,10 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
     private fun showMove() {
         Timber.d("showMove")
         val handles = longArrayOf(handle)
-        if (isCloudExplorerAvailable) {
-            LegacyOverlayDialogFragment.show(
-                fragmentManager = supportFragmentManager,
-                initialKey = MoveNavKey(sourceHandles = handles.toList()),
-            )
-        } else {
-            val intent = Intent(this, FileExplorerActivity::class.java)
-            intent.action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-            intent.putExtra(Constants.INTENT_EXTRA_KEY_MOVE_FROM, handles)
-            startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
-        }
+        val intent = Intent(this, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
+        intent.putExtra(Constants.INTENT_EXTRA_KEY_MOVE_FROM, handles)
+        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
     }
 
     private fun showPropertiesActivity() {

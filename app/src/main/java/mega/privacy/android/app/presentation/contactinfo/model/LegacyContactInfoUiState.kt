@@ -44,7 +44,6 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property showForceUpdateDialog                      True, shows force update dialog to the user
  * @property retentionTime                              The retention time.
  * @property leaveFolderNodeIds                         The list of node ids to be left
- * @property isCloudExplorerAvailable                   True if the new Cloud explorer is enabled.
  * @property navigateToChatOnAttachSuccess              True when a successful attach should navigate to the chat.
  */
 data class LegacyContactInfoUiState(
@@ -79,7 +78,6 @@ data class LegacyContactInfoUiState(
     val showForceUpdateDialog: Boolean = false,
     val retentionTime: Long? = null,
     val leaveFolderNodeIds: List<Long>? = null,
-    val isCloudExplorerAvailable: Boolean = false,
     val navigateToChatOnAttachSuccess: Boolean = false,
 ) {
 
