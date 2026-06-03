@@ -83,7 +83,9 @@ import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
@@ -173,6 +175,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val copyPublicNodeUseCase: CopyPublicNodeUseCase,
     private val checkPublicNodesNameCollisionUseCase: CheckPublicNodesNameCollisionUseCase,
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationContext private val applicationContext: Context,
     @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
@@ -191,6 +194,16 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     init {
         getRubbishBinNode()
         monitorIsLoggedIn()
+        loadCloudExplorerFeatureFlag()
+    }
+
+    private fun loadCloudExplorerFeatureFlag() {
+        viewModelScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.onFailure { Timber.e(it) }.getOrDefault(false)
+            uiState.update { it.copy(isCloudExplorerAvailable = enabled) }
+        }
     }
 
     private fun monitorIsLoggedIn() {
@@ -242,13 +255,18 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }
     }
 
-    /**
-     * Public-link copy counterpart of [checkNodesNameCollision]. Runs
-     * [CheckPublicNodesNameCollisionUseCase] on the single [PublicLinkFile] in
-     * `selectedNodes` and surfaces the result through
-     * [NodeActionState.publicCopyCollisionsResult] for the host to dispatch.
-     * No-op for empty, multi-node, or non-public selections.
-     */
+    /** Run a COPY collision check for [sourceHandles] → [targetHandle]. No-op if empty. */
+    fun checkCopyNameCollision(sourceHandles: List<Long>, targetHandle: Long) {
+        if (sourceHandles.isEmpty()) return
+        checkNodesNameCollision(sourceHandles, targetHandle, NodeNameCollisionType.COPY)
+    }
+
+    /** Move counterpart of [checkCopyNameCollision]. */
+    fun checkMoveNameCollision(sourceHandles: List<Long>, targetHandle: Long) {
+        if (sourceHandles.isEmpty()) return
+        checkNodesNameCollision(sourceHandles, targetHandle, NodeNameCollisionType.MOVE)
+    }
+
     fun checkPublicCopyCollision(targetHandle: Long) {
         val publicNode = selectedPublicLinkFile() ?: return
         viewModelScope.launch {

@@ -138,7 +138,9 @@ internal fun NodesExplorerScreen(
                     )
                 }
 
-                explorerMode == ExplorerMode.SelectCUFolder -> {
+                explorerMode == ExplorerMode.SelectCUFolder
+                        || explorerMode == ExplorerMode.Copy
+                        || explorerMode == ExplorerMode.Move -> {
                     onSelectFolder(nodeId)
                     onCloseExplorerScreen()
                 }

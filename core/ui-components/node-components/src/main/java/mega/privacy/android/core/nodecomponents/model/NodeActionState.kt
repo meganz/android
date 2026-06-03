@@ -67,4 +67,5 @@ data class NodeActionState(
     val viewInFolderEvent: StateEventWithContent<List<NavKey>> = consumed(),
     val isLoggedIn: Boolean = false,
     val loginRequiredEvent: StateEvent = consumed,
+    val isCloudExplorerAvailable: Boolean = false,
 )

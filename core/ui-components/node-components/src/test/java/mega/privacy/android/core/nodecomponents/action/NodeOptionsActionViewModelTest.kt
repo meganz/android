@@ -85,6 +85,7 @@ import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -177,6 +178,7 @@ class NodeOptionsActionViewModelTest {
     private val nodeSelectionModeActionMapper = mock<NodeSelectionModeActionMapper>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
     private val monitorUserCredentialsUseCase = mock<MonitorUserCredentialsUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
@@ -261,6 +263,7 @@ class NodeOptionsActionViewModelTest {
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             applicationContext = mockContext,
             nodeSourceType = nodeSourceType
         )
@@ -397,6 +400,35 @@ class NodeOptionsActionViewModelTest {
             )
         }
     }
+
+    @Test
+    fun `test that checkCopyNameCollision runs a COPY collision check for the supplied source handles`() =
+        runTest {
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                    type = NodeNameCollisionType.COPY,
+                ),
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+
+            viewModel.checkCopyNameCollision(
+                sourceHandles = listOf(sampleNode.id.longValue),
+                targetHandle = targetHandle,
+            )
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                type = NodeNameCollisionType.COPY,
+            )
+        }
 
     @Test
     fun `test that checkPublicCopyCollision surfaces a no-conflict result through publicCopyCollisionsResult`() =
@@ -928,6 +960,7 @@ class NodeOptionsActionViewModelTest {
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -999,6 +1032,7 @@ class NodeOptionsActionViewModelTest {
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -1064,6 +1098,7 @@ class NodeOptionsActionViewModelTest {
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -1121,6 +1156,7 @@ class NodeOptionsActionViewModelTest {
             copyPublicNodeUseCase = copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
         assertThrows<IllegalArgumentException> {

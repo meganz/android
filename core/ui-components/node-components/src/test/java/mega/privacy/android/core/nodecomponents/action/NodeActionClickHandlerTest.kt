@@ -257,6 +257,7 @@ class NodeActionClickHandlerTest {
     @Before
     fun setUp() {
         // Reset mocks
+        whenever(mockViewModel.uiState).thenReturn(MutableStateFlow(NodeActionState()))
         whenever(mockNodeHandlesToJsonMapper(any<List<Long>>())).thenReturn("test-json")
         whenever(mockNodeHandlesToJsonMapper(any<String>())).thenReturn(listOf())
         mockCheckNodesNameCollisionUseCase.stub {

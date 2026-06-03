@@ -54,6 +54,12 @@ data class MoveNavKey(val sourceHandles: List<Long>) : ExplorerNavKey {
 }
 
 @Serializable
+data class CopyResult(val sourceHandles: List<Long>, val target: NodeId)
+
+@Serializable
+data class MoveResult(val sourceHandles: List<Long>, val target: NodeId)
+
+@Serializable
 data class NodesExplorerNavKey(
     val nodeId: NodeId,
     val nodeSourceType: NodeSourceType,

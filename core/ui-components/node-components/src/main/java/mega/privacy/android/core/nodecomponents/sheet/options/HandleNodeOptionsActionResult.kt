@@ -19,6 +19,10 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
@@ -60,6 +64,36 @@ fun HandleNodeOptionsActionResult(
             val handles = result.nodes.map { it.id.longValue }
             nodeOptionsActionViewModel.triggerShareFolderFromDialogResult(handles)
             navigationHandler.clearResult(ShareFolderDialogNavKey.RESULT)
+        }
+    }
+
+    // Monitor the copy destination-folder picker result (single-activity copy flow)
+    val copyResult by navigationHandler
+        .monitorResult<CopyResult?>(CopyNavKey.RESULT)
+        .collectAsStateWithLifecycle(null)
+
+    LaunchedEffect(copyResult) {
+        copyResult?.let { result ->
+            nodeOptionsActionViewModel.checkCopyNameCollision(
+                sourceHandles = result.sourceHandles,
+                targetHandle = result.target.longValue,
+            )
+            navigationHandler.clearResult(CopyNavKey.RESULT)
+        }
+    }
+
+    // Monitor the move destination-folder picker result (single-activity move flow).
+    val moveResult by navigationHandler
+        .monitorResult<MoveResult?>(MoveNavKey.RESULT)
+        .collectAsStateWithLifecycle(null)
+
+    LaunchedEffect(moveResult) {
+        moveResult?.let { result ->
+            nodeOptionsActionViewModel.checkMoveNameCollision(
+                sourceHandles = result.sourceHandles,
+                targetHandle = result.target.longValue,
+            )
+            navigationHandler.clearResult(MoveNavKey.RESULT)
         }
     }
 

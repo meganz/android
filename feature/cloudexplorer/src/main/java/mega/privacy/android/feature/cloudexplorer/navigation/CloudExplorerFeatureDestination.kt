@@ -34,7 +34,9 @@ import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.navigation.destination.CopyResult
 import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
 import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
@@ -72,21 +74,21 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = navigationHandler::navigate,
                 onSelectFolder = onSelectCUFolder,
             )
-            val onCopyFolder: (NodeId) -> Unit = { nodeId ->
-                navigationHandler.returnResult(CopyNavKey.RESULT, nodeId)
+            val onCopyResult: (CopyResult) -> Unit = { result ->
+                navigationHandler.returnResult(CopyNavKey.RESULT, result)
             }
             copyDestination(
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onSelectFolder = onCopyFolder,
+                onCopyResult = onCopyResult,
             )
-            val onMoveFolder: (NodeId) -> Unit = { nodeId ->
-                navigationHandler.returnResult(MoveNavKey.RESULT, nodeId)
+            val onMoveResult: (MoveResult) -> Unit = { result ->
+                navigationHandler.returnResult(MoveNavKey.RESULT, result)
             }
             moveDestination(
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onSelectFolder = onMoveFolder,
+                onMoveResult = onMoveResult,
             )
             val onFilesPicked: (List<NodeId>) -> Unit = { nodeIds ->
                 navigationHandler.returnResult(ShareFilesToChatNavKey.RESULT, nodeIds)
@@ -102,8 +104,8 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = navigationHandler::navigate,
                 onStartUpload = transferHandler::setTransferEvent,
                 onSelectCUFolder = onSelectCUFolder,
-                onCopyFolder = onCopyFolder,
-                onMoveFolder = onMoveFolder,
+                onCopyResult = onCopyResult,
+                onMoveResult = onMoveResult,
                 onFilesPicked = onFilesPicked,
                 monitorResult = navigationHandler::monitorResult,
                 clearResult = navigationHandler::clearResult,
@@ -234,7 +236,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
     fun EntryProviderScope<NavKey>.copyDestination(
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (List<NavKey>) -> Unit,
-        onSelectFolder: (NodeId) -> Unit,
+        onCopyResult: (CopyResult) -> Unit,
     ) {
         entry<CopyNavKey> { key ->
             val viewModel = hiltViewModel<CopyViewModel>()
@@ -245,7 +247,9 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 startNavKey = key,
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
-                onSelectFolder = onSelectFolder,
+                onSelectFolder = { target ->
+                    onCopyResult(CopyResult(sourceHandles = key.sourceHandles, target = target))
+                },
             )
         }
     }
@@ -253,7 +257,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
     fun EntryProviderScope<NavKey>.moveDestination(
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (List<NavKey>) -> Unit,
-        onSelectFolder: (NodeId) -> Unit,
+        onMoveResult: (MoveResult) -> Unit,
     ) {
         entry<MoveNavKey> { key ->
             val viewModel = hiltViewModel<MoveViewModel>()
@@ -264,7 +268,9 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 startNavKey = key,
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
-                onSelectFolder = onSelectFolder,
+                onSelectFolder = { target ->
+                    onMoveResult(MoveResult(sourceHandles = key.sourceHandles, target = target))
+                },
             )
         }
     }
@@ -275,16 +281,20 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         onNavigate: (NavKey) -> Unit,
         onStartUpload: (TransferTriggerEvent) -> Unit,
         onSelectCUFolder: (NodeId) -> Unit,
-        onCopyFolder: (NodeId) -> Unit,
-        onMoveFolder: (NodeId) -> Unit,
+        onCopyResult: (CopyResult) -> Unit,
+        onMoveResult: (MoveResult) -> Unit,
         onFilesPicked: (List<NodeId>) -> Unit,
         monitorResult: (String) -> Flow<Any?>,
         clearResult: (String) -> Unit,
     ) {
         entry<NodesExplorerNavKey> { key ->
-            val onFolderSelected = when (key.startNavKey) {
-                CopyNavKey -> onCopyFolder
-                MoveNavKey -> onMoveFolder
+            val onFolderSelected: (NodeId) -> Unit = when (val nav = key.startNavKey) {
+                is CopyNavKey -> { target ->
+                    onCopyResult(CopyResult(sourceHandles = nav.sourceHandles, target = target))
+                }
+                is MoveNavKey -> { target ->
+                    onMoveResult(MoveResult(sourceHandles = nav.sourceHandles, target = target))
+                }
                 else -> onSelectCUFolder
             }
             var isProcessingAction by rememberSaveable { mutableStateOf(false) }

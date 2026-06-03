@@ -18,7 +18,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.serialization.NavKeySerializer
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -180,4 +184,15 @@ class LegacyOverlayDialogFragment : DialogFragment() {
             }
         }
     }
+}
+
+/**
+ * Hilt entry point so non-injectable hosts (e.g. manually constructed handlers) can obtain the
+ * dependencies needed to drive [LegacyOverlayDialogFragment] from an Android context.
+ */
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface LegacyOverlayDialogFragmentEntryPoint {
+    fun navigationResultManager(): NavigationResultManager
+    fun getFeatureFlagValueUseCase(): GetFeatureFlagValueUseCase
 }
