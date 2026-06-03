@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Looper
 import android.view.Surface
 import androidx.annotation.OptIn
 import androidx.core.content.ContextCompat
@@ -21,6 +22,7 @@ import androidx.media3.common.Player.STATE_ENDED
 import androidx.media3.common.Player.STATE_IDLE
 import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
+import androidx.media3.common.util.ExperimentalApi
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import androidx.media3.common.util.UnstableApi
@@ -29,15 +31,19 @@ import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.MergingMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.ShuffleOrder
+import androidx.media3.exoplayer.source.SingleSampleMediaSource
+import androidx.media3.exoplayer.text.TextOutput
+import androidx.media3.exoplayer.text.TextRenderer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
 import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.ui.PlayerNotificationManager
 import androidx.media3.ui.PlayerView
-import com.google.common.collect.ImmutableList
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.analytics.Analytics
@@ -56,13 +62,12 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.icon.pack.R
 import mega.privacy.mobile.analytics.event.VideoBufferingExceeded_1_SecondEvent
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
  * The implementation of MediaPlayerGateway
  */
-@OptIn(UnstableApi::class)
+@OptIn(UnstableApi::class, ExperimentalApi::class)
 class MediaPlayerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val crashReporter: CrashReporter,
@@ -265,7 +270,7 @@ class MediaPlayerFacade @Inject constructor(
         mediaPlayerCallback: MediaPlayerCallback,
     ): ExoPlayer {
         trackSelector = DefaultTrackSelector(context)
-        val renderersFactory = DefaultRenderersFactory(context).setExtensionRendererMode(
+        val renderersFactory = LegacySubtitleRenderersFactory(context).setExtensionRendererMode(
             DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
         )
         exoPlayer = ExoPlayer.Builder(context, renderersFactory)
@@ -377,7 +382,11 @@ class MediaPlayerFacade @Inject constructor(
     }
 
     private fun switchRendererToTextTrackType() {
-        if (hasSwitchTrackOnInit && isSubtitleHidden) return
+        // Guard against running more than once: this method only enables the text renderer on
+        // first track detection. Subsequent subtitle visibility changes are handled exclusively
+        // by showSubtitle() / hideSubtitle() via trackSelector.parameters, so isSubtitleHidden
+        // no longer needs to be checked here.
+        if (hasSwitchTrackOnInit) return
         val mappedTrackInfo = trackSelector.currentMappedTrackInfo
         val mediaUri = exoPlayer.currentMediaItem?.localConfiguration?.uri
         if (mappedTrackInfo != null) {
@@ -390,8 +399,6 @@ class MediaPlayerFacade @Inject constructor(
                     .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
                     .build()
                 trackSelector.setParameters(parameters)
-                exoPlayer.prepare()
-                exoPlayer.play()
             }
                 ?: Timber.d("SwitchTrackInfo: There is no text track type found, the media uri: $mediaUri")
         } else {
@@ -678,18 +685,24 @@ class MediaPlayerFacade @Inject constructor(
                     .setMimeType(MimeTypes.APPLICATION_SUBRIP)
                     .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
                     .build()
-                val mediaItem = MediaItem.Builder()
+                val videoMediaItem = MediaItem.Builder()
                     .setUri(videoUri)
                     .setMediaId(mediaId)
-                    .setSubtitleConfigurations(ImmutableList.of(subtitle))
                     .build()
+                // Use MergingMediaSource + SingleSampleMediaSource so that the entire SRT
+                // file is delivered as one sample from t=0. With legacy decoding enabled in
+                // LegacySubtitleRenderersFactory, TextRenderer holds all parsed cues and
+                // selects the correct one by timestamp for any seek position, correctly
+                // handling backward seeks into the middle of a cue.
+                val videoSource = mediaSourceFactory.createMediaSource(videoMediaItem)
+                val subtitleSource = SingleSampleMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(subtitle, C.TIME_UNSET)
+                val mergedSource = MergingMediaSource(false, true, videoSource, subtitleSource)
                 val oldPosition = player.currentPosition
-                // Stop player to set new media item that has subtitle
                 playerStop()
-                // Set new media item and start play video from the stop location
-                player.setMediaItem(mediaItem, oldPosition)
-                player.prepare()
-                player.play()
+                exoPlayer.setMediaSource(mergedSource, oldPosition)
+                exoPlayer.prepare()
+                player?.play()
                 showSubtitle()
                 true
             } else {
@@ -734,6 +747,29 @@ class MediaPlayerFacade @Inject constructor(
 
     override fun playPrev() {
         player?.seekToPrevious()
+    }
+
+    // In media3 1.4+, subtitle decoding was moved to extraction time via
+    // SubtitleTranscodingMediaPeriod. The new pipeline has a backward seek bug: seeking
+    // into the middle of an active cue does not correctly restore the cue state.
+    // Re-enabling legacy decoding keeps TextRenderer responsible for cue-timing selection,
+    // which works correctly for any seek position. Can be removed once media3 fixes the
+    // backward seek behaviour in SubtitleTranscodingMediaPeriod / ReplacingCuesResolver.
+    private class LegacySubtitleRenderersFactory(context: Context) :
+        DefaultRenderersFactory(context) {
+
+        override fun buildTextRenderers(
+            context: Context,
+            output: TextOutput,
+            outputLooper: Looper,
+            extensionRendererMode: Int,
+            out: ArrayList<Renderer>
+        ) {
+            out.add(TextRenderer(output, outputLooper).apply {
+                @Suppress("DEPRECATION")
+                experimentalSetLegacyDecodingEnabled(true)
+            })
+        }
     }
 
     companion object {
