@@ -2,6 +2,9 @@ package mega.privacy.android.feature.texteditor.components
 
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +26,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalDensity
@@ -108,9 +114,33 @@ fun TextEditorContent(
         LocalAutofill provides null,
         LocalTextSelectionColors provides selectionColors,
     ) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .then(if (!readOnly) Modifier.imePadding() else Modifier)) {
+        // In view (read-only) mode each chunk hosts its own SelectionContainer (a single
+        // container around the whole LazyColumn crashes — selectables in recycled items can't
+        // be resolved, see JetBrains/compose-multiplatform#1280). A SelectionContainer only
+        // clears its selection on a tap within its own bounds, so a tap on the empty space
+        // outside the text never clears it. Bumping this key recreates the per-chunk containers,
+        // which drops the active selection.
+        var selectionResetKey by remember { mutableIntStateOf(0) }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .then(if (!readOnly) Modifier.imePadding() else Modifier)
+                .then(
+                    if (readOnly) {
+                        Modifier.pointerInput(Unit) {
+                            awaitEachGesture {
+                                awaitFirstDown(requireUnconsumed = false)
+                                // Non-consuming: a clean tap on empty space (one not claimed by
+                                // text selection or list scrolling) clears the selection while
+                                // leaving the event available to other handlers (e.g. reveal bar).
+                                if (waitForUpOrCancellation() != null) selectionResetKey++
+                            }
+                        }
+                    } else {
+                        Modifier
+                    },
+                ),
+        ) {
             LaunchedEffect(restoreScrollIndex) {
                 val targetIndex = restoreScrollIndex ?: return@LaunchedEffect
                 snapshotFlow { lazyListState.layoutInfo.totalItemsCount }
@@ -119,20 +149,16 @@ fun TextEditorContent(
                 onRestoreScrollConsumed()
             }
             if (readOnly) {
-                // A single SelectionContainer spanning the whole list (rather than one per
-                // chunk hugging the text) makes the entire viewer one selection region, so a
-                // tap on the empty space outside the text clears the active selection.
-                SelectionContainer {
-                    ViewModeLazyColumn(
-                        lazyListState = lazyListState,
-                        chunkCount = chunkCount,
-                        totalLineCount = totalLineCount,
-                        chunkTextProvider = chunkTextProvider,
-                        chunkStartLineProvider = chunkStartLineProvider,
-                        showLineNumbers = showLineNumbers,
-                        textStyle = textStyle,
-                    )
-                }
+                ViewModeLazyColumn(
+                    lazyListState = lazyListState,
+                    chunkCount = chunkCount,
+                    totalLineCount = totalLineCount,
+                    chunkTextProvider = chunkTextProvider,
+                    chunkStartLineProvider = chunkStartLineProvider,
+                    showLineNumbers = showLineNumbers,
+                    textStyle = textStyle,
+                    selectionResetKey = selectionResetKey,
+                )
             } else {
                 EditModeLazyColumn(
                     lazyListState = lazyListState,
@@ -169,6 +195,8 @@ private fun ViewModeLazyColumn(
     chunkStartLineProvider: (Int) -> Int,
     showLineNumbers: Boolean,
     textStyle: TextStyle,
+    /** Bumped on a tap outside the text to recreate each chunk's SelectionContainer and clear the selection. */
+    selectionResetKey: Int,
 ) {
     LazyColumn(
         state = lazyListState,
@@ -193,6 +221,7 @@ private fun ViewModeLazyColumn(
                 maxLineNumber = totalLineCount,
                 showLineNumbers = showLineNumbers,
                 textStyle = textStyle,
+                selectionResetKey = selectionResetKey,
             )
         }
     }
@@ -282,7 +311,10 @@ private fun ReadOnlyChunkItem(
     maxLineNumber: Int,
     showLineNumbers: Boolean,
     textStyle: TextStyle,
+    selectionResetKey: Int,
 ) {
+    // Held outside the reset key() below so the gutter keeps its last layout while the
+    // SelectionContainer is being recreated — onTextLayout repopulates it, avoiding a flicker.
     var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
     EditorChunkLayout(
         showLineNumbers = showLineNumbers,
@@ -295,11 +327,17 @@ private fun ReadOnlyChunkItem(
             )
         },
     ) {
-        BasicText(
-            text = chunkText,
-            style = textStyle,
-            onTextLayout = { layoutResult = it },
-        )
+        // Recreating the SelectionContainer when selectionResetKey changes drops any active
+        // selection — the public SelectionContainer API has no programmatic clear.
+        key(selectionResetKey) {
+            SelectionContainer {
+                BasicText(
+                    text = chunkText,
+                    style = textStyle,
+                    onTextLayout = { layoutResult = it },
+                )
+            }
+        }
     }
 }
 
