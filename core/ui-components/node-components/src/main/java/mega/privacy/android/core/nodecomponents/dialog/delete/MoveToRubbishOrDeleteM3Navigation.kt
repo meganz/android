@@ -34,7 +34,8 @@ data class MoveToRubbishOrDeleteDialogResult(val isInRubbish: Boolean)
 /**
  * Navigation function to add the move to rubbish or delete dialog to the navigation graph
  *
- * @param onBack Callback when the dialog is dismissed (cancel, back press, or post-confirm pop)
+ * @param onBack Callback when the dialog is dismissed without confirming (cancel or back press).
+ *   It is NOT called on confirm — [returnResult] already pops the dialog off the back stack.
  * @param returnResult Callback to publish [MoveToRubbishOrDeleteDialogResult] when the user
  *   confirms; subscribers monitor [MoveToRubbishOrDeleteDialogArgs.RESULT].
  */
@@ -54,11 +55,15 @@ internal fun EntryProviderScope<NavKey>.moveToRubbishOrDeleteDialogM3(
             isNodeInRubbish = key.isInRubbish,
             onDismiss = onBack,
             onConfirm = {
+                // returnResult already pops this dialog off the back stack. Do NOT also call
+                // onBack() here — that extra pop removed the screen behind the dialog (e.g. the
+                // open shared folder, or the text editor), sending the user too far back. Screens
+                // that need to close themselves after the move (e.g. the text editor) do so via
+                // their own result monitor on MoveToRubbishOrDeleteDialogArgs.RESULT.
                 returnResult(
                     MoveToRubbishOrDeleteDialogArgs.RESULT,
                     MoveToRubbishOrDeleteDialogResult(isInRubbish = key.isInRubbish),
                 )
-                onBack()
             },
         )
     }
