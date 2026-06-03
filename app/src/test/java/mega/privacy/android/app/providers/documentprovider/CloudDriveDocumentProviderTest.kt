@@ -75,6 +75,11 @@ class CloudDriveDocumentProviderTest {
     private companion object {
         private const val CLOUD_DRIVE_ROOT_ID = "mega_cloud_drive_root"
         private const val ROOT_NODE_DOCUMENT_ID = "mega_cloud_drive_root:1"
+        private const val LOGGED_OUT_ROOT_ID = "mega_cloud_drive_root_loggedout"
+        private const val LOGGED_IN_ROOT_ID_PREFIX = "mega_cloud_drive_root_account_"
+
+        private fun accountScopedRootId(accountName: String): String =
+            "$LOGGED_IN_ROOT_ID_PREFIX${accountName.hashCode().toUInt().toString(16)}"
     }
 
     @Before
@@ -145,7 +150,7 @@ class CloudDriveDocumentProviderTest {
             assertThat(cursor.count).isEqualTo(1)
             cursor.moveToFirst()
             assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_ROOT_ID)))
-                .isEqualTo(CLOUD_DRIVE_ROOT_ID)
+                .isEqualTo(accountScopedRootId("test@mega.co.nz"))
             assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_DOCUMENT_ID)))
                 .isEqualTo(CLOUD_DRIVE_ROOT_ID)
             assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_SUMMARY)))
@@ -179,6 +184,8 @@ class CloudDriveDocumentProviderTest {
             .getString(R.string.login_to_mega)
         assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_SUMMARY)))
             .isEqualTo(expectedSummary)
+        assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_ROOT_ID)))
+            .isEqualTo(LOGGED_OUT_ROOT_ID)
     }
 
     @Test
