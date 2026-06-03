@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
@@ -60,12 +61,15 @@ import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.favourites.AddFavouritesUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.IsEditableImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.IsEditableVideoUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
@@ -121,6 +125,9 @@ class ImagePreviewViewModel @Inject constructor(
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val getNodeByHandle: GetNodeByHandle,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val isEditableImageUseCase: IsEditableImageUseCase,
+    private val isEditableVideoUseCase: IsEditableVideoUseCase,
     private val largeBundleHolder: LargeBundleHolder,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
@@ -419,15 +426,15 @@ class ImagePreviewViewModel @Inject constructor(
             ImagePreviewFetcherSource.FAVOURITE,
             ImagePreviewFetcherSource.SHARED_ITEMS,
         )
-        return isValidSource && hasWritePermission && imageNode.type.mimeType in
-                setOf(
-                    "image/jpeg",
-                    "image/jpg",
-                    "image/png",
-                    "image/bmp",
-                    "image/x-ms-bmp",
-                    "image/heif"
-                )
+        val isSupportedImage = runCatching {
+            isEditableImageUseCase(imageNode.type)
+        }.getOrDefault(false)
+        val isSupportedVideo = runCatching {
+            isEditableVideoUseCase(imageNode.type)
+        }.getOrDefault(false) && runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)
+        }.getOrDefault(false)
+        return isValidSource && hasWritePermission && (isSupportedImage || isSupportedVideo)
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {

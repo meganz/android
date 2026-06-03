@@ -21,12 +21,15 @@ dependencies {
 
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
+    implementation(project(":core:ui-components:shared-components"))
     implementation(project(":domain"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
 
     implementation(lib.mega.core.ui)
 
+    implementation(androidx.appcompat)
+    implementation(androidx.compose.activity)
     implementation(androidx.hilt.navigation)
     implementation(androidx.navigation3.runtime)
     implementation(androidx.navigation3.ui)

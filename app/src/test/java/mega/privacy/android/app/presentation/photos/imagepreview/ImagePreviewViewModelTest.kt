@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
@@ -66,6 +67,9 @@ import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisi
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.imagepreview.IsEditableImageUseCase
+import mega.privacy.android.domain.usecase.imagepreview.IsEditableVideoUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaNode
@@ -133,6 +137,9 @@ class ImagePreviewViewModelTest {
 
     @Suppress("DEPRECATION")
     private val getNodeByHandle: GetNodeByHandle = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val isEditableImageUseCase = IsEditableImageUseCase()
+    private val isEditableVideoUseCase = IsEditableVideoUseCase()
 
     private val accountLevelDetail = mock<AccountLevelDetail> {
         on { accountType }.thenReturn(AccountType.PRO_III)
@@ -179,6 +186,7 @@ class ImagePreviewViewModelTest {
         getNodeNameCollisionRenameNameUseCase,
         getNodeAccessPermission,
         getNodeByHandle,
+        getFeatureFlagValueUseCase,
     ).also {
         imageNodeFetchers.clear()
         underTest.consumeTransferEvent()
@@ -219,6 +227,9 @@ class ImagePreviewViewModelTest {
             getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             getNodeByHandle = getNodeByHandle,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            isEditableImageUseCase = isEditableImageUseCase,
+            isEditableVideoUseCase = isEditableVideoUseCase,
             largeBundleHolder = largeBundleHolder,
             context = mock(),
             setCopyLatestTargetPathUseCase = mock(),
@@ -743,7 +754,7 @@ class ImagePreviewViewModelTest {
         }
 
     @Test
-    internal fun `test that isPhotoEditorMenuVisible returns false when node type is video`() =
+    internal fun `test that isPhotoEditorMenuVisible returns false when node type is video and VideoEditor flag is disabled`() =
         runTest {
             val imageNode = mock<ImageNode> {
                 on { type } doReturn VideoFileTypeInfo("video/mp4", "mp4", Duration.parse("10s"))
@@ -752,11 +763,73 @@ class ImagePreviewViewModelTest {
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)).thenReturn(false)
 
             val result = underTest.isPhotoEditorMenuVisible(imageNode)
 
             assertThat(result).isFalse()
         }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns true when node type is video and VideoEditor flag is enabled`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn VideoFileTypeInfo("video/mp4", "mp4", Duration.parse("10s"))
+                on { id } doReturn NodeId(123L)
+            }
+            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)).thenReturn(true)
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isTrue()
+        }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns false when VideoEditor flag check throws`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn VideoFileTypeInfo("video/mp4", "mp4", Duration.parse("10s"))
+                on { id } doReturn NodeId(123L)
+            }
+            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoEditor))
+                .thenThrow(RuntimeException("Feature flag error"))
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isFalse()
+        }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "video/ogg",
+            "video/x-ms-wmv",
+            "video/divx",
+            "video/x-f4v",
+        ]
+    )
+    internal fun `test that isPhotoEditorMenuVisible returns false when video mime type is not supported`(
+        mimeType: String,
+    ) = runTest {
+        val imageNode = mock<ImageNode> {
+            on { type } doReturn VideoFileTypeInfo(mimeType, mimeType.substringAfterLast("/"), Duration.parse("10s"))
+            on { id } doReturn NodeId(123L)
+        }
+        whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)).thenReturn(true)
+
+        val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+        assertThat(result).isFalse()
+    }
 
     @Test
     internal fun `test that CopyOfflineNode transfer event is triggered when executeTransfer is invoked in offline mode`() =

@@ -85,9 +85,9 @@ import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
@@ -96,14 +96,16 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.feature.videoeditor.presentation.VideoEditorActivity
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -217,9 +219,14 @@ class ImagePreviewActivity : BaseActivity() {
                             ImagePreviewScreen(
                                 snackbarHostState = snackbarHostState,
                                 onClickBack = ::finish,
-                                onClickEdit = {
-                                    Analytics.tracker.trackEvent(PhotoEditorMenuItemEvent)
-                                    viewModel.launchPhotoEditor(it)
+                                onClickEdit = { imageNode ->
+                                    if (imageNode.type is VideoFileTypeInfo) {
+                                        // TODO add analytics event
+                                        openVideoEditor(imageNode)
+                                    } else {
+                                        Analytics.tracker.trackEvent(PhotoEditorMenuItemEvent)
+                                        viewModel.launchPhotoEditor(imageNode)
+                                    }
                                 },
                                 onClickVideoPlay = ::playVideo,
                                 onClickSlideshow = ::playSlideshow,
@@ -674,6 +681,10 @@ class ImagePreviewActivity : BaseActivity() {
                 }
             }
         }
+
+    private fun openVideoEditor(imageNode: ImageNode) {
+        startActivity(VideoEditorActivity.getIntent(this, imageNode.id.longValue))
+    }
 
     private fun openPhotoEditor(uri: Uri, destinationFileName: String) {
         var uCrop = UCrop.of(uri, Uri.fromFile(File(cacheDir, destinationFileName)))
