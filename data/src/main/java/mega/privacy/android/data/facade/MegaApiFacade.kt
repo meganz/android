@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import mega.privacy.android.data.constant.HttpServerConstant
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.IgnoredRequestListener
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -845,7 +846,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun httpServerIsRunning() = megaApi.httpServerIsRunning()
 
-    override suspend fun httpServerStart() = megaApi.httpServerStart()
+    override suspend fun httpServerStart() = megaApi.httpServerStart(
+        HttpServerConstant.HTTP_SERVER_LOCAL_ONLY,
+        HttpServerConstant.API_HTTP_SERVER_PORT,
+    )
 
     override suspend fun httpServerStop() = megaApi.httpServerStop()
 

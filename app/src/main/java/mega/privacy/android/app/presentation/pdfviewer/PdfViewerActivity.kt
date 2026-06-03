@@ -90,6 +90,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialo
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.passcode.PasscodeCheck
+import mega.privacy.android.data.constant.HttpServerConstant
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -567,7 +568,11 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
 
     private fun MegaApiAndroid.initStreaming() {
         if (httpServerIsRunning() == 0) {
-            httpServerStart()
+            httpServerStart(
+                HttpServerConstant.HTTP_SERVER_LOCAL_ONLY,
+                if (this === megaApiFolder) HttpServerConstant.FOLDER_API_HTTP_SERVER_PORT
+                else HttpServerConstant.API_HTTP_SERVER_PORT,
+            )
         }
     }
 

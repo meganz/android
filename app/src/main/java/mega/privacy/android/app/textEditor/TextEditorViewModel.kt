@@ -60,6 +60,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.constant.HttpServerConstant
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -480,7 +481,11 @@ class TextEditorViewModel @Inject constructor(
             val api = textEditorData.value?.api ?: return
 
             if (api.httpServerIsRunning() == 0) {
-                api.httpServerStart()
+                api.httpServerStart(
+                    HttpServerConstant.HTTP_SERVER_LOCAL_ONLY,
+                    if (api === megaApiFolder) HttpServerConstant.FOLDER_API_HTTP_SERVER_PORT
+                    else HttpServerConstant.API_HTTP_SERVER_PORT,
+                )
                 textEditorData.value?.needStopHttpServer = true
             }
 
