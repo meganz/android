@@ -10,6 +10,8 @@ import mega.privacy.android.domain.entity.featureflag.ApiFeature
  * @property description
  * @property defaultValue
  * @property checkRemote If true, the value will be checked from the remote server, if set to false we can toggle the flag as usual feature flag from the Settings in QA build
+ * @property singleCheckPerRun If true, the remote value is fetched once based on the account
+ * state at app startup, cached for the entire lifetime of the app process
  */
 enum class ApiFeatures(
     override val experimentName: String,
@@ -254,7 +256,7 @@ enum class ApiFeatures(
     CloudDriveDocumentProvider(
         experimentName = "cdsp",
         description = "Enable MEGA Cloud Drive as a SAF root in the Android system file picker",
-        singleCheckPerRun = true,
+        singleCheckPerRun = false,
         defaultValue = false,
     ),
 

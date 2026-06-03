@@ -82,6 +82,9 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         /** Distinct Root.COLUMN_ROOT_ID returned while NotLoggedIn so SAF treats it as a separate root and forces the picker to back out of any cached navigation when session transitions. */
         private const val LOGGED_OUT_ROOT_ID = "mega_cloud_drive_root_loggedout"
 
+        /** Prefix for the per-account Root.COLUMN_ROOT_ID. Suffixing with a hash of the account name makes account A and account B distinct roots in SAF's RootsCache, so the picker refreshes the row's summary on account switch instead of reusing the cached entry keyed by a constant root id. */
+        private const val LOGGED_IN_ROOT_ID_PREFIX = "mega_cloud_drive_root_account_"
+
         /** Daemon dispatcher so open work is not on the viewer thread. */
         private val openDocumentDispatcher: CoroutineDispatcher =
             Executors.newCachedThreadPool { r ->
@@ -137,11 +140,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             CloudDriveSessionState.NotLoggedIn -> getLoginToMEGAString()
             CloudDriveSessionState.Initialising -> getLoadingString()
         }
-        val rootId = if (session is CloudDriveSessionState.NotLoggedIn) {
-            LOGGED_OUT_ROOT_ID
-        } else {
-            CLOUD_DRIVE_ROOT_ID
-        }
+        val rootId = rootIdForSession(session)
         val result =
             getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false).apply {
                 addRootRow(rootId, summary)
@@ -174,6 +173,18 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                 this is CloudDriveSessionState.Offline ||
                 this is CloudDriveSessionState.PasscodeLockEnabled ||
                 this is CloudDriveSessionState.RootNodeNotLoaded
+
+    private fun rootIdForSession(session: CloudDriveSessionState): String = when (session) {
+        CloudDriveSessionState.NotLoggedIn -> LOGGED_OUT_ROOT_ID
+        CloudDriveSessionState.Initialising -> CLOUD_DRIVE_ROOT_ID
+        is CloudDriveSessionState.Ready -> accountScopedRootId(session.accountName)
+        is CloudDriveSessionState.PasscodeLockEnabled -> accountScopedRootId(session.accountName)
+        is CloudDriveSessionState.Offline -> accountScopedRootId(session.accountName)
+        is CloudDriveSessionState.RootNodeNotLoaded -> accountScopedRootId(session.accountName)
+    }
+
+    private fun accountScopedRootId(accountName: String): String =
+        "$LOGGED_IN_ROOT_ID_PREFIX${accountName.hashCode().toUInt().toString(16)}"
 
     private fun MatrixCursor.addRootRow(rootId: String, summary: String) {
         newRow().apply {

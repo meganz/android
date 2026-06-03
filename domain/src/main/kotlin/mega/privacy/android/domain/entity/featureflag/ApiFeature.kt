@@ -17,7 +17,8 @@ interface ApiFeature : Feature {
     val checkRemote: Boolean
 
     /**
-     * whether this feature should be checked only once per app run
+     * If true, the remote value is fetched once based on the account
+     * state at app startup, cached for the entire lifetime of the app process
      */
     val singleCheckPerRun: Boolean
 
