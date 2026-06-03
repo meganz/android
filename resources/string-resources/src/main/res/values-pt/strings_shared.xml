@@ -575,7 +575,7 @@
     <!-- Button text of the send meeting link to chat -->
     <string name="meetings_share_link_bottom_sheet_button_send_link_chat">Enviar link ao chat</string>
     <!-- Button text of the share meeting link -->
-    <string name="meetings_share_link_bottom_sheet_button_share_link">Obter link</string>
+    <string name="meetings_share_link_bottom_sheet_button_share_link">Compartilhar link</string>
     <!-- Title for the inline warning banner when storage is almost full -->
     <string name="account_storage_over_quota_inline_warning_banner_title">O armazenamento da sua conta está quase cheio</string>
     <!-- Title for the inline error banner when storage is full -->
@@ -2557,9 +2557,15 @@
     <string name="general_file_type">Tipo de arquivo</string>
     <string name="favourite_folders_empty_screen_description">Adicionar pastas aos Favoritos para vê-las aqui</string>
     <string name="general_chat_sent_as_message">Enviado como mensagem</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% desligado</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% de desconto</string>
     <string name="general_error_incorrect_name">Corrija o nome do arquivo antes de prosseguir</string>
     <string name="general_destination">Destino</string>
     <string name="video_player_more_options_pip_option">Imagem em imagem</string>
     <string name="file_link_unavaible_ToS_violation">O link do arquivo foi removido por infringir os nossos Termos de serviço.</string>
+    <string name="cloud_drive_inactivity_banner_title">A sua conta ficou inativa por muito tempo</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one">Como você não fez login na sua conta durante mais de %1$d mês, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
+        <item quantity="many">Como você não fez login na sua conta durante mais de %1$d de meses, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
+        <item quantity="other">Como você não fez login na sua conta durante mais de %1$d meses, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
+    </plurals>
 </resources>

@@ -2803,7 +2803,7 @@
     <string name="general_file_name">اسم الملف</string>
     <string name="general_error_invalid_name">اسم غير صالح</string>
     <string name="general_file_type">نوع الملف</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% إيقاف</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% خصم</string>
     <string name="general_error_incorrect_name">قم بتعديل اسم الملف قبل المتابعة</string>
     <string name="general_destination">الوجهة</string>
     <string name="video_player_more_options_pip_option">صورة داخل صورة</string>

@@ -2535,7 +2535,7 @@
         <item quantity="other">Șterge link-urile vizualizate</item>
     </plurals>
     <string name="general_chat_sent_as_message">Trimis ca mesaj</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% oprit</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% reducere</string>
     <string name="general_error_incorrect_name">Corectează numele fișierului înainte de a continua</string>
     <string name="general_destination">Destinație</string>
     <string name="video_player_more_options_pip_option">Imagine în imagine</string>

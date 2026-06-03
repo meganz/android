@@ -2489,13 +2489,13 @@
     <string name="new_file_subject_when_uploading">Objet</string>
     <string name="new_file_email_when_uploading">Adresse courriel</string>
     <string name="error_no_internet_title">Aucune connexion à Internet</string>
-    <string name="error_dialog_confirm_button">Fermer</string>
+    <string name="error_dialog_confirm_button">J’ai compris</string>
     <string name="home_configuration_widget_my_account_widget_name">Mon compte</string>
     <string name="general_new_group_chat">Nouvelle conversation de groupe</string>
-    <string name="general_new_group_chat_created">La nouvelle conversation de groupe a été créée</string>
+    <string name="general_new_group_chat_created">Nouvelle conversation de groupe créée</string>
     <string name="favourites_empty_screen_description">Ajoutez des fichiers et des dossiers aux Favoris pour les voir ici</string>
     <string name="node_sort_option_last_accessed_label">Date</string>
-    <string name="general_view_button">Visualiser</string>
+    <string name="general_view_button">Voir</string>
     <string name="home_cwlo_empty_state">Les éléments que vous avez laissés inachevés apparaîtront ici</string>
     <string name="folder_link_guest_banner_title">Enregistrez sur votre cloud MEGA</string>
     <string name="folder_link_guest_banner_description">Ne perdez pas ce lien. Créez un compte gratuit pour sauvegarder ce dossier et y accéder quand vous le souhaitez.</string>
@@ -2508,7 +2508,7 @@
     <string name="home_configuration_widget_removal_not_allowed_message">Au moins une section d\’accueil est requise</string>
     <string name="file_link_subtitle">Lien du fichier</string>
     <string name="name_collision_choose_folder_header">Sélectionnez le dossier que vous souhaitez conserver</string>
-    <string name="name_collision_folder_warning_upload_and_rename">Le dossier que vous téléversez sera renommé en&#160;:</string>
+    <string name="name_collision_folder_warning_upload_and_rename">Le dossier que vous téléversez sera renommé en :</string>
     <string name="google_sign_in">Se connecter avec Google</string>
     <string name="google_sign_in_failed">La connexion via Google a échoué. Veuillez réessayer.</string>
     <string name="google_sign_in_email_exists">Vous avez déjà un compte avec cet e-mail. Connectez-vous avec votre mot de passe.</string>
@@ -2533,19 +2533,19 @@
     </plurals>
     <string name="more_options">Plus d\’options</string>
     <plurals name="viewed_links_remove_selected_links_dialog_title">
-        <item quantity="one">Effacer le lien consulté ?</item>
-        <item quantity="many">Effacer les liens consultés ?</item>
-        <item quantity="other">Effacer les liens consultés ?</item>
+        <item quantity="one">Effacer le lien consulté ?</item>
+        <item quantity="many">Effacer les liens consultés ?</item>
+        <item quantity="other">Effacer les liens consultés ?</item>
     </plurals>
     <string name="favourite_folders_empty_screen_description">Ajoutez des dossiers aux Favoris pour les voir ici</string>
     <string name="general_chat_sent_as_message">Envoyé en tant que message</string>
     <string name="video_player_subtitles_empty_hint_description">Téléversez les sous-titres au format SRT sur votre disque Cloud</string>
     <string name="video_player_subtitles_add_subtitles_button">Ajouter des sous-titres</string>
     <string name="scan_dialog_discard_all_confirmation_title">Abandonner toutes les numérisations ?</string>
-    <string name="scan_dialog_discard_confirmation_title">Abandonner la numérisation ?</string>
-    <string name="scan_dialog_discard_all_confirmation_body">Le présent document sera perdu</string>
-    <string name="scan_dialog_discard_confirmation_action">Abandonner</string>
-    <string name="scan_dialog_discard_confirmation_body">La présente numérisation sera perdue</string>
+    <string name="scan_dialog_discard_confirmation_title">Annuler la numérisation ?</string>
+    <string name="scan_dialog_discard_all_confirmation_body">Le document actuel sera perdu</string>
+    <string name="scan_dialog_discard_confirmation_action">Annuler</string>
+    <string name="scan_dialog_discard_confirmation_body">La numérisation actuelle sera perdue</string>
     <string name="general_file_name">Nom du fichier</string>
     <string name="general_error_invalid_name">Le nom est invalide</string>
     <string name="general_file_type">Type de fichier</string>

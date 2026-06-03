@@ -172,7 +172,7 @@
     </plurals>
     <!-- Text of the video section playlist detail video number -->
     <plurals name="video_section_playlist_detail_video_number">
-        <item quantity="other">%1$d&#160;videos</item>
+        <item quantity="other">%1$d videos</item>
     </plurals>
     <!-- Warning shown when the user clicks on a web link and there is no app available at the moment for opening it. -->
     <string name="chat_click_link_in_message_intent_not_available">Bạn có thể không có ứng&#160;dụng nào đã được cài để mở trang web này</string>
@@ -1372,7 +1372,7 @@
     <string name="video_section_playlists_video_empty">Dọn rác</string>
     <!-- Text of video count of playlist in Video Section -->
     <plurals name="video_section_playlists_video_count">
-        <item quantity="other">%1$d&#160;videos</item>
+        <item quantity="other">%1$d videos</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
     <string name="sync_stop_backup_confirm_dialog_move_explanation">Di chuyển thư mục này vào Ổ Mây của bạn để có được toàn quyền truy cập vào dữ liệu của mình nhưng thư mục sẽ không còn được sao lưu.</string>
@@ -1990,7 +1990,7 @@
     <string name="rewarded_ad_dialog_title">Tiếp tục sau quảng&#160;cáo</string>
     <string name="rewarded_ad_dialog_watch_ad_button">Xem quảng&#160;cáo</string>
     <string name="rewarded_ad_dialog_upgrade_subtitle">Hoặc nâng cấp lên gói Pro để truy cập ngay lập tức và không có quảng cáo</string>
-    <string name="rewarded_ad_dialog_pro_card_title">MEGA&#160;Pro</string>
+    <string name="rewarded_ad_dialog_pro_card_title">MEGA Pro</string>
     <string name="rewarded_ad_dialog_perk_unlimited_downloads">Tải xuống không giới hạn, bỏ qua quảng&#160;cáo</string>
     <string name="rewarded_ad_dialog_perk_storage">Không&#160;gian lưu&#160;trữ được mã&#160;hóa lên tới 20&#160;TB</string>
     <string name="rewarded_ad_dialog_perk_transfer_speed">Tốc độ truyền tải ưu&#160;tiên</string>
@@ -2350,7 +2350,7 @@
     <string name="general_file_name">Tên Tệp Tin</string>
     <string name="general_error_invalid_name">Tên không hợp lệ</string>
     <string name="general_file_type">Dạng tệp</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d%% tắt</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d%% giảm giá</string>
     <string name="general_error_incorrect_name">Vui lòng sửa tên tệp của bạn trước khi tiếp tục</string>
     <string name="general_destination">Đích đến</string>
     <string name="video_player_more_options_pip_option">Hình trong hình</string>

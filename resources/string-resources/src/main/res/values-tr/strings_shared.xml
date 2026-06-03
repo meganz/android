@@ -961,7 +961,7 @@
     <!-- Warning text informing that a file preview failed to load. -->
     <string name="transfers_fake_preview_screen_general_error">Ön izleme yüklenemedi, lütfen tekrar deneyin</string>
     <!-- Warning shown after trying to cancel a download, but the request failed -->
-    <string name="transfers_error_cancelling_preview_download">Bir şeyler ters gitti. Ön izleme iptal edilemedi. Ayrıntılar için bildirime bakın.</string>
+    <string name="transfers_error_cancelling_preview_download">Bir şeyler ters gitti. Ön izleme iptal edilemedi. Ayrıntılar için bildirimlere bakın.</string>
     <!-- Title of the Rename and Create Backup Dialog -->
     <string name="sync_rename_and_create_backup_dialog_title">Yedek adı zaten mevcut</string>
     <!-- Text of the Rename and Create Backup Dialog -->
@@ -2086,7 +2086,7 @@
     <string name="general_invalid_double_dot_name_warning">“..” adı geçersizdir</string>
     <string name="album_get_multiple_links_list_title">Bağlantılar</string>
     <string name="album_get_multiple_links_copy_all_action">Tümünü kopyala</string>
-    <string name="transfers_upload_started_snackbar">Yükleme başladı. Ayrıntılar için bildirime bakın.</string>
+    <string name="transfers_upload_started_snackbar">Yükleme başladı. Ayrıntılar için bildirimlere bakın.</string>
     <string name="search_landing_title">Bir şey mi arıyorsunuz?</string>
     <string name="search_landing_subtitle">Dosya ve klasörlerde arayın</string>
     <string name="folder_created_success_message">Klasör oluşturuldu</string>

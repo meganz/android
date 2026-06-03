@@ -2447,7 +2447,7 @@
     </plurals>
     <string name="favourite_folders_empty_screen_description">Fügen Sie Ordner zu Ihren Favoriten hinzu, um sie hier anzuzeigen</string>
     <string name="general_chat_sent_as_message">Als Nachricht gesendet</string>
-    <string name="campaign_name_with_discount">%1$s: %2$d %% gespart</string>
+    <string name="campaign_name_with_discount">%1$s: %2$d %% gespart</string>
     <string name="scan_dialog_discard_all_confirmation_title">Alle Scans verwerfen?</string>
     <string name="scan_dialog_discard_confirmation_title">Scan verwerfen?</string>
     <string name="scan_dialog_discard_all_confirmation_body">Das aktuelle Dokument wird nicht gespeichert</string>
@@ -2461,8 +2461,8 @@
     <string name="general_destination">Ziel</string>
     <string name="cloud_drive_inactivity_banner_title">Ihr Account war zu lange inaktiv</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="one">Da Sie sich seit mehr als %1$d Monat nicht mehr eingeloggt haben, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht.</item>
-        <item quantity="other">Da Sie sich seit mehr als %1$d Monaten nicht mehr eingeloggt haben, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht.</item>
+        <item quantity="one">Da Sie sich seit mehr als %1$d Monat nicht mehr eingeloggt haben, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht</item>
+        <item quantity="other">Da Sie sich seit mehr als %1$d Monaten nicht mehr eingeloggt haben, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">Der Dateilink wurde entfernt, da er gegen unsere Nutzungsbedingungen verstieß.</string>
 </resources>
