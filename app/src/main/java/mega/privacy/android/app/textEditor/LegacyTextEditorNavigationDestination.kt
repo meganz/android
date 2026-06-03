@@ -234,6 +234,7 @@ private fun buildTextEditorViewModelArgs(
                 showSendToChat = shouldShowSendToChat(nodeSourceType),
                 isFromSharedFolder = isFromSharedFolder(nodeSourceType),
                 fromHome = navKey.fromHome,
+                isFolderLink = nodeSourceType == FOLDER_LINK_ADAPTER,
             )
         }
     }

@@ -43,14 +43,17 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScr
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFileLinkUseCase
+import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SetShowLineNumbersPreferenceUseCase
@@ -99,6 +102,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getTextContentForTextEditorUseCase: GetTextContentForTextEditorUseCase,
     private val getTextContentForFileLinkUseCase: GetTextContentForFileLinkUseCase,
+    private val getTextContentForFolderLinkUseCase: GetTextContentForFolderLinkUseCase,
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase,
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase,
     private val getShowLineNumbersPreferenceUseCase: GetShowLineNumbersPreferenceUseCase,
     private val setShowLineNumbersPreferenceUseCase: SetShowLineNumbersPreferenceUseCase,
@@ -254,20 +259,52 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         }
                         return@launch
                     }
+                } else if (args.isFolderLink) {
+                    // Folder link nodes live in the folder API session, not the main account, so
+                    // they must be resolved as public child nodes; resolving by handle through the
+                    // main API would fail and the file would never load.
+                    val folderNodeResult = runCatching {
+                        getPublicChildNodeFromIdUseCase(NodeId(resolvedNodeHandle)) as? TypedFileNode
+                    }
+                    val folderNode = folderNodeResult.getOrNull()
+                    if (folderNode != null) {
+                        resolvedNodeHandle = folderNode.id.longValue
+                        resolvedNode = folderNode
+                        resolvedPublicNode = folderNode
+                        _uiState.update {
+                            it.copy(fileName = folderNode.name)
+                        }
+                    } else {
+                        val exception = folderNodeResult.exceptionOrNull()
+                        Timber.e(exception, "Text editor: failed to resolve folder link node")
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorEvent = triggered,
+                                errorMessage = exception?.message?.ifBlank { null },
+                            )
+                        }
+                        return@launch
+                    }
                 }
-                val contentFlow = if (!publicUrl.isNullOrBlank()) {
-                    getTextContentForFileLinkUseCase(
+                val contentFlow = when {
+                    !publicUrl.isNullOrBlank() -> getTextContentForFileLinkUseCase(
                         urlFileLink = publicUrl,
                         chunkSizeLines = CHUNK_SIZE_LINES,
                     )
-                } else if (resolvedNode != null) {
-                    getTextContentForTextEditorUseCase(
+
+                    args.isFolderLink && resolvedNode != null -> getTextContentForFolderLinkUseCase(
+                        node = resolvedNode,
+                        chunkSizeLines = CHUNK_SIZE_LINES,
+                    )
+
+                    resolvedNode != null -> getTextContentForTextEditorUseCase(
                         resolvedNode = resolvedNode,
                         localPath = args.localPath,
                         chunkSizeLines = CHUNK_SIZE_LINES,
                     )
-                } else {
-                    getTextContentForTextEditorUseCase(
+
+                    else -> getTextContentForTextEditorUseCase(
                         nodeHandle = resolvedNodeHandle,
                         localPath = args.localPath,
                         chunkSizeLines = CHUNK_SIZE_LINES,
@@ -357,6 +394,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val localPath: String? = null,
         /** Public file link URL; when set the editor resolves the node from this URL. */
         val publicUrl: String? = null,
+        /** True when opened from a folder link; the node is resolved and streamed via the folder API. */
+        val isFolderLink: Boolean = false,
     )
 
     /** Total number of chunks in the current mode. */
@@ -763,11 +802,17 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val publicNode = resolvedPublicNode
             if (publicNode != null) {
-                val downloadNode = runCatching {
-                    mapTypedNodeToPublicLinkUseCase(publicNode)
-                }.onFailure {
-                    Timber.e(it, "Text editor: failed to map public node for download")
-                }.getOrDefault(publicNode)
+                // Folder-link nodes are already PublicLinkNodes; only file-link nodes (plain
+                // TypedFileNode) need mapping. Avoids re-wrapping an already-public node.
+                val downloadNode = if (publicNode is PublicLinkNode) {
+                    publicNode
+                } else {
+                    runCatching {
+                        mapTypedNodeToPublicLinkUseCase(publicNode)
+                    }.onFailure {
+                        Timber.e(it, "Text editor: failed to map public node for download")
+                    }.getOrDefault(publicNode)
+                }
                 _uiState.update {
                     it.copy(
                         transferEvent = triggered(

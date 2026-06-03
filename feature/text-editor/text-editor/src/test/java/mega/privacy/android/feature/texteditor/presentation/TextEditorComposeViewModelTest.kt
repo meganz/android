@@ -43,12 +43,14 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScr
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFileLinkUseCase
+import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
@@ -81,6 +83,8 @@ internal class TextEditorComposeViewModelTest {
 
     private val getTextContentForTextEditorUseCase: GetTextContentForTextEditorUseCase = mock()
     private val getTextContentForFileLinkUseCase: GetTextContentForFileLinkUseCase = mock()
+    private val getTextContentForFolderLinkUseCase: GetTextContentForFolderLinkUseCase = mock()
+    private val getPublicChildNodeFromIdUseCase: GetPublicChildNodeFromIdUseCase = mock()
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getNodeAccessUseCase: GetNodeAccessUseCase = mock()
@@ -107,10 +111,16 @@ internal class TextEditorComposeViewModelTest {
         whenever(it.name).thenReturn("public.txt")
     }
 
+    private val folderLinkNode: TypedFileNode = mock {
+        whenever(it.id).thenReturn(NodeId(FOLDER_LINK_HANDLE))
+        whenever(it.name).thenReturn("folder-link.txt")
+    }
+
     private lateinit var underTest: TextEditorComposeViewModel
 
     private companion object {
         const val FILE_LINK_URL = "https://mega.nz/file/abc"
+        const val FOLDER_LINK_HANDLE = 555L
     }
 
     @BeforeEach
@@ -118,6 +128,8 @@ internal class TextEditorComposeViewModelTest {
         reset(
             getTextContentForTextEditorUseCase,
             getTextContentForFileLinkUseCase,
+            getTextContentForFolderLinkUseCase,
+            getPublicChildNodeFromIdUseCase,
             saveTextContentForTextEditorUseCase,
             getNodeByIdUseCase,
             getNodeAccessUseCase,
@@ -162,6 +174,7 @@ internal class TextEditorComposeViewModelTest {
         messageId: Long? = null,
         localPath: String? = null,
         publicUrl: String? = null,
+        isFolderLink: Boolean = false,
         defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
     ) {
         underTest = TextEditorComposeViewModel(
@@ -179,10 +192,13 @@ internal class TextEditorComposeViewModelTest {
                 messageId = messageId,
                 localPath = localPath,
                 publicUrl = publicUrl,
+                isFolderLink = isFolderLink,
             ),
             defaultDispatcher = defaultDispatcher,
             getTextContentForTextEditorUseCase = getTextContentForTextEditorUseCase,
             getTextContentForFileLinkUseCase = getTextContentForFileLinkUseCase,
+            getTextContentForFolderLinkUseCase = getTextContentForFolderLinkUseCase,
+            getPublicChildNodeFromIdUseCase = getPublicChildNodeFromIdUseCase,
             saveTextContentForTextEditorUseCase = saveTextContentForTextEditorUseCase,
             getShowLineNumbersPreferenceUseCase = getShowLineNumbersPreferenceUseCase,
             setShowLineNumbersPreferenceUseCase = setShowLineNumbersPreferenceUseCase,
@@ -1825,6 +1841,85 @@ internal class TextEditorComposeViewModelTest {
             assertThat(downloadEvent.nodes).hasSize(1)
             assertThat(downloadEvent.nodes.first()).isInstanceOf(PublicLinkFile::class.java)
         }
+
+    private suspend fun stubFolderLinkInit() {
+        whenever(getPublicChildNodeFromIdUseCase(NodeId(FOLDER_LINK_HANDLE)))
+            .thenReturn(PublicLinkFile(folderLinkNode, null))
+        whenever(
+            getTextContentForFolderLinkUseCase(
+                node = any(),
+                chunkSizeLines = any(),
+            )
+        ).thenReturn(flowOf(listOf("hello folder")))
+        whenever(getNodeAccessUseCase(any())).thenReturn(null)
+    }
+
+    @Test
+    fun `test that init resolves folder link node and loads content when isFolderLink is set`() =
+        runTest {
+            stubFolderLinkInit()
+
+            initUnderTest(nodeHandle = FOLDER_LINK_HANDLE, isFolderLink = true)
+            advanceUntilIdle()
+
+            verify(getPublicChildNodeFromIdUseCase).invoke(NodeId(FOLDER_LINK_HANDLE))
+            verify(getTextContentForFolderLinkUseCase).invoke(
+                node = any(),
+                chunkSizeLines = any(),
+            )
+            val state = underTest.uiState.value
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.fileName).isEqualTo("folder-link.txt")
+        }
+
+    @Test
+    fun `test that init does not load via cloud use case for folder link`() = runTest {
+        stubFolderLinkInit()
+
+        initUnderTest(nodeHandle = FOLDER_LINK_HANDLE, isFolderLink = true)
+        advanceUntilIdle()
+
+        verify(getTextContentForTextEditorUseCase, never()).invoke(
+            nodeHandle = any(),
+            localPath = anyOrNull(),
+            chunkSizeLines = any(),
+        )
+    }
+
+    @Test
+    fun `test that init shows error when folder link node cannot be resolved`() = runTest {
+        whenever(getPublicChildNodeFromIdUseCase(NodeId(FOLDER_LINK_HANDLE))).thenReturn(null)
+
+        initUnderTest(nodeHandle = FOLDER_LINK_HANDLE, isFolderLink = true)
+        advanceUntilIdle()
+
+        verify(getTextContentForFolderLinkUseCase, never()).invoke(
+            node = any(),
+            chunkSizeLines = any(),
+        )
+        val state = underTest.uiState.value
+        assertThat(state.isLoading).isFalse()
+        assertThat(state.errorEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that folder link download uses resolved public node without remapping`() = runTest {
+        stubFolderLinkInit()
+
+        initUnderTest(nodeHandle = FOLDER_LINK_HANDLE, isFolderLink = true, showDownload = true)
+        advanceUntilIdle()
+
+        underTest.onMenuAction(TextEditorTopBarAction.Download)
+        advanceUntilIdle()
+
+        verify(mapTypedNodeToPublicLinkUseCase, never()).invoke(any(), anyOrNull())
+        val event = underTest.uiState.value.transferEvent
+        assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+        val downloadEvent =
+            (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+        assertThat(downloadEvent.nodes).hasSize(1)
+        assertThat(downloadEvent.nodes.first()).isInstanceOf(PublicLinkFile::class.java)
+    }
 
     @Test
     fun `test that fileName is updated when current node is renamed`() = runTest {
