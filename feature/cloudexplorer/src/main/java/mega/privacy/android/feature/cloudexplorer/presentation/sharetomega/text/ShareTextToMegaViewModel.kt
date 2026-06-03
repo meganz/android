@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.file.CreateTextFileWithContentUseCase
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 

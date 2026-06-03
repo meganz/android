@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":core:feature-flags"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
     implementation(project(":resources:icon-pack"))

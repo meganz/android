@@ -36,7 +36,7 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds

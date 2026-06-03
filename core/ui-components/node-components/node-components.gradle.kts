@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":core:feature-flags"))
     implementation(project(":core:passcode:passcode"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":core:analytics:analytics-tracker"))
 
     //core components

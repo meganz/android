@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":resources:string-resources"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
     implementation(project(":feature:sync"))

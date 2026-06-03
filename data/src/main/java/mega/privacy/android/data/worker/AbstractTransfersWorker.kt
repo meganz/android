@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
 import mega.privacy.android.domain.entity.transfer.TransferProgressResult
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.core.coroutine.logFlow
 import mega.privacy.android.domain.extension.onEachSampled
 import mega.privacy.android.domain.extension.onFirst
 import mega.privacy.android.domain.extension.skipUnstable
@@ -132,9 +133,11 @@ abstract class AbstractTransfersWorker(
                 }
             }
         }
+        .logFlow("Progress") {
+            "pendingWork=${it.pendingWork} hasOngoingTransfers=${it.monitorOngoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}"
+        }
         .transformWhile {
             emit(it.monitorOngoingActiveTransfersResult)
-            Timber.d("Progress emitted: $it.pendingWork ${it.monitorOngoingActiveTransfersResult.activeTransferTotals.hasOngoingTransfers()}")
             return@transformWhile it.pendingWork
         }
         .onEachSampled(

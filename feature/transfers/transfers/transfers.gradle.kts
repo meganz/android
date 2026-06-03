@@ -22,6 +22,7 @@ dependencies {
 
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":domain"))
     implementation(project(":navigation"))
     implementation(project(":resources:icon-pack"))

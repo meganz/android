@@ -21,7 +21,7 @@ import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNam
 import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.feature.myaccount.presentation.mapper.QuotaLevelMapper
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 

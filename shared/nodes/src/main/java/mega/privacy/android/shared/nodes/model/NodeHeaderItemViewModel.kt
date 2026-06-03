@@ -21,7 +21,7 @@ import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import timber.log.Timber
 

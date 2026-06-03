@@ -32,6 +32,7 @@ dependencies {
 
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(lib.mega.analytics)
 
     implementation(lib.kotlin.ktx)

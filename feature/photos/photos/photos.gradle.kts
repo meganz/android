@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":core:formatter"))
     implementation(project(":core:transfers"))
     implementation(project(":navigation"))

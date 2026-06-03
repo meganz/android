@@ -4,6 +4,10 @@ plugins {
 
 android {
     namespace = "mega.privacy.android.core.coroutine"
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {

@@ -14,7 +14,7 @@ import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTime
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.shared.account.overquota.mapper.OverQuotaStatusMapper
 import mega.privacy.android.shared.account.overquota.model.OverQuotaStatus
 import mega.privacy.android.shared.account.overquota.model.OverQuotaStatusUiState

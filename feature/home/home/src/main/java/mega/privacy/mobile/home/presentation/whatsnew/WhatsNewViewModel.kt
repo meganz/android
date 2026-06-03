@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.usecase.global.GetAppVersionUseCase
 import mega.privacy.android.domain.usecase.home.MarkNewFeatureDisplayedUseCase
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import javax.inject.Inject
 
 @HiltViewModel

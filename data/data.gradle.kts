@@ -36,6 +36,7 @@ configurations.matching { it.name.contains("AndroidTest") }.configureEach {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core:coroutine"))
     implementation(project(":shared:sync"))
     implementation(google.guava)
     api(project(":third-party-lib:pdfiumAndroid"))

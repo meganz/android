@@ -22,7 +22,7 @@ import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import mega.privacy.android.navigation.contract.sortedByPreferredSlot
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import javax.inject.Inject
 
 @HiltViewModel

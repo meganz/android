@@ -26,6 +26,7 @@ android {
 
 dependencies {
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":core:feature-flags"))
     lintChecks(project(":lint"))
     preBuiltSdkDependency(rootProject.extra)

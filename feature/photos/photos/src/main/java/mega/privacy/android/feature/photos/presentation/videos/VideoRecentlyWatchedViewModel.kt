@@ -33,7 +33,7 @@ import mega.privacy.android.domain.usecase.videosection.ClearRecentlyWatchedVide
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoRecentlyWatchedUseCase
 import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId

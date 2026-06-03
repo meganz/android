@@ -26,7 +26,7 @@ import mega.privacy.android.feature.contact.list.mapper.ContactItemUiModelMapper
 import mega.privacy.android.feature.contact.list.model.CallEventData
 import mega.privacy.android.feature.contact.list.model.ContactListUiState
 import mega.privacy.android.feature.contact.list.model.ContactUiModel
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 

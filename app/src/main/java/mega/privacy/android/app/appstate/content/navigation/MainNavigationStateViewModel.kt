@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
@@ -27,7 +26,8 @@ import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.core.coroutine.logFlow
 import mega.privacy.mobile.navigation.snowflake.model.NavigationItem
 import timber.log.Timber
 import javax.inject.Inject
@@ -47,16 +47,16 @@ class MainNavigationStateViewModel @Inject constructor(
         combine(
             isConnected,
             getNavigationItems()
-                .log("Navigation Items"),
+                .logFlow("Navigation Items"),
             filteredMainNavItemsFlow
                 .filter { it.isNotEmpty() }
                 .map { itemSet -> itemSet.map { it.screen }.toSet().toImmutableSet() }
-                .log("Main Nav Screens"),
+                .logFlow("Main Nav Screens"),
             monitorStartScreenPreferenceDestinationUseCase()
                 .map {
                     screenPreferenceDestinationMapper(it) ?: defaultStartScreen
                 }.take(1)
-                .log("Start Screen Preference Destination"),
+                .logFlow("Start Screen Preference Destination"),
         ) { isConnected, navigationItems, mainScreens, startScreenPreferenceDestination ->
             MainNavState.Data(
                 mainNavItems = navigationItems,
@@ -123,8 +123,4 @@ class MainNavigationStateViewModel @Inject constructor(
             )
             emit(true)
         }
-
-    private fun <T> Flow<T>.log(flowName: String): Flow<T> = this.onEach {
-        Timber.d("$flowName emitted: $it")
-    }
 }

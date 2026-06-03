@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -51,6 +52,9 @@ class NavigationGraphViewModelTest {
     @Test
     fun `test that initial state is loading`() = runTest {
         val featureDestinations = emptySet<@JvmSuppressWildcards FeatureDestination>()
+        getEnabledFlaggedItemsUseCase.stub {
+            on { invoke(featureDestinations) }.thenReturn(flow { awaitCancellation() })
+        }
         initUnderTest(featureDestinations)
         assertThat(underTest.state.value).isEqualTo(NavigationGraphState.Loading)
     }
@@ -61,7 +65,7 @@ class NavigationGraphViewModelTest {
         val expected = setOf(mock<FeatureDestination>())
 
         getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(expected) }.thenReturn(flow { emit(expected) })
+            on { invoke(expected) }.thenReturn(flow { emit(expected) })
         }
 
         initUnderTest(expected)

@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
@@ -36,7 +35,8 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.core.coroutine.logFlow
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
@@ -61,9 +61,8 @@ class GlobalStateViewModel @Inject constructor(
         getStateValues().catch {
             Timber.e(it, "Error while building auth state")
         }.distinctUntilChanged()
-            .onEach {
-                Timber.d("AuthState emitted: $it")
-            }.asUiStateFlow(
+            .logFlow("AuthState")
+            .asUiStateFlow(
                 scope = viewModelScope,
                 initialValue = GlobalState.Loading(ThemeMode.System)
             )

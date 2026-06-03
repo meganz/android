@@ -7,7 +7,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import javax.inject.Inject
 
 /**

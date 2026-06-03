@@ -16,7 +16,7 @@ import mega.privacy.android.domain.usecase.transfers.GetMaxUploadConnectionsUseC
 import mega.privacy.android.domain.usecase.transfers.SetMaxDownloadConnectionsUseCase
 import mega.privacy.android.domain.usecase.transfers.SetMaxUploadConnectionsUseCase
 import mega.privacy.android.feature.transfers.presentation.settings.model.TransfersSettingsUiState
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 

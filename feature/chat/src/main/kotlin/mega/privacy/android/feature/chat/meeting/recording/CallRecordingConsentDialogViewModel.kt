@@ -14,7 +14,7 @@ import mega.privacy.android.domain.usecase.call.BroadcastCallRecordingConsentEve
 import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingConsentUiState
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 

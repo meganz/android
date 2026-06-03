@@ -1,4 +1,4 @@
-package mega.privacy.android.navigation.contract.viewmodel
+package mega.privacy.android.core.coroutine
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

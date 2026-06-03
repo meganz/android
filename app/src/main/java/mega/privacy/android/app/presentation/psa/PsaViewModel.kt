@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
 import mega.privacy.android.domain.usecase.psa.SetDisplayedPsaUseCase
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 

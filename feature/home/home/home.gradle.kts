@@ -21,6 +21,7 @@ android {
 dependencies {
     implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
     implementation(project(":domain"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))

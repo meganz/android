@@ -50,7 +50,7 @@ import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationEr
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import timber.log.Timber
 

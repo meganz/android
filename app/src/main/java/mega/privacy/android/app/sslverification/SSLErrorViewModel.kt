@@ -11,7 +11,7 @@ import mega.privacy.android.app.sslverification.model.SSLDialogState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.apiserver.ResetConnectionUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -11,7 +11,7 @@ import mega.privacy.android.app.presentation.business.model.BusinessExpiredAlert
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import javax.inject.Inject
 
 /**

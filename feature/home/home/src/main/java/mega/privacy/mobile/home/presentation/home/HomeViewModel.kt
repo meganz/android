@@ -20,7 +20,7 @@ import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUs
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 import mega.privacy.mobile.home.presentation.home.model.HomeWidgetItem
 import timber.log.Timber
