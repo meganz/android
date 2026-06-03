@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.videoeditor.presentation
+package mega.privacy.android.feature.videoeditor.presentation.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,17 +10,17 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
-import mega.privacy.android.feature.videoeditor.presentation.model.VideoEditorUiState
+import mega.privacy.android.feature.videoeditor.presentation.screen.model.VideoEditorUiState
 
 /**
  * Stateful entry point for the video editor.
  *
- * Hosts the [VideoEditorViewModel] for the given [nodeHandle]
+ * Hosts the [VideoEditorScreenViewModel] for the given [nodeHandle]
  * @param nodeHandle The MEGA node handle of the video to edit.
  */
 @Composable
 internal fun VideoEditorRoute(nodeHandle: Long) {
-    val viewModel = hiltViewModel<VideoEditorViewModel, VideoEditorViewModel.Factory>(
+    val viewModel = hiltViewModel<VideoEditorScreenViewModel, VideoEditorScreenViewModel.Factory>(
         creationCallback = { factory -> factory.create(nodeHandle) }
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

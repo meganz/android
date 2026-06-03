@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.videoeditor.presentation.model
+package mega.privacy.android.feature.videoeditor.presentation.screen.model
 
 /**
  * UI state for the video editor screen.

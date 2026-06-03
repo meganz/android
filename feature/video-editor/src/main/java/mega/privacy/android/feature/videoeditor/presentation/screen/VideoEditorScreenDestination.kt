@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.videoeditor.presentation
+package mega.privacy.android.feature.videoeditor.presentation.screen
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey

@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.feature.videoeditor.presentation.screen.VideoEditorScreenViewModel
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -31,7 +32,7 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class VideoEditorViewModelTest {
+class VideoEditorScreenViewModelTest {
 
     companion object {
         @JvmField
@@ -43,7 +44,7 @@ class VideoEditorViewModelTest {
         private const val FILE_SIZE = 100L
     }
 
-    private lateinit var underTest: VideoEditorViewModel
+    private lateinit var underTest: VideoEditorScreenViewModel
 
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
@@ -59,7 +60,7 @@ class VideoEditorViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = VideoEditorViewModel(
+        underTest = VideoEditorScreenViewModel(
             nodeHandle = NODE_HANDLE,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getFilePreviewDownloadPathUseCase = getFilePreviewDownloadPathUseCase,

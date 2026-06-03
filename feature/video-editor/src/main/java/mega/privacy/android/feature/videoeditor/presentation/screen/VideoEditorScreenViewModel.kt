@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.videoeditor.presentation
+package mega.privacy.android.feature.videoeditor.presentation.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,15 +18,20 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
-import mega.privacy.android.feature.videoeditor.presentation.model.VideoEditorUiState
+import mega.privacy.android.feature.videoeditor.presentation.screen.model.VideoEditorUiState
 import timber.log.Timber
 import java.io.File
 
 /**
- * ViewModel for the video editor screen.
+ * Host ViewModel for the video editor screen.
+ *
+ * Owns the MEGA-integration side of the screen: it downloads the source video
+ * into cache (exposed via [uiState]) and uploads the exported result back to
+ * MEGA cloud. The in-editor MVI state lives in a separate [mega.privacy.android.feature.videoeditor.presentation.editor.EditorViewModel];
+ * the screen bridges the two.
  */
-@HiltViewModel(assistedFactory = VideoEditorViewModel.Factory::class)
-internal class VideoEditorViewModel @AssistedInject constructor(
+@HiltViewModel(assistedFactory = VideoEditorScreenViewModel.Factory::class)
+internal class VideoEditorScreenViewModel @AssistedInject constructor(
     @Assisted private val nodeHandle: Long,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
@@ -115,6 +120,6 @@ internal class VideoEditorViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(nodeHandle: Long): VideoEditorViewModel
+        fun create(nodeHandle: Long): VideoEditorScreenViewModel
     }
 }

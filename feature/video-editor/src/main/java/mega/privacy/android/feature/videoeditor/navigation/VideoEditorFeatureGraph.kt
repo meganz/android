@@ -5,7 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.feature.videoeditor.presentation.videoEditorScreen
+import mega.privacy.android.feature.videoeditor.presentation.screen.videoEditorScreen
 
 class VideoEditorFeatureGraph : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit

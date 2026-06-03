@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.videoeditor.presentation
+package mega.privacy.android.feature.videoeditor.presentation.screen
 
 import android.content.Context
 import android.content.Intent

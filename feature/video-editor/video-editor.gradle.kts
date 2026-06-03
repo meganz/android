@@ -29,6 +29,8 @@ dependencies {
     implementation(lib.mega.core.ui)
     implementation(lib.logging.timber)
 
+    implementation(google.bundles.media3)
+
     implementation(androidx.appcompat)
     implementation(androidx.compose.activity)
     implementation(androidx.hilt.navigation)
