@@ -119,15 +119,20 @@ fun TextEditorContent(
                 onRestoreScrollConsumed()
             }
             if (readOnly) {
-                ViewModeLazyColumn(
-                    lazyListState = lazyListState,
-                    chunkCount = chunkCount,
-                    totalLineCount = totalLineCount,
-                    chunkTextProvider = chunkTextProvider,
-                    chunkStartLineProvider = chunkStartLineProvider,
-                    showLineNumbers = showLineNumbers,
-                    textStyle = textStyle,
-                )
+                // A single SelectionContainer spanning the whole list (rather than one per
+                // chunk hugging the text) makes the entire viewer one selection region, so a
+                // tap on the empty space outside the text clears the active selection.
+                SelectionContainer {
+                    ViewModeLazyColumn(
+                        lazyListState = lazyListState,
+                        chunkCount = chunkCount,
+                        totalLineCount = totalLineCount,
+                        chunkTextProvider = chunkTextProvider,
+                        chunkStartLineProvider = chunkStartLineProvider,
+                        showLineNumbers = showLineNumbers,
+                        textStyle = textStyle,
+                    )
+                }
             } else {
                 EditModeLazyColumn(
                     lazyListState = lazyListState,
@@ -290,13 +295,11 @@ private fun ReadOnlyChunkItem(
             )
         },
     ) {
-        SelectionContainer {
-            BasicText(
-                text = chunkText,
-                style = textStyle,
-                onTextLayout = { layoutResult = it },
-            )
-        }
+        BasicText(
+            text = chunkText,
+            style = textStyle,
+            onTextLayout = { layoutResult = it },
+        )
     }
 }
 
