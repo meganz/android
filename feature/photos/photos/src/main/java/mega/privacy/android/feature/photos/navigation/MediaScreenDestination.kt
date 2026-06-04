@@ -68,7 +68,6 @@ import mega.privacy.android.navigation.destination.AlbumImportNavKey
 import mega.privacy.android.navigation.destination.AlbumImportPreviewNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
-import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
@@ -473,7 +472,6 @@ fun EntryProviderScope<NavKey>.albumImports(
             onConsumed = albumImportViewModel::resetAlbumSelectionFinishedEvent,
             action = {
                 navigationHandler.clearResult(FileExplorerNavKey.RESULT_FOLDER_HANDLE)
-                navigationHandler.navigateAndClearBackStack(DriveSyncNavKey())
             }
         )
 
