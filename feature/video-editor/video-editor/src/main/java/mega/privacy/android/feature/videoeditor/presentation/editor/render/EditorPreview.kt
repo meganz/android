@@ -12,13 +12,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.graphicsLayer
@@ -29,12 +32,15 @@ import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.compose.PlayerSurface
 import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
+import mega.privacy.android.feature.videoeditor.components.FreeFormCropOverlay
 import mega.privacy.android.feature.videoeditor.presentation.editor.engine.ToolRegistry
 import mega.privacy.android.feature.videoeditor.presentation.editor.engine.buildMediaItem
 import mega.privacy.android.feature.videoeditor.presentation.editor.engine.createPreviewPlayer
 import mega.privacy.android.feature.videoeditor.presentation.editor.state.EditorAction
 import mega.privacy.android.feature.videoeditor.presentation.editor.state.EditorState
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.BuiltInToolIds
+import mega.privacy.android.feature.videoeditor.presentation.editor.tool.crop.CropAction
+import mega.privacy.android.feature.videoeditor.presentation.editor.tool.crop.CropPreset
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
@@ -187,6 +193,13 @@ fun EditorPreview(
     val showCroppedRef = rememberUpdatedState(showCroppedPreview)
     val cropRectRef = rememberUpdatedState(cropRect)
 
+    // Crop-tool scratch state: pan/zoom of the raw source while framing the
+    // crop. Local to this composable so it doesn't survive tool exit; the crop
+    // overlay reads/writes it through callbacks, and the inner graphicsLayer
+    // below reads it while the Crop tool is active.
+    var videoPan by remember(state.source.uri) { mutableStateOf(Offset.Zero) }
+    var videoScale by remember(state.source.uri) { mutableFloatStateOf(1f) }
+
     BoxWithConstraints(
         modifier = modifier
             .background(Color.Black)
@@ -255,19 +268,57 @@ fun EditorPreview(
                                 val cropCenterY = ((rect.top + rect.bottom) / 2f) * height
                                 translationX = width / 2f - cropCenterX
                                 translationY = height / 2f - cropCenterY
+                            } else if (isCropTool) {
+                                // Crop tool free pan/zoom on the raw source.
+                                translationX = videoPan.x
+                                translationY = videoPan.y
+                                scaleX = videoScale
+                                scaleY = videoScale
                             }
                         },
                 )
             }
 
-            // Let the active tool inject its own preview overlay.
-            state.activeTool?.let { toolId ->
-                registry[toolId]?.PreviewOverlay(
-                    state = state,
-                    onAction = { action -> onAction(EditorAction.DispatchTool(action)) },
-                    previewSize = previewSize,
+            // Crop tool's overlay needs read+write access to videoPan/Scale,
+            // which lives in this composable — so it's rendered here directly
+            // rather than via tool.PreviewOverlay.
+            if (isCropTool && state.source.widthPx > 0 && state.source.heightPx > 0 &&
+                state.crop.freeForm
+            ) {
+                val rawSourceAspectRatio =
+                    state.source.widthPx.toFloat() / state.source.heightPx.toFloat()
+                val effectiveAspectLock = state.crop.aspectLock
+                    ?: rawSourceAspectRatio.takeIf { state.crop.selectedPreset == CropPreset.ORIGINAL }
+                val normalizedAspectLock = effectiveAspectLock?.let { it / rawSourceAspectRatio }
+                FreeFormCropOverlay(
+                    cropRect = state.crop.rect,
+                    sourceWidth = state.source.widthPx,
+                    sourceHeight = state.source.heightPx,
+                    videoPan = videoPan,
+                    videoScale = videoScale,
+                    aspectLock = normalizedAspectLock,
+                    presetKey = state.crop.selectedPreset,
+                    onCornerResize = { onAction(EditorAction.DispatchTool(CropAction.SetRect(it))) },
+                    onPanPinch = { newPan, newScale, newCropRect ->
+                        videoPan = newPan
+                        videoScale = newScale
+                        onAction(EditorAction.DispatchTool(CropAction.SetRect(newCropRect)))
+                    },
                     modifier = Modifier.fillMaxSize(),
                 )
+            }
+
+            // Other tools inject their overlay via PreviewOverlay (Crop is
+            // handled inline above).
+            state.activeTool?.let { toolId ->
+                if (toolId != BuiltInToolIds.Crop) {
+                    registry[toolId]?.PreviewOverlay(
+                        state = state,
+                        onAction = { action -> onAction(EditorAction.DispatchTool(action)) },
+                        previewSize = previewSize,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             }
         }
     }

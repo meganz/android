@@ -11,6 +11,7 @@ import dagger.multibindings.Multibinds
 import mega.privacy.android.feature.videoeditor.navigation.VideoEditorFeatureGraph
 import mega.privacy.android.feature.videoeditor.presentation.editor.engine.ToolRegistry
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.EditorTool
+import mega.privacy.android.feature.videoeditor.presentation.editor.tool.crop.CropTool
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.trim.TrimTool
 import mega.privacy.android.navigation.contract.FeatureDestination
 import javax.inject.Singleton
@@ -48,5 +49,10 @@ interface VideoEditorModule {
         @IntoSet
         @OptIn(UnstableApi::class)
         fun provideTrimTool(): EditorTool = TrimTool
+
+        @Provides
+        @IntoSet
+        @OptIn(UnstableApi::class)
+        fun provideCropTool(): EditorTool = CropTool
     }
 }
