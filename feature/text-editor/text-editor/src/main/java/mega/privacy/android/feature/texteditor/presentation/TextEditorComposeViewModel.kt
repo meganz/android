@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -119,6 +120,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase,
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    private val saveRecentlyUsedItemIfQualifiesUseCase: SaveRecentlyUsedItemIfQualifiesUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -175,6 +177,14 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     /** Last known scroll position reported by the UI, used for persistence. */
     private var lastScrollFraction: Float = 0f
     private var lastScrollOffset: Int = 0
+
+    /**
+     * How far the bottom of the viewport has reached through the document (0.0–1.0),
+     * reported by the UI. Unlike [lastScrollFraction] (which anchors on the first visible
+     * chunk for restoration), this reflects how much has actually been read and is used to
+     * decide near-completion exclusion from Continue Where Left Off.
+     */
+    private var lastReadThroughFraction: Float = 0f
 
     /** Whether long-line chunking (AND-23707) is enabled. Resolved once during init. */
     @Volatile
@@ -630,11 +640,25 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     private fun emitCloseEvent() {
         viewModelScope.launch {
-            // Order matters: saveRecentlyUsed() must run before saveScrollState() because
-            // the scroll table has a FK to recently_used, and the REPLACE strategy on
-            // recently_used cascade-deletes the scroll row before re-inserting.
-            saveRecentlyUsed()
-            saveScrollState()
+            // Decide on exit whether the document belongs in Continue Where Left Off based on how
+            // far it was read: below the near-completion fraction it is saved as resumable, at or
+            // above it is removed instead of being resurfaced (mirrors audio/video exclusion).
+            val saved = resolvedNodeHandle != INVALID_NODE_HANDLE &&
+                    runCatching {
+                        saveRecentlyUsedItemIfQualifiesUseCase(
+                            nodeHandle = resolvedNodeHandle,
+                            type = RecentlyUsedType.TextEditor,
+                            fileName = _uiState.value.fileName,
+                            progress = lastReadThroughFraction,
+                        )
+                    }.onFailure {
+                        Timber.e(it, "Failed to persist text file Continue Where Left Off")
+                    }.getOrDefault(false)
+            if (saved) {
+                // The scroll table has a FK to recently_used, so the row must exist first; the
+                // save above inserts it before we persist the scroll position here.
+                saveScrollState()
+            }
             _uiState.update { it.copy(closeEvent = triggered) }
         }
     }
@@ -1043,10 +1067,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      * Called by the UI to report the current scroll position.
      * [fraction] is the normalised position (0.0–1.0) used to calculate the chunk index.
      * [scrollOffset] is the pixel offset within the first visible chunk, for precise restoration.
+     * [readThroughFraction] is how far the bottom of the viewport has reached through the
+     * document (0.0–1.0); it defaults to 0f (not read through) for callers that report only
+     * the scroll position.
      */
-    fun updateScrollPosition(fraction: Float, scrollOffset: Int) {
+    fun updateScrollPosition(
+        fraction: Float,
+        scrollOffset: Int,
+        readThroughFraction: Float = 0f,
+    ) {
         lastScrollFraction = fraction
         lastScrollOffset = scrollOffset
+        lastReadThroughFraction = readThroughFraction
     }
 
     private suspend fun saveScrollState() {
@@ -1060,6 +1092,17 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 )
             )
         }.onFailure { Timber.e(it, "Failed to save text editor scroll state") }
+    }
+
+    private suspend fun saveRecentlyUsed() {
+        if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
+        runCatching {
+            saveRecentlyUsedItemUseCase(
+                nodeHandle = resolvedNodeHandle,
+                type = RecentlyUsedType.TextEditor,
+                fileName = _uiState.value.fileName,
+            )
+        }.onFailure { Timber.e(it, "Failed to save recently used item") }
     }
 
     private suspend fun restoreScrollPosition() {
@@ -1169,15 +1212,4 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun saveRecentlyUsed() {
-        if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
-        val fileName = _uiState.value.fileName
-        runCatching {
-            saveRecentlyUsedItemUseCase(
-                nodeHandle = resolvedNodeHandle,
-                type = RecentlyUsedType.TextEditor,
-                fileName = fileName,
-            )
-        }.onFailure { Timber.e(it, "Failed to save recently used item") }
-    }
 }

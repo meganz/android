@@ -15,6 +15,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,9 +38,10 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -75,7 +77,8 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val saveRecentlyUsedItemIfQualifiesUseCase: SaveRecentlyUsedItemIfQualifiesUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
@@ -438,12 +441,14 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         }
         if (!args.isExternalFile) {
             viewModelScope.launch {
-                setOrUpdateLastPageViewedInPdfUseCase(
-                    LastPageViewedInPdf(
-                        nodeHandle = args.nodeHandle,
-                        lastPageViewed = page.toLong()
+                runCatching {
+                    setOrUpdateLastPageViewedInPdfUseCase(
+                        LastPageViewedInPdf(
+                            nodeHandle = args.nodeHandle,
+                            lastPageViewed = page.toLong()
+                        )
                     )
-                )
+                }.onFailure { Timber.e(it, "Failed to persist last viewed PDF page") }
             }
         }
     }
@@ -455,17 +460,6 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 totalPages = pageCount,
                 error = null,
             )
-        }
-        if (!args.isExternalFile) {
-            viewModelScope.launch {
-                runCatching {
-                    saveRecentlyUsedItemUseCase(
-                        nodeHandle = args.nodeHandle,
-                        type = RecentlyUsedType.PDF,
-                        fileName = args.title.orEmpty(),
-                    )
-                }.onFailure { Timber.e(it, "Failed to save recently used PDF item") }
-            }
         }
     }
 
@@ -599,11 +593,41 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         }
     }
 
-    override fun onCleared() {
+    public override fun onCleared() {
         super.onCleared()
+        persistContinueWhereLeftOffOnExit()
         synchronized(engineLock) {
             searchEngine?.close()
             searchEngine = null
+        }
+    }
+
+    /**
+     * Decides whether the PDF belongs in Continue Where Left Off when the user leaves the viewer,
+     * rather than adding it on open. A document read through to the near-completion fraction is
+     * dropped from the carousel (and any stale entry removed) so a finished document is not
+     * surfaced back as resumable; anything less is saved as resumable.
+     *
+     * The last viewed page is persisted independently in [onPageChanged], so reading progress is
+     * retained regardless of this widget decision. Runs on [applicationScope] because
+     * [viewModelScope] is already cancelled by the time [onCleared] is called.
+     */
+    private fun persistContinueWhereLeftOffOnExit() {
+        if (args.isExternalFile) return
+        val currentPage = _state.value.currentPage ?: return
+        val totalPages = _state.value.totalPages
+        if (totalPages <= 0) return
+        val nodeHandle = args.nodeHandle
+        val fileName = args.title.orEmpty()
+        applicationScope.launch {
+            runCatching {
+                saveRecentlyUsedItemIfQualifiesUseCase(
+                    nodeHandle = nodeHandle,
+                    type = RecentlyUsedType.PDF,
+                    fileName = fileName,
+                    progress = currentPage.toFloat() / totalPages,
+                )
+            }.onFailure { Timber.e(it, "Failed to persist PDF Continue Where Left Off on exit") }
         }
     }
 

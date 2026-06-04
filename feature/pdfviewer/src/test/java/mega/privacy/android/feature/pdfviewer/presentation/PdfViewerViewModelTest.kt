@@ -7,6 +7,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.shockwave.pdfium.PdfTextMatch
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
@@ -27,7 +28,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -74,7 +75,8 @@ class PdfViewerViewModelTest {
         mock<SetOrUpdateLastPageViewedInPdfUseCase>()
     private val getDataBytesFromUrlUseCase = mock<GetDataBytesFromUrlUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-    private val saveRecentlyUsedItemUseCase = mock<SaveRecentlyUsedItemUseCase>()
+    private val saveRecentlyUsedItemIfQualifiesUseCase =
+        mock<SaveRecentlyUsedItemIfQualifiesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
@@ -103,7 +105,7 @@ class PdfViewerViewModelTest {
             setOrUpdateLastPageViewedInPdfUseCase,
             getDataBytesFromUrlUseCase,
             monitorConnectivityUseCase,
-            saveRecentlyUsedItemUseCase,
+            saveRecentlyUsedItemIfQualifiesUseCase,
             monitorOfflineNodeUpdatesUseCase,
             getFeatureFlagValueUseCase,
             getNodeByIdUseCase,
@@ -140,8 +142,9 @@ class PdfViewerViewModelTest {
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
-            saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
+            saveRecentlyUsedItemIfQualifiesUseCase = saveRecentlyUsedItemIfQualifiesUseCase,
             ioDispatcher = testDispatcher,
+            applicationScope = CoroutineScope(testDispatcher),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
@@ -244,6 +247,18 @@ class PdfViewerViewModelTest {
             assertThat(state.totalPages).isEqualTo(20)
         }
     }
+
+    @Test
+    fun `test that onPageChanged does not touch Continue Where Left Off while reading`() =
+        runTest {
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.onPageChanged(18, 20)
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+        }
 
     @Test
     fun `test that onLoadComplete sets loading to false and updates totalPages`() = runTest {
@@ -648,19 +663,62 @@ class PdfViewerViewModelTest {
         }
 
     @Test
-    fun `test that onLoadComplete saves recently used PDF item`() = runTest {
+    fun `test that onLoadComplete does not save recently used item on open`() = runTest {
         underTest = initViewModel()
         advanceUntilIdle()
 
         underTest.onLoadComplete(10)
         advanceUntilIdle()
 
-        verify(saveRecentlyUsedItemUseCase).invoke(
-            nodeHandle = 12345L,
-            type = RecentlyUsedType.PDF,
-            fileName = "Test Document.pdf",
-        )
+        verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
     }
+
+    @Test
+    fun `test that onCleared persists Continue Where Left Off with the read-through progress`() =
+        runTest {
+            underTest = initViewModel()
+            advanceUntilIdle()
+            underTest.onLoadComplete(20)
+            underTest.onPageChanged(5, 20)
+            advanceUntilIdle()
+
+            underTest.onCleared()
+            advanceUntilIdle()
+
+            verify(saveRecentlyUsedItemIfQualifiesUseCase).invoke(
+                nodeHandle = 12345L,
+                type = RecentlyUsedType.PDF,
+                fileName = "Test Document.pdf",
+                progress = 0.25f,
+            )
+        }
+
+    @Test
+    fun `test that onCleared does not touch Continue Where Left Off when totalPages is zero`() =
+        runTest {
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.onCleared()
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+        }
+
+    @Test
+    fun `test that onCleared does not touch Continue Where Left Off when isExternalFile is true`() =
+        runTest {
+            underTest = initViewModel(args = externalFileArgs)
+            advanceUntilIdle()
+            underTest.onLoadComplete(20)
+            underTest.onPageChanged(5, 20)
+            advanceUntilIdle()
+
+            underTest.onCleared()
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+        }
 
     @Test
     fun `test that monitorOfflineNodeAvailability does not trigger dismissEvent when nodeSourceType is not OFFLINE`() =
@@ -975,18 +1033,6 @@ class PdfViewerViewModelTest {
             advanceUntilIdle()
 
             verify(setOrUpdateLastPageViewedInPdfUseCase, never()).invoke(any())
-        }
-
-    @Test
-    fun `test that onLoadComplete does not save recently used when isExternalFile is true`() =
-        runTest {
-            underTest = initViewModel(args = externalFileArgs)
-            advanceUntilIdle()
-
-            underTest.onLoadComplete(10)
-            advanceUntilIdle()
-
-            verifyNoInteractions(saveRecentlyUsedItemUseCase)
         }
 
     @Test
