@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccess
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -74,6 +75,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -99,6 +101,8 @@ internal class TextEditorComposeViewModelTest {
     private val saveTextEditorScrollUseCase: SaveTextEditorScrollUseCase = mock()
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase = mock()
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase = mock()
+    private val saveRecentlyUsedItemIfQualifiesUseCase:
+            SaveRecentlyUsedItemIfQualifiesUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
@@ -144,6 +148,7 @@ internal class TextEditorComposeViewModelTest {
             saveTextEditorScrollUseCase,
             getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase,
+            saveRecentlyUsedItemIfQualifiesUseCase,
             monitorNodeUpdatesUseCase,
             monitorConnectivityUseCase,
             isConnectedToInternetUseCase,
@@ -214,6 +219,7 @@ internal class TextEditorComposeViewModelTest {
             saveTextEditorScrollUseCase = saveTextEditorScrollUseCase,
             getTextEditorScrollUseCase = getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
+            saveRecentlyUsedItemIfQualifiesUseCase = saveRecentlyUsedItemIfQualifiesUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
@@ -1537,6 +1543,84 @@ internal class TextEditorComposeViewModelTest {
         }
 
     @Test
+    fun `test that closing a read-through text file removes it from CWLO and does not save scroll state`() =
+        runTest {
+            val lines = listOf("line1")
+            doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+            whenever(saveRecentlyUsedItemIfQualifiesUseCase(any(), any(), any(), any()))
+                .thenReturn(false)
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+
+            // First visible chunk still near the top, but the bottom of the viewport has
+            // reached the end of the file.
+            underTest.updateScrollPosition(
+                fraction = 0.1f,
+                scrollOffset = 0,
+                readThroughFraction = 0.95f,
+            )
+            underTest.handleClose()
+            advanceUntilIdle()
+
+            verify(saveRecentlyUsedItemIfQualifiesUseCase).invoke(
+                nodeHandle = 1L,
+                type = RecentlyUsedType.TextEditor,
+                fileName = "",
+                progress = 0.95f,
+            )
+            verify(saveTextEditorScrollUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that closing a not read-through text file saves scroll state`() =
+        runTest {
+            val lines = listOf("line1")
+            doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+            whenever(saveRecentlyUsedItemIfQualifiesUseCase(any(), any(), any(), any()))
+                .thenReturn(true)
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+
+            underTest.updateScrollPosition(
+                fraction = 0.5f,
+                scrollOffset = 0,
+                readThroughFraction = 0.5f,
+            )
+            underTest.handleClose()
+            advanceUntilIdle()
+
+            verify(saveRecentlyUsedItemIfQualifiesUseCase).invoke(
+                nodeHandle = 1L,
+                type = RecentlyUsedType.TextEditor,
+                fileName = "",
+                progress = 0.5f,
+            )
+            verify(saveTextEditorScrollUseCase).invoke(any())
+        }
+
+    @Test
+    fun `test that closing does not persist Continue Where Left Off for an invalid node handle`() =
+        runTest {
+            val lines = listOf("line1")
+            doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+                .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+            initUnderTest(nodeHandle = -1L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+
+            underTest.updateScrollPosition(
+                fraction = 0.95f,
+                scrollOffset = 0,
+                readThroughFraction = 0.95f,
+            )
+            underTest.handleClose()
+            advanceUntilIdle()
+
+            verifyNoInteractions(saveRecentlyUsedItemIfQualifiesUseCase)
+        }
+
+    @Test
     fun `test that handleClose shows discard dialog when Edit mode has edits`() = runTest {
         val lines = (1..100).map { "line$it" }
         doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
@@ -1633,6 +1717,8 @@ internal class TextEditorComposeViewModelTest {
     fun `test that handleClose saves scroll state before closing`() = runTest {
         whenever(getTextContentForTextEditorUseCase(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any()))
             .thenReturn(flowOf(listOf("line1")))
+        whenever(saveRecentlyUsedItemIfQualifiesUseCase(any(), any(), any(), any()))
+            .thenReturn(true)
         initUnderTest(nodeHandle = 42L, mode = TextEditorMode.View)
         advanceUntilIdle()
 
@@ -1662,6 +1748,8 @@ internal class TextEditorComposeViewModelTest {
                     chunkSizeLines = any()
                 )
             ).thenReturn(flowOf(listOf("line1")))
+            whenever(saveRecentlyUsedItemIfQualifiesUseCase(any(), any(), any(), any()))
+                .thenReturn(true)
             initUnderTest(nodeHandle = 42L, mode = TextEditorMode.View)
             advanceUntilIdle()
 

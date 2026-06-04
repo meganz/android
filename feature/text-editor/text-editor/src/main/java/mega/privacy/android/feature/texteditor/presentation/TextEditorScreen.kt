@@ -197,15 +197,39 @@ fun TextEditorScreen(
 
     // snapshotFlow re-emits automatically when layoutInfo.totalItemsCount changes as
     // new chunks are loaded, so chunkCount is intentionally excluded from the key to
-    // avoid cancelling/relaunching the collector on every chunk load.
+    // avoid cancelling/relaunching the collector on every chunk load. Because this effect
+    // never restarts, the closure must only read live values: lazyListState and uiState are
+    // snapshot state, totalItems is the live chunk count (the list's only items are chunks,
+    // so it must be used instead of the captured chunkCount local, which is stale here), and
+    // chunkStartLineProvider reads current data from the ViewModel.
     LaunchedEffect(lazyListState) {
         snapshotFlow {
-            val totalItems = lazyListState.layoutInfo.totalItemsCount
-            val fraction = if (totalItems <= 1) 0f
+            val info = lazyListState.layoutInfo
+            val totalItems = info.totalItemsCount
+            // Anchor scroll restoration on the first visible chunk.
+            val scrollFraction = if (totalItems <= 1) 0f
             else lazyListState.firstVisibleItemIndex.toFloat() / (totalItems - 1).toFloat()
-            fraction to lazyListState.firstVisibleItemScrollOffset
-        }.collect { (fraction, offset) ->
-            viewModel.updateScrollPosition(fraction.coerceIn(0f, 1f), offset)
+            // Read-through is measured in LINES at the bottom of the viewport; see
+            // computeReadThroughFraction. This stays accurate even when the whole file is a
+            // single chunk (the common case for files < CHUNK_SIZE lines).
+            val lastItem = info.visibleItemsInfo.lastOrNull()
+            val readThroughFraction = if (lastItem == null) 0f else computeReadThroughFraction(
+                chunkStartLine = chunkStartLineProvider(lastItem.index),
+                nextChunkStartLine = if (lastItem.index + 1 < totalItems)
+                    chunkStartLineProvider(lastItem.index + 1)
+                else uiState.totalLineCount + 1,
+                chunkSizePx = lastItem.size,
+                chunkOffsetPx = lastItem.offset,
+                viewportEndOffsetPx = info.viewportEndOffset,
+                totalLines = uiState.totalLineCount,
+            )
+            Triple(scrollFraction, lazyListState.firstVisibleItemScrollOffset, readThroughFraction)
+        }.collect { (scrollFraction, offset, readThroughFraction) ->
+            viewModel.updateScrollPosition(
+                fraction = scrollFraction.coerceIn(0f, 1f),
+                scrollOffset = offset,
+                readThroughFraction = readThroughFraction.coerceIn(0f, 1f),
+            )
         }
     }
 

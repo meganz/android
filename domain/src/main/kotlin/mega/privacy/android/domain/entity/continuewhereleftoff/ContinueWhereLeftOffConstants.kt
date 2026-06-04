@@ -14,3 +14,10 @@ val CWLO_NEAR_COMPLETION_THRESHOLD_MS: Long = TimeUnit.SECONDS.toMillis(3)
  * considered resumable and are not surfaced back to the user.
  */
 val CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS: Long = TimeUnit.SECONDS.toMillis(15)
+
+/**
+ * Document items (PDF, text editor) read to at least this fraction of their length are
+ * considered effectively read-through and are excluded from the Continue Where Left Off
+ * carousel, mirroring [CWLO_NEAR_COMPLETION_THRESHOLD_MS] for audio/video.
+ */
+const val CWLO_NEAR_COMPLETION_FRACTION: Float = 0.9f
