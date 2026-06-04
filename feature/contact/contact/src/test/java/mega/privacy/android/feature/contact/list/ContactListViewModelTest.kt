@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.feature.contact.list.model.ContactListUiState
+import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
 import org.junit.jupiter.api.AfterEach
@@ -51,6 +52,7 @@ class ContactListViewModelTest {
     private val monitorContactRequestsUseCase = mock<MonitorContactRequestsUseCase>()
     private val contactItemUiStateMapper = ContactItemUiStateMapper(
         contactItemStatusMapper = ContactItemStatusMapper(),
+        contactItemAvatarMapper = ContactItemAvatarMapper(),
     )
 
     @BeforeEach

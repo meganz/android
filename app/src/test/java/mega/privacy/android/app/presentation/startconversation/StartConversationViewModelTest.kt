@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenU
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
 import mega.privacy.android.shared.resources.R as sharedR
@@ -113,7 +114,10 @@ class StartConversationViewModelTest {
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
     private val createGroupChatRoomUseCase = mock<CreateGroupChatRoomUseCase>()
     private val getNoteToSelfChatUseCase = mock<GetNoteToSelfChatUseCase>()
-    private val contactItemUiStateMapper = ContactItemUiStateMapper(ContactItemStatusMapper())
+    private val contactItemUiStateMapper = ContactItemUiStateMapper(
+        contactItemStatusMapper = ContactItemStatusMapper(),
+        contactItemAvatarMapper = ContactItemAvatarMapper(),
+    )
 
     @BeforeEach
     fun resetMocks() {

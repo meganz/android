@@ -17,6 +17,7 @@ import javax.inject.Inject
 /**
  * Use Case to retrieve contact groups for current user.
  */
+@Deprecated("Legacy logic. Will be deleted with [mega.privacy.android.feature_flags.AppFeatures.ContactsComposeUI]")
 class GetContactGroupsUseCase @Inject constructor(
     private val chatRepository: ChatRepository,
     private val avatarRepository: AvatarRepository,
