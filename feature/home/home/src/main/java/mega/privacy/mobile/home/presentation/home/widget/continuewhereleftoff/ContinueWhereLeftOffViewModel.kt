@@ -16,11 +16,13 @@ import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
+import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
+import mega.privacy.android.domain.usecase.node.GetCurrentVersionNodeUseCase
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.ContinueWhereLeftOffNameResolver
 import timber.log.Timber
@@ -30,6 +32,7 @@ import javax.inject.Inject
 internal class ContinueWhereLeftOffViewModel @Inject constructor(
     private val monitorContinueWhereLeftOffItemsUseCase: MonitorContinueWhereLeftOffItemsUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getCurrentVersionNodeUseCase: GetCurrentVersionNodeUseCase,
     private val nameResolver: ContinueWhereLeftOffNameResolver,
 ) : ViewModel() {
 
@@ -64,10 +67,17 @@ internal class ContinueWhereLeftOffViewModel @Inject constructor(
         )
     }
 
-    fun onItemClicked(nodeHandle: Long) {
+    fun onItemClicked(nodeHandle: Long, type: RecentlyUsedType) {
         viewModelScope.launch {
             runCatching {
-                getNodeByIdUseCase(NodeId(nodeHandle)) as? TypedFileNode
+                // Text files can be edited and saved back, which overwrites the cloud node with a
+                // new version (new handle). The stored handle then points at the stale previous
+                // version, so resolve the current version before opening to reflect the latest edit.
+                if (type == RecentlyUsedType.TextEditor) {
+                    getCurrentVersionNodeUseCase(NodeId(nodeHandle))
+                } else {
+                    getNodeByIdUseCase(NodeId(nodeHandle)) as? TypedFileNode
+                }
             }.onSuccess { node ->
                 node?.let { openNodeEventChannel.send(triggered(it)) }
             }.onFailure {

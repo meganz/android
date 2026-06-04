@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -40,9 +41,11 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccess
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
@@ -103,6 +106,8 @@ internal class TextEditorComposeViewModelTest {
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase = mock()
     private val saveRecentlyUsedItemIfQualifiesUseCase:
             SaveRecentlyUsedItemIfQualifiesUseCase = mock()
+    private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase = mock()
+    private val getNodeVersionsByHandleUseCase: GetNodeVersionsByHandleUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
@@ -149,6 +154,8 @@ internal class TextEditorComposeViewModelTest {
             getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase,
             saveRecentlyUsedItemIfQualifiesUseCase,
+            removeRecentlyUsedItemUseCase,
+            getNodeVersionsByHandleUseCase,
             monitorNodeUpdatesUseCase,
             monitorConnectivityUseCase,
             isConnectedToInternetUseCase,
@@ -159,6 +166,7 @@ internal class TextEditorComposeViewModelTest {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
             whenever(getNodeAccessUseCase(any())).thenReturn(null)
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
+            whenever(getNodeVersionsByHandleUseCase(any())).thenReturn(emptyList())
         }
         whenever(monitorNodeUpdatesUseCase()).thenReturn(flowOf())
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
@@ -220,6 +228,8 @@ internal class TextEditorComposeViewModelTest {
             getTextEditorScrollUseCase = getTextEditorScrollUseCase,
             saveRecentlyUsedItemUseCase = saveRecentlyUsedItemUseCase,
             saveRecentlyUsedItemIfQualifiesUseCase = saveRecentlyUsedItemIfQualifiesUseCase,
+            removeRecentlyUsedItemUseCase = removeRecentlyUsedItemUseCase,
+            getNodeVersionsByHandleUseCase = getNodeVersionsByHandleUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
@@ -1660,6 +1670,35 @@ internal class TextEditorComposeViewModelTest {
             type = RecentlyUsedType.TextEditor,
             fileName = "test.txt",
         )
+    }
+
+    @Test
+    fun `test that saveRecentlyUsedItem is not called in Create mode`() = runTest {
+        // In Create mode the node handle is the destination parent folder, not a real file (the
+        // file does not exist until the upload completes), so recording here would add the parent
+        // folder (e.g. "Cloud Drive") to the list. It must be skipped.
+        initUnderTest(nodeHandle = 100L, mode = TextEditorMode.Create, fileName = "new.txt")
+        underTest.getOrCreateChunkState(0)
+        underTest.handleClose()
+        advanceUntilIdle()
+
+        verify(saveRecentlyUsedItemUseCase, never()).invoke(any(), any(), any())
+        verify(saveRecentlyUsedItemIfQualifiesUseCase, never()).invoke(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `test that previous versions are removed from recently used when content loads`() = runTest {
+        whenever(getTextContentForTextEditorUseCase(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any()))
+            .thenReturn(flowOf(listOf("line1")))
+        val currentVersion = mock<TypedFileNode> { on { id } doReturn NodeId(42L) }
+        val previousVersion = mock<TypedFileNode> { on { id } doReturn NodeId(10L) }
+        whenever(getNodeVersionsByHandleUseCase(NodeId(42L)))
+            .thenReturn(listOf<UnTypedNode>(currentVersion, previousVersion))
+        initUnderTest(nodeHandle = 42L, fileName = "test.txt")
+        advanceUntilIdle()
+
+        verify(removeRecentlyUsedItemUseCase).invoke(10L)
+        verify(removeRecentlyUsedItemUseCase, never()).invoke(42L)
     }
 
     @Test

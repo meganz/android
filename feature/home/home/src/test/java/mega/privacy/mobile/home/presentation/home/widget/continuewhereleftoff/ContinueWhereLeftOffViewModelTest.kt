@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
+import mega.privacy.android.domain.usecase.node.GetCurrentVersionNodeUseCase
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.ContinueWhereLeftOffNameResolver
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -41,19 +42,25 @@ class ContinueWhereLeftOffViewModelTest {
     private val monitorContinueWhereLeftOffItemsUseCase =
         mock<MonitorContinueWhereLeftOffItemsUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getCurrentVersionNodeUseCase = mock<GetCurrentVersionNodeUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = ContinueWhereLeftOffViewModel(
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getCurrentVersionNodeUseCase = getCurrentVersionNodeUseCase,
             nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, DurationInSecondsTextMapper(), mock()),
         )
     }
 
     @AfterEach
     fun tearDown() {
-        reset(monitorContinueWhereLeftOffItemsUseCase, getNodeByIdUseCase)
+        reset(
+            monitorContinueWhereLeftOffItemsUseCase,
+            getNodeByIdUseCase,
+            getCurrentVersionNodeUseCase,
+        )
     }
 
     @Test
@@ -204,13 +211,32 @@ class ContinueWhereLeftOffViewModelTest {
 
         underTest.uiState.test {
             awaitItem() // initial
-            underTest.onItemClicked(nodeHandle)
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
             val state = awaitItem()
             assertThat(state.openNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
             assertThat((state.openNodeEvent as StateEventWithContentTriggered).content)
                 .isEqualTo(expectedNode)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that onItemClicked resolves current version when item is a text editor`() = runTest {
+        stubEmptyItems()
+        val nodeHandle = 123L
+        val currentVersion = mock<TypedFileNode>()
+        whenever(getCurrentVersionNodeUseCase(NodeId(nodeHandle))).thenReturn(currentVersion)
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.TextEditor)
+            val state = awaitItem()
+            assertThat(state.openNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((state.openNodeEvent as StateEventWithContentTriggered).content)
+                .isEqualTo(currentVersion)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(getCurrentVersionNodeUseCase).invoke(NodeId(nodeHandle))
     }
 
     @Test
@@ -221,7 +247,7 @@ class ContinueWhereLeftOffViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            underTest.onItemClicked(nodeHandle)
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
             assertThat(state.openNodeEvent)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
             cancelAndIgnoreRemainingEvents()
@@ -237,7 +263,7 @@ class ContinueWhereLeftOffViewModelTest {
 
         underTest.uiState.test {
             awaitItem() // initial
-            underTest.onItemClicked(nodeHandle)
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
             awaitItem() // triggered
             underTest.onOpenNodeEventConsumed()
             val state = awaitItem()

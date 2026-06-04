@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.node.GetCurrentVersionNodeUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.ClearRecentlyUsedItemsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffSortPreferenceUseCase
@@ -53,6 +54,7 @@ class ContinueWhereLeftOffListViewModelTest {
     private val setContinueWhereLeftOffSortUseCase =
         mock<SetContinueWhereLeftOffSortUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getCurrentVersionNodeUseCase = mock<GetCurrentVersionNodeUseCase>()
     private val clearRecentlyUsedItemsUseCase = mock<ClearRecentlyUsedItemsUseCase>()
 
     private val sampleItems = listOf(
@@ -84,6 +86,7 @@ class ContinueWhereLeftOffListViewModelTest {
             monitorContinueWhereLeftOffSortPreferenceUseCase = monitorContinueWhereLeftOffSortPreferenceUseCase,
             setContinueWhereLeftOffSortUseCase = setContinueWhereLeftOffSortUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getCurrentVersionNodeUseCase = getCurrentVersionNodeUseCase,
             clearRecentlyUsedItemsUseCase = clearRecentlyUsedItemsUseCase,
             nameResolver = ContinueWhereLeftOffNameResolver(
                 getNodeByIdUseCase,
@@ -100,6 +103,7 @@ class ContinueWhereLeftOffListViewModelTest {
             monitorContinueWhereLeftOffSortPreferenceUseCase,
             setContinueWhereLeftOffSortUseCase,
             getNodeByIdUseCase,
+            getCurrentVersionNodeUseCase,
             clearRecentlyUsedItemsUseCase,
         )
     }
@@ -386,13 +390,32 @@ class ContinueWhereLeftOffListViewModelTest {
 
         underTest.uiState.test {
             awaitItem() // initial
-            underTest.onItemClicked(nodeHandle)
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
             val state = awaitItem()
             assertThat(state.openNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
             assertThat((state.openNodeEvent as StateEventWithContentTriggered).content)
                 .isEqualTo(expectedNode)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that onItemClicked resolves current version when item is a text editor`() = runTest {
+        stubEmptyItems()
+        val nodeHandle = 123L
+        val currentVersion = mock<TypedFileNode>()
+        whenever(getCurrentVersionNodeUseCase(NodeId(nodeHandle))).thenReturn(currentVersion)
+
+        underTest.uiState.test {
+            awaitItem() // initial
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.TextEditor)
+            val state = awaitItem()
+            assertThat(state.openNodeEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((state.openNodeEvent as StateEventWithContentTriggered).content)
+                .isEqualTo(currentVersion)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(getCurrentVersionNodeUseCase).invoke(NodeId(nodeHandle))
     }
 
     @Test
@@ -403,7 +426,7 @@ class ContinueWhereLeftOffListViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            underTest.onItemClicked(nodeHandle)
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
             assertThat(state.openNodeEvent)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
             cancelAndIgnoreRemainingEvents()
@@ -419,7 +442,7 @@ class ContinueWhereLeftOffListViewModelTest {
 
         underTest.uiState.test {
             awaitItem() // initial
-            underTest.onItemClicked(nodeHandle)
+            underTest.onItemClicked(nodeHandle, RecentlyUsedType.Video)
             awaitItem() // triggered
             underTest.onOpenNodeEventConsumed()
             val state = awaitItem()
