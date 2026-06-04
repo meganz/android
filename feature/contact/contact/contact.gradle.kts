@@ -35,6 +35,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
+    implementation(project(":shared:contact"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)

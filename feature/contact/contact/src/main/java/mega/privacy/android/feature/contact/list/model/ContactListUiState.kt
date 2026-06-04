@@ -2,7 +2,7 @@ package mega.privacy.android.feature.contact.list.model
 
 import androidx.compose.runtime.Stable
 import de.palm.composestateevents.StateEventWithContent
-import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.shared.contact.model.ContactItemUiState
 
 /**
  * UI state for the contact list screen.
@@ -25,8 +25,8 @@ sealed interface ContactListUiState {
      * @property startCallEvent One-shot event to start or join a call.
      */
     data class Data(
-        val contacts: Map<String, List<ContactUiModel>>,
-        val recentlyAddedContacts: List<ContactUiModel>,
+        val contacts: Map<String, List<ContactItemUiState>>,
+        val recentlyAddedContacts: List<ContactItemUiState>,
         val incomingRequestCount: Int,
         val openChatEvent: StateEventWithContent<Long>,
         val startCallEvent: StateEventWithContent<CallEventData>,
@@ -46,33 +46,4 @@ data class CallEventData(
     val hasLocalAudio: Boolean,
     val hasLocalVideo: Boolean,
     val isExistingCall: Boolean,
-)
-
-/**
- * Pure UI model for a contact. No Android framework types.
- *
- * @property handle User handle.
- * @property email User email.
- * @property displayName Resolved display name (alias > fullName > email).
- * @property fullName Full name if available.
- * @property alias Alias if available.
- * @property status User chat status.
- * @property avatarUri Avatar URI string if available.
- * @property avatarColor Default avatar color as hex string.
- * @property lastSeenSeconds Raw last seen value in seconds.
- * @property isNew Whether the contact was recently added (within 3 days, no chatroom).
- * @property isVerified Whether the contact's credentials are verified.
- */
-data class ContactUiModel(
-    val handle: Long,
-    val email: String,
-    val displayName: String,
-    val fullName: String?,
-    val alias: String?,
-    val status: UserChatStatus,
-    val avatarUri: String?,
-    val avatarColor: String?,
-    val lastSeenSeconds: Int?,
-    val isNew: Boolean,
-    val isVerified: Boolean,
 )

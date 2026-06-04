@@ -22,8 +22,9 @@ import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
-import mega.privacy.android.feature.contact.list.mapper.ContactItemUiModelMapper
 import mega.privacy.android.feature.contact.list.model.ContactListUiState
+import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
+import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,7 +49,9 @@ class ContactListViewModelTest {
     private val startCallUseCase = mock<StartCallUseCase>()
     private val getChatCallUseCase = mock<GetChatCallUseCase>()
     private val monitorContactRequestsUseCase = mock<MonitorContactRequestsUseCase>()
-    private val contactItemUiModelMapper = ContactItemUiModelMapper()
+    private val contactItemUiStateMapper = ContactItemUiStateMapper(
+        contactItemStatusMapper = ContactItemStatusMapper(),
+    )
 
     @BeforeEach
     fun setUp() {
@@ -59,7 +62,7 @@ class ContactListViewModelTest {
             startCallUseCase = startCallUseCase,
             getChatCallUseCase = getChatCallUseCase,
             monitorContactRequestsUseCase = monitorContactRequestsUseCase,
-            contactItemUiModelMapper = contactItemUiModelMapper,
+            contactItemUiStateMapper = contactItemUiStateMapper,
         )
     }
 
@@ -173,7 +176,7 @@ class ContactListViewModelTest {
         underTest.uiState.test {
             val state = awaitDataState()
             assertThat(state.recentlyAddedContacts).hasSize(1)
-            assertThat(state.recentlyAddedContacts.first().email).isEqualTo("new@test.com")
+            assertThat(state.recentlyAddedContacts.first().handle).isEqualTo(1L)
         }
     }
 
