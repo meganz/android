@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,8 +67,23 @@ internal fun ContinueWhereLeftOffCarousel(
         if (items.isEmpty()) {
             ContinueWhereLeftOffEmptyView()
         } else {
+            val listState = rememberLazyListState()
+            // Keyed items keep the scroll anchored to the previously visible item, so when a
+            // new most recent item is added (or moved) to the front it stays off-screen.
+            // Snap back to the start whenever the most recent item changes, regardless of the
+            // current scroll position, so the most recent item is always shown (T21372416).
+            // requestScrollToItem applies the snap on the next remeasure with the new data and
+            // is dropped if the user interacts with the list before it lands.
+            LaunchedEffect(items.first().nodeHandle) {
+                if (!listState.isScrollInProgress) {
+                    listState.requestScrollToItem(0)
+                }
+            }
             LazyRow(
-                modifier = Modifier.fillMaxWidth(),
+                state = listState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG),
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -248,5 +265,7 @@ private fun ContinueWhereLeftOffCarouselEmptyPreview() {
 
 internal const val CONTINUE_WHERE_LEFT_OFF_EMPTY_TEXT_TEST_TAG =
     "continue_where_left_off_widget:empty_text"
+internal const val CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG =
+    "continue_where_left_off_widget:list"
 internal const val CONTINUE_WHERE_LEFT_OFF_CHEVRON_TEST_TAG =
     "continue_where_left_off_widget:chevron"

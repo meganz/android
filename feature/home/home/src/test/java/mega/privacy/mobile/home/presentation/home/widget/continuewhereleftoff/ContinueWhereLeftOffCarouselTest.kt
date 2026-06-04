@@ -1,11 +1,15 @@
 package mega.privacy.mobile.home.presentation.home.widget.continuewhereleftoff
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
@@ -91,6 +95,66 @@ class ContinueWhereLeftOffCarouselTest {
         composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_CHEVRON_TEST_TAG).performClick()
 
         assertThat(viewAllClicked).isTrue()
+    }
+
+    @Test
+    fun `test that carousel scrolls to start when a new most recent item is added`() {
+        val initialItems = buildItems(count = 10)
+        val items = setContentWithMutableItems(initialItems)
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG)
+            .performScrollToNode(hasText("Item 10"))
+        composeRule.onNodeWithText("Item 1").assertDoesNotExist()
+
+        val newItem = ContinueWhereLeftOffItem(
+            nodeHandle = 99L,
+            title = "New item",
+            type = RecentlyUsedType.Video,
+            lastAccessedTimestamp = 1712990000L,
+        )
+        items.value = listOf(newItem) + initialItems
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("New item").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that carousel scrolls to start when an existing item becomes most recent`() {
+        val initialItems = buildItems(count = 10)
+        val items = setContentWithMutableItems(initialItems)
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG)
+            .performScrollToNode(hasText("Item 10"))
+
+        // Item 5 is accessed again and moves to the front of the list
+        items.value = listOf(initialItems[4]) + (initialItems - initialItems[4])
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("Item 5").assertIsDisplayed()
+        composeRule.onNodeWithText("Item 1").assertIsDisplayed()
+    }
+
+    private fun buildItems(count: Int) = (1L..count).map { handle ->
+        ContinueWhereLeftOffItem(
+            nodeHandle = handle,
+            title = "Item $handle",
+            type = RecentlyUsedType.PDF,
+            lastAccessedTimestamp = 1712880000L + handle,
+        )
+    }
+
+    private fun setContentWithMutableItems(
+        initialItems: List<ContinueWhereLeftOffItem>,
+    ): MutableState<List<ContinueWhereLeftOffItem>> {
+        val items = mutableStateOf(initialItems)
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ContinueWhereLeftOffCarousel(
+                    items = items.value,
+                    onItemClick = {},
+                    onViewAllClick = {},
+                )
+            }
+        }
+        return items
     }
 
     private fun setContent(
