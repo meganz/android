@@ -254,6 +254,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private var playlistSearchQuery: String? = null
 
+    @Volatile
     private var shuffleOrder: ShuffleOrder = ExposedShuffleOrder(0, this)
 
     private var playingHandle = INVALID_HANDLE
@@ -1113,22 +1114,23 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
             val recreatedItems = mutableListOf<PlaylistItem>()
             // Adjust whether need to build play sources again to avoid playlist is reordered everytime playlist items updated
-            if (isBuildPlaySources && shuffleEnabled.value && shuffleOrder.length == items.size) {
+            val currentShuffleOrder = shuffleOrder
+            if (isBuildPlaySources && shuffleEnabled.value && currentShuffleOrder.length == items.size) {
                 recreatedItems.add(items[playingPosition])
 
                 var newPlayingIndex = 0
 
-                var index = shuffleOrder.getPreviousIndex(playingPosition)
+                var index = currentShuffleOrder.getPreviousIndex(playingPosition)
                 while (index != C.INDEX_UNSET) {
                     recreatedItems.add(0, items[index])
-                    index = shuffleOrder.getPreviousIndex(index)
+                    index = currentShuffleOrder.getPreviousIndex(index)
                     newPlayingIndex++
                 }
 
-                index = shuffleOrder.getNextIndex(playingPosition)
+                index = currentShuffleOrder.getNextIndex(playingPosition)
                 while (index != C.INDEX_UNSET) {
                     recreatedItems.add(items[index])
-                    index = shuffleOrder.getNextIndex(index)
+                    index = currentShuffleOrder.getNextIndex(index)
                 }
 
                 playingPosition = newPlayingIndex
