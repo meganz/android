@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
@@ -66,7 +67,7 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
             uiAction,
         ) { items, sortConfiguration, openNodeEvent, action ->
             ContinueWhereLeftOffListUiState(
-                items = items,
+                items = items.sortedForDisplay(sortConfiguration),
                 isLoading = false,
                 openNodeEvent = openNodeEvent,
                 sortConfiguration = sortConfiguration,
@@ -157,6 +158,27 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
         val showOptionsSheet: Boolean = false,
         val currentViewType: ViewType = ViewType.LIST,
     )
+
+    /**
+     * Re-sorts items by their resolved [ContinueWhereLeftOffItem.title] when sorting by name.
+     *
+     * The persisted file name in the database can be blank (it is only stored on a best-effort
+     * basis when a file is opened), so the database-level name sort is unreliable. By this point
+     * blank titles have been resolved from the node, so sorting here uses the actual node name as
+     * the sort source. Timestamp order comes correctly from the repository and is left untouched.
+     */
+    private fun List<ContinueWhereLeftOffItem>.sortedForDisplay(
+        sortConfiguration: NodeSortConfiguration,
+    ): List<ContinueWhereLeftOffItem> {
+        if (sortConfiguration.sortOption != NodeSortOption.Name) return this
+        val byTitle = compareBy(String.CASE_INSENSITIVE_ORDER) { item: ContinueWhereLeftOffItem ->
+            item.title
+        }
+        return when (sortConfiguration.sortDirection) {
+            SortDirection.Ascending -> sortedWith(byTitle)
+            SortDirection.Descending -> sortedWith(byTitle.reversed())
+        }
+    }
 
     companion object {
         private const val MAX_LIST_ITEMS = 50
