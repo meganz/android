@@ -28,6 +28,7 @@ Merge Request automatically.
 /create-mr --no-squash                       # Force no squash on merge (overrides default)
 /create-mr --wip-label                       # Explicitly add "WIP" label (same as default)
 /create-mr --no-wip-label                    # Skip the default "WIP" label
+/create-mr --no-jira                         # Skip the post-MR Jira transition + comment
 ```
 
 ## Arguments
@@ -43,6 +44,7 @@ Merge Request automatically.
 | `--no-squash`       | Force no squash on merge, regardless of target branch                       |                                      |
 | `--wip-label`       | Explicitly add the "WIP" label                                              |                                      |
 | `--no-wip-label`    | Skip adding the "WIP" label                                                 |                                      |
+| `--no-jira`         | Skip the post-MR Jira transition + auto-comment                             |                                      |
 
 ## Steps
 
@@ -254,3 +256,93 @@ The `merge_request.label` push option can be repeated to add multiple labels; on
 
 - Display the generated MR description so the user can review it.
 - Extract and display the MR URL from the `git push` output.
+
+### Step 6 — Offer to update Jira (skip if `--no-jira`)
+
+After the MR is successfully created, **ask the user** whether they want to
+transition the Jira ticket and post an auto-comment. Do **not** update Jira
+without an explicit yes — the MR is the source of truth and the user may not
+want the ticket to move yet (e.g. draft MR, still iterating, stacked MR).
+
+All Jira plumbing goes through `tools/jira/jira_cli.py` — refer
+to the per-subcommand flows in `.claude/skills/jira/SKILL.md` rather than
+re-implementing.
+
+1. **Decide whether to prompt at all**:
+   - If `--no-jira` was passed → skip silently.
+   - Otherwise extract the Jira key:
+     ```bash
+     KEY=$(tools/jira/jira branch-ticket)
+     ```
+     If exit 1 (no key in branch name), skip with the note `Jira step
+     skipped — no AND-\d+ in branch name.` Do not prompt.
+
+2. **Look up current Jira status** before prompting, so the user can decide
+   meaningfully:
+   ```bash
+   tools/jira/jira status "$KEY"
+   ```
+   If the CLI exits non-zero (auth, network), skip the prompt and tell the
+   user they can run `/jira submit <KEY>` manually later. Do not block the
+   MR on this.
+
+3. **Prompt the user** using `AskUserQuestion`:
+
+   - **Question**: `Update Jira ticket <KEY> (currently <current-status>)?`
+   - **Options**:
+     - `Transition + comment` — runs the full `/jira submit <KEY> --mr-url
+       <MR_URL>` flow (auto-comment + transition to Tech QA / Code Review /
+       In Review / Ready for Review — whichever the workflow exposes).
+     - `Comment only` — runs `/jira submit <KEY> --mr-url <MR_URL>
+       --no-transition` (post the auto-comment but leave status alone).
+     - `Skip` — no Jira API calls.
+
+4. **Act on the answer**:
+   - `Transition + comment` → follow the `/jira submit` flow end-to-end.
+   - `Comment only` → run only the comment-posting steps from `/jira submit`.
+   - `Skip` → no Jira API calls. Note in the final summary.
+
+5. **Check Test Instructions** (only if the user did NOT pick `Skip` in
+   step 3, and the Jira lookup in step 2 succeeded).
+
+   **Follow the `/jira test-instructions <KEY>` flow defined in
+   `.claude/skills/jira/SKILL.md` § "/jira test-instructions" verbatim** —
+   do not re-implement the field discovery, read, classify-diff rc handling,
+   or `--allow-empty` logic here. Future updates to that flow (exit-code
+   contract, generation template, prompt wording) live there as the single
+   source of truth; this step exists only to anchor the test-instructions
+   sub-step to the same Jira ticket and propagate its final outcome into
+   the MR-creation summary below.
+
+   This step is independent from the transition decision — even if the user
+   chose `Comment only` above, still offer to populate Test Instructions.
+
+   On failure: same policy as the transition step — surface the error, do
+   NOT fail the MR.
+
+6. **Failure handling**: if any Jira step fails after the user opted in,
+   surface the error but do **not** treat it as a failure of `create-mr` —
+   the MR was created successfully. Tell the user they can re-run the
+   relevant `/jira ...` command manually once the issue is resolved.
+
+7. **Report**: append lines to the final summary reflecting what actually
+   happened. Examples:
+
+   ```
+   Jira:              AND-1234 → Tech QA (comment posted)
+   Test Instruction:  updated (was empty)
+   ```
+
+   ```
+   Jira:              AND-1234 — comment posted (status unchanged)
+   Test Instruction:  skipped (already populated)
+   ```
+
+   ```
+   Jira:              skipped (user declined)
+   Test Instruction:  skipped (user declined)
+   ```
+
+   ```
+   Jira:              skipped (no AND-\d+ in branch)
+   ```

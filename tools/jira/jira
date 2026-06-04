@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Thin wrapper around tools/jira/jira_cli.py — exists so callers can write
+# `tools/jira/jira status AND-1234` instead of
+# `python3 tools/jira/jira_cli.py status AND-1234`.
+#
+# After cloning the repo, run once:   chmod +x tools/jira/jira
+# If you can't (or won't) chmod, you can always invoke it explicitly:
+#   bash tools/jira/jira <subcommand> ...
+
+set -e
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "Error: python3 not found in PATH." >&2
+    echo "macOS 12.3+ (March 2022) ships python3 by default." >&2
+    echo "If missing, install via:  xcode-select --install" >&2
+    exit 127
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 "${SCRIPT_DIR}/jira_cli.py" "$@"
