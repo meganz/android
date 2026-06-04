@@ -59,7 +59,7 @@ class ContinueWhereLeftOffWidget @Inject constructor() : HomeWidget, Flagged {
 
             ContinueWhereLeftOffCarousel(
                 items = uiState.items,
-                onItemClick = { item -> viewModel.onItemClicked(item.nodeHandle) },
+                onItemClick = { item -> viewModel.onItemClicked(item.nodeHandle, item.type) },
                 onViewAllClick = {
                     navigationHandler.navigate(ContinueWhereLeftOffScreenNavKey)
                 },

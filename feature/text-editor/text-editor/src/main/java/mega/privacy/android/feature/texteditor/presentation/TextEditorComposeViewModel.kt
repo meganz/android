@@ -40,9 +40,11 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.continuewhereleftoff.TextEditorScroll
 import mega.privacy.android.domain.usecase.continuewhereleftoff.GetTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveTextEditorScrollUseCase
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
@@ -121,6 +123,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val getTextEditorScrollUseCase: GetTextEditorScrollUseCase,
     private val saveRecentlyUsedItemUseCase: SaveRecentlyUsedItemUseCase,
     private val saveRecentlyUsedItemIfQualifiesUseCase: SaveRecentlyUsedItemIfQualifiesUseCase,
+    private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
+    private val getNodeVersionsByHandleUseCase: GetNodeVersionsByHandleUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -640,10 +644,14 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     private fun emitCloseEvent() {
         viewModelScope.launch {
-            // Decide on exit whether the document belongs in Continue Where Left Off based on how
+            // A newly created file's handle is still the destination parent folder until the upload
+            // completes, so recording it would add the parent folder (e.g. "Cloud Drive") to the
+            // list. Skip; the file is recorded with its real handle the next time it is opened.
+            // Otherwise decide whether the document belongs in Continue Where Left Off based on how
             // far it was read: below the near-completion fraction it is saved as resumable, at or
             // above it is removed instead of being resurfaced (mirrors audio/video exclusion).
-            val saved = resolvedNodeHandle != INVALID_NODE_HANDLE &&
+            val saved = args.mode != TextEditorMode.Create &&
+                    resolvedNodeHandle != INVALID_NODE_HANDLE &&
                     runCatching {
                         saveRecentlyUsedItemIfQualifiesUseCase(
                             nodeHandle = resolvedNodeHandle,
@@ -655,6 +663,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         Timber.e(it, "Failed to persist text file Continue Where Left Off")
                     }.getOrDefault(false)
             if (saved) {
+                // An edit-save uploads a new version with a new handle; drop any previous-version
+                // entries of this file so the list does not show a stale duplicate.
+                removeSupersededVersionsFromRecentlyUsed(resolvedNodeHandle)
                 // The scroll table has a FK to recently_used, so the row must exist first; the
                 // save above inserts it before we persist the scroll position here.
                 saveScrollState()
@@ -1103,6 +1114,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 fileName = _uiState.value.fileName,
             )
         }.onFailure { Timber.e(it, "Failed to save recently used item") }
+        removeSupersededVersionsFromRecentlyUsed(resolvedNodeHandle)
     }
 
     private suspend fun restoreScrollPosition() {
@@ -1212,4 +1224,19 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Saving an edited text file uploads a new version with a new handle, so a recently used entry
+     * keyed by a previous version's handle would linger as a duplicate of the same file. Drop any
+     * recently used entries that are previous versions of [nodeHandle].
+     */
+    private suspend fun removeSupersededVersionsFromRecentlyUsed(nodeHandle: Long) {
+        runCatching {
+            getNodeVersionsByHandleUseCase(NodeId(nodeHandle))
+                .map { it.id.longValue }
+                .filter { it != nodeHandle }
+                .forEach { removeRecentlyUsedItemUseCase(it) }
+        }.onFailure {
+            Timber.e(it, "Failed to remove superseded text file versions from recently used")
+        }
+    }
 }

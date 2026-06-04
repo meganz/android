@@ -161,7 +161,7 @@ internal fun ContinueWhereLeftOffListScreen(
                             title = item.title,
                             nodeHandle = item.nodeHandle,
                             icon = iconForType(item.type),
-                            onItemClicked = { viewModel.onItemClicked(item.nodeHandle) },
+                            onItemClicked = { viewModel.onItemClicked(item.nodeHandle, item.type) },
                         )
                     }
                 }
@@ -200,7 +200,7 @@ internal fun ContinueWhereLeftOffListScreen(
                             nodeHandle = item.nodeHandle,
                             duration = item.duration,
                             icon = iconForType(item.type),
-                            onItemClicked = { viewModel.onItemClicked(item.nodeHandle) },
+                            onItemClicked = { viewModel.onItemClicked(item.nodeHandle, item.type) },
                         )
                     }
                 }
