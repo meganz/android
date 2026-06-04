@@ -19,6 +19,8 @@ dependencies {
 
     lintChecks(project(":lint"))
 
+    implementation(project(":feature:video-editor:video-editor-snowflakes"))
+    implementation(project(":core:formatter"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":core:ui-components:shared-components"))
@@ -26,10 +28,17 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
 
+    // core-ui brings the Compose runtime/foundation; this module uses no
+    // DSTokens/core-ui components directly — those live in the snowflakes module.
     implementation(lib.mega.core.ui)
     implementation(lib.logging.timber)
 
+    // Full Media3 stack — the editor engine + preview (ExoPlayer/Transformer/
+    // PlayerSurface) live in this module.
     implementation(google.bundles.media3)
+
+    implementation(androidx.material3)
+    implementation(androidx.compose.icons.extended)
 
     implementation(androidx.appcompat)
     implementation(androidx.compose.activity)

@@ -35,7 +35,7 @@ import javax.inject.Inject
 @OptIn(UnstableApi::class)
 @HiltViewModel
 internal class EditorViewModel @Inject constructor(
-    private val toolRegistry: ToolRegistry,
+    val toolRegistry: ToolRegistry,
     private val getVideoMetadataUseCase: GetVideoMetadataUseCase,
 ) : ViewModel() {
 

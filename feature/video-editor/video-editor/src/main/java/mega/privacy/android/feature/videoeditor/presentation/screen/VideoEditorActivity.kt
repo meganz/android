@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.util.UnstableApi
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import javax.inject.Inject
@@ -21,6 +23,7 @@ class VideoEditorActivity : AppCompatActivity() {
     @Inject
     lateinit var appContainerProvider: AppContainerProvider
 
+    @OptIn(UnstableApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,7 +37,7 @@ class VideoEditorActivity : AppCompatActivity() {
                 useLegacyStatusBarColor = false,
                 includePsa = false,
             ) {
-                VideoEditorRoute(nodeHandle = nodeHandle)
+                VideoEditorRoute(nodeHandle = nodeHandle, onClose = ::finish)
             }
         )
     }

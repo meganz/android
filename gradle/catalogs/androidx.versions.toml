@@ -54,6 +54,7 @@ compose-activity = { module = "androidx.activity:activity-compose", version.ref 
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-material = { group = "androidx.compose.material", name = "material" }
 compose-icons = { group = "androidx.compose.material", name = "material-icons-core" }
+compose-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewmodel" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }

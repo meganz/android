@@ -2,7 +2,7 @@
 name: create-module
 description: >
   Create new Gradle modules in the Android project. Supports feature (simple and nested with
-  snowflake-components), core, and shared module types. Creates all required files (build file,
+  snowflakes), core, and shared module types. Creates all required files (build file,
   .gitignore, AndroidManifest.xml, source directories) and registers the module in settings.gradle.kts.
 triggers:
   - /create-module
@@ -36,7 +36,7 @@ Create new Gradle modules in the Android project with the correct file structure
 |----------|-------------|---------|
 | `feature\|core\|shared` | Module category (required, first positional arg) | `feature` |
 | Module name | Kebab-case name for the module (required, second positional arg) | `my-feature` |
-| `--nested` | Create a nested structure with a snowflake-components sub-module (feature only) | `--nested` |
+| `--nested` | Create a nested structure with a snowflakes sub-module (feature only) | `--nested` |
 | `--plugins <list>` | Comma-separated additional plugins: `room`, `parcelize`, `serialisation` | `--plugins room,parcelize` |
 | `--no-compose` | Omit the Compose plugin (default includes Compose for feature and shared) | `--no-compose` |
 | `--no-hilt` | Omit the Hilt plugin | `--no-hilt` |
@@ -53,7 +53,7 @@ Create new Gradle modules in the Android project with the correct file structure
 3. Determine the module structure:
    - **Simple feature**: `feature/{name}/{name}.gradle.kts` — included as `:feature:{name}`
    - **Nested feature (main)**: `feature/{name}/{name}/{name}.gradle.kts` — included as `:feature:{name}:{name}`
-   - **Nested feature (snowflake)**: `feature/{name}/{name}-snowflake-components/{name}-snowflake-components.gradle.kts` — included as `:feature:{name}:{name}-snowflake-components`
+   - **Nested feature (snowflake)**: `feature/{name}/{name}-snowflakes/{name}-snowflakes.gradle.kts` — included as `:feature:{name}:{name}-snowflakes`
    - **Core**: `core/{name}/{name}.gradle.kts` — included as `:core:{name}`
    - **Shared**: `shared/{name}/{name}.gradle.kts` — included as `:shared:{name}`
 4. Determine the namespace (see Namespace Rules below).
@@ -68,7 +68,7 @@ Module name: my-feature
 
 Directories to create:
   - feature/my-feature/my-feature/
-  - feature/my-feature/my-feature-snowflake-components/
+  - feature/my-feature/my-feature-snowflakes/
 
 Files to create:
   - feature/my-feature/my-feature/my-feature.gradle.kts
@@ -82,16 +82,16 @@ Files to create:
   - .../presentation/MyFeatureScreenDestination.kt
   - .../navigation/MyFeatureFeatureGraph.kt
   - .../di/MyFeatureModule.kt
-  - feature/my-feature/my-feature-snowflake-components/my-feature-snowflake-components.gradle.kts
+  - feature/my-feature/my-feature-snowflakes/my-feature-snowflakes.gradle.kts
     namespace: mega.privacy.android.feature.myfeature.components
-  - feature/my-feature/my-feature-snowflake-components/.gitignore
-  - feature/my-feature/my-feature-snowflake-components/src/main/AndroidManifest.xml
-  - feature/my-feature/my-feature-snowflake-components/src/main/java/  (empty source dir)
-  - feature/my-feature/my-feature-snowflake-components/src/test/java/  (empty test dir)
+  - feature/my-feature/my-feature-snowflakes/.gitignore
+  - feature/my-feature/my-feature-snowflakes/src/main/AndroidManifest.xml
+  - feature/my-feature/my-feature-snowflakes/src/main/java/  (empty source dir)
+  - feature/my-feature/my-feature-snowflakes/src/test/java/  (empty test dir)
 
 settings.gradle.kts entries:
   - include(":feature:my-feature:my-feature")
-  - include(":feature:my-feature:my-feature-snowflake-components")
+  - include(":feature:my-feature:my-feature-snowflakes")
 
 Plugins (main): mega.android.library, mega.android.library.compose, mega.android.hilt, kotlin.serialisation, kotlin-android
 Plugins (snowflake): mega.android.library, mega.android.library.compose, mega.android.hilt, kotlin.serialisation, kotlin-android
@@ -109,7 +109,7 @@ mkdir -p <module-path>/src/main/java
 mkdir -p <module-path>/src/test/java
 ```
 
-For **feature modules** (simple or nested main, but NOT snowflake-components), also create the navigation scaffolding packages:
+For **feature modules** (simple or nested main, but NOT snowflakes), also create the navigation scaffolding packages:
 ```bash
 mkdir -p <module-path>/src/main/java/<package-path>/presentation
 mkdir -p <module-path>/src/main/java/<package-path>/navigation
@@ -148,7 +148,7 @@ Create `<module-path>/src/main/AndroidManifest.xml`:
 
 ### Step 6 — Create Navigation Scaffolding (Feature Modules Only)
 
-For **feature modules** (simple or nested main, but NOT snowflake-components or `--minimal`), create three scaffolding files. These wire the feature into the app's navigation system.
+For **feature modules** (simple or nested main, but NOT snowflakes or `--minimal`), create three scaffolding files. These wire the feature into the app's navigation system.
 
 Use the following naming conventions (where `{Name}` is the PascalCase feature name, e.g., `my-feature` → `MyFeature`, and `{package}` is the namespace, e.g., `mega.privacy.android.feature.myfeature`):
 
@@ -249,12 +249,12 @@ Add the `include()` line(s) to `settings.gradle.kts`.
   - Feature modules: after the last existing `include(":feature:...")` line
   - Core modules: after the last existing `include(":core:...")` line
   - Shared modules: after the last existing `include(":shared:...")` line
-- For nested feature modules, place the main module include line immediately before the snowflake-components include line.
+- For nested feature modules, place the main module include line immediately before the snowflakes include line.
 
 **Include path format:**
 - Simple feature: `include(":feature:{name}")`
 - Nested feature main: `include(":feature:{name}:{name}")`
-- Nested feature snowflake: `include(":feature:{name}:{name}-snowflake-components")`
+- Nested feature snowflake: `include(":feature:{name}:{name}-snowflakes")`
 - Core: `include(":core:{name}")`
 - Shared: `include(":shared:{name}")`
 
@@ -269,9 +269,9 @@ Where `<gradle-path>` uses colons as separators (e.g., `feature:my-feature` or `
 
 Report success or failure to the user.
 
-If the module was created as nested with snowflake-components, remind the user that the main module can depend on the snowflake module via:
+If the module was created as nested with snowflakes, remind the user that the main module can depend on the snowflake module via:
 ```kotlin
-implementation(project(":feature:{name}:{name}-snowflake-components"))
+implementation(project(":feature:{name}:{name}-snowflakes"))
 ```
 
 ---
@@ -412,13 +412,13 @@ dependencies {
 
 Default plugins by module type:
 
-| Plugin | Feature (simple/nested) | Snowflake-components | Core | Shared |
-|--------|:-----------------------:|:--------------------:|:----:|:------:|
-| `mega.android.library` | Yes | Yes | Yes | Yes |
-| `mega.android.library.compose` | Yes | Yes | No | Yes |
-| `mega.android.hilt` | Yes | Yes | No | Yes |
-| `kotlin.serialisation` | Yes | Yes | No | No |
-| `kotlin-android` | Yes | Yes | No | Yes |
+| Plugin | Feature (simple/nested) | Snowflakes | Core | Shared |
+|--------|:-----------------------:|:----------:|:----:|:------:|
+| `mega.android.library` | Yes |    Yes     | Yes | Yes |
+| `mega.android.library.compose` | Yes |    Yes     | No | Yes |
+| `mega.android.hilt` | Yes |    Yes     | No | Yes |
+| `kotlin.serialisation` | Yes |    Yes     | No | No |
+| `kotlin-android` | Yes |    Yes     | No | Yes |
 
 Optional plugins (added via `--plugins`):
 
@@ -435,7 +435,7 @@ Optional plugins (added via `--plugins`):
 The `namespace` in the `android {}` block must be unique across all modules.
 
 1. **Feature modules** (simple or nested main): `mega.privacy.android.feature.{name}` where `{name}` has hyphens removed (e.g., `cloud-drive` → `clouddrive`, `text-editor` → `texteditor`)
-2. **Snowflake-components modules**: `mega.privacy.android.feature.{name}.components` where `{name}` has hyphens removed
+2. **Snowflakes modules**: `mega.privacy.android.feature.{name}.components` where `{name}` has hyphens removed
 3. **Core modules**: `mega.privacy.android.core.{name}` where `{name}` has hyphens replaced with underscores (e.g., `my-utility` → `mega.privacy.android.core.my_utility`)
 4. **Shared modules**: `mega.privacy.android.shared.{name}` where `{name}` has hyphens removed (e.g., `my-shared` → `mega.privacy.android.shared.myshared`)
 
