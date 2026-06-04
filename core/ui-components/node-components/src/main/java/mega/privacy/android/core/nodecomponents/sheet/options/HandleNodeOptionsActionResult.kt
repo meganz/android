@@ -75,8 +75,8 @@ fun HandleNodeOptionsActionResult(
     LaunchedEffect(copyResult) {
         copyResult?.let { result ->
             nodeOptionsActionViewModel.checkCopyNameCollision(
-                sourceHandles = result.sourceHandles,
-                targetHandle = result.target.longValue,
+                nodeIds = result.nodeIds,
+                target = result.target,
             )
             navigationHandler.clearResult(CopyNavKey.RESULT)
         }
@@ -90,8 +90,8 @@ fun HandleNodeOptionsActionResult(
     LaunchedEffect(moveResult) {
         moveResult?.let { result ->
             nodeOptionsActionViewModel.checkMoveNameCollision(
-                sourceHandles = result.sourceHandles,
-                targetHandle = result.target.longValue,
+                nodeIds = result.nodeIds,
+                target = result.target,
             )
             navigationHandler.clearResult(MoveNavKey.RESULT)
         }

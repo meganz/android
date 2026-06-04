@@ -85,7 +85,6 @@ import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
@@ -101,6 +100,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicL
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -255,16 +255,24 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }
     }
 
-    /** Run a COPY collision check for [sourceHandles] → [targetHandle]. No-op if empty. */
-    fun checkCopyNameCollision(sourceHandles: List<Long>, targetHandle: Long) {
-        if (sourceHandles.isEmpty()) return
-        checkNodesNameCollision(sourceHandles, targetHandle, NodeNameCollisionType.COPY)
+    /** Run a COPY collision check for [nodeIds] → [target]. No-op if empty. */
+    fun checkCopyNameCollision(nodeIds: List<NodeId>, target: NodeId) {
+        if (nodeIds.isEmpty()) return
+        checkNodesNameCollision(
+            nodeIds.map { it.longValue },
+            target.longValue,
+            NodeNameCollisionType.COPY,
+        )
     }
 
     /** Move counterpart of [checkCopyNameCollision]. */
-    fun checkMoveNameCollision(sourceHandles: List<Long>, targetHandle: Long) {
-        if (sourceHandles.isEmpty()) return
-        checkNodesNameCollision(sourceHandles, targetHandle, NodeNameCollisionType.MOVE)
+    fun checkMoveNameCollision(nodeIds: List<NodeId>, target: NodeId) {
+        if (nodeIds.isEmpty()) return
+        checkNodesNameCollision(
+            nodeIds.map { it.longValue },
+            target.longValue,
+            NodeNameCollisionType.MOVE,
+        )
     }
 
     fun checkPublicCopyCollision(targetHandle: Long) {

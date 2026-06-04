@@ -54,6 +54,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -584,12 +585,13 @@ internal class FileExplorerViewModelTest {
 
     @ParameterizedTest()
     @ValueSource(booleans = [true, false])
-    fun `test that checkFeatureFlag updates state correctly`(
+    fun `test that initCloudExplorerState updates state correctly`(
         isFeatureFlagEnabled: Boolean,
     ) = runTest {
         whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn isFeatureFlagEnabled
+        initViewModel()
 
-        underTest.checkFeatureFlag()
+        underTest.initCloudExplorerState(123L)
         testScheduler.advanceUntilIdle()
 
         underTest.uiState.test {
@@ -744,5 +746,82 @@ internal class FileExplorerViewModelTest {
 
             // path = [root], at root so pop returns null
             assertThat(underTest.popCloudDriveFolderForBack()).isNull()
+        }
+
+    @Test
+    fun `test that initCloudExplorerState resolves disabledTargetId from the parent of the given handle`() =
+        runTest {
+            val parentId = NodeId(456L)
+            val mockNode = mock<TypedNode> { on { this.parentId } doReturn parentId }
+            whenever(getNodeByIdUseCase(NodeId(123L))).thenReturn(mockNode)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn true
+            initViewModel()
+
+            underTest.initCloudExplorerState(123L)
+            testScheduler.advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().disabledTargetId).isEqualTo(parentId)
+            }
+        }
+
+    @Test
+    fun `test that initCloudExplorerState leaves disabledTargetId null when the handle is null`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn true
+            initViewModel()
+
+            underTest.initCloudExplorerState(null)
+            testScheduler.advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().disabledTargetId).isNull()
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that initCloudExplorerState does not resolve disabledTargetId when the feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn false
+            initViewModel()
+
+            underTest.initCloudExplorerState(123L)
+            testScheduler.advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().disabledTargetId).isNull()
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that initCloudExplorerState leaves disabledTargetId null when the node is not found`() =
+        runTest {
+            whenever(getNodeByIdUseCase(NodeId(123L))).thenReturn(null)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn true
+            initViewModel()
+
+            underTest.initCloudExplorerState(123L)
+            testScheduler.advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().disabledTargetId).isNull()
+            }
+        }
+
+    @Test
+    fun `test that initCloudExplorerState leaves disabledTargetId null when the lookup fails`() =
+        runTest {
+            whenever(getNodeByIdUseCase(NodeId(123L))).thenThrow(RuntimeException("boom"))
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn true
+            initViewModel()
+
+            underTest.initCloudExplorerState(123L)
+            testScheduler.advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().disabledTargetId).isNull()
+            }
         }
 }

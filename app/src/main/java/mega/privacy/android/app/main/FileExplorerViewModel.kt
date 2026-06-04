@@ -251,13 +251,22 @@ class FileExplorerViewModel @Inject constructor(
         return newPath.last()
     }
 
-    fun checkFeatureFlag() {
+    fun initCloudExplorerState(moveHandle: Long?) {
         viewModelScope.launch {
             val isFeatureFlagEnabled = runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
             }.getOrDefault(false)
+            val disabledTargetId = moveHandle?.takeIf { isFeatureFlagEnabled }?.let {
+                runCatching { getNodeByIdUseCase(NodeId(it))?.parentId }
+                    .getOrNull()
+            }
 
-            _uiState.update { state -> state.copy(isFeatureFlagEnabled = isFeatureFlagEnabled) }
+            _uiState.update { state ->
+                state.copy(
+                    isFeatureFlagEnabled = isFeatureFlagEnabled,
+                    disabledTargetId = disabledTargetId,
+                )
+            }
         }
     }
 

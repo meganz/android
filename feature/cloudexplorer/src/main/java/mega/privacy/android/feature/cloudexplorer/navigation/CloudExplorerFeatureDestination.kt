@@ -248,7 +248,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 onSelectFolder = { target ->
-                    onCopyResult(CopyResult(sourceHandles = key.sourceHandles, target = target))
+                    onCopyResult(CopyResult(nodeIds = key.nodeIds, target = target))
                 },
             )
         }
@@ -269,7 +269,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 onSelectFolder = { target ->
-                    onMoveResult(MoveResult(sourceHandles = key.sourceHandles, target = target))
+                    onMoveResult(MoveResult(nodeIds = key.nodeIds, target = target))
                 },
             )
         }
@@ -290,13 +290,17 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         entry<NodesExplorerNavKey> { key ->
             val onFolderSelected: (NodeId) -> Unit = when (val nav = key.startNavKey) {
                 is CopyNavKey -> { target ->
-                    onCopyResult(CopyResult(sourceHandles = nav.sourceHandles, target = target))
+                    onCopyResult(CopyResult(nodeIds = nav.nodeIds, target = target))
                 }
+
                 is MoveNavKey -> { target ->
-                    onMoveResult(MoveResult(sourceHandles = nav.sourceHandles, target = target))
+                    onMoveResult(MoveResult(nodeIds = nav.nodeIds, target = target))
                 }
+
                 else -> onSelectCUFolder
             }
+            // Block re-selecting the source nodes' current parent as the move target.
+            val disabledTargetId = (key.startNavKey as? MoveNavKey)?.disabledTargetId
             var isProcessingAction by rememberSaveable { mutableStateOf(false) }
             val (fileUriEvent, onFileUriConsumed) =
                 (key.startNavKey as? ShareTextToMegaNavKey)?.let { startNavKey ->
@@ -333,6 +337,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onFileUriConsumed = onFileUriConsumed,
                 onSelectFolder = onFolderSelected,
                 onFilesPicked = onFilesPicked,
+                disabledTargetId = disabledTargetId,
                 monitorResult = monitorResult,
                 clearResult = clearResult,
             )

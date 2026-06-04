@@ -516,7 +516,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             customToolbar = binding.appBarLayoutExplorer
         )
         setContentView(binding.root)
-        viewModel.checkFeatureFlag()
+        viewModel.initCloudExplorerState(intent.getLongArrayExtra("MOVE_FROM")?.get(0))
         credentials = runBlocking {
             runCatching {
                 getAccountCredentialsUseCase()
@@ -844,7 +844,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             .distinctUntilChanged()) { isEnabled ->
             isEnabled?.let {
                 if (isEnabled) {
-                    val cloudExplorerKey = cloudExplorerInitialKey()
+                    val cloudExplorerKey = cloudExplorerInitialKey(
+                        disabledTargetId = viewModel.uiState.value.disabledTargetId
+                    )
 
                     when {
                         intent.action == Intent.ACTION_SEND ||
@@ -853,6 +855,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                 this@FileExplorerActivity,
                                 MegaActivity::class.java
                             ).also {
+                                it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 startActivity(it)
                             }
                             finish()
@@ -888,12 +891,18 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
      * Maps the launching intent action to the matching `:feature:cloudexplorer` destination, or null
      * when the action has no compose destination (then the legacy fragment UI is used).
      */
-    private fun cloudExplorerInitialKey(): NavKey? = when (intent.action) {
+    private fun cloudExplorerInitialKey(disabledTargetId: NodeId?): NavKey? = when (intent.action) {
         ACTION_PICK_COPY_FOLDER ->
-            CopyNavKey(sourceHandles = intent.getLongArrayExtra("COPY_FROM")?.toList().orEmpty())
+            CopyNavKey(nodeIds = intent.getLongArrayExtra("COPY_FROM")?.map { NodeId(it) }
+                .orEmpty())
 
-        ACTION_PICK_MOVE_FOLDER ->
-            MoveNavKey(sourceHandles = intent.getLongArrayExtra("MOVE_FROM")?.toList().orEmpty())
+        ACTION_PICK_MOVE_FOLDER -> {
+            val moveFromHandles = intent.getLongArrayExtra("MOVE_FROM")
+            MoveNavKey(
+                nodeIds = moveFromHandles?.map { NodeId(it) }.orEmpty(),
+                disabledTargetId = disabledTargetId ?: NodeId(-1),
+            )
+        }
 
         ACTION_CHOOSE_MEGA_FOLDER_SYNC -> SelectCUFolderNavKey
 
@@ -960,14 +969,14 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         collectCloudExplorerResult<CopyResult>(CopyNavKey.RESULT) { result ->
             setResult(RESULT_OK, Intent().apply {
                 putExtra("COPY_TO", result.target.longValue)
-                putExtra("COPY_HANDLES", result.sourceHandles.toLongArray())
+                putExtra("COPY_HANDLES", result.nodeIds.map { it.longValue }.toLongArray())
             })
             finishAndRemoveTask()
         }
         collectCloudExplorerResult<MoveResult>(MoveNavKey.RESULT) { result ->
             setResult(RESULT_OK, Intent().apply {
                 putExtra("MOVE_TO", result.target.longValue)
-                putExtra("MOVE_HANDLES", result.sourceHandles.toLongArray())
+                putExtra("MOVE_HANDLES", result.nodeIds.map { it.longValue }.toLongArray())
             })
             finishAndRemoveTask()
         }

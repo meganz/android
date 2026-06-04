@@ -59,6 +59,7 @@ internal fun MoveScreen(
             nodeExplorerId = uiState.rootNodeId,
             nodeSourceType = uiState.nodeSourceType,
             tabIndex = tabIndex,
+            disabledTargetId = startNavKey.disabledTargetId,
             onCloseExplorerScreen = onNavigateBack,
             onNavigateBack = onNavigateBack,
             onNavigate = { onNavigate(listOf(it)) },

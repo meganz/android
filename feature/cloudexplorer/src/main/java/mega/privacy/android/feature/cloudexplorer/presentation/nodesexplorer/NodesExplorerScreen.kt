@@ -72,6 +72,7 @@ internal fun NodesExplorerScreen(
     onFileUriConsumed: () -> Unit = {},
     onSelectFolder: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
+    disabledTargetId: NodeId? = null,
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
 ) {
@@ -110,6 +111,7 @@ internal fun NodesExplorerScreen(
         nodeExplorerId = nodeExplorerId,
         nodeSourceType = nodeSourceType,
         shareUris = shareUris,
+        disabledTargetId = disabledTargetId,
         onCloseExplorerScreen = onCancelExplorerScreen,
         isProcessingAction = isProcessingAction,
         onFolderPicked = { nodeId ->

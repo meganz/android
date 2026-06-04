@@ -37,6 +37,7 @@ data class FileExplorerUiState(
     val nodeUpdatedEvent: StateEvent = consumed,
     val navigateToCloud: StateEventWithContent<NavigateToCloudEvent> = consumed(),
     val isFeatureFlagEnabled: Boolean? = null,
+    val disabledTargetId: NodeId? = null,
     val cloudDriveFolderPath: List<Long> = emptyList(),
     val cloudRootHandle: Long = -1,
 ) {

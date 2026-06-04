@@ -40,24 +40,24 @@ data class ShareFilesToChatNavKey(val chatId: Long) : ExplorerNavKey {
 }
 
 @Serializable
-data class CopyNavKey(val sourceHandles: List<Long>) : ExplorerNavKey {
+data class CopyNavKey(val nodeIds: List<NodeId>) : ExplorerNavKey {
     companion object {
         const val RESULT = "CopyNavKey::result"
     }
 }
 
 @Serializable
-data class MoveNavKey(val sourceHandles: List<Long>) : ExplorerNavKey {
+data class MoveNavKey(val nodeIds: List<NodeId>, val disabledTargetId: NodeId) : ExplorerNavKey {
     companion object {
         const val RESULT = "MoveNavKey::result"
     }
 }
 
 @Serializable
-data class CopyResult(val sourceHandles: List<Long>, val target: NodeId)
+data class CopyResult(val nodeIds: List<NodeId>, val target: NodeId)
 
 @Serializable
-data class MoveResult(val sourceHandles: List<Long>, val target: NodeId)
+data class MoveResult(val nodeIds: List<NodeId>, val target: NodeId)
 
 @Serializable
 data class NodesExplorerNavKey(

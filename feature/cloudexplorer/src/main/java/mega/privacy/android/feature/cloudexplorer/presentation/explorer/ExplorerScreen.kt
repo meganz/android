@@ -69,6 +69,7 @@ internal fun ExplorerScreen(
     modifier: Modifier = Modifier,
     shareUris: List<UriPath>? = null,
     tabIndex: Int = CLOUD_TAB_INDEX,
+    disabledTargetId: NodeId? = null,
     onFolderPicked: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
     onChatsSelected: () -> Unit = {},
@@ -151,7 +152,8 @@ internal fun ExplorerScreen(
                     },
                     primaryButtonEnabled = when {
                         !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
-                        selectedTabIndex == CLOUD_TAB_INDEX -> true
+                        selectedTabIndex == CLOUD_TAB_INDEX ->
+                            nodesExplorerUiStateShared.currentFolderId != disabledTargetId
                         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
                         else -> false
                     },

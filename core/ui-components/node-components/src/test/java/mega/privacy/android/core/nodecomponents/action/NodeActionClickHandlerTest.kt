@@ -125,6 +125,7 @@ import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import org.junit.After
 import org.junit.Before
@@ -177,11 +178,13 @@ class NodeActionClickHandlerTest {
 
     private val mockFileNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(123L)
+        on { parentId } doReturn NodeId(789L)
         on { name } doReturn "filename"
     }
 
     private val mockFolderNode = mock<TypedFolderNode> {
         on { id } doReturn NodeId(456L)
+        on { parentId } doReturn NodeId(999L)
         on { name } doReturn "foldername"
     }
 
@@ -408,7 +411,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(CopyNavKey(sourceHandles = listOf(123L)))
+        verify(mockNavigationHandler).navigate(CopyNavKey(nodeIds = listOf(NodeId(123L))))
     }
 
     @Test
@@ -422,7 +425,14 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockNavigationHandler).navigate(CopyNavKey(sourceHandles = listOf(123L, 456L)))
+        verify(mockNavigationHandler).navigate(
+            CopyNavKey(
+                nodeIds = listOf(
+                    NodeId(123L),
+                    NodeId(456L)
+                )
+            )
+        )
     }
 
     @Test
@@ -436,6 +446,53 @@ class NodeActionClickHandlerTest {
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
 
         verify(mockCopyLauncher).launch(longArrayOf(123L))
+    }
+
+    @Test
+    fun `test MoveAction single node navigates to MoveNavKey with the node parent when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = MoveActionClickHandler()
+        val menuAction = mock<MoveMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockNavigationHandler).navigate(
+            MoveNavKey(nodeIds = listOf(NodeId(123L)), disabledTargetId = NodeId(789L))
+        )
+    }
+
+    @Test
+    fun `test MoveAction multiple nodes navigates to MoveNavKey with the first node parent when cloud explorer enabled`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = MoveActionClickHandler()
+        val menuAction = mock<MoveMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockNavigationHandler).navigate(
+            MoveNavKey(
+                nodeIds = listOf(NodeId(123L), NodeId(456L)),
+                disabledTargetId = NodeId(789L),
+            )
+        )
+    }
+
+    @Test
+    fun `test MoveAction uses moveLauncher when cloud explorer enabled but navigationHandler is null`() {
+        whenever(mockViewModel.uiState).thenReturn(
+            MutableStateFlow(NodeActionState(isCloudExplorerAvailable = true))
+        )
+        val action = MoveActionClickHandler()
+        val menuAction = mock<MoveMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProviderNoHandler)
+
+        verify(mockMoveLauncher).launch(longArrayOf(123L))
     }
 
     // SaveToMegaAction Tests

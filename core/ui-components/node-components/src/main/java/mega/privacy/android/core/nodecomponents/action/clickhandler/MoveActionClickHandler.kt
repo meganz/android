@@ -5,6 +5,7 @@ import mega.privacy.android.core.nodecomponents.action.MultipleNodesActionProvid
 import mega.privacy.android.core.nodecomponents.action.NodeActionProvider
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
 import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.navigation.destination.MoveNavKey
 import javax.inject.Inject
@@ -13,7 +14,7 @@ class MoveActionClickHandler @Inject constructor() : SingleNodeAction, MultiNode
     override fun canHandle(action: MenuAction): Boolean = action is MoveMenuAction
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
-        launchMove(listOf(node.id.longValue), provider)
+        launchMove(listOf(node.id), node.parentId, provider)
     }
 
     override fun handle(
@@ -21,19 +22,21 @@ class MoveActionClickHandler @Inject constructor() : SingleNodeAction, MultiNode
         nodes: List<TypedNode>,
         provider: MultipleNodesActionProvider,
     ) {
-        launchMove(nodes.map { it.id.longValue }, provider)
+        launchMove(nodes.map { it.id }, nodes.firstOrNull()?.parentId ?: NodeId(-1L), provider)
     }
 
     /**
-     * Move counterpart of [CopyActionClickHandler.launchCopy]. Sources travel inside [MoveNavKey]
-     * and come back to the host inside [mega.privacy.android.navigation.destination.MoveResult].
+     * Move counterpart of [CopyActionClickHandler.launchCopy]. Sources and their current
+     * [parentId] travel inside [MoveNavKey] (the parent is used to block re-selecting the
+     * current folder as the move target) and come back inside
+     * [mega.privacy.android.navigation.destination.MoveResult].
      */
-    private fun launchMove(handles: List<Long>, provider: NodeActionProvider) {
+    private fun launchMove(nodeIds: List<NodeId>, parentId: NodeId, provider: NodeActionProvider) {
         val navigationHandler = provider.navigationHandler
         if (navigationHandler != null && provider.viewModel.uiState.value.isCloudExplorerAvailable) {
-            navigationHandler.navigate(MoveNavKey(sourceHandles = handles))
+            navigationHandler.navigate(MoveNavKey(nodeIds = nodeIds, disabledTargetId = parentId))
         } else {
-            provider.moveLauncher.launch(handles.toLongArray())
+            provider.moveLauncher.launch(nodeIds.map { it.longValue }.toLongArray())
         }
     }
 }

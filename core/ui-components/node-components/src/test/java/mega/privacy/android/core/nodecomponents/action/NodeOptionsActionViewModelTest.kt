@@ -21,7 +21,6 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
 import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
-import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
@@ -39,6 +38,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuActi
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
+import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -63,12 +63,12 @@ import mega.privacy.android.domain.entity.node.NodeLocation
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
-import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -102,11 +102,11 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicL
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -119,12 +119,13 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.never
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -420,14 +421,53 @@ class NodeOptionsActionViewModelTest {
             initViewModel()
 
             viewModel.checkCopyNameCollision(
-                sourceHandles = listOf(sampleNode.id.longValue),
-                targetHandle = targetHandle,
+                nodeIds = listOf(sampleNode.id),
+                target = NodeId(targetHandle),
             )
 
             verify(checkNodesNameCollisionUseCase).invoke(
                 nodes = mapOf(sampleNode.id.longValue to targetHandle),
                 type = NodeNameCollisionType.COPY,
             )
+        }
+
+    @Test
+    fun `test that checkMoveNameCollision runs a MOVE collision check for the supplied node ids`() =
+        runTest {
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                    type = NodeNameCollisionType.MOVE,
+                ),
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            )
+            initViewModel()
+
+            viewModel.checkMoveNameCollision(
+                nodeIds = listOf(sampleNode.id),
+                target = NodeId(targetHandle),
+            )
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                type = NodeNameCollisionType.MOVE,
+            )
+        }
+
+    @Test
+    fun `test that checkMoveNameCollision is a no-op for an empty node id list`() =
+        runTest {
+            initViewModel()
+
+            viewModel.checkMoveNameCollision(nodeIds = emptyList(), target = NodeId(999L))
+
+            verifyNoInteractions(checkNodesNameCollisionUseCase)
         }
 
     @Test
