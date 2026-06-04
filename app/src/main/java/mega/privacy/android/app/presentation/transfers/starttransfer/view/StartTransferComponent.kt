@@ -322,6 +322,9 @@ private fun StartTransferComponent(
                 }
 
                 is StartTransferEvent.FinishUploadProcessing -> {
+                    (event.triggerEvent as? StartUpload.Files)?.specificStartMessage?.let {
+                        snackBarHostState.showAutoDurationSnackbar(it)
+                    }
                     onScanningFinished(event)
                 }
 
