@@ -431,35 +431,46 @@ internal fun VideoPlayerScreen(
                                     )
                             }
 
+                            val prevDrawable = checkNotNull(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    R.drawable.media_player_prev
+                                )
+                            )
+                            val rewDrawable = checkNotNull(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    R.drawable.media_player_15_minus
+                                )
+                            )
+                            val nextDrawable = checkNotNull(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    R.drawable.media_player_next
+                                )
+                            )
+                            val ffwdDrawable = checkNotNull(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    R.drawable.media_player_15_plus
+                                )
+                            )
+
                             fun applyControlIcons() {
-                                playerComposeView.findViewById<ImageButton>(R.id.exo_prev)
-                                    ?.setImageDrawable(
-                                        ContextCompat.getDrawable(
-                                            context,
-                                            R.drawable.media_player_prev
-                                        )
+                                playerComposeView.apply {
+                                    findViewById<ImageButton>(R.id.exo_prev)?.setImageDrawable(
+                                        prevDrawable
                                     )
-                                playerComposeView.findViewById<ImageButton>(R.id.exo_rew)
-                                    ?.setImageDrawable(
-                                        ContextCompat.getDrawable(
-                                            context,
-                                            R.drawable.media_player_15_minus
-                                        )
+                                    findViewById<ImageButton>(R.id.exo_rew)?.setImageDrawable(
+                                        rewDrawable
                                     )
-                                playerComposeView.findViewById<ImageButton>(R.id.exo_next)
-                                    ?.setImageDrawable(
-                                        ContextCompat.getDrawable(
-                                            context,
-                                            R.drawable.media_player_next
-                                        )
+                                    findViewById<ImageButton>(R.id.exo_next)?.setImageDrawable(
+                                        nextDrawable
                                     )
-                                playerComposeView.findViewById<ImageButton>(R.id.exo_ffwd)
-                                    ?.setImageDrawable(
-                                        ContextCompat.getDrawable(
-                                            context,
-                                            R.drawable.media_player_15_plus
-                                        )
+                                    findViewById<ImageButton>(R.id.exo_ffwd)?.setImageDrawable(
+                                        ffwdDrawable
                                     )
+                                }
                             }
 
                             videoPlayerController = VideoPlayerController(

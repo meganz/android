@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer.facade
 
+import android.app.ActivityManager
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -29,6 +30,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.Renderer
@@ -262,6 +264,24 @@ class MediaPlayerFacade @Inject constructor(
 
     private var bufferingStartTime: Long = 0L
 
+    private fun buildLoadControl(): DefaultLoadControl {
+        val isLowRam = context.getSystemService(ActivityManager::class.java)?.isLowRamDevice ?: false
+        return if (isLowRam) {
+            DefaultLoadControl.Builder()
+                .setTargetBufferBytes(LOW_RAM_TARGET_BUFFER_BYTES)
+                .setPrioritizeTimeOverSizeThresholds(false)
+                .setBufferDurationsMs(
+                    LOW_RAM_MIN_BUFFER_MS,
+                    LOW_RAM_MAX_BUFFER_MS,
+                    LOW_RAM_BUFFER_FOR_PLAYBACK_MS,
+                    LOW_RAM_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
+                )
+                .build()
+        } else {
+            DefaultLoadControl() // Normal devices: use ExoPlayer default buffers (50 s)
+        }
+    }
+
     override fun createPlayer(
         shuffleEnabled: Boolean?,
         shuffleOrder: ShuffleOrder?,
@@ -275,6 +295,7 @@ class MediaPlayerFacade @Inject constructor(
         )
         exoPlayer = ExoPlayer.Builder(context, renderersFactory)
             .setTrackSelector(trackSelector)
+            .setLoadControl(buildLoadControl())
             .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
             .build().apply {
                 addListener(MetadataExtractor { title, artist, album ->
@@ -774,5 +795,13 @@ class MediaPlayerFacade @Inject constructor(
 
     companion object {
         private const val INCREMENT_TIME_IN_MS = 15000L
+
+        // ExoPlayer buffer configuration for low-RAM devices (heap growth limit ≤ 128 MB).
+        // Prioritises byte-size limits over time-based buffers to avoid OOM during video playback.
+        private const val LOW_RAM_TARGET_BUFFER_BYTES = 12 * 1024 * 1024 // 12 MB
+        private const val LOW_RAM_MIN_BUFFER_MS = 15_000
+        private const val LOW_RAM_MAX_BUFFER_MS = 30_000
+        private const val LOW_RAM_BUFFER_FOR_PLAYBACK_MS = 2_500
+        private const val LOW_RAM_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS = 5_000
     }
 }
