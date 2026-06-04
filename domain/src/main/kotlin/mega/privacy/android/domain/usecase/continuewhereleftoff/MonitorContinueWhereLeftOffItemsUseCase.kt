@@ -16,20 +16,27 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.repository.ContinueWhereLeftOffRepository
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import javax.inject.Inject
 
 /**
- * Monitors recently used items, excluding nodes that are hidden from the current user.
+ * Monitors recently used items, excluding nodes that can no longer be resumed by the current user.
  *
- * A node's raw sensitivity flag is not enough to decide visibility: the hidden-nodes feature is
- * paid-only, so a sensitive node must stay visible for free users (and for anyone who has turned
- * "show hidden items" on). Items are therefore only removed when the feature is actually active
- * for this account ([MonitorHiddenNodesEnabledUseCase]) AND the user is not showing hidden items
- * ([MonitorShowHiddenItemsUseCase]). Hidden items are removed from the index so they do not
- * reappear once dropped.
+ * Two kinds of items are dropped from the carousel:
+ *
+ * - **Moved to the rubbish bin or deleted.** These are never resumable, so they are removed
+ *   unconditionally ([IsNodeInRubbishOrDeletedUseCase]) regardless of any hidden-nodes setting.
+ * - **Hidden from the current user.** A node's raw sensitivity flag is not enough to decide
+ *   visibility: the hidden-nodes feature is paid-only, so a sensitive node must stay visible for
+ *   free users (and for anyone who has turned "show hidden items" on). Hidden items are therefore
+ *   only removed when the feature is actually active for this account
+ *   ([MonitorHiddenNodesEnabledUseCase]) AND the user is not showing hidden items
+ *   ([MonitorShowHiddenItemsUseCase]).
+ *
+ * In both cases the item is removed from the index so it does not reappear once dropped.
  *
  * When both [sortField] and [sortDirection] are non-null, those explicit values are
  * used and the persisted preference is ignored. Otherwise (either or both null) items
@@ -41,6 +48,7 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
 ) {
     operator fun invoke(
         limit: Int,
@@ -55,23 +63,50 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
             // values say the feature is enabled AND hidden items are not being shown.
             monitorHiddenNodesEnabledUseCase().onStart { emit(false) },
             monitorShowHiddenItemsUseCase().onStart { emit(true) },
-            // Re-evaluate when a node's sensitivity changes (e.g. the user hides the open file),
-            // since that does not alter the recently-used table on its own.
-            sensitiveNodeChanges(),
+            // Re-evaluate when a node moves (e.g. into the rubbish bin), is deleted, or has its
+            // sensitivity changed (e.g. the user hides the open file), since none of these alter
+            // the recently-used table on their own.
+            relevantNodeChanges(),
         ) { items, hiddenNodesEnabled, showHiddenItems, _ ->
+            // Items moved to the rubbish bin or deleted are never resumable, so drop them
+            // regardless of the hidden-nodes feature or the "show hidden items" setting.
+            val trashedHandles = items.trashedNodeHandles()
+            trashedHandles.forEach { repository.removeRecentlyUsedItem(it) }
+            val resumableItems = items.filterNot { it.nodeHandle in trashedHandles }
+
             if (!hiddenNodesEnabled || showHiddenItems) {
-                items
+                resumableItems
             } else {
-                val hiddenHandles = items.hiddenNodeHandles()
+                val hiddenHandles = resumableItems.hiddenNodeHandles()
                 hiddenHandles.forEach { repository.removeRecentlyUsedItem(it) }
-                items.filterNot { it.nodeHandle in hiddenHandles }
+                resumableItems.filterNot { it.nodeHandle in hiddenHandles }
             }
         }.distinctUntilChanged()
 
-    private fun sensitiveNodeChanges(): Flow<NodeUpdate> =
+    private fun relevantNodeChanges(): Flow<NodeUpdate> =
         monitorNodeUpdatesUseCase()
-            .filter { update -> update.changes.values.any { NodeChanges.Sensitive in it } }
+            .filter { update ->
+                update.changes.values.any { changes ->
+                    changes.any { it in RELEVANT_NODE_CHANGES }
+                }
+            }
             .onStart { emit(NodeUpdate(emptyMap())) }
+
+    private suspend fun List<ContinueWhereLeftOffItem>.trashedNodeHandles(): Set<Long> =
+        coroutineScope {
+            map { item -> async { item.nodeHandle to isNodeTrashed(item.nodeHandle) } }
+                .awaitAll()
+                .filter { (_, trashed) -> trashed }
+                .map { (nodeHandle, _) -> nodeHandle }
+                .toSet()
+        }
+
+    /**
+     * Whether the node has been moved to the rubbish bin or deleted. A lookup failure is treated as
+     * "not trashed" so a transient error never drops a recently-used item here.
+     */
+    private suspend fun isNodeTrashed(nodeHandle: Long): Boolean =
+        runCatching { isNodeInRubbishOrDeletedUseCase(nodeHandle) }.getOrDefault(false)
 
     private suspend fun List<ContinueWhereLeftOffItem>.hiddenNodeHandles(): Set<Long> =
         coroutineScope {
@@ -90,5 +125,18 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
     private suspend fun isNodeHidden(nodeHandle: Long): Boolean {
         val node = runCatching { getNodeByIdUseCase(NodeId(nodeHandle)) }.getOrNull()
         return node != null && (node.isMarkedSensitive || node.isSensitiveInherited)
+    }
+
+    private companion object {
+        /**
+         * Node changes that can affect whether a recently-used item is still resumable: a move into
+         * the rubbish bin ([NodeChanges.Parent]), a deletion ([NodeChanges.Remove]), or a change in
+         * sensitivity ([NodeChanges.Sensitive]).
+         */
+        private val RELEVANT_NODE_CHANGES = setOf(
+            NodeChanges.Parent,
+            NodeChanges.Remove,
+            NodeChanges.Sensitive,
+        )
     }
 }
