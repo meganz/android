@@ -1,10 +1,8 @@
 package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.node.NodeContentUri
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.AddNodeType
-import mega.privacy.android.domain.usecase.GetAlbumPhotoFileUrlByNodeIdUseCase
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
@@ -27,7 +25,6 @@ class GetNodeContentUriByHandleUseCase @Inject constructor(
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val getLocalFolderLinkFromMegaApiFolderUseCase: GetLocalFolderLinkFromMegaApiFolderUseCase,
-    private val getAlbumPhotoFileUrlByNodeIdUseCase: GetAlbumPhotoFileUrlByNodeIdUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val addNodeType: AddNodeType,
@@ -38,6 +35,8 @@ class GetNodeContentUriByHandleUseCase @Inject constructor(
      */
     suspend operator fun invoke(handle: Long): NodeContentUri {
         val hasCredentials = hasCredentialsUseCase()
+        // Cloud drive files and folder links opened while logged in using MegaApi http server;
+        // Folder links opened without login are streamed through the MegaApiFolder http server.
         val shouldStopHttpSever = when {
             hasCredentials && megaApiHttpServerIsRunningUseCase() == 0 -> {
                 megaApiHttpServerStartUseCase()
@@ -54,25 +53,21 @@ class GetNodeContentUriByHandleUseCase @Inject constructor(
         return getFileUrlByNodeHandleUseCase(handle)?.let { url ->
             NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)
         } ?: run {
-            getAlbumPhotoFileUrlByNodeIdUseCase(NodeId(handle))?.let { url ->
+            if (hasCredentials) {
+                getLocalFolderLinkFromMegaApiUseCase(handle)
+            } else {
+                getLocalFolderLinkFromMegaApiFolderUseCase(handle)
+            }?.let { url ->
                 NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)
             } ?: run {
-                if (hasCredentials) {
-                    getLocalFolderLinkFromMegaApiUseCase(handle)
-                } else {
-                    getLocalFolderLinkFromMegaApiFolderUseCase(handle)
-                }?.let { url ->
-                    NodeContentUri.RemoteContentUri(url, shouldStopHttpSever)
-                } ?: run {
-                    getNodeByHandleUseCase(handle, !hasCredentials)?.let { node ->
-                        val typedNode = addNodeType(node)
-                        if (typedNode is TypedFileNode) {
-                            getNodeContentUriUseCase(typedNode)
-                        } else {
-                            throw IllegalStateException("node is not a file")
-                        }
-                    } ?: throw IllegalStateException("cannot find node")
-                }
+                getNodeByHandleUseCase(handle, !hasCredentials)?.let { node ->
+                    val typedNode = addNodeType(node)
+                    if (typedNode is TypedFileNode) {
+                        getNodeContentUriUseCase(typedNode)
+                    } else {
+                        throw IllegalStateException("node is not a file")
+                    }
+                } ?: throw IllegalStateException("cannot find node")
             }
         }
     }
