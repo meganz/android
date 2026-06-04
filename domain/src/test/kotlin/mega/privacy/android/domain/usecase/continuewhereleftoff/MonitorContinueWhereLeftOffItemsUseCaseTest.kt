@@ -303,6 +303,61 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         }
 
     @Test
+    fun `test that item title is refreshed from the current node name`() = runTest {
+        val items = listOf(item(1L))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(items))
+        val renamedNode = mock<TypedNode> { on { name } doReturn "renamed.pdf" }
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(renamedNode)
+
+        underTest(10).test {
+            assertThat(awaitItem().single().title).isEqualTo("renamed.pdf")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that stored title is kept when node lookup returns null`() = runTest {
+        val items = listOf(item(1L))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(items))
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+
+        underTest(10).test {
+            assertThat(awaitItem().single().title).isEqualTo("file-1.pdf")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that stored title is kept when current node name is blank`() = runTest {
+        val items = listOf(item(1L))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(items))
+        val blankNameNode = mock<TypedNode> { on { name } doReturn "" }
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(blankNameNode)
+
+        underTest(10).test {
+            assertThat(awaitItem().single().title).isEqualTo("file-1.pdf")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that a renamed node is not refreshed once it has been removed`() = runTest {
+        val items = listOf(item(1L))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(items))
+        whenever(isNodeInRubbishOrDeletedUseCase(1L)).thenReturn(true)
+
+        underTest(10).test {
+            assertThat(awaitItem()).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(getNodeByIdUseCase, never()).invoke(NodeId(1L))
+    }
+
+    @Test
     fun `test that trashed node is not looked up for sensitivity`() = runTest {
         val items = listOf(item(1L))
         whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))

@@ -38,6 +38,12 @@ import javax.inject.Inject
  *
  * In both cases the item is removed from the index so it does not reappear once dropped.
  *
+ * Surviving items also have their title refreshed from the current node name: the
+ * recently-used table only stores the file name captured when the item was opened, so a
+ * later rename would otherwise leave a stale title in the carousel. Like the removals above,
+ * this is re-evaluated against the live node on every relevant change (and on each new
+ * subscription), so the title self-heals even when the rename happened off-screen.
+ *
  * When both [sortField] and [sortDirection] are non-null, those explicit values are
  * used and the persisted preference is ignored. Otherwise (either or both null) items
  * follow the persisted sort preference.
@@ -63,9 +69,9 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
             // values say the feature is enabled AND hidden items are not being shown.
             monitorHiddenNodesEnabledUseCase().onStart { emit(false) },
             monitorShowHiddenItemsUseCase().onStart { emit(true) },
-            // Re-evaluate when a node moves (e.g. into the rubbish bin), is deleted, or has its
-            // sensitivity changed (e.g. the user hides the open file), since none of these alter
-            // the recently-used table on their own.
+            // Re-evaluate when a node moves (e.g. into the rubbish bin), is deleted, has its
+            // sensitivity changed (e.g. the user hides the open file), or is renamed, since none
+            // of these alter the recently-used table on their own.
             relevantNodeChanges(),
         ) { items, hiddenNodesEnabled, showHiddenItems, _ ->
             // Items moved to the rubbish bin or deleted are never resumable, so drop them
@@ -74,13 +80,14 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
             trashedHandles.forEach { repository.removeRecentlyUsedItem(it) }
             val resumableItems = items.filterNot { it.nodeHandle in trashedHandles }
 
-            if (!hiddenNodesEnabled || showHiddenItems) {
+            val visibleItems = if (!hiddenNodesEnabled || showHiddenItems) {
                 resumableItems
             } else {
                 val hiddenHandles = resumableItems.hiddenNodeHandles()
                 hiddenHandles.forEach { repository.removeRecentlyUsedItem(it) }
                 resumableItems.filterNot { it.nodeHandle in hiddenHandles }
             }
+            visibleItems.withRefreshedTitles()
         }.distinctUntilChanged()
 
     private fun relevantNodeChanges(): Flow<NodeUpdate> =
@@ -91,6 +98,23 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
                 }
             }
             .onStart { emit(NodeUpdate(emptyMap())) }
+
+    /**
+     * Replaces each item's title with the current node name. The recently-used table only stores
+     * the name captured when the item was opened, so a later rename would otherwise leave a stale
+     * title. A lookup failure or a blank name keeps the stored title, so a transient error never
+     * blanks a title.
+     */
+    private suspend fun List<ContinueWhereLeftOffItem>.withRefreshedTitles(): List<ContinueWhereLeftOffItem> =
+        coroutineScope {
+            map { item ->
+                async {
+                    val currentName = runCatching { getNodeByIdUseCase(NodeId(item.nodeHandle)) }
+                        .getOrNull()?.name?.takeIf { it.isNotBlank() }
+                    currentName?.let { item.copy(title = it) } ?: item
+                }
+            }.awaitAll()
+        }
 
     private suspend fun List<ContinueWhereLeftOffItem>.trashedNodeHandles(): Set<Long> =
         coroutineScope {
@@ -129,14 +153,15 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
 
     private companion object {
         /**
-         * Node changes that can affect whether a recently-used item is still resumable: a move into
-         * the rubbish bin ([NodeChanges.Parent]), a deletion ([NodeChanges.Remove]), or a change in
-         * sensitivity ([NodeChanges.Sensitive]).
+         * Node changes that affect a recently-used item's display or whether it is still resumable:
+         * a move into the rubbish bin ([NodeChanges.Parent]), a deletion ([NodeChanges.Remove]), a
+         * change in sensitivity ([NodeChanges.Sensitive]), or a rename ([NodeChanges.Name]).
          */
         private val RELEVANT_NODE_CHANGES = setOf(
             NodeChanges.Parent,
             NodeChanges.Remove,
             NodeChanges.Sensitive,
+            NodeChanges.Name,
         )
     }
 }

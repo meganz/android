@@ -13,6 +13,11 @@ import javax.inject.Inject
  * Resolves blank titles and audio/video durations in [ContinueWhereLeftOffItem] lists
  * by fetching node data from [GetNodeByIdUseCase]. Results are cached by nodeHandle
  * so each node is resolved at most once per instance lifetime.
+ *
+ * The incoming title is authoritative: it is kept whenever it is non-blank (the domain
+ * keeps it in sync with the current node name), and the cached name is only used as a
+ * fallback for a still-blank title. This prevents a stale cached name from clobbering a
+ * title that has since been refreshed (e.g. after a rename).
  */
 internal class ContinueWhereLeftOffNameResolver @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
@@ -26,7 +31,7 @@ internal class ContinueWhereLeftOffNameResolver @Inject constructor(
     fun applyCachedNames(items: List<ContinueWhereLeftOffItem>) = items.map { item ->
         cache[item.nodeHandle]?.let { resolved ->
             item.copy(
-                title = resolved.name.ifBlank { item.title },
+                title = item.title.ifBlank { resolved.name },
                 duration = resolved.duration ?: item.duration,
             )
         } ?: item
