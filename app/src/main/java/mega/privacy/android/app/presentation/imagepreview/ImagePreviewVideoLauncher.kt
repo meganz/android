@@ -11,8 +11,8 @@ import mega.privacy.android.domain.entity.node.chat.ChatImageFile
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
+import mega.privacy.android.domain.usecase.node.GetAlbumLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetFolderLinkNodeContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaNode
@@ -28,7 +28,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val addImageTypeUseCase: AddImageTypeUseCase,
     private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
-    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val getAlbumLinkNodeContentUriUseCase: GetAlbumLinkNodeContentUriUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val getFileTypeInfoUseCase: GetFileTypeInfoUseCase,
     private val megaNavigator: MegaNavigator,
@@ -70,7 +70,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
                         getNodeContentUriUseCase(imageNode as ChatImageFile)
 
                     ImagePreviewFetcherSource.ALBUM_SHARING ->
-                        getNodeContentUriByHandleUseCase(imageNode.id.longValue)
+                        getAlbumLinkNodeContentUriUseCase(imageNode.id)
 
                     else -> getFolderLinkNodeContentUriUseCase(typedFileNode)
                 }

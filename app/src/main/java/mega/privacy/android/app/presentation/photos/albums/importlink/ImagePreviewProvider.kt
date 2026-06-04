@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.node.GetAlbumLinkNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.navigation.ExtraConstant
@@ -50,6 +51,7 @@ class ImagePreviewProvider @Inject constructor(
     private val monitorSubFolderMediaDiscoverySettingsUseCase: MonitorSubFolderMediaDiscoverySettingsUseCase,
     private val megaNavigator: MegaNavigator,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val getAlbumLinkNodeContentUriUseCase: GetAlbumLinkNodeContentUriUseCase,
 ) {
 
     /**
@@ -201,7 +203,11 @@ class ImagePreviewProvider @Inject constructor(
                     isFolderLink = isFolderLink
                 )
             } ?: run {
-                val contentUri = getNodeContentUriByHandleUseCase(nodeHandle)
+                val contentUri = if (viewType == FROM_ALBUM_SHARING) {
+                    getAlbumLinkNodeContentUriUseCase(NodeId(nodeHandle))
+                } else {
+                    getNodeContentUriByHandleUseCase(nodeHandle)
+                }
                 megaNavigator.openMediaPlayerActivity(
                     context = activity,
                     contentUri = contentUri,
