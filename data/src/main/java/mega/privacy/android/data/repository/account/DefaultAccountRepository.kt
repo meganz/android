@@ -87,6 +87,7 @@ import mega.privacy.android.domain.exception.NotMasterBusinessAccountException
 import mega.privacy.android.domain.exception.QRCodeException
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
+import mega.privacy.android.domain.exception.WrongMultiFactorAuthPinException
 import mega.privacy.android.domain.exception.account.ConfirmCancelAccountException
 import mega.privacy.android.domain.exception.account.ConfirmChangeEmailException
 import mega.privacy.android.domain.exception.account.CreateAccountException
@@ -283,6 +284,110 @@ internal class DefaultAccountRepository @Inject constructor(
                 }
             }
         }
+
+    override suspend fun requestDeleteAccountLinkWith2FA(pin: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaApiGateway.multiFactorAuthCancelAccount(
+                    pin,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = on2FARequestFinished(
+                            continuation = continuation,
+                            requestType = MegaRequest.TYPE_GET_CANCEL_LINK,
+                            methodName = "requestDeleteAccountLinkWith2FA",
+                        )
+                    )
+                )
+            }
+        }
+
+    override suspend fun requestChangeEmailWith2FA(newEmail: String, pin: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaApiGateway.multiFactorAuthChangeEmail(
+                    newEmail,
+                    pin,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = on2FARequestFinished(
+                            continuation = continuation,
+                            requestType = MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK,
+                            methodName = "requestChangeEmailWith2FA",
+                        )
+                    )
+                )
+            }
+        }
+
+    override suspend fun disableMultiFactorAuth(pin: String) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            megaApiGateway.multiFactorAuthDisable(
+                pin,
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = on2FARequestFinished(
+                        continuation = continuation,
+                        requestType = MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET,
+                        methodName = "disableMultiFactorAuth",
+                    )
+                )
+            )
+        }
+    }
+
+    override suspend fun changePasswordWith2FA(newPassword: String, pin: String): Boolean =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaApiGateway.multiFactorAuthChangePassword(
+                    null,
+                    newPassword,
+                    pin,
+                    OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request: MegaRequest, error: MegaError ->
+                            if (request.isType(MegaRequest.TYPE_CHANGE_PW)) {
+                                when (error.errorCode) {
+                                    MegaError.API_OK ->
+                                        continuation.resumeWith(Result.success(true))
+
+                                    MegaError.API_EFAILED, MegaError.API_EEXPIRED ->
+                                        continuation.failWithException(
+                                            WrongMultiFactorAuthPinException(
+                                                error.errorCode,
+                                                error.errorString,
+                                            )
+                                        )
+
+                                    else -> continuation.failWithError(
+                                        error,
+                                        "changePasswordWith2FA",
+                                    )
+                                }
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
+    private fun on2FARequestFinished(
+        continuation: Continuation<Unit>,
+        requestType: Int,
+        methodName: String,
+    ) = { request: MegaRequest, error: MegaError ->
+        if (request.isType(requestType)) {
+            when (error.errorCode) {
+                MegaError.API_OK -> continuation.resumeWith(Result.success(Unit))
+
+                MegaError.API_EFAILED, MegaError.API_EEXPIRED ->
+                    continuation.failWithException(
+                        WrongMultiFactorAuthPinException(
+                            error.errorCode,
+                            error.errorString,
+                        )
+                    )
+
+                else -> continuation.failWithError(error, methodName)
+            }
+        }
+    }
 
     override fun monitorUserUpdates() = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUsersUpdate>()

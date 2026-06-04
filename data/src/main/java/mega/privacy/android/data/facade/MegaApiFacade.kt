@@ -956,6 +956,34 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.multiFactorAuthEnable(pin, listener)
     }
 
+    override fun multiFactorAuthDisable(pin: String, listener: MegaRequestListenerInterface?) {
+        megaApi.multiFactorAuthDisable(pin, listener)
+    }
+
+    override fun multiFactorAuthCancelAccount(
+        pin: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.multiFactorAuthCancelAccount(pin, listener)
+    }
+
+    override fun multiFactorAuthChangeEmail(
+        newEmail: String,
+        pin: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.multiFactorAuthChangeEmail(newEmail, pin, listener)
+    }
+
+    override fun multiFactorAuthChangePassword(
+        currentPassword: String?,
+        newPassword: String,
+        pin: String,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.multiFactorAuthChangePassword(currentPassword, newPassword, pin, listener)
+    }
+
     override fun isMasterKeyExported(listener: MegaRequestListenerInterface?) {
         megaApi.isMasterKeyExported(listener)
     }

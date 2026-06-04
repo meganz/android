@@ -2232,6 +2232,54 @@ interface MegaApiGateway {
     fun enableMultiFactorAuth(pin: String, listener: MegaRequestListenerInterface?)
 
     /**
+     * Disable multi-factor authentication for the account.
+     * Associated request type: MegaRequest::TYPE_MULTI_FACTOR_AUTH_SET (flag false on success).
+     *
+     * @param pin      Valid 6-digit 2FA PIN code
+     * @param listener MegaRequestListener to track this request
+     */
+    fun multiFactorAuthDisable(pin: String, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Request a delete (cancel) account confirmation link, gated by a 2FA PIN.
+     * Associated request type: MegaRequest::TYPE_GET_CANCEL_LINK.
+     *
+     * @param pin      Valid 6-digit 2FA PIN code
+     * @param listener MegaRequestListener to track this request
+     */
+    fun multiFactorAuthCancelAccount(pin: String, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Request a change-email confirmation link, gated by a 2FA PIN.
+     * Associated request type: MegaRequest::TYPE_GET_CHANGE_EMAIL_LINK.
+     *
+     * @param newEmail The new email address requested by the user
+     * @param pin      Valid 6-digit 2FA PIN code
+     * @param listener MegaRequestListener to track this request
+     */
+    fun multiFactorAuthChangeEmail(
+        newEmail: String,
+        pin: String,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
+     * Change the account password, gated by a 2FA PIN.
+     * Associated request type: MegaRequest::TYPE_CHANGE_PW.
+     *
+     * @param currentPassword Current password (nullable — pass null to skip the legacy check)
+     * @param newPassword     The new password
+     * @param pin             Valid 6-digit 2FA PIN code
+     * @param listener        MegaRequestListener to track this request
+     */
+    fun multiFactorAuthChangePassword(
+        currentPassword: String?,
+        newPassword: String,
+        pin: String,
+        listener: MegaRequestListenerInterface?,
+    )
+
+    /**
      * Set a public attribute of the current user
      *
      *

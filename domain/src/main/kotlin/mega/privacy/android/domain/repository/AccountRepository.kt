@@ -76,6 +76,45 @@ interface AccountRepository {
     suspend fun requestDeleteAccountLink()
 
     /**
+     * Request a delete (cancel) account link, gated by a valid Multi-Factor Authentication PIN.
+     *
+     * @param pin The 6-digit 2FA PIN.
+     * @throws WrongMultiFactorAuthPinException if the PIN is invalid or expired.
+     * @throws MegaException for any other failure.
+     */
+    suspend fun requestDeleteAccountLinkWith2FA(pin: String)
+
+    /**
+     * Request a change-email confirmation link, gated by a valid Multi-Factor Authentication PIN.
+     *
+     * @param newEmail The new email address requested by the user.
+     * @param pin The 6-digit 2FA PIN.
+     * @throws WrongMultiFactorAuthPinException if the PIN is invalid or expired.
+     * @throws MegaException for any other failure.
+     */
+    suspend fun requestChangeEmailWith2FA(newEmail: String, pin: String)
+
+    /**
+     * Disable Multi-Factor Authentication for the current account.
+     *
+     * @param pin The 6-digit 2FA PIN.
+     * @throws WrongMultiFactorAuthPinException if the PIN is invalid or expired.
+     * @throws MegaException for any other failure.
+     */
+    suspend fun disableMultiFactorAuth(pin: String)
+
+    /**
+     * Change the account password, gated by a valid Multi-Factor Authentication PIN.
+     *
+     * @param newPassword The new password.
+     * @param pin The 6-digit 2FA PIN.
+     * @return true if the change succeeded.
+     * @throws WrongMultiFactorAuthPinException if the PIN is invalid or expired.
+     * @throws MegaException for any other failure.
+     */
+    suspend fun changePasswordWith2FA(newPassword: String, pin: String): Boolean
+
+    /**
      * Monitor user updates
      *
      * @return a flow of all global user updates
