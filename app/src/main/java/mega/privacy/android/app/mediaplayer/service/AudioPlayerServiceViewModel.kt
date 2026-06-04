@@ -73,6 +73,7 @@ import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
@@ -1216,18 +1217,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 saveAudioPlaybackInfoUseCase()
             }.onFailure { Timber.e(it, "Failed to save audio playback info") }
         }
-        if (handle != INVALID_HANDLE) {
-            val playingItem = playlistItems.firstOrNull { it.nodeHandle == handle }
-            sharingScope.launch {
-                runCatching {
-                    saveRecentlyUsedItemUseCase(
-                        nodeHandle = handle,
-                        type = RecentlyUsedType.Audio,
-                        fileName = playingItem?.nodeName.orEmpty(),
-                    )
-                }.onFailure { Timber.e(it, "Failed to save recently used audio item") }
-            }
-        }
     }
 
     private fun updatePlayingPosition(handle: Long, playlistItems: List<PlaylistItem>) {
@@ -1397,17 +1386,29 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
     }
 
-    override fun removeRecentlyUsedItemIfNearCompletion(
+    override fun saveRecentlyUsedItemIfQualifies(
         handle: Long,
         duration: Long,
         position: Long,
     ) {
-        if (handle == INVALID_HANDLE || duration <= 0L
-            || duration - position >= CWLO_NEAR_COMPLETION_THRESHOLD_MS
-        ) return
+        // Duration not yet known: cannot evaluate, leave the CWLO index untouched.
+        if (handle == INVALID_HANDLE || duration <= 0L) return
+        val qualifies = position > CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
+                && duration - position >= CWLO_NEAR_COMPLETION_THRESHOLD_MS
         applicationScope.launch {
-            runCatching { removeRecentlyUsedItemUseCase(handle) }
-                .onFailure { Timber.e(it, "Failed to remove CWLO item near completion") }
+            runCatching {
+                if (qualifies) {
+                    val fileName = playlistItemsFlow.value.first
+                        .firstOrNull { it.nodeHandle == handle }?.nodeName.orEmpty()
+                    saveRecentlyUsedItemUseCase(
+                        nodeHandle = handle,
+                        type = RecentlyUsedType.Audio,
+                        fileName = fileName,
+                    )
+                } else {
+                    removeRecentlyUsedItemUseCase(handle)
+                }
+            }.onFailure { Timber.e(it, "Failed to update CWLO item on leave") }
         }
     }
 

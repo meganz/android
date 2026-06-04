@@ -97,6 +97,7 @@ import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
@@ -1068,7 +1069,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
      */
     private fun clear() {
         searchJob?.cancel()
-        removeRecentlyUsedItemIfNearCompletion()
+        saveRecentlyUsedItemIfQualifies()
         applicationScope.launch {
             if (needStopStreamingServer) {
                 httpServerStopUseCase()
@@ -1078,22 +1079,35 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     }
 
     /**
-     * If the current item is within [CWLO_NEAR_COMPLETION_THRESHOLD_MS] of its end, drop it from
-     * the Continue Where Left Off index. Covers the case where the user exits before the
-     * 1-second ticker in [trackPlaybackPositionUseCase] gets to delete the entry — including
-     * short videos (<=15s) for which the ticker filter never fires.
+     * Decide whether the current item belongs in the Continue Where Left Off index when the
+     * user leaves the player (or playback ends). The item is added only once it has been played
+     * past [CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS] and is still more than
+     * [CWLO_NEAR_COMPLETION_THRESHOLD_MS] from its end; otherwise it is removed so that briefly
+     * opened, finished, or near-completion items are not surfaced back as resumable.
      *
      * Caveat: in repeat mode ExoPlayer may loop directly without firing STATE_ENDED, or fire
      * it after position has wrapped to 0. In that case the ticker path is the source of truth.
      */
-    private fun removeRecentlyUsedItemIfNearCompletion() {
+    private fun saveRecentlyUsedItemIfQualifies() {
         val handle = mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLongOrNull() ?: return
         val duration = mediaPlayerGateway.getCurrentItemDuration()
         val position = mediaPlayerGateway.getCurrentPlayingPosition()
-        if (duration <= 0L || duration - position >= CWLO_NEAR_COMPLETION_THRESHOLD_MS) return
+        // Duration not yet known: cannot evaluate, leave the CWLO index untouched.
+        if (duration <= 0L) return
+        val qualifies = position > CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
+                && duration - position >= CWLO_NEAR_COMPLETION_THRESHOLD_MS
         applicationScope.launch {
-            runCatching { removeRecentlyUsedItemUseCase(handle) }
-                .onFailure { Timber.e(it, "Failed to remove CWLO item near completion") }
+            runCatching {
+                if (qualifies) {
+                    saveRecentlyUsedItemUseCase(
+                        nodeHandle = handle,
+                        type = RecentlyUsedType.Video,
+                        fileName = uiState.value.metadata.nodeName,
+                    )
+                } else {
+                    removeRecentlyUsedItemUseCase(handle)
+                }
+            }.onFailure { Timber.e(it, "Failed to update CWLO item on leave") }
         }
     }
 
@@ -1209,7 +1223,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         val playbackState = uiState.value.mediaPlaybackState
         when (state) {
             MEDIA_PLAYER_STATE_ENDED if playbackState == MediaPlaybackState.Playing -> {
-                removeRecentlyUsedItemIfNearCompletion()
+                saveRecentlyUsedItemIfQualifies()
                 updatePlaybackState(MediaPlaybackState.Paused)
             }
 
@@ -1256,15 +1270,6 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                         args.collectionTitle
                     )
                 }.onFailure { Timber.e(it, "Failed to save video recently watched") }
-            }
-            viewModelScope.launch {
-                runCatching {
-                    saveRecentlyUsedItemUseCase(
-                        nodeHandle = handle,
-                        type = RecentlyUsedType.Video,
-                        fileName = uiState.value.metadata.nodeName,
-                    )
-                }.onFailure { Timber.e(it, "Failed to save recently used video item") }
             }
         }
     }

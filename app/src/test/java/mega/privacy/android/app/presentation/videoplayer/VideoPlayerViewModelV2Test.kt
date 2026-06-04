@@ -1346,11 +1346,8 @@ class VideoPlayerViewModelV2Test {
                     expectedCollectionId,
                     expectedCollectionTitle
                 )
-                verify(saveRecentlyUsedItemUseCase).invoke(
-                    expectedId,
-                    RecentlyUsedType.Video,
-                    underTest.uiState.value.metadata.nodeName,
-                )
+                // CWLO membership is no longer decided here; it is computed on leave.
+                verify(saveRecentlyUsedItemUseCase, never()).invoke(any(), any(), any())
             }
         }
 
@@ -2101,13 +2098,13 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
-    fun `test that removeRecentlyUsedItemUseCase is invoked when onPlaybackStateChanged ends within 2 seconds of completion`() =
+    fun `test that removeRecentlyUsedItemUseCase is invoked when onPlaybackStateChanged ends within 3 seconds of completion`() =
         runTest {
             val handle = 12345L
             val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
             whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
             whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(60_000L)
-            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(59_500L)
+            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(58_000L)
             initViewModel()
             underTest.updatePlaybackState(MediaPlaybackState.Playing)
 
@@ -2117,7 +2114,7 @@ class VideoPlayerViewModelV2Test {
         }
 
     @Test
-    fun `test that removeRecentlyUsedItemUseCase is not invoked when onPlaybackStateChanged ends more than 2 seconds from completion`() =
+    fun `test that saveRecentlyUsedItemUseCase is invoked when onPlaybackStateChanged ends past 15 seconds and more than 3 seconds from completion`() =
         runTest {
             val handle = 12345L
             val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
@@ -2129,7 +2126,29 @@ class VideoPlayerViewModelV2Test {
 
             underTest.onPlaybackStateChanged(MEDIA_PLAYER_STATE_ENDED)
 
+            verify(saveRecentlyUsedItemUseCase).invoke(
+                nodeHandle = handle,
+                type = RecentlyUsedType.Video,
+                fileName = underTest.uiState.value.metadata.nodeName,
+            )
             verify(removeRecentlyUsedItemUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that saveRecentlyUsedItemUseCase is not invoked when onPlaybackStateChanged ends at 15 seconds or less`() =
+        runTest {
+            val handle = 12345L
+            val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
+            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(10_000L)
+            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(10_000L)
+            initViewModel()
+            underTest.updatePlaybackState(MediaPlaybackState.Playing)
+
+            underTest.onPlaybackStateChanged(MEDIA_PLAYER_STATE_ENDED)
+
+            verify(saveRecentlyUsedItemUseCase, never()).invoke(any(), any(), any())
+            verify(removeRecentlyUsedItemUseCase).invoke(handle)
         }
 
     @Test
@@ -2664,82 +2683,6 @@ class VideoPlayerViewModelV2Test {
             }
         }
 
-    @Test
-    fun `test that saveRecentlyUsedItemUseCase is invoked with Video type when saveVideoWatchedTime is called`() =
-        runTest {
-            val expectedId = 1L
-            val instant = Instant.ofEpochMilli(2000L)
-            mockStatic(Instant::class.java).use {
-                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
-                val testMediaItem = MediaItem.Builder()
-                    .setMediaId(expectedId.toString())
-                    .build()
-                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
-                underTest.saveVideoWatchedTime()
-
-                verify(saveRecentlyUsedItemUseCase).invoke(
-                    nodeHandle = expectedId,
-                    type = RecentlyUsedType.Video,
-                    fileName = underTest.uiState.value.metadata.nodeName,
-                )
-            }
-        }
-
-    @Test
-    fun `test that saveRecentlyUsedItemUseCase is still invoked when saveVideoRecentlyWatchedUseCase throws`() =
-        runTest {
-            val expectedId = 1L
-            val instant = Instant.ofEpochMilli(2000L)
-            mockStatic(Instant::class.java).use {
-                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
-                val testMediaItem = MediaItem.Builder()
-                    .setMediaId(expectedId.toString())
-                    .build()
-                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
-                whenever(
-                    saveVideoRecentlyWatchedUseCase(any(), any(), any(), any())
-                ).thenThrow(RuntimeException("test error"))
-                underTest.saveVideoWatchedTime()
-                advanceUntilIdle()
-
-                verify(saveRecentlyUsedItemUseCase).invoke(
-                    nodeHandle = expectedId,
-                    type = RecentlyUsedType.Video,
-                    fileName = underTest.uiState.value.metadata.nodeName,
-                )
-            }
-        }
-
-    @Test
-    fun `test that saveVideoRecentlyWatchedUseCase is still invoked when saveRecentlyUsedItemUseCase throws`() =
-        runTest {
-            val expectedId = 1L
-            val instant = Instant.ofEpochMilli(2000L)
-            testArgs = testArgs.copy(
-                collectionId = expectedCollectionId,
-                collectionTitle = expectedCollectionTitle,
-            )
-            initViewModel()
-            mockStatic(Instant::class.java).use {
-                it.`when`<Instant> { Instant.now() }.thenReturn(instant)
-                val testMediaItem = MediaItem.Builder()
-                    .setMediaId(expectedId.toString())
-                    .build()
-                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
-                whenever(
-                    saveRecentlyUsedItemUseCase(any(), any(), any())
-                ).thenThrow(RuntimeException("test error"))
-                underTest.saveVideoWatchedTime()
-                advanceUntilIdle()
-
-                verify(saveVideoRecentlyWatchedUseCase).invoke(
-                    expectedId,
-                    2,
-                    expectedCollectionId,
-                    expectedCollectionTitle
-                )
-            }
-        }
 
     @ParameterizedTest(name = "when adapter type is {0}, nodeSourceType should be {1}")
     @MethodSource("provideAdapterToNodeSourceType")
