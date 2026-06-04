@@ -11,6 +11,7 @@ import mega.privacy.android.data.featuretoggle.file.FileFeatureFlagValueProvider
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
+import mega.privacy.android.domain.featuretoggle.qualifier.DefaultFeatureFlagProviders
 import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature_flags.AppFeatures
 
@@ -86,6 +87,24 @@ abstract class FeatureFlagModule {
         @Provides
         @IntoSet
         fun provideApiFeaturesFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            ApiFeatures.Companion
+
+        @Provides
+        @IntoSet
+        @DefaultFeatureFlagProviders
+        fun provideAppFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            AppFeatures.Companion
+
+        @Provides
+        @IntoSet
+        @DefaultFeatureFlagProviders
+        fun provideAbTestFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            ABTestFeatures.Companion
+
+        @Provides
+        @IntoSet
+        @DefaultFeatureFlagProviders
+        fun provideApiFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             ApiFeatures.Companion
     }
 }

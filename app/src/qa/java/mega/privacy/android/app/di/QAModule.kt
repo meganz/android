@@ -45,6 +45,7 @@ import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.data.qualifier.ExcludeFileName
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
+import mega.privacy.android.domain.featuretoggle.qualifier.DefaultFeatureFlagProviders
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.navigation.contract.settings.FeatureSettingEntryPoint
@@ -212,6 +213,12 @@ internal class QAModule {
     @Provides
     @IntoSet
     fun provideFeatureFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+        QAFeatures.Companion
+
+    @Provides
+    @IntoSet
+    @DefaultFeatureFlagProviders
+    fun provideQAFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
         QAFeatures.Companion
 
     /**
