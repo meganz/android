@@ -51,8 +51,11 @@ else
     JOBS=$(nproc)
 fi
 
+CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-RelWithDebInfo}
+
 echo "-- JOBS: ${JOBS}"
 echo "-- BUILD_ARCHS: ${BUILD_ARCHS}"
+echo "-- CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}"
 echo "-- VCPKG_ROOT: ${VCPKG_ROOT}"
 echo "-- ANDROID_NDK_HOME: ${ANDROID_NDK_HOME}"
 
@@ -68,7 +71,7 @@ for ABI in ${BUILD_ARCHS}; do
         -B ${BUILD_DIR} \
         -DSDK_DIR=mega/sdk \
         -DVCPKG_ROOT=${VCPKG_ROOT} \
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
         -DANDROID_PLATFORM=${ANDROID_API_LEVEL} \
         -DANDROID_ABI=${ABI} &>>${LOG_FILE}
 
