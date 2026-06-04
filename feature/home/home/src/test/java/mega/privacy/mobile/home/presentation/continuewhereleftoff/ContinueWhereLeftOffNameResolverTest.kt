@@ -64,6 +64,16 @@ class ContinueWhereLeftOffNameResolverTest {
     }
 
     @Test
+    fun `test that a non-blank incoming title is preferred over the cached name`() = runTest {
+        stubNode(1L, "old.pdf")
+        underTest.resolveBlankNames(listOf(item(1L, "")))
+
+        val refreshed = underTest.applyCachedNames(listOf(item(1L, "new.pdf")))
+
+        assertThat(refreshed[0].title).isEqualTo("new.pdf")
+    }
+
+    @Test
     fun `test that resolved name is cached on second call`() = runTest {
         val items = listOf(item(1L, ""))
         stubNode(1L, "resolved.pdf")
