@@ -169,13 +169,119 @@ class ContinueWhereLeftOffListViewModelTest {
     }
 
     @Test
-    fun `test that items are displayed in the order returned by use case`() = runTest {
+    fun `test that items keep use case order when sorting by timestamp`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Timestamp,
+            SortDirection.Descending,
+        )
         stubItems(sampleItems)
 
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.items.map { it.nodeHandle })
                 .containsExactly(1L, 2L, 3L).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that items are sorted by title ascending when sorting by name`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+        stubItems(sampleItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            // Alpha.mp3 (2L), Bravo.mp4 (3L), Charlie.pdf (1L)
+            assertThat(state.items.map { it.nodeHandle })
+                .containsExactly(2L, 3L, 1L).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that items are sorted by title descending when sorting by name`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Descending,
+        )
+        stubItems(sampleItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            // Charlie.pdf (1L), Bravo.mp4 (3L), Alpha.mp3 (2L)
+            assertThat(state.items.map { it.nodeHandle })
+                .containsExactly(1L, 3L, 2L).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that name sort is case insensitive`() = runTest {
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+        stubItems(
+            listOf(
+                ContinueWhereLeftOffItem(
+                    nodeHandle = 1L,
+                    type = RecentlyUsedType.PDF,
+                    title = "banana.pdf",
+                    lastAccessedTimestamp = 1000L,
+                ),
+                ContinueWhereLeftOffItem(
+                    nodeHandle = 2L,
+                    type = RecentlyUsedType.Audio,
+                    title = "Apple.mp3",
+                    lastAccessedTimestamp = 2000L,
+                ),
+            )
+        )
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            // Apple.mp3 (2L) before banana.pdf (1L) — case-insensitive
+            assertThat(state.items.map { it.nodeHandle })
+                .containsExactly(2L, 1L).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that name sort uses node name resolved from blank title`() = runTest {
+        val items = listOf(
+            ContinueWhereLeftOffItem(
+                nodeHandle = 1L,
+                type = RecentlyUsedType.PDF,
+                title = "Zebra.pdf",
+                lastAccessedTimestamp = 1000L,
+            ),
+            ContinueWhereLeftOffItem(
+                nodeHandle = 2L,
+                type = RecentlyUsedType.Audio,
+                title = "",
+                lastAccessedTimestamp = 2000L,
+            ),
+        )
+        val typedNode = mock<TypedFileNode> {
+            on { name }.thenReturn("Apple.mp3")
+        }
+        whenever(getNodeByIdUseCase(NodeId(2L))).thenReturn(typedNode)
+        stubSortPreference(
+            ContinueWhereLeftOffSortField.Name,
+            SortDirection.Ascending,
+        )
+        stubItems(items)
+
+        underTest.uiState.test {
+            // UnconfinedTestDispatcher resolves the blank name synchronously, so the
+            // re-emitted list is sorted by the resolved node name (Apple.mp3 before Zebra.pdf).
+            val state = expectMostRecentItem()
+            assertThat(state.items.map { it.title })
+                .containsExactly("Apple.mp3", "Zebra.pdf").inOrder()
             cancelAndIgnoreRemainingEvents()
         }
     }
