@@ -27,7 +27,6 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.resources.R
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
@@ -200,8 +199,6 @@ fun getLastSeenString(lastGreen: Int?): String? {
 
     val lastGreenCalendar = Calendar.getInstance().apply { add(Calendar.MINUTE, -lastGreen) }
     val timeToConsiderAsLongTimeAgo = 65535
-
-    Timber.d("Ts last green: %s", lastGreenCalendar.timeInMillis)
 
     return when {
         lastGreen >= timeToConsiderAsLongTimeAgo -> {
