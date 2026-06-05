@@ -43,6 +43,8 @@ import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlWithEmail
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
+import mega.privacy.android.domain.entity.login.megaPassword
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.GoogleSignInResult
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -383,7 +385,7 @@ class LoginViewModel @Inject constructor(
                     is2FARequired = false,
                     accountSession = it.accountSession?.copy(email = result.email)
                         ?: AccountSession(email = result.email),
-                    password = result.sub,
+                    password = result.megaPassword,
                     ongoingTransfersExist = null,
                 )
             }
@@ -397,7 +399,7 @@ class LoginViewModel @Inject constructor(
         runCatching {
             loginUseCase(
                 result.email,
-                result.sub,
+                result.megaPassword,
                 DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
             ).collectLatest { status -> status.checkStatus(email = result.email) }
         }.onFailure { exception ->
@@ -429,7 +431,7 @@ class LoginViewModel @Inject constructor(
     private fun handleGoogleSignIn2FA(result: GoogleSignInResult) {
         savedStateHandle[IS_2FA_REQUIRED] = true
         savedStateHandle[PENDING_2FA_EMAIL] = result.email
-        savedStateHandle[PENDING_2FA_PASSWORD] = result.sub
+        savedStateHandle[PENDING_2FA_PASSWORD] = result.megaPassword
         _state.update {
             it.copy(
                 isLoginInProgress = false,
@@ -444,7 +446,7 @@ class LoginViewModel @Inject constructor(
         runCatching {
             createAccountUseCase(
                 email = result.email,
-                password = result.sub,
+                password = result.megaPassword,
                 firstName = result.firstName.orEmpty(),
                 lastName = result.lastName.orEmpty(),
             )
@@ -497,7 +499,7 @@ class LoginViewModel @Inject constructor(
 
     private fun GoogleSignInResult.toEphemeralCredentials() = EphemeralCredentials(
         email = email,
-        password = sub,
+        password = megaPassword,
         session = null,
         firstName = firstName,
         lastName = lastName,
