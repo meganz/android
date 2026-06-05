@@ -41,6 +41,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import urllib.parse
 
 # Default points at MEGA's production Jira (Server / Data Center).
 # Override via $JIRA_BASE_URL for staging, sandbox, or future Cloud
@@ -104,6 +105,9 @@ TICKET_RE = re.compile(r"AND-\d+", re.IGNORECASE)
 ISSUE_KEY_RE = re.compile(r"^[A-Z][A-Z0-9]+-\d+$")
 FIELD_ID_RE = re.compile(r"^(customfield_\d+|[a-zA-Z][a-zA-Z0-9]*)$")
 TRANSITION_ID_RE = re.compile(r"^\d+$")
+# Jira Server usernames: letters/digits plus . _ @ - (email-style names are
+# common). Goes into a JSON body, not a URL path, but keep it strict anyway.
+USERNAME_RE = re.compile(r"^[A-Za-z0-9._@-]+$")
 
 
 def _validate(value, regex, name):
@@ -365,6 +369,16 @@ def cmd_transition(args):
     expect_status(code, body, 204)
 
 
+def cmd_assign(args):
+    _validate(args.key, ISSUE_KEY_RE, "issue key")
+    _validate(args.username, USERNAME_RE, "username")
+    # Jira Server / DC takes {"name": ...}; Cloud would need accountId, but
+    # this CLI targets the MEGA Server instance only (see module docstring).
+    code, body = jira("PUT", f"/issue/{args.key}/assignee",
+                      {"name": args.username})
+    expect_status(code, body, 204)
+
+
 def cmd_comment(args):
     _validate(args.key, ISSUE_KEY_RE, "issue key")
     text = sys.stdin.read()
@@ -465,6 +479,177 @@ def cmd_update_field(args):
             )
     code, body = jira("PUT", f"/issue/{args.key}", {"fields": {args.field_id: value}})
     expect_status(code, body, 204)
+
+
+def _kv(spec):
+    """Split a `key=value` CLI spec. Value may itself contain '='.
+
+    Raises ValueError on a missing '='. Returns (key.strip(), value) — the
+    value is NOT stripped, so callers can pass values with leading/trailing
+    spaces deliberately (rare, but Jira allows it).
+    """
+    if "=" not in spec:
+        raise ValueError(f"expected key=value, got {spec!r}")
+    k, v = spec.split("=", 1)
+    return k.strip(), v
+
+
+def _build_create_payload(*, project, issuetype, summary, description,
+                          components=None, labels=None, priority=None,
+                          selects=None, raw_fields=None):
+    """Assemble the `/rest/api/2/issue` create payload from CLI inputs.
+
+    Pure (no I/O) so it is unit-testable in `selftest`. Raises ValueError on
+    any caller mistake; cmd_create maps that to exit 1.
+
+    - `selects` are `customfield_NNNNN=VALUE` specs for single-select fields
+      (wrapped as `{"value": VALUE}`) — the common MEGA case
+      (customfield_10500=OPEX, customfield_10501=Cloud/Default).
+    - `raw_fields` are `field=<json>` specs for anything else (cascading
+      selects, arrays, user pickers); the value is parsed as JSON verbatim.
+    """
+    if not summary or not summary.strip():
+        raise ValueError("summary is required")
+    fields = {
+        "project": {"key": project},
+        "summary": summary,
+        "issuetype": {"name": issuetype},
+        "description": description,
+    }
+    if components:
+        fields["components"] = [{"name": c} for c in components]
+    if labels:
+        for l in labels:
+            # Jira rejects labels containing whitespace with an opaque 400;
+            # fail loudly here with the offending value instead.
+            if re.search(r"\s", l):
+                raise ValueError(f"label {l!r} contains whitespace; Jira labels cannot")
+        fields["labels"] = list(labels)
+    if priority:
+        fields["priority"] = {"name": priority}
+    for spec in (selects or []):
+        k, v = _kv(spec)
+        if not FIELD_ID_RE.fullmatch(k):
+            raise ValueError(f"invalid --select field id {k!r}")
+        fields[k] = {"value": v}
+    for spec in (raw_fields or []):
+        k, v = _kv(spec)
+        if not FIELD_ID_RE.fullmatch(k):
+            raise ValueError(f"invalid --field field id {k!r}")
+        try:
+            fields[k] = json.loads(v)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"--field {k} value is not valid JSON: {e}")
+    return {"fields": fields}
+
+
+def cmd_create(args):
+    description = sys.stdin.read()
+    # A bug with no description is almost never intended; require it unless the
+    # caller explicitly opts out (mirrors update-field's --allow-empty guard).
+    if not description.strip() and not args.allow_empty_description:
+        die(
+            "empty description on stdin. Pipe the body in, or pass "
+            "--allow-empty-description to create a summary-only ticket.",
+            1,
+        )
+    try:
+        payload = _build_create_payload(
+            project=args.project,
+            issuetype=args.type,
+            summary=args.summary,
+            description=description,
+            components=args.component,
+            labels=args.label,
+            priority=args.priority,
+            selects=args.select,
+            raw_fields=args.field,
+        )
+    except ValueError as e:
+        die(str(e), 1)
+    # --dry-run: print the exact payload and make NO network call. Lets the
+    # caller review a batch of payloads (e.g. one per security finding) before
+    # creating anything real.
+    if args.dry_run:
+        print(json.dumps(payload, indent=2))
+        return
+    code, body = jira("POST", "/issue", payload)
+    expect_status(code, body, 201)
+    data = json.loads(body)
+    print(json.dumps({
+        "key": data["key"],
+        "id": data["id"],
+        "browse_url": f"{BASE_URL}/browse/{data['key']}",
+    }, indent=2))
+
+
+def cmd_search(args):
+    params = urllib.parse.urlencode({
+        "jql": args.jql,
+        "fields": args.fields,
+        "maxResults": str(args.max),
+    })
+    code, body = jira("GET", f"/search?{params}")
+    expect_status(code, body, 200)
+    data = json.loads(body)
+    issues = [{
+        "key": i["key"],
+        "summary": i["fields"].get("summary"),
+        "status": (i["fields"].get("status") or {}).get("name"),
+        "browse_url": f"{BASE_URL}/browse/{i['key']}",
+    } for i in data.get("issues", [])]
+    print(json.dumps({"total": data.get("total", 0), "issues": issues}, indent=2))
+
+
+def cmd_components(args):
+    code, body = jira("GET", f"/project/{args.project}/components")
+    expect_status(code, body, 200)
+    data = json.loads(body)
+    print(json.dumps([{"id": c["id"], "name": c["name"]} for c in data], indent=2))
+
+
+def cmd_create_meta(args):
+    """Print required fields + allowed values for creating <type> in <project>.
+
+    Lets a skill discover what the project's create screen actually requires
+    (and the allowed values for select fields) instead of hardcoding
+    customfield ids that drift between projects/instances.
+
+    Uses the per-issuetype createmeta endpoints
+    (`/issue/createmeta/{project}/issuetypes[/{id}]`). The legacy single-shot
+    `GET /issue/createmeta?projectKeys=...&expand=...` was removed in Jira
+    9.0+ (it 404s as "Issue Does Not Exist" because the router falls through
+    to `/issue/{key}`), so we don't use it.
+    """
+    # 1. Resolve the issue-type id by name (paginated list of types).
+    code, body = jira("GET", f"/issue/createmeta/{args.project}/issuetypes")
+    expect_status(code, body, 200)
+    types = json.loads(body).get("values", [])
+    match = next((t for t in types if t.get("name", "").lower() == args.type.lower()), None)
+    if not match:
+        available = ", ".join(t.get("name", "") for t in types)
+        die(f"No issue type {args.type!r} in {args.project}. Available: {available}", 1)
+
+    # 2. Fetch that type's create fields (also paginated under "values").
+    code, body = jira("GET", f"/issue/createmeta/{args.project}/issuetypes/{match['id']}")
+    expect_status(code, body, 200)
+    fields = json.loads(body).get("values", [])
+    out = []
+    for f in fields:
+        allowed = [
+            av.get("value") or av.get("name")
+            for av in f.get("allowedValues", [])
+        ]
+        out.append({
+            "id": f.get("fieldId"),
+            "name": f.get("name"),
+            "required": f.get("required", False),
+            "allowedValues": allowed[:25] or None,
+        })
+    # Required fields first, then alphabetical by id — the caller mostly cares
+    # about what it MUST supply.
+    out.sort(key=lambda f: (not f["required"], f["id"] or ""))
+    print(json.dumps(out, indent=2))
 
 
 def cmd_branch_ticket(args):
@@ -704,6 +889,14 @@ def cmd_selftest(args):
             for t in ["foo", "1a", "../1", ""]:
                 self.assertIsNone(TRANSITION_ID_RE.fullmatch(t), t)
 
+        def test_username_accepts(self):
+            for u in ["juh", "juh@mega.co.nz", "first.last", "a-b_c1"]:
+                self.assertIsNotNone(USERNAME_RE.fullmatch(u), u)
+
+        def test_username_rejects(self):
+            for u in ["", "a b", "a/b", "a\nb", 'a"b']:
+                self.assertIsNone(USERNAME_RE.fullmatch(u), u)
+
         # --- _sanitize_token ------------------------------------------
         def test_sanitize_strips_whitespace(self):
             self.assertEqual(_sanitize_token("  abc  "), "abc")
@@ -722,6 +915,76 @@ def cmd_selftest(args):
             # PAT format: contains / and + freely.
             self.assertEqual(_sanitize_token("MDYzMDc0Or4z+/DeqHAm"),
                              "MDYzMDc0Or4z+/DeqHAm")
+
+        # --- _kv -------------------------------------------------------
+        def test_kv_splits_on_first_equals(self):
+            self.assertEqual(_kv("customfield_10500=OPEX"),
+                             ("customfield_10500", "OPEX"))
+            # value may contain '=' (e.g. base64 / equations)
+            self.assertEqual(_kv("k=a=b"), ("k", "a=b"))
+            self.assertEqual(_kv("  k =v"), ("k", "v"))
+
+        def test_kv_rejects_missing_equals(self):
+            with self.assertRaises(ValueError):
+                _kv("noequals")
+
+        # --- _build_create_payload ------------------------------------
+        def test_build_payload_minimal(self):
+            p = _build_create_payload(
+                project="AND", issuetype="Bug",
+                summary="Title", description="Body",
+            )
+            self.assertEqual(p, {"fields": {
+                "project": {"key": "AND"},
+                "summary": "Title",
+                "issuetype": {"name": "Bug"},
+                "description": "Body",
+            }})
+
+        def test_build_payload_full(self):
+            p = _build_create_payload(
+                project="AND", issuetype="Bug", summary="T", description="D",
+                components=["Login", "Security"], labels=["security", "crypto"],
+                priority="High",
+                selects=["customfield_10500=OPEX", "customfield_10501=Cloud/Default"],
+                raw_fields=['customfield_10999=["a","b"]'],
+            )
+            f = p["fields"]
+            self.assertEqual(f["components"], [{"name": "Login"}, {"name": "Security"}])
+            self.assertEqual(f["labels"], ["security", "crypto"])
+            self.assertEqual(f["priority"], {"name": "High"})
+            self.assertEqual(f["customfield_10500"], {"value": "OPEX"})
+            self.assertEqual(f["customfield_10501"], {"value": "Cloud/Default"})
+            self.assertEqual(f["customfield_10999"], ["a", "b"])
+
+        def test_build_payload_requires_summary(self):
+            for bad in (None, "", "   "):
+                with self.assertRaises(ValueError):
+                    _build_create_payload(
+                        project="AND", issuetype="Bug",
+                        summary=bad, description="D",
+                    )
+
+        def test_build_payload_rejects_label_whitespace(self):
+            with self.assertRaises(ValueError):
+                _build_create_payload(
+                    project="AND", issuetype="Bug", summary="T", description="D",
+                    labels=["has space"],
+                )
+
+        def test_build_payload_rejects_bad_field_id(self):
+            with self.assertRaises(ValueError):
+                _build_create_payload(
+                    project="AND", issuetype="Bug", summary="T", description="D",
+                    selects=["../etc=OPEX"],
+                )
+
+        def test_build_payload_rejects_bad_json_field(self):
+            with self.assertRaises(ValueError):
+                _build_create_payload(
+                    project="AND", issuetype="Bug", summary="T", description="D",
+                    raw_fields=["customfield_1=not json"],
+                )
 
         # --- _parse_shell_rhs -----------------------------------------
         def test_parse_rhs_bare(self):
@@ -810,6 +1073,11 @@ def main():
     sp.add_argument("transition_id")
     sp.set_defaults(func=cmd_transition)
 
+    sp = sub.add_parser("assign", help="Assign an issue to a username")
+    sp.add_argument("key")
+    sp.add_argument("username")
+    sp.set_defaults(func=cmd_assign)
+
     sp = sub.add_parser("comment", help="POST a comment (body on stdin)")
     sp.add_argument("key")
     sp.set_defaults(func=cmd_comment)
@@ -832,6 +1100,43 @@ def main():
     sp.add_argument("--force-type", action="store_true",
                     help="Allow writing a raw string to a non-string field (advanced)")
     sp.set_defaults(func=cmd_update_field)
+
+    sp = sub.add_parser("create", help="Create an issue (description on stdin)")
+    sp.add_argument("--summary", required=True, help="Issue summary / title")
+    sp.add_argument("--type", default="Bug", help="Issue type name (default: Bug)")
+    sp.add_argument("--project", default="AND", help="Project key (default: AND)")
+    sp.add_argument("--component", action="append",
+                    help="Component name (repeatable)")
+    sp.add_argument("--label", action="append",
+                    help="Label, no whitespace (repeatable)")
+    sp.add_argument("--priority", help="Priority name, e.g. High / Medium / Low")
+    sp.add_argument("--select", action="append", metavar="customfield_N=VALUE",
+                    help="Single-select custom field, wrapped as {\"value\": VALUE} "
+                         "(repeatable). e.g. customfield_10500=OPEX")
+    sp.add_argument("--field", action="append", metavar="customfield_N=JSON",
+                    help="Raw custom field; value parsed as JSON (repeatable, advanced)")
+    sp.add_argument("--allow-empty-description", action="store_true",
+                    help="Permit a summary-only ticket (empty stdin)")
+    sp.add_argument("--dry-run", action="store_true",
+                    help="Print the create payload and make NO network call")
+    sp.set_defaults(func=cmd_create)
+
+    sp = sub.add_parser("search", help="JQL search (dedup before create)")
+    sp.add_argument("jql", help='JQL, e.g. \'project = AND AND summary ~ "ANDROID_ID"\'')
+    sp.add_argument("--fields", default="key,summary,status",
+                    help="Comma-separated fields (default: key,summary,status)")
+    sp.add_argument("--max", type=int, default=50, help="Max results (default: 50)")
+    sp.set_defaults(func=cmd_search)
+
+    sp = sub.add_parser("components", help="List a project's components")
+    sp.add_argument("--project", default="AND", help="Project key (default: AND)")
+    sp.set_defaults(func=cmd_components)
+
+    sp = sub.add_parser("create-meta",
+                        help="Show required fields + allowed values for create")
+    sp.add_argument("--project", default="AND", help="Project key (default: AND)")
+    sp.add_argument("--type", default="Bug", help="Issue type name (default: Bug)")
+    sp.set_defaults(func=cmd_create_meta)
 
     sub.add_parser("branch-ticket",
                    help="Extract AND-NNNN from current git branch").set_defaults(func=cmd_branch_ticket)
