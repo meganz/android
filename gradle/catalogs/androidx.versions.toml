@@ -37,6 +37,7 @@ splashscreen = "1.2.0"
 browser = "1.10.0"
 nav3 = "1.1.1"
 credentials = "1.6.0"
+webkit = "1.16.0"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
@@ -116,6 +117,7 @@ material3-window = { group = "androidx.compose.material3", name = "material3-win
 browser = { module = "androidx.browser:browser", version.ref = "browser" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+webkit = { module = "androidx.webkit:webkit", version.ref = "webkit" }
 
 [bundles]
 lifecycle = ["lifecycle-livedata", "lifecycle-viewmodel", "lifecycle-runtime", "lifecycle-reactivestreams", "lifecycle-common", "lifecycle-process", "lifecycle-service", "lifecycle-runtime-compose"]

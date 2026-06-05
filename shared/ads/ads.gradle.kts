@@ -75,6 +75,7 @@ dependencies {
 
     implementation(google.gson)
     implementation(google.ads.mobile.sdk)
+    implementation(androidx.webkit)
     implementation(androidx.datastore.preferences)
     implementation(androidx.hilt.navigation)
 
