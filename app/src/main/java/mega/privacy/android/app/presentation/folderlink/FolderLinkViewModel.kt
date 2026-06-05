@@ -301,7 +301,7 @@ class FolderLinkViewModel @Inject constructor(
             }
         }
 
-        Timber.d("Folder link to import: $urlWithKey")
+        Timber.d("Folder link import requested")
         folderLogin(urlWithKey, true)
     }
 
@@ -659,23 +659,13 @@ class FolderLinkViewModel @Inject constructor(
             val folderUrl = intent.dataString
             var folderSubHandle: String? = null
             folderUrl?.let { url ->
-                Timber.d("URL: $url")
                 val s =
                     url.split("!".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 Timber.d("URL parts: ${s.size}")
                 for (i in s.indices) {
                     when (i) {
-                        1 -> {
-                            Timber.d("URL_handle: ${s[1]}")
-                        }
-
-                        2 -> {
-                            Timber.d("URL_key: ${s[2]}")
-                        }
-
                         3 -> {
                             folderSubHandle = s[3]
-                            Timber.d("URL_subhandle: $folderSubHandle")
                         }
                     }
                 }
@@ -688,7 +678,6 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val info = getPublicLinkInformationUseCase(url)
-                Timber.d("Public link info: $info")
                 queryAdsUseCase(info.id.longValue)
             }.onSuccess { value ->
                 _state.update { it.copy(shouldShowAdsForLink = value) }

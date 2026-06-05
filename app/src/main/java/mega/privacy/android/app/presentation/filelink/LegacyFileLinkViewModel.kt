@@ -135,7 +135,7 @@ class LegacyFileLinkViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { getPublicNodeUseCase(link) }
                 .onSuccess { node ->
-                    Timber.d("getPublicNode result: ${node.name}")
+                    Timber.d("getPublicNode succeeded")
                     val iconResource = node.getIcon(
                         originShares = false,
                         fileTypeIconMapper = fileTypeIconMapper
@@ -256,7 +256,7 @@ class LegacyFileLinkViewModel @Inject constructor(
                     "$url#$key"
                 }
             }
-            Timber.d("File link to import: $urlWithKey")
+            Timber.d("File link import requested")
             getPublicNode(urlWithKey, true)
         }
     }

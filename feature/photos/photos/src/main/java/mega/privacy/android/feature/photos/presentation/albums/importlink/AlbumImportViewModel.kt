@@ -589,7 +589,7 @@ class AlbumImportViewModel @AssistedInject constructor(
             return
         }
 
-        Timber.d("Processing album URL: $albumLink")
+        Timber.d("Processing shared album link")
 
         val subHandle = albumLink.substringAfterLast("!", "")
             .takeIf { it.isNotBlank() }
@@ -598,7 +598,6 @@ class AlbumImportViewModel @AssistedInject constructor(
                 return
             }
 
-        Timber.d("Extracted sub-handle: $subHandle")
         state.update { it.copy(folderSubHandle = subHandle) }
     }
 
