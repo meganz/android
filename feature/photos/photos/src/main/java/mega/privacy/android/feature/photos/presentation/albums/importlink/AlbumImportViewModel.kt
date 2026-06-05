@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
@@ -71,6 +73,7 @@ class AlbumImportViewModel @AssistedInject constructor(
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val getPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase,
     private val getCurrentStorageStateUseCase: GetCurrentStorageStateUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @ApplicationContext private val context: Context,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @Assisted private val albumLink: String?,
@@ -97,6 +100,7 @@ class AlbumImportViewModel @AssistedInject constructor(
     var availableStorage: Long = 0
 
     init {
+        loadCloudExplorerFeatureFlag()
         viewModelScope.launch {
             monitorNetworkConnection()
             handleSharedAlbumLink()
@@ -116,6 +120,15 @@ class AlbumImportViewModel @AssistedInject constructor(
                     isAvailableStorageCollected = it.isAvailableStorageCollected || !isLogin,
                 )
             }
+        }
+    }
+
+    private fun loadCloudExplorerFeatureFlag() {
+        viewModelScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.onFailure { Timber.e(it) }.getOrDefault(false)
+            state.update { it.copy(isCloudExplorerAvailable = enabled) }
         }
     }
 

@@ -32,4 +32,5 @@ data class AlbumImportState(
     val openFileNodeEvent: StateEventWithContent<PhotoUiState> = consumed(),
     val storageState: StorageState = StorageState.Unknown,
     val addToCloudDriveFinishedEvent: StateEvent = consumed,
+    val isCloudExplorerAvailable: Boolean = false,
 )

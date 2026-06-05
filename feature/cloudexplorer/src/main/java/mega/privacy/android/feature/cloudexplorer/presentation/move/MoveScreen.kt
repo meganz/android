@@ -67,7 +67,6 @@ internal fun MoveScreen(
             onFolderPicked = { nodeId ->
                 isProcessingAction = true
                 onSelectFolder(nodeId)
-                onNavigateBack()
             },
         )
     }

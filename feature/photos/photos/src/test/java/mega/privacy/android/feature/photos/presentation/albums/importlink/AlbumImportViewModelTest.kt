@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -72,6 +73,7 @@ class AlbumImportViewModelTest {
         mock()
     private val mockGetPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase = mock()
     private val mockGetCurrentStorageStateUseCase: GetCurrentStorageStateUseCase = mock()
+    private val mockGetFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val mockContext: Context = mock()
     private val mockPhotoUiStateMapper: PhotoUiStateMapper = mock()
 
@@ -99,6 +101,7 @@ class AlbumImportViewModelTest {
             getPublicNodeFromSerializedDataUseCase = mockGetPublicNodeFromSerializedDataUseCase,
             getPublicAlbumNodesDataUseCase = mockGetPublicAlbumNodesDataUseCase,
             getCurrentStorageStateUseCase = mockGetCurrentStorageStateUseCase,
+            getFeatureFlagValueUseCase = mockGetFeatureFlagValueUseCase,
             context = mockContext,
             defaultDispatcher = testDispatcher,
             albumLink = albumLink,

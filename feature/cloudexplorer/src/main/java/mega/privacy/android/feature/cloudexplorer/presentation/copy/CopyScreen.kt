@@ -66,7 +66,6 @@ internal fun CopyScreen(
             onFolderPicked = { nodeId ->
                 isProcessingAction = true
                 onSelectFolder(nodeId)
-                onNavigateBack()
             },
         )
     }

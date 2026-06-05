@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.cloudexplorer.presentation.importnodes
+package mega.privacy.android.feature.cloudexplorer.presentation.importalbum
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -11,22 +11,22 @@ import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
-import mega.privacy.android.navigation.destination.ImportNavKey
+import mega.privacy.android.navigation.destination.ImportAlbumNavKey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ImportScreen(
-    uiState: ImportUiState,
-    startNavKey: ImportNavKey,
+internal fun ImportAlbumScreen(
+    uiState: ImportAlbumUiState,
+    startNavKey: ImportAlbumNavKey,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     onSelectFolder: (NodeId) -> Unit,
 ) {
-    if (uiState is ImportUiState.Data) {
+    if (uiState is ImportAlbumUiState.Data) {
         var isProcessingAction by rememberSaveable { mutableStateOf(false) }
 
         ExplorerScreen(
-            explorerMode = ExplorerMode.Import,
+            explorerMode = ExplorerMode.AlbumImport,
             startNavKey = startNavKey,
             isInnerNavigation = false,
             nodeExplorerId = uiState.rootNodeId,

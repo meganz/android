@@ -69,6 +69,7 @@ import mega.privacy.android.navigation.destination.AlbumImportPreviewNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
+import mega.privacy.android.navigation.destination.ImportAlbumNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
@@ -454,6 +455,10 @@ fun EntryProviderScope<NavKey>.albumImports(
         val fileExplorerResultFlow by navigationHandler
             .monitorResult<Long?>(FileExplorerNavKey.RESULT_FOLDER_HANDLE)
             .collectAsStateWithLifecycle(null)
+        // Single-activity import folder picker result (new cloud explorer).
+        val importAlbumResult by navigationHandler
+            .monitorResult<NodeId?>(ImportAlbumNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
         val context = LocalContext.current
         val albumImportViewModel: AlbumImportViewModel =
             hiltViewModel<AlbumImportViewModel, AlbumImportViewModel.Factory> {
@@ -467,11 +472,18 @@ fun EntryProviderScope<NavKey>.albumImports(
             }
         }
 
+        LaunchedEffect(importAlbumResult) {
+            importAlbumResult?.let {
+                albumImportViewModel.importAlbum(it)
+            }
+        }
+
         EventEffect(
             event = uiState.addToCloudDriveFinishedEvent,
             onConsumed = albumImportViewModel::resetAlbumSelectionFinishedEvent,
             action = {
                 navigationHandler.clearResult(FileExplorerNavKey.RESULT_FOLDER_HANDLE)
+                navigationHandler.clearResult(ImportAlbumNavKey.RESULT)
             }
         )
 
@@ -498,9 +510,13 @@ fun EntryProviderScope<NavKey>.albumImports(
                 navigationHandler.navigate(AlbumImportPreviewNavKey(photoId = it.id))
             },
             onNavigateFileExplorer = {
-                navigationHandler.navigate(
-                    FileExplorerNavKey(action = "ACTION_IMPORT_ALBUM")
-                )
+                if (uiState.isCloudExplorerAvailable) {
+                    navigationHandler.navigate(ImportAlbumNavKey)
+                } else {
+                    navigationHandler.navigate(
+                        FileExplorerNavKey(action = "ACTION_IMPORT_ALBUM")
+                    )
+                }
             },
             onUpgradeAccount = {
                 navigationHandler.navigate(UpgradeAccountNavKey())

@@ -38,7 +38,6 @@ internal fun SelectCUFolderScreen(
             onFolderPicked = { nodeId ->
                 isProcessingAction = true
                 onSelectFolder(nodeId)
-                onNavigateBack()
             },
         )
     }
