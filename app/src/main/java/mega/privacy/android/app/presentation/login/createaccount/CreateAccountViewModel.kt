@@ -143,7 +143,6 @@ class CreateAccountViewModel @Inject constructor(
     private fun updateFirstNameValidationState() {
         val firstName: String = savedStateHandle[KEY_FIRST_NAME] ?: ""
         val (isValid, isLengthExceeded) = checkFirstNameValidity(firstName)
-        Timber.d("CreateAccountViewModel, isValid: $isValid, isLengthExceeded: $isLengthExceeded")
         _uiState.update {
             it.copy(
                 isFirstNameValid = isValid,
