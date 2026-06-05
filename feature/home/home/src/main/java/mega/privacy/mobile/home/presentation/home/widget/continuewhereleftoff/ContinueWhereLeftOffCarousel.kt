@@ -22,10 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -79,6 +81,8 @@ internal fun ContinueWhereLeftOffCarousel(
                     listState.requestScrollToItem(0)
                 }
             }
+            val visibleItems = items.take(CAROUSEL_MAX_VISIBLE_ITEMS)
+            val showMore = items.size > CAROUSEL_MAX_VISIBLE_ITEMS
             LazyRow(
                 state = listState,
                 modifier = Modifier
@@ -88,7 +92,7 @@ internal fun ContinueWhereLeftOffCarousel(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(
-                    items = items,
+                    items = visibleItems,
                     key = { it.nodeHandle },
                     contentType = { it.type },
                 ) { item ->
@@ -96,6 +100,11 @@ internal fun ContinueWhereLeftOffCarousel(
                         item = item,
                         onClick = { onItemClick(item) },
                     )
+                }
+                if (showMore) {
+                    item(key = CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG) {
+                        ContinueWhereLeftOffMoreCard(onClick = onViewAllClick)
+                    }
                 }
             }
         }
@@ -214,6 +223,48 @@ private fun ContinueWhereLeftOffCard(
     }
 }
 
+@Composable
+private fun ContinueWhereLeftOffMoreCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val moreText =
+        stringResource(sharedR.string.album_content_selection_action_more_description)
+    Box(
+        modifier = modifier
+            .width(96.dp)
+            .testTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center,
+    ) {
+        // Reserve the same height as a real card (90dp thumbnail box + title row) so the "More"
+        // label is centered vertically across the full card height, including the title area.
+        // Hidden from accessibility so the visible label below is the only one announced.
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.clearAndSetSemantics { },
+        ) {
+            Spacer(modifier = Modifier.height(90.dp))
+            MegaText(
+                text = moreText,
+                textColor = TextColor.Primary,
+                style = AppTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                maxLines = 1,
+                modifier = Modifier
+                    .alpha(0f)
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+            )
+        }
+        MegaText(
+            text = moreText,
+            textColor = TextColor.Primary,
+            style = AppTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+        )
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun ContinueWhereLeftOffCarouselPreview() {
@@ -253,6 +304,25 @@ private fun ContinueWhereLeftOffCarouselPreview() {
 
 @CombinedThemePreviews
 @Composable
+private fun ContinueWhereLeftOffCarouselWithMorePreview() {
+    AndroidThemeForPreviews {
+        ContinueWhereLeftOffCarousel(
+            items = (1L..9L).map { handle ->
+                ContinueWhereLeftOffItem(
+                    nodeHandle = handle,
+                    title = "Item $handle.pdf",
+                    type = RecentlyUsedType.PDF,
+                    lastAccessedTimestamp = 1712880000L + handle,
+                )
+            },
+            onItemClick = {},
+            onViewAllClick = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
 private fun ContinueWhereLeftOffCarouselEmptyPreview() {
     AndroidThemeForPreviews {
         ContinueWhereLeftOffCarousel(
@@ -263,9 +333,15 @@ private fun ContinueWhereLeftOffCarouselEmptyPreview() {
     }
 }
 
+// The carousel renders at most this many cards; when there are more items a "More" tile is
+// appended that opens the full list (T21373295).
+private const val CAROUSEL_MAX_VISIBLE_ITEMS = 8
+
 internal const val CONTINUE_WHERE_LEFT_OFF_EMPTY_TEXT_TEST_TAG =
     "continue_where_left_off_widget:empty_text"
 internal const val CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG =
     "continue_where_left_off_widget:list"
 internal const val CONTINUE_WHERE_LEFT_OFF_CHEVRON_TEST_TAG =
     "continue_where_left_off_widget:chevron"
+internal const val CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG =
+    "continue_where_left_off_widget:more"
