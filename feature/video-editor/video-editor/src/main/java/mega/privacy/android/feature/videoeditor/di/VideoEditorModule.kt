@@ -13,6 +13,7 @@ import mega.privacy.android.feature.videoeditor.presentation.editor.engine.ToolR
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.EditorTool
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.crop.CropTool
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.rotate.RotateTool
+import mega.privacy.android.feature.videoeditor.presentation.editor.tool.speed.SpeedTool
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.trim.TrimTool
 import mega.privacy.android.navigation.contract.FeatureDestination
 import javax.inject.Singleton
@@ -60,5 +61,10 @@ interface VideoEditorModule {
         @IntoSet
         @OptIn(UnstableApi::class)
         fun provideRotateTool(): EditorTool = RotateTool
+
+        @Provides
+        @IntoSet
+        @OptIn(UnstableApi::class)
+        fun provideSpeedTool(): EditorTool = SpeedTool
     }
 }
