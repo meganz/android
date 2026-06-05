@@ -29,7 +29,6 @@ class MobileAdsInitialiser @Inject constructor(
     getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : AppStartInitialiserAction(
     action = {
-        val isInitialised = AtomicBoolean(false)
         monitorMiscLoadedUseCase()
             .filter { it && !isInitialised.get() }
             .collect {
@@ -51,4 +50,8 @@ class MobileAdsInitialiser @Inject constructor(
                 }
             }
     }
-)
+) {
+    companion object {
+        private val isInitialised = AtomicBoolean(false)
+    }
+}

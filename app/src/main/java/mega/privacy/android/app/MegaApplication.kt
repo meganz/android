@@ -232,6 +232,13 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     }
 
     /**
+     * Returns true if [throwable] has at least one stack frame inside the app's package.
+     * Pure third-party / system stacks return false so they can be reported as non-fatals
+     */
+    private fun isAppRelatedThrowable(throwable: Throwable): Boolean =
+        throwable.stackTrace.any { it.className.startsWith(APP_PACKAGE_PREFIX) }
+
+    /**
      * On create
      *
      */
@@ -248,7 +255,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
             Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
                 handleUncaughtException(throwable)
-                defaultHandler?.uncaughtException(thread, throwable)
+                if (isAppRelatedThrowable(throwable)) {
+                    defaultHandler?.uncaughtException(thread, throwable)
+                }
             }
 
             JniExceptionReporter.handler = object : JniExceptionHandler {
@@ -567,6 +576,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
          * App Key
          */
         const val APP_KEY = "6tioyn8ka5l6hty"
+
+        private const val APP_PACKAGE_PREFIX = "mega.privacy.android."
 
         /**
          * Is logging out
