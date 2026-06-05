@@ -156,7 +156,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
      * @param sNode [MegaNode]
      */
     fun showOptionsPanel(sNode: MegaNode) {
-        Timber.d("Node handle: ${sNode.handle}")
+        Timber.d("showOptionsPanel")
         contactInfoActivity.showOptionsPanel(sNode)
     }
 
@@ -424,7 +424,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                         handleList.add(it.handle)
                     }
                     viewModel.setLeaveFolderNodeIds(handleList)
-                    Timber.d("Leave folder node ids: $handleList")
+                    Timber.d("Leave folder requested for %d nodes", handleList.size)
                 }
 
                 R.id.cab_menu_rename -> {
