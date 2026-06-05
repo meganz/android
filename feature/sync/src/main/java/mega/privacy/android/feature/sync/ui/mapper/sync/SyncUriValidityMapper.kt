@@ -134,7 +134,7 @@ class SyncUriValidityMapper @Inject constructor(
         val isNewDCIMLogicEnabled =
             getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
 
-        Timber.d("Checking path against Camera Uploads and Media Uploads. Path: $path, Primary: $primaryFolderPath, Media: $mediaUploadPath, Local DCIM: $localDCIMFolderPath, isNewDCIMLogicEnabled: $isNewDCIMLogicEnabled")
+        Timber.d("checkIfPathIsAlreadyUsedByCameraUploads, isNewDCIMLogicEnabled: $isNewDCIMLogicEnabled")
 
         val isCameraMatch = isCameraUploadsEnabledUseCase() &&
                 primaryFolderPath.isNotEmpty() &&
