@@ -1,11 +1,17 @@
 package mega.privacy.android.domain.usecase.login
 
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.logout.LogoutTask
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -39,9 +45,12 @@ internal class LogoutUseCaseTest {
     internal fun `test that logout tasks on success methods are called if logged out successfully`() =
         runTest {
             underTest()
-            inOrder(loginRepository, logoutTask1, logoutTask2) {
+            inOrder(loginRepository, logoutTask1) {
                 verify(loginRepository).logout()
                 verify(logoutTask1).onLogoutSuccess()
+            }
+            inOrder(loginRepository, logoutTask2) {
+                verify(loginRepository).logout()
                 verify(logoutTask2).onLogoutSuccess()
             }
         }
@@ -72,6 +81,51 @@ internal class LogoutUseCaseTest {
             verify(logoutTask2).onPreLogout()
             verify(loginRepository).logout()
         }
+    }
+
+    @Test
+    fun `test that on logout success tasks complete when the caller is cancelled during cleanup`() =
+        runTest {
+            var job: Job? = null
+            loginRepository.stub {
+                onBlocking { logout() }.thenAnswer { job?.cancel() }
+            }
+            logoutTask1.stub {
+                onBlocking { onLogoutSuccess() } doSuspendableAnswer { yield() }
+            }
+
+            job = launch { underTest() }
+            job.join()
+
+            verify(logoutTask1).onLogoutSuccess()
+            verify(logoutTask2).onLogoutSuccess()
+        }
+
+    @Test
+    fun `test that remaining on logout success tasks are called when an earlier task throws`() =
+        runTest {
+            logoutTask1.stub {
+                onBlocking { onLogoutSuccess() }.thenAnswer { throw Exception("Task failed") }
+            }
+
+            underTest()
+
+            verify(logoutTask2).onLogoutSuccess()
+        }
+
+    @Test
+    fun `test that invoke waits for all on logout success tasks to finish`() = runTest {
+        var slowTaskCompleted = false
+        logoutTask1.stub {
+            onBlocking { onLogoutSuccess() } doSuspendableAnswer {
+                delay(100)
+                slowTaskCompleted = true
+            }
+        }
+
+        underTest()
+
+        assertThat(slowTaskCompleted).isTrue()
     }
 
     @Test
