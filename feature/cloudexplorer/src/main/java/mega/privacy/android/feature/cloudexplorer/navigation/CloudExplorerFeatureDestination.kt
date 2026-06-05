@@ -16,6 +16,8 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.copy.CopyScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.copy.CopyViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.importnodes.ImportScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.importnodes.ImportViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.move.MoveScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.move.MoveViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
@@ -35,6 +37,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.ImportNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
@@ -74,6 +77,14 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = navigationHandler::navigate,
                 onSelectFolder = onSelectCUFolder,
             )
+            val onImportFolder: (NodeId) -> Unit = { nodeId ->
+                navigationHandler.returnResult(ImportNavKey.RESULT, nodeId)
+            }
+            importDestination(
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
+                onSelectFolder = onImportFolder,
+            )
             val onCopyResult: (CopyResult) -> Unit = { result ->
                 navigationHandler.returnResult(CopyNavKey.RESULT, result)
             }
@@ -104,6 +115,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = navigationHandler::navigate,
                 onStartUpload = transferHandler::setTransferEvent,
                 onSelectCUFolder = onSelectCUFolder,
+                onImportFolder = onImportFolder,
                 onCopyResult = onCopyResult,
                 onMoveResult = onMoveResult,
                 onFilesPicked = onFilesPicked,
@@ -168,6 +180,25 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             SelectCUFolderScreen(
+                uiState = uiState,
+                startNavKey = key,
+                onNavigateBack = { onNavigateBack(key) },
+                onNavigate = onNavigate,
+                onSelectFolder = onSelectFolder,
+            )
+        }
+    }
+
+    fun EntryProviderScope<NavKey>.importDestination(
+        onNavigateBack: (NavKey) -> Unit,
+        onNavigate: (NavKey) -> Unit,
+        onSelectFolder: (NodeId) -> Unit,
+    ) {
+        entry<ImportNavKey> { key ->
+            val viewModel = hiltViewModel<ImportViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            ImportScreen(
                 uiState = uiState,
                 startNavKey = key,
                 onNavigateBack = { onNavigateBack(key) },
@@ -281,6 +312,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         onNavigate: (NavKey) -> Unit,
         onStartUpload: (TransferTriggerEvent) -> Unit,
         onSelectCUFolder: (NodeId) -> Unit,
+        onImportFolder: (NodeId) -> Unit,
         onCopyResult: (CopyResult) -> Unit,
         onMoveResult: (MoveResult) -> Unit,
         onFilesPicked: (List<NodeId>) -> Unit,
@@ -296,6 +328,8 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 is MoveNavKey -> { target ->
                     onMoveResult(MoveResult(nodeIds = nav.nodeIds, target = target))
                 }
+
+                is ImportNavKey -> onImportFolder
 
                 else -> onSelectCUFolder
             }

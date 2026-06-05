@@ -108,6 +108,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_FOLDER_DIALOG_SHOWN
@@ -152,6 +153,7 @@ import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.CopyResult
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.ImportNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
@@ -906,6 +908,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         ACTION_CHOOSE_MEGA_FOLDER_SYNC -> SelectCUFolderNavKey
 
+        ACTION_PICK_IMPORT_FOLDER -> ImportNavKey
+
         ACTION_MULTISELECT_FILE ->
             ShareFilesToChatNavKey(chatId = MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
 
@@ -984,6 +988,15 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             setResult(RESULT_OK, Intent().apply {
                 putExtra(EXTRA_MEGA_SELECTED_FOLDER, nodeId.longValue)
                 putExtra(EXTRA_IS_FOLDER_FROM_INCOMING, false)
+            })
+            finishAndRemoveTask()
+        }
+        collectCloudExplorerResult<NodeId>(ImportNavKey.RESULT) { nodeId ->
+            setResult(RESULT_OK, Intent().apply {
+                putExtra(INTENT_EXTRA_KEY_IMPORT_TO, nodeId.longValue)
+                intent.getLongArrayExtra(INTENT_EXTRA_KEY_IMPORT_CHAT)?.let {
+                    putExtra(INTENT_EXTRA_KEY_IMPORT_CHAT, it)
+                }
             })
             finishAndRemoveTask()
         }

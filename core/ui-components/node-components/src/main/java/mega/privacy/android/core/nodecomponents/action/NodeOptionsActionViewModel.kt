@@ -336,6 +336,18 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         uiState.update { it.copy(publicCopyCollisionsResult = consumed()) }
     }
 
+    fun checkImportNameCollision(targetHandle: Long) {
+        if (selectedPublicLinkFile() != null) {
+            checkPublicCopyCollision(targetHandle)
+        } else {
+            checkNodesNameCollision(
+                uiState.value.selectedNodes.map { it.id.longValue },
+                targetHandle,
+                NodeNameCollisionType.COPY,
+            )
+        }
+    }
+
     private fun selectedPublicLinkFile(): PublicLinkFile? =
         uiState.value.selectedNodes.singleOrNull() as? PublicLinkFile
 

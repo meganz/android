@@ -677,6 +677,95 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
+    fun `test that checkImportNameCollision uses the public copy flow for a single PublicLinkFile selection`() =
+        runTest {
+            val publicNode = mock<PublicLinkFile> { on { id } doReturn NodeId(789L) }
+            val targetHandle = sampleNode.id.longValue
+            whenever(
+                checkPublicNodesNameCollisionUseCase(
+                    listOf(publicNode),
+                    targetHandle,
+                    NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                PublicNodeNameCollisionResult(
+                    noConflictNodes = listOf(publicNode),
+                    conflictNodes = emptyList(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(publicNode))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            verify(checkPublicNodesNameCollisionUseCase).invoke(
+                listOf(publicNode),
+                targetHandle,
+                NodeNameCollisionType.COPY,
+            )
+            verify(checkNodesNameCollisionUseCase, never()).invoke(any(), any())
+        }
+
+    @Test
+    fun `test that checkImportNameCollision uses the regular copy flow for a non-public selection`() =
+        runTest {
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(sampleNode))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(sampleNode.id.longValue to targetHandle),
+                type = NodeNameCollisionType.COPY,
+            )
+            verify(checkPublicNodesNameCollisionUseCase, never()).invoke(any(), any(), any())
+        }
+
+    @Test
+    fun `test that checkImportNameCollision uses the regular copy flow for a multi-node selection`() =
+        runTest {
+            val first = mock<PublicLinkFile> { on { id } doReturn NodeId(101L) }
+            val second = mock<PublicLinkFile> { on { id } doReturn NodeId(202L) }
+            val targetHandle = 999L
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(101L to targetHandle, 202L to targetHandle),
+                    type = NodeNameCollisionType.COPY,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.COPY,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(first, second))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(101L to targetHandle, 202L to targetHandle),
+                type = NodeNameCollisionType.COPY,
+            )
+            verify(checkPublicNodesNameCollisionUseCase, never()).invoke(any(), any(), any())
+        }
+
+    @Test
     fun `test that setMoveTargetPath is called when move node is success`() = runTest {
         whenever(moveNodesUseCase(mapOf(sampleNode.id.longValue to sampleNode.id.longValue)))
             .thenReturn(MoveRequestResult.GeneralMovement(0, 0))
