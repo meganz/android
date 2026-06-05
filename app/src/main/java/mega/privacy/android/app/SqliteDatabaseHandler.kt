@@ -1085,13 +1085,12 @@ class SqliteDatabaseHandler @Inject constructor(
             readableDatabase.query(selectQuery).use { cursor ->
                 if (cursor.moveToFirst()) {
                     value = decrypt(cursor.getString(0))
-                    Timber.d("%s value: %s", columnName, value)
+                    Timber.d("Read value for %s", columnName)
                 } else {
                     Timber.w("No value found, setting default")
                     val values = ContentValues()
                     values.put(columnName, encrypt(defaultValue))
                     writableDatabase.insert(tableName, SQLiteDatabase.CONFLICT_NONE, values)
-                    Timber.d("Default value: %s", defaultValue)
                 }
             }
         } catch (e: Exception) {
