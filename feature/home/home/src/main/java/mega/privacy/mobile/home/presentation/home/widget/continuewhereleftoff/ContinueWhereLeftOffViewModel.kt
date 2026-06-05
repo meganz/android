@@ -91,6 +91,9 @@ internal class ContinueWhereLeftOffViewModel @Inject constructor(
     }
 
     companion object {
-        private const val MAX_CAROUSEL_ITEMS = 10
+        // The carousel shows at most 8 cards. Fetch one extra so the UI can tell whether there
+        // are more than 8 items and, if so, show a "More" tile that opens the full list
+        // (T21373295).
+        private const val MAX_CAROUSEL_ITEMS = 9
     }
 }

@@ -196,7 +196,7 @@ class ContinueWhereLeftOffViewModelTest {
             }
 
             verify(monitorContinueWhereLeftOffItemsUseCase).invoke(
-                limit = 10,
+                limit = 9,
                 sortField = ContinueWhereLeftOffSortField.Timestamp,
                 sortDirection = SortDirection.Descending,
             )

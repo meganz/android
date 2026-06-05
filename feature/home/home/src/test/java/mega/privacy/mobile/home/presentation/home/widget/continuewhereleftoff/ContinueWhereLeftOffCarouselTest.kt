@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -99,10 +100,10 @@ class ContinueWhereLeftOffCarouselTest {
 
     @Test
     fun `test that carousel scrolls to start when a new most recent item is added`() {
-        val initialItems = buildItems(count = 10)
+        val initialItems = buildItems(count = 8)
         val items = setContentWithMutableItems(initialItems)
         composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG)
-            .performScrollToNode(hasText("Item 10"))
+            .performScrollToNode(hasText("Item 8"))
         composeRule.onNodeWithText("Item 1").assertDoesNotExist()
 
         val newItem = ContinueWhereLeftOffItem(
@@ -119,10 +120,10 @@ class ContinueWhereLeftOffCarouselTest {
 
     @Test
     fun `test that carousel scrolls to start when an existing item becomes most recent`() {
-        val initialItems = buildItems(count = 10)
+        val initialItems = buildItems(count = 8)
         val items = setContentWithMutableItems(initialItems)
         composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG)
-            .performScrollToNode(hasText("Item 10"))
+            .performScrollToNode(hasText("Item 8"))
 
         // Item 5 is accessed again and moves to the front of the list
         items.value = listOf(initialItems[4]) + (initialItems - initialItems[4])
@@ -130,6 +131,47 @@ class ContinueWhereLeftOffCarouselTest {
 
         composeRule.onNodeWithText("Item 5").assertIsDisplayed()
         composeRule.onNodeWithText("Item 1").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that more tile is not displayed when items are within the visible limit`() {
+        setContent(items = buildItems(count = 8))
+
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that more tile is displayed when items exceed the visible limit`() {
+        setContent(items = buildItems(count = 9))
+
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG)
+            .performScrollToNode(hasTestTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG))
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that only the visible limit of items is shown when more tile is displayed`() {
+        setContent(items = buildItems(count = 9))
+
+        // The 9th item is replaced by the "More" tile, so it is never rendered in the carousel
+        composeRule.onNodeWithText("Item 9").assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that onViewAllClick is invoked when more tile is clicked`() {
+        var viewAllClicked = false
+        setContent(
+            items = buildItems(count = 9),
+            onViewAllClick = { viewAllClicked = true },
+        )
+
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG)
+            .performScrollToNode(hasTestTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG))
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_MORE_TEST_TAG).performClick()
+
+        assertThat(viewAllClicked).isTrue()
     }
 
     private fun buildItems(count: Int) = (1L..count).map { handle ->
