@@ -97,6 +97,8 @@ internal fun PdfViewerContent(
     val scrollToHideBehavior = rememberPdfScrollToHideBehavior()
     val onChromeVisibilityRef = remember { mutableStateOf(onChromeVisibilityChange) }
     val scrubbingRef = remember { mutableStateOf(false) }
+    // Previous scrub state, so we can detect when a scrub ends and re-evaluate the chrome.
+    val wasScrubbingRef = remember { mutableStateOf(false) }
     // Swallows the library's initial jumpTo(defaultPage) scroll so opening on a restored page
     // doesn't hide the chrome before any user scroll. Re-armed on every (re)load.
     val awaitingInitialPositionRef = remember { mutableStateOf(true) }
@@ -143,7 +145,15 @@ internal fun PdfViewerContent(
             allMatchRectsByPageRef.value = allMatchRectsByPage
 
             onChromeVisibilityRef.value = onChromeVisibilityChange
-            scrubbingRef.value = isScrubPressed || scrubProgress != null
+            val scrubbingNow = isScrubPressed || scrubProgress != null
+            // Scrub-driven onPageScroll is suppressed, and scrubbing to the top fires no user
+            // scroll — so when a scrub ends, re-evaluate the chrome from the final position.
+            // Without this, returning to the top via the scrubber never reveals the toolbars.
+            if (wasScrubbingRef.value && !scrubbingNow && pdfView.pageCount > 0) {
+                onChromeVisibilityChange(!pdfView.canScrollVertically(-1))
+            }
+            wasScrubbingRef.value = scrubbingNow
+            scrubbingRef.value = scrubbingNow
 
             // Trigger redraw when current-match highlights change
             if (highlightPdfRects !== lastHighlightIdentity.value) {

@@ -305,15 +305,27 @@ internal fun PdfViewerScreen(
                         }
                     }
 
-                    // Overlays use innerPadding so they stay clear of chrome / system bars.
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    ) {
-                        // Fast-scroll page indicator — draggable thumb on the right edge that
-                        // also reflects the current scroll position of the document.
-                        if (currentPage != null) {
+                    // Reserve the toolbar-occupied insets for the scrubber as a CONSTANT band:
+                    //  • using the live innerPadding makes the thumb jump when the toolbars toggle
+                    //    (the track height changes), and
+                    //  • spanning the full height lets the toolbars cover the thumb at the extremes.
+                    // So we keep the largest top/bottom inset seen — captured while the toolbars are
+                    // visible (they are on open) — so the track stays constant AND in the gap
+                    // between the bars. maxOf never shrinks, so toggling the toolbars is a no-op.
+                    var reservedTopInset by remember { mutableStateOf(0.dp) }
+                    var reservedBottomInset by remember { mutableStateOf(0.dp) }
+                    reservedTopInset = maxOf(reservedTopInset, innerPadding.calculateTopPadding())
+                    reservedBottomInset =
+                        maxOf(reservedBottomInset, innerPadding.calculateBottomPadding())
+
+                    // Fast-scroll page indicator — draggable thumb on the right edge that also
+                    // reflects the current scroll position.
+                    if (currentPage != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = reservedTopInset, bottom = reservedBottomInset)
+                        ) {
                             PdfPageIndicator(
                                 currentPage = currentPage,
                                 totalPages = uiState.totalPages,
@@ -325,9 +337,15 @@ internal fun PdfViewerScreen(
                                 onScrubPressed = { isScrubPressed = it },
                             )
                         }
+                    }
 
-                        // Floating search results bar (bottom-center)
-                        if (searchState.isSearchActive && searchState.hasResults) {
+                    // Floating search results bar (bottom-center)
+                    if (searchState.isSearchActive && searchState.hasResults) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding)
+                        ) {
                             PdfSearchResultsBar(
                                 label = uiState.searchState.label,
                                 onPrev = onNavigateToPreviousMatch,
