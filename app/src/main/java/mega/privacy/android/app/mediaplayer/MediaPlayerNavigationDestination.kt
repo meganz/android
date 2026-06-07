@@ -1,6 +1,5 @@
 package mega.privacy.android.app.mediaplayer
 
-import android.content.ActivityNotFoundException
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
@@ -41,10 +40,10 @@ fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
             if (intent.resolveActivity(context.packageManager) != null) {
                 try {
                     context.startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
+                } catch (e: Exception) {
                     Timber.e(
                         e,
-                        "Legacy media player: no activity for VIEW intent (data=${intent.data}, type=${intent.type})",
+                        "Legacy media player: VIEW intent (data=${intent.data}, type=${intent.type})",
                     )
                     snackbarEventQueue.queueMessage(R.string.intent_not_available_file)
                 }
