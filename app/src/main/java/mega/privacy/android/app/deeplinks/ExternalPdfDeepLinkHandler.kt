@@ -4,9 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import mega.privacy.android.app.extensions.isHttpScheme
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import timber.log.Timber
@@ -14,26 +11,21 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Handles external [Intent.ACTION_VIEW] PDF opens, routing to the Compose PDF viewer or the
- * legacy [mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity].
+ * Handles external [Intent.ACTION_VIEW] PDF opens, routing to the Compose PDF viewer.
  */
 @Singleton
 class ExternalPdfDeepLinkHandler @Inject constructor(
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getFileNameFromStringUriUseCase: GetFileNameFromStringUriUseCase,
-    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) {
 
     /**
-     * If [intent] is an external PDF view, routes to Compose PDF or legacy activity and returns true.
-     * Otherwise returns false and leaves [intent] unchanged.
+     * If [intent] is an external PDF view, routes to Compose PDF viewer and returns true.
      *
      * Navigation is delegated to the caller via [navigateToComposePdfViewer] so that each Activity
      * instance handles its own back-stack and the shared singleton queue is not involved.
      */
     suspend fun consumeExternalActionViewPdfIfApplicable(
         intent: Intent,
-        launchLegacyPdfViewer: suspend () -> Unit,
         navigateToComposePdfViewer: suspend (PdfViewerNavKey) -> Unit,
     ): Boolean {
         if (intent.action != Intent.ACTION_VIEW) return false
@@ -43,23 +35,9 @@ class ExternalPdfDeepLinkHandler @Inject constructor(
             return false
         }
 
-        val isPdfViewerComposeEnabled = if (!isConnectedToInternetUseCase()) {
-            true
-        } else {
-            // Keep aligned with ApiFeatures.PdfViewerComposeUI's defaultValue (true)
-            runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
-            }.getOrDefault(true)
-        }
-
-        if (isPdfViewerComposeEnabled) {
-            Timber.d("External PDF open: routing to new Compose PDF Viewer")
-            // Delegate to the caller so each Activity instance navigates within its own task stack.
-            navigateToComposePdfViewer(buildExternalPdfNavKey(uri))
-        } else {
-            Timber.d("External PDF open: routing to legacy PdfViewerActivity")
-            launchLegacyPdfViewer()
-        }
+        Timber.d("External PDF open: routing to new Compose PDF Viewer")
+        // Delegate to the caller so each Activity instance navigates within its own task stack.
+        navigateToComposePdfViewer(buildExternalPdfNavKey(uri))
         return true
     }
 

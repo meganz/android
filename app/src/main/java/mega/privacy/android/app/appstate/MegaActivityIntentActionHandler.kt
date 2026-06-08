@@ -10,7 +10,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.deeplinks.ExternalPdfDeepLinkHandler
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
@@ -100,7 +99,6 @@ class MegaActivityIntentActionHandler @Inject constructor(
             Intent.ACTION_VIEW -> {
                 if (externalPdfDeepLinkHandler.consumeExternalActionViewPdfIfApplicable(
                         intent = intent,
-                        launchLegacyPdfViewer = { launchLegacyPdfViewer(intent) },
                         navigateToComposePdfViewer = { navigationEventQueue.emit(it) },
                     )
                 ) {
@@ -207,20 +205,6 @@ class MegaActivityIntentActionHandler @Inject constructor(
                 grantUriPermission(listOf(uri))
                 listOf(UriPath(uri.toString()))
             }
-    }
-
-    private suspend fun launchLegacyPdfViewer(intent: Intent) {
-        runCatching {
-            activity.startActivity(
-                Intent(intent)
-                    .setClass(activity, PdfViewerActivity::class.java)
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            )
-            activity.finish()
-        }.onFailure { error ->
-            Timber.e(error, "Forward to PdfViewerActivity failed")
-            snackbarEventQueue.queueMessage(R.string.dialog_cannot_open_file_title)
-        }
     }
 
     private fun grantUriPermission(uris: List<Uri>) {
