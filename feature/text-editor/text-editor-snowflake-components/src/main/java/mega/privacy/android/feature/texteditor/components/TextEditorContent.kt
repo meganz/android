@@ -30,6 +30,7 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -47,6 +48,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.Constraints
@@ -121,25 +123,39 @@ fun TextEditorContent(
         // outside the text never clears it. Bumping this key recreates the per-chunk containers,
         // which drops the active selection.
         var selectionResetKey by remember { mutableIntStateOf(0) }
+        // In edit mode the focused chunk is the only one that can hold a selection; tracking it
+        // lets a tap on empty space collapse just that chunk's selection.
+        var focusedEditChunk by remember { mutableIntStateOf(0) }
+        // Read through an updated-state holder so the long-lived pointerInput coroutine always
+        // sees the latest provider without restarting when its lambda identity changes.
+        val currentChunkStateProvider by rememberUpdatedState(chunkStateProvider)
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .then(if (!readOnly) Modifier.imePadding() else Modifier)
-                .then(
-                    if (readOnly) {
-                        Modifier.pointerInput(Unit) {
-                            awaitEachGesture {
-                                awaitFirstDown(requireUnconsumed = false)
-                                // Non-consuming: a clean tap on empty space (one not claimed by
-                                // text selection or list scrolling) clears the selection while
-                                // leaving the event available to other handlers (e.g. reveal bar).
-                                if (waitForUpOrCancellation() != null) selectionResetKey++
+                .pointerInput(readOnly) {
+                    awaitEachGesture {
+                        awaitFirstDown(requireUnconsumed = false)
+                        // Non-consuming: a clean tap on empty space — one not claimed by text
+                        // selection, a text field, or list scrolling — clears the active
+                        // selection while leaving the event available to other handlers (e.g.
+                        // the reveal bar). View mode has no programmatic clear, so it recreates
+                        // the per-chunk SelectionContainers via a key bump; edit mode collapses
+                        // the focused field's selection in place, which clears the highlight and
+                        // dismisses the selection toolbar without losing focus or the keyboard.
+                        if (waitForUpOrCancellation() != null) {
+                            if (readOnly) {
+                                selectionResetKey++
+                            } else {
+                                currentChunkStateProvider?.invoke(focusedEditChunk)?.edit {
+                                    // Collapse to the end of the current selection; a tap with
+                                    // no selection (just a cursor) leaves the cursor put.
+                                    if (!selection.collapsed) selection = TextRange(selection.max)
+                                }
                             }
                         }
-                    } else {
-                        Modifier
-                    },
-                ),
+                    }
+                },
         ) {
             LaunchedEffect(restoreScrollIndex) {
                 val targetIndex = restoreScrollIndex ?: return@LaunchedEffect
@@ -160,6 +176,9 @@ fun TextEditorContent(
                     selectionResetKey = selectionResetKey,
                 )
             } else {
+                val onChunkFocusedNonNull = requireNotNull(onChunkFocused) {
+                    "onChunkFocused must be non-null in edit mode"
+                }
                 EditModeLazyColumn(
                     lazyListState = lazyListState,
                     chunkCount = chunkCount,
@@ -172,8 +191,9 @@ fun TextEditorContent(
                         "onChunkDisposed must be non-null in edit mode"
                     },
                     isChunkReadOnly = isChunkReadOnly,
-                    onChunkFocused = requireNotNull(onChunkFocused) {
-                        "onChunkFocused must be non-null in edit mode"
+                    onChunkFocused = { idx ->
+                        focusedEditChunk = idx
+                        onChunkFocusedNonNull(idx)
                     },
                     showLineNumbers = showLineNumbers,
                     textStyle = textStyle,
