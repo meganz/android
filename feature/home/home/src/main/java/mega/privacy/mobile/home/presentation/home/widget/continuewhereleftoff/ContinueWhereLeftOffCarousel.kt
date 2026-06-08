@@ -186,6 +186,10 @@ private fun ContinueWhereLeftOffCard(
     Column(
         modifier = modifier
             .width(140.dp)
+            // Dim the whole card for hidden items so icon-only files (e.g. text) are also
+            // visibly marked, matching the Recents list and the shared node items; the
+            // thumbnail blur below only affects real image previews.
+            .alpha(if (item.isSensitive) 0.5f else 1f)
             .clickable { onClick() },
     ) {
         BoxSurface(
@@ -201,6 +205,7 @@ private fun ContinueWhereLeftOffCard(
                 defaultImage = iconForType(item.type),
                 contentDescription = item.title,
                 layoutType = ThumbnailLayoutType.Grid,
+                blurImage = item.isSensitive,
                 modifier = Modifier.matchParentSize(),
             )
             item.duration?.takeIf { it.isNotEmpty() }?.let { duration ->
