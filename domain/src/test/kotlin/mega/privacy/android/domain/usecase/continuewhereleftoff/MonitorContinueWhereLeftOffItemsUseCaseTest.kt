@@ -199,21 +199,74 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
     }
 
     @Test
-    fun `test that sensitive item is kept when showing hidden items`() = runTest {
-        val items = listOf(item(1L))
-        val sensitiveNode = nodeMock(marked = true, inherited = false)
-        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
-            .thenReturn(flowOf(items))
-        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
-        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(sensitiveNode)
+    fun `test that sensitive item is kept and flagged sensitive when showing hidden items`() =
+        runTest {
+            val items = listOf(item(1L))
+            val sensitiveNode = nodeMock(marked = true, inherited = false)
+            whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+                .thenReturn(flowOf(items))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(sensitiveNode)
 
-        underTest(10).test {
-            assertThat(awaitItem().map { it.nodeHandle }).containsExactly(1L)
-            cancelAndIgnoreRemainingEvents()
+            underTest(10).test {
+                val result = awaitItem()
+                assertThat(result.map { it.nodeHandle }).containsExactly(1L)
+                assertThat(result.single().isSensitive).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(repository, never()).removeRecentlyUsedItem(any())
         }
-        verify(repository, never()).removeRecentlyUsedItem(any())
-    }
+
+    @Test
+    fun `test that inherited sensitive item is flagged sensitive when showing hidden items`() =
+        runTest {
+            val items = listOf(item(1L))
+            val inheritedSensitiveNode = nodeMock(marked = false, inherited = true)
+            whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+                .thenReturn(flowOf(items))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(inheritedSensitiveNode)
+
+            underTest(10).test {
+                assertThat(awaitItem().single().isSensitive).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that non sensitive item is not flagged sensitive when showing hidden items`() =
+        runTest {
+            val items = listOf(item(1L))
+            val plainNode = nodeMock(marked = false, inherited = false)
+            whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+                .thenReturn(flowOf(items))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(plainNode)
+
+            underTest(10).test {
+                assertThat(awaitItem().single().isSensitive).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sensitive item is not flagged sensitive when hidden nodes feature is not enabled`() =
+        runTest {
+            val items = listOf(item(1L))
+            val sensitiveNode = nodeMock(marked = true, inherited = false)
+            whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+                .thenReturn(flowOf(items))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+
+            underTest(10).test {
+                assertThat(awaitItem().single().isSensitive).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that non sensitive items are kept when hidden nodes enabled and not showing hidden items`() =

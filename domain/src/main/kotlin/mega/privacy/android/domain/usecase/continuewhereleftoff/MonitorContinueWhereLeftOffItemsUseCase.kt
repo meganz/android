@@ -34,7 +34,9 @@ import javax.inject.Inject
  *   free users (and for anyone who has turned "show hidden items" on). Hidden items are therefore
  *   only removed when the feature is actually active for this account
  *   ([MonitorHiddenNodesEnabledUseCase]) AND the user is not showing hidden items
- *   ([MonitorShowHiddenItemsUseCase]).
+ *   ([MonitorShowHiddenItemsUseCase]). When the feature is active and the user IS showing hidden
+ *   items, the hidden items are kept but flagged [ContinueWhereLeftOffItem.isSensitive] so the
+ *   carousel can blur them, mirroring how the node lists mark sensitive content.
  *
  * In both cases the item is removed from the index so it does not reappear once dropped.
  *
@@ -80,12 +82,21 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
             trashedHandles.forEach { repository.removeRecentlyUsedItem(it) }
             val resumableItems = items.filterNot { it.nodeHandle in trashedHandles }
 
-            val visibleItems = if (!hiddenNodesEnabled || showHiddenItems) {
-                resumableItems
-            } else {
-                val hiddenHandles = resumableItems.hiddenNodeHandles()
-                hiddenHandles.forEach { repository.removeRecentlyUsedItem(it) }
-                resumableItems.filterNot { it.nodeHandle in hiddenHandles }
+            val visibleItems = when {
+                // Hidden-nodes feature off for this account: nothing is sensitive, show as-is.
+                !hiddenNodesEnabled -> resumableItems
+                // Feature on and showing hidden items: keep the hidden ones but flag them so the
+                // carousel blurs them, the same way the node lists render sensitive content.
+                showHiddenItems -> {
+                    val hiddenHandles = resumableItems.hiddenNodeHandles()
+                    resumableItems.map { it.copy(isSensitive = it.nodeHandle in hiddenHandles) }
+                }
+                // Feature on and not showing hidden items: drop the hidden ones entirely.
+                else -> {
+                    val hiddenHandles = resumableItems.hiddenNodeHandles()
+                    hiddenHandles.forEach { repository.removeRecentlyUsedItem(it) }
+                    resumableItems.filterNot { it.nodeHandle in hiddenHandles }
+                }
             }
             visibleItems.withRefreshedTitles()
         }.distinctUntilChanged()
