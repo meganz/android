@@ -17,35 +17,45 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
+import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.videoeditor.components.ToolTabBar
 import mega.privacy.android.feature.videoeditor.components.ToolTabUiItem
 import mega.privacy.android.feature.videoeditor.presentation.editor.EditorViewModel
-import mega.privacy.android.feature.videoeditor.presentation.editor.ui.EditorDownloadState
-import mega.privacy.android.feature.videoeditor.presentation.editor.ui.EditorErrorState
-import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PreviewControls
-import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PreviewStatusBadges
-import mega.privacy.android.feature.videoeditor.presentation.editor.ui.ToolActionBar
-import mega.privacy.android.feature.videoeditor.presentation.editor.ui.ToolDeck
 import mega.privacy.android.feature.videoeditor.presentation.editor.engine.ToolRegistry
+import mega.privacy.android.feature.videoeditor.presentation.editor.export.ExportProgress
 import mega.privacy.android.feature.videoeditor.presentation.editor.render.EditorPreview
 import mega.privacy.android.feature.videoeditor.presentation.editor.state.EditorAction
 import mega.privacy.android.feature.videoeditor.presentation.editor.state.EditorState
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.BuiltInToolIds
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.ToolId
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.EditorDownloadState
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.EditorErrorState
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.ExportProgressDialog
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PreviewControls
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PreviewStatusBadges
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.ToolActionBar
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.ToolDeck
 import mega.privacy.android.feature.videoeditor.presentation.screen.model.VideoEditorUiState
 import java.io.File
 
@@ -62,13 +72,16 @@ import java.io.File
 @UnstableApi
 @Composable
 internal fun VideoEditorRoute(nodeHandle: Long, onClose: () -> Unit) {
-    val screenViewModel = hiltViewModel<VideoEditorScreenViewModel, VideoEditorScreenViewModel.Factory>(
-        creationCallback = { factory -> factory.create(nodeHandle) }
-    )
+    val screenViewModel =
+        hiltViewModel<VideoEditorScreenViewModel, VideoEditorScreenViewModel.Factory> { factory ->
+            factory.create(nodeHandle)
+        }
+
     val editorViewModel = hiltViewModel<EditorViewModel>()
 
     val uiState by screenViewModel.uiState.collectAsStateWithLifecycle()
     val editorState by editorViewModel.editorState.collectAsStateWithLifecycle()
+    val exportProgress by editorViewModel.exportProgress.collectAsStateWithLifecycle()
 
     // Hand the downloaded file to the editor exactly once, when it becomes ready.
     LaunchedEffect(uiState.videoFilePath) {
@@ -78,11 +91,38 @@ internal fun VideoEditorRoute(nodeHandle: Long, onClose: () -> Unit) {
         }
     }
 
+    // Collapse the per-tick InProgress stream to just the terminal outcome to reduce recomposition
+    val exportResult by remember {
+        derivedStateOf {
+            exportProgress as? ExportProgress.Done ?: exportProgress as? ExportProgress.Error
+        }
+    }
+
+    // Relay the editor's terminal export result to the host, which owns the MEGA side
+    LaunchedEffect(exportResult) {
+        when (val result = exportResult) {
+            is ExportProgress.Done -> {
+                screenViewModel.onExportSucceeded(result.outputUri)
+                editorViewModel.dismissExportResult()
+            }
+
+            is ExportProgress.Error -> {
+                screenViewModel.onExportFailed()
+                editorViewModel.dismissExportResult()
+            }
+
+            else -> Unit
+        }
+    }
+
     VideoEditorScreen(
         uiState = uiState,
         editorState = editorState,
+        exportProgress = exportProgress,
         registry = editorViewModel.toolRegistry,
         onAction = editorViewModel::dispatch,
+        onSave = editorViewModel::startExport,
+        onCancelExport = editorViewModel::cancelExport,
         onClose = onClose,
     )
 }
@@ -97,8 +137,11 @@ internal fun VideoEditorRoute(nodeHandle: Long, onClose: () -> Unit) {
 internal fun VideoEditorScreen(
     uiState: VideoEditorUiState,
     editorState: EditorState,
+    exportProgress: ExportProgress,
     registry: ToolRegistry,
     onAction: (EditorAction) -> Unit,
+    onSave: () -> Unit,
+    onCancelExport: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -110,8 +153,11 @@ internal fun VideoEditorScreen(
 
         else -> EditorBody(
             state = editorState,
+            exportProgress = exportProgress,
             registry = registry,
             onAction = onAction,
+            onSave = onSave,
+            onCancelExport = onCancelExport,
             onClose = onClose,
             modifier = modifier,
         )
@@ -122,8 +168,11 @@ internal fun VideoEditorScreen(
 @Composable
 private fun EditorBody(
     state: EditorState,
+    exportProgress: ExportProgress,
     registry: ToolRegistry,
     onAction: (EditorAction) -> Unit,
+    onSave: () -> Unit,
+    onCancelExport: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -141,11 +190,22 @@ private fun EditorBody(
                 animationSpec = tween(durationMillis = 340, easing = LinearOutSlowInEasing),
             ),
         ) {
-            // Save action (export) is added in the export MR; for now the bar
-            // just carries the title and a close affordance.
             MegaTopAppBar(
                 title = "Edit video",
                 navigationType = AppBarNavigationType.Close(onClose),
+                trailingIcons = {
+                    val saveEnabled =
+                        state.source.isLoaded && exportProgress !is ExportProgress.InProgress
+                    MegaText(
+                        text = "Save copy",
+                        style = AppTheme.typography.labelLarge,
+                        textColor = if (saveEnabled) TextColor.Brand else TextColor.Disabled,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(enabled = saveEnabled, onClick = onSave)
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    )
+                },
             )
         }
 
@@ -182,6 +242,13 @@ private fun EditorBody(
         }
 
         BottomSlot(state = state, registry = registry, onAction = onAction)
+    }
+
+    (exportProgress as? ExportProgress.InProgress)?.let { inProgress ->
+        ExportProgressDialog(
+            percent = inProgress.percent,
+            onCancel = onCancelExport,
+        )
     }
 }
 

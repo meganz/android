@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
@@ -16,7 +17,9 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import android.net.Uri
 import mega.privacy.android.feature.videoeditor.presentation.screen.VideoEditorScreenViewModel
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -25,8 +28,10 @@ import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -49,6 +54,7 @@ class VideoEditorScreenViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
     private val downloadNodeUseCase = mock<DownloadNodeUseCase>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     @BeforeEach
     fun setUp() {
@@ -56,6 +62,7 @@ class VideoEditorScreenViewModelTest {
             getNodeByIdUseCase,
             getFilePreviewDownloadPathUseCase,
             downloadNodeUseCase,
+            snackbarEventQueue,
         )
     }
 
@@ -65,6 +72,7 @@ class VideoEditorScreenViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getFilePreviewDownloadPathUseCase = getFilePreviewDownloadPathUseCase,
             downloadNodeUseCase = downloadNodeUseCase,
+            snackbarEventQueue = snackbarEventQueue,
         )
     }
 
@@ -170,5 +178,27 @@ class VideoEditorScreenViewModelTest {
             assertThat(state.isError).isTrue()
             assertThat(state.videoFilePath).isNull()
         }
+    }
+
+    @Test
+    fun `test that onExportSucceeded queues a success message`() = runTest {
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn null
+        initViewModel()
+
+        underTest.onExportSucceeded(mock<Uri>())
+        advanceUntilIdle()
+
+        verifyBlocking(snackbarEventQueue) { queueMessage(eq("Video saved")) }
+    }
+
+    @Test
+    fun `test that onExportFailed queues a failure message`() = runTest {
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn null
+        initViewModel()
+
+        underTest.onExportFailed()
+        advanceUntilIdle()
+
+        verifyBlocking(snackbarEventQueue) { queueMessage(eq("Couldn't save video")) }
     }
 }

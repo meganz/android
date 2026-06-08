@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.videoeditor.presentation.screen
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import mega.privacy.android.feature.videoeditor.presentation.screen.model.VideoEditorUiState
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import timber.log.Timber
 import java.io.File
 
@@ -36,6 +38,7 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
     private val downloadNodeUseCase: DownloadNodeUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(VideoEditorUiState())
@@ -118,8 +121,28 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
         _uiState.update { it.copy(isLoading = false, isError = true) }
     }
 
+    /**
+     * Called when the editor finishes encoding the edited video to [outputUri].
+     * Confirms the outcome to the user; the encoded file is the input for the
+     * MEGA upload.
+     */
+    fun onExportSucceeded(outputUri: Uri) {
+        viewModelScope.launch { snackbarEventQueue.queueMessage(EXPORT_SUCCESS_MESSAGE) }
+    }
+
+    /** Called when the editor's export fails, to report it to the user. */
+    fun onExportFailed() {
+        viewModelScope.launch { snackbarEventQueue.queueMessage(EXPORT_FAILURE_MESSAGE) }
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(nodeHandle: Long): VideoEditorScreenViewModel
+    }
+
+    // TODO use string res
+    private companion object {
+        const val EXPORT_SUCCESS_MESSAGE = "Video saved"
+        const val EXPORT_FAILURE_MESSAGE = "Couldn't save video"
     }
 }
