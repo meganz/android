@@ -8,9 +8,11 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.feature.documentscanner.data.boundary.DefaultStabilityTracker
 import mega.privacy.android.feature.documentscanner.data.boundary.TFLiteBoundaryDetector
 import mega.privacy.android.feature.documentscanner.data.model.DownloadingScannerModelProvider
+import mega.privacy.android.feature.documentscanner.data.repository.DefaultScannerPreferencesRepository
 import mega.privacy.android.feature.documentscanner.domain.boundary.DocumentBoundaryDetector
 import mega.privacy.android.feature.documentscanner.domain.boundary.StabilityTracker
 import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelProvider
+import mega.privacy.android.feature.documentscanner.domain.repository.ScannerPreferencesRepository
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -48,6 +50,12 @@ abstract class BoundaryDetectorModule {
     internal abstract fun bindScannerModelProvider(
         impl: DownloadingScannerModelProvider,
     ): ScannerModelProvider
+
+    @Binds
+    @Singleton
+    internal abstract fun bindScannerPreferencesRepository(
+        impl: DefaultScannerPreferencesRepository,
+    ): ScannerPreferencesRepository
 
     companion object {
         /**

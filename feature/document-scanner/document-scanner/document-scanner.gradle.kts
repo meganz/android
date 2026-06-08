@@ -41,6 +41,9 @@ dependencies {
     implementation(androidx.work.ktx)
     implementation(androidx.hilt.work)
 
+    // Jetpack DataStore for the small cellular-consent preference
+    implementation(androidx.datastore.preferences)
+
     // Testing
     testImplementation(project(":core-test"))
     testImplementation(platform(testlib.junit5.bom))
