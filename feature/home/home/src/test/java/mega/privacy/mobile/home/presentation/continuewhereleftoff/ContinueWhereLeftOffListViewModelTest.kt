@@ -95,6 +95,7 @@ class ContinueWhereLeftOffListViewModelTest {
                 getNodeByIdUseCase,
                 DurationInSecondsTextMapper(),
                 mock(),
+                mock { on { it.invoke() } doReturn true },
             ),
             monitorConnectivityUseCase = monitorConnectivityUseCase,
         )

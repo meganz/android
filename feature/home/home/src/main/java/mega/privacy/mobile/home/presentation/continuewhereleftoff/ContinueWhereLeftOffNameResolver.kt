@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import javax.inject.Inject
 
 /**
@@ -23,6 +24,7 @@ internal class ContinueWhereLeftOffNameResolver @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val removeRecentlyUsedItemUseCase: RemoveRecentlyUsedItemUseCase,
+    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
 ) {
     private data class ResolvedData(val name: String, val duration: String?)
 
@@ -38,6 +40,11 @@ internal class ContinueWhereLeftOffNameResolver @Inject constructor(
     }
 
     suspend fun resolveBlankNames(items: List<ContinueWhereLeftOffItem>): Boolean {
+        // Resolving names/durations reads the account node tree, which may be unavailable while
+        // offline (or briefly during reconnect). Skip resolution entirely when disconnected:
+        // there is nothing to fetch, and a transient miss must not be mistaken for a deleted node
+        // and prune the item. Items keep their stored/cached names and resolve once back online.
+        if (!isConnectedToInternetUseCase()) return false
         val unresolved = items.filter { it.nodeHandle !in cache && (it.title.isBlank() || it.duration == null) }
         if (unresolved.isEmpty()) return false
         val sizeBefore = cache.size
