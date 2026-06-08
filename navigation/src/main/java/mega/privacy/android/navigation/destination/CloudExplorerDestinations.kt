@@ -50,6 +50,13 @@ data class ShareFilesToChatNavKey(val chatId: Long) : ExplorerNavKey {
 }
 
 @Serializable
+data class AddVideoToPlaylistNavKey(val addedVideoIds: List<NodeId>) : ExplorerNavKey {
+    companion object {
+        const val RESULT = "AddVideoToPlaylistNavKey::result"
+    }
+}
+
+@Serializable
 data class CopyNavKey(val nodeIds: List<NodeId>) : ExplorerNavKey {
     companion object {
         const val RESULT = "CopyNavKey::result"
@@ -76,4 +83,5 @@ data class NodesExplorerNavKey(
     val explorerMode: ExplorerMode,
     val startNavKey: ExplorerNavKey,
     val shareUris: List<UriPath>?,
+    val disabledNodeIds: List<NodeId> = emptyList(),
 ) : NavKey

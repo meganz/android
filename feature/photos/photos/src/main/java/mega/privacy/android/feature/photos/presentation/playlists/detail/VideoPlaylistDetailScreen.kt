@@ -69,6 +69,7 @@ import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BO
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.destination.AddVideoToPlaylistNavKey
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
@@ -85,6 +86,7 @@ internal fun VideoPlaylistDetailRoute(
     clearResult: (key: String) -> Unit,
     navigate: (navKey: NavKey) -> Unit,
     onBack: () -> Unit,
+    addedVideoIds: List<NodeId>? = null,
     viewModel: VideoPlaylistDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -96,6 +98,15 @@ internal fun VideoPlaylistDetailRoute(
         onConsumed = viewModel::resetNavigateToVideoPlayer,
         action = navigate
     )
+
+    // Videos picked from the cloud explorer (AddVideoToPlaylistNavKey) are added here.
+    LaunchedEffect(addedVideoIds) {
+        val videoIds = addedVideoIds ?: return@LaunchedEffect
+        if (videoIds.isNotEmpty()) {
+            viewModel.addVideosToPlaylist(videoIds)
+        }
+        clearResult(AddVideoToPlaylistNavKey.RESULT)
+    }
 
     VideoPlaylistDetailScreen(
         uiState = uiState,
@@ -113,9 +124,10 @@ internal fun VideoPlaylistDetailRoute(
         selectAll = viewModel::selectAllVideos,
         clearSelection = viewModel::clearSelection,
         resetRemoveVideosEvent = viewModel::resetNumberOfRemovedVideosEvent,
+        resetAddedVideosEvent = viewModel::resetNumberOfAddedVideosEvent,
         removeVideosFromPlaylist = viewModel::removeVideosFromPlaylist,
         clearResultFlow = clearResult,
-        navigateToSelectVideos = navigate,
+        navigate = navigate,
         onBack = onBack,
         onMenuClick = navigate,
         onSortNodes = viewModel::setCloudSortOrder
@@ -142,9 +154,10 @@ internal fun VideoPlaylistDetailScreen(
     onLongClick: (item: VideoUiEntity) -> Unit = {},
     selectAll: () -> Unit = {},
     clearSelection: () -> Unit = {},
-    navigateToSelectVideos: (navKey: SelectVideosForPlaylistNavKey) -> Unit = {},
+    navigate: (NavKey) -> Unit = {},
     clearResultFlow: (key: String) -> Unit = {},
     resetRemoveVideosEvent: () -> Unit = {},
+    resetAddedVideosEvent: () -> Unit = {},
     onMenuClick: (NavKey) -> Unit = {},
     onSortNodes: (NodeSortConfiguration) -> Unit = {},
     multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
@@ -180,10 +193,16 @@ internal fun VideoPlaylistDetailScreen(
                         .testTag(VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG),
                     visible = selectedNodes.isEmpty(),
                     onClick = {
-                        val playlistHandle = dataState.playlistDetail.uiEntity.id.longValue
-                        navigateToSelectVideos(
-                            SelectVideosForPlaylistNavKey(playlistHandle = playlistHandle)
-                        )
+                        if (uiState.isCloudExplorerAvailable) {
+                            val addedVideos = uiState.playlistDetail?.videos?.map { it.id }
+                                ?: emptyList()
+                            navigate(AddVideoToPlaylistNavKey(addedVideos))
+                        } else {
+                            val playlistHandle = dataState.playlistDetail.uiEntity.id.longValue
+                            navigate(
+                                SelectVideosForPlaylistNavKey(playlistHandle = playlistHandle)
+                            )
+                        }
                     }
                 )
             }
@@ -335,6 +354,22 @@ internal fun VideoPlaylistDetailScreen(
                         val title = uiState.playlistDetail?.uiEntity?.title ?: ""
                         val message = resources.getQuantityString(
                             sharedR.plurals.video_section_playlist_detail_remove_videos_message,
+                            number,
+                            number,
+                            title
+                        )
+                        snackbarHostState?.showAutoDurationSnackbar(message)
+                    }
+                }
+
+                EventEffect(
+                    event = videoPlaylistEditState.numberOfAddedVideosEvent,
+                    onConsumed = resetAddedVideosEvent,
+                ) { number ->
+                    if (number > 0) {
+                        val title = uiState.playlistDetail?.uiEntity?.title ?: ""
+                        val message = resources.getQuantityString(
+                            sharedR.plurals.video_section_playlist_detail_add_videos_message,
                             number,
                             number,
                             title

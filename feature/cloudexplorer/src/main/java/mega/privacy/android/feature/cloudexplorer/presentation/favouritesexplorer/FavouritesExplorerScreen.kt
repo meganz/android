@@ -57,6 +57,8 @@ internal fun FavouritesExplorerContent(
     modifier: Modifier = Modifier,
     selectionState: NodeSelectionState = rememberNodeSelectionState(),
     isSelectionModeEnabled: Boolean = false,
+    disabledNodeIds: Set<NodeId> = emptySet(),
+    videosOnly: Boolean = false,
 ) = with(uiStateShared) {
     EventEffect(
         event = navigateBack,
@@ -72,10 +74,16 @@ internal fun FavouritesExplorerContent(
     }
     val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
         when {
+            // Pre-added nodes are shown checked but disabled; ignore taps.
+            item.id in disabledNodeIds -> Unit
+
             item.isFolderNode -> {
                 onFolderClick(item.id)
                 selectionState.deselectAll()
             }
+
+            // Only videos can be added to a playlist; ignore taps on other files.
+            videosOnly && !item.isVideoNode -> Unit
 
             isSelectionModeEnabled -> selectionState.toggleSelection(item.id)
         }
@@ -88,6 +96,9 @@ internal fun FavouritesExplorerContent(
             EmptyFolder(isFolderPicker)
         },
         itemListView = {
+            val isAlreadyAdded = it.id in disabledNodeIds
+            val isUnsupportedFile = videosOnly && !it.isFolderNode && !it.isVideoNode
+            val isDisabled = isAlreadyAdded || isUnsupportedFile
             CloudExplorerListViewItem(
                 title = it.title.text,
                 subtitle = it.subtitle.text(),
@@ -101,13 +112,16 @@ internal fun FavouritesExplorerContent(
                 isSensitive = it.isSensitive && isHiddenNodesEnabled,
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
-                isSelected = selectionState.selectedNodeIds.contains(it.id),
+                isSelected = selectionState.selectedNodeIds.contains(it.id) || isAlreadyAdded,
                 isInSelectionMode = isSelectionModeEnabled && (it.node is FileNode),
                 onItemClicked = { onItemClicked(it) },
-                enabled = it.isFolderNode || isSelectionModeEnabled,
+                enabled = (it.isFolderNode || isSelectionModeEnabled) && !isDisabled,
             )
         },
         itemGridView = {
+            val isAlreadyAdded = it.id in disabledNodeIds
+            val isUnsupportedFile = videosOnly && !it.isFolderNode && !it.isVideoNode
+            val isDisabled = isAlreadyAdded || isUnsupportedFile
             CloudExplorerGridViewItem(
                 name = it.title.text,
                 iconRes = it.iconRes,
@@ -121,9 +135,9 @@ internal fun FavouritesExplorerContent(
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
                 label = it.nodeLabel,
-                isSelected = selectionState.selectedNodeIds.contains(it.id),
+                isSelected = selectionState.selectedNodeIds.contains(it.id) || isAlreadyAdded,
                 isInSelectionMode = isSelectionModeEnabled && (it.node is FileNode),
-                enabled = it.isFolderNode || isSelectionModeEnabled,
+                enabled = (it.isFolderNode || isSelectionModeEnabled) && !isDisabled,
             )
         },
         onRefreshNodes = onRefreshNodes,
@@ -159,6 +173,8 @@ internal fun TabsScope.FavouritesExplorerTab(
     onNavigateBack: () -> Unit,
     selectionState: NodeSelectionState = rememberNodeSelectionState(),
     isSelectionModeEnabled: Boolean = false,
+    disabledNodeIds: Set<NodeId> = emptySet(),
+    videosOnly: Boolean = false,
 ) {
     val viewModel =
         hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
@@ -187,6 +203,7 @@ internal fun TabsScope.FavouritesExplorerTab(
                             explorerMode = explorerMode,
                             startNavKey = startNavKey,
                             shareUris = shareUris,
+                            disabledNodeIds = disabledNodeIds.toList(),
                         )
                     )
                 }
@@ -194,6 +211,8 @@ internal fun TabsScope.FavouritesExplorerTab(
             onRefreshNodes = viewModel::refreshNodes,
             selectionState = selectionState,
             isSelectionModeEnabled = isSelectionModeEnabled,
+            disabledNodeIds = disabledNodeIds,
+            videosOnly = videosOnly,
             modifier = modifier,
         )
     }

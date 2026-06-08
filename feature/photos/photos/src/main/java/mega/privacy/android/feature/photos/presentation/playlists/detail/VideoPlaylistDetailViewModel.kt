@@ -17,14 +17,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
@@ -35,11 +35,13 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
@@ -50,8 +52,10 @@ import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationEr
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
-import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,9 +73,11 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private val nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val removeVideosFromPlaylistUseCase: RemoveVideosFromPlaylistUseCase,
+    private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @Assisted private val args: Args,
 ) : ViewModel() {
     private val selectedVideoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
@@ -90,6 +96,13 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
                 viewModelScope,
                 SortOrder.ORDER_DEFAULT_ASC
             )
+    }
+
+    private val isCloudExplorerAvailableFlow: Flow<Boolean> = flow {
+        emit(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
+    }.catch {
+        Timber.e(it)
+        emit(false)
     }
 
     private fun combinedTriggerFlow(): Flow<Unit> = merge(
@@ -120,8 +133,10 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
             monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
             monitorShowHiddenItemsUseCase().catch { Timber.e(it) },
             selectedVideoIdsFlow,
-            sortOrder,
-        ) { videoPlaylist, isHiddenNodesEnabled, isShowHiddenItems, selectedVideoIds, sortOrder ->
+            combine(sortOrder, isCloudExplorerAvailableFlow) { order, isAvailable ->
+                order to isAvailable
+            },
+        ) { videoPlaylist, isHiddenNodesEnabled, isShowHiddenItems, selectedVideoIds, (sortOrder, isCloudExplorerAvailable) ->
             val showHiddenItems = isShowHiddenItems || !isHiddenNodesEnabled
             val videoPlaylistUiEntity = videoPlaylist?.let {
                 videoPlaylistDetailUiEntityMapper(it, showHiddenItems, selectedVideoIds)
@@ -138,7 +153,8 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
                 showHiddenItems = showHiddenItems,
                 selectedTypedNodes = selectedNodes,
                 isHiddenNodesEnabled = isHiddenNodesEnabled,
-                selectedSortConfiguration = sortOrderPair
+                selectedSortConfiguration = sortOrderPair,
+                isCloudExplorerAvailable = isCloudExplorerAvailable,
             )
         }.catch {
             Timber.e(it)
@@ -333,6 +349,32 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
         videoPlaylistEditState.update {
             it.copy(
                 numberOfRemovedVideosEvent = consumed()
+            )
+        }
+    }
+
+    internal fun addVideosToPlaylist(
+        videoIDs: List<NodeId>,
+        handle: Long = args.playlistHandle,
+    ) =
+        viewModelScope.launch {
+            runCatching {
+                addVideosToPlaylistUseCase(NodeId(handle), videoIDs)
+            }.onSuccess { numberOfAddedVideos ->
+                videoPlaylistEditState.update {
+                    it.copy(
+                        numberOfAddedVideosEvent = triggered(numberOfAddedVideos)
+                    )
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    internal fun resetNumberOfAddedVideosEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                numberOfAddedVideosEvent = consumed()
             )
         }
     }

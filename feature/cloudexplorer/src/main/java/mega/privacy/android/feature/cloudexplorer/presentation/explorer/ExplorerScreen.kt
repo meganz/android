@@ -70,6 +70,7 @@ internal fun ExplorerScreen(
     shareUris: List<UriPath>? = null,
     tabIndex: Int = CLOUD_TAB_INDEX,
     disabledTargetId: NodeId? = null,
+    disabledNodeIds: Set<NodeId> = emptySet(),
     onFolderPicked: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
     onChatsSelected: () -> Unit = {},
@@ -99,6 +100,7 @@ internal fun ExplorerScreen(
     val chatExplorerSelectionState = rememberChatExplorerSelectionState()
     val nodeSelectionState = rememberNodeSelectionState()
     val isFileSelectionEnabled = !explorerMode.isFolderPicker
+    val videosOnly = explorerMode.isVideoPicker
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -190,6 +192,7 @@ internal fun ExplorerScreen(
                                         explorerMode = explorerMode,
                                         startNavKey = startNavKey,
                                         shareUris = shareUris,
+                                        disabledNodeIds = disabledNodeIds.toList(),
                                     )
                                 )
                             }
@@ -197,6 +200,8 @@ internal fun ExplorerScreen(
                         onRefreshNodes = nodesExplorerViewModel::refreshNodes,
                         selectionState = nodeSelectionState,
                         isSelectionModeEnabled = isFileSelectionEnabled,
+                        disabledNodeIds = disabledNodeIds,
+                        videosOnly = videosOnly,
                         modifier = modifier,
                     )
                 }
@@ -220,6 +225,8 @@ internal fun ExplorerScreen(
                         onNavigateBack = onNavigateBack,
                         selectionState = nodeSelectionState,
                         isSelectionModeEnabled = isFileSelectionEnabled,
+                        disabledNodeIds = disabledNodeIds,
+                        videosOnly = videosOnly,
                     )
                 }
                 if (!isInnerNavigation && explorerMode.isChatAvailable) {
@@ -258,6 +265,7 @@ internal fun ExplorerScreen(
                                     explorerMode = explorerMode,
                                     startNavKey = startNavKey,
                                     shareUris = shareUris,
+                                    disabledNodeIds = disabledNodeIds.toList(),
                                 )
                             )
                         } ?: snackbarHostState?.showAutoDurationSnackbar(

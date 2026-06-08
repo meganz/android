@@ -12,13 +12,13 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import org.junit.Rule
 import org.junit.Test
@@ -34,7 +34,9 @@ class VideoPlaylistDetailScreenTest {
     val composeTestRule = createComposeRule()
 
     private fun setComposeContent(
-        uiState: VideoPlaylistDetailUiState = VideoPlaylistDetailUiState.Data(),
+        uiState: VideoPlaylistDetailUiState = VideoPlaylistDetailUiState.Data(
+            isCloudExplorerAvailable = false,
+        ),
         showRenameVideoPlaylistDialog: () -> Unit = {},
         numberOfAddedVideos: Int? = null,
         videoPlaylistEditState: VideoPlaylistEditState = VideoPlaylistEditState(),
@@ -103,7 +105,8 @@ class VideoPlaylistDetailScreenTest {
     fun `test that empty view is displayed as expected when currentPlaylist is null`() {
         setComposeContent(
             uiState = VideoPlaylistDetailUiState.Data(
-                playlistDetail = null
+                playlistDetail = null,
+                isCloudExplorerAvailable = false,
             )
         )
 
@@ -124,7 +127,8 @@ class VideoPlaylistDetailScreenTest {
             uiState = VideoPlaylistDetailUiState.Data(
                 playlistDetail = mock<VideoPlaylistDetailUiEntity> {
                     on { videos }.thenReturn(emptyList())
-                }
+                },
+                isCloudExplorerAvailable = false,
             )
         )
 
@@ -150,7 +154,8 @@ class VideoPlaylistDetailScreenTest {
         }
         setComposeContent(
             uiState = VideoPlaylistDetailUiState.Data(
-                playlistDetail = playlistDetail
+                playlistDetail = playlistDetail,
+                isCloudExplorerAvailable = false,
             )
         )
 
@@ -227,6 +232,7 @@ class VideoPlaylistDetailScreenTest {
             uiState = VideoPlaylistDetailUiState.Data(
                 playlistDetail = playlistDetail,
                 selectedTypedNodes = setOf(selectedNode),
+                isCloudExplorerAvailable = false,
             )
         )
 
@@ -268,6 +274,7 @@ class VideoPlaylistDetailScreenTest {
             uiState = VideoPlaylistDetailUiState.Data(
                 playlistDetail = playlistDetail,
                 selectedTypedNodes = setOf(selectedNode),
+                isCloudExplorerAvailable = false,
             ),
             selectAll = { selectAllInvoked = true }
         )
@@ -302,6 +309,7 @@ class VideoPlaylistDetailScreenTest {
             uiState = VideoPlaylistDetailUiState.Data(
                 playlistDetail = playlistDetail,
                 selectedTypedNodes = emptySet(),
+                isCloudExplorerAvailable = false,
             )
         )
 

@@ -59,6 +59,7 @@ import mega.privacy.android.feature.photos.presentation.videos.VideoRecentlyWatc
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.contract.shared.sharedViewModel
+import mega.privacy.android.navigation.destination.AddVideoToPlaylistNavKey
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.AlbumDecryptionKeyNavKey
@@ -169,6 +170,9 @@ fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
     entry<VideoPlaylistDetailNavKey> { key ->
         val numberOfAddedVideos by resultFlow(SelectVideosForPlaylistNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
+        val addedVideoIds by navigationHandler
+            .monitorResult<List<NodeId>>(AddVideoToPlaylistNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
         val viewModel =
             hiltViewModel<VideoPlaylistDetailViewModel, VideoPlaylistDetailViewModel.Factory> { factory ->
                 factory.create(
@@ -191,6 +195,7 @@ fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
 
         VideoPlaylistDetailRoute(
             numberOfAddedVideos = numberOfAddedVideos,
+            addedVideoIds = addedVideoIds,
             clearResult = navigationHandler::clearResult,
             navigate = navigationHandler::navigate,
             onBack = navigationHandler::back,

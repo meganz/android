@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.feature.cloudexplorer.presentation.addvideotoplaylist.AddVideoToPlaylistScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.addvideotoplaylist.AddVideoToPlaylistViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.copy.CopyScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.copy.CopyViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.importalbum.ImportAlbumScreen
@@ -37,6 +39,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.uploadscanneddocu
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.AddVideoToPlaylistNavKey
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.CopyResult
 import mega.privacy.android.navigation.destination.ImportAlbumNavKey
@@ -120,6 +123,14 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onNavigate = navigationHandler::navigate,
                 onFilesPicked = onFilesPicked,
             )
+            val onVideosPicked: (List<NodeId>) -> Unit = { nodeIds ->
+                navigationHandler.returnResult(AddVideoToPlaylistNavKey.RESULT, nodeIds)
+            }
+            addVideoToPlaylistDestination(
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
+                onVideosPicked = onVideosPicked,
+            )
             nodeExplorerDestination(
                 onCloseExplorerScreen = { navigationHandler.backTo(it, true) },
                 onNavigateBack = navigationHandler::remove,
@@ -131,6 +142,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onCopyResult = onCopyResult,
                 onMoveResult = onMoveResult,
                 onFilesPicked = onFilesPicked,
+                onVideosPicked = onVideosPicked,
                 monitorResult = navigationHandler::monitorResult,
                 clearResult = navigationHandler::clearResult,
             )
@@ -295,6 +307,25 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         }
     }
 
+    fun EntryProviderScope<NavKey>.addVideoToPlaylistDestination(
+        onNavigateBack: (NavKey) -> Unit,
+        onNavigate: (NavKey) -> Unit,
+        onVideosPicked: (List<NodeId>) -> Unit,
+    ) {
+        entry<AddVideoToPlaylistNavKey> { key ->
+            val viewModel = hiltViewModel<AddVideoToPlaylistViewModel>()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            AddVideoToPlaylistScreen(
+                uiState = uiState,
+                startNavKey = key,
+                onVideosPicked = onVideosPicked,
+                onNavigateBack = { onNavigateBack(key) },
+                onNavigate = onNavigate,
+            )
+        }
+    }
+
     fun EntryProviderScope<NavKey>.copyDestination(
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (List<NavKey>) -> Unit,
@@ -348,6 +379,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         onCopyResult: (CopyResult) -> Unit,
         onMoveResult: (MoveResult) -> Unit,
         onFilesPicked: (List<NodeId>) -> Unit,
+        onVideosPicked: (List<NodeId>) -> Unit,
         monitorResult: (String) -> Flow<Any?>,
         clearResult: (String) -> Unit,
     ) {
@@ -369,6 +401,9 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             }
             // Block re-selecting the source nodes' current parent as the move target.
             val disabledTargetId = (key.startNavKey as? MoveNavKey)?.disabledTargetId
+            // Route picked files to the right result key based on the originating flow.
+            val onFilesPickedForKey: (List<NodeId>) -> Unit =
+                if (key.startNavKey is AddVideoToPlaylistNavKey) onVideosPicked else onFilesPicked
             var isProcessingAction by rememberSaveable { mutableStateOf(false) }
             val (fileUriEvent, onFileUriConsumed) =
                 (key.startNavKey as? ShareTextToMegaNavKey)?.let { startNavKey ->
@@ -404,8 +439,9 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 onStartUpload = onStartUpload,
                 onFileUriConsumed = onFileUriConsumed,
                 onSelectFolder = onFolderSelected,
-                onFilesPicked = onFilesPicked,
+                onFilesPicked = onFilesPickedForKey,
                 disabledTargetId = disabledTargetId,
+                disabledNodeIds = key.disabledNodeIds.toSet(),
                 monitorResult = monitorResult,
                 clearResult = clearResult,
             )

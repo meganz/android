@@ -13,10 +13,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -32,11 +29,13 @@ import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
@@ -48,7 +47,11 @@ import mega.privacy.android.feature.photos.presentation.playlists.detail.model.V
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -86,10 +89,12 @@ class VideoPlaylistDetailViewModelTest {
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
     private val removeVideosFromPlaylistUseCase = mock<RemoveVideosFromPlaylistUseCase>()
+    private val addVideosToPlaylistUseCase = mock<AddVideosToPlaylistUseCase>()
     private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
     private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
     private val nodeSortConfigurationUiMapper = NodeSortConfigurationUiMapper()
     private val nodeSourceTypeToViewTypeMapper = NodeSourceTypeToViewTypeMapper()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val sortOrderFlow = MutableStateFlow<SortOrder?>(SortOrder.ORDER_DEFAULT_ASC)
 
@@ -124,9 +129,11 @@ class VideoPlaylistDetailViewModelTest {
             nodeSourceTypeToViewTypeMapper = nodeSourceTypeToViewTypeMapper,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
             removeVideosFromPlaylistUseCase = removeVideosFromPlaylistUseCase,
+            addVideosToPlaylistUseCase = addVideosToPlaylistUseCase,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             args = args,
         )
     }
@@ -145,8 +152,10 @@ class VideoPlaylistDetailViewModelTest {
             monitorHiddenNodesEnabledUseCase,
             getNodeContentUriByHandleUseCase,
             removeVideosFromPlaylistUseCase,
+            addVideosToPlaylistUseCase,
             monitorSortCloudOrderUseCase,
-            setCloudSortOrderUseCase
+            setCloudSortOrderUseCase,
+            getFeatureFlagValueUseCase
         )
         sortOrderFlow.value = SortOrder.ORDER_DEFAULT_ASC
     }
@@ -369,6 +378,7 @@ class VideoPlaylistDetailViewModelTest {
         detailEntity: VideoPlaylistDetailUiEntity = expectedPlaylistDetail,
         showHiddenItems: Boolean = false,
         isHiddenNodesEnabled: Boolean = true,
+        isCloudExplorerAvailable: Boolean = false,
     ) {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(
             flow {
@@ -403,6 +413,8 @@ class VideoPlaylistDetailViewModelTest {
             )
         ).thenReturn(detailEntity)
         whenever(monitorSortCloudOrderUseCase()).thenReturn(sortOrderFlow)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer))
+            .thenReturn(isCloudExplorerAvailable)
     }
 
     @Test
@@ -934,6 +946,72 @@ class VideoPlaylistDetailViewModelTest {
 
             assertThat(
                 underTest.videoPlaylistEditState.value.numberOfRemovedVideosEvent
+            ).isEqualTo(consumed())
+        }
+
+    @Test
+    fun `test that addVideosToPlaylist invokes use case and triggers numberOfAddedVideosEvent`() =
+        runTest {
+            stubInitialValues()
+            val videoIds = listOf(NodeId(10L), NodeId(20L))
+            val numberOfAdded = 2
+            whenever(addVideosToPlaylistUseCase(any(), any())).thenReturn(numberOfAdded)
+
+            underTest.addVideosToPlaylist(videoIds)
+            advanceUntilIdle()
+
+            val event = underTest.videoPlaylistEditState.value.numberOfAddedVideosEvent
+            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((event as StateEventWithContentTriggered).content).isEqualTo(numberOfAdded)
+            verify(addVideosToPlaylistUseCase).invoke(testId, videoIds)
+        }
+
+    @Test
+    fun `test that addVideosToPlaylist with custom handle invokes use case with that handle`() =
+        runTest {
+            stubInitialValues()
+            val customHandle = 999L
+            val videoIds = listOf(NodeId(1L))
+            whenever(addVideosToPlaylistUseCase(any(), any())).thenReturn(1)
+
+            underTest.addVideosToPlaylist(videoIds, handle = customHandle)
+            advanceUntilIdle()
+
+            verify(addVideosToPlaylistUseCase).invoke(NodeId(customHandle), videoIds)
+        }
+
+    @Test
+    fun `test that resetNumberOfAddedVideosEvent resets event to consumed`() = runTest {
+        stubInitialValues()
+        whenever(addVideosToPlaylistUseCase(any(), any())).thenReturn(1)
+
+        underTest.addVideosToPlaylist(listOf(NodeId(1L)))
+        advanceUntilIdle()
+        assertThat(underTest.videoPlaylistEditState.value.numberOfAddedVideosEvent)
+            .isInstanceOf(StateEventWithContentTriggered::class.java)
+
+        underTest.resetNumberOfAddedVideosEvent()
+        assertThat(
+            underTest.videoPlaylistEditState.value.numberOfAddedVideosEvent
+        ).isEqualTo(consumed())
+    }
+
+    @Test
+    fun `test that when addVideosToPlaylistUseCase fails numberOfAddedVideosEvent is not triggered`() =
+        runTest {
+            stubInitialValues()
+            whenever(
+                addVideosToPlaylistUseCase(
+                    any(),
+                    any()
+                )
+            ).thenThrow(RuntimeException("test"))
+
+            underTest.addVideosToPlaylist(listOf(NodeId(1L)))
+            advanceUntilIdle()
+
+            assertThat(
+                underTest.videoPlaylistEditState.value.numberOfAddedVideosEvent
             ).isEqualTo(consumed())
         }
 

@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
  * @property editVideoPlaylistErrorMessage Error message to show when editing video playlist fails
  * @property playlistsRemovedEvent Event for playlists removed
  * @property numberOfRemovedVideosEvent Event for number of videos removed from playlist
+ * @property numberOfAddedVideosEvent Event for number of videos added to playlist
  */
 data class VideoPlaylistEditState(
     val showUpdateVideoPlaylist: Boolean = false,
@@ -24,4 +25,5 @@ data class VideoPlaylistEditState(
     val editVideoPlaylistErrorMessage: String? = null,
     val playlistsRemovedEvent: StateEventWithContent<List<String>> = consumed(),
     val numberOfRemovedVideosEvent: StateEventWithContent<Int> = consumed(),
+    val numberOfAddedVideosEvent: StateEventWithContent<Int> = consumed(),
 )
