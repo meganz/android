@@ -36,6 +36,8 @@ fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
                 mediaQueueTitle = key.mediaQueueTitle,
                 collectionTitle = key.collectionTitle,
                 collectionId = key.collectionId,
+                publicLinkUrl = key.publicLinkUrl,
+                localFilePath = key.localFilePath,
             )
             if (intent.resolveActivity(context.packageManager) != null) {
                 try {

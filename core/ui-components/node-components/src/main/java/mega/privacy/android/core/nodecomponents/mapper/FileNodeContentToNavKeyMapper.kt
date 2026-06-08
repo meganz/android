@@ -112,6 +112,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 fileTypeInfo = fileNode.type,
                 searchedItems = searchedItems,
                 nodeHandles = nodeIds,
+                publicLinkUrl = publicUrl
             )
 
             is FileNodeContent.LocalZipFile -> LegacyZipBrowserNavKey(

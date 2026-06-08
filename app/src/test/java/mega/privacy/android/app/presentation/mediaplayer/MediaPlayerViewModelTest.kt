@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -23,15 +24,18 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -41,6 +45,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -66,16 +71,18 @@ internal class MediaPlayerViewModelTest {
     private val getFileUriUseCase = mock<GetFileUriUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val moveNodesToRubbishUseCase = mock<MoveNodesToRubbishUseCase>()
+    private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
+    private val mapTypedNodeToPublicLinkUseCase = mock<MapTypedNodeToPublicLinkUseCase>()
     private val fakeMonitorShowHiddenItemsFlow = MutableSharedFlow<Boolean>()
     private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
 
     @BeforeEach
     fun setUp() {
-        wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(
-            fakeMonitorShowHiddenItemsFlow
-        )
-        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(fakeMonitorAccountDetailFlow)
-        wheneverBlocking { isHiddenNodesOnboardedUseCase() }.thenReturn(false)
+        runBlocking {
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(fakeMonitorShowHiddenItemsFlow)
+            whenever(monitorAccountDetailUseCase()).thenReturn(fakeMonitorAccountDetailFlow)
+            whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+        }
         initUnderTest()
     }
 
@@ -92,6 +99,8 @@ internal class MediaPlayerViewModelTest {
             getFileUriUseCase = getFileUriUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
+            getPublicNodeUseCase = getPublicNodeUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
         )
     }
 
@@ -104,6 +113,8 @@ internal class MediaPlayerViewModelTest {
             monitorShowHiddenItemsUseCase,
             monitorAccountDetailUseCase,
             moveNodesToRubbishUseCase,
+            getPublicNodeUseCase,
+            mapTypedNodeToPublicLinkUseCase,
         )
     }
 
@@ -669,6 +680,32 @@ internal class MediaPlayerViewModelTest {
             underTest.updateItemToRemove(handle)
 
             underTest.itemToRemove.test().assertValue(handle)
+        }
+
+    @Test
+    internal fun `test that downloadPublicLinkFile emits node via onDownloadFileLinkNode when successful`() =
+        runTest {
+            val url = "https://mega.nz/file/abc123"
+            val publicNode = PublicLinkFile(node = mock(), parent = null)
+            whenever(getPublicNodeUseCase(url)).thenReturn(mock())
+            whenever(mapTypedNodeToPublicLinkUseCase(any(), anyOrNull())).thenReturn(publicNode)
+
+            underTest.downloadPublicLinkFile(url)
+            advanceUntilIdle()
+
+            underTest.onDownloadFileLinkNode().test().assertValue(publicNode)
+        }
+
+    @Test
+    internal fun `test that downloadPublicLinkFile shows general error snackbar when getPublicNodeUseCase fails`() =
+        runTest {
+            val url = "https://mega.nz/file/abc123"
+            whenever(getPublicNodeUseCase(url)).thenThrow(RuntimeException("Network error"))
+
+            underTest.downloadPublicLinkFile(url)
+            advanceUntilIdle()
+
+            underTest.onSnackbarMessage().test().assertValue(R.string.general_error)
         }
 
     companion object {

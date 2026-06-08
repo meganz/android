@@ -306,6 +306,8 @@ data class LegacyMediaPlayerNavKey(
     val mediaQueueTitle: String? = null,
     val collectionTitle: String? = null,
     val collectionId: Long? = null,
+    val publicLinkUrl: String? = null,
+    val localFilePath: String? = null,
 ) : NoSessionNavKey.Optional
 
 @Serializable

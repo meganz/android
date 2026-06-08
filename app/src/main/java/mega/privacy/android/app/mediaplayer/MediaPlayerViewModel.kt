@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -32,10 +33,12 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -60,12 +63,15 @@ class MediaPlayerViewModel @Inject constructor(
     private val getFileUriUseCase: GetFileUriUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
+    private val getPublicNodeUseCase: GetPublicNodeUseCase,
+    private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
 ) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
     private val snackbarMessage = SingleLiveEvent<Int>()
     private val startChatFileOfflineDownload = SingleLiveEvent<ChatFile>()
+    private val downloadFileLinkNode = SingleLiveEvent<TypedNode>()
 
     /**
      * The flow for clicked event
@@ -130,6 +136,8 @@ class MediaPlayerViewModel @Inject constructor(
     internal fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     internal fun onStartChatFileOfflineDownload(): LiveData<ChatFile> = startChatFileOfflineDownload
+
+    internal fun onDownloadFileLinkNode(): LiveData<TypedNode> = downloadFileLinkNode
 
     /**
      * Rename update
@@ -375,4 +383,17 @@ class MediaPlayerViewModel @Inject constructor(
 
     internal suspend fun getContentUri(file: File) =
         getFileUriUseCase(file, Constants.AUTHORITY_STRING_FILE_PROVIDER)
+
+    internal fun downloadPublicLinkFile(publicUrl: String) {
+        viewModelScope.launch {
+            runCatching {
+                mapTypedNodeToPublicLinkUseCase(getPublicNodeUseCase(publicUrl))
+            }.onSuccess { node ->
+                downloadFileLinkNode.value = node
+            }.onFailure {
+                Timber.e(it, "Get public node failed")
+                snackbarMessage.value = R.string.general_error
+            }
+        }
+    }
 }

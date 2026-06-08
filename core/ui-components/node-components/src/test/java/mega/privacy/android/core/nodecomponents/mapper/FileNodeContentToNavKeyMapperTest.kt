@@ -524,7 +524,8 @@ class FileNodeContentToNavKeyMapperTest {
             fileName = fileName,
             parentHandle = -1L,
             fileHandle = nodeHandle,
-            fileTypeInfo = fileTypeInfo
+            fileTypeInfo = fileTypeInfo,
+            publicLinkUrl = "https://mega.nz/file/xyz"
         )
         assertThat(result).isEqualTo(expected)
     }

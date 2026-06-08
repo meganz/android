@@ -58,7 +58,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ADAPTER_TYPES_WITHOUT_ACCESS_CHECK
-import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
@@ -396,6 +395,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             }
         }
 
+        observeDownloadFileLinkNode()
+
         collectFlow(viewModel.menuClickEventFlow.debounce { (menuId) ->
             if (menuId == R.id.share) {
                 TIMEOUT_FOR_SHARED_MENU_ITEM
@@ -424,9 +425,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                         }
 
                         FILE_LINK_ADAPTER -> {
-                            launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)
-                                ?.let { serialize ->
-                                    saveFileLinkNode(serialize)
+                            launchIntent.getStringExtra(URL_FILE_LINK)
+                                ?.let { url ->
+                                    saveFileLinkNode(url)
                                 }
                         }
 
