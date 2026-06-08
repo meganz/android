@@ -20,6 +20,9 @@ import mega.privacy.android.navigation.contract.menu.CommonMenuAction
  * @param showMoreAction Whether to show the More (node options) button. False for external files.
  * @param showActions Whether to show the Search/More actions. False while the PDF is still loading.
  * @param modifier Modifier for the composable
+ * @param showMoreAction Whether to show the More (node options) button. False for external files.
+ * @param onShare Callback to share the PDF. Null hides the Share action. Shares the public link
+ *  for file links and the file itself for externally-opened PDFs (decided by the caller).
  */
 @Composable
 internal fun PdfViewerTopBar(
@@ -30,6 +33,7 @@ internal fun PdfViewerTopBar(
     modifier: Modifier = Modifier,
     showMoreAction: Boolean = true,
     showActions: Boolean = true,
+    onShare: (() -> Unit)? = null,
 ) {
     MegaTopAppBar(
         modifier = modifier.fillMaxWidth(),
@@ -38,6 +42,9 @@ internal fun PdfViewerTopBar(
         actions = buildList {
             if (showActions) {
                 add(MenuActionWithClick(CommonMenuAction.Search) { onSearch() })
+                if (onShare != null) {
+                    add(MenuActionWithClick(PdfShareAction) { onShare() })
+                }
                 if (showMoreAction) {
                     add(MenuActionWithClick(CommonMenuAction.More) { onOpenNodeOptions() })
                 }

@@ -184,6 +184,42 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
+    fun `test that Pdf content maps to PdfViewerNavKey with FileLink sets nodeSourceType FILE_LINK and publicLinkUrl`() {
+        val nodeHandle = 222L
+        val publicUrl = "https://mega.nz/file/abc"
+        val localFile = File("/path/to/file-link.pdf")
+        val nodeContentUri = NodeContentUri.LocalContentUri(localFile)
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            name = "file-link.pdf",
+            fileTypeInfo = PdfFileTypeInfo
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.FILE_LINK))
+            .thenReturn(NodeSourceTypeInt.FILE_LINK_ADAPTER)
+
+        val content = FileNodeContent.Pdf(uri = nodeContentUri)
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.FileLink(url = publicUrl),
+            isPDFViewerEnabled = true
+        )
+
+        val expected = PdfViewerNavKey(
+            nodeHandle = nodeHandle,
+            contentUri = localFile.path,
+            isLocalContent = true,
+            shouldStopHttpServer = false,
+            nodeSourceType = NodeSourceType.FILE_LINK,
+            mimeType = "application/pdf",
+            title = "file-link.pdf",
+            publicLinkUrl = publicUrl,
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
     fun `test that ImageForNode content maps to LegacyImageViewerNavKey`() {
         val nodeHandle = 789L
         val parentHandle = 101L

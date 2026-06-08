@@ -72,6 +72,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                     nodeSourceType = nodeSourceData.nodeSourceType,
                     mimeType = fileNode.type.mimeType,
                     title = fileNode.name,
+                    publicLinkUrl = publicUrl,
                 )
             }
 

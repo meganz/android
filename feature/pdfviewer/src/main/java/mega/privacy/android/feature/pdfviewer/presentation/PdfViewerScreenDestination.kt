@@ -19,6 +19,8 @@ import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionH
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.pdfviewer.presentation.components.startPdfFileShareIntent
+import mega.privacy.android.feature.pdfviewer.presentation.components.startPdfPublicLinkShareIntent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
@@ -43,7 +45,7 @@ import mega.privacy.android.shared.nodes.sheet.PublicLinkType
 internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
-    onOpenNodeOptions: (Long, NodeSourceType) -> Unit,
+    onOpenNodeOptions: (Long, NodeSourceType, String?) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<PdfViewerNavKey> { navKey ->
@@ -73,6 +75,7 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
                         messageId = navKey.messageId,
                         shouldStopHttpServer = navKey.shouldStopHttpServer,
                         isExternalFile = navKey.isExternalFile,
+                        publicLinkUrl = navKey.publicLinkUrl,
                     )
                 )
             }
@@ -119,7 +122,15 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
         PdfViewerScreen(
             uiState = uiState,
             onBack = pdfViewerOnBack,
-            onMoreClicked = { onOpenNodeOptions(uiState.nodeHandle, uiState.nodeSourceType) },
+            onMoreClicked = {
+                // Forward the file-link URL so the node-options sheet resolves the public node
+                // (a file-link node is not in the account); null for non-file-link sources.
+                onOpenNodeOptions(
+                    uiState.nodeHandle,
+                    uiState.nodeSourceType,
+                    navKey.publicLinkUrl,
+                )
+            },
             onPageChanged = viewModel::onPageChanged,
             onLoadComplete = viewModel::onLoadComplete,
             onError = viewModel::onLoadError,
@@ -165,6 +176,27 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             bottomBarActions = nodeActionState.visibleActions
                 .filterNot { it is CommonMenuAction.More },
             singleNodeActionHandler = singleNodeActionHandler,
+            // Reuse one Share action for the two surfaces that have something to share:
+            //  • file link  → share the original public-link URL (mirrors the file-link screen);
+            //  • external   → share the file itself via its content URI (mirrors legacy share).
+            // Null for in-account sources, where Share lives in the node-options sheet instead.
+            onShare = when {
+                navKey.publicLinkUrl != null -> {
+                    { activity?.startPdfPublicLinkShareIntent(navKey.publicLinkUrl, uiState.title) }
+                }
+
+                navKey.isExternalFile -> {
+                    {
+                        activity?.startPdfFileShareIntent(
+                            contentUri = navKey.contentUri,
+                            mimeType = navKey.mimeType,
+                            title = uiState.title,
+                        )
+                    }
+                }
+
+                else -> null
+            },
         )
 
         if (showLoginRequiredSheet) {

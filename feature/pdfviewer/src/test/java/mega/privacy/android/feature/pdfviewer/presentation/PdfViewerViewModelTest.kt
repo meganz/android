@@ -28,10 +28,12 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
@@ -80,6 +82,8 @@ class PdfViewerViewModelTest {
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
+    private val getPublicNodeByIdUseCase = mock<GetPublicNodeByIdUseCase>()
     private val getOfflineFileInformationByIdUseCase =
         mock<GetOfflineFileInformationByIdUseCase>()
     private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
@@ -109,6 +113,8 @@ class PdfViewerViewModelTest {
             monitorOfflineNodeUpdatesUseCase,
             getFeatureFlagValueUseCase,
             getNodeByIdUseCase,
+            getPublicNodeUseCase,
+            getPublicNodeByIdUseCase,
             getOfflineFileInformationByIdUseCase,
             offlineTypedNodeMapper,
             context,
@@ -147,6 +153,8 @@ class PdfViewerViewModelTest {
             applicationScope = CoroutineScope(testDispatcher),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getPublicNodeUseCase = getPublicNodeUseCase,
+            getPublicNodeByIdUseCase = getPublicNodeByIdUseCase,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
             offlineTypedNodeMapper = offlineTypedNodeMapper,
         )
@@ -1118,4 +1126,71 @@ class PdfViewerViewModelTest {
         }
         verifyNoInteractions(offlineTypedNodeMapper)
     }
+
+    @Test
+    fun `test that currentNode is resolved from the public link for FILE_LINK source`() = runTest {
+        val publicUrl = "https://mega.nz/file/abc"
+        val fileLinkArgs = defaultArgs.copy(
+            nodeSourceType = NodeSourceType.FILE_LINK,
+            publicLinkUrl = publicUrl,
+        )
+        val node = mock<TypedFileNode>()
+        wheneverBlocking { getPublicNodeUseCase(publicUrl) }.thenReturn(node)
+
+        underTest = initViewModel(args = fileLinkArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isEqualTo(node)
+        }
+        verifyNoInteractions(getNodeByIdUseCase)
+    }
+
+    @Test
+    fun `test that currentNode stays null for FILE_LINK source when public link url is missing`() =
+        runTest {
+            val fileLinkArgs = defaultArgs.copy(
+                nodeSourceType = NodeSourceType.FILE_LINK,
+                publicLinkUrl = null,
+            )
+
+            underTest = initViewModel(args = fileLinkArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isNull()
+            }
+            verifyNoInteractions(getPublicNodeUseCase, getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that currentNode is resolved via GetPublicNodeByIdUseCase for FOLDER_LINK source`() =
+        runTest {
+            val folderLinkArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.FOLDER_LINK)
+            val node = mock<TypedFileNode>()
+            wheneverBlocking { getPublicNodeByIdUseCase(NodeId(12345L)) }.thenReturn(node)
+
+            underTest = initViewModel(args = folderLinkArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isEqualTo(node)
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
+    @Test
+    fun `test that currentNode stays null for FOLDER_LINK source when node cannot be resolved`() =
+        runTest {
+            val folderLinkArgs = defaultArgs.copy(nodeSourceType = NodeSourceType.FOLDER_LINK)
+            wheneverBlocking { getPublicNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+
+            underTest = initViewModel(args = folderLinkArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isNull()
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
 }

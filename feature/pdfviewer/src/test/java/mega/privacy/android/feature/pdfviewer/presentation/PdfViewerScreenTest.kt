@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_PAGE_INDICATOR_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_ERROR_DIALOG_TAG
 import mega.privacy.android.feature.pdfviewer.presentation.components.PDF_VIEWER_PASSWORD_DIALOG_TAG
+import mega.privacy.android.feature.pdfviewer.presentation.components.PdfShareAction
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 import mega.privacy.android.shared.resources.R as sharedR
@@ -102,6 +103,7 @@ class PdfViewerScreenTest {
         uiState: PdfViewerState = defaultState(),
         bottomBarActions: List<MenuActionWithIcon> = emptyList(),
         singleNodeActionHandler: SingleNodeActionHandler = SingleNodeActionHandler { _, _ -> },
+        onShare: (() -> Unit)? = null,
     ) {
         composeTestRule.setContent {
             PdfViewerScreen(
@@ -124,6 +126,7 @@ class PdfViewerScreenTest {
                 onNavigateToPreviousMatch = onNavigateToPreviousMatch,
                 bottomBarActions = bottomBarActions,
                 singleNodeActionHandler = singleNodeActionHandler,
+                onShare = onShare,
             )
         }
     }
@@ -560,5 +563,49 @@ class PdfViewerScreenTest {
         assertThat(action).isSameInstanceAs(trashAction)
         assertThat(capturedNode).isSameInstanceAs(node)
     }
-    // endregion floating bottom toolbar
+
+    // region top bar share
+    @Test
+    fun `test that share action is displayed when onShare is provided`() {
+        setContent(
+            uiState = defaultState(),
+            onShare = {},
+        )
+
+        composeTestRule.onNodeWithTag(PdfShareAction.testTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that share action is not displayed when onShare is null`() {
+        setContent(
+            uiState = defaultState(),
+            onShare = null,
+        )
+
+        composeTestRule.onNodeWithTag(PdfShareAction.testTag).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that share action is displayed for an external file when onShare is provided`() {
+        setContent(
+            uiState = defaultState(isExternalFile = true),
+            onShare = {},
+        )
+
+        composeTestRule.onNodeWithTag(PdfShareAction.testTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that onShare is invoked when the share action is clicked`() {
+        var shared = false
+        setContent(
+            uiState = defaultState(),
+            onShare = { shared = true },
+        )
+
+        composeTestRule.onNodeWithTag(PdfShareAction.testTag).performClick()
+
+        assertThat(shared).isTrue()
+    }
+    // endregion top bar share
 }

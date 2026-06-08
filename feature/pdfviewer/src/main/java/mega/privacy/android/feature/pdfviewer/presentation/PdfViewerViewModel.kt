@@ -44,6 +44,8 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -81,6 +83,8 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val saveRecentlyUsedItemIfQualifiesUseCase: SaveRecentlyUsedItemIfQualifiesUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getPublicNodeUseCase: GetPublicNodeUseCase,
+    private val getPublicNodeByIdUseCase: GetPublicNodeByIdUseCase,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
 ) : ViewModel() {
@@ -712,21 +716,45 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * information so the toolbar still works on orphan offline copies (mirrors
      * `NodeOptionsBottomSheetViewModel.loadOfflineFallbackNode`).
      *
+     * For FILE_LINK sources the node is not in the signed-in account, so it is resolved from the
+     * public link URL via [GetPublicNodeUseCase] instead of by handle.
+     *
+     * For FOLDER_LINK sources the node lives in the folder-link session (MegaApiFolder), not the
+     * account, so [GetNodeByIdUseCase] (account-only) would return null. It is resolved via
+     * [GetPublicNodeByIdUseCase], which falls back to the folder API and authorizes the node.
+     *
      * No-op for external files (no MEGA node).
      */
     private fun loadCurrentNode() {
         if (args.isExternalFile || args.nodeHandle == -1L) return
         viewModelScope.launch {
-            val nodeId = NodeId(args.nodeHandle)
-            val node: TypedNode? =
-                runCatching { getNodeByIdUseCase(nodeId) }
-                    .getOrElse {
-                        Timber.e(it, "Failed to resolve node for floating toolbar")
-                        null
-                    } ?: loadOfflineFallbackNode(nodeId)
+            val node: TypedNode? = when (args.nodeSourceType) {
+                NodeSourceType.FILE_LINK -> loadPublicLinkNode()
+
+                NodeSourceType.FOLDER_LINK ->
+                    runCatching { getPublicNodeByIdUseCase(NodeId(args.nodeHandle)) }
+                        .onFailure { Timber.e(it, "Failed to resolve folder-link node for floating toolbar") }
+                        .getOrNull()
+
+                else -> {
+                    val nodeId = NodeId(args.nodeHandle)
+                    runCatching { getNodeByIdUseCase(nodeId) }
+                        .getOrElse {
+                            Timber.e(it, "Failed to resolve node for floating toolbar")
+                            null
+                        } ?: loadOfflineFallbackNode(nodeId)
+                }
+            }
             node ?: return@launch
             _state.update { it.copy(currentNode = node) }
         }
+    }
+
+    private suspend fun loadPublicLinkNode(): TypedNode? {
+        val url = args.publicLinkUrl ?: return null
+        return runCatching { getPublicNodeUseCase(url) }
+            .onFailure { Timber.e(it, "Failed to resolve public node for file-link toolbar") }
+            .getOrNull()
     }
 
     private suspend fun loadOfflineFallbackNode(nodeId: NodeId): TypedNode? {
@@ -750,6 +778,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * @param messageId The message ID if opening from chat (optional)
      * @param shouldStopHttpServer True if HTTP server should be stopped when done
      * @param isExternalFile True if the PDF was opened from an external app intent (no MEGA node)
+     * @param publicLinkUrl The public file-link URL when opened from a file link
      */
     data class Args(
         val nodeHandle: Long,
@@ -762,6 +791,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         val messageId: Long?,
         val shouldStopHttpServer: Boolean,
         val isExternalFile: Boolean = false,
+        val publicLinkUrl: String? = null,
     )
 
     @AssistedFactory

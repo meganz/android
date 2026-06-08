@@ -77,6 +77,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param bottomBarActions Actions to render in the floating toolbar. Sourced from
  *  [NodeOptionsActionViewModel] in the destination — pass an empty list to hide the toolbar.
  * @param singleNodeActionHandler Dispatcher for floating-toolbar actions on the current node
+ * @param onShare Callback to share the PDF. Null hides the Share action. Shares the public link
+ *  for file links and the file itself for externally-opened PDFs (decided by the caller).
  * @param modifier Modifier for the composable
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,6 +104,7 @@ internal fun PdfViewerScreen(
     bottomBarActions: List<MenuActionWithIcon>,
     singleNodeActionHandler: SingleNodeActionHandler,
     modifier: Modifier = Modifier,
+    onShare: (() -> Unit)? = null,
 ) {
     val searchState = uiState.searchState
 
@@ -223,6 +226,7 @@ internal fun PdfViewerScreen(
                             onOpenNodeOptions = onMoreClicked,
                             showMoreAction = !uiState.isExternalFile,
                             showActions = !showLoading,
+                            onShare = onShare,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }

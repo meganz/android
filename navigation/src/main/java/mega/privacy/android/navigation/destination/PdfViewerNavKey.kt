@@ -19,6 +19,8 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
  * @param messageId The message ID if opening from chat (optional)
  * @param title Optional title to display in the toolbar
  * @param isExternalFile True if the PDF was opened from an external app intent (no MEGA node)
+ * @param publicLinkUrl The public file-link URL, when the PDF is opened from a file link. Used to
+ *  resolve the public node for the toolbar actions, since a file-link node is not in the account.
  */
 @Serializable
 @Parcelize
@@ -33,6 +35,7 @@ data class PdfViewerNavKey(
     val messageId: Long? = null,
     val title: String? = null,
     val isExternalFile: Boolean = false,
+    val publicLinkUrl: String? = null,
 ) : NoSessionNavKey.Optional, Parcelable {
 
     companion object {
