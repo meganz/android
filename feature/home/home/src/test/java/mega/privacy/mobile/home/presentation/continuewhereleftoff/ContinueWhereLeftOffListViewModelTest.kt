@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.ClearRecentlyUse
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SetContinueWhereLeftOffSortUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import org.junit.jupiter.api.AfterEach
@@ -56,6 +57,7 @@ class ContinueWhereLeftOffListViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getCurrentVersionNodeUseCase = mock<GetCurrentVersionNodeUseCase>()
     private val clearRecentlyUsedItemsUseCase = mock<ClearRecentlyUsedItemsUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private val sampleItems = listOf(
         ContinueWhereLeftOffItem(
@@ -81,6 +83,7 @@ class ContinueWhereLeftOffListViewModelTest {
     @BeforeEach
     fun setUp() {
         stubDefaultSortPreference()
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         underTest = ContinueWhereLeftOffListViewModel(
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
             monitorContinueWhereLeftOffSortPreferenceUseCase = monitorContinueWhereLeftOffSortPreferenceUseCase,
@@ -93,6 +96,7 @@ class ContinueWhereLeftOffListViewModelTest {
                 DurationInSecondsTextMapper(),
                 mock(),
             ),
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
     }
 
@@ -105,6 +109,7 @@ class ContinueWhereLeftOffListViewModelTest {
             getNodeByIdUseCase,
             getCurrentVersionNodeUseCase,
             clearRecentlyUsedItemsUseCase,
+            monitorConnectivityUseCase,
         )
     }
 
@@ -554,6 +559,31 @@ class ContinueWhereLeftOffListViewModelTest {
             val state = awaitItem()
             assertThat(state.openNodeEvent)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isConnected is true when online`() = runTest {
+        stubEmptyItems()
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+            assertThat(state.isConnected).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isConnected is false when offline`() = runTest {
+        stubEmptyItems()
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.isLoading) state = awaitItem()
+            assertThat(state.isConnected).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }

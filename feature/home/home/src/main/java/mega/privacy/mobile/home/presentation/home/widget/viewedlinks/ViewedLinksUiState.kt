@@ -16,6 +16,7 @@ import mega.privacy.android.shared.nodes.model.NodeSortOption
  * @property sortConfiguration The active sort option and direction.
  * @property currentViewType Whether the list is shown as list or grid.
  * @property selectedNodeHandles Node handles currently selected in multi-selection mode.
+ * @property isConnected Whether the device currently has a network connection.
  * @property isInSelectionMode Flag to determine if state is currently in selection mode
  * @property selectedCount The number of nodes selected
  */
@@ -27,6 +28,7 @@ data class ViewedLinksUiState(
     ),
     val currentViewType: ViewType = ViewType.LIST,
     val selectedNodeHandles: Set<Long> = emptySet(),
+    val isConnected: Boolean = true,
 ) {
     val isInSelectionMode: Boolean = selectedNodeHandles.isNotEmpty()
     val selectedCount: Int = selectedNodeHandles.size

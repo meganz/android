@@ -10,6 +10,7 @@ import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 internal data class ContinueWhereLeftOffListUiState(
     val items: List<ContinueWhereLeftOffItem> = emptyList(),
     val isLoading: Boolean = true,
+    val isConnected: Boolean = true,
     val openNodeEvent: StateEventWithContent<TypedFileNode> = consumed(),
     val sortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     val currentViewType: ViewType = ViewType.LIST,

@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
@@ -70,11 +71,13 @@ import javax.inject.Inject
  * @param snackbarEventQueue
  * @param monitorViewTypeUseCase
  * @param setViewTypeUseCase
+ * @param monitorConnectivityUseCase
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 internal class ViewedLinksViewModel @Inject constructor(
     monitorViewedLinksUseCase: MonitorViewedLinksUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewedLinksSortPreferenceUseCase: MonitorViewedLinksSortPreferenceUseCase,
     private val setViewedLinksSortUseCase: SetViewedLinksSortUseCase,
     private val viewedLinksSortMapper: ViewedLinksSortMapper,
@@ -97,12 +100,14 @@ internal class ViewedLinksViewModel @Inject constructor(
             clearAllLinksEvent,
             monitorViewTypeUseCase(),
             selectedNodeHandles,
-        ) { sortConfiguration, clearAllLinksEvent, viewType, selectedHandles ->
+            monitorConnectivityUseCase().catch { Timber.e(it) },
+        ) { sortConfiguration, clearAllLinksEvent, viewType, selectedHandles, isConnected ->
             ViewedLinksUiState(
                 clearAllLinksEvent = clearAllLinksEvent,
                 sortConfiguration = sortConfiguration,
                 currentViewType = viewType,
                 selectedNodeHandles = selectedHandles,
+                isConnected = isConnected,
             )
         }.catch { e ->
             Timber.e(e, "Failed to build ViewedLinks UI state")
