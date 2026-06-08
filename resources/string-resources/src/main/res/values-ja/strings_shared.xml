@@ -2386,7 +2386,7 @@
     <string name="video_player_more_options_pip_option">ピクチャー・イン・ピクチャー</string>
     <string name="cloud_drive_inactivity_banner_title">長期間アカウントの利用（ログイン）がありませんでした</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="other">%1$dか月以上にわたりログインがなかったため、当社の非アクティブポリシーに基づき、お客様のファイルは削除されました。</item>
+        <item quantity="other">お客様のアカウントが%1$dか月以上非アクティブだったため、当社の非アクティブポリシーに基づきファイルが削除されました。</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました。</string>
 </resources>

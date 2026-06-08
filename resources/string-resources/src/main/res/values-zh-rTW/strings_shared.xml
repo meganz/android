@@ -1121,7 +1121,7 @@
         <item quantity="other">已取消隱藏%1$d個項目</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
-    <string name="slideshow_tutorial_title">安全地播放投影片</string>
+    <string name="slideshow_tutorial_title">安全地播放幻燈片</string>
     <!-- Step 1 for slideshow secure mode tutorial -->
     <string name="slideshow_tutorial_step1">按下電源按鈕鎖定螢幕。</string>
     <!-- Step 2 for slideshow secure mode tutorial -->
@@ -1129,7 +1129,7 @@
     <!-- Step 3 for slideshow secure mode tutorial -->
     <string name="slideshow_tutorial_step3">再次按下電源按鈕重新開啟螢幕。</string>
     <!-- Note indicating the slideshow plays securely while locked -->
-    <string name="slideshow_tutorial_note">當您的裝置保持安全鎖定時，投影片將會播放。</string>
+    <string name="slideshow_tutorial_note">當您的裝置保持安全鎖定時，幻燈片將會播放。</string>
     <!-- State to indicate an achievement has applied -->
     <string name="applied_label">已套用</string>
     <!-- title of the section for start mega vpn free trial in achivements section -->
@@ -2384,4 +2384,7 @@
     <string name="general_destination">目的地</string>
     <string name="video_player_more_options_pip_option">子母畫面</string>
     <string name="file_link_unavaible_ToS_violation">該檔案連結因違反我們的服務條款而被刪除。</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="other">由於您已超過%1$d個月未登入，您的檔案已根據我們的不活躍政策而遭移除</item>
+    </plurals>
 </resources>

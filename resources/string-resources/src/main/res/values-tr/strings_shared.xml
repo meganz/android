@@ -857,7 +857,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Etkin değil</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
-    <string name="device_center_list_view_item_status_attention_needed">Dikkat gerekiyor</string>
+    <string name="device_center_list_view_item_status_attention_needed">Kontrol gerekiyor</string>
     <!--General Unable to log in-->
     <string name="general_unable_to_login">Giriş yapılamıyor</string>
     <!--General check inbox-->
@@ -2477,8 +2477,8 @@
     <string name="video_player_more_options_pip_option">Resim içinde resim</string>
     <string name="cloud_drive_inactivity_banner_title">Hesabınız çok uzun süredir aktif değil</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="one">%1$d aydan uzun süredir giriş yapmadığınız için dosyalarınız, etkinlik dışı kalma politikamız uyarınca silindi</item>
-        <item quantity="other">%1$d aydan uzun süredir giriş yapmadığınız için dosyalarınız, etkinlik dışı kalma politikamız uyarınca silindi</item>
+        <item quantity="one">Hesabınız %1$d aydan fazla süredir hareketsiz olduğu için dosyalarınız, hareketsizlik politikamız gereği kaldırıldı</item>
+        <item quantity="other">Hesabınız %1$d aydan fazla süredir hareketsiz olduğu için dosyalarınız, hareketsizlik politikamız gereği kaldırıldı</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">Hizmet Şartlarımızı ihlal ettiği için dosya bağlantısı kaldırıldı.</string>
 </resources>
