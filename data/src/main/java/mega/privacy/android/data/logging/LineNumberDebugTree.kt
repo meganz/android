@@ -18,7 +18,7 @@ internal class LineNumberDebugTree : Timber.DebugTree() {
         Timber.Forest::class.java.name,
         Timber.Tree::class.java.name,
         Timber.DebugTree::class.java.name,
-        LogFlowTree::class.java.name,
+        LogFileTree::class.java.name,
         LineNumberDebugTree::class.java.name,
         TimberMegaLogger::class.java.name,
         TimberChatLogger::class.java.name,

@@ -7,10 +7,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.data.gateway.FileLogWriter
+import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.gateway.LogWriterGateway
+import mega.privacy.android.data.gateway.LogbackLogFlushGateway
 import mega.privacy.android.data.gateway.TimberChatLogger
 import mega.privacy.android.data.gateway.TimberMegaLogger
-import mega.privacy.android.data.logging.LogFlowTree
+import mega.privacy.android.data.logging.LogFileTree
 import mega.privacy.android.data.repository.TimberLoggingRepository
 import mega.privacy.android.domain.qualifier.ChatLogger
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -37,21 +39,11 @@ internal abstract class LoggingModule {
     @Binds
     abstract fun bindMegaLoggerInterface(implementation: TimberMegaLogger): MegaLoggerInterface
 
+    @Singleton
+    @Binds
+    abstract fun bindLogFlushGateway(implementation: LogbackLogFlushGateway): LogFlushGateway
+
     companion object {
-        @SdkLogger
-        @Provides
-        fun provideSdkLogFlowTree(
-            @SdkLogger useCase: CreateLogEntry,
-            @IoDispatcher dispatcher: CoroutineDispatcher,
-        ): LogFlowTree = LogFlowTree(dispatcher, useCase)
-
-        @ChatLogger
-        @Provides
-        fun provideChatLogFlowTree(
-            @ChatLogger useCase: CreateLogEntry,
-            @IoDispatcher dispatcher: CoroutineDispatcher,
-        ): LogFlowTree = LogFlowTree(dispatcher, useCase)
-
         @Singleton
         @SdkLogger
         @Provides
@@ -63,5 +55,23 @@ internal abstract class LoggingModule {
         @Provides
         fun provideChatFileLogger(): LogWriterGateway =
             FileLogWriter { LoggerFactory.getLogger(TimberChatLogger::class.java) }
+
+        @Singleton
+        @SdkLogger
+        @Provides
+        fun provideSdkLogFileTree(
+            @SdkLogger createLogEntry: CreateLogEntry,
+            @SdkLogger writer: LogWriterGateway,
+            @IoDispatcher dispatcher: CoroutineDispatcher,
+        ): LogFileTree = LogFileTree(dispatcher, createLogEntry, writer)
+
+        @Singleton
+        @ChatLogger
+        @Provides
+        fun provideChatLogFileTree(
+            @ChatLogger createLogEntry: CreateLogEntry,
+            @ChatLogger writer: LogWriterGateway,
+            @IoDispatcher dispatcher: CoroutineDispatcher,
+        ): LogFileTree = LogFileTree(dispatcher, createLogEntry, writer)
     }
 }

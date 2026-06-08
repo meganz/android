@@ -1,41 +1,19 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.LoggingRepository
 import javax.inject.Inject
 
 /**
- * Default initialise logging
+ * Initialise the logging subsystem at app startup.
  *
- * @property loggingRepository
- * @property coroutineDispatcher
+ * Trees are planted as a side-effect of injecting [LoggingRepository], but the
+ * underlying Logback configuration must be applied before any log entry can
+ * actually reach disk — that's what this use case does.
  */
 class InitialiseLoggingUseCase @Inject constructor(
     private val loggingRepository: LoggingRepository,
-    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) {
-
     suspend operator fun invoke() {
-        coroutineScope {
-            launch(coroutineDispatcher) { monitorSdkLoggingSetting() }
-            launch(coroutineDispatcher) { monitorChatLoggingSetting() }
-        }
-    }
-
-    private suspend fun monitorSdkLoggingSetting() {
-        loggingRepository.getSdkLoggingFlow()
-            .collect {
-                loggingRepository.logToSdkFile(it)
-            }
-    }
-
-    private suspend fun monitorChatLoggingSetting() {
-        loggingRepository.getChatLoggingFlow()
-            .collect {
-                loggingRepository.logToChatFile(it)
-            }
+        loggingRepository.initialise()
     }
 }

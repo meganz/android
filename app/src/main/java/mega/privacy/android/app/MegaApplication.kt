@@ -60,6 +60,7 @@ import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
 import mega.privacy.android.app.utils.greeter.Greeter
+import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.logging.Log
@@ -220,6 +221,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser
 
+    @Inject
+    lateinit var logFlushGateway: LogFlushGateway
+
     var localIpAddress: String? = ""
 
     private val meetingListener = MeetingListener()
@@ -362,6 +366,14 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             if (backgroundStatus != -1 && backgroundStatus != 1) {
                 megaChatApi.setBackgroundStatus(true)
             }
+        }
+        applicationScope.launch { logFlushGateway.flush() }
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= TRIM_MEMORY_UI_HIDDEN) {
+            applicationScope.launch { logFlushGateway.flush() }
         }
     }
 
