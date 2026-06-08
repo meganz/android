@@ -83,5 +83,7 @@ internal class ApiFeatureFlagProvider @Inject constructor(
 
     override val priority = FeatureFlagValuePriority.RemoteToggled
 
-    val timeOut = 10.seconds
+    // Max wait for misc flags to load. Kept short so that with no/slow network the flag check
+    // fails fast (within 2s) and falls back to the default value instead of blocking the caller.
+    val timeOut = 2.seconds
 }

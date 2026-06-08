@@ -16,10 +16,7 @@ import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomS
 import mega.privacy.android.domain.entity.ConnectivityState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.GetCurrentConnectivityStateUseCase
-import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -53,14 +50,10 @@ class MegaActivityIntentActionHandlerTest {
     private val navigationResultManager = mock<NavigationResultManager>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val getCurrentConnectivityStateUseCase = mock<GetCurrentConnectivityStateUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getFileNameFromStringUriUseCase = mock<GetFileNameFromStringUriUseCase>()
-    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
 
     private val externalPdfDeepLinkHandler = ExternalPdfDeepLinkHandler(
-        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         getFileNameFromStringUriUseCase = getFileNameFromStringUriUseCase,
-        isConnectedToInternetUseCase = isConnectedToInternetUseCase,
     )
 
     companion object {
@@ -89,12 +82,8 @@ class MegaActivityIntentActionHandlerTest {
             navigationResultManager,
             snackbarEventQueue,
             getCurrentConnectivityStateUseCase,
-            getFeatureFlagValueUseCase,
             getFileNameFromStringUriUseCase,
-            isConnectedToInternetUseCase,
         )
-        // Default to connected so PDF routing tests exercise the feature flag branch
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
     }
 
     @Test
@@ -368,7 +357,7 @@ class MegaActivityIntentActionHandlerTest {
         }
 
     @Test
-    fun `test that handleAction invokes navigateToComposePdfViewer when action is ACTION_VIEW with pdf MIME type and compose flag is enabled`() =
+    fun `test that handleAction invokes navigateToComposePdfViewer when action is ACTION_VIEW with pdf MIME type`() =
         runTest {
             val contentUriString = "content://com.example/file.pdf"
             val uri = mock<Uri>()
@@ -378,7 +367,6 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("file.pdf")
 
             underTest.handleAction(
@@ -403,7 +391,7 @@ class MegaActivityIntentActionHandlerTest {
         }
 
     @Test
-    fun `test that handleAction invokes navigateToComposePdfViewer with isLocalContent false when action is ACTION_VIEW with https URI and compose flag is enabled`() =
+    fun `test that handleAction invokes navigateToComposePdfViewer with isLocalContent false when action is ACTION_VIEW with https URI`() =
         runTest {
             val httpsUriString = "https://www.w3.org/sample.pdf"
             val uri = mock<Uri>()
@@ -413,7 +401,6 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpsUriString)).thenReturn("sample.pdf")
 
             underTest.handleAction(
@@ -438,7 +425,7 @@ class MegaActivityIntentActionHandlerTest {
         }
 
     @Test
-    fun `test that handleAction invokes navigateToComposePdfViewer with isLocalContent false when action is ACTION_VIEW with http URI and compose flag is enabled`() =
+    fun `test that handleAction invokes navigateToComposePdfViewer with isLocalContent false when action is ACTION_VIEW with http URI`() =
         runTest {
             val httpUriString = "http://example.com/sample.pdf"
             val uri = mock<Uri>()
@@ -448,7 +435,6 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpUriString)).thenReturn("sample.pdf")
 
             underTest.handleAction(
@@ -473,7 +459,7 @@ class MegaActivityIntentActionHandlerTest {
         }
 
     @Test
-    fun `test that handleAction invokes navigateToComposePdfViewer when action is ACTION_VIEW with pdf path extension and compose flag is enabled`() =
+    fun `test that handleAction invokes navigateToComposePdfViewer when action is ACTION_VIEW with pdf path extension`() =
         runTest {
             val fileUriString = "file:///storage/emulated/0/Download/document.pdf"
             val uri = mock<Uri>()
@@ -484,7 +470,6 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn(null)
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(fileUriString)).thenReturn("document.pdf")
 
             underTest.handleAction(
@@ -509,7 +494,7 @@ class MegaActivityIntentActionHandlerTest {
         }
 
     @Test
-    fun `test that handleAction invokes navigateToComposePdfViewer with title appended with pdf extension when compose flag is enabled`() =
+    fun `test that handleAction invokes navigateToComposePdfViewer with title appended with pdf extension`() =
         runTest {
             val contentUriString = "content://com.example/file.pdf"
             val uri = mock<Uri>()
@@ -519,7 +504,6 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             // Resolver returns base name without extension; production adds ".pdf" via FileUtil.addPdfFileExtension
             whenever(getFileNameFromStringUriUseCase(contentUriString)).thenReturn("file")
 
@@ -577,7 +561,6 @@ class MegaActivityIntentActionHandlerTest {
             whenever(intent.action).thenReturn(Intent.ACTION_VIEW)
             whenever(intent.type).thenReturn("application/pdf")
             whenever(intent.data).thenReturn(uri)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)).thenReturn(true)
             whenever(getFileNameFromStringUriUseCase(httpsUriString)).thenReturn(null)
 
             underTest.handleAction(
@@ -615,7 +598,11 @@ class MegaActivityIntentActionHandlerTest {
                 refreshSession = {},
             )
 
-            verify(getFeatureFlagValueUseCase, never()).invoke(any())
+            verify(navigationEventQueue, never()).emit(
+                navKey = any(),
+                priority = any(),
+                navOptions = anyOrNull(),
+            )
         }
 
     @Test
