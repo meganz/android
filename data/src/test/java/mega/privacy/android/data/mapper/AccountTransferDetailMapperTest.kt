@@ -1,36 +1,22 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class AccountTransferDetailMapperTest {
-
-    private val fileSizeMapper = mock<FileSizeMapper>()
 
     private lateinit var underTest: AccountTransferDetailMapper
 
     @BeforeEach
     fun setUp() {
-        underTest = AccountTransferDetailMapper(fileSizeMapper = fileSizeMapper)
-    }
-
-    @AfterEach
-    fun tearDown() {
-        reset(fileSizeMapper)
+        underTest = AccountTransferDetailMapper()
     }
 
     @Test
     fun `test that totalTransfer and usedTransfer are passed through unchanged`() {
-        whenever(fileSizeMapper(100L)).thenReturn(100.0)
-        whenever(fileSizeMapper(50L)).thenReturn(50.0)
-
         val result = underTest(totalTransfer = 100L, usedTransfer = 50L)
 
         assertThat(result.totalTransfer).isEqualTo(100L)
@@ -52,41 +38,54 @@ internal class AccountTransferDetailMapperTest {
     }
 
     @Test
-    fun `test that usedTransferPercentage is computed from the mapped used and total values`() {
-        whenever(fileSizeMapper(100L)).thenReturn(50.0)
-        whenever(fileSizeMapper(200L)).thenReturn(100.0)
-
+    fun `test that usedTransferPercentage is computed from the raw used and total values`() {
         val result = underTest(totalTransfer = 200L, usedTransfer = 100L)
 
         assertThat(result.usedTransferPercentage).isEqualTo(50)
     }
 
     @Test
-    fun `test that usedTransferPercentage is 100 when mapped used equals mapped total`() {
-        whenever(fileSizeMapper(500L)).thenReturn(5.0)
+    fun `test that usedTransferPercentage is correct when used and total span different size units`() {
+        // 512 MB used out of 2 GB total -> 25%
+        val usedTransfer = 512L * 1024 * 1024
+        val totalTransfer = 2L * 1024 * 1024 * 1024
 
+        val result = underTest(totalTransfer = totalTransfer, usedTransfer = usedTransfer)
+
+        assertThat(result.usedTransferPercentage).isEqualTo(25)
+    }
+
+    @Test
+    fun `test that usedTransferPercentage is 100 when used equals total`() {
         val result = underTest(totalTransfer = 500L, usedTransfer = 500L)
 
         assertThat(result.usedTransferPercentage).isEqualTo(100)
     }
 
     @Test
-    fun `test that usedTransferPercentage is 0 when mapped used is 0 and totalTransfer is positive`() {
-        whenever(fileSizeMapper(0L)).thenReturn(0.0)
-        whenever(fileSizeMapper(100L)).thenReturn(100.0)
-
+    fun `test that usedTransferPercentage is 0 when used is 0 and totalTransfer is positive`() {
         val result = underTest(totalTransfer = 100L, usedTransfer = 0L)
 
         assertThat(result.usedTransferPercentage).isEqualTo(0)
     }
 
     @Test
-    fun `test that usedTransferPercentage truncates fractional results down`() {
-        whenever(fileSizeMapper(45L)).thenReturn(45.0)
-        whenever(fileSizeMapper(1000L)).thenReturn(1000.0)
+    fun `test that usedTransferPercentage is floored when used is genuinely below total`() {
+        // 9996 / 10000 = 99.96% -> 99, consistent with other clients
+        val result = underTest(totalTransfer = 10000L, usedTransfer = 9996L)
 
-        val result = underTest(totalTransfer = 1000L, usedTransfer = 45L)
+        assertThat(result.usedTransferPercentage).isEqualTo(99)
+    }
 
-        assertThat(result.usedTransferPercentage).isEqualTo(4)
+    @Test
+    fun `test that usedTransferPercentage is 100 when a large quota is essentially full`() {
+        // 240 TB quota with usedTransfer one byte short: the Float precision step at this
+        // magnitude is larger than the gap, so it must read as 100% (matches other clients).
+        val totalTransfer = 240L * 1024 * 1024 * 1024 * 1024
+        val usedTransfer = totalTransfer - 1
+
+        val result = underTest(totalTransfer = totalTransfer, usedTransfer = usedTransfer)
+
+        assertThat(result.usedTransferPercentage).isEqualTo(100)
     }
 }
