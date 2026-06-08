@@ -2461,8 +2461,8 @@
     <string name="general_destination">Ziel</string>
     <string name="cloud_drive_inactivity_banner_title">Ihr Account war zu lange inaktiv</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="one">Da Sie sich seit mehr als %1$d Monat nicht mehr eingeloggt haben, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht</item>
-        <item quantity="other">Da Sie sich seit mehr als %1$d Monaten nicht mehr eingeloggt haben, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht</item>
+        <item quantity="one">Da Ihr Account länger als %1$d Monat inaktiv war, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht</item>
+        <item quantity="other">Da Ihr Account länger als %1$d Monate inaktiv war, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">Der Dateilink wurde entfernt, da er gegen unsere Nutzungsbedingungen verstieß.</string>
 </resources>

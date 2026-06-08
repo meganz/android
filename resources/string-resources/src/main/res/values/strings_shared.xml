@@ -2922,8 +2922,8 @@
     <string name="cloud_drive_inactivity_banner_title">Your account was inactive for too long</string>
     <!-- Body text of the inactivity banner on the Cloud Drive screen. %1$d is the number of months of inactivity, e.g. "Because you didn't log in for over 24 months, your files and messages were removed as per our inactivity policy." -->
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="one">Because you didn’t log in for over %1$d month, your files were removed as per our inactivity policy</item>
-        <item quantity="other">Because you didn’t log in for over %1$d months, your files were removed as per our inactivity policy</item>
+        <item quantity="one">Because your account was inactive for over %1$d month, your files were removed as per our inactivity policy</item>
+        <item quantity="other">Because your account was inactive for over %1$d months, your files were removed as per our inactivity policy</item>
     </plurals>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>

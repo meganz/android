@@ -2555,17 +2555,17 @@
     <string name="video_player_subtitles_empty_hint_description">Faça o upload de legendas no formato SRT para a sua Nuvem de arquivos</string>
     <string name="video_player_subtitles_add_subtitles_button">Adicionar legenda</string>
     <string name="general_file_type">Tipo de arquivo</string>
-    <string name="favourite_folders_empty_screen_description">Adicionar pastas aos Favoritos para vê-las aqui</string>
-    <string name="general_chat_sent_as_message">Enviado como mensagem</string>
+    <string name="favourite_folders_empty_screen_description">Adicione pastas aos Favoritos para vê-las aqui</string>
+    <string name="general_chat_sent_as_message">Enviado como uma mensagem</string>
     <string name="campaign_name_with_discount">%1$s: %2$d%% de desconto</string>
-    <string name="general_error_incorrect_name">Corrija o nome do arquivo antes de prosseguir</string>
+    <string name="general_error_incorrect_name">Corrija o nome do arquivo antes de continuar</string>
     <string name="general_destination">Destino</string>
-    <string name="video_player_more_options_pip_option">Imagem em imagem</string>
+    <string name="video_player_more_options_pip_option">Picture-in-picture</string>
     <string name="file_link_unavaible_ToS_violation">O link do arquivo foi removido por infringir os nossos Termos de serviço.</string>
     <string name="cloud_drive_inactivity_banner_title">A sua conta ficou inativa por muito tempo</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="one">Como você não fez login na sua conta durante mais de %1$d mês, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
-        <item quantity="many">Como você não fez login na sua conta durante mais de %1$d de meses, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
-        <item quantity="other">Como você não fez login na sua conta durante mais de %1$d meses, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
+        <item quantity="one">Como a sua conta ficou inativa por mais de %1$d mês, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
+        <item quantity="many">Como a sua conta ficou inativa por mais de %1$d de meses, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
+        <item quantity="other">Como a sua conta ficou inativa por mais de %1$d meses, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
     </plurals>
 </resources>
