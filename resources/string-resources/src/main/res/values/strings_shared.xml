@@ -1739,14 +1739,12 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
-    is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
-    is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1783,11 +1781,9 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
-    is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
-    is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2927,4 +2923,26 @@
     </plurals>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_ToS_violation">The file link has been removed as it violated our Terms of Service.</string>
+    <!-- Contact list: label for the "Contact requests" header row -->
+    <string name="contacts_section_requests">Requests</string>
+    <!-- Contact list: label for the "Group chats" header row -->
+    <string name="contacts_section_groups">Groups</string>
+    <!-- Contact list: section title above the horizontally scrolling list of recently added contacts -->
+    <string name="contacts_section_recently_added">Recently added</string>
+    <!-- Contact list bottom sheet: action that opens a one-to-one chat with the selected contact -->
+    <string name="contacts_action_send_message">Send message</string>
+    <!-- Contact list bottom sheet: action that starts a voice call with the selected contact -->
+    <string name="contacts_action_audio_call">Audio call</string>
+    <!-- Contact list bottom sheet: action that starts a video call with the selected contact -->
+    <string name="contacts_action_video_call">Video call</string>
+    <!-- Contact list bottom sheet: action that navigates to the contact information screen -->
+    <string name="contacts_action_contact_info">Contact info</string>
+    <!-- Contact list bottom sheet: destructive action that removes the contact from the user's contact list -->
+    <string name="contacts_action_remove_contact">Remove contact</string>
+    <!-- Contact list: placeholder displayed inside the search field on the contacts screen -->
+    <string name="contacts_search_hint">Search contacts</string>
+    <!-- Contact list: title of the dialog asking the user to confirm removing a contact. %1$s is the contact display name. -->
+    <string name="contacts_remove_dialog_title">Remove %1$s?</string>
+    <!-- Contact list: body of the dialog asking the user to confirm removing a contact -->
+    <string name="contacts_remove_dialog_message">This contact will be removed from your contact list.</string>
 </resources>

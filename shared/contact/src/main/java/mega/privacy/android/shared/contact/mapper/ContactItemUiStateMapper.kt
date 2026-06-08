@@ -33,6 +33,7 @@ class ContactItemUiStateMapper @Inject constructor(
         lastSeen = contactItem.lastSeen,
         avatar = contactItemAvatarMapper(contactItem),
         isVerified = contactItem.areCredentialsVerified,
+        email = contactItem.email,
     )
 
     private fun resolveDisplayName(contactItem: ContactItem): String {

@@ -97,6 +97,15 @@ fun EntryProviderScope<NavKey>.legacyMeetingScreen(
                         putExtra(MeetingActivity.MEETING_IS_GUEST, meetingInfo.isGuest)
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
+
+                    is MeetingNavKeyInfo.StartOutgoingCall -> {
+                        MegaApplication.getInstance().openCallService(key.chatId)
+
+                        setAction(MeetingActivity.MEETING_ACTION_IN)
+                        putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, meetingInfo.isAudioEnable)
+                        putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, meetingInfo.isVideoEnable)
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
                 }
             }
             context.startActivity(intent)

@@ -2,6 +2,7 @@ package mega.privacy.android.feature.contact.list.model
 
 import androidx.compose.runtime.Stable
 import de.palm.composestateevents.StateEventWithContent
+import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 
 /**
@@ -26,7 +27,7 @@ sealed interface ContactListUiState {
      */
     data class Data(
         val contacts: Map<String, List<ContactItemUiState>>,
-        val recentlyAddedContacts: List<ContactItemUiState>,
+        val recentlyAddedContacts: ImmutableList<ContactItemUiState>,
         val incomingRequestCount: Int,
         val openChatEvent: StateEventWithContent<Long>,
         val startCallEvent: StateEventWithContent<CallEventData>,

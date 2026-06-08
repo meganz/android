@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDesti
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.navigation.authenticityCredentialsLegacyDestination
 import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentLegacyDestination
-import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.contactsListDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsRequestLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.createGroupChatLegacyDestination
 import mega.privacy.android.app.presentation.fileexplorer.fileExplorer
@@ -65,7 +65,7 @@ class LegacyCoreActivityFeatureGraph(
             cookieSettingsNavigationDestination(navigationHandler::back)
             startScreenPreferenceScreen(navigationHandler::back)
             searchLegacyDestination(navigationHandler::back)
-            contactsLegacyDestination(navigationHandler::back)
+            contactsListDestination(navigationHandler)
             contactsRequestLegacyDestination(navigationHandler::back)
             inviteContactLegacyDestination(navigationHandler::back)
             authenticityCredentialsLegacyDestination(navigationHandler::back)

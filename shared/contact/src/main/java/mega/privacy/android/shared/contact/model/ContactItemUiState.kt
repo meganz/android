@@ -14,6 +14,9 @@ import mega.android.core.ui.components.contact.state.ContactItemStatus
  * @property lastSeen Last time the contact was active.
  * @property avatar Avatar source: image file or coloured initials.
  * @property isVerified Whether to overlay the "verified contact" badge on the avatar.
+ * @property email Contact's email address, used when callers need to identify the
+ * contact by email (e.g. for navigation to Contact info or remove-by-email). Empty
+ * string when the email is unavailable.
  */
 @Stable
 data class ContactItemUiState(
@@ -23,5 +26,6 @@ data class ContactItemUiState(
     val lastSeen: Int?,
     val avatar: AvatarData,
     val isVerified: Boolean,
+    val email: String = "",
 )
 

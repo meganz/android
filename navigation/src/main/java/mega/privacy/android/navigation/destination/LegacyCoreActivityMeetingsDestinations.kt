@@ -43,6 +43,12 @@ sealed interface MeetingNavKeyInfo {
         val isOutgoing: Boolean,
         val answer: Boolean,
     ) : MeetingNavKeyInfo
+
+    @Serializable
+    data class StartOutgoingCall(
+        val isAudioEnable: Boolean,
+        val isVideoEnable: Boolean,
+    ) : MeetingNavKeyInfo
 }
 
 @Serializable

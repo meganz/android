@@ -6,6 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +50,7 @@ import javax.inject.Inject
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-internal class ContactListViewModel @Inject constructor(
+class ContactListViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val removeContactByEmailUseCase: RemoveContactByEmailUseCase,
@@ -108,13 +110,13 @@ internal class ContactListViewModel @Inject constructor(
             if (query.isNullOrBlank()) {
                 ContactData(
                     groupedContacts = indexed.map { it.ui }.groupByInitial(),
-                    recentlyAdded = indexed.filter { it.isNew }.map { it.ui },
+                    recentlyAdded = indexed.filter { it.isNew }.map { it.ui }.toImmutableList(),
                 )
             } else {
                 val filtered = indexed.filter { it.matches(query) }
                 ContactData(
                     groupedContacts = filtered.map { it.ui }.groupByInitial(),
-                    recentlyAdded = emptyList(),
+                    recentlyAdded = emptyList<ContactItemUiState>().toImmutableList(),
                 )
             }
         }.catch { Timber.e(it) }
@@ -259,7 +261,7 @@ internal class ContactListViewModel @Inject constructor(
      */
     private data class ContactData(
         val groupedContacts: Map<String, List<ContactItemUiState>>,
-        val recentlyAdded: List<ContactItemUiState>,
+        val recentlyAdded: ImmutableList<ContactItemUiState>,
     )
 }
 
