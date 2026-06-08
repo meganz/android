@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.viewedlinks.ViewedLinksSortField
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.ClearViewedLinksUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.viewedlinks.MonitorViewedLinksUseCase
@@ -62,6 +63,7 @@ class ViewedLinksViewModelTest {
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val monitorViewTypeUseCase = mock<MonitorViewType>()
     private val setViewTypeUseCase = mock<SetViewType>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private lateinit var underTest: ViewedLinksViewModel
 
@@ -79,6 +81,7 @@ class ViewedLinksViewModelTest {
             snackbarEventQueue,
             monitorViewTypeUseCase,
             setViewTypeUseCase,
+            monitorConnectivityUseCase,
         )
     }
 
@@ -87,11 +90,13 @@ class ViewedLinksViewModelTest {
         sortField: ViewedLinksSortField = ViewedLinksSortField.LastAccessed,
         sortDirection: SortDirection = SortDirection.Descending,
         viewType: ViewType = ViewType.LIST,
+        isConnected: Boolean = true,
     ) {
         whenever(monitorViewedLinksSortPreferenceUseCase())
             .thenReturn(flowOf(sortField to sortDirection))
         whenever(monitorViewedLinksUseCase(any(), any())).thenAnswer { fakePagingSource(links) }
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(viewType))
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(isConnected))
         whenever(viewedLinksSortMapper(any<NodeSortOption>())).thenAnswer { invocation ->
             when (invocation.getArgument<NodeSortOption>(0)) {
                 NodeSortOption.Name -> ViewedLinksSortField.Name
@@ -126,6 +131,7 @@ class ViewedLinksViewModelTest {
             snackbarEventQueue = snackbarEventQueue,
             monitorViewTypeUseCase = monitorViewTypeUseCase,
             setViewTypeUseCase = setViewTypeUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
     }
 
@@ -509,6 +515,29 @@ class ViewedLinksViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that isConnected is true when online`() = runTest {
+        initViewModel(emptyList(), isConnected = true)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isConnected).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isConnected is false when offline`() = runTest {
+        initViewModel(emptyList(), isConnected = false)
+
+        underTest.uiState.test {
+            // The default `true` may precede the offline value depending on conflation.
+            var state = awaitItem()
+            if (state.isConnected) state = awaitItem()
+            assertThat(state.isConnected).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     private suspend fun ReceiveTurbine<ViewedLinksUiState>.awaitViewType(expected: ViewType) {
         var state = awaitItem()

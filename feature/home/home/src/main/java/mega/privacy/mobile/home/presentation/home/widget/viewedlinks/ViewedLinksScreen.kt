@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,6 +49,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
@@ -158,32 +160,44 @@ internal fun ViewedLinksScreen(
         val modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
-        if (isListView) {
-            ViewedLinksList(
-                lazyItems = lazyItems,
-                isRefreshing = isRefreshing,
-                sortConfiguration = uiState.sortConfiguration,
-                selectedNodeHandles = uiState.selectedNodeHandles,
-                isInSelectionMode = isInSelectionMode,
-                onSortOrderClick = { showSortSheet = true },
-                onChangeViewTypeClick = onChangeViewTypeClick,
-                onItemClick = onItemClick,
-                onItemLongClick = onItemLongClick,
-                modifier = modifier,
-            )
-        } else {
-            ViewedLinksGrid(
-                lazyItems = lazyItems,
-                isRefreshing = isRefreshing,
-                sortConfiguration = uiState.sortConfiguration,
-                selectedNodeHandles = uiState.selectedNodeHandles,
-                isInSelectionMode = isInSelectionMode,
-                onSortOrderClick = { showSortSheet = true },
-                onChangeViewTypeClick = onChangeViewTypeClick,
-                onItemClick = onItemClick,
-                onItemLongClick = onItemLongClick,
-                modifier = modifier,
-            )
+        when {
+            !uiState.isConnected -> {
+                EmptyStateView(
+                    modifier = modifier,
+                    imagePainter = painterResource(id = iconPackR.drawable.ic_no_cloud),
+                    title = stringResource(sharedR.string.sync_no_network_state),
+                )
+            }
+
+            isListView -> {
+                ViewedLinksList(
+                    lazyItems = lazyItems,
+                    isRefreshing = isRefreshing,
+                    sortConfiguration = uiState.sortConfiguration,
+                    selectedNodeHandles = uiState.selectedNodeHandles,
+                    isInSelectionMode = isInSelectionMode,
+                    onSortOrderClick = { showSortSheet = true },
+                    onChangeViewTypeClick = onChangeViewTypeClick,
+                    onItemClick = onItemClick,
+                    onItemLongClick = onItemLongClick,
+                    modifier = modifier,
+                )
+            }
+
+            else -> {
+                ViewedLinksGrid(
+                    lazyItems = lazyItems,
+                    isRefreshing = isRefreshing,
+                    sortConfiguration = uiState.sortConfiguration,
+                    selectedNodeHandles = uiState.selectedNodeHandles,
+                    isInSelectionMode = isInSelectionMode,
+                    onSortOrderClick = { showSortSheet = true },
+                    onChangeViewTypeClick = onChangeViewTypeClick,
+                    onItemClick = onItemClick,
+                    onItemLongClick = onItemLongClick,
+                    modifier = modifier,
+                )
+            }
         }
     }
 

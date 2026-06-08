@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.ClearRecentlyUse
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffItemsUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.MonitorContinueWhereLeftOffSortPreferenceUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SetContinueWhereLeftOffSortUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
@@ -45,6 +46,7 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     private val getCurrentVersionNodeUseCase: GetCurrentVersionNodeUseCase,
     private val clearRecentlyUsedItemsUseCase: ClearRecentlyUsedItemsUseCase,
     private val nameResolver: ContinueWhereLeftOffNameResolver,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     private val uiAction = MutableStateFlow(UiAction())
@@ -65,10 +67,12 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
             openNodeEventChannel.receiveAsFlow()
                 .onStart { emit(consumed()) },
             uiAction,
-        ) { items, sortConfiguration, openNodeEvent, action ->
+            monitorConnectivityUseCase().catch { Timber.e(it) },
+        ) { items, sortConfiguration, openNodeEvent, action, isConnected ->
             ContinueWhereLeftOffListUiState(
                 items = items.sortedForDisplay(sortConfiguration),
                 isLoading = false,
+                isConnected = isConnected,
                 openNodeEvent = openNodeEvent,
                 sortConfiguration = sortConfiguration,
                 showSortSheet = action.showSortSheet,

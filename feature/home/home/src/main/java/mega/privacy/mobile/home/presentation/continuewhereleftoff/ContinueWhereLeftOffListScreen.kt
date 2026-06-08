@@ -112,6 +112,16 @@ internal fun ContinueWhereLeftOffListScreen(
         },
     ) { paddingValues ->
         when {
+            !uiState.isConnected -> {
+                EmptyStateView(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    imagePainter = painterResource(id = IconPackR.drawable.ic_no_cloud),
+                    title = stringResource(sharedR.string.sync_no_network_state),
+                )
+            }
+
             uiState.isLoading -> {
                 Box(
                     modifier = Modifier
