@@ -50,7 +50,7 @@ class ContinueWhereLeftOffViewModelTest {
             monitorContinueWhereLeftOffItemsUseCase = monitorContinueWhereLeftOffItemsUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getCurrentVersionNodeUseCase = getCurrentVersionNodeUseCase,
-            nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, DurationInSecondsTextMapper(), mock()),
+            nameResolver = ContinueWhereLeftOffNameResolver(getNodeByIdUseCase, DurationInSecondsTextMapper(), mock(), mock { on { it.invoke() } doReturn true }),
         )
     }
 

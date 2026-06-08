@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.RemoveRecentlyUsedItemUseCase
+import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,20 +27,23 @@ class ContinueWhereLeftOffNameResolverTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
     private val removeRecentlyUsedItemUseCase = mock<RemoveRecentlyUsedItemUseCase>()
+    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private lateinit var underTest: ContinueWhereLeftOffNameResolver
 
     @BeforeEach
     fun setUp() {
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         underTest = ContinueWhereLeftOffNameResolver(
             getNodeByIdUseCase,
             durationInSecondsTextMapper,
             removeRecentlyUsedItemUseCase,
+            isConnectedToInternetUseCase,
         )
     }
 
     @AfterEach
     fun tearDown() {
-        reset(getNodeByIdUseCase, removeRecentlyUsedItemUseCase)
+        reset(getNodeByIdUseCase, removeRecentlyUsedItemUseCase, isConnectedToInternetUseCase)
     }
 
     @Test
@@ -127,6 +131,16 @@ class ContinueWhereLeftOffNameResolverTest {
         underTest.resolveBlankNames(items)
 
         verifyNoInteractions(removeRecentlyUsedItemUseCase)
+    }
+
+    @Test
+    fun `test that resolution is skipped without fetching or removing when offline`() = runTest {
+        whenever(isConnectedToInternetUseCase()).thenReturn(false)
+
+        val result = underTest.resolveBlankNames(listOf(item(1L, "")))
+
+        assertThat(result).isFalse()
+        verifyNoInteractions(getNodeByIdUseCase, removeRecentlyUsedItemUseCase)
     }
 
     @Test
