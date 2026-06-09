@@ -523,110 +523,100 @@ fun MediaMainScreen(
             )
         },
     ) { paddingValues ->
-        val tabEntries = rememberSaveable(mediaMainUiState.isMediaRevampPhase2Enabled) {
-            if (mediaMainUiState.isMediaRevampPhase2Enabled) {
-                MediaScreen.entries
-            } else {
-                MediaScreen.entries.filter {
-                    it == MediaScreen.Timeline || it == MediaScreen.Albums
-                }
-            }
-        }
+        val tabEntries = MediaScreen.entries
 
-        key(tabEntries.size) {
-            MegaCollapsibleTabRow(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = paddingValues.calculateTopPadding()),
-                beyondViewportPageCount = 1,
-                hideTabs =
-                    selectionModeType.isAnActiveSelection() || isSearchModeForVideosOrPlaylists,
-                pagerScrollEnabled =
-                    selectionModeType == MediaSelectionModeType.None && !isSearchModeForVideosOrPlaylists,
-                initialSelectedIndex = currentTabIndex.coerceAtMost(tabEntries.lastIndex),
-                onTabSelected = { index ->
-                    currentTabIndex = index
-                    tabEntries.getOrNull(index)?.let { selectedTab ->
-                        Analytics.tracker.trackEvent(selectedTab.analyticsInfo)
-                    }
-                    true
-                },
-                cells = {
-                    tabEntries.forEach { tab ->
-                        with(tab) {
-                            addTextTabWithScrollableContent(
-                                tabItem = getTabItem(),
-                                content = { _, modifier ->
-                                    MediaContent(
-                                        modifier = modifier,
-                                        timelineContentPadding = paddingValues,
-                                        mainViewModel = viewModel,
-                                        albumsTabViewModel = albumsTabViewModel,
-                                        timelineTabUiState = timelineTabUiState,
-                                        timelineFilterUiState = timelineFilterUiState,
-                                        mediaCameraUploadUiState = mediaCameraUploadUiState,
-                                        videosSelectionUiState = videosSelectionUiState,
-                                        selectedPhotoIds = selectedPhotoIds,
-                                        showTimelineSortDialog = showTimelineSortDialog,
-                                        selectedTimePeriod = selectedTimePeriod,
-                                        setEnableCUPage = setEnableCUPage,
-                                        onTimelineGridSizeChange = onTimelineGridSizeChange,
-                                        onTimelineSortDialogDismissed = {
-                                            showTimelineSortDialog = false
-                                        },
-                                        onTimelineSortOptionChange = {
-                                            onTimelineSortOptionChange(it)
-                                            showTimelineSortDialog = false
-                                        },
-                                        onTimelinePhotoClick = {
-                                            if (selectionModeType == MediaSelectionModeType.Timeline) {
-                                                onTimelinePhotoSelected(it)
-                                            } else {
-                                                onNavigateToTimelinePhotoPreview(
-                                                    MediaTimelinePhotoPreviewNavKey(
-                                                        id = it,
-                                                        sortType = timelineTabUiState.currentSort.toLegacySort().name,
-                                                        filterType = timelineFilterUiState.mediaType.name,
-                                                        mediaSource = timelineFilterUiState.mediaSource.toLegacyPhotosSource().name
-                                                    )
+        MegaCollapsibleTabRow(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding()),
+            beyondViewportPageCount = 1,
+            hideTabs =
+                selectionModeType.isAnActiveSelection() || isSearchModeForVideosOrPlaylists,
+            pagerScrollEnabled =
+                selectionModeType == MediaSelectionModeType.None && !isSearchModeForVideosOrPlaylists,
+            initialSelectedIndex = currentTabIndex.coerceAtMost(tabEntries.lastIndex),
+            onTabSelected = { index ->
+                currentTabIndex = index
+                tabEntries.getOrNull(index)?.let { selectedTab ->
+                    Analytics.tracker.trackEvent(selectedTab.analyticsInfo)
+                }
+                true
+            },
+            cells = {
+                tabEntries.forEach { tab ->
+                    with(tab) {
+                        addTextTabWithScrollableContent(
+                            tabItem = getTabItem(),
+                            content = { _, modifier ->
+                                MediaContent(
+                                    modifier = modifier,
+                                    timelineContentPadding = paddingValues,
+                                    mainViewModel = viewModel,
+                                    albumsTabViewModel = albumsTabViewModel,
+                                    timelineTabUiState = timelineTabUiState,
+                                    timelineFilterUiState = timelineFilterUiState,
+                                    mediaCameraUploadUiState = mediaCameraUploadUiState,
+                                    videosSelectionUiState = videosSelectionUiState,
+                                    selectedPhotoIds = selectedPhotoIds,
+                                    showTimelineSortDialog = showTimelineSortDialog,
+                                    selectedTimePeriod = selectedTimePeriod,
+                                    setEnableCUPage = setEnableCUPage,
+                                    onTimelineGridSizeChange = onTimelineGridSizeChange,
+                                    onTimelineSortDialogDismissed = {
+                                        showTimelineSortDialog = false
+                                    },
+                                    onTimelineSortOptionChange = {
+                                        onTimelineSortOptionChange(it)
+                                        showTimelineSortDialog = false
+                                    },
+                                    onTimelinePhotoClick = {
+                                        if (selectionModeType == MediaSelectionModeType.Timeline) {
+                                            onTimelinePhotoSelected(it)
+                                        } else {
+                                            onNavigateToTimelinePhotoPreview(
+                                                MediaTimelinePhotoPreviewNavKey(
+                                                    id = it,
+                                                    sortType = timelineTabUiState.currentSort.toLegacySort().name,
+                                                    filterType = timelineFilterUiState.mediaType.name,
+                                                    mediaSource = timelineFilterUiState.mediaSource.toLegacyPhotosSource().name
                                                 )
-                                            }
-                                        },
-                                        onTimelinePhotoSelected = onTimelinePhotoSelected,
-                                        clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-                                        onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                                        navigationHandler = navigationHandler,
-                                        handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                                        handleNotificationPermissionResult = handleNotificationPermissionResult,
-                                        onCUBannerDismissRequest = onCUBannerDismissRequest,
-                                        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                                        onMediaTimePeriodSelected = onMediaTimePeriodSelected,
-                                        showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
-                                        dismissVideoPlaylistRemovedDialog = {
-                                            showVideoPlaylistRemovedDialog = false
-                                        },
-                                        onCurrentVideosSearchQueryRequest = {
-                                            onCurrentVideosSearchQueryRequest().let {
-                                                if (it != videosTabQuery) {
-                                                    videosTabQuery = it
-                                                }
-                                            }
-                                        },
-                                        updateSelectionModeAvailableActions = { selectedNodes, nodeSourceType ->
-                                            selectedVideoNodes = selectedNodes
-                                            updateSelectionModeAvailableActions(
-                                                selectedNodes.toSet(),
-                                                NodeSourceType.CLOUD_DRIVE
                                             )
                                         }
-                                    )
-                                }
-                            )
-                        }
+                                    },
+                                    onTimelinePhotoSelected = onTimelinePhotoSelected,
+                                    clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
+                                    onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                                    navigationHandler = navigationHandler,
+                                    handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+                                    handleNotificationPermissionResult = handleNotificationPermissionResult,
+                                    onCUBannerDismissRequest = onCUBannerDismissRequest,
+                                    onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+                                    onMediaTimePeriodSelected = onMediaTimePeriodSelected,
+                                    showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
+                                    dismissVideoPlaylistRemovedDialog = {
+                                        showVideoPlaylistRemovedDialog = false
+                                    },
+                                    onCurrentVideosSearchQueryRequest = {
+                                        onCurrentVideosSearchQueryRequest().let {
+                                            if (it != videosTabQuery) {
+                                                videosTabQuery = it
+                                            }
+                                        }
+                                    },
+                                    updateSelectionModeAvailableActions = { selectedNodes, nodeSourceType ->
+                                        selectedVideoNodes = selectedNodes
+                                        updateSelectionModeAvailableActions(
+                                            selectedNodes.toSet(),
+                                            NodeSourceType.CLOUD_DRIVE
+                                        )
+                                    }
+                                )
+                            }
+                        )
                     }
                 }
-            )
-        }
+            }
+        )
     }
 
     AnimatedVisibility(

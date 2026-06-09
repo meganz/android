@@ -11,10 +11,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 class ShortcutsWidgetViewModelTest {
@@ -40,25 +39,11 @@ class ShortcutsWidgetViewModelTest {
     }
 
     private fun stubFeatureFlag(
-        isMediaRevampPhase2Enabled: Boolean = false,
         isAudiosChipVisible: Boolean = false,
     ) {
-        getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.MediaRevampPhase2) } doReturn isMediaRevampPhase2Enabled
-            onBlocking { invoke(ApiFeatures.AudiosChipInHome) } doReturn isAudiosChipVisible
-        }
-    }
-
-    @ParameterizedTest(name = "when the MediaRevampPhase2 is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that isMediaRevampPhase2Enabled is updated correctly`(
-        isMediaRevampPhase2Enabled: Boolean
-    ) = runTest {
-        stubFeatureFlag(isMediaRevampPhase2Enabled = isMediaRevampPhase2Enabled)
-        initViewModel()
-
-        underTest.uiState.test {
-            assertThat(awaitItem().isMediaRevampPhase2Enabled).isEqualTo(isMediaRevampPhase2Enabled)
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AudiosChipInHome))
+                .thenReturn(isAudiosChipVisible)
         }
     }
 

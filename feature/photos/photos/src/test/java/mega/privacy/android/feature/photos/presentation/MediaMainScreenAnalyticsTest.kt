@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.presentation
 
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.analytics.test.AnalyticsTestRule
@@ -24,7 +25,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaType
@@ -40,6 +40,8 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNorm
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
+import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.MediaScreenAlbumsTabEvent
@@ -75,6 +77,7 @@ class MediaMainScreenAnalyticsTest {
 
     private val mediaMainViewModel = mock<MediaMainViewModel>()
     private val albumsTabViewModel = mock<AlbumsTabViewModel>()
+    private val videosTabViewModel = mock<VideosTabViewModel>()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val viewModelFactory = object : ViewModelProvider.Factory {
@@ -104,14 +107,14 @@ class MediaMainScreenAnalyticsTest {
 
     private fun setupViewModels() {
         whenever(mediaMainViewModel.uiState).thenReturn(
-            MutableStateFlow(
-                MediaMainUiState(
-                    isMediaRevampPhase2Enabled = false // Only Timeline and Albums tabs to avoid Hilt dependencies
-                )
-            )
+            MutableStateFlow(MediaMainUiState())
         )
         whenever(albumsTabViewModel.uiState)
             .thenReturn(MutableStateFlow(AlbumsTabUiState()))
+        whenever(videosTabViewModel.uiState)
+            .thenReturn(MutableStateFlow(VideosTabUiState.Loading))
+        whenever(videosTabViewModel.navigateToVideoPlayerEvent)
+            .thenReturn(MutableStateFlow(consumed()))
     }
 
     private fun setupViewModelStore() {

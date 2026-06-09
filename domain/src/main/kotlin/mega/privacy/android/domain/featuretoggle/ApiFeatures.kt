@@ -113,15 +113,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Media Revamp phase 2 feature flag
-     */
-    MediaRevampPhase2(
-        experimentName = "mrp2",
-        description = "Enable Media Revamp phase 2 features",
-        defaultValue = false
-    ),
-
-    /**
      * Text editor Compose migration (AND-22552).
      * When enabled, opens the text editor in the Compose screen (Nav3 + Material 3) instead of the legacy Activity.
      */
