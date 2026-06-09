@@ -2,10 +2,12 @@ package mega.privacy.android.feature.videoeditor.presentation
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import android.content.Context
@@ -20,7 +22,11 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import mega.privacy.android.feature.videoeditor.presentation.screen.VideoEditorScreenViewModel
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -56,14 +62,20 @@ class VideoEditorScreenViewModelTest {
         private const val FILE_SIZE = 100L
         private const val MODIFICATION_TIME = 1_700_000_000L
         private const val UPLOAD_MESSAGE = "Uploading edits as a new file"
+        private const val TRANSFER_TAG = 999
     }
 
     private lateinit var underTest: VideoEditorScreenViewModel
 
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
+    private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
     private val getFilePreviewDownloadPathUseCase = mock<GetFilePreviewDownloadPathUseCase>()
     private val downloadNodeUseCase = mock<DownloadNodeUseCase>()
     private val getNodeNameCollisionRenameNameUseCase = mock<GetNodeNameCollisionRenameNameUseCase>()
+    private val getPreviewUseCase = mock<GetPreviewUseCase>()
+    private val getThumbnailUseCase = mock<GetThumbnailUseCase>()
+    private val cancelTransferByTagUseCase = mock<CancelTransferByTagUseCase>()
+    private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val context = mock<Context> {
         on { getString(sharedR.string.photo_editor_upload_message) } doReturn UPLOAD_MESSAGE
@@ -73,9 +85,13 @@ class VideoEditorScreenViewModelTest {
     fun setUp() {
         reset(
             getNodeByIdUseCase,
+            getNodePreviewFileUseCase,
             getFilePreviewDownloadPathUseCase,
             downloadNodeUseCase,
             getNodeNameCollisionRenameNameUseCase,
+            getPreviewUseCase,
+            getThumbnailUseCase,
+            cancelTransferByTagUseCase,
             snackbarEventQueue,
         )
     }
@@ -84,9 +100,14 @@ class VideoEditorScreenViewModelTest {
         underTest = VideoEditorScreenViewModel(
             nodeHandle = NODE_HANDLE,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getNodePreviewFileUseCase = getNodePreviewFileUseCase,
             getFilePreviewDownloadPathUseCase = getFilePreviewDownloadPathUseCase,
             downloadNodeUseCase = downloadNodeUseCase,
             getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
+            getPreviewUseCase = getPreviewUseCase,
+            getThumbnailUseCase = getThumbnailUseCase,
+            cancelTransferByTagUseCase = cancelTransferByTagUseCase,
+            applicationScope = applicationScope,
             snackbarEventQueue = snackbarEventQueue,
             context = context,
         )
@@ -114,6 +135,11 @@ class VideoEditorScreenViewModelTest {
         on { progress } doReturn Progress(floatValue)
     }
 
+    private fun transferWith(floatValue: Float, tag: Int): Transfer = mock {
+        on { progress } doReturn Progress(floatValue)
+        on { this.tag } doReturn tag
+    }
+
     @Test
     fun `test that initial state is loading`() = runTest {
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn null
@@ -137,23 +163,151 @@ class VideoEditorScreenViewModelTest {
     }
 
     @Test
-    fun `test that state is ready when a complete cached copy already exists`(
+    fun `test that file name and size are exposed once the node is resolved`(
         @TempDir tempDir: File,
     ) = runTest {
-        val cached = File(tempDir, FILE_NAME).apply { writeBytes(ByteArray(FILE_SIZE.toInt())) }
+        File(tempDir, FILE_NAME).writeBytes(ByteArray(FILE_SIZE.toInt()))
         val node = stubNode()
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
         whenever(getFilePreviewDownloadPathUseCase()) doReturn tempDir.path
         initViewModel()
 
         underTest.uiState.test {
-            val state = awaitItem().takeIf { !it.isLoading } ?: awaitItem()
-            assertThat(state.videoFilePath).isEqualTo(cached.path)
+            var state = awaitItem()
+            while (state.fileName.isEmpty() && !state.isError) {
+                state = awaitItem()
+            }
+            assertThat(state.fileName).isEqualTo(FILE_NAME)
+            assertThat(state.fileSizeBytes).isEqualTo(FILE_SIZE)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the preview image is used for the preview when available`(
+        @TempDir tempDir: File,
+    ) = runTest {
+        File(tempDir, FILE_NAME).writeBytes(ByteArray(FILE_SIZE.toInt()))
+        val preview = File(tempDir, "preview.jpg").apply { writeBytes(ByteArray(4)) }
+        val node = stubNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn tempDir.path
+        whenever(getPreviewUseCase(node)) doReturn preview
+        initViewModel()
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.previewImagePath == null) {
+                state = awaitItem()
+            }
+            assertThat(state.previewImagePath).isEqualTo(preview.path)
+            cancelAndIgnoreRemainingEvents()
+        }
+        // The thumbnail is not requested when a preview is available.
+        org.mockito.kotlin.verifyNoInteractions(getThumbnailUseCase)
+    }
+
+    @Test
+    fun `test that the thumbnail is used for the preview when no preview is available`(
+        @TempDir tempDir: File,
+    ) = runTest {
+        File(tempDir, FILE_NAME).writeBytes(ByteArray(FILE_SIZE.toInt()))
+        val thumbnail = File(tempDir, "thumbnail.jpg").apply { writeBytes(ByteArray(4)) }
+        val node = stubNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn tempDir.path
+        whenever(getPreviewUseCase(node)) doReturn null
+        whenever(getThumbnailUseCase(NODE_HANDLE)) doReturn thumbnail
+        initViewModel()
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.previewImagePath == null) {
+                state = awaitItem()
+            }
+            assertThat(state.previewImagePath).isEqualTo(thumbnail.path)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that an existing complete local copy is reused without downloading`(
+        @TempDir tempDir: File,
+    ) = runTest {
+        val existing = File(tempDir, "offline-$FILE_NAME")
+            .apply { writeBytes(ByteArray(FILE_SIZE.toInt())) }
+        val node = stubNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        whenever(getNodePreviewFileUseCase(node)) doReturn existing
+        initViewModel()
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.videoFilePath == null && !state.isError) {
+                state = awaitItem()
+            }
+            assertThat(state.videoFilePath).isEqualTo(existing.path)
             assertThat(state.downloadProgress).isEqualTo(100)
             assertThat(state.isError).isFalse()
+            // A reused copy is ready instantly, so the "Preparing video" dialog must never show.
+            assertThat(state.isDownloading).isFalse()
         }
-        // Cached copy must not be downloaded again.
+        // A complete local copy must not be downloaded again.
         org.mockito.kotlin.verifyNoInteractions(downloadNodeUseCase)
+        // The cache download path is not even resolved when a local copy is reused.
+        org.mockito.kotlin.verifyNoInteractions(getFilePreviewDownloadPathUseCase)
+    }
+
+    @Test
+    fun `test that an incomplete local copy is not reused and triggers download`(
+        @TempDir tempDir: File,
+    ) = runTest {
+        // A partial/derived file whose size does not match the node must be rejected.
+        val partial = File(tempDir, "partial-$FILE_NAME")
+            .apply { writeBytes(ByteArray((FILE_SIZE - 1).toInt())) }
+        val finishEvent = TransferEvent.TransferFinishEvent(transferWithProgress(1f), error = null)
+        val node = stubNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        whenever(getNodePreviewFileUseCase(node)) doReturn partial
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn tempDir.path
+        whenever(downloadNodeUseCase(any(), any(), anyOrNull(), any())) doReturn flow {
+            File(tempDir, FILE_NAME).writeBytes(ByteArray(FILE_SIZE.toInt()))
+            emit(finishEvent)
+        }
+        initViewModel()
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.videoFilePath == null && !state.isError) {
+                state = awaitItem()
+            }
+            assertThat(state.videoFilePath).isEqualTo(File(tempDir, FILE_NAME).path)
+            assertThat(state.isError).isFalse()
+        }
+        verifyBlocking(downloadNodeUseCase) { invoke(any(), any(), anyOrNull(), any()) }
+    }
+
+    @Test
+    fun `test that isDownloading is true once a network download is in progress`(
+        @TempDir tempDir: File,
+    ) = runTest {
+        val updateEvent = TransferEvent.TransferUpdateEvent(transferWithProgress(0.5f))
+        val node = stubNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn tempDir.path
+        // Flow emits progress but never finishes, so the download stays in progress.
+        whenever(downloadNodeUseCase(any(), any(), anyOrNull(), any())) doReturn flowOf(updateEvent)
+        initViewModel()
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (!state.isDownloading && !state.isError) {
+                state = awaitItem()
+            }
+            assertThat(state.isDownloading).isTrue()
+            assertThat(state.videoFilePath).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -243,6 +397,38 @@ class VideoEditorScreenViewModelTest {
         advanceUntilIdle()
 
         verifyBlocking(snackbarEventQueue) { queueMessage(eq("Couldn't save video")) }
+    }
+
+    @Test
+    fun `test that cancelDownload cancels the in-progress transfer by its tag`(
+        @TempDir tempDir: File,
+    ) = runTest {
+        // Built outside the whenever stubbing to avoid nested stubbing.
+        val node = stubNode()
+        val updateEvent = TransferEvent.TransferUpdateEvent(transferWith(0.5f, TRANSFER_TAG))
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn tempDir.path
+        // Emit a progress event so the transfer tag is captured, but never finish the download.
+        whenever(downloadNodeUseCase(any(), any(), anyOrNull(), any())) doReturn flowOf(updateEvent)
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.cancelDownload()
+        advanceUntilIdle()
+
+        verifyBlocking(cancelTransferByTagUseCase) { invoke(TRANSFER_TAG) }
+    }
+
+    @Test
+    fun `test that cancelDownload does nothing when no transfer is in progress`() = runTest {
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn null
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.cancelDownload()
+        advanceUntilIdle()
+
+        org.mockito.kotlin.verifyNoInteractions(cancelTransferByTagUseCase)
     }
 
     @Test

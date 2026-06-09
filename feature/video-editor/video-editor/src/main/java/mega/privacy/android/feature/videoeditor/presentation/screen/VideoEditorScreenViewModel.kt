@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,9 +25,14 @@ import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
+import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
+import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import mega.privacy.android.feature.videoeditor.presentation.screen.model.VideoEditorUiState
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -46,10 +52,15 @@ import java.io.File
 internal class VideoEditorScreenViewModel @AssistedInject constructor(
     @Assisted private val nodeHandle: Long,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val getFilePreviewDownloadPathUseCase: GetFilePreviewDownloadPathUseCase,
     private val downloadNodeUseCase: DownloadNodeUseCase,
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
+    private val getPreviewUseCase: GetPreviewUseCase,
+    private val getThumbnailUseCase: GetThumbnailUseCase,
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -59,6 +70,9 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
     /** The resolved source node, retained from the download so the exported copy can be
      * uploaded back to its parent folder. */
     private var sourceNode: TypedFileNode? = null
+
+    /** Tag of the in-progress download transfer */
+    private var downloadTransferTag: Int? = null
 
     init {
         downloadVideo()
@@ -74,6 +88,20 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
                 return@launch
             }
             sourceNode = node
+            _uiState.update { it.copy(fileName = node.name, fileSizeBytes = node.size) }
+            loadPreviewImage(node)
+
+            // Check cache first
+            val existingLocalFile = runCatching {
+                getNodePreviewFileUseCase(node)
+            }.onFailure {
+                Timber.e(it, "Failed to resolve existing local file for node $nodeHandle")
+            }.getOrNull()
+
+            if (existingLocalFile != null && existingLocalFile.length() == node.size) {
+                emitReady(existingLocalFile)
+                return@launch
+            }
 
             val downloadPath = runCatching { getFilePreviewDownloadPathUseCase() }
                 .onFailure { Timber.e(it, "Failed to resolve cache download path") }
@@ -84,18 +112,14 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
             }
 
             val destFile = File(downloadPath, node.name)
-            // Reuse a previously cached copy when it is already fully downloaded.
-            if (destFile.exists() && destFile.length() == node.size) {
-                emitReady(destFile)
-                return@launch
-            }
             destFile.delete()
 
+            _uiState.update { it.copy(isDownloading = true) }
             runCatching {
                 downloadNodeUseCase(
                     node = node,
                     destinationPath = downloadPath,
-                    appData = listOf(TransferAppData.PreviewDownload),
+                    appData = listOf(TransferAppData.BackgroundTransfer),
                     isHighPriority = true,
                 ).collect { event -> handleTransferEvent(event, destFile) }
             }.onFailure {
@@ -106,11 +130,15 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
     }
 
     private fun handleTransferEvent(event: TransferEvent, destFile: File) {
+        // Capture the tag so the transfer can be cancelled at the SDK level on dismiss.
+        downloadTransferTag = event.transfer.tag
         when (event) {
             is TransferEvent.TransferUpdateEvent ->
                 _uiState.update { it.copy(downloadProgress = event.transfer.progress.intValue) }
 
             is TransferEvent.TransferFinishEvent -> {
+                // Finished (success or error): nothing left to cancel.
+                downloadTransferTag = null
                 if (event.error == null && destFile.exists() && destFile.length() > 0L) {
                     emitReady(destFile)
                 } else {
@@ -123,10 +151,30 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Loads a still image for the preview shown while preparing. Prefers the higher-resolution
+     * preview; falls back to the thumbnail when no preview is available. Runs in the background so
+     * it never delays the download.
+     */
+    private fun loadPreviewImage(node: TypedFileNode) {
+        viewModelScope.launch {
+            val image = runCatching { getPreviewUseCase(node) }
+                .onFailure { Timber.e(it, "Failed to load preview for node $nodeHandle") }
+                .getOrNull()
+                ?: runCatching { getThumbnailUseCase(node.id.longValue) }
+                    .onFailure { Timber.e(it, "Failed to load thumbnail for node $nodeHandle") }
+                    .getOrNull()
+            if (image != null) {
+                _uiState.update { it.copy(previewImagePath = image.path) }
+            }
+        }
+    }
+
     private fun emitReady(destFile: File) {
         _uiState.update {
             it.copy(
                 isLoading = false,
+                isDownloading = false,
                 downloadProgress = 100,
                 videoFilePath = destFile.path,
                 isError = false,
@@ -135,7 +183,7 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
     }
 
     private fun emitError() {
-        _uiState.update { it.copy(isLoading = false, isError = true) }
+        _uiState.update { it.copy(isLoading = false, isDownloading = false, isError = true) }
     }
 
     /**
@@ -180,6 +228,20 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
                 Timber.e(it, "Failed to resolve upload name for the exported video")
                 onExportFailed()
             }
+        }
+    }
+
+    /**
+     * Cancels the in-progress source download at the SDK level when the user dismisses the
+     * preparing dialog. Runs on [applicationScope] so the cancellation completes even though the
+     * caller immediately navigates back.
+     */
+    fun cancelDownload() {
+        val tag = downloadTransferTag ?: return
+        downloadTransferTag = null
+        applicationScope.launch {
+            runCatching { cancelTransferByTagUseCase(tag) }
+                .onFailure { Timber.e(it, "Failed to cancel download transfer $tag") }
         }
     }
 

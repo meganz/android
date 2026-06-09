@@ -33,6 +33,8 @@ dependencies {
     implementation(lib.mega.core.ui)
     implementation(lib.logging.timber)
     implementation(lib.compose.state.events)
+    implementation(lib.coil3)
+    implementation(lib.coil.compose)
 
     // Full Media3 stack — the editor engine + preview (ExoPlayer/Transformer/
     // PlayerSurface) live in this module.

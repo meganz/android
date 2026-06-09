@@ -51,9 +51,10 @@ import mega.privacy.android.feature.videoeditor.presentation.editor.state.Editor
 import mega.privacy.android.feature.videoeditor.presentation.editor.state.EditorState
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.BuiltInToolIds
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.ToolId
-import mega.privacy.android.feature.videoeditor.presentation.editor.ui.EditorDownloadState
 import mega.privacy.android.feature.videoeditor.presentation.editor.ui.EditorErrorState
 import mega.privacy.android.feature.videoeditor.presentation.editor.ui.ExportProgressDialog
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PrepareVideoDialog
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PreparingPreview
 import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PreviewControls
 import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PreviewStatusBadges
 import mega.privacy.android.feature.videoeditor.presentation.editor.ui.ToolActionBar
@@ -141,6 +142,10 @@ internal fun VideoEditorRoute(
         onAction = editorViewModel::dispatch,
         onSave = editorViewModel::startExport,
         onCancelExport = editorViewModel::cancelExport,
+        onCancelDownload = {
+            screenViewModel.cancelDownload()
+            onClose()
+        },
         onClose = onClose,
     )
 }
@@ -160,25 +165,35 @@ internal fun VideoEditorScreen(
     onAction: (EditorAction) -> Unit,
     onSave: () -> Unit,
     onCancelExport: () -> Unit,
+    onCancelDownload: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
         uiState.isError -> EditorErrorState(message = "Failed to load video", modifier = modifier)
 
-        uiState.videoFilePath == null ->
-            EditorDownloadState(percent = uiState.downloadProgress, modifier = modifier)
+        else -> {
+            EditorBody(
+                state = editorState,
+                exportProgress = exportProgress,
+                preparingImagePath = uiState.previewImagePath,
+                registry = registry,
+                onAction = onAction,
+                onSave = onSave,
+                onCancelExport = onCancelExport,
+                onClose = onClose,
+                modifier = modifier,
+            )
 
-        else -> EditorBody(
-            state = editorState,
-            exportProgress = exportProgress,
-            registry = registry,
-            onAction = onAction,
-            onSave = onSave,
-            onCancelExport = onCancelExport,
-            onClose = onClose,
-            modifier = modifier,
-        )
+            if (uiState.isDownloading) {
+                PrepareVideoDialog(
+                    fileName = uiState.fileName,
+                    fileSizeBytes = uiState.fileSizeBytes,
+                    percent = uiState.downloadProgress,
+                    onCancel = onCancelDownload,
+                )
+            }
+        }
     }
 }
 
@@ -187,6 +202,7 @@ internal fun VideoEditorScreen(
 private fun EditorBody(
     state: EditorState,
     exportProgress: ExportProgress,
+    preparingImagePath: String?,
     registry: ToolRegistry,
     onAction: (EditorAction) -> Unit,
     onSave: () -> Unit,
@@ -213,8 +229,8 @@ private fun EditorBody(
                 navigationType = AppBarNavigationType.Close(onClose),
                 trailingIcons = {
                     val saveEnabled = state.source.isLoaded &&
-                        exportProgress !is ExportProgress.InProgress &&
-                        exportProgress !is ExportProgress.Done
+                            exportProgress !is ExportProgress.InProgress &&
+                            exportProgress !is ExportProgress.Done
                     MegaText(
                         text = "Save copy",
                         style = AppTheme.typography.labelLarge,
@@ -241,6 +257,13 @@ private fun EditorBody(
                 onBufferingChange = { isBuffering = it },
                 modifier = Modifier.fillMaxSize(),
             )
+            // Until the downloaded video is loaded into the player, show its preview/thumbnail still
+            if (!state.source.isLoaded && preparingImagePath != null) {
+                PreparingPreview(
+                    imagePath = preparingImagePath,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
             PreviewStatusBadges(
                 speed = state.speed.speed,
                 showSpeed = !state.speed.isIdentity && state.activeTool != BuiltInToolIds.Speed,

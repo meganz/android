@@ -284,6 +284,7 @@ alwaysApply: true
 
 ### Documentation
 - **KDoc**: Use KDoc for public API documentation
+- **Code comments**: Write concise code comments when they add meaningful context. Do not add comments for self-explanatory code or repeat what is already obvious from names, structure, or logic.
 - **README**: Maintain comprehensive README files
 - **Architecture Docs**: Document architectural decisions and patterns
 
