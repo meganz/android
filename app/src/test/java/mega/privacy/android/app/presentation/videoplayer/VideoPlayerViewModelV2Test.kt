@@ -147,6 +147,11 @@ import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADA
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackAviStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMkvStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMovStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMp4StartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackOtherStartedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
@@ -2923,6 +2928,110 @@ class VideoPlayerViewModelV2Test {
                     cancelAndConsumeRemainingEvents()
                 }
             }
+        }
+
+    @Test
+    fun `test that VideoPlaybackMp4StartedEvent is tracked when playing an mp4 file`() = runTest {
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock(),
+            handle = testHandle,
+            fileName = "video.mp4"
+        )
+        initViewModel()
+        underTest.initVideoPlayerData(intent)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMp4StartedEvent>()).isNotEmpty()
+    }
+
+    @Test
+    fun `test that VideoPlaybackAviStartedEvent is tracked when playing an avi file`() = runTest {
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock(),
+            handle = testHandle,
+            fileName = "video.avi"
+        )
+        initViewModel()
+        underTest.initVideoPlayerData(intent)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackAviStartedEvent>()).isNotEmpty()
+    }
+
+    @Test
+    fun `test that VideoPlaybackMkvStartedEvent is tracked when playing an mkv file`() = runTest {
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock(),
+            handle = testHandle,
+            fileName = "video.mkv"
+        )
+        initViewModel()
+        underTest.initVideoPlayerData(intent)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMkvStartedEvent>()).isNotEmpty()
+    }
+
+    @Test
+    fun `test that VideoPlaybackMovStartedEvent is tracked when playing a mov file`() = runTest {
+        val intent = mock<Intent>()
+        initTestDataForTestingInvalidParams(
+            intent = intent,
+            rebuildPlaylist = true,
+            launchSource = VIDEO_BROWSE_ADAPTER,
+            data = mock(),
+            handle = testHandle,
+            fileName = "video.mov"
+        )
+        initViewModel()
+        underTest.initVideoPlayerData(intent)
+        advanceUntilIdle()
+        assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMovStartedEvent>()).isNotEmpty()
+    }
+
+    @Test
+    fun `test that VideoPlaybackOtherStartedEvent is tracked when playing a file with an unrecognized extension`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = "video.wmv"
+            )
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+            assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackOtherStartedEvent>()).isNotEmpty()
+        }
+
+    @Test
+    fun `test that VideoPlaybackMp4StartedEvent is tracked when playing a file with uppercase MP4 extension`() =
+        runTest {
+            val intent = mock<Intent>()
+            initTestDataForTestingInvalidParams(
+                intent = intent,
+                rebuildPlaylist = true,
+                launchSource = VIDEO_BROWSE_ADAPTER,
+                data = mock(),
+                handle = testHandle,
+                fileName = "video.MP4"
+            )
+            initViewModel()
+            underTest.initVideoPlayerData(intent)
+            advanceUntilIdle()
+            assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMp4StartedEvent>()).isNotEmpty()
         }
 
     companion object {

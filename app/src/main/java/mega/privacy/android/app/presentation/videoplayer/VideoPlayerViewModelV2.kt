@@ -181,6 +181,11 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackAviStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMkvStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMovStartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackMp4StartedEvent
+import mega.privacy.mobile.analytics.event.VideoPlaybackOtherStartedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerFullScreenPressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerIsActivatedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerOriginalPressedEvent
@@ -453,6 +458,14 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         val uri = intent.data
         val currentPlayingHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
         val currentPlayingFileName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME).orEmpty()
+        val fileExtension = currentPlayingFileName.substringAfterLast(".", "").lowercase()
+        when (fileExtension) {
+            "mp4" -> Analytics.tracker.trackEvent(VideoPlaybackMp4StartedEvent)
+            "avi" -> Analytics.tracker.trackEvent(VideoPlaybackAviStartedEvent)
+            "mkv" -> Analytics.tracker.trackEvent(VideoPlaybackMkvStartedEvent)
+            "mov" -> Analytics.tracker.trackEvent(VideoPlaybackMovStartedEvent)
+            else -> Analytics.tracker.trackEvent(VideoPlaybackOtherStartedEvent)
+        }
         needStopStreamingServer =
             intent.getBooleanExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
         playerRetry = 0
