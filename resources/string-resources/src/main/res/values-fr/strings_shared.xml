@@ -2560,4 +2560,10 @@
         <item quantity="many">Comme vous ne vous êtes pas connecté pendant %1$d mois, vos fichiers ont été supprimés conformément à notre politique d’inactivité.</item>
         <item quantity="other">Comme vous ne vous êtes pas connecté pendant %1$d mois, vos fichiers ont été supprimés conformément à notre politique d’inactivité.</item>
     </plurals>
+    <string name="contacts_section_requests">Demandes</string>
+    <string name="contacts_action_send_message">Envoyer un message</string>
+    <string name="contacts_action_contact_info">Renseignements sur le contact</string>
+    <string name="contacts_action_remove_contact">Supprimer le contact</string>
+    <string name="contacts_section_groups">Groupes</string>
+    <string name="contacts_section_recently_added">Ajoutés récemment</string>
 </resources>

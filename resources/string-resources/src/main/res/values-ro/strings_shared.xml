@@ -2554,4 +2554,10 @@
         <item quantity="other">%1$d participanți</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">Linkul fișierului a fost eliminat deoarece a încălcat Termenii de utilizare a serviciului.</string>
+    <string name="contacts_section_requests">Cereri</string>
+    <string name="contacts_section_groups">Grupuri</string>
+    <string name="contacts_section_recently_added">Adăugate recent</string>
+    <string name="contacts_action_send_message">Trimite un mesaj</string>
+    <string name="contacts_action_contact_info">Informații de contact</string>
+    <string name="contacts_action_remove_contact">Eliminați contactul</string>
 </resources>

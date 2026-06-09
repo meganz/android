@@ -2651,4 +2651,10 @@
         <item quantity="other">%1$d участники</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">Ссылка на файл была удалёна из-за нарушения наших условий использования.</string>
+    <string name="contacts_section_requests">Запросы</string>
+    <string name="contacts_section_groups">Группы</string>
+    <string name="contacts_section_recently_added">Добавлены недавно</string>
+    <string name="contacts_action_send_message">Отправить cообщение</string>
+    <string name="contacts_action_contact_info">О контакте</string>
+    <string name="contacts_action_remove_contact">Удалить контакт</string>
 </resources>

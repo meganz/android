@@ -2481,4 +2481,10 @@
         <item quantity="other">Hesabınız %1$d aydan fazla süredir hareketsiz olduğu için dosyalarınız, hareketsizlik politikamız gereği kaldırıldı</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">Hizmet Şartlarımızı ihlal ettiği için dosya bağlantısı kaldırıldı.</string>
+    <string name="contacts_section_requests">İstekler</string>
+    <string name="contacts_section_groups">Gruplar</string>
+    <string name="contacts_section_recently_added">Yakın zamanda eklendi</string>
+    <string name="contacts_action_send_message">Mesaj gönder</string>
+    <string name="contacts_action_contact_info">Kişi bilgileri</string>
+    <string name="contacts_action_remove_contact">Kişiyi kaldır</string>
 </resources>

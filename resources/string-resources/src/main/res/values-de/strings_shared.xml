@@ -2465,4 +2465,15 @@
         <item quantity="other">Da Ihr Account länger als %1$d Monate inaktiv war, wurden Ihre Dateien gemäß unserer Inaktivitätsrichtlinie gelöscht</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">Der Dateilink wurde entfernt, da er gegen unsere Nutzungsbedingungen verstieß.</string>
+    <string name="contacts_section_requests">Anfragen</string>
+    <string name="contacts_search_hint">Kontakte durchsuchen</string>
+    <string name="contacts_action_send_message">Nachricht schicken</string>
+    <string name="contacts_action_audio_call">Sprachanruf</string>
+    <string name="contacts_action_video_call">Videoanruf</string>
+    <string name="contacts_action_contact_info">Kontaktinfo</string>
+    <string name="contacts_action_remove_contact">Kontakt entfernen</string>
+    <string name="contacts_section_groups">Gruppen</string>
+    <string name="contacts_section_recently_added">Neu hinzugefügt</string>
+    <string name="contacts_remove_dialog_title">%1$s entfernen?</string>
+    <string name="contacts_remove_dialog_message">Dieser Kontakt wird aus Ihrer Kontaktliste entfernt.</string>
 </resources>

@@ -2355,4 +2355,10 @@
     <string name="general_destination">Đích đến</string>
     <string name="video_player_more_options_pip_option">Hình trong hình</string>
     <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
+    <string name="contacts_section_requests">Yêu cầu</string>
+    <string name="contacts_section_groups">Nhóm</string>
+    <string name="contacts_section_recently_added">Mới thêm gần đây</string>
+    <string name="contacts_action_send_message">Gửi tin nhắn</string>
+    <string name="contacts_action_contact_info">Thông tin liên lạc</string>
+    <string name="contacts_action_remove_contact">Xóa tên liên lạc</string>
 </resources>

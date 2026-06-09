@@ -2474,8 +2474,14 @@
     <string name="video_player_more_options_pip_option">Beeld-in-beeld</string>
     <string name="cloud_drive_inactivity_banner_title">Uw account is te lang inactief geweest</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="one">Omdat u langer dan %1$d maand niet bent ingelogd, zijn uw bestanden verwijderd conform ons inactiviteitsbeleid</item>
-        <item quantity="other">Omdat u meer dan %1$d maanden niet bent ingelogd, zijn uw bestanden verwijderd conform ons inactiviteitsbeleid</item>
+        <item quantity="one">Omdat uw account inactief was voor meer dan %1$d maand, zijn uw bestanden verwijderd conform ons inactiviteitsbeleid</item>
+        <item quantity="other">Omdat uw account inactief was voor meer dan %1$d maanden, zijn uw bestanden verwijderd conform ons inactiviteitsbeleid</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">De bestandslink was verwijderd omdat het one Algemene Voorwaarden schendt.</string>
+    <string name="contacts_section_requests">Verzoeken</string>
+    <string name="contacts_section_groups">Groepen</string>
+    <string name="contacts_section_recently_added">Recent Toegevoegd</string>
+    <string name="contacts_action_send_message">Bericht versturen</string>
+    <string name="contacts_action_contact_info">Contact informatie</string>
+    <string name="contacts_action_remove_contact">Contact verwijderen</string>
 </resources>
