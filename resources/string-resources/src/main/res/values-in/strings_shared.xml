@@ -2344,4 +2344,10 @@
     <string name="name_collision_folder_warning_upload_and_rename">Folder yang sedang Anda unggah akan diubah namanya menjadi:</string>
     <string name="home_configuration_widget_removal_not_allowed_message">Setidaknya satu bagian beranda diperlukan</string>
     <string name="file_link_unavaible_ToS_violation">Tautan file telah dihapus karena melanggar Persyaratan Layanan kami.</string>
+    <string name="contacts_section_requests">Permintaan</string>
+    <string name="contacts_action_send_message">Kirim pesan</string>
+    <string name="contacts_action_contact_info">Info kontak</string>
+    <string name="contacts_action_remove_contact">Hapus kontak</string>
+    <string name="contacts_section_groups">Grup</string>
+    <string name="contacts_section_recently_added">Baru-baru ini ditambahkan</string>
 </resources>

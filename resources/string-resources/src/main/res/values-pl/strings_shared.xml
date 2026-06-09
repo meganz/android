@@ -2659,4 +2659,10 @@
         <item quantity="other">Ponieważ Twoje konto było nieaktywne przez ponad %1$d miesięcy, Twoje pliki zostały usunięte zgodnie z naszą polityką dotyczącą braku aktywności</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">Łącze do pliku zostało usunięte, ponieważ naruszało nasze warunki korzystania z usługi.</string>
+    <string name="contacts_section_requests">Zgłoszenia</string>
+    <string name="contacts_section_groups">Grupy</string>
+    <string name="contacts_section_recently_added">Ostatnio dodane</string>
+    <string name="contacts_action_send_message">Wyślij wiadomość</string>
+    <string name="contacts_action_contact_info">Informacje kontaktowe</string>
+    <string name="contacts_action_remove_contact">Usuń kontakt</string>
 </resources>

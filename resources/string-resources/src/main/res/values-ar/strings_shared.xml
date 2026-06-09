@@ -2817,4 +2817,15 @@
         <item quantity="many">لأنك لم تقم بتسجيل الدخول لأكثر من %1$d شهراً، تم حذف ملفاتك وفقًا لسياسة عدم النشاط لدينا</item>
         <item quantity="other">لأنك لم تقم بتسجيل الدخول لأكثر من %1$d شهر، تم حذف ملفاتك وفقًا لسياسة عدم النشاط لدينا</item>
     </plurals>
+    <string name="contacts_section_requests">الطلبات</string>
+    <string name="contacts_search_hint">ابحث في جهات الاتصال</string>
+    <string name="contacts_action_send_message">أرسل رسالة</string>
+    <string name="contacts_action_audio_call">مكالمة صوتية</string>
+    <string name="contacts_action_video_call">مكالمة فيديو</string>
+    <string name="contacts_action_contact_info">معلومات جهة الاتصال</string>
+    <string name="contacts_action_remove_contact">حذف جهة الاتصال</string>
+    <string name="contacts_section_groups">مجموعات</string>
+    <string name="contacts_section_recently_added">تمت إضافته مؤخراً</string>
+    <string name="contacts_remove_dialog_title">إزالة %1$s؟</string>
+    <string name="contacts_remove_dialog_message">سيتم حذف جهة الاتصال هذه من قائمة جهات الاتصال الخاصة بك.</string>
 </resources>

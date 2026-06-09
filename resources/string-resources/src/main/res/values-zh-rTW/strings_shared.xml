@@ -2385,6 +2385,13 @@
     <string name="video_player_more_options_pip_option">子母畫面</string>
     <string name="file_link_unavaible_ToS_violation">該檔案連結因違反我們的服務條款而被刪除。</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="other">由於您已超過%1$d個月未登入，您的檔案已根據我們的不活躍政策而遭移除</item>
+        <item quantity="other">由於您的帳戶已閒置超過%1$d個月，根據我們的閒置帳戶政策，您的檔案已被移除</item>
     </plurals>
+    <string name="cloud_drive_inactivity_banner_title">您的帳戶已閒置過久</string>
+    <string name="contacts_section_requests">請求</string>
+    <string name="contacts_section_groups">群組</string>
+    <string name="contacts_section_recently_added">最近加入</string>
+    <string name="contacts_action_send_message">發送訊息</string>
+    <string name="contacts_action_contact_info">聯絡資訊</string>
+    <string name="contacts_action_remove_contact">移除聯絡人</string>
 </resources>

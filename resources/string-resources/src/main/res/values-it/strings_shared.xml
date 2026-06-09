@@ -2549,4 +2549,10 @@
         <item quantity="many">Dato che non effettui l\’acceso da più di %1$d di mesi, i tuoi file sono stati rimossi come da nostra politica riguardo l’inattività</item>
         <item quantity="other">Dato che non effettui l\’acceso da più di %1$d mesi, i tuoi file sono stati rimossi come da nostra politica riguardo l’inattività</item>
     </plurals>
+    <string name="contacts_section_requests">Richieste</string>
+    <string name="contacts_action_send_message">Invia messaggio</string>
+    <string name="contacts_action_contact_info">Info contatto</string>
+    <string name="contacts_action_remove_contact">Rimuovi contatto</string>
+    <string name="contacts_section_groups">Gruppi</string>
+    <string name="contacts_section_recently_added">Aggiunto recentemente</string>
 </resources>

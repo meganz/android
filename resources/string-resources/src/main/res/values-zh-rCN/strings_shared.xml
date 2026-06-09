@@ -2384,4 +2384,14 @@
         <item quantity="other">%1$d 位参与者</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">该文件链接因违反我们的服务条款而被移除。</string>
+    <string name="cloud_drive_inactivity_banner_title">您的帐户处于非活动状态的时间太长</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="other">由于您的账户在超过 %1$d 个月未活跃登录，按照我们的账户活跃政策，您的文件已被删除</item>
+    </plurals>
+    <string name="contacts_section_requests">请求</string>
+    <string name="contacts_section_groups">群组</string>
+    <string name="contacts_section_recently_added">最近添加</string>
+    <string name="contacts_action_send_message">发送消息</string>
+    <string name="contacts_action_contact_info">联系人信息</string>
+    <string name="contacts_action_remove_contact">移除联系人</string>
 </resources>

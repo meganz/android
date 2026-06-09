@@ -151,7 +151,7 @@
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Entiendo que [B]si olvido mi contraseña, puedo perder mis datos[/B]. Más información sobre el [A]cifrado punto a punto de MEGA[/A].</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">Debes aceptar los Términos de Servicio</string>
+    <string name="create_account_no_terms">Debes aceptar los Términos de servicio</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">Debes confirmar que comprendes el peligro de perder tu contraseña</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->

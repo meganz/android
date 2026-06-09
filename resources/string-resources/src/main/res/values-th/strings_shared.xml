@@ -2380,4 +2380,10 @@
     <plurals name="cloud_drive_inactivity_banner_message">
         <item quantity="other">เนื่องจากคุณไม่ได้เข้าสู่ระบบนานกว่า %1$d เดือน ระบบจึงลบไฟล์ออกตามนโยบายการไม่มีการใช้งานของบัญชี</item>
     </plurals>
+    <string name="contacts_section_requests">คำขอ</string>
+    <string name="contacts_section_groups">กลุ่ม</string>
+    <string name="contacts_section_recently_added">เพิ่มล่าสุด</string>
+    <string name="contacts_action_send_message">ส่งข้อความ</string>
+    <string name="contacts_action_contact_info">ข้อมูลการติดต่อ</string>
+    <string name="contacts_action_remove_contact">เอาผู้ติดต่อออก</string>
 </resources>

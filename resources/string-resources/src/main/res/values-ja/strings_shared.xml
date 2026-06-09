@@ -2389,4 +2389,15 @@
         <item quantity="other">お客様のアカウントが%1$dか月以上非アクティブだったため、当社の非アクティブポリシーに基づきファイルが削除されました。</item>
     </plurals>
     <string name="file_link_unavaible_ToS_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました。</string>
+    <string name="contacts_remove_dialog_title">%1$sさんを削除しますか？</string>
+    <string name="contacts_remove_dialog_message">この連絡先は、あなたの連絡先リストから削除されます。</string>
+    <string name="contacts_section_requests">要求</string>
+    <string name="contacts_section_groups">グループ</string>
+    <string name="contacts_section_recently_added">最近追加</string>
+    <string name="contacts_action_send_message">メッセージを送信</string>
+    <string name="contacts_action_contact_info">連絡先情報</string>
+    <string name="contacts_action_remove_contact">連絡先を削除</string>
+    <string name="contacts_action_audio_call">音声通話</string>
+    <string name="contacts_action_video_call">ビデオ通話</string>
+    <string name="contacts_search_hint">連絡先を検索</string>
 </resources>

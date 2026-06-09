@@ -2568,4 +2568,15 @@
         <item quantity="many">Como a sua conta ficou inativa por mais de %1$d de meses, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
         <item quantity="other">Como a sua conta ficou inativa por mais de %1$d meses, os seus arquivos foram deletados de acordo com a nossa política de inatividade</item>
     </plurals>
+    <string name="contacts_section_requests">Solicitações</string>
+    <string name="contacts_section_groups">Grupos</string>
+    <string name="contacts_section_recently_added">Adicionado recentemente</string>
+    <string name="contacts_action_send_message">Enviar mensagem</string>
+    <string name="contacts_action_contact_info">Informações do contato</string>
+    <string name="contacts_action_remove_contact">Remover contato</string>
+    <string name="contacts_action_audio_call">Chamada de áudio</string>
+    <string name="contacts_action_video_call">Chamada de vídeo</string>
+    <string name="contacts_search_hint">Pesquisar contatos</string>
+    <string name="contacts_remove_dialog_title">Remover %1$s?</string>
+    <string name="contacts_remove_dialog_message">Este contato será removido da sua lista de contatos.</string>
 </resources>

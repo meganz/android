@@ -2528,8 +2528,19 @@
     <string name="file_link_unavaible_ToS_violation">El enlace de archivo ha sido eliminado por infringir nuestros Términos de servicio.</string>
     <string name="cloud_drive_inactivity_banner_title">Tu cuenta ha estado inactiva durante demasiado tiempo</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="one">Tus archivos se han eliminado siguiendo nuestra política de inactividad porque no has iniciado sesión durante más de %1$d mes</item>
-        <item quantity="many">Tus archivos se han eliminado siguiendo nuestra política de inactividad porque no has iniciado sesión durante más de %1$d de meses</item>
-        <item quantity="other">Tus archivos se han eliminado siguiendo nuestra política de inactividad porque no has iniciado sesión durante más de %1$d meses</item>
+        <item quantity="one">Tus archivos se han eliminado siguiendo nuestra política de inactividad porque la cuenta se ha quedado inactiva durante más de %1$d mes</item>
+        <item quantity="many">Tus archivos se han eliminado siguiendo nuestra política de inactividad porque la cuenta se ha quedado inactiva durante más de %1$d de meses</item>
+        <item quantity="other">Tus archivos se han eliminado siguiendo nuestra política de inactividad porque la cuenta se ha quedado inactiva durante más de %1$d meses</item>
     </plurals>
+    <string name="contacts_section_requests">Invitaciones</string>
+    <string name="contacts_search_hint">Buscar contactos</string>
+    <string name="contacts_action_send_message">Enviar mensaje</string>
+    <string name="contacts_action_audio_call">Llamar</string>
+    <string name="contacts_action_video_call">Videollamar</string>
+    <string name="contacts_action_contact_info">Info</string>
+    <string name="contacts_action_remove_contact">Eliminar contacto</string>
+    <string name="contacts_section_groups">Grupos</string>
+    <string name="contacts_section_recently_added">Añadido recientemente</string>
+    <string name="contacts_remove_dialog_title">¿Eliminar %1$s?</string>
+    <string name="contacts_remove_dialog_message">Este contacto será eliminado de tu lista de contactos.</string>
 </resources>
