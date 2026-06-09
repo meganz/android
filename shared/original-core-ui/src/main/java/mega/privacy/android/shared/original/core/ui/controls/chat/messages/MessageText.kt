@@ -481,6 +481,7 @@ private fun String.getFormatsFromLinks(links: List<String>): List<Format> = buil
     links.forEach {
         val link = it.getLinkWithoutFormatTags()
         val startIndex = this@getFormatsFromLinks.indexOf(link)
+        if (startIndex < 0) return@forEach
         val endIndex = startIndex + link.length
         add(
             Format(

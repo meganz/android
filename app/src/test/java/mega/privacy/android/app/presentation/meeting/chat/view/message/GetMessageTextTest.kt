@@ -371,6 +371,11 @@ internal class GetMessageTextTest {
                 listOf("www.mega.io"),
                 "www.mega.io"
             ),
+            Arguments.of(
+                "Hello *world*",
+                listOf("www.notpresent.io"),
+                "Hello world"
+            ),
         )
     }
 }
