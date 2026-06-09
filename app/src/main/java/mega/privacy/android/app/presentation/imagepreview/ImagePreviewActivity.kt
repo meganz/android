@@ -15,11 +15,16 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
@@ -38,6 +43,8 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -46,10 +53,13 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToImportActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
+import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
+import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.components.largebundle.largeBundleHolder
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragmentFactory
+import mega.privacy.android.app.presentation.container.SharedAppContainer
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
@@ -71,8 +81,6 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.SlideshowAct
 import mega.privacy.android.app.presentation.imagepreview.view.ImagePreviewScreen
 import mega.privacy.android.app.presentation.offline.action.HandleOfflineNodeActions
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
-import mega.privacy.android.app.presentation.psa.PsaContainer
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentView
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -98,7 +106,8 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
-import mega.privacy.android.feature.videoeditor.presentation.screen.VideoEditorActivity
+import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.destination.VideoEditorScreenNavKey
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -120,6 +129,12 @@ import javax.inject.Inject
 class ImagePreviewActivity : BaseActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var featureDestinations: Set<@JvmSuppressWildcards FeatureDestination>
 
     @Inject
     lateinit var nodeLabelBottomSheetDialogFragmentFactory: NodeLabelBottomSheetDialogFragmentFactory
@@ -187,81 +202,114 @@ class ImagePreviewActivity : BaseActivity() {
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val snackbarHostState: SnackbarHostState = remember {
-                SnackbarHostState()
-            }
-            val systemUiController = rememberSystemUiController()
-            val isDarkMode = themeMode.isDarkMode()
-            LaunchedEffect(systemUiController, isDarkMode) {
-                systemUiController.setSystemBarsColor(
-                    color = Color.Transparent,
-                    darkIcons = !isDarkMode
-                )
-            }
-            val uiState by viewModel.state.collectAsStateWithLifecycle()
-            OriginalTheme(isDark = isDarkMode) {
-                PasscodeContainer(
-                    content = {
-                        PsaContainer {
-                            ImagePreviewScreen(
-                                snackbarHostState = snackbarHostState,
-                                onClickBack = ::finish,
-                                onClickEdit = { imageNode ->
-                                    if (imageNode.type is VideoFileTypeInfo) {
-                                        // TODO add analytics event
-                                        openVideoEditor(imageNode)
-                                    } else {
-                                        Analytics.tracker.trackEvent(PhotoEditorMenuItemEvent)
-                                        viewModel.launchPhotoEditor(imageNode)
-                                    }
-                                },
-                                onClickVideoPlay = ::playVideo,
-                                onClickSlideshow = ::playSlideshow,
-                                onClickInfo = ::checkInfo,
-                                onClickFavourite = ::favouriteNode,
-                                onClickLabel = ::handleLabel,
-                                onClickOpenWith = ::handleOpenWith,
-                                onClickSaveToDevice = ::saveNodeToDevice,
-                                onClickImport = ::importNode,
-                                onSwitchAvailableOffline = ::setAvailableOffline,
-                                onClickGetLink = ::getNodeLink,
-                                onClickSendTo = {
-                                    nodeAttachmentViewModel.startAttachNodes(listOf(it.id))
-                                },
-                                onClickShare = ::shareNode,
-                                onClickRename = ::renameNode,
-                                onClickHide = ::hideNode,
-                                onClickHideHelp = ::showHiddenNodesOnboarding,
-                                onClickUnhide = ::unhideNode,
-                                onClickMove = ::moveNode,
-                                onClickCopy = ::copyNode,
-                                onClickRestore = ::restoreNode,
-                                onClickRemove = ::removeNode,
-                                onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
-                                onClickAddToAlbum = ::addToAlbum,
-                            )
-
-                            NodeAttachmentView(
-                                viewModel = nodeAttachmentViewModel,
-                                snackbarHostState = snackbarHostState,
-                            )
-                            HandleOfflineNodeActions(
-                                viewModel = offlineNodeActionsViewModel,
-                                snackBarHostState = snackbarHostState,
-                                coroutineScope = rememberCoroutineScope(),
-                            )
-                        }
-                    }
-                )
-            }
-            EventEffect(
-                event = uiState.openPhotoEditorEvent,
-                onConsumed = { viewModel.onOpenPhotoEditorEventConsumed() },
-            ) { (imageNode, imagePath) ->
-                openPhotoEditor(imagePath.toUri(), imageNode.name)
+            // Host a nav3 scaffold so the viewer can navigate to other destinations (e.g. the video editor)
+            LegacyActivityScaffold(
+                container = { content ->
+                    SharedAppContainer(
+                        themeMode = themeMode,
+                        useLegacyStatusBarColor = false,
+                        finishOnSessionRefresh = false,
+                        content = content,
+                    )
+                },
+                initialKey = ImagePreviewNavKey,
+                navigationResultManager = navigationResultManager,
+                featureDestinations = featureDestinations,
+                onEmptyBackStack = ::finish,
+            ) { navigationHandler, _ ->
+                entry<ImagePreviewNavKey> {
+                    ImagePreviewContent(
+                        onEditVideo = { imageNode ->
+                            navigationHandler.navigate(VideoEditorScreenNavKey(imageNode.id.longValue))
+                        },
+                    )
+                }
             }
         }
         setupFlow()
+    }
+
+    @Composable
+    private fun ImagePreviewContent(onEditVideo: (ImageNode) -> Unit) {
+        val themeMode by monitorThemeModeUseCase()
+            .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val isDarkMode = themeMode.isDarkMode()
+        val snackbarHostState = remember { SnackbarHostState() }
+        val systemUiController = rememberSystemUiController()
+        LaunchedEffect(systemUiController, isDarkMode) {
+            systemUiController.setSystemBarsColor(
+                color = Color.Transparent,
+                darkIcons = !isDarkMode,
+            )
+        }
+        val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+        OriginalTheme(isDark = isDarkMode) {
+            ImagePreviewScreen(
+                viewModel = viewModel,
+                snackbarHostState = snackbarHostState,
+                onClickBack = ::finish,
+                onClickEdit = { imageNode ->
+                    if (imageNode.type is VideoFileTypeInfo) {
+                        // TODO add analytics event
+                        onEditVideo(imageNode)
+                    } else {
+                        Analytics.tracker.trackEvent(PhotoEditorMenuItemEvent)
+                        viewModel.launchPhotoEditor(imageNode)
+                    }
+                },
+                onClickVideoPlay = ::playVideo,
+                onClickSlideshow = ::playSlideshow,
+                onClickInfo = ::checkInfo,
+                onClickFavourite = ::favouriteNode,
+                onClickLabel = ::handleLabel,
+                onClickOpenWith = ::handleOpenWith,
+                onClickSaveToDevice = ::saveNodeToDevice,
+                onClickImport = ::importNode,
+                onSwitchAvailableOffline = ::setAvailableOffline,
+                onClickGetLink = ::getNodeLink,
+                onClickSendTo = {
+                    nodeAttachmentViewModel.startAttachNodes(listOf(it.id))
+                },
+                onClickShare = ::shareNode,
+                onClickRename = ::renameNode,
+                onClickHide = ::hideNode,
+                onClickHideHelp = ::showHiddenNodesOnboarding,
+                onClickUnhide = ::unhideNode,
+                onClickMove = ::moveNode,
+                onClickCopy = ::copyNode,
+                onClickRestore = ::restoreNode,
+                onClickRemove = ::removeNode,
+                onClickMoveToRubbishBin = ::moveNodeToRubbishBin,
+                onClickAddToAlbum = ::addToAlbum,
+            )
+
+            NodeAttachmentView(
+                viewModel = nodeAttachmentViewModel,
+                snackbarHostState = snackbarHostState,
+            )
+            HandleOfflineNodeActions(
+                viewModel = offlineNodeActionsViewModel,
+                snackBarHostState = snackbarHostState,
+                coroutineScope = rememberCoroutineScope(),
+            )
+
+            // Render snackbar from Nav3 components, e.g. LegacyActivityScaffold > StartTransferComponent
+            LocalSnackBarHostState.current?.let { hostState ->
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.BottomCenter,
+                ) {
+                    MegaSnackbar(hostState)
+                }
+            }
+        }
+        EventEffect(
+            event = uiState.openPhotoEditorEvent,
+            onConsumed = { viewModel.onOpenPhotoEditorEventConsumed() },
+        ) { (imageNode, imagePath) ->
+            openPhotoEditor(imagePath.toUri(), imageNode.name)
+        }
     }
 
     override fun shouldSetStatusBarTextColor() = false
@@ -628,10 +676,6 @@ class ImagePreviewActivity : BaseActivity() {
                 }
             }
         }
-
-    private fun openVideoEditor(imageNode: ImageNode) {
-        startActivity(VideoEditorActivity.getIntent(this, imageNode.id.longValue))
-    }
 
     private fun openPhotoEditor(uri: Uri, destinationFileName: String) {
         var uCrop = UCrop.of(uri, Uri.fromFile(File(cacheDir, destinationFileName)))

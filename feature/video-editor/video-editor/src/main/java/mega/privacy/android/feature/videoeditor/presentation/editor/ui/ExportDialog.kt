@@ -24,10 +24,11 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 
 /**
- * Modal dialog shown while an export is encoding. Mirrors the download dialog:
- * a centered card with a determinate progress bar and a single Cancel action.
+ * Modal dialog shown while encoding the edited copy. A centered card with a determinate progress
+ * bar and a Cancel action.
  *
  * @param percent encode progress, 0..100.
+ * @param onCancel cancels the export.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

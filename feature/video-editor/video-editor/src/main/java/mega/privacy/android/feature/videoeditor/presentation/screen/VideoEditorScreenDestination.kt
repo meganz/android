@@ -14,6 +14,10 @@ fun EntryProviderScope<NavKey>.videoEditorScreen(
     transferHandler: TransferHandler,
 ) {
     entry<VideoEditorScreenNavKey> { navKey ->
-        VideoEditorRoute(nodeHandle = navKey.nodeHandle, onClose = navigationHandler::back)
+        VideoEditorRoute(
+            nodeHandle = navKey.nodeHandle,
+            onClose = navigationHandler::back,
+            onTransfer = transferHandler::setTransferEvent,
+        )
     }
 }

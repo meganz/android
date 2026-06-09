@@ -44,8 +44,9 @@ import kotlin.reflect.KClass
  * @param onEmptyBackStack invoked when a back op would leave the back stack empty.
  * @param excludeOwnDestination feature destination class whose `navigationGraph` should NOT be
  * registered — the activity provides its own entry in [entryContent].
- * @param overlayContent composed inside the [LocalSnackBarHostState] provider alongside the
- * `NavDisplay`. Use it for activity-level side-effects that need the snackbar host.
+ * @param overlayContent composed inside the [LocalSnackBarHostState] provider, after (i.e. on
+ * top of) the `NavDisplay`. Use it for activity-level side-effects that need the snackbar host,
+ * or to render UI that should overlay the navigation content (e.g. a snackbar host).
  * @param entryContent block that registers the activity's own `entry<...>` blocks; receives
  * the shared [NavigationHandler] and [TransferHandler].
  */
@@ -84,7 +85,6 @@ fun LegacyActivityScaffold(
 
         CompositionLocalProvider(LocalSnackBarHostState provides snackbarHostState) {
             SnackbarLifetimeController()
-            overlayContent()
             NavDisplay(
                 backStack = backStack,
                 onBack = { navigationHandler.back() },
@@ -122,6 +122,7 @@ fun LegacyActivityScaffold(
                 event = transferState.transferEvent,
                 onConsumeEvent = appTransferViewModel::consumedTransferEvent,
             )
+            overlayContent()
         }
     }
 }

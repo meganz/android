@@ -34,11 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.videoeditor.components.ToolTabBar
 import mega.privacy.android.feature.videoeditor.components.ToolTabUiItem
 import mega.privacy.android.feature.videoeditor.presentation.editor.EditorViewModel
@@ -68,10 +70,16 @@ import java.io.File
  *
  * @param nodeHandle The MEGA node handle of the video to edit.
  * @param onClose Invoked when the user dismisses the editor.
+ * @param onTransfer Invoked with the upload event for the exported copy; the host wires it to the
+ * app's transfer subsystem.
  */
 @UnstableApi
 @Composable
-internal fun VideoEditorRoute(nodeHandle: Long, onClose: () -> Unit) {
+internal fun VideoEditorRoute(
+    nodeHandle: Long,
+    onClose: () -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit,
+) {
     val screenViewModel =
         hiltViewModel<VideoEditorScreenViewModel, VideoEditorScreenViewModel.Factory> { factory ->
             factory.create(nodeHandle)
@@ -83,6 +91,16 @@ internal fun VideoEditorRoute(nodeHandle: Long, onClose: () -> Unit) {
     val editorState by editorViewModel.editorState.collectAsStateWithLifecycle()
     val exportProgress by editorViewModel.exportProgress.collectAsStateWithLifecycle()
 
+    // Hand the upload event to the app's transfer subsystem, then close the editor. The app (still
+    // alive, the editor is just a nav entry) enqueues the upload and shows its start snackbar.
+    EventEffect(
+        event = uiState.transferEvent,
+        onConsumed = screenViewModel::consumeTransferEvent,
+    ) { event ->
+        onTransfer(event)
+        onClose()
+    }
+
     // Hand the downloaded file to the editor exactly once, when it becomes ready.
     LaunchedEffect(uiState.videoFilePath) {
         val path = uiState.videoFilePath
@@ -91,14 +109,14 @@ internal fun VideoEditorRoute(nodeHandle: Long, onClose: () -> Unit) {
         }
     }
 
-    // Collapse the per-tick InProgress stream to just the terminal outcome to reduce recomposition
+    // Only react to the terminal outcome, not every progress tick.
     val exportResult by remember {
         derivedStateOf {
             exportProgress as? ExportProgress.Done ?: exportProgress as? ExportProgress.Error
         }
     }
 
-    // Relay the editor's terminal export result to the host, which owns the MEGA side
+    // Relay the export result to the host (owns the MEGA side).
     LaunchedEffect(exportResult) {
         when (val result = exportResult) {
             is ExportProgress.Done -> {
@@ -194,8 +212,9 @@ private fun EditorBody(
                 title = "Edit video",
                 navigationType = AppBarNavigationType.Close(onClose),
                 trailingIcons = {
-                    val saveEnabled =
-                        state.source.isLoaded && exportProgress !is ExportProgress.InProgress
+                    val saveEnabled = state.source.isLoaded &&
+                        exportProgress !is ExportProgress.InProgress &&
+                        exportProgress !is ExportProgress.Done
                     MegaText(
                         text = "Save copy",
                         style = AppTheme.typography.labelLarge,
@@ -259,9 +278,8 @@ private fun BottomSlot(
     registry: ToolRegistry,
     onAction: (EditorAction) -> Unit,
 ) {
-    // Hold the last-active tool so the deck keeps rendering its content while
-    // the exit-slide plays — state.activeTool flips to null the moment the user
-    // dismisses, so without this the deck would slide out empty.
+    // Hold the last-active tool so the deck keeps rendering its content while the exit-slide
+    // plays; state.activeTool flips to null on dismiss, which would otherwise empty the deck.
     var lastTool by remember { mutableStateOf<ToolId?>(null) }
     LaunchedEffect(state.activeTool) {
         if (state.activeTool != null) lastTool = state.activeTool

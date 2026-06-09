@@ -32,6 +32,7 @@ dependencies {
     // DSTokens/core-ui components directly — those live in the snowflakes module.
     implementation(lib.mega.core.ui)
     implementation(lib.logging.timber)
+    implementation(lib.compose.state.events)
 
     // Full Media3 stack — the editor engine + preview (ExoPlayer/Transformer/
     // PlayerSurface) live in this module.
