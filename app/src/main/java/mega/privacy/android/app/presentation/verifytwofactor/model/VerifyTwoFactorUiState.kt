@@ -31,5 +31,4 @@ data class VerifyTwoFactorUiState(
     val passwordChangedEvent: StateEventWithContent<PasswordChangedAction> = consumed(),
     val logoutEvent: StateEvent = consumed,
     val disableSuccessEvent: StateEvent = consumed,
-    val finishEvent: StateEvent = consumed,
 )

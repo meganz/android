@@ -424,7 +424,9 @@
         <activity
             android:name=".presentation.twofactorauthentication.TwoFactorAuthenticationActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".presentation.verifytwofactor.VerifyTwoFactorActivity" />
+        <activity
+            android:name=".presentation.verifytwofactor.VerifyTwoFactorActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".BusinessExpiredAlertActivity" />
         <activity android:name=".presentation.verification.SMSVerificationActivity" />
         <activity android:name=".presentation.verification.SMSVerificationTextActivity" />
