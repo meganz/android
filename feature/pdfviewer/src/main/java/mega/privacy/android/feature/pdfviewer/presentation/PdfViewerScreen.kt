@@ -7,10 +7,15 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -23,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -45,6 +51,7 @@ import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerS
 import mega.privacy.android.feature.pdfviewer.presentation.components.PdfViewerTopBar
 import mega.privacy.android.feature.pdfviewer.presentation.components.getPdfUri
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -196,29 +203,28 @@ internal fun PdfViewerScreen(
         MegaScaffoldWithTopAppBarScrollBehavior(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                if (showLoading.not()) {
-                    if (searchState.isSearchActive) {
-                        PdfViewerSearchTopBar(
-                            query = searchState.query,
-                            onQueryChanged = onSearchQueryChanged,
-                            onClose = onDeactivateSearch,
+                if (searchState.isSearchActive) {
+                    PdfViewerSearchTopBar(
+                        query = searchState.query,
+                        onQueryChanged = onSearchQueryChanged,
+                        onClose = onDeactivateSearch,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                } else {
+                    AnimatedVisibility(
+                        visible = chromeVisible,
+                        enter = slideInVertically { -it } + fadeIn(),
+                        exit = slideOutVertically { -it } + fadeOut(),
+                    ) {
+                        PdfViewerTopBar(
+                            title = uiState.title,
+                            onBack = onBack,
+                            onSearch = onActivateSearch,
+                            onOpenNodeOptions = onMoreClicked,
+                            showMoreAction = !uiState.isExternalFile,
+                            showActions = !showLoading,
                             modifier = Modifier.fillMaxWidth(),
                         )
-                    } else {
-                        AnimatedVisibility(
-                            visible = chromeVisible,
-                            enter = slideInVertically { -it } + fadeIn(),
-                            exit = slideOutVertically { -it } + fadeOut(),
-                        ) {
-                            PdfViewerTopBar(
-                                title = uiState.title,
-                                onBack = onBack,
-                                onSearch = onActivateSearch,
-                                onOpenNodeOptions = onMoreClicked,
-                                showMoreAction = !uiState.isExternalFile,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
                     }
                 }
             },
@@ -255,12 +261,22 @@ internal fun PdfViewerScreen(
                     // PDF deliberately ignores innerPadding so the page doesn't resize/jump when chrome toggles.
                     when {
                         showLoading -> {
-                            InfiniteProgressBarIndicator(
-                                modifier = Modifier
-                                    .align(Alignment.Center)
-                                    .widthIn(min = 100.dp)
-                                    .padding(horizontal = 44.dp),
-                            )
+                            Column(
+                                modifier = Modifier.align(Alignment.Center),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Image(
+                                    modifier = Modifier.size(96.dp),
+                                    painter = painterResource(IconPackR.drawable.ic_pdf_medium_solid),
+                                    contentDescription = stringResource(sharedR.string.transfers_fake_preview_text),
+                                )
+                                Spacer(modifier = Modifier.height(30.dp))
+                                InfiniteProgressBarIndicator(
+                                    modifier = Modifier
+                                        .widthIn(min = 100.dp)
+                                        .padding(horizontal = 44.dp),
+                                )
+                            }
                         }
 
                         uiState.error != null && !uiState.isPasswordError -> {

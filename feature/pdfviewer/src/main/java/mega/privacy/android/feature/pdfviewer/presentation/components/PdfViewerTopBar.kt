@@ -18,6 +18,7 @@ import mega.privacy.android.navigation.contract.menu.CommonMenuAction
  * @param onSearch Callback when the search icon is tapped
  * @param onOpenNodeOptions Callback for opening node options (More button)
  * @param showMoreAction Whether to show the More (node options) button. False for external files.
+ * @param showActions Whether to show the Search/More actions. False while the PDF is still loading.
  * @param modifier Modifier for the composable
  */
 @Composable
@@ -28,15 +29,18 @@ internal fun PdfViewerTopBar(
     onOpenNodeOptions: () -> Unit,
     modifier: Modifier = Modifier,
     showMoreAction: Boolean = true,
+    showActions: Boolean = true,
 ) {
     MegaTopAppBar(
         modifier = modifier.fillMaxWidth(),
         title = title.orEmpty(),
         navigationType = AppBarNavigationType.Back(onBack),
         actions = buildList {
-            add(MenuActionWithClick(CommonMenuAction.Search) { onSearch() })
-            if (showMoreAction) {
-                add(MenuActionWithClick(CommonMenuAction.More) { onOpenNodeOptions() })
+            if (showActions) {
+                add(MenuActionWithClick(CommonMenuAction.Search) { onSearch() })
+                if (showMoreAction) {
+                    add(MenuActionWithClick(CommonMenuAction.More) { onOpenNodeOptions() })
+                }
             }
         },
     )
