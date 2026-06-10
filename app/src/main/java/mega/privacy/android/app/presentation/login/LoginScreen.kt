@@ -28,7 +28,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.utils.Constants
@@ -88,13 +87,6 @@ fun LoginScreen(
     EventEffect(uiState.openUrlEvent, viewModel::onOpenUrlEventConsumed) {
         Timber.d("Open url $it")
         context.launchUrl(it)
-
-        if (uiState.intentState == LoginIntentState.ReadyForFinalSetup
-            && uiState.isPendingToGetLinkWithSession
-        ) {
-            Timber.d("Finish after opening pending url")
-            activity?.finish()
-        }
     }
 
     val needsBackOverride = with(uiState) {

@@ -323,7 +323,6 @@ private class LoginStateProvider : PreviewParameterProvider<LoginState> {
             isLoginRequired = true,
             accountSession = AccountSession(email = "email@email.es"),
             password = "Password",
-            isLocalLogoutInProgress = true
         ),
         LoginState(
             isLoginRequired = true,
@@ -337,24 +336,14 @@ private class LoginStateProvider : PreviewParameterProvider<LoginState> {
         ),
         LoginState(
             is2FARequired = true,
-            twoFAPin = listOf("1", "2", "", "", "", "")
         ),
         LoginState(
             multiFactorAuthState = MultiFactorAuthState.Failed,
-            twoFAPin = listOf("1", "2", "3", "4", "5", "6")
         ),
         LoginState(
             multiFactorAuthState = MultiFactorAuthState.Checking,
-            twoFAPin = listOf("1", "2", "3", "4", "5", "6")
         ),
     ).asSequence()
 }
 
 internal const val TWO_FA_PROGRESS_TEST_TAG = "TWO_FA_PROGRESS"
-internal const val ENTER_AUTHENTICATION_CODE_TAG =
-    "two_factor_authentication:text_enter_authentication_code"
-internal const val INVALID_CODE_TAG =
-    "two_factor_authentication:text_invalid_code"
-internal const val LOST_AUTHENTICATION_CODE_TAG =
-    "two_factor_authentication:text_mega_button_lost_authentication_code"
-
