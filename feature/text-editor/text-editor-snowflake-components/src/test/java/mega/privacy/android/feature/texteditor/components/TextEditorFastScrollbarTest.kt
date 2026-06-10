@@ -152,6 +152,68 @@ internal class TextEditorFastScrollbarTest {
     }
 
     @Test
+    fun `test that calculateScrollTarget returns first item with no offset at proportion 0`() {
+        val result = calculateScrollTarget(proportion = 0f, itemCount = 10)
+        assertThat(result.index).isEqualTo(0)
+        assertThat(result.offsetFraction).isEqualTo(0f)
+    }
+
+    @Test
+    fun `test that calculateScrollTarget returns last item fully scrolled at proportion 1`() {
+        val result = calculateScrollTarget(proportion = 1f, itemCount = 10)
+        // 1.0 * 10 = 10.0 -> clamped index 9, fraction 1.0 (fully into the last item = end of list)
+        assertThat(result.index).isEqualTo(9)
+        assertThat(result.offsetFraction).isWithin(0.001f).of(1f)
+    }
+
+    @Test
+    fun `test that calculateScrollTarget maps mid proportion to mid item`() {
+        val result = calculateScrollTarget(proportion = 0.5f, itemCount = 10)
+        assertThat(result.index).isEqualTo(5)
+        assertThat(result.offsetFraction).isWithin(0.001f).of(0f)
+    }
+
+    @Test
+    fun `test that calculateScrollTarget yields sub-item offset for continuous position`() {
+        // 0.25 over 4 items -> position 1.0 exactly is index 1 offset 0; use a value that lands mid item
+        val result = calculateScrollTarget(proportion = 0.3f, itemCount = 4)
+        // 0.3 * 4 = 1.2 -> index 1, fraction 0.2
+        assertThat(result.index).isEqualTo(1)
+        assertThat(result.offsetFraction).isWithin(0.001f).of(0.2f)
+    }
+
+    @Test
+    fun `test that calculateScrollTarget clamps proportion above 1`() {
+        val result = calculateScrollTarget(proportion = 1.5f, itemCount = 10)
+        // clamped to 1.0 -> last item fully scrolled
+        assertThat(result.index).isEqualTo(9)
+        assertThat(result.offsetFraction).isWithin(0.001f).of(1f)
+    }
+
+    @Test
+    fun `test that calculateScrollTarget clamps proportion below 0`() {
+        val result = calculateScrollTarget(proportion = -0.5f, itemCount = 10)
+        assertThat(result.index).isEqualTo(0)
+        assertThat(result.offsetFraction).isEqualTo(0f)
+    }
+
+    @Test
+    fun `test that calculateScrollTarget returns zero target when itemCount is 0`() {
+        val result = calculateScrollTarget(proportion = 0.5f, itemCount = 0)
+        assertThat(result.index).isEqualTo(0)
+        assertThat(result.offsetFraction).isEqualTo(0f)
+    }
+
+    @Test
+    fun `test that calculateScrollTarget never returns index out of bounds`() {
+        // proportion just below 1 with small list must still clamp to last index
+        val result = calculateScrollTarget(proportion = 0.999999f, itemCount = 2)
+        assertThat(result.index).isEqualTo(1)
+        assertThat(result.offsetFraction).isAtLeast(0f)
+        assertThat(result.offsetFraction).isAtMost(1f)
+    }
+
+    @Test
     fun `test that shouldShowScrollbar returns false when itemCount is 0`() {
         assertThat(shouldShowScrollbar(0)).isFalse()
     }

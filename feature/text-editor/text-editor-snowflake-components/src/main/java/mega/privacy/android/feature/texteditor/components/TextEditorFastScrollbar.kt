@@ -209,25 +209,34 @@ fun TextEditorFastScrollbar(
                                     dragState.accumulatedPx += dragAmount
                                     val rawProportion = dragState.startProportion + dragState.accumulatedPx / scrollableHeightPixels
                                     val dragProportion = rawProportion.coerceIn(0f, 1f)
-                                    val targetIndex = (dragProportion * (itemCount - 1)).toInt().coerceIn(0, itemCount - 1)
+                                    // Map the drag to a continuous position inside the list so the thumb
+                                    // tracks the finger smoothly instead of snapping to whole chunks. The
+                                    // fractional part is converted to a pixel offset within the target chunk.
+                                    val target = calculateScrollTarget(dragProportion, itemCount)
                                     scrollJobHolder.job?.cancel()
                                     scrollJobHolder.job = coroutineScope.launch {
+                                        // Approximate the target chunk height with the first visible chunk's
+                                        // measured height; chunks are near-uniform so this keeps the offset
+                                        // close enough for a fast-scroll thumb without measuring the target.
+                                        val chunkSizePx = state.layoutInfo.visibleItemsInfo
+                                            .firstOrNull()?.size ?: 0
+                                        val scrollOffset = (target.offsetFraction * chunkSizePx).roundToInt()
                                         var current = state.firstVisibleItemIndex
-                                        if (targetIndex <= current + SCROLL_STEP_ITEMS) {
-                                            state.scrollToItem(targetIndex.coerceIn(0, itemCount - 1))
+                                        if (target.index <= current + SCROLL_STEP_ITEMS) {
+                                            state.scrollToItem(target.index, scrollOffset)
                                         } else {
-                                            var next = (current + SCROLL_STEP_ITEMS).coerceAtMost(targetIndex)
+                                            var next = (current + SCROLL_STEP_ITEMS).coerceAtMost(target.index)
                                             var prevIndex = -1
-                                            while (next < targetIndex) {
+                                            while (next < target.index) {
                                                 state.scrollToItem(next.coerceIn(0, itemCount - 1))
                                                 delay(SCROLL_STEP_DELAY_MS)
                                                 current = state.firstVisibleItemIndex
                                                 // No progress means scrollToItem hit platform limits; bail to avoid infinite loop.
-                                                if (current >= targetIndex || current == prevIndex) break
+                                                if (current >= target.index || current == prevIndex) break
                                                 prevIndex = current
-                                                next = (current + SCROLL_STEP_ITEMS).coerceAtMost(targetIndex)
+                                                next = (current + SCROLL_STEP_ITEMS).coerceAtMost(target.index)
                                             }
-                                            state.scrollToItem(targetIndex.coerceIn(0, itemCount - 1))
+                                            state.scrollToItem(target.index, scrollOffset)
                                         }
                                     }
                                 }
@@ -300,6 +309,39 @@ internal fun calculateScrollProportion(
         val continuousIndex = firstVisibleItemIndex.toFloat() + itemProgress
         (continuousIndex / itemCountFloat).coerceIn(0f, 1f)
     }
+}
+
+/**
+ * Target position for a fast-scroll drag: an item [index] plus the fraction of the way [offsetFraction]
+ * (0..1) the thumb sits into that item. The fraction is later converted to a pixel scroll offset using
+ * the measured item height so the thumb tracks the finger continuously rather than snapping per item.
+ *
+ * @param index  The item to scroll to (0-based, clamped to the list bounds).
+ * @param offsetFraction  How far into [index] to scroll, in the range 0f..1f.
+ */
+internal data class ScrollTarget(
+    val index: Int,
+    val offsetFraction: Float,
+)
+
+/**
+ * Maps a 0..1 drag [proportion] onto a continuous scroll position in a list of [itemCount] items.
+ *
+ * Because each item (text chunk) spans up to a thousand lines, snapping the drag to whole item
+ * indices makes the thumb feel coarse and jumpy. Treating the drag as a position over the whole
+ * line range — item index plus a sub-item fraction — keeps the gesture smooth. The fraction is later
+ * turned into a pixel offset inside the target item.
+ *
+ * @param proportion  The drag proportion along the track, in the range 0f..1f.
+ * @param itemCount  Total number of items in the list.
+ */
+internal fun calculateScrollTarget(proportion: Float, itemCount: Int): ScrollTarget {
+    if (itemCount <= 0) return ScrollTarget(index = 0, offsetFraction = 0f)
+    val clamped = proportion.coerceIn(0f, 1f)
+    val continuousPosition = clamped * itemCount
+    val index = continuousPosition.toInt().coerceIn(0, itemCount - 1)
+    val offsetFraction = (continuousPosition - index).coerceIn(0f, 1f)
+    return ScrollTarget(index = index, offsetFraction = offsetFraction)
 }
 
 /**
