@@ -3,6 +3,7 @@ package mega.privacy.android.feature.transfers.components
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -93,128 +94,131 @@ internal fun CompletedTransferItem(
 ) {
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
 
-    SwipeToDismissBox(
-        state = swipeToDismissBoxState,
-        backgroundContent = {
-            when (swipeToDismissBoxState.dismissDirection) {
-                SwipeToDismissBoxValue.StartToEnd -> if (enableSwipeToDismiss && enableDismissFromStartToEnd) {
-                    MegaIcon(
-                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.RotateCcw),
-                        contentDescription = "Retry icon",
-                        tint = IconColor.Inverse,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(DSTokens.colors.support.info)
-                            .wrapContentSize(Alignment.CenterStart)
-                            .padding(12.dp)
-                            .testTag(TEST_TAG_RETRY_ICON)
-                    )
-                }
+    // Box isolates animateItem() from SwipeToDismissBox's anchor measure pass (AND-23610).
+    Box(modifier = modifier.fillMaxWidth()) {
+        SwipeToDismissBox(
+            state = swipeToDismissBoxState,
+            backgroundContent = {
+                when (swipeToDismissBoxState.dismissDirection) {
+                    SwipeToDismissBoxValue.StartToEnd -> if (enableSwipeToDismiss && enableDismissFromStartToEnd) {
+                        MegaIcon(
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.RotateCcw),
+                            contentDescription = "Retry icon",
+                            tint = IconColor.Inverse,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(DSTokens.colors.support.info)
+                                .wrapContentSize(Alignment.CenterStart)
+                                .padding(12.dp)
+                                .testTag(TEST_TAG_RETRY_ICON)
+                        )
+                    }
 
-                SwipeToDismissBoxValue.EndToStart -> if (enableSwipeToDismiss) {
-                    MegaIcon(
-                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
-                        contentDescription = "Clear icon",
-                        tint = IconColor.Inverse,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(DSTokens.colors.support.error)
-                            .wrapContentSize(Alignment.CenterEnd)
-                            .padding(12.dp)
-                            .testTag(TEST_TAG_CLEAR_ICON)
-                    )
-                }
+                    SwipeToDismissBoxValue.EndToStart -> if (enableSwipeToDismiss) {
+                        MegaIcon(
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
+                            contentDescription = "Clear icon",
+                            tint = IconColor.Inverse,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(DSTokens.colors.support.error)
+                                .wrapContentSize(Alignment.CenterEnd)
+                                .padding(12.dp)
+                                .testTag(TEST_TAG_CLEAR_ICON)
+                        )
+                    }
 
-                SwipeToDismissBoxValue.Settled -> {}
+                    SwipeToDismissBoxValue.Settled -> {}
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+            enableDismissFromStartToEnd = enableSwipeToDismiss && enableDismissFromStartToEnd,
+            enableDismissFromEndToStart = enableSwipeToDismiss,
+            onDismiss = { direction ->
+                when (direction) {
+                    SwipeToDismissBoxValue.StartToEnd -> onRetry()
+                    SwipeToDismissBoxValue.EndToStart -> onClear()
+                    SwipeToDismissBoxValue.Settled -> {}
+                }
             }
-        },
-        modifier = modifier.fillMaxWidth(),
-        enableDismissFromStartToEnd = enableSwipeToDismiss && enableDismissFromStartToEnd,
-        enableDismissFromEndToStart = enableSwipeToDismiss,
-        onDismiss = { direction ->
-            when (direction) {
-                SwipeToDismissBoxValue.StartToEnd -> onRetry()
-                SwipeToDismissBoxValue.EndToStart -> onClear()
-                SwipeToDismissBoxValue.Settled -> {}
-            }
-        }
-    ) {
-        Row(
-            modifier = modifier
-                .testTag(TEST_TAG_COMPLETED_TRANSFER_ITEM)
-                .background(DSTokens.colors.background.pageBackground)
-                .heightIn(min = 68.dp)
-                .padding(vertical = 12.dp)
-                .padding(start = 12.dp, end = 16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            val info = if (location != null) {
-                joinInfoText(sizeString, date)
-            } else {
-                error ?: stringResource(id = sharedR.string.transfers_section_cancelled)
-            }
-            TransferImage(
-                fileTypeResId = fileTypeResId,
-                previewUri = previewUri,
-                modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE),
-            )
-            Column(
-                Modifier
-                    .padding(start = 12.dp, end = 8.dp)
-                    .weight(1f)
+            Row(
+                modifier = Modifier
+                    .testTag(TEST_TAG_COMPLETED_TRANSFER_ITEM)
+                    .background(DSTokens.colors.background.pageBackground)
+                    .heightIn(min = 68.dp)
+                    .padding(vertical = 12.dp)
+                    .padding(start = 12.dp, end = 16.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                MegaText(
-                    text = fileName,
-                    maxLines = 1,
-                    overflow = TextOverflow.MiddleEllipsis,
-                    style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.W400),
-                    textColor = TextColor.Primary,
-                    modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_NAME),
+                val info = if (location != null) {
+                    joinInfoText(sizeString, date)
+                } else {
+                    error ?: stringResource(id = sharedR.string.transfers_section_cancelled)
+                }
+                TransferImage(
+                    fileTypeResId = fileTypeResId,
+                    previewUri = previewUri,
+                    modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_IMAGE),
                 )
-                if (location != null) {
-                    MegaText(
-                        text = location,
-                        style = AppTheme.typography.bodyMedium,
-                        maxLines = 2,
-                        overflow = TextOverflow.StartEllipsis,
-                        textColor = if (error != null) TextColor.Error else TextColor.Secondary,
-                        modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_RESULT),
-                    )
-                }
-                Row(
-                    modifier = Modifier.padding(top = 2.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                Column(
+                    Modifier
+                        .padding(start = 12.dp, end = 8.dp)
+                        .weight(1f)
                 ) {
-                    LeadingIndicator(
-                        modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
-                        isDownload = isDownload,
-                        isError = error != null,
-                    )
                     MegaText(
-                        text = info,
+                        text = fileName,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = AppTheme.typography.bodySmall,
-                        textColor = if (error != null) TextColor.Error else TextColor.Secondary,
-                        modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_RESULT),
+                        overflow = TextOverflow.MiddleEllipsis,
+                        style = AppTheme.typography.titleMedium.copy(fontWeight = FontWeight.W400),
+                        textColor = TextColor.Primary,
+                        modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_NAME),
                     )
+                    if (location != null) {
+                        MegaText(
+                            text = location,
+                            style = AppTheme.typography.bodyMedium,
+                            maxLines = 2,
+                            overflow = TextOverflow.StartEllipsis,
+                            textColor = if (error != null) TextColor.Error else TextColor.Secondary,
+                            modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_RESULT),
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.padding(top = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        LeadingIndicator(
+                            modifier = Modifier.testTag(TEST_TAG_ACTIVE_TRANSFER_TYPE_ICON),
+                            isDownload = isDownload,
+                            isError = error != null,
+                        )
+                        MegaText(
+                            text = info,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = AppTheme.typography.bodySmall,
+                            textColor = if (error != null) TextColor.Error else TextColor.Secondary,
+                            modifier = Modifier.testTag(TEST_TAG_COMPLETED_TRANSFER_RESULT),
+                        )
+                    }
                 }
-            }
-            if (isSelected == null) {
-                IconButton(
-                    onClick = onMoreClicked,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    MegaIcon(
-                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
-                        contentDescription = "",
-                        tint = IconColor.Secondary,
-                    )
+                if (isSelected == null) {
+                    IconButton(
+                        onClick = onMoreClicked,
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        MegaIcon(
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
+                            contentDescription = "",
+                            tint = IconColor.Secondary,
+                        )
+                    }
+                } else {
+                    SelectedTransferIcon(isSelected)
                 }
-            } else {
-                SelectedTransferIcon(isSelected)
             }
         }
     }
