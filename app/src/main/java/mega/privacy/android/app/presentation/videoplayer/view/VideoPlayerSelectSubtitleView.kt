@@ -27,11 +27,11 @@ import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerSubtitleUiState
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchEmptyView
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
 import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
@@ -39,6 +39,8 @@ import mega.privacy.android.shared.original.core.ui.controls.progressindicator.M
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.search.presentation.component.SearchEmptyStateView
+import mega.privacy.android.shared.search.presentation.model.SearchEmptyContent
 
 @Composable
 internal fun VideoPlayerSelectSubtitleView(
@@ -155,18 +157,25 @@ internal fun SelectSubtitleView(
                     )
 
                     items.isEmpty() && query.isNullOrEmpty() -> EmptyStateView(
-                        modifier = Modifier.padding(horizontal = 36.dp).testTag(
-                            VIDEO_PLAYER_SELECT_SUBTITLE_EMPTY_LIST_TEST_TAG
-                        ),
+                        modifier = Modifier
+                            .padding(horizontal = 36.dp)
+                            .testTag(
+                                VIDEO_PLAYER_SELECT_SUBTITLE_EMPTY_LIST_TEST_TAG
+                            ),
                         title = stringResource(id = R.string.media_player_video_select_subtitle_file_empty_message),
                         description = SpannableText(stringResource(sharedR.string.video_player_subtitles_empty_hint_description)),
                         imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
                     )
 
-                    items.isEmpty() -> SearchEmptyView(
+                    items.isEmpty() -> SearchEmptyStateView(
                         modifier = Modifier.testTag(
                             VIDEO_PLAYER_SELECT_SUBTITLE_SEARCH_EMPTY_TEST_TAG
-                        )
+                        ),
+                        content = SearchEmptyContent(
+                            title = LocalizedText.StringRes(sharedR.string.photos_search_empty_state_title),
+                            description = LocalizedText.StringRes(sharedR.string.photos_search_empty_state_description),
+                            image = iconPackR.drawable.ic_search_02,
+                        ),
                     )
 
                     else -> SubtitleFileInfoListView(

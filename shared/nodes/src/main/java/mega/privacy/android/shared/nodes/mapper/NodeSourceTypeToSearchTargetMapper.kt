@@ -1,16 +1,14 @@
-package mega.privacy.android.feature.clouddrive.presentation.search.mapper
+package mega.privacy.android.shared.nodes.mapper
 
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.search.SearchTarget
 import javax.inject.Inject
 
 /**
- * Mapper used to map node source types to search targets
+ * Maps a [NodeSourceType] to the [SearchTarget] used when searching that source.
  */
 class NodeSourceTypeToSearchTargetMapper @Inject constructor() {
     /**
-     * invoke
-     *
      * @param nodeSourceType source type for nodes leading to search
      */
     operator fun invoke(nodeSourceType: NodeSourceType): SearchTarget =

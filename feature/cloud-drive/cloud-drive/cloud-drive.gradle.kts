@@ -23,6 +23,7 @@ dependencies {
 
     implementation(project(":shared:ads"))
     implementation(project(":shared:nodes"))
+    implementation(project(":shared:search"))
     implementation(project(":shared:account"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))

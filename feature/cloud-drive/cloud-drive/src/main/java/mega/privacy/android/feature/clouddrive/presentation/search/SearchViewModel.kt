@@ -12,6 +12,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -20,15 +22,13 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -39,7 +39,9 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchParameters
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -53,13 +55,24 @@ import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.SearchPlaceholderMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.labelResId
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.titleResId
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.search.presentation.model.SearchFilterChipState
+import mega.privacy.android.shared.search.presentation.model.SearchFilterOption
+import mega.privacy.android.shared.search.presentation.model.SearchFilterOptions
+import mega.privacy.android.shared.search.presentation.model.SearchShellState
 import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -95,6 +108,17 @@ class SearchViewModel @AssistedInject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    /**
+     * State consumed by the shared search shell, derived from [uiState].
+     */
+    val shellState: StateFlow<SearchShellState> = uiState
+        .map { it.toShellState() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(SHELL_STATE_STOP_TIMEOUT_MS),
+            _uiState.value.toShellState(),
+        )
+
     private val searchQueryFlow = MutableStateFlow("")
     private var nodeMultiSelectionJob: Job? = null
 
@@ -129,6 +153,19 @@ class SearchViewModel @AssistedInject constructor(
             is SearchUiAction.SelectRecentSearch -> onSelectRecentSearch(action.query)
             is SearchUiAction.ClearRecentSearches -> onClearRecentSearches()
         }
+    }
+
+    /**
+     * Filter options for the tapped chip, or null if the id is unknown.
+     */
+    fun filterOptions(filterId: String): SearchFilterOptions? =
+        _uiState.value.filterOptionsFor(filterId)
+
+    /**
+     * Applies a filter option selection coming from the search shell.
+     */
+    fun onFilterOptionSelected(filterId: String, optionId: String?) {
+        toSearchFilterResult(filterId, optionId)?.let(::updateFilter)
     }
 
     private fun updateFilter(result: SearchFilterResult) {
@@ -528,8 +565,94 @@ class SearchViewModel @AssistedInject constructor(
         val nodeSourceType: NodeSourceType,
     )
 
+    private fun SearchUiState.toShellState(): SearchShellState = SearchShellState(
+        searchText = searchText,
+        searchedQuery = searchedQuery,
+        placeholder = placeholderText,
+        isLoading = isLoading,
+        isPreSearch = isPreSearch,
+        isEmpty = isEmpty,
+        recentSearches = recentSearches,
+        isRecentSearchesLoading = isRecentSearchesLoading,
+        filters = if (isFilterAllowed) toFilterChips() else emptyList(),
+    )
+
+    private fun SearchUiState.toFilterChips(): List<SearchFilterChipState> = listOf(
+        SearchFilterChipState(
+            id = SearchFilterType.TYPE.name,
+            label = LocalizedText.StringRes(
+                typeFilterOption?.labelResId ?: SearchFilterType.TYPE.titleResId
+            ),
+            isSelected = typeFilterOption != null,
+        ),
+        SearchFilterChipState(
+            id = SearchFilterType.LAST_MODIFIED.name,
+            label = LocalizedText.StringRes(
+                dateModifiedFilterOption?.labelResId ?: SearchFilterType.LAST_MODIFIED.titleResId
+            ),
+            isSelected = dateModifiedFilterOption != null,
+        ),
+        SearchFilterChipState(
+            id = SearchFilterType.DATE_ADDED.name,
+            label = LocalizedText.StringRes(
+                dateAddedFilterOption?.labelResId ?: SearchFilterType.DATE_ADDED.titleResId
+            ),
+            isSelected = dateAddedFilterOption != null,
+        ),
+    )
+
+    private fun SearchUiState.filterOptionsFor(filterId: String): SearchFilterOptions? {
+        val filterType =
+            runCatching { SearchFilterType.valueOf(filterId) }.getOrNull() ?: return null
+        return when (filterType) {
+            SearchFilterType.TYPE -> SearchFilterOptions(
+                id = filterId,
+                title = LocalizedText.StringRes(filterType.titleResId),
+                options = TypeFilterOption.entries.map {
+                    SearchFilterOption(it.name, LocalizedText.StringRes(it.labelResId))
+                },
+                selectedOptionId = typeFilterOption?.name,
+            )
+
+            SearchFilterType.LAST_MODIFIED ->
+                dateFilterOptions(filterId, filterType, dateModifiedFilterOption)
+
+            SearchFilterType.DATE_ADDED ->
+                dateFilterOptions(filterId, filterType, dateAddedFilterOption)
+        }
+    }
+
+    private fun dateFilterOptions(
+        filterId: String,
+        filterType: SearchFilterType,
+        selected: DateFilterOption?,
+    ) = SearchFilterOptions(
+        id = filterId,
+        title = LocalizedText.StringRes(filterType.titleResId),
+        options = DateFilterOption.entries.map {
+            SearchFilterOption(it.name, LocalizedText.StringRes(it.labelResId))
+        },
+        selectedOptionId = selected?.name,
+    )
+
+    private fun toSearchFilterResult(filterId: String, optionId: String?): SearchFilterResult? {
+        val filterType =
+            runCatching { SearchFilterType.valueOf(filterId) }.getOrNull() ?: return null
+        return when (filterType) {
+            SearchFilterType.TYPE ->
+                SearchFilterResult.Type(optionId?.let { TypeFilterOption.valueOf(it) })
+
+            SearchFilterType.LAST_MODIFIED ->
+                SearchFilterResult.DateModified(optionId?.let { DateFilterOption.valueOf(it) })
+
+            SearchFilterType.DATE_ADDED ->
+                SearchFilterResult.DateAdded(optionId?.let { DateFilterOption.valueOf(it) })
+        }
+    }
+
     companion object {
         const val SEARCH_DEBOUNCE_MS = 300L
+        private const val SHELL_STATE_STOP_TIMEOUT_MS = 5_000L
     }
 }
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.search.view
+package mega.privacy.android.shared.search.presentation.component
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,19 +10,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.text.SpannableText
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.search.presentation.model.SearchEmptyContent
 
 
 @Composable
-fun SearchEmptyView(
+fun SearchEmptyStateView(
+    content: SearchEmptyContent,
     modifier: Modifier = Modifier,
 ) {
     val isLandscapeMode =
@@ -36,16 +36,22 @@ fun SearchEmptyView(
             .conditional(!isLandscapeMode) {
                 imePadding()
             },
-        title = stringResource(id = sharedR.string.photos_search_empty_state_title),
-        description = SpannableText(text = stringResource(id = sharedR.string.photos_search_empty_state_description)),
-        imagePainter = painterResource(id = IconPackR.drawable.ic_search_02),
+        title = content.title.text,
+        description = SpannableText(text = content.description.text),
+        imagePainter = painterResource(id = content.image),
     )
 }
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewSearchEmptyView() {
+private fun PreviewSearchEmptyStateView() {
     AndroidThemeForPreviews {
-        SearchEmptyView()
+        SearchEmptyStateView(
+            content = SearchEmptyContent(
+                title = LocalizedText.Literal("Nothing here"),
+                description = LocalizedText.Literal("Try a different search"),
+                image = mega.privacy.android.icon.pack.R.drawable.ic_search_02,
+            )
+        )
     }
 }

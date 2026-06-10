@@ -11,11 +11,6 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -45,11 +40,17 @@ import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.SearchPlaceholderMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -1520,5 +1521,49 @@ class SearchViewModelTest {
         advanceUntilIdle()
 
         verify(saveRecentSearchUseCase, times(0)).invoke(any())
+    }
+
+    @Test
+    fun `test that shellState exposes the filter chips for cloud drive`() = runTest {
+        setupTestData()
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.shellState.value.filters.map { it.id }).containsExactly(
+            SearchFilterType.TYPE.name,
+            SearchFilterType.LAST_MODIFIED.name,
+            SearchFilterType.DATE_ADDED.name,
+        )
+    }
+
+    @Test
+    fun `test that filterOptions returns the type options`() = runTest {
+        setupTestData()
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        val options = underTest.filterOptions(SearchFilterType.TYPE.name)
+
+        assertThat(options).isNotNull()
+        assertThat(options!!.options.map { it.id })
+            .containsExactlyElementsIn(TypeFilterOption.entries.map { it.name })
+    }
+
+    @Test
+    fun `test that onFilterOptionSelected applies the selected filter`() = runTest {
+        setupTestData()
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.onFilterOptionSelected(SearchFilterType.TYPE.name, TypeFilterOption.Video.name)
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.typeFilterOption).isEqualTo(TypeFilterOption.Video)
     }
 }

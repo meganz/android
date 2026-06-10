@@ -96,6 +96,7 @@ include(":shared:account")
 include(":shared:ads")
 include(":shared:transfers")
 include(":shared:contact")
+include(":shared:search")
 
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts

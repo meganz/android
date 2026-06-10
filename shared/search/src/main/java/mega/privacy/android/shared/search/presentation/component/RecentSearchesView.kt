@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.search.view
+package mega.privacy.android.shared.search.presentation.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +29,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * View to display recent searches
+ * View to display recent searches.
  *
  * @param queries List of recent search strings
  * @param onClicked Callback when a recent search is clicked, with the search string and a boolean for keyboard
@@ -118,4 +118,3 @@ private fun RecentSearchesViewPreview() {
         )
     }
 }
-

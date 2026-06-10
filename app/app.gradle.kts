@@ -213,6 +213,7 @@ dependencies {
     // Modules
     implementation(project(":shared:ads"))
     implementation(project(":shared:nodes"))
+    implementation(project(":shared:search"))
     implementation(project(":shared:account"))
     implementation(project(":shared:contact"))
     implementation(project(":core:formatter"))

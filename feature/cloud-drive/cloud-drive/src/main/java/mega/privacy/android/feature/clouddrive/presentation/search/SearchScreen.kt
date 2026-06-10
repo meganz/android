@@ -1,45 +1,28 @@
 package mega.privacy.android.feature.clouddrive.presentation.search
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
-import mega.android.core.ui.modifiers.applyScrollToHideBehavior
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
-import mega.android.core.ui.modifiers.excludingBottomPadding
-import mega.android.core.ui.preview.CombinedThemePreviews
-import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
@@ -47,18 +30,11 @@ import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHa
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodesLoadingState
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
-import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
-import mega.privacy.android.feature.clouddrive.presentation.search.view.RecentSearchesView
-import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchEmptyView
-import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterBottomSheetContent
-import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterChips
-import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchLandingView
-import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTopAppBar
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -70,9 +46,12 @@ import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
-
+import mega.privacy.android.shared.search.presentation.SearchShellScaffold
+import mega.privacy.android.shared.search.presentation.model.SearchEmptyContent
+import mega.privacy.mobile.analytics.event.SearchDateAddedDropdownChipPressedEvent
+import mega.privacy.mobile.analytics.event.SearchFileTypeDropdownChipPressedEvent
+import mega.privacy.mobile.analytics.event.SearchLastModifiedDropdownChipPressedEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +63,7 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val shellState by viewModel.shellState.collectAsStateWithLifecycle()
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val megaNavigator = rememberMegaNavigator()
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
@@ -97,19 +77,33 @@ fun SearchScreen(
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val snackbarHostState = LocalSnackBarHostState.current
-    var selectedFilterType by rememberSaveable { mutableStateOf<SearchFilterType?>(null) }
-    val filterBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val localKeyboardController = LocalSoftwareKeyboardController.current
-    val localFocusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
 
-    MegaScaffoldWithTopAppBarScrollBehavior(
+    SearchShellScaffold(
         modifier = modifier,
-        topBar = {
-            if (uiState.isInSelectionMode) {
+        state = shellState,
+        landingContent = SearchEmptyContent(
+            title = LocalizedText.StringRes(sharedR.string.search_landing_title),
+            description = LocalizedText.StringRes(sharedR.string.search_landing_subtitle),
+            image = IconPackR.drawable.ic_search_02,
+        ),
+        emptyContent = SearchEmptyContent(
+            title = LocalizedText.StringRes(sharedR.string.photos_search_empty_state_title),
+            description = LocalizedText.StringRes(sharedR.string.photos_search_empty_state_description),
+            image = IconPackR.drawable.ic_search_02,
+        ),
+        onSearchTextChange = { viewModel.processAction(SearchUiAction.UpdateSearchText(it)) },
+        onBack = navigationHandler::back,
+        onRecentSearchSelected = { viewModel.processAction(SearchUiAction.SelectRecentSearch(it)) },
+        onClearRecentSearches = { viewModel.processAction(SearchUiAction.ClearRecentSearches) },
+        filterOptionsProvider = viewModel::filterOptions,
+        onFilterChipClicked = { filterId -> trackFilterChipPressed(filterId) },
+        onFilterOptionSelected = viewModel::onFilterOptionSelected,
+        topBarOverride = if (uiState.isInSelectionMode) {
+            {
                 NodeSelectionModeAppBar(
                     count = uiState.selectedItemsCount,
                     isAllSelected = uiState.isAllSelected,
@@ -117,18 +111,8 @@ fun SearchScreen(
                     onSelectAllClicked = { viewModel.processAction(SearchUiAction.SelectAllItems) },
                     onCancelSelectionClicked = { viewModel.processAction(SearchUiAction.DeselectAllItems) }
                 )
-            } else {
-                SearchTopAppBar(
-                    searchText = uiState.searchText,
-                    placeholderText = uiState.placeholderText.text,
-                    onSearchTextChanged = {
-                        viewModel.processAction(SearchUiAction.UpdateSearchText(it))
-                    },
-                    onBack = navigationHandler::back,
-                    focusRequester = focusRequester
-                )
             }
-        },
+        } else null,
         bottomBar = {
             NodeSelectionModeBottomBar(
                 availableActions = nodeActionState.availableActions,
@@ -138,23 +122,27 @@ fun SearchScreen(
                 selectedNodes = uiState.selectedNodes,
                 isSelecting = uiState.isSelecting,
             )
-        }
+        },
+        loadingContent = {
+            NodesViewSkeleton(
+                contentPadding = PaddingValues(top = 8.dp),
+                isListView = isListView,
+                spanCount = spanCount,
+            )
+        },
     ) { contentPadding ->
-        SearchContent(
-            modifier = Modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        localFocusManager.clearFocus()
-                    })
-                },
-            uiState = uiState,
-            contentPadding = contentPadding,
-            isListView = isListView,
+        NodesView(
+            modifier = Modifier.fillMaxWidth(),
+            listContentPadding = PaddingValues(
+                top = 8.dp,
+                bottom = contentPadding.calculateSafeBottomPadding()
+            ),
             spanCount = spanCount,
-            onFilterClicked = { filterType ->
-                localKeyboardController?.hide()
-                selectedFilterType = filterType
-            },
+            items = uiState.items,
+            highlightText = uiState.searchedQuery,
+            isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
+            isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+            showHiddenNodes = uiState.showHiddenNodes,
             onMenuClicked = { nodeUiItem ->
                 localKeyboardController?.hide()
                 navigationHandler.navigate(
@@ -171,25 +159,16 @@ fun SearchScreen(
             onLongClicked = { nodeUiItem ->
                 viewModel.processAction(SearchUiAction.ItemLongClicked(nodeUiItem))
             },
-            onSortOrderClick = {
-                showSortBottomSheet = true
-            },
+            sortConfiguration = uiState.selectedSortConfiguration,
+            isListView = isListView,
+            onSortOrderClick = { showSortBottomSheet = true },
             onChangeViewTypeClicked = {
                 viewModel.processAction(SearchUiAction.ChangeViewTypeClicked)
             },
-            onRecentSearchClicked = { query, openKeyboard ->
-                viewModel.processAction(SearchUiAction.SelectRecentSearch(query))
-                coroutineScope.launch {
-                    if (openKeyboard) {
-                        focusRequester.requestFocus()
-                    } else {
-                        localFocusManager.clearFocus()
-                    }
-                }
-            },
-            onClearRecentSearches = {
-                viewModel.processAction(SearchUiAction.ClearRecentSearches)
-            },
+            showMediaDiscoveryButton = false,
+            onEnterMediaDiscoveryClick = { /* No-op */ },
+            inSelectionMode = uiState.isInSelectionMode,
+            isContactVerificationOn = uiState.isContactVerificationOn
         )
     }
 
@@ -247,30 +226,6 @@ fun SearchScreen(
         )
     }
 
-    selectedFilterType?.let { filterType ->
-        MegaModalBottomSheet(
-            modifier = modifier.statusBarsPadding(),
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
-            sheetState = filterBottomSheetState,
-            onDismissRequest = { selectedFilterType = null },
-        ) {
-            SearchFilterBottomSheetContent(
-                filterType = filterType,
-                selectedTypeFilter = uiState.typeFilterOption,
-                selectedDateModifiedFilter = uiState.dateModifiedFilterOption,
-                selectedDateAddedFilter = uiState.dateAddedFilterOption,
-                onFilterSelected = { result ->
-                    viewModel.processAction(SearchUiAction.SelectFilter(result))
-                    coroutineScope.launch {
-                        filterBottomSheetState.hide()
-                    }.invokeOnCompletion {
-                        selectedFilterType = null
-                    }
-                },
-            )
-        }
-    }
-
     if (showSortBottomSheet) {
         SortBottomSheet(
             title = stringResource(sharedR.string.action_sort_by_header),
@@ -300,178 +255,12 @@ fun SearchScreen(
     }
 }
 
-@Composable
-fun SearchContent(
-    uiState: SearchUiState,
-    contentPadding: PaddingValues,
-    isListView: Boolean,
-    spanCount: Int,
-    onFilterClicked: (SearchFilterType) -> Unit,
-    onMenuClicked: (NodeUiItem<TypedNode>) -> Unit,
-    onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
-    onLongClicked: (NodeUiItem<TypedNode>) -> Unit,
-    onSortOrderClick: () -> Unit,
-    onChangeViewTypeClicked: () -> Unit,
-    onRecentSearchClicked: (String, Boolean) -> Unit,
-    onClearRecentSearches: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.padding(contentPadding.excludingBottomPadding())
-    ) {
-        if (uiState.isFilterAllowed) {
-            SearchFilterChips(
-                modifier = Modifier
-                    .applyScrollToHideBehavior()
-                    .padding(vertical = 12.dp),
-                typeFilterOption = uiState.typeFilterOption,
-                dateModifiedFilterOption = uiState.dateModifiedFilterOption,
-                dateAddedFilterOption = uiState.dateAddedFilterOption,
-                onFilterClicked = onFilterClicked,
-            )
-        }
-
-        when {
-            uiState.isPreSearch -> {
-                if (uiState.recentSearches.isNotEmpty()) {
-                    RecentSearchesView(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .imePadding()
-                            .testTag(SEARCH_CONTENT_RECENT_SEARCHES_TAG),
-                        queries = uiState.recentSearches,
-                        onClicked = onRecentSearchClicked,
-                        onClearAllClicked = onClearRecentSearches,
-                    )
-                } else if (!uiState.isRecentSearchesLoading) {
-                    SearchLandingView(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .imePadding()
-                            .testTag(SEARCH_CONTENT_LANDING_TAG)
-                    )
-                }
-            }
-
-            uiState.isLoading -> {
-                NodesViewSkeleton(
-                    contentPadding = PaddingValues(top = 8.dp),
-                    isListView = isListView,
-                    spanCount = spanCount,
-                )
-            }
-
-            uiState.isEmpty -> {
-                SearchEmptyView(
-                    modifier = Modifier
-                        .testTag(SEARCH_CONTENT_EMPTY_TAG),
-                )
-            }
-
-            else -> NodesView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(SEARCH_CONTENT_RESULTS_TAG),
-                listContentPadding = PaddingValues(
-                    top = 8.dp,
-                    bottom = contentPadding.calculateSafeBottomPadding()
-                ),
-                spanCount = spanCount,
-                items = uiState.items,
-                highlightText = uiState.searchedQuery,
-                isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                showHiddenNodes = uiState.showHiddenNodes,
-                onMenuClicked = onMenuClicked,
-                onItemClicked = onItemClicked,
-                onLongClicked = onLongClicked,
-                sortConfiguration = uiState.selectedSortConfiguration,
-                isListView = isListView,
-                onSortOrderClick = onSortOrderClick,
-                onChangeViewTypeClicked = onChangeViewTypeClicked,
-                showMediaDiscoveryButton = false,
-                onEnterMediaDiscoveryClick = { /* No-op */ },
-                inSelectionMode = uiState.isInSelectionMode,
-                isContactVerificationOn = uiState.isContactVerificationOn
-            )
-        }
+internal fun trackFilterChipPressed(filterId: String) {
+    val event = when (runCatching { SearchFilterType.valueOf(filterId) }.getOrNull()) {
+        SearchFilterType.TYPE -> SearchFileTypeDropdownChipPressedEvent
+        SearchFilterType.LAST_MODIFIED -> SearchLastModifiedDropdownChipPressedEvent
+        SearchFilterType.DATE_ADDED -> SearchDateAddedDropdownChipPressedEvent
+        null -> return
     }
+    Analytics.tracker.trackEvent(event)
 }
-
-@CombinedThemePreviews
-@Composable
-private fun SearchContentPreSearchPreview() {
-    AndroidThemeForPreviews {
-        SearchContent(
-            uiState = SearchUiState(
-                isRecentSearchesLoading = false
-            ),
-            contentPadding = PaddingValues(0.dp),
-            isListView = true,
-            spanCount = 2,
-            onFilterClicked = {},
-            onMenuClicked = {},
-            onItemClicked = {},
-            onLongClicked = {},
-            onSortOrderClick = {},
-            onChangeViewTypeClicked = {},
-            onRecentSearchClicked = { _, _ -> },
-            onClearRecentSearches = {},
-        )
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun SearchContentEmptyPreview() {
-    AndroidThemeForPreviews {
-        SearchContent(
-            uiState = SearchUiState(
-                searchText = "test",
-                searchedQuery = "test",
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-                isHiddenNodeSettingsLoading = false
-            ),
-            contentPadding = PaddingValues(0.dp),
-            isListView = true,
-            spanCount = 2,
-            onFilterClicked = {},
-            onMenuClicked = {},
-            onItemClicked = {},
-            onLongClicked = {},
-            onSortOrderClick = {},
-            onChangeViewTypeClicked = {},
-            onRecentSearchClicked = { _, _ -> },
-            onClearRecentSearches = {},
-        )
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun SearchContentLoadingPreview() {
-    AndroidThemeForPreviews {
-        SearchContent(
-            uiState = SearchUiState(
-                searchText = "test",
-                nodesLoadingState = NodesLoadingState.Loading,
-            ),
-            contentPadding = PaddingValues(0.dp),
-            isListView = true,
-            spanCount = 2,
-            onFilterClicked = {},
-            onMenuClicked = {},
-            onItemClicked = {},
-            onLongClicked = {},
-            onSortOrderClick = {},
-            onChangeViewTypeClicked = {},
-            onRecentSearchClicked = { _, _ -> },
-            onClearRecentSearches = {},
-        )
-    }
-}
-
-internal const val SEARCH_CONTENT_RECENT_SEARCHES_TAG = "search_content:recent_searches"
-internal const val SEARCH_CONTENT_LANDING_TAG = "search_content:landing"
-internal const val SEARCH_CONTENT_EMPTY_TAG = "search_content:empty"
-internal const val SEARCH_CONTENT_RESULTS_TAG = "search_content:results"

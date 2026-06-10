@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.search.view
+package mega.privacy.android.shared.search.presentation.component
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,6 +14,11 @@ import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 
+/**
+ * Search top app bar with a query field and back navigation.
+ *
+ * Generic shell component reused across search consumers (nodes, chats, ...).
+ */
 @Composable
 fun SearchTopAppBar(
     searchText: String,
@@ -21,7 +26,7 @@ fun SearchTopAppBar(
     onSearchTextChanged: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    focusRequester: FocusRequester = remember { FocusRequester() }
+    focusRequester: FocusRequester = remember { FocusRequester() },
 ) {
     var isExiting by remember { mutableStateOf(false) }
     val localFocusManager = LocalFocusManager.current
