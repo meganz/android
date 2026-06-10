@@ -3,6 +3,9 @@
 BUILD_STEP = ""
 
 ASK_AI_CMD = "@ai"
+// GitLab account the pipeline itself posts from (Gitlab-Access-Token credential).
+// Comments authored by this user must never re-trigger the job.
+BOT_USERNAME = "appdev"
 ASK_AI_OUTPUT_FILE = "ask_ai_output.md"
 ASK_AI_ERROR_REPORT_FILE = "ask_ai_error_report.txt"
 
@@ -39,7 +42,10 @@ pipeline {
                 String folder = "android-ask-ai/MR-${common.getMrNumber()}"
                 String jenkinsLog = common.uploadFileToArtifactory(folder, CONSOLE_LOG_FILE)
 
-                String failMsg = ":x: **${ASK_AI_CMD} failed** (Build: ${env.BUILD_NUMBER})<br/>" +
+                // "Ask AI" on purpose, not "@ai": the posted comment must not match
+                // the job's trigger phrase regex, or the failure post re-triggers
+                // the build in an infinite loop.
+                String failMsg = ":x: **Ask AI failed** (Build: ${env.BUILD_NUMBER})<br/>" +
                         "Stage: ${BUILD_STEP}<br/>" +
                         "Error: ${errorMessage}<br/>" +
                         "[Build log](${jenkinsLog})"
@@ -140,13 +146,21 @@ pipeline {
 }
 
 /**
- * Run the Ask AI stage when this build was triggered by an MR comment whose
- * body starts with @ai.
+ * Run the Ask AI stage when this build was triggered by an MR comment that
+ * mentions @ai and was NOT posted by the pipeline's own bot account.
  */
 def shouldRunAskAi() {
     boolean isNote = env.gitlabActionType == "NOTE" || env.GITLAB_OBJECT_KIND == "note"
     if (!isNote) {
         echo "shouldRunAskAi: skipping, not a NOTE event (gitlabActionType=${env.gitlabActionType}, GITLAB_OBJECT_KIND=${env.GITLAB_OBJECT_KIND})"
+        return false
+    }
+    // Loopback guard: the pipeline posts failure reports and AI replies to the
+    // MR from BOT_USERNAME. Those comments can contain "@ai" and would
+    // otherwise re-trigger this job forever.
+    String author = env.gitlabUserUsername
+    if (author != null && author.equalsIgnoreCase(BOT_USERNAME)) {
+        echo "shouldRunAskAi: skipping, comment was posted by the bot account '${author}'"
         return false
     }
     String body = env.gitlabTriggerPhrase
@@ -248,7 +262,10 @@ def lookupDiscussionIdViaApi(String mrIid) {
 //      and bind its PAT (api scope) to the Gitlab-Access-Token credential.
 //      Replies will appear under that user, matching the @ai mention.
 //
-//   4. Loopback prevention: shouldRunAskAi() already short-circuits because
-//      the bot's reply does not start with @ai. As an extra safety net, you
-//      can exclude the `ai` user in the GitLab Plugin's trigger config.
+//   4. Loopback prevention (two layers):
+//        - shouldRunAskAi() skips comments authored by BOT_USERNAME, so
+//          neither failure reports nor AI replies can re-trigger the stage.
+//        - Pipeline-posted messages must never contain the literal "@ai "
+//          (the failure post says "Ask AI failed"), so the Jenkins trigger
+//          regex (.*@ai .*) does not even fire a build for them.
 // -----------------------------------------------------------------------------
