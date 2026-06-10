@@ -1,5 +1,6 @@
 package mega.privacy.mobile.home.presentation.continuewhereleftoff
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
@@ -16,4 +17,5 @@ internal data class ContinueWhereLeftOffListUiState(
     val currentViewType: ViewType = ViewType.LIST,
     val showSortSheet: Boolean = false,
     val showOptionsSheet: Boolean = false,
+    val clearHistoryCompletedEvent: StateEvent = consumed,
 )

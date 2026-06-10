@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
@@ -370,7 +371,20 @@ class ContinueWhereLeftOffListViewModelTest {
     }
 
     @Test
-    fun `test that clearAll dismisses options sheet`() = runTest {
+    fun `test that clearAll triggers clearHistoryCompletedEvent when clearing succeeds`() =
+        runTest {
+            stubEmptyItems()
+
+            underTest.uiState.test {
+                awaitItem() // initial
+                underTest.clearAll()
+                assertThat(awaitItem().clearHistoryCompletedEvent).isEqualTo(triggered)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that clearAll does not dismiss the options sheet`() = runTest {
         stubEmptyItems()
 
         underTest.uiState.test {
@@ -378,7 +392,10 @@ class ContinueWhereLeftOffListViewModelTest {
             underTest.showOptionsSheet()
             assertThat(awaitItem().showOptionsSheet).isTrue()
             underTest.clearAll()
-            assertThat(awaitItem().showOptionsSheet).isFalse()
+            // The screen dismisses the sheet before showing the confirmation dialog,
+            // so clearAll() must not touch showOptionsSheet.
+            assertThat(awaitItem().clearHistoryCompletedEvent).isEqualTo(triggered)
+            assertThat(underTest.uiState.value.showOptionsSheet).isTrue()
             cancelAndIgnoreRemainingEvents()
         }
     }

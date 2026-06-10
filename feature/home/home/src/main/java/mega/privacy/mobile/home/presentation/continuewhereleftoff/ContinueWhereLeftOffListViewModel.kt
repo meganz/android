@@ -3,6 +3,7 @@ package mega.privacy.mobile.home.presentation.continuewhereleftoff
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -78,6 +79,7 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
                 showSortSheet = action.showSortSheet,
                 showOptionsSheet = action.showOptionsSheet,
                 currentViewType = action.currentViewType,
+                clearHistoryCompletedEvent = action.clearHistoryCompletedEvent,
             )
         }.catch { e ->
             Timber.e(e, "Failed to load CWLO list items")
@@ -150,17 +152,27 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     }
 
     fun clearAll() {
-        uiAction.update { it.copy(showOptionsSheet = false) }
+        // The options sheet is already dismissed by the screen before the confirmation
+        // dialog is shown, so clearAll() only performs the clear and signals completion.
         viewModelScope.launch {
             runCatching { clearRecentlyUsedItemsUseCase() }
+                .onSuccess {
+                    // History is now empty; signal the screen to navigate back.
+                    uiAction.update { it.copy(clearHistoryCompletedEvent = triggered) }
+                }
                 .onFailure { Timber.e(it, "Failed to clear CWLO history") }
         }
+    }
+
+    fun onClearHistoryCompletedEventConsumed() {
+        uiAction.update { it.copy(clearHistoryCompletedEvent = consumed) }
     }
 
     private data class UiAction(
         val showSortSheet: Boolean = false,
         val showOptionsSheet: Boolean = false,
         val currentViewType: ViewType = ViewType.LIST,
+        val clearHistoryCompletedEvent: StateEvent = consumed,
     )
 
     /**

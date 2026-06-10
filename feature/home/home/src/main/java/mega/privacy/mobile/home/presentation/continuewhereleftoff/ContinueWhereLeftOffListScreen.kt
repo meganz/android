@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
@@ -90,12 +92,21 @@ internal fun ContinueWhereLeftOffListScreen(
     val optionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isListView = uiState.currentViewType == ViewType.LIST
     val coroutineScope = rememberCoroutineScope()
+    var showClearConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
     EventEffect(
         event = uiState.openNodeEvent,
         onConsumed = viewModel::onOpenNodeEventConsumed,
     ) { node ->
         openedFileNode = node
+    }
+
+    EventEffect(
+        event = uiState.clearHistoryCompletedEvent,
+        onConsumed = viewModel::onClearHistoryCompletedEventConsumed,
+    ) {
+        // The list is now empty after clearing, so return to the previous screen.
+        onBack()
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -252,10 +263,29 @@ internal fun ContinueWhereLeftOffListScreen(
             NodeActionListTile(
                 text = stringResource(sharedR.string.home_cwlo_clear_history),
                 icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
-                onActionClicked = viewModel::clearAll,
+                onActionClicked = {
+                    viewModel.dismissOptionsSheet()
+                    showClearConfirmationDialog = true
+                },
                 modifier = Modifier.testTag(CLEAR_HISTORY_TAG),
             )
         }
+    }
+
+    if (showClearConfirmationDialog) {
+        BasicDialog(
+            modifier = Modifier.testTag(CLEAR_HISTORY_DIALOG_TAG),
+            title = stringResource(sharedR.string.home_cwlo_clear_history_dialog_title),
+            description = stringResource(sharedR.string.home_cwlo_clear_history_dialog_message),
+            positiveButtonText = stringResource(sharedR.string.general_clear),
+            negativeButtonText = stringResource(sharedR.string.general_dismiss_dialog),
+            onPositiveButtonClicked = {
+                showClearConfirmationDialog = false
+                viewModel.clearAll()
+            },
+            onDismiss = { showClearConfirmationDialog = false },
+            onNegativeButtonClicked = { showClearConfirmationDialog = false },
+        )
     }
 
     openedFileNode?.let { node ->
@@ -358,6 +388,7 @@ private fun ContinueWhereLeftOffGridItem(
 }
 
 internal const val CLEAR_HISTORY_TAG = "cwlo_list:clear_history"
+internal const val CLEAR_HISTORY_DIALOG_TAG = "cwlo_list:clear_history_dialog"
 
 @CombinedThemePreviews
 @Composable
