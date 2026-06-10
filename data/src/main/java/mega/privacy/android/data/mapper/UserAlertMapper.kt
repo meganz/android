@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
 import mega.privacy.android.domain.entity.UnknownAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingAcceptedAlert
+import mega.privacy.android.domain.entity.UpdatedSharedNodesAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingDeniedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
@@ -296,6 +297,26 @@ internal suspend fun toUserAlert(
         MegaUserAlert.TYPE_REMOVEDSHAREDNODES -> {
             val itemCountIndex: Long = 0
             RemovedSharedNodesAlert(
+                id = megaUserAlert.id,
+                seen = megaUserAlert.seen,
+                createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
+                isOwnChange = megaUserAlert.isOwnChange,
+                nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
+                itemCount = megaUserAlert.getNumber(itemCountIndex).toInt(),
+                contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
+            )
+        }
+
+        MegaUserAlert.TYPE_UPDATEDSHAREDNODES -> {
+            val itemCountIndex: Long = 0
+            UpdatedSharedNodesAlert(
                 id = megaUserAlert.id,
                 seen = megaUserAlert.seen,
                 createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),

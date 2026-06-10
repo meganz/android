@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.PaymentReminderAlert
 import mega.privacy.android.domain.entity.PaymentSucceededAlert
 import mega.privacy.android.domain.entity.RemovedFromShareByOwnerAlert
 import mega.privacy.android.domain.entity.RemovedSharedNodesAlert
+import mega.privacy.android.domain.entity.UpdatedSharedNodesAlert
 import mega.privacy.android.domain.entity.ScheduledMeetingAlert
 import mega.privacy.android.domain.entity.TakeDownAlert
 import mega.privacy.android.domain.entity.TakeDownReinstatedAlert
@@ -195,6 +196,15 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
     is RemovedSharedNodesAlert -> { context ->
         context.resources.getQuantityString(
             R.plurals.subtitle_notification_deleted_items,
+            itemCount,
+            contact.getNicknameStringOrEmail(context),
+            itemCount
+        )
+    }
+
+    is UpdatedSharedNodesAlert -> { context ->
+        context.resources.getQuantityString(
+            SharedR.plurals.notifications_history_updated_items_subtitle,
             itemCount,
             contact.getNicknameStringOrEmail(context),
             itemCount

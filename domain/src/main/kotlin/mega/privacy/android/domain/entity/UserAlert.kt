@@ -402,6 +402,28 @@ data class RemovedSharedNodesAlert(
 ) : UserAlert, IncomingShareAlert {}
 
 /**
+ * Updated shared nodes alert
+ *
+ * @property id
+ * @property seen
+ * @property createdTime
+ * @property isOwnChange
+ * @property nodeId
+ * @property contact
+ * @property itemCount
+ */
+data class UpdatedSharedNodesAlert(
+    override val id: Long,
+    override val seen: Boolean,
+    override val createdTime: Long,
+    override val isOwnChange: Boolean,
+    override val nodeId: Long?,
+    override val contact: Contact,
+    val itemCount: Int,
+    override val destination: UserAlertDestination?,
+) : UserAlert, IncomingShareAlert {}
+
+/**
  * Payment succeeded alert
  *
  * @property id

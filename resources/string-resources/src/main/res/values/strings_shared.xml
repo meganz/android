@@ -2966,4 +2966,9 @@
     <string name="contacts_groups_create_error">An error occurred when creating the chat</string>
     <!-- Description of the auth alert bottom sheet shown to guest users for an external file, encouraging them to save it to their MEGA account -->
     <string name="public_link_auth_alert_description_external_file">Keep this file safe and access it anytime</string>
+    <!-- Subtitle of the historic notification for updates inside an existing shared folder, Plural of item. 2 items -->
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one">[A]%1$s [/A][B]updated %2$d item.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]updated %2$d items.[/B]</item>
+    </plurals>
 </resources>
