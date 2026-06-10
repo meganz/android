@@ -14,10 +14,13 @@ import mega.privacy.android.navigation.destination.CreateGroupChatNavKey.KEY
 data class CannotVerifyContactDialogNavKey(val email: String) : DialogNavKey
 
 /**
- * Add contacts nav key
+ * Add contacts nav key. Opens the MEGA-contacts multi-select picker; the selected
+ * contact emails are published as a `List<String>` under [KEY].
  */
 @Serializable
-data object AddContactsNavKey : NavKey
+data object AddContactsNavKey : NavKey {
+    const val KEY: String = "add_contacts"
+}
 
 /** Launches the legacy "Add contacts" activity in "only create group" mode; result published under [KEY]. */
 @Serializable

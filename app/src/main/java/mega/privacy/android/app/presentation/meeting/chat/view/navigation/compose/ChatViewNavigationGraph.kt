@@ -148,7 +148,8 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
         chatToolbarModal(
             navController = navController,
             scaffoldState = scaffoldState,
-            onCameraPermissionDenied = onCameraPermissionDenied
+            onCameraPermissionDenied = onCameraPermissionDenied,
+            onNavigate = onNavigate,
         ) {
             navController.popBackStack(
                 ConversationRoute,

@@ -38,11 +38,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.GiphyPickerActivity
 import mega.privacy.android.app.activities.GiphyPickerActivity.Companion.GIF_DATA
 import mega.privacy.android.app.camera.InAppCameraLauncher
-import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
-import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
@@ -80,7 +78,7 @@ fun ChatToolbarBottomSheet(
     isVisible: Boolean,
     uiState: ChatUiState,
     scaffoldState: ScaffoldState,
-    onAttachContacts: (List<String>) -> Unit,
+    onNavigateToAddContacts: () -> Unit,
     navigateToFileModal: () -> Unit,
     modifier: Modifier = Modifier,
     onAttachFiles: (List<UriPath>, PitagTrigger) -> Unit = { _, _ -> },
@@ -152,20 +150,11 @@ fun ChatToolbarBottomSheet(
         }
     }
 
-    val attachContactLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        result.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
-            ?.let { contactList ->
-                onAttachContacts(contactList.toList())
-            }
-        hideSheet()
-    }
-
     val coroutineScope = rememberCoroutineScope()
     val onAttachContactClicked: () -> Unit = {
         if (uiState.hasAnyContact) {
-            openAttachContactActivity(context, attachContactLauncher)
+            onNavigateToAddContacts()
+            hideSheet()
         } else {
             coroutineScope.launch {
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(context.getString(R.string.no_contacts_invite))
@@ -357,7 +346,7 @@ private fun openDocumentScanner(
 private fun ChatToolbarBottomSheetPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ChatToolbarBottomSheet(
-            onAttachContacts = {},
+            onNavigateToAddContacts = {},
             uiState = ChatUiState(),
             scaffoldState = rememberScaffoldState(),
             onPickLocation = {},

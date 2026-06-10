@@ -158,7 +158,7 @@ internal class ChatToolbarBottomSheetTest {
                     uiState = ChatUiState(),
                     scaffoldState = rememberScaffoldState(),
                     navigateToFileModal = {},
-                    onAttachContacts = {},
+                    onNavigateToAddContacts = {},
                     onAttachFiles = onAttachFileClicked,
                     onAttachScan = onAttachScan,
                 )

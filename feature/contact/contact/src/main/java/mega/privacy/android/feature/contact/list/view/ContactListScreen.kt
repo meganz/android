@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.contact.list.view
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -13,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -29,7 +27,6 @@ import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.fab.MegaFab
-import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -38,6 +35,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.contact.list.model.CallEventData
 import mega.privacy.android.feature.contact.list.model.ContactListUiState
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.feature.contact.components.ContactListLoadingView
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -213,15 +211,12 @@ fun ContactListScreen(
  */
 @Composable
 private fun ContactListLoading(padding: PaddingValues) {
-    Box(
+    ContactListLoadingView(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
             .testTag(CONTACT_LIST_LOADING_TAG),
-        contentAlignment = Alignment.Center,
-    ) {
-        LargeInfiniteSpinnerIndicator()
-    }
+    )
 }
 
 

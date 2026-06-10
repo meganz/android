@@ -13,8 +13,7 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
  */
 class ContactFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, transferHandler: TransferHandler) -> Unit =
-        { navigationHandler, _ ->
-            addContacts(navigationHandler)
+        { _, _ ->
         }
 }
 

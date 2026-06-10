@@ -2949,4 +2949,11 @@
     <string name="contacts_remove_dialog_title">Remove %1$s?</string>
     <!-- Contact list: body of the dialog asking the user to confirm removing a contact -->
     <string name="contacts_remove_dialog_message">This contact will be removed from your contact list.</string>
+    <!-- Add contacts picker: toolbar title shown when selecting contacts to send to a chat -->
+    <string name="send_contacts">Send contacts</string>
+    <!-- Multi-select picker: toolbar title showing how many items are currently selected. %1$d is the count. -->
+    <plurals name="general_selection_num_selected">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
 </resources>

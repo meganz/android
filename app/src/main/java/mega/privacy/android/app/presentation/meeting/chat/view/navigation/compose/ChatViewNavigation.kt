@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.destination.AddContactsNavKey
 import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 
 internal const val ConversationRoute = "conversation"
@@ -63,6 +64,16 @@ internal fun NavGraphBuilder.chatScreen(
                 ?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
             viewModel.onAttachNodes(nodeIds)
             clearResult(ShareFilesToChatNavKey.RESULT)
+        }
+
+        val addContactsResult by monitorResult(AddContactsNavKey.KEY)
+            .collectAsStateWithLifecycle(null)
+        LaunchedEffect(addContactsResult) {
+            @Suppress("UNCHECKED_CAST")
+            val emails = (addContactsResult as? List<String>)
+                ?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
+            viewModel.onAttachContacts(emails)
+            clearResult(AddContactsNavKey.KEY)
         }
 
         ChatView(

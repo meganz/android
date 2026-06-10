@@ -1,0 +1,152 @@
+package mega.privacy.android.feature.contact.add.view
+
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
+import mega.android.core.ui.components.contact.state.ContactItemStatus
+import mega.privacy.android.feature.contact.add.model.AddContactUiState
+import mega.privacy.android.shared.contact.model.AvatarData
+import mega.privacy.android.shared.contact.model.ContactItemUiState
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class AddContactsScreenTest {
+
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    @Test
+    fun `test that the shimmer loading view is displayed when state is Loading`() {
+        setScreen(AddContactUiState.Loading)
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_LOADING_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_LIST_TAG).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that the empty view is displayed when there are no contacts`() {
+        setScreen(AddContactUiState.Data(contacts = persistentListOf(), query = null))
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_EMPTY_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the contact list is displayed when there are contacts`() {
+        setScreen(dataState(contact(1L, "Alice"), contact(2L, "Bob")))
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_LIST_TAG).assertIsDisplayed()
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW).assertCountEquals(2)
+    }
+
+    @Test
+    fun `test that the fab is hidden until a contact is selected`() {
+        setScreen(dataState(contact(1L, "Alice")))
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_FAB_TAG).assertIsNotDisplayed()
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_FAB_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the title reflects the selection count`() {
+        setScreen(dataState(contact(1L, "Alice"), contact(2L, "Bob")))
+
+        composeTestRule.onNodeWithText("Send contacts").assertIsDisplayed()
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+        composeTestRule.onNodeWithText("1 selected").assertIsDisplayed()
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[1].performClick()
+        composeTestRule.onNodeWithText("2 selected").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that confirming reports the selected handles`() {
+        var confirmed: Set<Long>? = null
+        setScreen(dataState(contact(1L, "Alice"), contact(2L, "Bob")), onConfirm = { confirmed = it })
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_FAB_TAG).performClick()
+
+        assertThat(confirmed).containsExactly(1L)
+    }
+
+    @Test
+    fun `test that selection is retained when a selected contact is filtered out`() {
+        val state = mutableStateOf(dataState(contact(1L, "Alice"), contact(2L, "Bob")))
+        composeTestRule.setContent {
+            AddContactsScreen(
+                state = state.value,
+                onSearchQueryChange = {},
+                onConfirm = {},
+                onBack = {},
+            )
+        }
+
+        // Select Alice (the first row) -> FAB appears.
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_FAB_TAG).assertIsDisplayed()
+
+        // Filter Alice out of the visible list.
+        composeTestRule.runOnIdle { state.value = dataState(contact(2L, "Bob")) }
+
+        // Selection is held independently of the list, so the FAB stays visible.
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_FAB_TAG).assertIsDisplayed()
+    }
+
+    private fun setScreen(
+        state: AddContactUiState,
+        onSearchQueryChange: (String?) -> Unit = {},
+        onConfirm: (Set<Long>) -> Unit = {},
+        onBack: () -> Unit = {},
+    ) {
+        composeTestRule.setContent {
+            AddContactsScreen(
+                state = state,
+                onSearchQueryChange = onSearchQueryChange,
+                onConfirm = onConfirm,
+                onBack = onBack,
+            )
+        }
+    }
+
+    private fun dataState(vararg contacts: ContactItemUiState) =
+        AddContactUiState.Data(contacts = contacts.toList().toImmutableList(), query = null)
+
+    private fun contact(
+        handle: Long,
+        displayName: String = "Contact $handle",
+        email: String = "$handle@test.com",
+    ) = ContactItemUiState(
+        handle = handle,
+        displayName = displayName,
+        status = ContactItemStatus.Online,
+        lastSeen = null,
+        avatar = AvatarData.Initials(
+            initials = displayName.first().toString(),
+            avatarColor = Color(0xFF2E7D32),
+        ),
+        isVerified = false,
+        email = email,
+    )
+
+    private companion object {
+        const val CONTACT_ITEM_VIEW_ROW = "contact_item_view:row"
+    }
+}

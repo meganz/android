@@ -8,13 +8,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.navOptions
 import androidx.compose.material.navigation.bottomSheet
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatToolbarBottomSheet
+import mega.privacy.android.navigation.destination.AddContactsNavKey
 
 internal fun NavGraphBuilder.chatToolbarModal(
     navController: NavHostController,
     scaffoldState: ScaffoldState,
     onCameraPermissionDenied: () -> Unit,
+    onNavigate: (NavKey) -> Unit,
     closeBottomSheets: () -> Unit,
 ) {
     bottomSheet(route = "toolbarModal") { backStackEntry ->
@@ -22,7 +25,7 @@ internal fun NavGraphBuilder.chatToolbarModal(
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
         ChatToolbarBottomSheet(
-            onAttachContacts = viewModel::onAttachContacts,
+            onNavigateToAddContacts = { onNavigate(AddContactsNavKey) },
             uiState = uiState,
             scaffoldState = scaffoldState,
             onPickLocation = {
