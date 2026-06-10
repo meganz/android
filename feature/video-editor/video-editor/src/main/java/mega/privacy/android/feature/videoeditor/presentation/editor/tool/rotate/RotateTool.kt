@@ -66,8 +66,12 @@ object RotateTool : EditorTool {
 
     override fun videoEffects(state: EditorState): List<Effect> {
         if (state.rotate.isIdentity) return emptyList()
+        // State degrees are clockwise (the preview renders them via Compose
+        // `rotationZ`, positive = clockwise), while Media3's transformation is
+        // counterclockwise — negate so the export matches the preview. The
+        // builder normalises negatives into [0, 360).
         val transformation = ScaleAndRotateTransformation.Builder()
-            .setRotationDegrees(state.rotate.degrees.toFloat())
+            .setRotationDegrees(-state.rotate.degrees.toFloat())
             .apply { if (state.rotate.flipHorizontal) setScale(-1f, 1f) }
             .build()
         return listOf(transformation)

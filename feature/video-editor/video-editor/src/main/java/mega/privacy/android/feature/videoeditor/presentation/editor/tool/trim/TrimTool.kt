@@ -47,11 +47,16 @@ object TrimTool : EditorTool {
         val trimAction = action as? TrimAction ?: return state
         return when (trimAction) {
             is TrimAction.SetRange -> {
-                val start = trimAction.startMs.coerceAtLeast(0L)
-                // Keep end ≥ start so the range is never inverted; an inverted
-                // range would make the top-level playhead clamp throw on
-                // coerceIn(start, end).
-                val end = trimAction.endMs.coerceAtMost(state.source.durationMs).coerceAtLeast(start)
+                // Start is honoured within [0, duration - minRange],
+                // end yields to keep the window at least minRange and at most
+                // the duration. This also keeps the range non-inverted for the
+                // top-level playhead clamp. The filmstrip already stops a
+                // dragged handle at the floor, so this is defence-in-depth for
+                // programmatic callers and millisecond rounding.
+                val duration = state.source.durationMs
+                val minRange = MIN_TRIM_RANGE_MS.coerceAtMost(duration)
+                val start = trimAction.startMs.coerceIn(0L, duration - minRange)
+                val end = trimAction.endMs.coerceIn(start + minRange, duration)
                 state.copy(trim = state.trim.copy(startMs = start, endMs = end))
             }
 
@@ -93,6 +98,7 @@ object TrimTool : EditorTool {
                 trimEndMs = state.trim.endMs,
                 playheadMs = state.playback.playheadMs,
                 onTrimChange = { start, end -> onAction(TrimAction.SetRange(start, end)) },
+                minTrimRangeMs = MIN_TRIM_RANGE_MS,
                 onSeek = { ms -> onAction(TrimAction.SeekTo(ms)) },
             )
             Row(

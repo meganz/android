@@ -75,7 +75,10 @@ object VolumeTool : EditorTool {
         if (state.volume.isIdentity) return emptyList()
         val gain = state.volume.volume
         val processor = ChannelMixingAudioProcessor()
-        for (channelCount in intArrayOf(1, 2, 4, 6, 8)) {
+        // The processor throws on any decoded channel count without a registered
+        // matrix, so cover every count up to 7.1 — including the odd layouts
+        // (3.0, 5.0, 6.1) — or the whole export fails for such sources.
+        for (channelCount in 1..MAX_CHANNEL_COUNT) {
             processor.putChannelMixingMatrix(scaledIdentityMatrix(channelCount, gain))
         }
         return listOf(processor)
@@ -150,4 +153,7 @@ object VolumeTool : EditorTool {
         }
         return ChannelMixingMatrix(channelCount, channelCount, coefficients)
     }
+
+    /** Highest audio channel count to register a gain matrix for (7.1 surround). */
+    private const val MAX_CHANNEL_COUNT = 8
 }

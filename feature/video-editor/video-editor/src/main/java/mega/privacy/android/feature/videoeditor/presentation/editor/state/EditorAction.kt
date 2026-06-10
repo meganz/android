@@ -20,12 +20,12 @@ sealed interface EditorAction {
         val heightPx: Int,
     ) : EditorAction
 
+    /** The source's metadata could not be read — the video can't be edited. */
+    data class SourceLoadFailed(val uri: Uri) : EditorAction
     data class SourceSizeChanged(val widthPx: Int, val heightPx: Int) : EditorAction
     data object ClearSource : EditorAction
-
     data class SetPlaying(val isPlaying: Boolean) : EditorAction
     data class SetPlayhead(val ms: Long) : EditorAction
-
     data class EnterTool(val tool: ToolId) : EditorAction
     data object CancelTool : EditorAction
     data object ApplyTool : EditorAction

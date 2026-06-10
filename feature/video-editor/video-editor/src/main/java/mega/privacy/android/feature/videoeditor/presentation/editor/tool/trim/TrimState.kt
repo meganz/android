@@ -13,3 +13,10 @@ data class TrimState(
     fun isFullRange(sourceDurationMs: Long): Boolean =
         startMs == 0L && (endMs == sourceDurationMs || endMs == 0L)
 }
+
+/**
+ * Smallest selectable trim window, in milliseconds. Absolute — a long
+ * recording can still be trimmed down to a one-second clip. Sources shorter
+ * than this are pinned to their full range.
+ */
+const val MIN_TRIM_RANGE_MS = 1_000L

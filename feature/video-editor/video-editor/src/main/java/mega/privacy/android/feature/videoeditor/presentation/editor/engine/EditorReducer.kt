@@ -66,6 +66,11 @@ private fun reduceCore(
                 playback = state.playback.copy(playheadMs = 0L),
             )
 
+        is EditorAction.SourceLoadFailed ->
+            // Same stale-read guard as SourceLoaded.
+            if (action.uri != state.source.uri) state
+            else state.copy(source = state.source.copy(loadFailed = true))
+
         is EditorAction.SourceSizeChanged -> {
             if (action.widthPx <= 0 || action.heightPx <= 0) state
             else if (state.source.widthPx == action.widthPx &&

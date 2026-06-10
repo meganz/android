@@ -77,6 +77,37 @@ class EditorReducerTest {
     }
 
     @Test
+    fun `test that SourceLoadFailed marks the source as failed`() {
+        val loaded = reduce(EditorState(), EditorAction.LoadVideo(uri), registry)
+
+        val state = reduce(loaded, EditorAction.SourceLoadFailed(uri), registry)
+
+        assertThat(state.source.loadFailed).isTrue()
+    }
+
+    @Test
+    fun `test that SourceLoadFailed is ignored when its uri is not the active source`() {
+        val loaded = reduce(EditorState(), EditorAction.LoadVideo(uri), registry)
+
+        val state = reduce(loaded, EditorAction.SourceLoadFailed(mock()), registry)
+
+        assertThat(state.source.loadFailed).isFalse()
+    }
+
+    @Test
+    fun `test that LoadVideo clears a previous load failure`() {
+        val failed = reduce(
+            reduce(EditorState(), EditorAction.LoadVideo(uri), registry),
+            EditorAction.SourceLoadFailed(uri),
+            registry,
+        )
+
+        val state = reduce(failed, EditorAction.LoadVideo(mock()), registry)
+
+        assertThat(state.source.loadFailed).isFalse()
+    }
+
+    @Test
     fun `test that SetPlaying updates the playback slice`() {
         val state = reduce(EditorState(), EditorAction.SetPlaying(true), registry)
 

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -106,6 +107,40 @@ class EditorViewModelTest {
         assertThat(state.source.heightPx).isEqualTo(1080)
         assertThat(state.trim.endMs).isEqualTo(5_000L)
     }
+
+    @Test
+    fun `test that LoadVideo marks the source as failed when the metadata has no duration`() =
+        runTest {
+            val uri = mock<Uri>()
+            wheneverBlocking { getVideoMetadataUseCase(any()) } doReturn VideoMetadata(
+                durationMs = 0L,
+                widthPx = 0,
+                heightPx = 0,
+            )
+            val underTest = initViewModel()
+
+            underTest.dispatch(EditorAction.LoadVideo(uri))
+            advanceUntilIdle()
+
+            val state = underTest.editorState.value
+            assertThat(state.source.loadFailed).isTrue()
+            assertThat(state.source.isLoaded).isFalse()
+        }
+
+    @Test
+    fun `test that LoadVideo marks the source as failed when the metadata read throws`() =
+        runTest {
+            val uri = mock<Uri>()
+            wheneverBlocking { getVideoMetadataUseCase(any()) } doAnswer {
+                throw RuntimeException("boom")
+            }
+            val underTest = initViewModel()
+
+            underTest.dispatch(EditorAction.LoadVideo(uri))
+            advanceUntilIdle()
+
+            assertThat(underTest.editorState.value.source.loadFailed).isTrue()
+        }
 
     @Test
     fun `test that startExport emits Done with the exported uri on success`() = runTest {

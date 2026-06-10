@@ -170,13 +170,17 @@ internal fun VideoEditorScreen(
     modifier: Modifier = Modifier,
 ) {
     when {
-        uiState.isError -> EditorErrorState(message = "Failed to load video", modifier = modifier)
+        // Download failed (uiState) or the downloaded file's metadata couldn't
+        // be read (editorState) — either way the source can't be edited.
+        uiState.isError || editorState.source.loadFailed ->
+            EditorErrorState(message = "Failed to load video", modifier = modifier) // TODO
 
         else -> {
             EditorBody(
                 state = editorState,
                 exportProgress = exportProgress,
                 preparingImagePath = uiState.previewImagePath,
+                exportFileName = uiState.exportFileName,
                 registry = registry,
                 onAction = onAction,
                 onSave = onSave,
@@ -203,6 +207,7 @@ private fun EditorBody(
     state: EditorState,
     exportProgress: ExportProgress,
     preparingImagePath: String?,
+    exportFileName: String,
     registry: ToolRegistry,
     onAction: (EditorAction) -> Unit,
     onSave: () -> Unit,
@@ -289,6 +294,7 @@ private fun EditorBody(
     (exportProgress as? ExportProgress.InProgress)?.let { inProgress ->
         ExportProgressDialog(
             percent = inProgress.percent,
+            fileName = exportFileName,
             onCancel = onCancelExport,
         )
     }

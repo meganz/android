@@ -90,6 +90,15 @@ internal class EditorViewModel @Inject constructor(
         metadataJob = viewModelScope.launch {
             runCatching { getVideoMetadataUseCase(uri.toString()) }
                 .onSuccess { info ->
+                    // The gateway resolves read failures to a zero-duration
+                    // sentinel rather than throwing - a source without a
+                    // readable duration can't be edited, so surface it as a
+                    // load failure instead of leaving the editor waiting.
+                    if (info.durationMs <= 0L) {
+                        Timber.e("Source metadata has no duration; treating as load failure")
+                        dispatch(EditorAction.SourceLoadFailed(uri))
+                        return@onSuccess
+                    }
                     sourceMetadata = info
                     dispatch(
                         EditorAction.SourceLoaded(
@@ -100,7 +109,10 @@ internal class EditorViewModel @Inject constructor(
                         ),
                     )
                 }
-                .onFailure { Timber.e(it, "Failed to read metadata for $uri") }
+                .onFailure {
+                    Timber.e(it, "Failed to read source metadata")
+                    dispatch(EditorAction.SourceLoadFailed(uri))
+                }
         }
     }
 

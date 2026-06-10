@@ -15,6 +15,7 @@ import android.net.Uri
 import de.palm.composestateevents.StateEventWithContentTriggered
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -38,6 +39,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -133,11 +135,14 @@ class VideoEditorScreenViewModelTest {
 
     private fun transferWithProgress(floatValue: Float): Transfer = mock {
         on { progress } doReturn Progress(floatValue)
+        // Blank, like an unset path: the ViewModel falls back to the recomputed destination.
+        on { localPath } doReturn ""
     }
 
     private fun transferWith(floatValue: Float, tag: Int): Transfer = mock {
         on { progress } doReturn Progress(floatValue)
         on { this.tag } doReturn tag
+        on { localPath } doReturn ""
     }
 
     @Test
@@ -288,6 +293,56 @@ class VideoEditorScreenViewModelTest {
     }
 
     @Test
+    fun `test that state is error when the node name contains a path separator`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "../$FILE_NAME"
+            on { size } doReturn FILE_SIZE
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem().takeIf { !it.isLoading } ?: awaitItem()
+            assertThat(state.isError).isTrue()
+        }
+        // The unsafe name must never reach the cache lookup or the download.
+        org.mockito.kotlin.verifyNoInteractions(getNodePreviewFileUseCase)
+        org.mockito.kotlin.verifyNoInteractions(downloadNodeUseCase)
+    }
+
+    @Test
+    fun `test that the transfer's local path is used when the download finishes under another name`(
+        @TempDir tempDir: File,
+    ) = runTest {
+        // The SDK escapes fs-incompatible characters, so the file can land under
+        // a different name than the recomputed destination.
+        val escapedFile = File(tempDir, "escaped-$FILE_NAME")
+        val transfer = mock<Transfer> {
+            on { progress } doReturn Progress(1f)
+            on { localPath } doReturn escapedFile.path
+        }
+        val finishEvent = TransferEvent.TransferFinishEvent(transfer, error = null)
+        val node = stubNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn tempDir.path
+        whenever(downloadNodeUseCase(any(), any(), anyOrNull(), any())) doReturn flow {
+            escapedFile.writeBytes(ByteArray(FILE_SIZE.toInt()))
+            emit(finishEvent)
+        }
+        initViewModel()
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state.videoFilePath == null && !state.isError) {
+                state = awaitItem()
+            }
+            assertThat(state.videoFilePath).isEqualTo(escapedFile.path)
+            assertThat(state.isError).isFalse()
+        }
+    }
+
+    @Test
     fun `test that isDownloading is true once a network download is in progress`(
         @TempDir tempDir: File,
     ) = runTest {
@@ -384,6 +439,41 @@ class VideoEditorScreenViewModelTest {
         assertThat(upload.pathsAndNames)
             .isEqualTo(mapOf("/cache/video-editor-export.mp4" to "video (1).mp4"))
         assertThat(upload.specificStartMessage).isEqualTo(UPLOAD_MESSAGE)
+    }
+
+    @Test
+    fun `test that onExportSucceeded uploads a non-mp4 source's copy under an mp4 name`(
+        @TempDir tempDir: File,
+    ) = runTest {
+        // The encoded copy is always MP4, so the upload name must not keep the
+        // source's container extension.
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "video.mkv"
+            on { size } doReturn FILE_SIZE
+            on { parentId } doReturn NodeId(PARENT_HANDLE)
+            on { modificationTime } doReturn MODIFICATION_TIME
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))) doReturn node
+        whenever(getFilePreviewDownloadPathUseCase()) doReturn tempDir.path
+        initViewModel()
+        advanceUntilIdle()
+        wheneverBlocking { getNodeNameCollisionRenameNameUseCase(any()) } doReturn "video (1).mp4"
+        val outputUri = mock<Uri> { on { path } doReturn "/cache/video-editor-export.mp4" }
+
+        underTest.onExportSucceeded(outputUri)
+        advanceUntilIdle()
+
+        val collisionCaptor = argumentCaptor<FileNameCollision>()
+        verifyBlocking(getNodeNameCollisionRenameNameUseCase) { invoke(collisionCaptor.capture()) }
+        assertThat(collisionCaptor.firstValue.name).isEqualTo("video.mp4")
+        // The same derived name is exposed for the export progress dialog.
+        assertThat(underTest.uiState.value.exportFileName).isEqualTo("video.mp4")
+        val event = underTest.uiState.value.transferEvent
+        val upload = (event as StateEventWithContentTriggered).content
+                as TransferTriggerEvent.StartUpload.Files
+        assertThat(upload.pathsAndNames)
+            .isEqualTo(mapOf("/cache/video-editor-export.mp4" to "video (1).mp4"))
     }
 
     @Test

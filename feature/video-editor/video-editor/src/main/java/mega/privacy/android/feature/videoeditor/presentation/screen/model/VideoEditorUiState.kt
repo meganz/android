@@ -15,6 +15,8 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @param isDownloading Whether a network download is actually in progress; stays false when a local
  * or cached copy is reused, so the "Preparing video" dialog is not flashed for an instant ready
  * @param fileName Name of the source video, shown while it is being downloaded
+ * @param exportFileName Name the exported copy is uploaded under (before collision renaming):
+ * the source name with an .mp4 extension, since the encoder always outputs MP4. Shown while encoding
  * @param fileSizeBytes Size of the source video in bytes, used for the download size readout
  * @param previewImagePath Absolute path to the source's preview (or thumbnail fallback), shown in
  * the preview area while preparing
@@ -28,6 +30,7 @@ data class VideoEditorUiState(
     val downloadProgress: Int = 0,
     val isDownloading: Boolean = false,
     val fileName: String = "",
+    val exportFileName: String = "",
     val fileSizeBytes: Long = 0L,
     val previewImagePath: String? = null,
     val videoFilePath: String? = null,

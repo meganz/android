@@ -87,8 +87,22 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
                 emitError()
                 return@launch
             }
+            // A node name can be set by any client; one containing a path
+            // separator would escape the cache directory when joined into a
+            // local path below (and in the cache lookup), so reject it.
+            if (node.name.contains(File.separatorChar)) {
+                Timber.e("Rejecting node $nodeHandle: name contains a path separator")
+                emitError()
+                return@launch
+            }
             sourceNode = node
-            _uiState.update { it.copy(fileName = node.name, fileSizeBytes = node.size) }
+            _uiState.update {
+                it.copy(
+                    fileName = node.name,
+                    exportFileName = exportFileNameFor(node.name),
+                    fileSizeBytes = node.size,
+                )
+            }
             loadPreviewImage(node)
 
             // Check cache first
@@ -139,8 +153,15 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
             is TransferEvent.TransferFinishEvent -> {
                 // Finished (success or error): nothing left to cancel.
                 downloadTransferTag = null
-                if (event.error == null && destFile.exists() && destFile.length() > 0L) {
-                    emitReady(destFile)
+                // The SDK may store the file under an escaped name when the
+                // node name contains fs-incompatible characters, so trust the
+                // transfer's actual local path over the recomputed destination.
+                val downloadedFile = event.transfer.localPath
+                    .takeIf { it.isNotBlank() }
+                    ?.let(::File)
+                    ?: destFile
+                if (event.error == null && downloadedFile.exists() && downloadedFile.length() > 0L) {
+                    emitReady(downloadedFile)
                 } else {
                     Timber.e(event.error, "Video download finished with error for node $nodeHandle")
                     emitError()
@@ -203,7 +224,7 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
             runCatching {
                 val collision = FileNameCollision(
                     collisionHandle = node.id.longValue,
-                    name = node.name,
+                    name = exportFileNameFor(node.name),
                     size = node.size,
                     lastModified = node.modificationTime,
                     parentHandle = node.parentId.longValue,
@@ -260,7 +281,17 @@ internal class VideoEditorScreenViewModel @AssistedInject constructor(
         fun create(nodeHandle: Long): VideoEditorScreenViewModel
     }
 
+    /**
+     * The name the exported copy is uploaded under, before collision renaming.
+     * The encoded copy is always MP4 (the transformer's muxer only writes MP4),
+     * so the name must carry the .mp4 extension even when the source was
+     * another container (mkv, mov, avi, ...).
+     */
+    private fun exportFileNameFor(sourceName: String): String =
+        "${sourceName.substringBeforeLast('.')}$EXPORT_FILE_EXTENSION"
+
     private companion object {
         const val EXPORT_FAILURE_MESSAGE = "Couldn't save video"
+        const val EXPORT_FILE_EXTENSION = ".mp4"
     }
 }

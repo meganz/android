@@ -40,8 +40,11 @@ import javax.inject.Inject
  *
  * Collection drives the encode: cancelling the collector stops the transformer
  * (on the Main thread, via the producer's `finally`), and a failure surfaces as
- * the flow throwing. The output is left in the cache for the caller (the upload
- * flow consumes it and is responsible for removing it).
+ * the flow throwing. The output is left in the cache for the caller: the upload
+ * flow consumes it as a temporary source, so the SDK deletes it once the upload
+ * finishes. Each export writes to a unique file so a new export can never
+ * clobber an output a still-running upload is reading; leftovers from failed or
+ * cancelled runs are swept by [deleteStaleExports] on the next export.
  */
 @UnstableApi
 class VideoExporter @Inject constructor(
@@ -60,10 +63,11 @@ class VideoExporter @Inject constructor(
         tools: List<EditorTool>,
         sourceMetadata: VideoMetadata?,
     ): Flow<ExportEvent> = channelFlow {
-        // Clear any leftover output from a prior run off the main thread
-        val outputFile = withContext(ioDispatcher) {
-            File(context.cacheDir, EXPORT_FILE_NAME).apply { delete() }
-        }
+        deleteStaleExports()
+        val outputFile = File(
+            context.cacheDir,
+            "$EXPORT_FILE_PREFIX${System.currentTimeMillis()}$EXPORT_FILE_EXTENSION",
+        )
         val completion = CompletableDeferred<Unit>()
 
         val transformer = withContext(mainDispatcher) {
@@ -131,8 +135,22 @@ class VideoExporter @Inject constructor(
         }
     }
 
+    /**
+     * Sweep export outputs left behind by failed or cancelled uploads. Anything
+     * old enough can no longer be an in-flight upload's source (a successful
+     * upload's file is deleted by the SDK itself), so it is safe to remove.
+     */
+    private suspend fun deleteStaleExports() = withContext(ioDispatcher) {
+        val cutoff = System.currentTimeMillis() - STALE_EXPORT_MAX_AGE_MS
+        context.cacheDir.listFiles()
+            ?.filter { it.name.startsWith(EXPORT_FILE_PREFIX) && it.lastModified() < cutoff }
+            ?.forEach { it.delete() }
+    }
+
     private companion object {
-        const val EXPORT_FILE_NAME = "video-editor-export.mp4"
+        const val EXPORT_FILE_PREFIX = "video-editor-export-"
+        const val EXPORT_FILE_EXTENSION = ".mp4"
         const val PROGRESS_POLL_INTERVAL_MS = 150L
+        const val STALE_EXPORT_MAX_AGE_MS = 24 * 60 * 60 * 1000L
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -42,6 +43,8 @@ import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.Bui
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.crop.CropAction
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.crop.CropPreset
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.abs
 
 /**
@@ -112,11 +115,23 @@ fun EditorPreview(
         }
     }
 
-    LaunchedEffect(state.source.uri, state.trim.startMs, state.trim.endMs) {
-        if (state.source.uri != null && state.source.durationMs > 0L) {
-            player.setMediaItem(buildMediaItem(state))
-            player.prepare()
-        }
+    // (Re)prepare the player when the source loads or the trim changes. Trim
+    // updates stream in on every handle-drag tick, and each prepare tears down
+    // the decoder and re-buffers the clipping window — so trim changes are
+    // debounced via collectLatest until the drag settles. The first emission
+    // (source load) prepares immediately.
+    val stateLive = rememberUpdatedState(state)
+    LaunchedEffect(state.source.uri, state.source.durationMs) {
+        if (state.source.uri == null || state.source.durationMs <= 0L) return@LaunchedEffect
+        var prepared = false
+        snapshotFlow { stateLive.value.trim }
+            .distinctUntilChanged()
+            .collectLatest {
+                if (prepared) delay(TRIM_REPREPARE_DEBOUNCE_MS)
+                player.setMediaItem(buildMediaItem(stateLive.value))
+                player.prepare()
+                prepared = true
+            }
     }
 
     // Speed is applied via setPlaybackSpeed, NOT via SpeedChangeEffect — running
@@ -342,6 +357,13 @@ private const val SEEK_CORRECTION_THRESHOLD_MS = 250L
 
 /** Poll interval for pushing the player position back into editor state while playing. */
 private const val PLAYHEAD_POLL_INTERVAL_MS = 80L
+
+/**
+ * Quiet period after the last trim change before the clipped media item is
+ * rebuilt and re-prepared — long enough to coalesce a handle drag, short enough
+ * that the preview frame updates promptly once the drag settles.
+ */
+private const val TRIM_REPREPARE_DEBOUNCE_MS = 200L
 
 /**
  * Preview-volume clamp. `ExoPlayer.volume` can't amplify, so the preview is

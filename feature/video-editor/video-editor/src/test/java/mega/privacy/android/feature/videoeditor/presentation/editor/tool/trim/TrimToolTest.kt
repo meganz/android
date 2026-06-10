@@ -30,10 +30,63 @@ class TrimToolTest {
     }
 
     @Test
-    fun `test that SetRange keeps the end at least the start`() {
+    fun `test that SetRange keeps the end at least the start plus the minimum range`() {
         val result = TrimTool.reduce(state(), TrimAction.SetRange(startMs = 8_000L, endMs = 2_000L))
 
-        assertThat(result.trim).isEqualTo(TrimState(startMs = 8_000L, endMs = 8_000L))
+        assertThat(result.trim).isEqualTo(
+            TrimState(startMs = 8_000L, endMs = 8_000L + MIN_TRIM_RANGE_MS),
+        )
+    }
+
+    @Test
+    fun `test that SetRange pushes the end forward when the range closes below the minimum`() {
+        val original = state(trim = TrimState(0L, 5_000L))
+
+        val result =
+            TrimTool.reduce(original, TrimAction.SetRange(startMs = 4_800L, endMs = 5_000L))
+
+        assertThat(result.trim).isEqualTo(
+            TrimState(startMs = 4_800L, endMs = 4_800L + MIN_TRIM_RANGE_MS),
+        )
+    }
+
+    @Test
+    fun `test that SetRange pulls a dragged end handle forward to the minimum range`() {
+        val original = state(trim = TrimState(4_000L, durationMs))
+
+        val result =
+            TrimTool.reduce(original, TrimAction.SetRange(startMs = 4_000L, endMs = 4_200L))
+
+        assertThat(result.trim).isEqualTo(
+            TrimState(startMs = 4_000L, endMs = 4_000L + MIN_TRIM_RANGE_MS),
+        )
+    }
+
+    @Test
+    fun `test that SetRange anchors at the duration when the end cannot move forward`() {
+        val original = state(trim = TrimState(8_000L, durationMs))
+
+        val result = TrimTool.reduce(
+            original,
+            TrimAction.SetRange(startMs = durationMs - 200L, endMs = durationMs),
+        )
+
+        assertThat(result.trim).isEqualTo(
+            TrimState(startMs = durationMs - MIN_TRIM_RANGE_MS, endMs = durationMs),
+        )
+    }
+
+    @Test
+    fun `test that SetRange pins a source shorter than the minimum range to its full range`() {
+        val shortDuration = 500L
+        val original = EditorState(
+            source = SourceState(durationMs = shortDuration),
+            trim = TrimState(0L, shortDuration),
+        )
+
+        val result = TrimTool.reduce(original, TrimAction.SetRange(startMs = 100L, endMs = 300L))
+
+        assertThat(result.trim).isEqualTo(TrimState(startMs = 0L, endMs = shortDuration))
     }
 
     @Test

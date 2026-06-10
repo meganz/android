@@ -56,6 +56,10 @@ private const val THUMB_COUNT = 10
 /**
  * Trim filmstrip: thumbnail strip + draggable in/out handles + playhead. Tap or
  * drag on any non-handle part seeks the playhead inside the trim window.
+ *
+ * @param minTrimRangeMs Smallest window the handles can close down to, in
+ * milliseconds. Absolute, so the floor doesn't scale with the video length;
+ * sources shorter than it are pinned to the full range.
  */
 @Composable
 fun Filmstrip(
@@ -66,6 +70,7 @@ fun Filmstrip(
     playheadMs: Long,
     onTrimChange: (Long, Long) -> Unit,
     modifier: Modifier = Modifier,
+    minTrimRangeMs: Long = 1_000L,
     onSeek: (Long) -> Unit = {},
 ) {
     var widthPx by remember { mutableStateOf(0) }
@@ -77,6 +82,7 @@ fun Filmstrip(
     val startFrac = trimStartMs.toFloat() / safeDuration
     val endFrac = trimEndMs.toFloat() / safeDuration
     val playFrac = playheadMs.toFloat() / safeDuration
+    val minGapFrac = (minTrimRangeMs.toFloat() / safeDuration).coerceIn(0f, 1f)
 
     val startFracState = rememberUpdatedState(startFrac)
     val endFracState = rememberUpdatedState(endFrac)
@@ -180,7 +186,7 @@ fun Filmstrip(
                 brand = brand,
                 onDrag = { dx ->
                     val newStartFrac = (startFracState.value + dx / widthPx)
-                        .coerceIn(0f, endFracState.value - 0.02f)
+                        .coerceIn(0f, (endFracState.value - minGapFrac).coerceAtLeast(0f))
                     onTrimState.value((newStartFrac * safeDuration).toLong(), trimEndMsState.value)
                 },
             )
@@ -190,7 +196,7 @@ fun Filmstrip(
                 brand = brand,
                 onDrag = { dx ->
                     val newEndFrac = (endFracState.value + dx / widthPx)
-                        .coerceIn(startFracState.value + 0.02f, 1f)
+                        .coerceIn((startFracState.value + minGapFrac).coerceAtMost(1f), 1f)
                     onTrimState.value(trimStartMsState.value, (newEndFrac * safeDuration).toLong())
                 },
             )
