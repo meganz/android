@@ -107,6 +107,8 @@ import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.transition.opaqueFadeBackwardTransition
+import mega.privacy.android.navigation.contract.transition.opaqueFadeForwardTransition
 import mega.privacy.android.navigation.destination.VideoEditorScreenNavKey
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -216,6 +218,11 @@ class ImagePreviewActivity : BaseActivity() {
                 navigationResultManager = navigationResultManager,
                 featureDestinations = featureDestinations,
                 onEmptyBackStack = ::finish,
+                // The Activity window is translucent (to support flick-to-dismiss), so the default
+                // crossfade would briefly reveal the Activity behind it. These keep the screen
+                // underneath opaque and only fade the top-most entry.
+                transitionSpec = { opaqueFadeForwardTransition },
+                popTransitionSpec = { opaqueFadeBackwardTransition },
             ) { navigationHandler, _ ->
                 entry<ImagePreviewNavKey> {
                     ImagePreviewContent(

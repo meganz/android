@@ -1,5 +1,7 @@
 package mega.privacy.android.app.appstate.content.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -47,6 +49,8 @@ import kotlin.reflect.KClass
  * @param overlayContent composed inside the [LocalSnackBarHostState] provider, after (i.e. on
  * top of) the `NavDisplay`. Use it for activity-level side-effects that need the snackbar host,
  * or to render UI that should overlay the navigation content (e.g. a snackbar host).
+ * @param transitionSpec transition used for forward navigation. Defaults to [fadeTransition].
+ * @param popTransitionSpec transition used for back/pop navigation. Defaults to [fadeTransition].
  * @param entryContent block that registers the activity's own `entry<...>` blocks; receives
  * the shared [NavigationHandler] and [TransferHandler].
  */
@@ -60,6 +64,8 @@ fun LegacyActivityScaffold(
     onEmptyBackStack: () -> Unit = {},
     excludeOwnDestination: KClass<out FeatureDestination>? = null,
     overlayContent: @Composable () -> Unit = {},
+    transitionSpec: AnimatedContentTransitionScope<*>.() -> ContentTransform = { fadeTransition },
+    popTransitionSpec: AnimatedContentTransitionScope<*>.() -> ContentTransform = { fadeTransition },
     entryContent: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit,
 ) {
     container {
@@ -93,9 +99,9 @@ fun LegacyActivityScaffold(
                     rememberSaveableStateHolderNavEntryDecorator(),
                     rememberSharedViewModelStoreNavEntryDecorator(),
                 ),
-                transitionSpec = { fadeTransition },
-                popTransitionSpec = { fadeTransition },
-                predictivePopTransitionSpec = { fadeTransition },
+                transitionSpec = transitionSpec,
+                popTransitionSpec = popTransitionSpec,
+                predictivePopTransitionSpec = { popTransitionSpec() },
                 entryProvider = entryProvider {
                     entryContent(navigationHandler, transferHandler)
                     featureDestinations
