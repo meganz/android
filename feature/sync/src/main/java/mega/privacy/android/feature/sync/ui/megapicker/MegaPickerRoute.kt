@@ -96,6 +96,7 @@ internal fun MegaPickerRoute(
             },
             onDismiss = {
                 viewModel.handleAction(MegaPickerAction.DisableBatteryOptimizationsDialogShown)
+                selectCurrentFolder(viewModel, syncPermissionsManager)
             },
         )
     }
