@@ -52,6 +52,7 @@ enum class PublicLinkType {
     Folder,
     File,
     Album,
+    ExternalFile, // A file opened from outside the app, prompting the user to save it.
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,6 +70,7 @@ fun PublicLinkAuthAlertBottomSheet(
             PublicLinkType.Folder -> sharedR.string.public_link_auth_alert_title_folder
             PublicLinkType.File -> sharedR.string.public_link_auth_alert_title_file
             PublicLinkType.Album -> sharedR.string.public_link_auth_alert_title_album
+            PublicLinkType.ExternalFile -> sharedR.string.public_link_auth_alert_title_file
         }
     )
     val description = stringResource(
@@ -78,6 +80,8 @@ fun PublicLinkAuthAlertBottomSheet(
                 -> sharedR.string.public_link_auth_alert_description_default
 
             PublicLinkType.Album -> sharedR.string.public_link_auth_alert_description_album
+            PublicLinkType.ExternalFile
+                -> sharedR.string.public_link_auth_alert_description_external_file
         }
     )
     MegaModalBottomSheet(

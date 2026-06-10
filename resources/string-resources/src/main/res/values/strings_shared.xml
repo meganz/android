@@ -2964,4 +2964,6 @@
     <string name="contacts_groups_empty_title">No groups</string>
     <!-- Contact groups: error message shown when creating a new group chat fails -->
     <string name="contacts_groups_create_error">An error occurred when creating the chat</string>
+    <!-- Description of the auth alert bottom sheet shown to guest users for an external file, encouraging them to save it to their MEGA account -->
+    <string name="public_link_auth_alert_description_external_file">Keep this file safe and access it anytime</string>
 </resources>

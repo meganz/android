@@ -169,7 +169,7 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
 
         if (showLoginRequiredSheet) {
             PublicLinkAuthAlertBottomSheet(
-                type = PublicLinkType.File,
+                type = PublicLinkType.ExternalFile,
                 onSignupClicked = {
                     showLoginRequiredSheet = false
                     activity.setPendingDeepLink(navKey.contentUri, navKey.mimeType)
