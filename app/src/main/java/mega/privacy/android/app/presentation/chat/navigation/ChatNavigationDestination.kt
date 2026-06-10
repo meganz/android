@@ -10,8 +10,10 @@ import mega.privacy.android.app.presentation.meeting.chat.ChatActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 
 fun EntryProviderScope<NavKey>.chatLegacyDestination(removeDestination: () -> Unit) {
     entry<ChatNavKey>(
@@ -24,6 +26,31 @@ fun EntryProviderScope<NavKey>.chatLegacyDestination(removeDestination: () -> Un
         }
     }
 }
+
+/**
+ * Destination for [ShowChatMessagesNavKey]. Opens [ChatActivity] for the given chat with
+ * the "show messages" action hardcoded.
+ * @param navigationHandler
+ */
+fun EntryProviderScope<NavKey>.showChatMessagesDestination(navigationHandler: NavigationHandler) {
+    entry<ShowChatMessagesNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
+        val context = LocalContext.current
+        LaunchedEffect(Unit) {
+            context.startActivity(createShowMessagesIntent(context, key.chatId))
+            navigationHandler.remove(key)
+        }
+    }
+}
+
+@Suppress("DEPRECATION") // The activity is launched via the legacy intent action.
+private fun createShowMessagesIntent(context: Context, chatId: Long): Intent =
+    Intent(context, ChatActivity::class.java).apply {
+        action = Constants.ACTION_CHAT_SHOW_MESSAGES
+        putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
+        putExtra(EXTRA_ACTION, Constants.ACTION_CHAT_SHOW_MESSAGES)
+    }
 
 /**
  * Creates an Intent for ChatHostActivity with all relevant extras

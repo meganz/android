@@ -22,10 +22,12 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doReturnConsecutively
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -82,12 +84,13 @@ class ContactGroupsViewModelTest {
     }
 
     @Test
-    fun `test that state stays Loading when use case throws`() = runTest {
+    fun `test that state is Data with no groups when use case throws`() = runTest {
         getContactGroupsUseCase.stub { on { invoke() } doThrow RuntimeException("error") }
 
         underTest.uiState.test {
-            assertThat(awaitItem()).isEqualTo(ContactGroupUiState.Loading)
-            expectNoEvents()
+            val actual = awaitDataState()
+            assertThat(actual.groups).isEmpty()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -179,9 +182,7 @@ class ContactGroupsViewModelTest {
             underTest.uiState.test {
                 awaitDataState()
                 underTest.createGroupChat(arrayListOf("a@mega.co.nz"), "Title", true)
-                val actual = awaitDataState()
-                assertThat(actual.groupChatCreated)
-                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                val actual = awaitDataState { it.groupChatCreated is StateEventWithContentTriggered }
                 assertThat((actual.groupChatCreated as StateEventWithContentTriggered).content)
                     .isEqualTo(123L)
                 cancelAndIgnoreRemainingEvents()
@@ -199,9 +200,7 @@ class ContactGroupsViewModelTest {
             underTest.uiState.test {
                 awaitDataState()
                 underTest.createGroupChat(arrayListOf("a@mega.co.nz"), "Title", true)
-                val actual = awaitDataState()
-                assertThat(actual.groupChatCreated)
-                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                val actual = awaitDataState { it.groupChatCreated is StateEventWithContentTriggered }
                 assertThat((actual.groupChatCreated as StateEventWithContentTriggered).content)
                     .isEqualTo(INVALID_GROUP_CHAT_ID)
                 cancelAndIgnoreRemainingEvents()
@@ -218,16 +217,62 @@ class ContactGroupsViewModelTest {
         underTest.uiState.test {
             awaitDataState()
             underTest.createGroupChat(arrayListOf("a@mega.co.nz"), "Title", true)
-            val triggered = awaitDataState()
-            assertThat(triggered.groupChatCreated)
-                .isInstanceOf(StateEventWithContentTriggered::class.java)
+            awaitDataState { it.groupChatCreated is StateEventWithContentTriggered }
 
             underTest.onGroupChatCreatedConsumed()
-            val consumed = awaitDataState()
+            val consumed = awaitDataState { it.groupChatCreated is StateEventWithContentConsumed }
             assertThat(consumed.groupChatCreated)
                 .isInstanceOf(StateEventWithContentConsumed::class.java)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that createGroupChat success refreshes the groups once`() = runTest {
+        getContactGroupsUseCase.stub {
+            on { invoke() } doReturnConsecutively listOf(
+                listOf(group(chatId = 1L, title = "Alpha")),
+                listOf(group(chatId = 1L, title = "Alpha"), group(chatId = 2L, title = "Beta")),
+            )
+        }
+        whenever(
+            createGroupChatRoomUseCase(any(), anyOrNull(), any(), any(), any())
+        ) doReturn 123L
+
+        underTest.uiState.test {
+            awaitDataState { it.groups.size == 1 }
+            underTest.createGroupChat(arrayListOf("a@mega.co.nz"), "Title", true)
+            val refreshed = awaitDataState { it.groups.size == 2 }
+            assertThat(refreshed.groups).hasSize(2)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(getContactGroupsUseCase, times(2)).invoke()
+    }
+
+    @Test
+    fun `test that consuming the created event does not reload the groups`() = runTest {
+        getContactGroupsUseCase.stub {
+            on { invoke() } doReturnConsecutively listOf(
+                listOf(group(chatId = 1L, title = "Alpha")),
+                listOf(group(chatId = 1L, title = "Alpha"), group(chatId = 2L, title = "Beta")),
+            )
+        }
+        whenever(
+            createGroupChatRoomUseCase(any(), anyOrNull(), any(), any(), any())
+        ) doReturn 123L
+
+        underTest.uiState.test {
+            awaitDataState { it.groups.size == 1 }
+            underTest.createGroupChat(arrayListOf("a@mega.co.nz"), "Title", true)
+            awaitDataState { it.groups.size == 2 }
+            underTest.onGroupChatCreatedConsumed()
+            awaitDataState { it.groupChatCreated is StateEventWithContentConsumed }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // One load on init + one refresh after creation. Consuming the event must not refetch.
+        verify(getContactGroupsUseCase, times(2)).invoke()
     }
 
     private fun group(chatId: Long, title: String) = ContactGroup(
@@ -244,11 +289,12 @@ class ContactGroupsViewModelTest {
         isPrivate = false,
     )
 
-    private suspend fun ReceiveTurbine<ContactGroupUiState>.awaitDataState(): ContactGroupUiState.Data {
-        var item = awaitItem()
-        while (item !is ContactGroupUiState.Data) {
-            item = awaitItem()
+    private suspend fun ReceiveTurbine<ContactGroupUiState>.awaitDataState(
+        predicate: (ContactGroupUiState.Data) -> Boolean = { true },
+    ): ContactGroupUiState.Data {
+        while (true) {
+            val item = awaitItem()
+            if (item is ContactGroupUiState.Data && predicate(item)) return item
         }
-        return item
     }
 }

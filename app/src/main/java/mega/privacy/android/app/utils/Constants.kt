@@ -142,6 +142,7 @@ object Constants {
     const val OPENED_FROM_CHAT: String = "OPENED_FROM_CHAT"
     const val ACTION_OPEN_CHAT_LINK: String = "OPEN_CHAT_LINK"
     const val ACTION_JOIN_OPEN_CHAT_LINK: String = "JOIN_OPEN_CHAT_LINK"
+    @Deprecated("Use ShowChatMessagesNavKey for navigation instead of this intent action.")
     const val ACTION_CHAT_SHOW_MESSAGES: String = "CHAT_SHOW_MESSAGES"
     const val ACTION_SHOW_UPGRADE_ACCOUNT: String = "ACTION_SHOW_UPGRADE_ACCOUNT"
     const val ACTION_OPEN_CONTACTS_SECTION: String = "ACTION_OPEN_CONTACTS_SECTION"

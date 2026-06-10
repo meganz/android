@@ -17,6 +17,7 @@ import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.audiosection.audioSectionDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
+import mega.privacy.android.app.presentation.chat.navigation.showChatMessagesDestination
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.navigation.authenticityCredentialsLegacyDestination
 import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.addContactsDestination
@@ -72,6 +73,7 @@ class LegacyCoreActivityFeatureGraph(
             inviteContactLegacyDestination(navigationHandler::back)
             authenticityCredentialsLegacyDestination(navigationHandler::back)
             chatLegacyDestination(navigationHandler::back)
+            showChatMessagesDestination(navigationHandler)
             manageChatHistoryLegacyDestination(navigationHandler::remove)
             testPasswordLegacyDestination(navigationHandler::back)
             legacyFileLinkScreen(navigationHandler::back)

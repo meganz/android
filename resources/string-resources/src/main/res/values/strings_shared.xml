@@ -2956,4 +2956,12 @@
         <item quantity="one">%1$d selected</item>
         <item quantity="other">%1$d selected</item>
     </plurals>
+    <!-- Contact groups: screen/top bar title for the list of the user's group chats -->
+    <string name="contacts_groups_title">Groups</string>
+    <!-- Contact groups: placeholder displayed inside the search field on the groups screen -->
+    <string name="contacts_groups_search_hint">Search groups</string>
+    <!-- Contact groups: title shown in the empty state when the user has no group chats -->
+    <string name="contacts_groups_empty_title">No groups</string>
+    <!-- Contact groups: error message shown when creating a new group chat fails -->
+    <string name="contacts_groups_create_error">An error occurred when creating the chat</string>
 </resources>

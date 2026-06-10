@@ -83,6 +83,18 @@ data class ChatNavKey(
 }
 
 /**
+ * Navigation key for opening a chat showing its messages.
+ *
+ * The "show messages" action is implicit, so callers only need to provide the
+ * chat id. Prefer this over [ChatNavKey] with an explicit action string.
+ *
+ * @param chatId Chat ID to open.
+ */
+@Serializable
+@Parcelize
+data class ShowChatMessagesNavKey(val chatId: Long) : NoSessionNavKey.Optional, Parcelable
+
+/**
  * Navigation key for Chat List
  *
  * @param createNewChat True if the Chat List screen should open with the Create New Chat flow

@@ -15,6 +15,8 @@ android {
     }
     namespace = "mega.privacy.android.feature.contact"
 
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
+
     testOptions {
         unitTests {
             targetSdk = 34

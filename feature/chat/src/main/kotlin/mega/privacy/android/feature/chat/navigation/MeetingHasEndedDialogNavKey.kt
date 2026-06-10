@@ -8,8 +8,8 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.chat.meeting.view.MeetingHasEndedDialog
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
-import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.LeftMeetingNavKey
+import mega.privacy.android.navigation.destination.ShowChatMessagesNavKey
 
 /**
  * Meeting has ended dialog destination [DialogNavKey]
@@ -39,11 +39,9 @@ fun EntryProviderScope<in DialogNavKey>.meetingHasEndedDialog(
             },
             onShowChat = {
                 key.chatId?.let {
-                    navigate(ChatNavKey(it, ACTION_CHAT_SHOW_MESSAGES))
+                    navigate(ShowChatMessagesNavKey(it))
                 } ?: navigate(LeftMeetingNavKey())
             },
         )
     }
 }
-
-internal const val ACTION_CHAT_SHOW_MESSAGES = "CHAT_SHOW_MESSAGES"
