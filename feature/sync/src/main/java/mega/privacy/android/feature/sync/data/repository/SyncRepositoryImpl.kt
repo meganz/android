@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaSyncList
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class SyncRepositoryImpl @Inject constructor(
     private val syncWorkManagerGateway: SyncWorkManagerGateway,
@@ -120,9 +121,9 @@ internal class SyncRepositoryImpl @Inject constructor(
                 MegaSyncListenerEvent.OnRefreshSyncState
             }
         ).flowOn(ioDispatcher)
-            .shareIn(appScope, SharingStarted.Eagerly)
+            .shareIn(appScope, SharingStarted.Lazily)
     }
-    override val syncChanges: Flow<MegaSyncListenerEvent> = _syncChanges
+    override val syncChanges: Flow<MegaSyncListenerEvent> get() = _syncChanges
 
     override suspend fun getSyncStalledIssues(): List<StalledIssue> = withContext(ioDispatcher) {
         runCatching {
@@ -140,11 +141,11 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val _syncStalledIssues by lazy {
         _syncChanges
             .onEach {
-                delay(SYNC_REFRESH_DELAY)
+                delay(SYNC_REFRESH_DELAY.milliseconds)
             }
             .map { getSyncStalledIssues() }
             .flowOn(ioDispatcher)
-            .shareIn(appScope, SharingStarted.Eagerly, replay = 1)
+            .shareIn(appScope, SharingStarted.Lazily, replay = 1)
     }
 
     override fun monitorStalledIssues() = _syncStalledIssues
@@ -154,7 +155,7 @@ internal class SyncRepositoryImpl @Inject constructor(
             .map { getFolderPairs() }
             .onStart { emit(getFolderPairs()) }
             .flowOn(ioDispatcher)
-            .shareIn(appScope, SharingStarted.Eagerly, replay = 1)
+            .shareIn(appScope, SharingStarted.Lazily, replay = 1)
     }
 
     override fun monitorFolderPairChanges() = _folderPair
