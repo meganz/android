@@ -99,7 +99,6 @@ import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
-import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
@@ -867,18 +866,6 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     override fun launchUrl(context: Context?, url: String?, appendNoPlansParam: Boolean) {
         context?.launchUrl(url, appendNoPlansParam)
-    }
-
-    override fun openSearchActivity(
-        context: Context,
-        nodeSourceType: NodeSourceType,
-        parentHandle: Long,
-    ) {
-        navigateForSingleActivity(
-            context = context, singleActivityDestination = LegacySearchNavKey(
-                nodeSourceType = nodeSourceType, parentHandle = parentHandle
-            )
-        )
     }
 
     override fun openTakedownPolicyLink(context: Context) {

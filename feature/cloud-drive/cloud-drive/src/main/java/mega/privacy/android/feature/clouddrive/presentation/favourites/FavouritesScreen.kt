@@ -24,7 +24,6 @@ import mega.privacy.android.feature.clouddrive.presentation.favourites.model.Fav
 import mega.privacy.android.feature.clouddrive.presentation.favourites.view.FavouritesContent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
-import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -101,18 +100,12 @@ fun FavouritesScreen(
                         if (!uiState.isEmpty) {
                             add(
                                 MenuActionWithClick(CommonMenuAction.Search) {
-                                    val searchNavKey = if (uiState.isSearchRevampEnabled) {
+                                    navigationHandler.navigate(
                                         SearchNavKey(
                                             parentHandle = -1L,
                                             nodeSourceType = NodeSourceType.FAVOURITES
                                         )
-                                    } else {
-                                        LegacySearchNavKey(
-                                            parentHandle = -1L,
-                                            nodeSourceType = NodeSourceType.FAVOURITES
-                                        )
-                                    }
-                                    navigationHandler.navigate(searchNavKey)
+                                    )
                                 })
                         }
                     }

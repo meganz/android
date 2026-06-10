@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeContentUri
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
@@ -142,13 +141,6 @@ data class ContactInfoNavKey(val email: String) : NavKey
 data class FileContactInfoNavKey(
     val folderHandle: Long,
     val folderName: String,
-) : NavKey
-
-@Deprecated("Use SearchNavKey instead, it will navigate to legacy screen if the SearchRevamp flag is not set")
-@Serializable
-data class LegacySearchNavKey(
-    val nodeSourceType: NodeSourceType,
-    val parentHandle: Long,
 ) : NavKey
 
 @Serializable

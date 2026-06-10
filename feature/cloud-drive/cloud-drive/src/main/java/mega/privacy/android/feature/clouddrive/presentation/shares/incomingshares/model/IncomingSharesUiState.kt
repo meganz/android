@@ -3,12 +3,12 @@ package mega.privacy.android.feature.clouddrive.presentation.shares.incomingshar
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 
 /**
  * UI state for Incoming Shares
@@ -31,7 +31,6 @@ data class IncomingSharesUiState(
     val hasMediaItems: Boolean = false,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
-    val isSearchRevampEnabled: Boolean = false,
 ) {
 
 

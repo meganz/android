@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScree
 import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryLegacyDestination
 import mega.privacy.android.app.presentation.pdfviewer.legacyPdfViewerScreen
 import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.mediaDiscoveryLegacyDestination
-import mega.privacy.android.app.presentation.search.navigation.searchLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
 import mega.privacy.android.app.presentation.settings.startscreen.startScreenPreferenceScreen
@@ -66,7 +65,6 @@ class LegacyCoreActivityFeatureGraph(
             webDestinations(navigationHandler::back)
             cookieSettingsNavigationDestination(navigationHandler::back)
             startScreenPreferenceScreen(navigationHandler::back)
-            searchLegacyDestination(navigationHandler::back)
             contactsListDestination(navigationHandler)
             addContactsDestination(navigationHandler)
             contactsRequestLegacyDestination(navigationHandler::back)

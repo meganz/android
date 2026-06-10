@@ -35,7 +35,6 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.navigation.getSearchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
@@ -47,6 +46,7 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
@@ -171,11 +171,12 @@ internal fun SharesScreen(
                     actions = buildList {
                         add(
                             MenuActionWithClick(CommonMenuAction.Search) {
-                                val searchNavKey = selectedTab.toNodeSourceType().getSearchNavKey(
-                                    folderId = -1L,
-                                    isRevampEnabled = incomingSharesUiState.isSearchRevampEnabled
+                                navigationHandler.navigate(
+                                    SearchNavKey(
+                                        parentHandle = -1L,
+                                        nodeSourceType = selectedTab.toNodeSourceType()
+                                    )
                                 )
-                                navigationHandler.navigate(searchNavKey)
                             }
                         )
                     },

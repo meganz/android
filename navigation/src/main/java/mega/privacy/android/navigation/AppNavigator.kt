@@ -16,7 +16,6 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
@@ -504,19 +503,6 @@ interface AppNavigator {
      * URLs to suppress checkout redirects. Pass false for links where checkout should be shown.
      */
     fun launchUrl(context: Context?, url: String?, appendNoPlansParam: Boolean = true)
-
-    /**
-     * Open Search Activity
-     *
-     * @param context The context
-     * @param nodeSourceType The source type of the node
-     * @param parentHandle The parent handle of the node
-     */
-    fun openSearchActivity(
-        context: Context,
-        nodeSourceType: NodeSourceType,
-        parentHandle: Long,
-    )
 
     /**
      * Open take down policy link in custom tabs

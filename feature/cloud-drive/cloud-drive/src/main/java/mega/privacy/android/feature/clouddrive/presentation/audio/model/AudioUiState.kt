@@ -27,7 +27,6 @@ sealed interface AudioUiState {
      * @property openedFileNode File opened for playback / actions, if any.
      * @property selectedSortOrder Domain sort order for opened-file handling.
      * @property selectedSortConfiguration Sort UI state for the nodes header.
-     * @property isSearchRevampEnabled Which search entry (revamp vs legacy) to use from the app bar.
      */
     data class Data(
         val items: List<NodeViewItem<TypedNode>>,
