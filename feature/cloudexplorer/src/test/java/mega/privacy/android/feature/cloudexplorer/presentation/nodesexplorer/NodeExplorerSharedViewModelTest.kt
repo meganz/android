@@ -21,9 +21,12 @@ import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
@@ -32,10 +35,12 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -48,6 +53,8 @@ class NodeExplorerSharedViewModelTest {
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val nodeViewItemMapper = mock<NodeViewItemMapper>()
+    private val searchUseCase = mock<SearchUseCase>()
+    private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
 
     private val nodeId = NodeId(1234L)
     private val nodeSourceType = NodeSourceType.INCOMING_SHARES
@@ -61,6 +68,8 @@ class NodeExplorerSharedViewModelTest {
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
             nodeViewItemMapper,
+            searchUseCase,
+            nodeSourceTypeToSearchTargetMapper,
         )
         whenever(monitorStorageStateUseCase()) doReturn flowOf()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf()
@@ -81,6 +90,8 @@ class NodeExplorerSharedViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             nodeViewItemMapper = nodeViewItemMapper,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
+            searchUseCase = searchUseCase,
+            nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             args = args,
             loadNodesImpl = loadNodesImpl,
             refreshNodesImpl = refreshNodesImpl
@@ -99,6 +110,30 @@ class NodeExplorerSharedViewModelTest {
             assertThat(actual.items).isEmpty()
             assertThat(actual.navigateBack).isEqualTo(consumed)
         }
+    }
+
+    @Test
+    fun `test that onSearchQuery folds the mapped search results into searchItems`() = runTest {
+        val nodes = listOf<TypedNode>(mock())
+        val items = listOf<NodeViewItem<TypedNode>>(mock())
+        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
+        wheneverBlocking { searchUseCase(any(), any(), any()) } doReturn nodes
+        wheneverBlocking {
+            nodeViewItemMapper(
+                nodeList = nodes,
+                nodeSourceType = nodeSourceType,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
+            )
+        } doReturn items
+
+        initViewModel()
+        viewModel.onSearchQuery("doc")
+        advanceUntilIdle()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.searchItems).isEqualTo(items)
     }
 
     @ParameterizedTest
@@ -269,6 +304,8 @@ private class TestNodeExplorerSharedViewModel(
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     nodeViewItemMapper: NodeViewItemMapper,
     getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    searchUseCase: SearchUseCase,
+    nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     args: Args,
     private val loadNodesImpl: () -> Unit = {},
     private val refreshNodesImpl: () -> Unit = {},
@@ -279,6 +316,8 @@ private class TestNodeExplorerSharedViewModel(
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
     nodeViewItemMapper = nodeViewItemMapper,
     getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+    searchUseCase = searchUseCase,
+    nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     args = args,
 ) {
     override fun loadNodes() = loadNodesImpl()

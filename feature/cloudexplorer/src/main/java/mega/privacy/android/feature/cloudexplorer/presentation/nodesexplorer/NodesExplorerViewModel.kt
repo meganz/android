@@ -21,8 +21,10 @@ import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildre
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import timber.log.Timber
 
@@ -38,6 +40,8 @@ class NodesExplorerViewModel @AssistedInject constructor(
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
+    searchUseCase: SearchUseCase,
+    nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -46,6 +50,8 @@ class NodesExplorerViewModel @AssistedInject constructor(
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
     nodeViewItemMapper = nodeViewItemMapper,
     getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+    searchUseCase = searchUseCase,
+    nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     args = args,
 ) {
 

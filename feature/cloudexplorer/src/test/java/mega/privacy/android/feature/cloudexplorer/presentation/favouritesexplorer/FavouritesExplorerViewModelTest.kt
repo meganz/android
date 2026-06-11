@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
@@ -8,6 +9,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -17,7 +19,10 @@ import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarning
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
@@ -47,6 +52,8 @@ class FavouritesExplorerViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val nodeViewItemMapper = mock<NodeViewItemMapper>()
     private val getAllFavoritesUseCase = mock<GetAllFavoritesUseCase>()
+    private val searchUseCase = mock<SearchUseCase>()
+    private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -56,7 +63,9 @@ class FavouritesExplorerViewModelTest {
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
             nodeViewItemMapper,
-            getAllFavoritesUseCase
+            getAllFavoritesUseCase,
+            searchUseCase,
+            nodeSourceTypeToSearchTargetMapper,
         )
         whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
@@ -83,6 +92,8 @@ class FavouritesExplorerViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             nodeViewItemMapper = nodeViewItemMapper,
             getAllFavoritesUseCase = getAllFavoritesUseCase,
+            searchUseCase = searchUseCase,
+            nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             args = FavouritesExplorerViewModel.Args(showFiles),
         )
@@ -222,6 +233,33 @@ class FavouritesExplorerViewModelTest {
 
         verify(getAllFavoritesUseCase, times(2)).invoke()
         assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
+    }
+
+    @Test
+    fun `test that searchItems exposes the recursive favourites search results`() = runTest {
+        val match = mock<TypedFileNode> { on { id } doReturn NodeId(2L) }
+        val results = listOf<TypedNode>(match)
+        val searchedItems = listOf(nodeUiItem(match))
+        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.ROOT_NODES
+        wheneverBlocking { searchUseCase(any(), any(), any()) } doReturn results
+        whenever(
+            nodeViewItemMapper(
+                nodeList = results,
+                nodeSourceType = NodeSourceType.FAVOURITES,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
+            )
+        ) doReturn searchedItems
+
+        initViewModel(showFiles = true)
+        advanceUntilIdle()
+        viewModel.onSearchQuery("spec")
+        advanceUntilIdle()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.searchItems.map { it.node })
+            .containsExactly(match)
     }
 
     companion object {

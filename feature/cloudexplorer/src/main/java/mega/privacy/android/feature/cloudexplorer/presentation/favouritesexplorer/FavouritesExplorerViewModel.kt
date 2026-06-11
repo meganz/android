@@ -20,9 +20,11 @@ import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarning
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel.Args
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import timber.log.Timber
 
@@ -34,6 +36,8 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     nodeViewItemMapper: NodeViewItemMapper,
     getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    searchUseCase: SearchUseCase,
+    nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val getAllFavoritesUseCase: GetAllFavoritesUseCase,
     @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
@@ -43,6 +47,8 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
     nodeViewItemMapper = nodeViewItemMapper,
     getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+    searchUseCase = searchUseCase,
+    nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.FAVOURITES,
@@ -62,11 +68,12 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
             getAllFavoritesUseCase()
                 .catch { Timber.e(it) }
                 .collectLatest { nodes ->
-                    val favourites =
-                        if (args.showFiles) nodes else nodes.filterIsInstance<TypedFolderNode>()
-
                     setItems(
-                        nodes = favourites,
+                        nodes = if (args.showFiles) {
+                            nodes
+                        } else {
+                            nodes.filterIsInstance<TypedFolderNode>()
+                        },
                         nodesLoadingState = NodesLoadingState.FullyLoaded,
                     )
                 }

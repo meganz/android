@@ -16,6 +16,8 @@ data class NodesExplorerSharedUiState(
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
     val items: List<NodeViewItem<TypedNode>> = emptyList(),
+    val searchLoadingState: NodesLoadingState = NodesLoadingState.FullyLoaded,
+    val searchItems: List<NodeViewItem<TypedNode>> = emptyList(),
     val isHiddenNodeSettingsLoading: Boolean = true,
     val showHiddenNodes: Boolean = false,
     val isHiddenNodesEnabled: Boolean = false,

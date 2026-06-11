@@ -12,9 +12,11 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import javax.inject.Inject
 
@@ -26,6 +28,8 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     nodeViewItemMapper: NodeViewItemMapper,
     getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    searchUseCase: SearchUseCase,
+    nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val getIncomingSharesChildrenNodeUseCase: GetIncomingSharesChildrenNodeUseCase,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -34,6 +38,8 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
     nodeViewItemMapper = nodeViewItemMapper,
     getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+    searchUseCase = searchUseCase,
+    nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.INCOMING_SHARES,

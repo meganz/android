@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
@@ -23,7 +24,9 @@ import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildre
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
@@ -32,6 +35,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -55,6 +59,8 @@ class NodesExplorerViewModelTest {
     private val getNodesByIdInChunkUseCase = mock<GetNodesByIdInChunkUseCase>()
     private val getNodeInfoByIdUseCase = mock<GetNodeInfoByIdUseCase>()
     private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
+    private val searchUseCase = mock<SearchUseCase>()
+    private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
 
     private val nodeId = NodeId(rootNodeHandle)
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -97,6 +103,8 @@ class NodesExplorerViewModelTest {
             getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
             getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
             getRootNodeIdUseCase = getRootNodeIdUseCase,
+            searchUseCase = searchUseCase,
+            nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             args = args
         )
@@ -198,6 +206,30 @@ class NodesExplorerViewModelTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun `test that searchItems exposes the mapped search results for a query`() = runTest {
+        val nodes = listOf<TypedNode>(mock())
+        val items = listOf<NodeViewItem<TypedNode>>(mock())
+        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.ROOT_NODES
+        wheneverBlocking { searchUseCase(any(), any(), any()) } doReturn nodes
+        wheneverBlocking {
+            nodeViewItemMapper(
+                nodeList = nodes,
+                nodeSourceType = nodeSourceType,
+                highlightedNodeId = null,
+                isHiddenNodesEnabled = false,
+                highlightedNames = null,
+                isContactVerificationOn = false,
+            )
+        } doReturn items
+
+        initViewModel()
+        viewModel.onSearchQuery("doc")
+        advanceUntilIdle()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.searchItems).isEqualTo(items)
     }
 
     companion object {

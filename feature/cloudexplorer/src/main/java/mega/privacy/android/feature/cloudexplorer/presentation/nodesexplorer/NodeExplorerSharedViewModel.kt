@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,11 +20,14 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import timber.log.Timber
 
@@ -37,11 +41,15 @@ abstract class NodeExplorerSharedViewModel(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val nodeViewItemMapper: NodeViewItemMapper,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    private val searchUseCase: SearchUseCase,
+    private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val args: Args,
 ) : ViewModel() {
 
     private val _nodedExplorerSharedUiState = MutableStateFlow(NodesExplorerSharedUiState())
     val nodeExplorerSharedUiState = _nodedExplorerSharedUiState.asStateFlow()
+
+    private val searchQuery = MutableStateFlow<String?>(null)
 
     init {
         _nodedExplorerSharedUiState.update { state ->
@@ -52,6 +60,7 @@ abstract class NodeExplorerSharedViewModel(
         }
         monitorHiddenNodes()
         monitorStorageOverQuota()
+        monitorSearchQuery()
     }
 
     fun monitorNodeUpdates() {
@@ -127,6 +136,70 @@ abstract class NodeExplorerSharedViewModel(
 
     private suspend fun contactVerificationEnabled() =
         runCatching { getContactVerificationWarningUseCase() }.getOrDefault(false)
+
+    /**
+     * Sets the query whose matches [NodesExplorerSharedUiState.searchItems] exposes. Pass `null`/blank
+     * when the search is closed. Re-issuing the same query is ignored (the backing [StateFlow] only
+     * emits on change) so a configuration change keeps the previous results.
+     */
+    fun onSearchQuery(query: String?) {
+        searchQuery.value = query
+    }
+
+    /**
+     * Runs the search for the latest [searchQuery]; [collectLatest] cancels the previous search when
+     * a new query arrives.
+     */
+    private fun monitorSearchQuery() {
+        viewModelScope.launch {
+            searchQuery.filterNotNull().collectLatest { search(it) }
+        }
+    }
+
+    /**
+     * Runs a recursive search for [query] scoped to this source ([Args.nodeId]/[Args.nodeSourceType])
+     * and folds the matches into [NodesExplorerSharedUiState.searchItems], kept separate from
+     * [NodesExplorerSharedUiState.items] so the browse list stays unfiltered.
+     */
+    private suspend fun search(query: String?) {
+        if (query.isNullOrBlank()) {
+            _nodedExplorerSharedUiState.update { state ->
+                state.copy(
+                    searchItems = emptyList(),
+                    searchLoadingState = NodesLoadingState.FullyLoaded,
+                )
+            }
+            return
+        }
+        _nodedExplorerSharedUiState.update { state ->
+            state.copy(searchLoadingState = NodesLoadingState.Loading)
+        }
+        val nodes = runCatching {
+            searchUseCase(
+                parentHandle = args.nodeId,
+                nodeSourceType = args.nodeSourceType,
+                searchParameters = SearchParameters(
+                    query = query,
+                    searchTarget = nodeSourceTypeToSearchTargetMapper(args.nodeSourceType),
+                    description = query,
+                ),
+            )
+        }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
+        val items = nodeViewItemMapper(
+            nodeList = nodes,
+            nodeSourceType = args.nodeSourceType,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = _nodedExplorerSharedUiState.value.isHiddenNodesEnabled,
+            highlightedNames = null,
+            isContactVerificationOn = contactVerificationEnabled(),
+        )
+        _nodedExplorerSharedUiState.update { state ->
+            state.copy(
+                searchItems = items,
+                searchLoadingState = NodesLoadingState.FullyLoaded,
+            )
+        }
+    }
 
     fun onNavigateBackEventConsumed() {
         _nodedExplorerSharedUiState.update { state ->
