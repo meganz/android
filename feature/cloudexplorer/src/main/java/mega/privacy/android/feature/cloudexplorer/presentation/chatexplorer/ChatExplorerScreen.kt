@@ -49,6 +49,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CHAT_TAB_TAG
+import mega.privacy.android.feature.cloudexplorer.presentation.search.ChatExplorerSearchContent
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
@@ -260,6 +261,9 @@ internal fun TabsScope.ChatExplorerTab(
     shareTextToMegaNavKey: ShareTextToMegaNavKey?,
     selectionState: ChatExplorerSelectionState,
     isProcessingAction: Boolean,
+    showSearch: Boolean,
+    searchQuery: String?,
+    onSearchQueryChanged: (String) -> Unit,
     prepareChatsEvent: StateEvent,
     onPrepareChatsConsumed: () -> Unit,
     onChatsReadyToShare: (List<Long>) -> Unit,
@@ -336,14 +340,24 @@ internal fun TabsScope.ChatExplorerTab(
             testTag = CHAT_TAB_TAG,
         ),
     ) { _, modifier ->
-        ChatExplorerContent(
-            uiState = uiState,
-            isProcessingAction = isProcessingAction,
-            selectedChatIds = selectionState.selectedChatIds,
-            onNewGroupChatClick = { onNavigate(CreateGroupChatNavKey) },
-            onChatToggled = selectionState::toggleSelection,
-            modifier = modifier,
-        )
+        if (showSearch) {
+            ChatExplorerSearchContent(
+                query = searchQuery,
+                onQueryChanged = onSearchQueryChanged,
+                chatExplorerSelectionState = selectionState,
+                isProcessingAction = isProcessingAction,
+                modifier = modifier,
+            )
+        } else {
+            ChatExplorerContent(
+                uiState = uiState,
+                isProcessingAction = isProcessingAction,
+                selectedChatIds = selectionState.selectedChatIds,
+                onNewGroupChatClick = { onNavigate(CreateGroupChatNavKey) },
+                onChatToggled = selectionState::toggleSelection,
+                modifier = modifier,
+            )
+        }
     }
 }
 

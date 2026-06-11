@@ -194,6 +194,9 @@ internal fun NodesExplorerScreenContent(
     isSelectionModeEnabled: Boolean = uiStateShared.isSelectionModeEnabled,
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
+    emptyView: @Composable () -> Unit = {
+        if (uiState.isRoot) EmptyRoot() else EmptyFolder()
+    },
 ) = with(uiStateShared) {
     EventEffect(
         event = navigateBack,
@@ -234,10 +237,7 @@ internal fun NodesExplorerScreenContent(
         items = nodeUiItems,
         nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         nodesLoadingState = nodesLoadingState,
-        emptyView = {
-            if (uiState.isRoot) EmptyRoot()
-            else EmptyFolder()
-        },
+        emptyView = emptyView,
         itemListView = {
             val isAlreadyAdded = it.id in disabledNodeIds
             val isUnsupportedFile = videosOnly && !it.isFolderNode && !it.isVideoNode

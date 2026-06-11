@@ -1,12 +1,15 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.explorer
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -46,6 +49,8 @@ import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexp
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreenContent
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.search.NodesExplorerSearchContent
+import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
@@ -53,6 +58,7 @@ import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.search.presentation.component.SearchTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,11 +88,22 @@ internal fun ExplorerScreen(
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
     var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
+    var showSearch by rememberSaveable { mutableStateOf(false) }
+    // Raw search-field text is host UI state; each tab owns its own search ViewModel + content.
+    var searchText by rememberSaveable { mutableStateOf("") }
+    val onSearchQueryChanged: (String) -> Unit = { searchText = it }
+    val onCloseSearch: () -> Unit = {
+        searchText = ""
+        showSearch = false
+    }
     val protectedUserTap: (() -> Unit) -> Unit = { action -> if (!isProcessingAction) action() }
+
+
+    BackHandler(enabled = showSearch) { onCloseSearch() }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
     val resources = LocalResources.current
-    val nodesExplorerViewModel =
+    val viewModel =
         hiltViewModel<NodesExplorerViewModel, NodesExplorerViewModel.Factory> { factory ->
             factory.create(
                 args = NodeExplorerSharedViewModel.Args(
@@ -95,12 +112,17 @@ internal fun ExplorerScreen(
                 )
             )
         }
-    val nodesExplorerUiState by nodesExplorerViewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
-    val nodesExplorerUiStateShared by nodesExplorerViewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
+    val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
     val chatExplorerSelectionState = rememberChatExplorerSelectionState()
     val nodeSelectionState = rememberNodeSelectionState()
     val isFileSelectionEnabled = !explorerMode.isFolderPicker
     val videosOnly = explorerMode.isVideoPicker
+    val tabHasContent = remember { mutableStateMapOf<Int, Boolean>() }
+    val currentListHasContent = when {
+        isInnerNavigation || selectedTabIndex == CLOUD_TAB_INDEX -> uiStateShared.items.isNotEmpty()
+        else -> tabHasContent[selectedTabIndex] == true
+    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -108,33 +130,50 @@ internal fun ExplorerScreen(
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         topBar = {
-            MegaTopAppBar(
-                navigationType = if (isInnerNavigation) {
-                    AppBarNavigationType.Back { protectedUserTap { onNavigateBack() } }
-                } else {
-                    AppBarNavigationType.Close { protectedUserTap { onNavigateBack() } }
-                },
-                title = when {
-                    chatExplorerSelectionState.selectedItemsCount > 0 -> chatExplorerSelectionState.selectedItemsCount.toString()
-                    isInnerNavigation -> nodesExplorerUiState.folderName.text
-                    else -> stringResource(explorerMode.titleStringId)
-                },
-                actions = buildList {
-                    if (selectedTabIndex == CLOUD_TAB_INDEX && explorerMode.isFolderPicker) {
-                        add(
-                            MenuActionWithClick(NewFolderMenuAction) {
-                                if (!isProcessingAction) {
-                                    showNewFolderDialog = true
+            if (showSearch) {
+                SearchTopAppBar(
+                    searchText = searchText,
+                    placeholderText = stringResource(sharedR.string.search_bar_placeholder_text),
+                    onSearchTextChanged = onSearchQueryChanged,
+                    onBack = onCloseSearch,
+                )
+            } else {
+                MegaTopAppBar(
+                    navigationType = if (isInnerNavigation) {
+                        AppBarNavigationType.Back { protectedUserTap { onNavigateBack() } }
+                    } else {
+                        AppBarNavigationType.Close { protectedUserTap { onNavigateBack() } }
+                    },
+                    title = when {
+                        chatExplorerSelectionState.selectedItemsCount > 0 -> chatExplorerSelectionState.selectedItemsCount.toString()
+                        isInnerNavigation -> uiState.folderName.text
+                        else -> stringResource(explorerMode.titleStringId)
+                    },
+                    actions = buildList {
+                        if (selectedTabIndex == CLOUD_TAB_INDEX && explorerMode.isFolderPicker) {
+                            add(
+                                MenuActionWithClick(NewFolderMenuAction) {
+                                    if (!isProcessingAction) {
+                                        showNewFolderDialog = true
+                                    }
                                 }
-                            }
-                        )
-                    }
-                    //TODO Add search and select all per tab (cloud-style tabs use isFolderPicker().not() for select all)
-                },
-            )
+                            )
+                        }
+                        if (currentListHasContent) {
+                            add(
+                                MenuActionWithClick(CommonMenuAction.Search) {
+                                    if (!isProcessingAction) {
+                                        showSearch = true
+                                    }
+                                }
+                            )
+                        }
+                    },
+                )
+            }
         },
         bottomBar = {
-            if (!isProcessingAction) {
+            if (!isProcessingAction && !showSearch) {
                 InlineAnchoredButtonGroup(
                     modifier = Modifier.testTag(ACTION_BUTTONS_VIEW_TAG),
                     primaryButtonText = stringResource(explorerMode.actionStringId),
@@ -145,7 +184,7 @@ internal fun ExplorerScreen(
                                     onChatsSelected()
 
                                 explorerMode.isFolderPicker ->
-                                    onFolderPicked(nodesExplorerUiStateShared.currentFolderId)
+                                    onFolderPicked(uiStateShared.currentFolderId)
 
                                 else ->
                                     onFilesPicked(nodeSelectionState.selectedNodeIds.toList())
@@ -154,8 +193,7 @@ internal fun ExplorerScreen(
                     },
                     primaryButtonEnabled = when {
                         !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
-                        selectedTabIndex == CLOUD_TAB_INDEX ->
-                            nodesExplorerUiStateShared.currentFolderId != disabledTargetId
+                        selectedTabIndex == CLOUD_TAB_INDEX -> uiStateShared.currentFolderId != disabledTargetId
                         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
                         else -> false
                     },
@@ -165,12 +203,27 @@ internal fun ExplorerScreen(
             }
         }
     ) { paddingValues ->
+        val onFolderClick: (NodeId) -> Unit = { nodeId ->
+            protectedUserTap {
+                onNavigate(
+                    NodesExplorerNavKey(
+                        nodeId = nodeId,
+                        nodeSourceType = uiStateShared.nodeSourceType,
+                        explorerMode = explorerMode,
+                        startNavKey = startNavKey,
+                        shareUris = shareUris,
+                        disabledNodeIds = disabledNodeIds.toList(),
+                    )
+                )
+            }
+        }
+
         MegaCollapsibleTabRow(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
             beyondViewportPageCount = 1,
-            hideTabs = isInnerNavigation,
+            hideTabs = isInnerNavigation || showSearch,
             cells = {
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(
@@ -178,41 +231,47 @@ internal fun ExplorerScreen(
                         testTag = CLOUD_TAB_TAG
                     ),
                 ) { _, modifier ->
-                    NodesExplorerScreenContent(
-                        uiState = nodesExplorerUiState,
-                        uiStateShared = nodesExplorerUiStateShared,
-                        onNavigateBack = { protectedUserTap { onNavigateBack() } },
-                        consumeNavigateBack = nodesExplorerViewModel::onNavigateBackEventConsumed,
-                        onFolderClick = { nodeId ->
-                            protectedUserTap {
-                                onNavigate(
-                                    NodesExplorerNavKey(
-                                        nodeId = nodeId,
-                                        nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
-                                        explorerMode = explorerMode,
-                                        startNavKey = startNavKey,
-                                        shareUris = shareUris,
-                                        disabledNodeIds = disabledNodeIds.toList(),
-                                    )
-                                )
-                            }
-                        },
-                        onRefreshNodes = nodesExplorerViewModel::refreshNodes,
-                        selectionState = nodeSelectionState,
-                        isSelectionModeEnabled = isFileSelectionEnabled,
-                        disabledNodeIds = disabledNodeIds,
-                        videosOnly = videosOnly,
-                        modifier = modifier,
-                    )
+                    if (showSearch) {
+                        NodesExplorerSearchContent(
+                            query = searchText,
+                            onQueryChanged = onSearchQueryChanged,
+                            nodeSelectionState = nodeSelectionState,
+                            isFileSelectionEnabled = isFileSelectionEnabled,
+                            videosOnly = videosOnly,
+                            disabledNodeIds = disabledNodeIds,
+                            onFolderClick = onFolderClick,
+                            onCloseSearch = onCloseSearch,
+                            modifier = modifier,
+                        )
+                    } else {
+                        NodesExplorerScreenContent(
+                            uiState = uiState,
+                            uiStateShared = uiStateShared,
+                            onNavigateBack = { protectedUserTap { onNavigateBack() } },
+                            consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
+                            onFolderClick = onFolderClick,
+                            onRefreshNodes = viewModel::refreshNodes,
+                            selectionState = nodeSelectionState,
+                            isSelectionModeEnabled = isFileSelectionEnabled,
+                            disabledNodeIds = disabledNodeIds,
+                            videosOnly = videosOnly,
+                            modifier = modifier,
+                        )
+                    }
                 }
                 if (!isInnerNavigation && explorerMode.isIncomingAvailable) {
                     IncomingExplorerTab(
                         explorerMode = explorerMode,
                         startNavKey = startNavKey,
                         shareUris = shareUris,
+                        showSearch = showSearch,
+                        searchQuery = searchText,
+                        onSearchQueryChanged = onSearchQueryChanged,
+                        onCloseSearch = onCloseSearch,
                         protectedUserTap = protectedUserTap,
                         onNavigate = onNavigate,
                         onNavigateBack = onNavigateBack,
+                        onHasContentChanged = { tabHasContent[INCOMING_TAB_INDEX] = it },
                     )
                 }
                 if (!isInnerNavigation) {
@@ -220,6 +279,10 @@ internal fun ExplorerScreen(
                         explorerMode = explorerMode,
                         startNavKey = startNavKey,
                         shareUris = shareUris,
+                        showSearch = showSearch,
+                        searchQuery = searchText,
+                        onSearchQueryChanged = onSearchQueryChanged,
+                        onCloseSearch = onCloseSearch,
                         protectedUserTap = protectedUserTap,
                         onNavigate = onNavigate,
                         onNavigateBack = onNavigateBack,
@@ -227,6 +290,7 @@ internal fun ExplorerScreen(
                         isSelectionModeEnabled = isFileSelectionEnabled,
                         disabledNodeIds = disabledNodeIds,
                         videosOnly = videosOnly,
+                        onHasContentChanged = { tabHasContent[FAVOURITES_TAB_INDEX] = it },
                     )
                 }
                 if (!isInnerNavigation && explorerMode.isChatAvailable) {
@@ -234,6 +298,9 @@ internal fun ExplorerScreen(
                         shareTextToMegaNavKey = startNavKey as? ShareTextToMegaNavKey,
                         selectionState = chatExplorerSelectionState,
                         isProcessingAction = isProcessingAction,
+                        showSearch = showSearch,
+                        searchQuery = searchText,
+                        onSearchQueryChanged = onSearchQueryChanged,
                         prepareChatsEvent = prepareChatsEvent,
                         onPrepareChatsConsumed = onPrepareChatsConsumed,
                         onChatsReadyToShare = onChatsReadyToShare,
@@ -241,10 +308,11 @@ internal fun ExplorerScreen(
                         onNavigate = onNavigate,
                         monitorResult = monitorResult,
                         clearResult = clearResult,
+                        onHasContentChanged = { tabHasContent[CHAT_TAB_INDEX] = it },
                     )
                 }
             },
-            initialSelectedIndex = tabIndex,
+            initialSelectedIndex = selectedTabIndex,
             onTabSelected = {
                 selectedTabIndex = it
                 true
@@ -253,7 +321,7 @@ internal fun ExplorerScreen(
 
         if (showNewFolderDialog) {
             NewFolderNodeDialog(
-                parentNode = nodesExplorerUiStateShared.currentFolderId,
+                parentNode = uiStateShared.currentFolderId,
                 onCreateFolder = { folderId ->
                     showNewFolderDialog = false
                     coroutineScope.launch {
@@ -261,7 +329,7 @@ internal fun ExplorerScreen(
                             onNavigate(
                                 NodesExplorerNavKey(
                                     nodeId = it,
-                                    nodeSourceType = nodesExplorerUiStateShared.nodeSourceType,
+                                    nodeSourceType = uiStateShared.nodeSourceType,
                                     explorerMode = explorerMode,
                                     startNavKey = startNavKey,
                                     shareUris = shareUris,

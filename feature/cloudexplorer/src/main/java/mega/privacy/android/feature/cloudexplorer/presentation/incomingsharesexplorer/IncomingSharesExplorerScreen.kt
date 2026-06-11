@@ -2,6 +2,7 @@ package mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesex
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +38,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudE
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.search.IncomingSharesExplorerSearchContent
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
@@ -57,6 +59,7 @@ internal fun IncomingSharesExplorerContent(
     onFolderClick: (NodeId) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
+    emptyView: @Composable () -> Unit = { EmptyFolder() },
 ) = with(uiStateShared) {
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
@@ -92,9 +95,7 @@ internal fun IncomingSharesExplorerContent(
         items = visibleItems,
         nodeSourceType = uiStateShared.nodeSourceType,
         nodesLoadingState = nodesLoadingState,
-        emptyView = {
-            EmptyFolder()
-        },
+        emptyView = emptyView,
         itemListView = {
             CloudExplorerListViewItem(
                 title = it.title.text,
@@ -150,38 +151,57 @@ internal fun TabsScope.IncomingExplorerTab(
     explorerMode: ExplorerMode,
     startNavKey: ExplorerNavKey,
     shareUris: List<UriPath>?,
+    showSearch: Boolean,
+    searchQuery: String?,
+    onSearchQueryChanged: (String) -> Unit,
+    onCloseSearch: () -> Unit,
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
+    onHasContentChanged: (Boolean) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<IncomingSharesExplorerViewModel>()
     val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    LaunchedEffect(uiStateShared.items.isEmpty()) {
+        onHasContentChanged(uiStateShared.items.isNotEmpty())
+    }
+    val onFolderClick: (NodeId) -> Unit = { nodeId ->
+        protectedUserTap {
+            onNavigate(
+                NodesExplorerNavKey(
+                    nodeId = nodeId,
+                    nodeSourceType = uiStateShared.nodeSourceType,
+                    explorerMode = explorerMode,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris,
+                )
+            )
+        }
+    }
     addTextTabWithScrollableContent(
         tabItem = TabItems(
             title = stringResource(sharedR.string.general_title_incoming_shares),
             testTag = INCOMING_TAB_TAG,
         ),
     ) { _, modifier ->
-        IncomingSharesExplorerContent(
-            uiStateShared = uiStateShared,
-            onNavigateBack = { protectedUserTap { onNavigateBack() } },
-            consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
-            onFolderClick = { nodeId ->
-                protectedUserTap {
-                    onNavigate(
-                        NodesExplorerNavKey(
-                            nodeId = nodeId,
-                            nodeSourceType = uiStateShared.nodeSourceType,
-                            explorerMode = explorerMode,
-                            startNavKey = startNavKey,
-                            shareUris = shareUris,
-                        )
-                    )
-                }
-            },
-            onRefreshNodes = viewModel::refreshNodes,
-            modifier = modifier,
-        )
+        if (showSearch) {
+            IncomingSharesExplorerSearchContent(
+                query = searchQuery,
+                onQueryChanged = onSearchQueryChanged,
+                onFolderClick = onFolderClick,
+                onCloseSearch = onCloseSearch,
+                modifier = modifier,
+            )
+        } else {
+            IncomingSharesExplorerContent(
+                uiStateShared = uiStateShared,
+                onNavigateBack = { protectedUserTap { onNavigateBack() } },
+                consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
+                onFolderClick = onFolderClick,
+                onRefreshNodes = viewModel::refreshNodes,
+                modifier = modifier,
+            )
+        }
     }
 }
 

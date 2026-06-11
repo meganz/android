@@ -2,6 +2,7 @@ package mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplor
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudE
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.FAVOURITES_TAB_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.search.FavouritesExplorerSearchContent
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
@@ -59,6 +61,7 @@ internal fun FavouritesExplorerContent(
     isSelectionModeEnabled: Boolean = false,
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
+    emptyView: @Composable () -> Unit = { EmptyFolder(isFolderPicker) },
 ) = with(uiStateShared) {
     EventEffect(
         event = navigateBack,
@@ -92,9 +95,7 @@ internal fun FavouritesExplorerContent(
         items = visibleItems,
         nodeSourceType = uiStateShared.nodeSourceType,
         nodesLoadingState = nodesLoadingState,
-        emptyView = {
-            EmptyFolder(isFolderPicker)
-        },
+        emptyView = emptyView,
         itemListView = {
             val isAlreadyAdded = it.id in disabledNodeIds
             val isUnsupportedFile = videosOnly && !it.isFolderNode && !it.isVideoNode
@@ -168,6 +169,10 @@ internal fun TabsScope.FavouritesExplorerTab(
     explorerMode: ExplorerMode,
     startNavKey: ExplorerNavKey,
     shareUris: List<UriPath>?,
+    showSearch: Boolean,
+    searchQuery: String?,
+    onSearchQueryChanged: (String) -> Unit,
+    onCloseSearch: () -> Unit,
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
@@ -175,6 +180,7 @@ internal fun TabsScope.FavouritesExplorerTab(
     isSelectionModeEnabled: Boolean = false,
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
+    onHasContentChanged: (Boolean) -> Unit = {},
 ) {
     val viewModel =
         hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
@@ -183,38 +189,57 @@ internal fun TabsScope.FavouritesExplorerTab(
             )
         }
     val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    LaunchedEffect(uiStateShared.items.isEmpty()) {
+        onHasContentChanged(uiStateShared.items.isNotEmpty())
+    }
+    val onFolderClick: (NodeId) -> Unit = { nodeId ->
+        protectedUserTap {
+            onNavigate(
+                NodesExplorerNavKey(
+                    nodeId = nodeId,
+                    nodeSourceType = uiStateShared.nodeSourceType,
+                    explorerMode = explorerMode,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris,
+                    disabledNodeIds = disabledNodeIds.toList(),
+                )
+            )
+        }
+    }
     addTextTabWithScrollableContent(
         tabItem = TabItems(
             title = stringResource(sharedR.string.video_section_title_favourite_playlist),
             testTag = FAVOURITES_TAB_TAG,
         ),
     ) { _, modifier ->
-        FavouritesExplorerContent(
-            uiStateShared = uiStateShared,
-            isFolderPicker = explorerMode.isFolderPicker,
-            onNavigateBack = { protectedUserTap { onNavigateBack() } },
-            consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
-            onFolderClick = { nodeId ->
-                protectedUserTap {
-                    onNavigate(
-                        NodesExplorerNavKey(
-                            nodeId = nodeId,
-                            nodeSourceType = uiStateShared.nodeSourceType,
-                            explorerMode = explorerMode,
-                            startNavKey = startNavKey,
-                            shareUris = shareUris,
-                            disabledNodeIds = disabledNodeIds.toList(),
-                        )
-                    )
-                }
-            },
-            onRefreshNodes = viewModel::refreshNodes,
-            selectionState = selectionState,
-            isSelectionModeEnabled = isSelectionModeEnabled,
-            disabledNodeIds = disabledNodeIds,
-            videosOnly = videosOnly,
-            modifier = modifier,
-        )
+        if (showSearch) {
+            FavouritesExplorerSearchContent(
+                query = searchQuery,
+                onQueryChanged = onSearchQueryChanged,
+                isFolderPicker = explorerMode.isFolderPicker,
+                nodeSelectionState = selectionState,
+                isFileSelectionEnabled = isSelectionModeEnabled,
+                videosOnly = videosOnly,
+                disabledNodeIds = disabledNodeIds,
+                onFolderClick = onFolderClick,
+                onCloseSearch = onCloseSearch,
+                modifier = modifier,
+            )
+        } else {
+            FavouritesExplorerContent(
+                uiStateShared = uiStateShared,
+                isFolderPicker = explorerMode.isFolderPicker,
+                onNavigateBack = { protectedUserTap { onNavigateBack() } },
+                consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
+                onFolderClick = onFolderClick,
+                onRefreshNodes = viewModel::refreshNodes,
+                selectionState = selectionState,
+                isSelectionModeEnabled = isSelectionModeEnabled,
+                disabledNodeIds = disabledNodeIds,
+                videosOnly = videosOnly,
+                modifier = modifier,
+            )
+        }
     }
 }
 
