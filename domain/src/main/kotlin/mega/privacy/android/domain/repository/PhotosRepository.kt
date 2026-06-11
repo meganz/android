@@ -215,6 +215,15 @@ interface PhotosRepository {
     suspend fun saveImageResult(nodeId: NodeId, imageResult: ImageResult)
 
     /**
+     * Clear the cached image result for a single node, but only if its download never
+     * completed. Used to evict an abandoned (e.g. cancelled) partial result so the node
+     * is re-fetched on the next access instead of serving a stale, partially loaded image.
+     *
+     * @param nodeId the node whose uncompleted cached result should be evicted
+     */
+    suspend fun clearImageResult(nodeId: NodeId)
+
+    /**
      * Clear all image result from cache
      */
     fun clearImageResult(uncompletedOnly: Boolean)

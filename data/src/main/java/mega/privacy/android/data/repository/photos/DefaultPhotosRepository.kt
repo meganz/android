@@ -1130,6 +1130,17 @@ internal class DefaultPhotosRepository @Inject constructor(
         }
     }
 
+    override suspend fun clearImageResult(nodeId: NodeId) {
+        try {
+            val entry = imageResultCache[nodeId]
+            if (entry != null && !entry.value.isFullyLoaded) {
+                imageResultCache.remove(nodeId)
+            }
+        } catch (e: Throwable) {
+            Timber.e(e)
+        }
+    }
+
     override fun clearImageResult(uncompletedOnly: Boolean) {
         try {
             if (uncompletedOnly) {

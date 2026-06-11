@@ -72,6 +72,14 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     override suspend fun getPublicNodeThumbnailFromServer(handle: Long): File? =
         withContext(ioDispatcher) {
             megaApiFolder.getMegaNodeByHandle(handle)?.let { node ->
+                if (!node.hasThumbnail()) {
+                    Timber.d(
+                        "Public node %s (%s) has no thumbnail attribute; skipping fetch",
+                        node.base64Handle,
+                        node.name,
+                    )
+                    return@withContext null
+                }
                 getThumbnailFile(node)?.let { thumbnail ->
                     suspendCancellableCoroutine { continuation ->
                         val listener =

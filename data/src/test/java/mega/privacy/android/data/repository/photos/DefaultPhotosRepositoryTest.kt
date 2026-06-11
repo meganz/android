@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -358,6 +359,27 @@ class DefaultPhotosRepositoryTest {
         assertThat(underTest.setTimelineFilterPreferences(expectedMegaStringMapValue))
             .isEqualTo(expectedMegaStringMapValue.toString())
     }
+
+    @Test
+    fun `test that clearImageResult by node id evicts an uncompleted cached result`() = runTest {
+        underTest = createUnderTest()
+        val nodeId = NodeId(1L)
+        underTest.saveImageResult(nodeId, ImageResult(isFullyLoaded = false))
+        assertThat(underTest.monitorImageResult(nodeId)).isNotNull()
+
+        underTest.clearImageResult(nodeId)
+
+        assertThat(underTest.monitorImageResult(nodeId)).isNull()
+    }
+
+    @Test
+    fun `test that clearImageResult by node id does nothing when the node is not cached`() =
+        runTest {
+            underTest = createUnderTest()
+
+            // Should not throw for an unknown node.
+            underTest.clearImageResult(NodeId(99L))
+        }
 
     private fun createUnderTest() = DefaultPhotosRepository(
         nodeRepository = nodeRepository,

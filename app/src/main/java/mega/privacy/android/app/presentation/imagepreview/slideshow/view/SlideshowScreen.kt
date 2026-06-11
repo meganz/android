@@ -399,7 +399,7 @@ private fun SlideShowContent(
             val imageNode = imageNodes[index]
             val status by produceState(
                 initialValue = ImageResultStatus(0, false, null, null),
-                key1 = imageNode,
+                key1 = imageNode.id,
             ) {
                 downloadImage(imageNode).collectLatest { imageResult ->
                     value = ImageResultStatus(

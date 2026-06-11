@@ -134,6 +134,7 @@ class ThumbnailPreviewRepositoryImplTest {
     fun `test that get public node thumbnail from server returns successfully if no error is thrown`() {
         runTest {
             whenever(megaNode.base64Handle).thenReturn(thumbnailName)
+            whenever(megaNode.hasThumbnail()).thenReturn(true)
             whenever(megaApiFolder.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
             whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnailFile)
 
@@ -160,6 +161,7 @@ class ThumbnailPreviewRepositoryImplTest {
     fun `test that get public node thumbnail from server returns doesn't successfully`() {
         runTest {
             whenever(megaNode.base64Handle).thenReturn(thumbnailName)
+            whenever(megaNode.hasThumbnail()).thenReturn(true)
             whenever(megaApiFolder.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
             whenever(cacheGateway.getCacheFile(any(), anyOrNull())).thenReturn(thumbnailFile)
 
@@ -179,6 +181,19 @@ class ThumbnailPreviewRepositoryImplTest {
             assertThrows<MegaException> {
                 underTest.getPublicNodeThumbnailFromServer(nodeHandle)
             }
+        }
+    }
+
+    @Test
+    fun `test that get public node thumbnail from server returns null and does not call the sdk when the node has no thumbnail`() {
+        runTest {
+            whenever(megaNode.hasThumbnail()).thenReturn(false)
+            whenever(megaApiFolder.getMegaNodeByHandle(nodeHandle)).thenReturn(megaNode)
+
+            val actual = underTest.getPublicNodeThumbnailFromServer(nodeHandle)
+
+            assertThat(actual).isNull()
+            verify(megaApiFolder, never()).getThumbnail(any(), any(), any())
         }
     }
 

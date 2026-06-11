@@ -522,7 +522,7 @@ private fun ImagePreviewContent(
             if (imageNode != null) {
                 val imageResultTriple by produceState<Triple<Int, String?, String?>>(
                     initialValue = Triple(0, null, null),
-                    key1 = imageNode,
+                    key1 = imageNode.id,
                 ) {
                     downloadImage(imageNode).collectLatest { imageResult ->
                         value = Triple(

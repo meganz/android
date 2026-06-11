@@ -14,7 +14,9 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedImageNode
+import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase.Companion.FILE
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -41,6 +43,7 @@ internal class GetImageUseCaseTest {
     private val fullSizeFilePath = "/tempMEGA/test.jpg"
 
     private val isFullSizeRequiredUseCase: IsFullSizeRequiredUseCase = mock()
+    private val photosRepository: PhotosRepository = mock()
     private val imageNode: TypedImageNode = mock {
         on { fetchFullImage }.thenReturn { _, _ ->
             emptyFlow()
@@ -53,7 +56,7 @@ internal class GetImageUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest =
-            GetImageUseCase(isFullSizeRequiredUseCase, mock())
+            GetImageUseCase(isFullSizeRequiredUseCase, photosRepository)
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
@@ -216,6 +219,26 @@ internal class GetImageUseCaseTest {
                 verify(fetchFullImageLambda).invoke(any(), any())
                 cancelAndIgnoreRemainingEvents()
             }
+        }
+
+    @Test
+    internal fun `test that clearImageResult is invoked for the node when the download flow completes`() =
+        runTest {
+            imageNode.stub {
+                on { type } doReturn mock<StaticImageFileTypeInfo>()
+                on { id } doReturn NodeId(7L)
+                // A preview is already available and full size is not required, so the flow
+                // emits a fully loaded result once and then completes.
+                on { previewPath } doReturn previewFilePath
+            }
+            whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(false)
+
+            underTest.invoke(imageNode, false, highPriority = false, resetDownloads = {}).test {
+                awaitItem()
+                awaitComplete()
+            }
+
+            verify(photosRepository).clearImageResult(NodeId(7L))
         }
 
     @Test
