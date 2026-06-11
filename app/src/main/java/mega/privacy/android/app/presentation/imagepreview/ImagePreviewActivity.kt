@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -304,7 +305,7 @@ class ImagePreviewActivity : BaseActivity() {
             // Render snackbar from Nav3 components, e.g. LegacyActivityScaffold > StartTransferComponent
             LocalSnackBarHostState.current?.let { hostState ->
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().systemBarsPadding(),
                     contentAlignment = Alignment.BottomCenter,
                 ) {
                     MegaSnackbar(hostState)

@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.videoeditor.presentation.screen
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -50,6 +51,7 @@ import mega.privacy.android.feature.videoeditor.presentation.editor.state.Editor
 import mega.privacy.android.feature.videoeditor.presentation.editor.state.EditorState
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.BuiltInToolIds
 import mega.privacy.android.feature.videoeditor.presentation.editor.tool.api.ToolId
+import mega.privacy.android.feature.videoeditor.presentation.editor.ui.DiscardChangesDialog
 import mega.privacy.android.feature.videoeditor.presentation.editor.ui.EditorErrorState
 import mega.privacy.android.feature.videoeditor.presentation.editor.ui.ExportProgressDialog
 import mega.privacy.android.feature.videoeditor.presentation.editor.ui.PrepareVideoDialog
@@ -182,6 +184,14 @@ internal fun VideoEditorScreen(
 ) {
     val isError = uiState.isError || editorState.source.loadFailed
 
+    // Confirm before closing with unexported edits. `saveEnabled` flags exactly those
+    // (and is false while downloading/exporting), so other exit flows skip the prompt.
+    var showDiscardDialog by remember { mutableStateOf(false) }
+    val onCloseRequest = {
+        if (saveEnabled) showDiscardDialog = true else onClose()
+    }
+    BackHandler(enabled = saveEnabled) { showDiscardDialog = true }
+
     MegaScaffold(
         modifier = modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets.ime,
@@ -199,7 +209,7 @@ internal fun VideoEditorScreen(
             ) {
                 MegaTopAppBar(
                     title = "Edit video",
-                    navigationType = AppBarNavigationType.Close(onClose),
+                    navigationType = AppBarNavigationType.Close(onCloseRequest),
                     trailingIcons = {
                         if (!isError) {
                             PrimaryFilledButtonM3XSmall(
@@ -243,6 +253,16 @@ internal fun VideoEditorScreen(
                     onCancel = onCancelDownload,
                 )
             }
+        }
+
+        if (showDiscardDialog) {
+            DiscardChangesDialog(
+                onDiscard = {
+                    showDiscardDialog = false
+                    onClose()
+                },
+                onDismiss = { showDiscardDialog = false },
+            )
         }
     }
 }
