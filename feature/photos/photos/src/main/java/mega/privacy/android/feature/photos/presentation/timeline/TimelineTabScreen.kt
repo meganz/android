@@ -285,6 +285,7 @@ internal fun TimelineTabScreen(
                 selectedTimePeriod = selectedTimePeriod,
                 shouldShowTimePeriodSelector = shouldShowTimePeriodSelector,
                 onMediaTimePeriodSelected = {
+                    trackTimePeriodSelection(it)
                     val scrollIndex =
                         timelineLazyListState.calculateScrollIndexBasedOnTimePeriodClick(
                             targetPeriod = it,
