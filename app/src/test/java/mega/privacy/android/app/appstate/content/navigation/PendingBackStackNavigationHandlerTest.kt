@@ -540,25 +540,6 @@ class PendingBackStackNavigationHandlerTest {
     }
 
     @Test
-    fun `test that refresh event Refresh is passed correctly when root node changes to false`() =
-        runTest {
-            backStack.addAll(listOf(Destination1, Destination3))
-
-            underTest.onRootNodeChange(
-                RootNodeState(
-                    exists = false,
-                    refreshEvent = RefreshEvent.ManualRefresh
-                )
-            )
-
-            val lastDestination = backStack.last() as? FetchingContentNavKey
-            assertThat(lastDestination).isNotNull()
-            assertThat(lastDestination?.session).isEqualTo(initialSession)
-            assertThat(lastDestination?.isFromLogin).isFalse()
-            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ManualRefresh)
-        }
-
-    @Test
     fun `test that refresh event ChangeEnvironment is passed correctly when root node changes to false`() =
         runTest {
             backStack.addAll(listOf(Destination1, Destination3))
@@ -589,30 +570,6 @@ class PendingBackStackNavigationHandlerTest {
             assertThat(lastDestination?.session).isEqualTo(initialSession)
             assertThat(lastDestination?.isFromLogin).isFalse()
             assertThat(lastDestination?.refreshEvent).isNull()
-        }
-
-    @Test
-    fun `test that refresh event Refresh is passed when root node changes from true to false with refresh event`() =
-        runTest {
-            backStack.addAll(listOf(Destination1, Destination2))
-
-            underTest.onRootNodeChange(
-                RootNodeState(
-                    exists = false,
-                    refreshEvent = RefreshEvent.ManualRefresh
-                )
-            )
-
-            val lastDestination = backStack.last() as? FetchingContentNavKey
-            assertThat(lastDestination).isNotNull()
-            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ManualRefresh)
-            assertThat(backStack).containsExactly(
-                FetchingContentNavKey(
-                    initialSession,
-                    false,
-                    RefreshEvent.ManualRefresh
-                )
-            )
         }
 
     @Test

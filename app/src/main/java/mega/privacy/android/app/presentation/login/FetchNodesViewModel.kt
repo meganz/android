@@ -74,7 +74,12 @@ class FetchNodesViewModel @AssistedInject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(FetchNodesUiState(isFromLogin = args.isFromLogin))
+    private val _state = MutableStateFlow(
+        FetchNodesUiState(
+            isFromLogin = args.isFromLogin,
+            isRefreshSession = args.refreshEvent == RefreshEvent.SdkReload,
+        )
+    )
     val state: StateFlow<FetchNodesUiState> = _state
 
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
@@ -107,8 +112,8 @@ class FetchNodesViewModel @AssistedInject constructor(
             if (args.refreshEvent == RefreshEvent.ChangeEnvironment) {
                 Timber.d("Fast login due to ${args.refreshEvent} event")
                 fastLogin(session = args.session, refreshChatUrl = true)
-            } else if (args.refreshEvent == RefreshEvent.ManualRefresh || args.refreshEvent == RefreshEvent.SdkReload) {
-                Timber.d("Refresh event ${args.refreshEvent} - fetch nodes")
+            } else if (args.refreshEvent == RefreshEvent.SdkReload) {
+                Timber.d("Refresh event SdkReload - fetch nodes")
                 fetchNodes(isRefreshSession = true)
             } else if (isMegaApiLoggedInUseCase()) {
                 Timber.d("User is logged in, fetch nodes")
@@ -312,16 +317,10 @@ class FetchNodesViewModel @AssistedInject constructor(
                     if (update.progress?.floatValue == 1F) {
                         fetchNodeProvider.clearLoginByAccount()
                         Timber.d("fetch nodes finished")
-                        _state.update {
-                            it.copy(
-                                fetchNodesUpdate = update,
-                                isRefreshSession = args.refreshEvent == RefreshEvent.ManualRefresh,
-                            )
-                        }
                     } else {
-                        Timber.d("fetch nodes update")
-                        _state.update { it.copy(fetchNodesUpdate = update) }
+                        Timber.d("fetch nodes update $update")
                     }
+                    _state.update { it.copy(fetchNodesUpdate = update) }
                 }
             }.onFailure { exception ->
                 when (exception) {

@@ -1,8 +1,11 @@
 package mega.privacy.android.app.appstate.content.destinations
 
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -33,6 +36,7 @@ fun EntryProviderScope<NavKey>.fetchingContentDestination(
             EnterTransition.None togetherWith ExitTransition.None
         } + buildMetadata { withOverlaySuppression() }
     ) {
+        val activity = LocalActivity.current
         val viewModel = hiltViewModel<FetchNodesViewModel, FetchNodesViewModel.Factory>(
             creationCallback = { factory ->
                 factory.create(
@@ -46,8 +50,19 @@ fun EntryProviderScope<NavKey>.fetchingContentDestination(
         )
         val state by viewModel.state.collectAsStateWithLifecycle()
 
-        if (state.isRefreshSession) {
-            navigate(MyAccountNavKey())
+        val needsBackOverride =
+            state.isFastLoginInProgress || (state.fetchNodesUpdate?.progress?.floatValue
+                ?: 0.0f) < 1f
+        BackHandler(enabled = needsBackOverride) {
+            activity?.moveTaskToBack(true)
+        }
+
+        val refreshFinished =
+            state.isRefreshSession && state.fetchNodesUpdate?.progress?.floatValue == 1F
+        LaunchedEffect(refreshFinished) {
+            if (refreshFinished) {
+                navigate(MyAccountNavKey())
+            }
         }
 
         FetchNodesContent(

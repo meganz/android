@@ -48,6 +48,7 @@ data class FetchNodesUiState(
             val progressAfterLogin = if (isFromLogin) 0.4f else 0.5f
             val progressAfterFetchNode = progressAfterLogin + if (isFromLogin) 0.1f else 0.45f
             return when {
+                isRefreshSession -> fetchNodesUpdate?.progress?.floatValue ?: 0f
                 isFastLoginInProgress -> progressAfterLogin
                 fetchNodesUpdate?.progress != null -> {
                     val fetchNodeProgress = fetchNodesUpdate.progress?.floatValue ?: 0f

@@ -107,11 +107,6 @@ class MegaActivityIntentActionHandler @Inject constructor(
                 }
             }
 
-            Constants.ACTION_REFRESH -> {
-                refreshSession(RefreshEvent.ManualRefresh)
-                intent.action = null
-            }
-
             Constants.ACTION_REFRESH_API_SERVER -> {
                 refreshSession(RefreshEvent.ChangeEnvironment)
                 intent.action = null

@@ -87,18 +87,6 @@ class MegaActivityIntentActionHandlerTest {
     }
 
     @Test
-    fun `test that handleAction calls refreshSession with ManualRefresh when action is ACTION_REFRESH`() =
-        runTest {
-            val intent = mock<Intent>()
-            whenever(intent.action).thenReturn(Constants.ACTION_REFRESH)
-            var refreshedWith: RefreshEvent? = null
-
-            underTest.handleAction(intent, { refreshedWith = it })
-
-            assertThat(refreshedWith).isEqualTo(RefreshEvent.ManualRefresh)
-        }
-
-    @Test
     fun `test that handleAction calls refreshSession with ChangeEnvironment when action is ACTION_REFRESH_API_SERVER`() =
         runTest {
             val intent = mock<Intent>()

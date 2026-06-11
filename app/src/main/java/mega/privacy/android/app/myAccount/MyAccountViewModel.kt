@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.dialog.storagestatus.SubscriptionCheckResult
@@ -42,7 +41,6 @@ import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
@@ -680,20 +678,6 @@ class MyAccountViewModel @Inject constructor(
                 snackbarDuration = MegaSnackbarDuration.Long,
             )
         }
-    }
-
-    /**
-     * Refresh
-     *
-     * @param activity
-     */
-    suspend fun refresh(activity: Activity) = runCatching {
-        Intent(activity, MegaActivity::class.java).apply {
-            action = ACTION_REFRESH
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }.also { activity.startActivity(it) }
-    }.onFailure {
-        Timber.e(it, "Error refreshing account")
     }
 
     /**

@@ -27,7 +27,6 @@ object Constants {
     const val REQUEST_CODE_GET_FOLDER_CONTENT: Int = 1039
 
     const val ACTION_REFRESH_AFTER_BLOCKED: String = "ACTION_REFRESH_AFTER_BLOCKED"
-    const val ACTION_REFRESH: String = "ACTION_REFRESH"
     const val ACTION_REFRESH_API_SERVER: String = "ACTION_REFRESH_API_SERVER"
     const val ACTION_SHORTCUT_UPLOAD: String = "mega.privacy.android.action.SHORTCUT_UPLOAD"
     const val ACTION_SHORTCUT_SCAN_DOCUMENT: String = "mega.privacy.android.action.SHORTCUT_SCAN_DOCUMENT"
