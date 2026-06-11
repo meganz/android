@@ -89,7 +89,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
@@ -123,7 +123,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
@@ -382,7 +382,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                             renameNode(handle, newName, actionNodeCallback)
                         },
                         getRootNodeUseCase = getRootNodeUseCase,
-                        getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                        nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                     )
                 }
             }

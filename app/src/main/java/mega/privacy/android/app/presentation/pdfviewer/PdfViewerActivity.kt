@@ -96,7 +96,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
@@ -139,7 +139,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
@@ -1569,7 +1569,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                         renameNode(nodeHandle, newName)
                     },
                     getRootNodeUseCase = getRootNodeUseCase,
-                    getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                    nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                 )
             }
 

@@ -36,13 +36,12 @@ import mega.privacy.android.app.utils.Util.SHOW_IM_DELAY
 import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.navigation.MegaNavigatorEntryPoint
 import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.resources.R as sharedR
@@ -99,7 +98,7 @@ object MegaNodeDialogUtil {
      *                           valid new name. The caller is responsible for performing the
      *                           rename via `RenameNodeUseCase` and surfacing any result UI.
      * @param getRootNodeUseCase
-     * @param getTypedChildrenNodeUseCase
+     * @param nodeExistsInCurrentLocationUseCase
      * @return The rename dialog.
      */
     @JvmStatic
@@ -110,7 +109,7 @@ object MegaNodeDialogUtil {
         actionNodeCallback: ActionNodeCallback?,
         onRenameConfirmed: (nodeHandle: Long, newName: String) -> Unit,
         getRootNodeUseCase: GetRootNodeUseCase,
-        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
+        nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     ): AlertDialog {
         val renameDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -131,7 +130,7 @@ object MegaNodeDialogUtil {
             dialogType = TYPE_RENAME,
             onRenameConfirmed = onRenameConfirmed,
             getRootNodeUseCase = getRootNodeUseCase,
-            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
         )
     }
 
@@ -143,7 +142,7 @@ object MegaNodeDialogUtil {
      * @param parentNode         Required parent node for checking if already exist a folder with that name.
      * @param typedText          Typed text if the dialog has to be shown after a screen rotation.
      * @param getRootNodeUseCase
-     * @param getTypedChildrenNodeUseCase
+     * @param nodeExistsInCurrentLocationUseCase
      * @return The create new folder dialog.
      */
     @JvmStatic
@@ -153,7 +152,7 @@ object MegaNodeDialogUtil {
         parentNode: MegaNode?,
         typedText: String? = null,
         getRootNodeUseCase: GetRootNodeUseCase,
-        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
+        nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     ): AlertDialog {
         val newFolderDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -173,7 +172,7 @@ object MegaNodeDialogUtil {
             builder = newFolderDialogBuilder,
             dialogType = TYPE_NEW_FOLDER,
             getRootNodeUseCase = getRootNodeUseCase,
-            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
         )
 
         if (!typedText.isNullOrEmpty()) {
@@ -191,7 +190,7 @@ object MegaNodeDialogUtil {
      * @param typedName The previous typed text.
      * @param fromHome  True if the text file will be created from Homepage, false otherwise.
      * @param getRootNodeUseCase
-     * @param getTypedChildrenNodeUseCase
+     * @param nodeExistsInCurrentLocationUseCase
      * @return The create new text file dialog.
      */
     @JvmStatic
@@ -201,7 +200,7 @@ object MegaNodeDialogUtil {
         typedName: String?,
         fromHome: Boolean,
         getRootNodeUseCase: GetRootNodeUseCase,
-        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
+        nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     ): AlertDialog {
         val newTxtFileDialogBuilder = MaterialAlertDialogBuilder(context)
 
@@ -221,7 +220,7 @@ object MegaNodeDialogUtil {
             builder = newTxtFileDialogBuilder,
             dialogType = TYPE_NEW_TXT_FILE,
             getRootNodeUseCase = getRootNodeUseCase,
-            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
         )
 
         if (typedName != null && typedName != TXT_EXTENSION) {
@@ -248,7 +247,7 @@ object MegaNodeDialogUtil {
      *                              - TYPE_NEW_FILE:     Create new file action.
      *                              - TYPE_NEW_URL_FILE: Create new URL file action.
      * @param getRootNodeUseCase
-     * @param getTypedChildrenNodeUseCase
+     * @param nodeExistsInCurrentLocationUseCase
      * @return The created dialog.
      */
     @Suppress("DEPRECATION")
@@ -264,7 +263,7 @@ object MegaNodeDialogUtil {
         dialogType: Int,
         onRenameConfirmed: ((nodeHandle: Long, newName: String) -> Unit)? = null,
         getRootNodeUseCase: GetRootNodeUseCase,
-        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
+        nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     ): AlertDialog {
         builder.setView(R.layout.dialog_create_rename_node)
 
@@ -329,7 +328,7 @@ object MegaNodeDialogUtil {
                                 dialogType = dialogType,
                                 onRenameConfirmed = onRenameConfirmed,
                                 getRootNodeUseCase = getRootNodeUseCase,
-                                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                             )
                         }
 
@@ -354,7 +353,7 @@ object MegaNodeDialogUtil {
                             dialogType = dialogType,
                             onRenameConfirmed = onRenameConfirmed,
                             getRootNodeUseCase = getRootNodeUseCase,
-                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                         )
                     }
 
@@ -386,7 +385,7 @@ object MegaNodeDialogUtil {
      *                              - TYPE_NEW_FILE:     Create new file action.
      *                              - TYPE_NEW_URL_FILE: Create new URL file action.
      * @param getRootNodeUseCase
-     * @param getTypedChildrenNodeUseCase
+     * @param nodeExistsInCurrentLocationUseCase
      */
     private fun checkActionDialogValue(
         context: Context,
@@ -401,7 +400,7 @@ object MegaNodeDialogUtil {
         dialogType: Int,
         onRenameConfirmed: ((nodeHandle: Long, newName: String) -> Unit)? = null,
         getRootNodeUseCase: GetRootNodeUseCase,
-        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
+        nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     ) {
         val typedString = typeText?.text.toString().trim()
 
@@ -446,7 +445,7 @@ object MegaNodeDialogUtil {
                 isRenameAction = dialogType == TYPE_RENAME,
                 node = node,
                 getRootNodeUseCase = getRootNodeUseCase,
-                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
             ) -> {
                 showDialogError(
                     typeText,
@@ -698,7 +697,7 @@ object MegaNodeDialogUtil {
         isRenameAction: Boolean,
         node: MegaNode?,
         getRootNodeUseCase: GetRootNodeUseCase,
-        getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase,
+        nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     ): Boolean {
 
         return runBlocking {
@@ -708,8 +707,7 @@ object MegaNodeDialogUtil {
                 else -> NodeId(node.handle)
             } ?: return@runBlocking false
 
-            getTypedChildrenNodeUseCase(parentId, SortOrder.ORDER_NONE)
-                .any { child -> child.name == typedString }
+            nodeExistsInCurrentLocationUseCase(parentId, typedString)
         }
     }
 

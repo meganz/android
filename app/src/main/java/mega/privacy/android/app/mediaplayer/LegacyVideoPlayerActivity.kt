@@ -124,8 +124,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
@@ -152,7 +152,7 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     /**
      * MediaPlayerGateway for video player
@@ -508,7 +508,7 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
                                 renameNode(handle, newName, actionNodeCallback)
                             },
                             getRootNodeUseCase = getRootNodeUseCase,
-                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                         )
                     }
                 }

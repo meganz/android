@@ -126,7 +126,7 @@ import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.ChatListNavKey
@@ -220,7 +220,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     @Inject
     lateinit var getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase
@@ -614,7 +614,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             parentNode = currentParentNode,
                             typedText = savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT),
                             getRootNodeUseCase = getRootNodeUseCase,
-                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                         )
                 }
             }
@@ -2409,7 +2409,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     parentNode = currentParentNode,
                     typedText = null,
                     getRootNodeUseCase = getRootNodeUseCase,
-                    getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                    nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                 )
             }
 

@@ -73,7 +73,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
@@ -123,7 +123,7 @@ class FileInfoActivity : BaseActivity() {
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     @Inject
     lateinit var getNodeByIdUseCase: GetNodeByIdUseCase
@@ -517,7 +517,7 @@ class FileInfoActivity : BaseActivity() {
             actionNodeCallback = null,
             onRenameConfirmed = { handle, newName -> renameNode(handle, newName) },
             getRootNodeUseCase = getRootNodeUseCase,
-            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
         )
 
     private fun renameNode(nodeHandle: Long, newName: String) {

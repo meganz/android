@@ -255,7 +255,7 @@ class ContactFileListBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
         } else if (id == R.id.rename_option) {
 
             val getRootNodeUseCase = contactFileListActivity?.getRootNodeUseCase ?: contactInfoActivity?.getRootNodeUseCase ?: return
-            val getTypedChildrenNodeUseCase = contactFileListActivity?.getTypedChildrenNodeUseCase ?: contactInfoActivity?.getTypedChildrenNodeUseCase ?: return
+            val nodeExistsInCurrentLocationUseCase = contactFileListActivity?.nodeExistsInCurrentLocationUseCase ?: contactInfoActivity?.nodeExistsInCurrentLocationUseCase ?: return
             val snackbarShower = activity as? SnackbarShower
             val actionNodeCallback = activity as? ActionNodeCallback
 
@@ -268,7 +268,7 @@ class ContactFileListBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
                     renameNode(handle, newName, snackbarShower, actionNodeCallback)
                 },
                 getRootNodeUseCase = getRootNodeUseCase,
-                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
             )
         } else if (id == R.id.move_option) {
             if (requireActivity() is ContactFileListActivity) {
