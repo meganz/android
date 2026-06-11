@@ -51,3 +51,5 @@ internal fun NavGraphBuilder.nodeBottomSheetNavigation(
         )
     }
 }
+
+internal const val nodeListHandle = "nodeListHandle"

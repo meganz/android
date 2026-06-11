@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.dialogs.sharefolder.access.ShareFolderAccessDialog
-import mega.privacy.android.app.presentation.search.nodeListHandle
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import timber.log.Timber
 

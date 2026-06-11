@@ -6,7 +6,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import mega.privacy.android.app.presentation.node.dialogs.renamenode.RenameNodeDialog
-import mega.privacy.android.app.presentation.search.nodeListHandle
 import java.io.File
 
 internal fun NavGraphBuilder.renameDialogNavigation(

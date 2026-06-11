@@ -33,6 +33,7 @@ import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
+const val SEARCH_SCREEN_MINI_AUDIO_PLAYER_TEST_TAG = "search_screen:mini_audio_player"
 
 /**
  * Mini audio player view

@@ -173,16 +173,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Audio Section Revamp feature flag (AND-22975).
-     * Callers use `AudioSectionNavKey`; the app host gates Compose (`AudioNavKey`) vs legacy activity.
-     */
-    AudioSectionRevamp(
-        experimentName = "asr1",
-        description = "Navigate to the new Compose-based Audio section instead of the legacy one",
-        defaultValue = false
-    ),
-
-    /**
      * Continue where you left off feature (AND-23051).
      * When enabled, persists user progress (PDF page, video/audio position, text editor cursor)
      * and shows a Home screen carousel widget for quick resume.

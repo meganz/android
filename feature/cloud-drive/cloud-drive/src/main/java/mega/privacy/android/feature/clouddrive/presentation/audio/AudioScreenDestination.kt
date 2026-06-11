@@ -12,7 +12,6 @@ import mega.privacy.android.navigation.destination.AudioNavKey
 
 /**
  * Registers the Compose Audio destination for [AudioNavKey].
- * Feature-flag routing (Compose vs legacy activity) lives in the app module on `AudioSectionNavKey`.
  */
 fun EntryProviderScope<NavKey>.audioScreen(
     navigationHandler: NavigationHandler,
