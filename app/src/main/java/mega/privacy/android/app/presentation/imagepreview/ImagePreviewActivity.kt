@@ -104,7 +104,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.transition.opaqueFadeBackwardTransition
@@ -148,7 +148,7 @@ class ImagePreviewActivity : BaseActivity() {
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
@@ -561,7 +561,7 @@ class ImagePreviewActivity : BaseActivity() {
                     performRename(handle, newName, snackbarShower)
                 },
                 getRootNodeUseCase = getRootNodeUseCase,
-                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
             )
         }
     }

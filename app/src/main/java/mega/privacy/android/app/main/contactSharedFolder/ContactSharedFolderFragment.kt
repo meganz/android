@@ -37,7 +37,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaError
@@ -60,7 +60,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
@@ -439,7 +439,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                                 renameNode(handle, newName, snackbarShower, actionNodeCallback)
                             },
                             getRootNodeUseCase = getRootNodeUseCase,
-                            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
                         )
                     }
                 }

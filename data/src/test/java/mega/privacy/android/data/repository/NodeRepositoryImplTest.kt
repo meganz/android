@@ -280,6 +280,32 @@ internal class NodeRepositoryImplTest {
     }
 
     @Test
+    fun `test that doesChildExistByName returns true when gateway getChildNode returns a node`() =
+        runTest {
+            val name = "child"
+            val parent = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(parent)
+            whenever(megaApiGateway.getChildNode(parent, name)).thenReturn(mock())
+
+            val actual = underTest.doesChildExistByName(nodeId, name)
+
+            assertThat(actual).isTrue()
+        }
+
+    @Test
+    fun `test that doesChildExistByName returns false when gateway getChildNode returns null`() =
+        runTest {
+            val name = "child"
+            val parent = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(parent)
+            whenever(megaApiGateway.getChildNode(parent, name)).thenReturn(null)
+
+            val actual = underTest.doesChildExistByName(nodeId, name)
+
+            assertThat(actual).isFalse()
+        }
+
+    @Test
     fun `test when stopSharingNode is called then api gateway stopSharingNode is called with the proper node`() =
         runTest {
             val megaNode = mock<MegaNode>()
