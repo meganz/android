@@ -5,16 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.model.LocalizedText
@@ -54,10 +50,7 @@ class HomeChipsWidget @Inject constructor(
         navigationHandler: NavigationHandler,
         transferHandler: TransferHandler,
     ) {
-        val viewModel = hiltViewModel<HomeChipsWidgetViewModel>()
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         HomeChips(
-            isAudiosChipVisible = uiState.isAudiosChipVisible,
             modifier = modifier,
             onNavigate = navigationHandler::navigate
         )
@@ -66,7 +59,6 @@ class HomeChipsWidget @Inject constructor(
 
 @Composable
 private fun HomeChips(
-    isAudiosChipVisible: Boolean,
     onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -86,17 +78,15 @@ private fun HomeChips(
                 onNavigate(FavouritesNavKey)
             },
         )
-        if (isAudiosChipVisible) {
-            MegaChip(
-                content = stringResource(sharedR.string.home_screen_audios_chip_title),
-                selected = false,
-                leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Music),
-                onClick = {
-                    Analytics.tracker.trackEvent(AudiosChipButtonPressedEvent)
-                    onNavigate(AudioSectionNavKey)
-                },
-            )
-        }
+        MegaChip(
+            content = stringResource(sharedR.string.home_screen_audios_chip_title),
+            selected = false,
+            leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Music),
+            onClick = {
+                Analytics.tracker.trackEvent(AudiosChipButtonPressedEvent)
+                onNavigate(AudioSectionNavKey)
+            },
+        )
         MegaChip(
             content = stringResource(sharedR.string.section_saved_for_offline_new),
             selected = false,
@@ -124,15 +114,6 @@ private fun HomeChips(
 @Composable
 private fun HomeChipsPreview() {
     AndroidThemeForPreviews {
-        LazyColumn {
-            listOf(false, true).forEach { allVisible ->
-                item {
-                    HomeChips(
-                        isAudiosChipVisible = allVisible,
-                        onNavigate = {}
-                    )
-                }
-            }
-        }
+        HomeChips(onNavigate = {})
     }
 }

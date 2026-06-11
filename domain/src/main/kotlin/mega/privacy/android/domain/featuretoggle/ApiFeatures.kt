@@ -164,15 +164,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Enable Audios chip in Home screen
-     */
-    AudiosChipInHome(
-        experimentName = "acih",
-        description = "Enable Audios chip in Home screen",
-        defaultValue = false
-    ),
-
-    /**
      * Enable Whats New feature dialog
      */
     WhatsNewFeatureDialog(
