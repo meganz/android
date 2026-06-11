@@ -49,6 +49,8 @@ private val ChatExplorerUiState.Data.noteToSelf get() = items.noteToSelf
 private val ChatExplorerUiState.Data.recents get() = items.recents
 private val ChatExplorerUiState.Data.others get() = items.others
 
+private const val NOTE_TO_SELF_TITLE = "Note to self"
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -218,6 +220,74 @@ internal class ChatExplorerViewModelTest {
             assertThat(data.noteToSelf).isEqualTo(chatRow(note))
             assertThat(data.recents).isEmpty()
             assertThat(data.others).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that searchResults exposes only the chats matching the query`() = runTest {
+        val design = chatItem(chatId = 1L, title = "Design Team", isGroup = true)
+        val marketing = chatItem(chatId = 2L, title = "Marketing", isGroup = true)
+        stubChatLists(active = listOf(design, marketing))
+        stubMapperForChats(listOf(design, marketing))
+        val underTest = buildViewModel()
+
+        underTest.onSearchQuery(ChatExplorerViewModel.ChatSearchInput("design", NOTE_TO_SELF_TITLE))
+
+        underTest.uiState.test {
+            advanceUntilIdle()
+            val data = expectMostRecentItem() as ChatExplorerUiState.Data
+            val matched = data.searchResults.recents + data.searchResults.others
+            assertThat(matched.map { it.id }).containsExactly(1L)
+        }
+    }
+
+    @Test
+    fun `test that searchResults includes note-to-self when its title matches the query`() =
+        runTest {
+            val note = chatItem(chatId = 1L, title = "Note", isNoteToSelf = true)
+            stubChatLists(active = listOf(note))
+            stubMapperForChats(listOf(note))
+            val underTest = buildViewModel()
+
+            underTest.onSearchQuery(ChatExplorerViewModel.ChatSearchInput("note to", NOTE_TO_SELF_TITLE))
+
+            underTest.uiState.test {
+                advanceUntilIdle()
+                val data = expectMostRecentItem() as ChatExplorerUiState.Data
+                assertThat(data.searchResults.noteToSelf).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test that searchResults excludes note-to-self when its title does not match the query`() =
+        runTest {
+            val note = chatItem(chatId = 1L, title = "Note", isNoteToSelf = true)
+            stubChatLists(active = listOf(note))
+            stubMapperForChats(listOf(note))
+            val underTest = buildViewModel()
+
+            underTest.onSearchQuery(ChatExplorerViewModel.ChatSearchInput("design", NOTE_TO_SELF_TITLE))
+
+            underTest.uiState.test {
+                advanceUntilIdle()
+                val data = expectMostRecentItem() as ChatExplorerUiState.Data
+                assertThat(data.searchResults.noteToSelf).isNull()
+            }
+        }
+
+    @Test
+    fun `test that a blank query exposes no search results`() = runTest {
+        val design = chatItem(chatId = 1L, title = "Design Team", isGroup = true)
+        stubChatLists(active = listOf(design))
+        stubMapperForChats(listOf(design))
+        val underTest = buildViewModel()
+
+        underTest.onSearchQuery(ChatExplorerViewModel.ChatSearchInput("", NOTE_TO_SELF_TITLE))
+
+        underTest.uiState.test {
+            advanceUntilIdle()
+            val data = expectMostRecentItem() as ChatExplorerUiState.Data
+            assertThat(data.searchResults.isEmpty).isTrue()
         }
     }
 

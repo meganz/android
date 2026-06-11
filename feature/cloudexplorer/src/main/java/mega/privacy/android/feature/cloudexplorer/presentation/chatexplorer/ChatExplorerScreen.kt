@@ -78,11 +78,11 @@ private fun ChatExplorerContent(
             )
         } else {
             ChatExplorerList(
-                data = uiState,
+                items = uiState.items,
                 isProcessingAction = isProcessingAction,
                 selectedChatIds = selectedChatIds,
-                onNewGroupChatClick = onNewGroupChatClick,
                 onChatToggled = onChatToggled,
+                onNewGroupChatClick = onNewGroupChatClick,
                 modifier = modifier,
             )
         }
@@ -136,13 +136,13 @@ private fun EmptyView(
 }
 
 @Composable
-private fun ChatExplorerList(
-    data: ChatExplorerUiState.Data,
+internal fun ChatExplorerList(
+    items: ChatExplorerUiState.Items,
     isProcessingAction: Boolean,
     selectedChatIds: Set<Long>,
-    onNewGroupChatClick: () -> Unit,
     onChatToggled: (chatId: Long) -> Unit,
     modifier: Modifier = Modifier,
+    onNewGroupChatClick: (() -> Unit)? = null,
 ) {
     LazyColumn(
         modifier = modifier
@@ -150,10 +150,12 @@ private fun ChatExplorerList(
             .testTag(CHAT_EXPLORER_LIST_TAG),
         contentPadding = PaddingValues(top = 8.dp),
     ) {
-        item(key = "new_group_chat") {
-            NewGroupChatItemView(onClick = onNewGroupChatClick)
+        onNewGroupChatClick?.let { onClick ->
+            item(key = "new_group_chat") {
+                NewGroupChatItemView(onClick = onClick)
+            }
         }
-        data.items.noteToSelf?.let { item ->
+        items.noteToSelf?.let { item ->
             item(key = "note_to_self:${item.id}") {
                 ChatExplorerItemView(
                     item = item,
@@ -163,22 +165,24 @@ private fun ChatExplorerList(
                 )
             }
         }
-        item(key = "header:recent") {
-            RecentChatsAndMeetingsHeaderItemView()
+        if (items.recents.isNotEmpty()) {
+            item(key = "header:recent") {
+                RecentChatsAndMeetingsHeaderItemView()
+            }
+            items(items = items.recents, key = { "${it.id}" }) { item ->
+                ChatExplorerItemView(
+                    item = item,
+                    isProcessingAction = isProcessingAction,
+                    isSelected = item.id in selectedChatIds,
+                    onChatToggled = onChatToggled,
+                )
+            }
         }
-        items(items = data.items.recents, key = { "${it.id}" }) { item ->
-            ChatExplorerItemView(
-                item = item,
-                isProcessingAction = isProcessingAction,
-                isSelected = item.id in selectedChatIds,
-                onChatToggled = onChatToggled,
-            )
-        }
-        if (data.items.others.isNotEmpty()) {
+        if (items.others.isNotEmpty()) {
             item(key = "header:all") {
                 AllContactsChatsAndMeetingsHeaderItemView()
             }
-            items(items = data.items.others, key = { "${it.id}" }) { item ->
+            items(items = items.others, key = { "${it.id}" }) { item ->
                 ChatExplorerItemView(
                     item = item,
                     isProcessingAction = isProcessingAction,
@@ -263,9 +267,13 @@ internal fun TabsScope.ChatExplorerTab(
     onNavigate: (NavKey) -> Unit,
     monitorResult: (String) -> Flow<Any?>,
     clearResult: (String) -> Unit,
+    onHasContentChanged: (Boolean) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<ChatExplorerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect((uiState as? ChatExplorerUiState.Data)?.isEmpty) {
+        onHasContentChanged((uiState as? ChatExplorerUiState.Data)?.isEmpty == false)
+    }
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
@@ -425,6 +433,7 @@ private fun ChatExplorerContentPreview(
                 ),
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
+                searchResults = ChatExplorerUiState.Items.Empty,
             ),
             isProcessingAction = isProcessingAction,
             selectedChatIds = setOf(11L),
@@ -468,6 +477,7 @@ private fun ChatExplorerEmptyListPreview() {
                 ),
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
+                searchResults = ChatExplorerUiState.Items.Empty,
             ),
             isProcessingAction = false,
             selectedChatIds = emptySet(),

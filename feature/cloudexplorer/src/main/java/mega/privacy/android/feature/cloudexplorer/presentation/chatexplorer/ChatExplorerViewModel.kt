@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
@@ -49,21 +50,45 @@ internal class ChatExplorerViewModel @Inject constructor(
     private val newChatCreatedChannel = Channel<StateEventWithContent<Long>>(Channel.BUFFERED)
     private val chatsReadyToShareChannel =
         Channel<StateEventWithContent<List<Long>>>(Channel.BUFFERED)
+    private val searchQueryChannel = Channel<ChatSearchInput?>(Channel.CONFLATED)
 
     val uiState: StateFlow<ChatExplorerUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             chatItemsFlow(),
+            searchQueryChannel.receiveAsFlow().onStart { emit(null) }.distinctUntilChanged(),
             newChatCreatedChannel.receiveAsFlow().onStart { emit(consumed()) },
             chatsReadyToShareChannel.receiveAsFlow().onStart { emit(consumed()) }
-        ) { chats, newChatCreatedEvent, chatsReadyToShareEvent ->
+        ) { chats, search, newChatCreatedEvent, chatsReadyToShareEvent ->
             ChatExplorerUiState.Data(
                 items = chats,
+                searchResults = if (search == null || search.query.isBlank()) {
+                    ChatExplorerUiState.Items.Empty
+                } else {
+                    chats.matching(search)
+                },
                 newChatCreatedEvent = newChatCreatedEvent,
                 chatsReadyToShareEvent = chatsReadyToShareEvent,
             )
         }.catch { e -> Timber.e(e, "Failed to assemble chat explorer state") }
             .asUiStateFlow(viewModelScope, ChatExplorerUiState.Loading)
     }
+
+    /**
+     * Sets the [search] whose matches [ChatExplorerUiState.Data.searchResults] exposes. Pass `null`
+     * when the search is closed.
+     */
+    fun onSearchQuery(search: ChatSearchInput?) {
+        viewModelScope.launch { searchQueryChannel.send(search) }
+    }
+
+    /**
+     * A search request: the [query] text plus the localized [noteToSelfTitle], resolved by the
+     * caller so the note-to-self row is matched without the ViewModel holding a Context.
+     */
+    data class ChatSearchInput(
+        val query: String,
+        val noteToSelfTitle: String,
+    )
 
     private fun chatItemsFlow(): Flow<ChatExplorerUiState.Items> = flow {
         runCatching { getNoteToSelfChatUseCase() }.onFailure {
@@ -178,6 +203,24 @@ internal class ChatExplorerViewModel @Inject constructor(
         item: ChatExplorerUiItem,
     ): List<ChatExplorerUiItem> =
         (this + item).sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.sortKey() })
+
+    private fun ChatExplorerUiState.Items.matching(search: ChatSearchInput): ChatExplorerUiState.Items =
+        ChatExplorerUiState.Items(
+            noteToSelf = noteToSelf?.takeIf { it.matchesQuery(search) },
+            recents = recents.filter { it.matchesQuery(search) },
+            others = others.filter { it.matchesQuery(search) },
+        )
+
+    private fun ChatExplorerUiItem.matchesQuery(search: ChatSearchInput): Boolean {
+        val name = when (this) {
+            is ChatExplorerUiItem.NoteToSelf -> search.noteToSelfTitle
+            is ChatExplorerUiItem.GroupChat -> title
+            is ChatExplorerUiItem.Meeting -> title
+            is ChatExplorerUiItem.OneToOneChat -> contactName.orEmpty()
+            is ChatExplorerUiItem.Contact -> contactName.orEmpty()
+        }
+        return name.contains(search.query, ignoreCase = true)
+    }
 
     private fun ChatExplorerUiItem.sortKey(): String = when (this) {
         is ChatExplorerUiItem.NoteToSelf -> ""
