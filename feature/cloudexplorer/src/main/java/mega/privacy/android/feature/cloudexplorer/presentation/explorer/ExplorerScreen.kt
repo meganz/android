@@ -133,7 +133,24 @@ internal fun ExplorerScreen(
             if (showSearch) {
                 SearchTopAppBar(
                     searchText = searchText,
-                    placeholderText = stringResource(sharedR.string.search_bar_placeholder_text),
+                    placeholderText = when {
+                        isInnerNavigation ->
+                            stringResource(
+                                sharedR.string.search_placeholder_folder,
+                                uiState.folderName.text
+                            )
+
+                        selectedTabIndex == INCOMING_TAB_INDEX ->
+                            stringResource(sharedR.string.search_placeholder_incoming_shares)
+
+                        selectedTabIndex == FAVOURITES_TAB_INDEX ->
+                            stringResource(sharedR.string.search_placeholder_favourites)
+
+                        selectedTabIndex == CHAT_TAB_INDEX ->
+                            stringResource(sharedR.string.search_placeholder_chat)
+
+                        else -> stringResource(sharedR.string.search_placeholder_cloud_drive)
+                    },
                     onSearchTextChanged = onSearchQueryChanged,
                     onBack = onCloseSearch,
                 )

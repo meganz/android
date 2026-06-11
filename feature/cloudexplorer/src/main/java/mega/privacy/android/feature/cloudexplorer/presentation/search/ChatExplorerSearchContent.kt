@@ -28,6 +28,7 @@ internal fun ChatExplorerSearchContent(
     onQueryChanged = onQueryChanged,
     modifier = modifier,
     recentSearchesEnabled = false,
+    landingDescription = sharedR.string.search_landing_chat_explorer_subtitle,
 ) { debouncedQuery ->
     val viewModel = hiltViewModel<ChatExplorerViewModel>()
     val chatState by viewModel.uiState.collectAsStateWithLifecycle()

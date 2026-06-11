@@ -2975,4 +2975,8 @@
     <string name="home_cwlo_clear_history_dialog_title">Clear history</string>
     <!-- Description shown in the confirmation dialog before clearing the continue where you left off history -->
     <string name="home_cwlo_clear_history_dialog_message">Are you sure you want to clear your history? This cannot be undone.</string>
+    <!-- Placeholder text for search bar when searching in Chat section -->
+    <string name="search_placeholder_chat">Search in Chat</string>
+    <!-- Subtitle for the Search Landing Screen in Chat explorer section-->
+    <string name="search_landing_chat_explorer_subtitle">Search contacts, chats, and meetings</string>
 </resources>
