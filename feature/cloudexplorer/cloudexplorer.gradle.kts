@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":shared:chats"))
     implementation(project(":shared:nodes"))
+    implementation(project(":shared:search"))
     implementation(project(":shared:transfers"))
 
     testImplementation(project(":core-test"))
