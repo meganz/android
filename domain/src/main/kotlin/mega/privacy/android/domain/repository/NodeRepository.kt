@@ -509,6 +509,17 @@ interface NodeRepository {
     suspend fun getChildNode(parentNodeId: NodeId?, name: String?): UnTypedNode?
 
     /**
+     * Checks whether a child with the given name exists directly under the parent node.
+     *
+     * Lightweight: resolves a single node by name without mapping the whole children list.
+     *
+     * @param parentNodeId parent node id
+     * @param name name to be searched
+     * @return true if a child with the given name exists, false otherwise
+     */
+    suspend fun doesChildExistByName(parentNodeId: NodeId, name: String): Boolean
+
+    /**
      * Sets the original fingerprint of a [Node]
      *
      * @param nodeId the [NodeId] to attach the [originalFingerprint] to

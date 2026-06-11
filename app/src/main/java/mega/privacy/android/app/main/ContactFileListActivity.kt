@@ -94,7 +94,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -134,7 +134,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     @Inject
     @ApplicationScope
@@ -319,7 +319,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 parentNode = megaApi.getNodeByHandle(parentHandle),
                 typedText = typedText,
                 getRootNodeUseCase = getRootNodeUseCase,
-                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
             )
     }
 
@@ -331,7 +331,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 typedName = typedName,
                 fromHome = false,
                 getRootNodeUseCase = getRootNodeUseCase,
-                getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+                nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
             )
         }
     }

@@ -100,7 +100,7 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
@@ -144,7 +144,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     lateinit var getRootNodeUseCase: GetRootNodeUseCase
 
     @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
+    lateinit var nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
@@ -1123,7 +1123,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 performRename(handle, newName, actionNodeCallback)
             },
             getRootNodeUseCase = getRootNodeUseCase,
-            getTypedChildrenNodeUseCase = getTypedChildrenNodeUseCase,
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
         )
     }
 

@@ -768,6 +768,12 @@ internal class NodeRepositoryImpl @Inject constructor(
                 ?.let { nodeMapper(megaNode = it, offline = getOfflineNode(it.handle)) }
         }
 
+    override suspend fun doesChildExistByName(parentNodeId: NodeId, name: String): Boolean =
+        withContext(ioDispatcher) {
+            val parent = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
+            megaApiGateway.getChildNode(parent, name) != null
+        }
+
     override suspend fun setOriginalFingerprint(nodeId: NodeId, originalFingerprint: String) =
         withContext(ioDispatcher) {
             val node = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)

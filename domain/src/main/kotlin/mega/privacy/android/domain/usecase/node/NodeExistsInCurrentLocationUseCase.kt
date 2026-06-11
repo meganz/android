@@ -13,15 +13,14 @@ class NodeExistsInCurrentLocationUseCase @Inject constructor(
 
     /**
      * Invoke
+     *
+     * Uses a lightweight name lookup instead of mapping the whole children list,
+     * avoiding heavy work when the parent folder has many children.
+     *
      * @param nodeId  [NodeId]
      * @param name  Name to be searched
      * @return      True if same name found. False otherwise
      */
-    suspend operator fun invoke(nodeId: NodeId, name: String): Boolean {
-        val childrenNodes = nodeRepository.getNodeChildren(nodeId = nodeId, order = null)
-        val searchNode = childrenNodes.find { untypedNode ->
-            untypedNode.name == name
-        }
-        return searchNode != null
-    }
+    suspend operator fun invoke(nodeId: NodeId, name: String): Boolean =
+        nodeRepository.doesChildExistByName(parentNodeId = nodeId, name = name)
 }
