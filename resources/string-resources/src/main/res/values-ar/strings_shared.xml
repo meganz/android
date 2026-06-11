@@ -2828,4 +2828,10 @@
     <string name="contacts_section_recently_added">تمت إضافته مؤخراً</string>
     <string name="contacts_remove_dialog_title">إزالة %1$s؟</string>
     <string name="contacts_remove_dialog_message">سيتم حذف جهة الاتصال هذه من قائمة جهات الاتصال الخاصة بك.</string>
+    <string name="send_contacts">إرسال جهات الاتصال</string>
+    <string name="contacts_groups_title">مجموعات</string>
+    <string name="contacts_groups_empty_title">لا توجد مجموعات</string>
+    <string name="contacts_groups_create_error">حدث خطأ أثناء إنشاء المحادثة</string>
+    <string name="contacts_groups_search_hint">بحث في المجموعات</string>
+    <string name="public_link_auth_alert_description_external_file">احفظ هذا الملف بأمان ويمكنك الوصول إليه في أي وقت</string>
 </resources>

@@ -2555,4 +2555,12 @@
     <string name="contacts_action_remove_contact">Rimuovi contatto</string>
     <string name="contacts_section_groups">Gruppi</string>
     <string name="contacts_section_recently_added">Aggiunto recentemente</string>
+    <string name="contacts_action_audio_call">Chiamata audio</string>
+    <string name="contacts_action_video_call">Videochiamata</string>
+    <string name="contacts_search_hint">Cerca contatti</string>
+    <string name="contacts_remove_dialog_title">Rimuovere %1$s?</string>
+    <string name="contacts_remove_dialog_message">Questo contatto verrà rimosso dalla tua rubrica.</string>
+    <string name="send_contacts">Invia contatti</string>
+    <string name="contacts_groups_title">Gruppi</string>
+    <string name="contacts_groups_create_error">Un errore è avvenuto durante la creazione della chat</string>
 </resources>

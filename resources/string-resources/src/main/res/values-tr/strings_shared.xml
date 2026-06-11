@@ -2487,4 +2487,25 @@
     <string name="contacts_action_send_message">Mesaj gönder</string>
     <string name="contacts_action_contact_info">Kişi bilgileri</string>
     <string name="contacts_action_remove_contact">Kişiyi kaldır</string>
+    <string name="contacts_action_audio_call">Sesli ara</string>
+    <string name="contacts_action_video_call">Görüntülü ara</string>
+    <string name="contacts_search_hint">Kişileri ara</string>
+    <string name="contacts_remove_dialog_title">%1$s kaldırılsın mı?</string>
+    <string name="contacts_remove_dialog_message">Bu kişi, kişiler listenizden kaldırılacaktır.</string>
+    <string name="send_contacts">Kişilere gönder</string>
+    <string name="contacts_groups_title">Gruplar</string>
+    <string name="contacts_groups_create_error">Sohbet oluşturulurken bir hata oluştu</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="one">%1 seçildi</item>
+        <item quantity="other">%1 seçildi</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">Grup ara</string>
+    <string name="contacts_groups_empty_title">Grup yok</string>
+    <string name="public_link_auth_alert_description_external_file">Bu dosyayı güvende tutun ve dilediğiniz zaman erişin</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one">[A]%1$s [/A][B]%2$d öğe güncelledi.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]%2$d öğe güncelledi.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Geçmişi temizle</string>
+    <string name="home_cwlo_clear_history_dialog_message">Geçmişinizi temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
 </resources>

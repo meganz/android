@@ -2657,4 +2657,19 @@
     <string name="contacts_action_send_message">Отправить cообщение</string>
     <string name="contacts_action_contact_info">О контакте</string>
     <string name="contacts_action_remove_contact">Удалить контакт</string>
+    <string name="cloud_drive_inactivity_banner_title">Ваш аккаунт был неактивен слишком долго.</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one"></item>
+        <item quantity="few">Поскольку ваш аккаунт был неактивен более %1$d месяцев, ваши файлы были удалены в соответствии с нашей политикой бездействия.</item>
+        <item quantity="many">Поскольку ваш аккаунт был неактивен более %1$d месяцев, ваши файлы были удалены в соответствии с нашей политикой бездействия.</item>
+        <item quantity="other">Поскольку ваш аккаунт был неактивен более %1$d месяцев, ваши файлы были удалены в соответствии с нашей политикой бездействия.</item>
+    </plurals>
+    <string name="contacts_action_audio_call">Голосовой звонок</string>
+    <string name="contacts_action_video_call">Видеозвонок</string>
+    <string name="contacts_search_hint">Поиск контактов</string>
+    <string name="contacts_remove_dialog_title">Удалить %1$s?</string>
+    <string name="contacts_remove_dialog_message">Этот контакт будет удален из вашего списка контактов.</string>
+    <string name="send_contacts">Добавить контакты</string>
+    <string name="contacts_groups_title">Группы</string>
+    <string name="contacts_groups_create_error">Ошибка. Не удалось создать чат</string>
 </resources>

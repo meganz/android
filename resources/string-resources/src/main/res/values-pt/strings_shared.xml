@@ -2579,4 +2579,22 @@
     <string name="contacts_search_hint">Pesquisar contatos</string>
     <string name="contacts_remove_dialog_title">Remover %1$s?</string>
     <string name="contacts_remove_dialog_message">Este contato será removido da sua lista de contatos.</string>
+    <string name="send_contacts">Enviar contatos</string>
+    <string name="contacts_groups_title">Grupos</string>
+    <string name="contacts_groups_create_error">Aconteceu um erro ao criar do chat</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="one">%1$d selecionado</item>
+        <item quantity="many">%1$d selecionados</item>
+        <item quantity="other">%1$d selecionados</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">Pesquisar grupos</string>
+    <string name="contacts_groups_empty_title">Não há grupos</string>
+    <string name="public_link_auth_alert_description_external_file">Guarde este arquivo com segurança e acesse-o a qualquer momento</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one">[A]%1$s [/A][B]atualizou %2$d item.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]atualizou %2$d de itens.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]atualizou %2$d itens.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Limpar histórico</string>
+    <string name="home_cwlo_clear_history_dialog_message">Você tem certeza de que quer deletar o seu histórico? Esta ação não pode ser desfeita.</string>
 </resources>

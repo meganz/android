@@ -2394,4 +2394,12 @@
     <string name="contacts_action_send_message">發送訊息</string>
     <string name="contacts_action_contact_info">聯絡資訊</string>
     <string name="contacts_action_remove_contact">移除聯絡人</string>
+    <string name="contacts_action_audio_call">語音通話</string>
+    <string name="contacts_action_video_call">視訊通話</string>
+    <string name="contacts_search_hint">搜尋聯絡人</string>
+    <string name="contacts_remove_dialog_title">移除 %1$s？</string>
+    <string name="contacts_remove_dialog_message">此聯絡人將從您的聯絡人名單中移除。</string>
+    <string name="send_contacts">發送聯絡人</string>
+    <string name="contacts_groups_title">群組</string>
+    <string name="contacts_groups_create_error">建立對話時發生錯誤</string>
 </resources>

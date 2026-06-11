@@ -2541,8 +2541,8 @@
     <string name="general_chat_sent_as_message">Envoyé en tant que message</string>
     <string name="video_player_subtitles_empty_hint_description">Téléversez les sous-titres au format SRT sur votre disque Cloud</string>
     <string name="video_player_subtitles_add_subtitles_button">Ajouter des sous-titres</string>
-    <string name="scan_dialog_discard_all_confirmation_title">Abandonner toutes les numérisations ?</string>
-    <string name="scan_dialog_discard_confirmation_title">Annuler la numérisation ?</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Abandonner toutes les numérisations ?</string>
+    <string name="scan_dialog_discard_confirmation_title">Annuler la numérisation ?</string>
     <string name="scan_dialog_discard_all_confirmation_body">Le document actuel sera perdu</string>
     <string name="scan_dialog_discard_confirmation_action">Annuler</string>
     <string name="scan_dialog_discard_confirmation_body">La numérisation actuelle sera perdue</string>
@@ -2566,4 +2566,25 @@
     <string name="contacts_action_remove_contact">Supprimer le contact</string>
     <string name="contacts_section_groups">Groupes</string>
     <string name="contacts_section_recently_added">Ajoutés récemment</string>
+    <string name="contacts_action_audio_call">Appel audio</string>
+    <string name="contacts_action_video_call">Appel vidéo</string>
+    <string name="contacts_search_hint">Rechercher des contacts</string>
+    <string name="contacts_remove_dialog_title">Supprimer %1$s ?</string>
+    <string name="contacts_remove_dialog_message">Ce contact sera supprimé de votre liste de contacts.</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="one">%1$d sélectionné</item>
+        <item quantity="many">%1$d sélectionnés</item>
+        <item quantity="other">%1$d sélectionnés</item>
+    </plurals>
+    <string name="send_contacts">Envoyer des contacts</string>
+    <string name="contacts_groups_title">Groupes</string>
+    <string name="contacts_groups_empty_title">Aucun groupe</string>
+    <string name="contacts_groups_create_error">Une erreur est survenue en créant la conversation</string>
+    <string name="contacts_groups_search_hint">Rechercher des groupes</string>
+    <string name="public_link_auth_alert_description_external_file">Conservez ce fichier en sécurité et accédez-y à tout moment</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one">[A]%1$s [/A][B]a mis à jour %2$d élément.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]a mis à jour %2$d éléments.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]a mis à jour %2$d éléments.[/B]</item>
+    </plurals>
 </resources>

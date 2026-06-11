@@ -2772,10 +2772,6 @@
     <string name="open_link_dialog_description">Paste any MEGA link to open it</string>
     <!-- Bottom sheet option to clear continue where you left off history -->
     <string name="home_cwlo_clear_history">Clear \u201CContinue where you left\u201D history</string>
-    <!-- Title shown in the confirmation dialog before clearing the continue where you left off history -->
-    <string name="home_cwlo_clear_history_dialog_title">Clear history</string>
-    <!-- Description shown in the confirmation dialog before clearing the continue where you left off history -->
-    <string name="home_cwlo_clear_history_dialog_message">Are you sure you want to clear your history? This cannot be undone.</string>
     <!-- Bottom sheet option to clear viewed links history -->
     <string name="home_widget_viewed_links_clear_history">Clear viewed links history</string>
     <!-- Description shown in the confirmation dialog before clearing the viewed links history -->
@@ -2975,4 +2971,8 @@
         <item quantity="one">[A]%1$s [/A][B]updated %2$d item.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]updated %2$d items.[/B]</item>
     </plurals>
+    <!-- Title shown in the confirmation dialog before clearing the continue where you left off history -->
+    <string name="home_cwlo_clear_history_dialog_title">Clear history</string>
+    <!-- Description shown in the confirmation dialog before clearing the continue where you left off history -->
+    <string name="home_cwlo_clear_history_dialog_message">Are you sure you want to clear your history? This cannot be undone.</string>
 </resources>

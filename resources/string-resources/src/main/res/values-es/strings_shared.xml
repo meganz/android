@@ -2543,4 +2543,20 @@
     <string name="contacts_section_recently_added">Añadido recientemente</string>
     <string name="contacts_remove_dialog_title">¿Eliminar %1$s?</string>
     <string name="contacts_remove_dialog_message">Este contacto será eliminado de tu lista de contactos.</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="one">%1$d seleccionado</item>
+        <item quantity="many">%1$d seleccionados</item>
+        <item quantity="other">%1$d seleccionados</item>
+    </plurals>
+    <string name="send_contacts">Enviar contactos</string>
+    <string name="contacts_groups_title">Grupos</string>
+    <string name="contacts_groups_empty_title">No hay grupos</string>
+    <string name="contacts_groups_create_error">Se ha producido un error. No se ha podido crear el chat</string>
+    <string name="contacts_groups_search_hint">Buscar grupos</string>
+    <string name="public_link_auth_alert_description_external_file">Mantén este archivo seguro y accede a él en cualquier momento</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one">[A]%1$s [/A][B]ha actualizado %2$d elemento.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]ha actualizado %2$d de elementos.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]ha actualizado %2$d elementos.[/B]</item>
+    </plurals>
 </resources>

@@ -2476,4 +2476,10 @@
     <string name="contacts_section_recently_added">Neu hinzugefügt</string>
     <string name="contacts_remove_dialog_title">%1$s entfernen?</string>
     <string name="contacts_remove_dialog_message">Dieser Kontakt wird aus Ihrer Kontaktliste entfernt.</string>
+    <string name="send_contacts">Kontakt senden</string>
+    <string name="contacts_groups_title">Gruppen</string>
+    <string name="contacts_groups_create_error">Bei der Erstellung des Chats ist ein Fehler aufgetreten</string>
+    <string name="contacts_groups_empty_title">Keine Gruppen</string>
+    <string name="contacts_groups_search_hint">Gruppen suchen</string>
+    <string name="public_link_auth_alert_description_external_file">Speichern Sie diese Datei sicher, um jederzeit Zugriff darauf zu haben</string>
 </resources>

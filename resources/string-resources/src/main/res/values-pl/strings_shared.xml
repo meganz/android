@@ -2665,4 +2665,29 @@
     <string name="contacts_action_send_message">Wyślij wiadomość</string>
     <string name="contacts_action_contact_info">Informacje kontaktowe</string>
     <string name="contacts_action_remove_contact">Usuń kontakt</string>
+    <string name="contacts_action_audio_call">Połączenie audio</string>
+    <string name="contacts_action_video_call">Wideokonferencja</string>
+    <string name="contacts_search_hint">Wyszukaj kontakty</string>
+    <string name="contacts_remove_dialog_title">Usunąć %1$s?</string>
+    <string name="contacts_remove_dialog_message">Ten kontakt zostanie usunięty z twojej listy kontaktów.</string>
+    <string name="send_contacts">Wyślij kontakty</string>
+    <string name="contacts_groups_title">Grupy</string>
+    <string name="contacts_groups_create_error">Wystąpił błąd podczas tworzenia czatu</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="one">%1$d wybrany</item>
+        <item quantity="few">%1$d wybrane</item>
+        <item quantity="many">%1$d wybrane</item>
+        <item quantity="other">%1$d wybrane</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">Wyszukaj grupy</string>
+    <string name="contacts_groups_empty_title">Brak grup</string>
+    <string name="public_link_auth_alert_description_external_file">Przechowuj ten plik w bezpieczny sposób i zachowaj do niego dostęp w dowolnym momencie</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one">[A]%1$s [/A][B]zaktualizowano %2$d pozycje.[/B]</item>
+        <item quantity="few">[A]%1$s [/A][B]zaktualizowano %2$d pozycje.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]zaktualizowano %2$d pozycje.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]zaktualizowano %2$d pozycje.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Wyczyść historię</string>
+    <string name="home_cwlo_clear_history_dialog_message">Czy na pewno chcesz wyczyścić swoją historię? Nie da się tego cofnąć.</string>
 </resources>

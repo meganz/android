@@ -2394,4 +2394,23 @@
     <string name="contacts_action_send_message">发送消息</string>
     <string name="contacts_action_contact_info">联系人信息</string>
     <string name="contacts_action_remove_contact">移除联系人</string>
+    <string name="contacts_action_audio_call">语音通话</string>
+    <string name="contacts_action_video_call">视频通话</string>
+    <string name="contacts_search_hint">搜索联系人</string>
+    <string name="contacts_remove_dialog_title">移除 %1$s？</string>
+    <string name="contacts_remove_dialog_message">该联系人将从您的联系人列表中移除。</string>
+    <string name="send_contacts">发送联系人</string>
+    <string name="contacts_groups_title">群组</string>
+    <string name="contacts_groups_create_error">创建聊天时发送错误</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="other">%1$d 已选</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">搜索群组</string>
+    <string name="contacts_groups_empty_title">没有群组</string>
+    <string name="public_link_auth_alert_description_external_file">将此文件保存在安全的位置，并可随时访问</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="other">[A]%1$s [/A][B]已更新 %2$d 项。[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">清除历史记录</string>
+    <string name="home_cwlo_clear_history_dialog_message">您确定要清除历史记录吗？此操作无法撤销。</string>
 </resources>

@@ -2400,4 +2400,18 @@
     <string name="contacts_action_audio_call">音声通話</string>
     <string name="contacts_action_video_call">ビデオ通話</string>
     <string name="contacts_search_hint">連絡先を検索</string>
+    <string name="send_contacts">連絡先を送信</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="other">%1$d人を選択</item>
+    </plurals>
+    <string name="contacts_groups_title">グループ</string>
+    <string name="contacts_groups_create_error">チャットの作成時にエラーが発生しました</string>
+    <string name="contacts_groups_search_hint">グループを検索</string>
+    <string name="contacts_groups_empty_title">グループはありません</string>
+    <string name="public_link_auth_alert_description_external_file">このファイルを安全に保管し、いつでもアクセスできるようにしましょう</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="other">[A]%1$s [/A][B]%2$d項目を更新しました。[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">履歴を消去</string>
+    <string name="home_cwlo_clear_history_dialog_message">履歴を消去してもよろしいですか？この操作は元に戻せません。</string>
 </resources>

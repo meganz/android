@@ -2350,4 +2350,16 @@
     <string name="contacts_action_remove_contact">Hapus kontak</string>
     <string name="contacts_section_groups">Grup</string>
     <string name="contacts_section_recently_added">Baru-baru ini ditambahkan</string>
+    <string name="cloud_drive_inactivity_banner_title">Akun Anda tidak aktif terlalu lama</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="other">Karena akun Anda tidak aktif selama lebih dari %1$d bulan, berkas-berkas Anda telah dihapus sesuai kebijakan ketidakaktifan kami</item>
+    </plurals>
+    <string name="contacts_action_audio_call">Panggilan audio</string>
+    <string name="contacts_action_video_call">Panggilan video</string>
+    <string name="contacts_search_hint">Cari kontak</string>
+    <string name="contacts_remove_dialog_title">Hapus %1$s?</string>
+    <string name="contacts_remove_dialog_message">Kontak ini akan dihapus dari daftar kontak Anda.</string>
+    <string name="send_contacts">Kirim kontak</string>
+    <string name="contacts_groups_title">Grup</string>
+    <string name="contacts_groups_create_error">Terjadi kesalahan saat membuat obrolan</string>
 </resources>

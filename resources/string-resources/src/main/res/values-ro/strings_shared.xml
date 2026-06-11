@@ -2560,4 +2560,18 @@
     <string name="contacts_action_send_message">Trimite un mesaj</string>
     <string name="contacts_action_contact_info">Informații de contact</string>
     <string name="contacts_action_remove_contact">Eliminați contactul</string>
+    <string name="cloud_drive_inactivity_banner_title">Contul tău a fost inactiv pentru prea mult timp</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="one">Pentru că contul tău a fost inactiv pentru peste %1$d lună, fișierele tale au fost șterse conform politicii noastre de inactivitate</item>
+        <item quantity="few">Pentru că contul tău a fost inactiv pentru peste %1$d luni, fișierele tale au fost șterse conform politicii noastre de inactivitate</item>
+        <item quantity="other">Pentru că contul tău a fost inactiv pentru peste %1$d luni, fișierele tale au fost șterse conform politicii noastre de inactivitate</item>
+    </plurals>
+    <string name="contacts_action_audio_call">Apel audio</string>
+    <string name="contacts_action_video_call">Apel video</string>
+    <string name="contacts_search_hint">Caută contacte</string>
+    <string name="contacts_remove_dialog_title">Șterge %1$s?</string>
+    <string name="contacts_remove_dialog_message">Acest contact va fi șters din lista ta de contacte.</string>
+    <string name="send_contacts">Trimite contacte</string>
+    <string name="contacts_groups_title">Grupuri</string>
+    <string name="contacts_groups_create_error">A apărut o eroare la crearea chatului</string>
 </resources>

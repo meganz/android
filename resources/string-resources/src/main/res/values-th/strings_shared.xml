@@ -2378,7 +2378,7 @@
     <string name="file_link_unavaible_ToS_violation">ลิงก์ไฟล์ถูกลบออกเนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
     <string name="cloud_drive_inactivity_banner_title">บัญชีของคุณไม่มีการเคลื่อนไหวนานเกินไป</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="other">เนื่องจากคุณไม่ได้เข้าสู่ระบบนานกว่า %1$d เดือน ระบบจึงลบไฟล์ออกตามนโยบายการไม่มีการใช้งานของบัญชี</item>
+        <item quantity="other">เนื่องจากบัญชีของคุณไม่มีความเคลื่อนไหวนานกว่า %1$d เดือน ระบบจึงได้ลบไฟล์ออกตามนโยบายการไม่มีการใช้งาน</item>
     </plurals>
     <string name="contacts_section_requests">คำขอ</string>
     <string name="contacts_section_groups">กลุ่ม</string>
@@ -2386,4 +2386,23 @@
     <string name="contacts_action_send_message">ส่งข้อความ</string>
     <string name="contacts_action_contact_info">ข้อมูลการติดต่อ</string>
     <string name="contacts_action_remove_contact">เอาผู้ติดต่อออก</string>
+    <string name="contacts_action_audio_call">โทรด้วยเสียง</string>
+    <string name="contacts_action_video_call">สนทนาทางวิดีโอ</string>
+    <string name="contacts_search_hint">ค้นหาผู้ติดต่อ</string>
+    <string name="contacts_remove_dialog_title">ต้องการลบ %1$s หรือไม่</string>
+    <string name="contacts_remove_dialog_message">ระบบจะลบรายชื่อนี้ออกจากรายชื่อผู้ติดต่อของคุณ</string>
+    <string name="send_contacts">ส่งรายชื่อ</string>
+    <string name="contacts_groups_title">กลุ่ม</string>
+    <string name="contacts_groups_create_error">เกิดข้อผิดพลาดขณะสร้างการแชท</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="other">เลือกอยู่ %1$d รายการ</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">ค้นหากลุ่ม</string>
+    <string name="contacts_groups_empty_title">ไม่พบกลุ่ม</string>
+    <string name="public_link_auth_alert_description_external_file">จัดเก็บไฟล์นี้อย่างปลอดภัยและเปิดเข้าใช้งานได้ทุกเมื่อ</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="other">[A]%1$s [/A][B]อัปเดตข้อมูลแล้ว %2$d รายการ[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">ล้างประวัติการใช้งาน</string>
+    <string name="home_cwlo_clear_history_dialog_message">คุณแน่ใจหรือไม่ว่าต้องการล้างประวัติการใช้งาน เนื่องจากไม่สามารถย้อนกลับการดำเนินการนี้ได้</string>
 </resources>

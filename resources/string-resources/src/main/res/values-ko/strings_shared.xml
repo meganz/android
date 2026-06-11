@@ -2389,4 +2389,7 @@
     <string name="contacts_search_hint">연락처 검색</string>
     <string name="contacts_remove_dialog_title">%1$s 님을 삭제할까요?</string>
     <string name="contacts_remove_dialog_message">이 연락처가 당신의 연락처 목록에서 삭제됩니다.</string>
+    <string name="send_contacts">연락처 보내기</string>
+    <string name="contacts_groups_title">그룹</string>
+    <string name="contacts_groups_create_error">대화를 만드는 중 오류가 발생했습니다</string>
 </resources>

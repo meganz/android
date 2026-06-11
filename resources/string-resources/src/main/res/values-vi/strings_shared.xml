@@ -2361,4 +2361,16 @@
     <string name="contacts_action_send_message">Gửi tin nhắn</string>
     <string name="contacts_action_contact_info">Thông tin liên lạc</string>
     <string name="contacts_action_remove_contact">Xóa tên liên lạc</string>
+    <string name="cloud_drive_inactivity_banner_title">Tài khoản của bạn đã không hoạt động quá lâu</string>
+    <plurals name="cloud_drive_inactivity_banner_message">
+        <item quantity="other">Vì tài khoản của bạn đã không hoạt động trong hơn %1$d tháng, các tệp của bạn đã bị xóa theo chính sách không hoạt động của chúng tôi.</item>
+    </plurals>
+    <string name="contacts_action_audio_call">Cuộc gọi thoại</string>
+    <string name="contacts_action_video_call">Cuộc gọi video</string>
+    <string name="contacts_search_hint">Tìm liên hệ</string>
+    <string name="contacts_remove_dialog_title">Xóa %1$s?</string>
+    <string name="contacts_remove_dialog_message">Liên hệ này sẽ bị xóa khỏi danh bạ của bạn.</string>
+    <string name="send_contacts">Gửi tên liên lạc</string>
+    <string name="contacts_groups_title">Nhóm</string>
+    <string name="contacts_groups_create_error">Có lỗi phát&#160;sinh ra trong lúc tạo cuộc chat</string>
 </resources>
