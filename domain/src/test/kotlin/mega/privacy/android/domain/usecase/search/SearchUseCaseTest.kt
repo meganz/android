@@ -1,19 +1,28 @@
 package mega.privacy.android.domain.usecase.search
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.repository.FavouritesRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.favourites.SortFavouritesUseCase
 import mega.privacy.android.domain.usecase.node.AddNodesTypeUseCase
+import mega.privacy.android.domain.usecase.shares.MapNodeToShareUseCase
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -26,13 +35,17 @@ class SearchUseCaseTest {
     private val favouritesRepository: FavouritesRepository = mock()
     private val addNodesTypeUseCase: AddNodesTypeUseCase = mock()
     private val sortFavouritesUseCase: SortFavouritesUseCase = mock()
+    private val mapNodeToShareUseCase: MapNodeToShareUseCase = mock()
+    private val nodeRepository: NodeRepository = mock()
 
     private val underTest = SearchUseCase(
         getCloudSortOrder = getCloudSortOrder,
         searchRepository = searchRepository,
         favouritesRepository = favouritesRepository,
         sortFavouritesUseCase = sortFavouritesUseCase,
-        addNodesTypeUseCase = addNodesTypeUseCase
+        addNodesTypeUseCase = addNodesTypeUseCase,
+        mapNodeToShareUseCase = mapNodeToShareUseCase,
+        nodeRepository = nodeRepository,
     )
 
     @Test
@@ -57,6 +70,8 @@ class SearchUseCaseTest {
     fun `test that getInShares is called when query is empty and parentHandle is invalid and searchTarget is INCOMING_SHARE`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(searchRepository.getInShares()).thenReturn(emptyList())
+            whenever(addNodesTypeUseCase(any())).thenReturn(emptyList())
             underTest(
                 parentHandle = NodeId(-1),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
@@ -75,6 +90,8 @@ class SearchUseCaseTest {
     fun `test that getInShares is called when query is empty and description and tag exist and parentHandle is invalid and searchTarget is INCOMING_SHARE`() =
         runTest {
             whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(searchRepository.getInShares()).thenReturn(emptyList())
+            whenever(addNodesTypeUseCase(any())).thenReturn(emptyList())
             underTest(
                 parentHandle = NodeId(-1),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
@@ -395,4 +412,98 @@ class SearchUseCaseTest {
             )
         }
     }
+
+    @Test
+    fun `test that root incoming share search results are wrapped as share nodes while inner results stay plain`() =
+        runTest {
+            val rootNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(123L))
+                on { parentId }.thenReturn(NodeId(-1))
+            }
+            val innerNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(999L))
+                on { parentId }.thenReturn(NodeId(555L))
+            }
+            val shareNode = mock<ShareFolderNode>()
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(searchRepository.search(anyOrNull(), any(), any())).thenReturn(emptyList())
+            whenever(addNodesTypeUseCase(any())).thenReturn(listOf(rootNode, innerNode))
+            whenever(nodeRepository.getNodeAccessPermission(NodeId(123L))).thenReturn(
+                AccessPermission.READ
+            )
+            whenever(nodeRepository.getIncomingShareParentUserEmail(NodeId(123L))).thenReturn("sharer@mega.co.nz")
+            whenever(mapNodeToShareUseCase(eq(rootNode), anyOrNull())).thenReturn(shareNode)
+
+            val result = underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                searchParameters = SearchParameters(
+                    query = "doc",
+                    searchTarget = SearchTarget.INCOMING_SHARE,
+                    searchCategory = SearchCategory.ALL,
+                    description = null,
+                    tag = null,
+                ),
+            )
+
+            assertThat(result).containsExactly(shareNode, innerNode).inOrder()
+            verify(nodeRepository, times(0)).getNodeAccessPermission(NodeId(999L))
+            verify(mapNodeToShareUseCase, times(0)).invoke(eq(innerNode), anyOrNull())
+        }
+
+    @Test
+    fun `test that root incoming share with no access stays plain`() =
+        runTest {
+            val rootNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(NodeId(123L))
+                on { parentId }.thenReturn(NodeId(-1))
+            }
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(searchRepository.search(anyOrNull(), any(), any())).thenReturn(emptyList())
+            whenever(addNodesTypeUseCase(any())).thenReturn(listOf(rootNode))
+            whenever(nodeRepository.getNodeAccessPermission(NodeId(123L))).thenReturn(null)
+
+            val result = underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                searchParameters = SearchParameters(
+                    query = "doc",
+                    searchTarget = SearchTarget.INCOMING_SHARE,
+                    searchCategory = SearchCategory.ALL,
+                    description = null,
+                    tag = null,
+                ),
+            )
+
+            assertThat(result).containsExactly(rootNode)
+            verify(mapNodeToShareUseCase, times(0)).invoke(any(), anyOrNull())
+        }
+
+    @Test
+    fun `test that non incoming share search results are not wrapped as share nodes`() =
+        runTest {
+            val folderNode = mock<TypedFolderNode>()
+            whenever(searchRepository.getInvalidHandle()).thenReturn(NodeId(-1))
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(searchRepository.getRootNodeId()).thenReturn(NodeId(-1))
+            whenever(searchRepository.search(anyOrNull(), any(), any())).thenReturn(emptyList())
+            whenever(addNodesTypeUseCase(any())).thenReturn(listOf(folderNode))
+
+            val result = underTest(
+                parentHandle = NodeId(-1),
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                searchParameters = SearchParameters(
+                    query = "doc",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL,
+                    description = null,
+                    tag = null,
+                ),
+            )
+
+            assertThat(result).containsExactly(folderNode)
+            verify(nodeRepository, times(0)).getNodeAccessPermission(any())
+        }
 }
