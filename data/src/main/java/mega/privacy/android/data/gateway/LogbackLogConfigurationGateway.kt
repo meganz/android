@@ -13,8 +13,6 @@ import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 
 /**
@@ -27,11 +25,9 @@ class LogbackLogConfigurationGateway @Inject constructor(
     @ApplicationContext private val context: Context,
     @LogFileDirectory private val logFileDirectory: Lazy<File>,
 ) : LogConfigurationGateway {
-    private val mutex = Mutex()
 
-    override suspend fun resetLoggingConfiguration() = mutex.withLock {
+    override suspend fun resetLoggingConfiguration() {
         val loggingContext = LoggerFactory.getILoggerFactory() as LoggerContext
-        val loggers = loggingContext.copyOfListenerList
         loggingContext.reset()
         loggingContext.putProperty("LOG_DIR", logFileDirectory.get().absolutePath)
         val config = JoranConfigurator()
@@ -40,9 +36,6 @@ class LogbackLogConfigurationGateway @Inject constructor(
         try {
             val inputStream: InputStream = context.assets.open("logback.xml")
             config.doConfigure(inputStream)
-            for (l in loggers) {
-                loggingContext.addListener(l)
-            }
         } catch (e: JoranException) {
             e.printStackTrace()
         } catch (e: IOException) {

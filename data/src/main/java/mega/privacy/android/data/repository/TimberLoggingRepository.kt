@@ -1,8 +1,6 @@
 package mega.privacy.android.data.repository
 
-import android.content.Context
 import dagger.Lazy
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.FileCompressionGateway
@@ -34,8 +32,8 @@ import javax.inject.Inject
 internal class TimberLoggingRepository @Inject constructor(
     private val megaSdkLogger: MegaLoggerInterface,
     private val megaChatLogger: MegaChatLoggerInterface,
-    @SdkLogger private val sdkLogFileTree: LogFileTree,
-    @ChatLogger private val chatLogFileTree: LogFileTree,
+    @SdkLogger private val sdkLogFileTree: Lazy<LogFileTree>,
+    @ChatLogger private val chatLogFileTree: Lazy<LogFileTree>,
     private val loggingConfig: LogbackLogConfigurationGateway,
     private val fileCompressionGateway: FileCompressionGateway,
     private val megaApiGateway: MegaApiGateway,
@@ -43,15 +41,6 @@ internal class TimberLoggingRepository @Inject constructor(
     @LogFileDirectory private val logFileDirectory: Lazy<File>,
     @LogZipFileDirectory private val logZipFileDirectory: Lazy<File>,
 ) : LoggingRepository {
-
-    init {
-        if (!Timber.forest().contains(sdkLogFileTree)) {
-            Timber.plant(sdkLogFileTree)
-        }
-        if (!Timber.forest().contains(chatLogFileTree)) {
-            Timber.plant(chatLogFileTree)
-        }
-    }
 
     override fun enableLogAllToConsole(isDebugBuild: Boolean) {
         MegaApiAndroid.addLoggerObject(megaSdkLogger)
@@ -66,7 +55,16 @@ internal class TimberLoggingRepository @Inject constructor(
 
     override suspend fun initialise() {
         withContext(ioDispatcher) {
+            // Fix race condition when multiple LoggerFactory.getLogger call
             loggingConfig.resetLoggingConfiguration()
+            val sdkTree = sdkLogFileTree.get()
+            if (!Timber.forest().contains(sdkTree)) {
+                Timber.plant(sdkTree)
+            }
+            val chatTree = chatLogFileTree.get()
+            if (!Timber.forest().contains(chatTree)) {
+                Timber.plant(chatTree)
+            }
         }
     }
 
