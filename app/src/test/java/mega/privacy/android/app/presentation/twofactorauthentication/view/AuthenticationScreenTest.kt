@@ -8,9 +8,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.view.TWO_FA_PROGRESS_TEST_TAG
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
-import mega.privacy.android.app.presentation.twofactorauthentication.view.TWO_FACTOR_AUTHENTICATION_TEST_TAG
+import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AUTHENTICATION_SCREEN_PIN_FIELD_TAG
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationScreen
 import org.junit.Rule
 import org.junit.Test
@@ -29,16 +30,16 @@ class AuthenticationScreenTest {
         composeRule.setContent {
             AuthenticationScreen(
                 uiState = uiState,
-                on2FAPinChanged = { _, _ -> },
                 on2FAChanged = {},
-                onFirstTime2FAConsumed = { })
+            )
         }
     }
 
     @Test
     fun `test that authentication instruction message is shown`() {
         setupRule()
-        composeRule.onNodeWithText(fromId(R.string.explain_confirm_2fa)).assertIsDisplayed()
+        composeRule.onNodeWithText(fromId(sharedR.string.multi_factor_auth_login_verification_content))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -60,9 +61,9 @@ class AuthenticationScreenTest {
     }
 
     @Test
-    fun `test that 2FA input fields are shown`() {
+    fun `test that 2FA input field is shown`() {
         setupRule()
-        composeRule.onNodeWithTag(TWO_FACTOR_AUTHENTICATION_TEST_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(AUTHENTICATION_SCREEN_PIN_FIELD_TAG).assertIsDisplayed()
     }
 
     @Test

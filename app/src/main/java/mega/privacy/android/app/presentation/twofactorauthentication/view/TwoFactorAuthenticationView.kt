@@ -1,16 +1,16 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view
 
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -40,14 +40,11 @@ internal fun TwoFactorAuthenticationView(
     uiState: TwoFactorAuthenticationUIState,
     isDarkMode: Boolean,
     qrCodeMapper: QRCodeMapper,
-    onBackPressedDispatcher: OnBackPressedDispatcher,
     onFinishActivity: () -> Unit,
     openPlayStore: () -> Unit,
     isIntentAvailable: (String) -> Boolean,
     onOpenInClicked: (String) -> Unit,
-    on2FAPinChanged: (String, Int) -> Unit,
     on2FAChanged: (String) -> Unit,
-    onFirstTime2FAConsumed: () -> Unit,
     on2FAPinReset: () -> Unit,
     onExportRkClicked: () -> Unit,
     onDismissClicked: () -> Unit,
@@ -56,33 +53,32 @@ internal fun TwoFactorAuthenticationView(
     onIsWritePermissionDeniedConsumed: () -> Unit,
     onIsSeedCopiedToClipboardConsumed: () -> Unit,
 ) {
-    val currentScreen =
-        remember { mutableStateOf(ScreenType.InitialisationScreen) }
+    var currentScreen by rememberSaveable {
+        mutableStateOf(ScreenType.InitialisationScreen)
+    }
     val resources = LocalResources.current
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = scaffoldState.snackbarHostState
     val coroutineScope = rememberCoroutineScope()
-    val onBackPressedDispatcherOwner = LocalOnBackPressedDispatcherOwner.current
-    onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(enabled = true) {
-        override fun handleOnBackPressed() {
-            when (currentScreen.value) {
 
-                ScreenType.SetupScreen -> {
-                    currentScreen.value = ScreenType.InitialisationScreen
-                }
+    val onBack: () -> Unit = {
+        when (currentScreen) {
+            ScreenType.SetupScreen -> {
+                currentScreen = ScreenType.InitialisationScreen
+            }
 
-                ScreenType.AuthenticationScreen -> {
-                    on2FAPinReset()
-                    currentScreen.value = ScreenType.SetupScreen
-                }
+            ScreenType.AuthenticationScreen -> {
+                on2FAPinReset()
+                currentScreen = ScreenType.SetupScreen
+            }
 
-                else -> {
-                    onFinishActivity()
-                }
+            else -> {
+                onFinishActivity()
             }
         }
+    }
+    BackHandler(onBack = onBack)
 
-    })
     MegaScaffold(
         modifier = Modifier.imePadding(),
         scaffoldState = scaffoldState,
@@ -90,9 +86,7 @@ internal fun TwoFactorAuthenticationView(
             MegaAppBar(
                 appBarType = AppBarType.BACK_NAVIGATION,
                 title = stringResource(id = R.string.settings_2fa),
-                onNavigationPressed = {
-                    onBackPressedDispatcherOwner?.onBackPressedDispatcher?.onBackPressed()
-                },
+                onNavigationPressed = onBack,
             )
         },
     ) { padding ->
@@ -103,10 +97,10 @@ internal fun TwoFactorAuthenticationView(
                     snackBarHostState.showAutoDurationSnackbar(resources.getString(R.string.qr_seed_text_error))
                 }
             } else {
-                currentScreen.value = ScreenType.SetupScreen
+                currentScreen = ScreenType.SetupScreen
             }
         }
-        when (currentScreen.value) {
+        when (currentScreen) {
             ScreenType.InitialisationScreen -> {
                 InitialisationScreen(
                     onNextClicked = onBeginSetupClicked,
@@ -120,7 +114,7 @@ internal fun TwoFactorAuthenticationView(
                     isDarkMode = isDarkMode,
                     qrCodeMapper = qrCodeMapper,
                     onNextClicked = {
-                        currentScreen.value = ScreenType.AuthenticationScreen
+                        currentScreen = ScreenType.AuthenticationScreen
                     },
                     openPlayStore = openPlayStore,
                     isIntentAvailable = isIntentAvailable,
@@ -133,9 +127,7 @@ internal fun TwoFactorAuthenticationView(
             ScreenType.AuthenticationScreen -> {
                 AuthenticationScreen(
                     uiState = uiState,
-                    on2FAPinChanged = on2FAPinChanged,
                     on2FAChanged = on2FAChanged,
-                    onFirstTime2FAConsumed = onFirstTime2FAConsumed,
                     modifier = contentModifier,
                 )
             }
@@ -178,11 +170,11 @@ internal fun TwoFactorAuthenticationView(
 
         when (uiState.authenticationState) {
             AuthenticationState.Passed -> {
-                currentScreen.value = ScreenType.AuthenticationCompletedScreen
+                currentScreen = ScreenType.AuthenticationCompletedScreen
             }
 
             AuthenticationState.Error,
-            -> {
+                -> {
                 LaunchedEffect(key1 = uiState.authenticationState) {
                     snackBarHostState.showAutoDurationSnackbar(resources.getString(R.string.error_enable_2fa))
                 }

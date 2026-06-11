@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
@@ -34,7 +35,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -84,14 +84,11 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             uiState = uiState,
             isDarkMode = isDarkMode,
             qrCodeMapper = qrCodeMapper,
-            onBackPressedDispatcher = onBackPressedDispatcher,
             onFinishActivity = ::finish,
             isIntentAvailable = { isIntentAvailable(uiState.twoFactorAuthUrl) },
             onOpenInClicked = this::onOpenInClicked,
             openPlayStore = this::openPlayStore,
-            on2FAPinChanged = viewModel::on2FAPinChanged,
             on2FAChanged = viewModel::on2FAChanged,
-            onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
             on2FAPinReset = viewModel::on2FAPinReset,
             onExportRkClicked = { chooseRecoverySaveLocation() },
             onDismissClicked = ::finish,
@@ -122,11 +119,10 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         enableEdgeToEdge()
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
-            OriginalTheme(isDark = themeMode.isDarkMode()) {
+            MegaAppContainer(themeMode = themeMode) {
                 TwoFactorAuthenticationScreen(themeMode.isDarkMode())
             }
         }
-        viewModel.getAuthenticationCode()
     }
 
     /**
