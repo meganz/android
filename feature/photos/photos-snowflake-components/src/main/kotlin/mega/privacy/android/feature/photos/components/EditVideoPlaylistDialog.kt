@@ -30,7 +30,12 @@ fun EditVideoPlaylistDialog(
         inputs = arrayOf(initialInputText),
         stateSaver = TextFieldValue.Saver
     ) {
-        mutableStateOf(value = TextFieldValue(initialInputText, TextRange(title.length)))
+        mutableStateOf(
+            value = TextFieldValue(
+                initialInputText,
+                TextRange(0, initialInputText.length)
+            )
+        )
     }
     BasicInputDialog(
         modifier = modifier,
