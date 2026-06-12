@@ -104,6 +104,18 @@ class FavouriteBottomSheetMenuItemTest {
             },
             false,
             false,
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            true,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isFavourite } doReturn false
+                on { isNodeKeyDecrypted } doReturn true
+            },
+            false,
+            true,
         )
     )
 }
