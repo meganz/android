@@ -241,7 +241,7 @@ class PendingBackStackNavigationHandler(
         }
         if (backstack.isEmpty()) backstack.addAll(setOf(initialLoginDestination, newDestination))
         // show non-required destinations immediately
-        backstack.addAll(backstack.pending.filter { it is NoSessionNavKey })
+        backstack.addAll(backstack.pending.filter { it is NoSessionNavKey && it !in backstack })
         backstack.pending = backstack.pending.filterNot { it is NoSessionNavKey }
         logBackStack("removeAuthRequiredDestinations")
         return authRequiredDestinations
@@ -341,6 +341,7 @@ class PendingBackStackNavigationHandler(
                 add(defaultLandingScreen)
             }
         }.union(backstack.pending)
+            .filterNot { it in backstack }
         backstack.pending = emptyList()
         if (pending.isNotEmpty()) {
             navigate(pending.toList())

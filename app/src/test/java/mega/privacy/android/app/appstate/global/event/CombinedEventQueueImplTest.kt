@@ -267,6 +267,42 @@ class CombinedEventQueueImplTest {
         assertThat(actual?.navOptions).isNull()
     }
 
+    @Test
+    fun `test that duplicate dialog events with equal dialogDestination are deduplicated in the queue`() =
+        runTest {
+            mockTimeProvider(1, 2, 3)
+            val dialogKey = DialogTestKey
+
+            underTest.emit(AppDialogEvent(dialogKey))
+            underTest.emit(AppDialogEvent(dialogKey))
+            underTest.emit(AppDialogEvent(dialogKey))
+
+            underTest.events.receiveAsFlow().map { it.invoke() }.test {
+                val first = awaitItem() as? AppDialogEvent
+                assertThat(first?.dialogDestination).isEqualTo(dialogKey)
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that emitting same dialog navKey multiple times only enqueues one AppDialogEvent`() =
+        runTest {
+            mockTimeProvider(1, 2, 3, 4, 5, 6)
+            val dialogKey = DialogTestKey
+
+            underTest.emit(dialogKey)
+            underTest.emit(dialogKey)
+            underTest.emit(dialogKey)
+
+            underTest.events.receiveAsFlow().map { it.invoke() }.test {
+                val first = awaitItem() as? AppDialogEvent
+                assertThat(first?.dialogDestination).isEqualTo(dialogKey)
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private fun mockTimeProvider(firstTime: Long = 0L, vararg times: Long = longArrayOf(0L)) {
         whenever(timeProvider()).thenReturn(firstTime, *times.toTypedArray())
     }

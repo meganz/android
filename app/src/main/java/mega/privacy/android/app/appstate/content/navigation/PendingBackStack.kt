@@ -25,6 +25,9 @@ class PendingBackStack<T : NavKey>(
     internal val base: NavBackStack<T>,
 ) : MutableList<T> by base, StateObject by base, RandomAccess by base {
     var pending: List<T> = emptyList()
+        set(value) {
+            field = value.distinct()
+        }
 }
 
 @Composable

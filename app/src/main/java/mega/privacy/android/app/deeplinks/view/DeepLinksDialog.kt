@@ -3,6 +3,7 @@ package mega.privacy.android.app.deeplinks.view
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -21,16 +22,20 @@ internal fun DeepLinksDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    with(uiState) {
-        if (navKeys == null) {
-            BasicSpinnerDialog(
-                modifier = modifier.testTag(DEEP_LINK_DIALOG_TEST_TAG),
-                contentText = stringResource(R.string.processing_link),
-                onDismiss = onDismiss
-            )
-        } else {
-            onDismiss()
+    val navKeys = uiState.navKeys
+    val navOptions = uiState.navOptions
 
+    if (navKeys == null) {
+        BasicSpinnerDialog(
+            modifier = modifier.testTag(DEEP_LINK_DIALOG_TEST_TAG),
+            contentText = stringResource(R.string.processing_link),
+            onDismiss = onDismiss
+        )
+    }
+
+    LaunchedEffect(navKeys) {
+        if (navKeys != null) {
+            onDismiss()
             if (navKeys.isNotEmpty()) {
                 onNavigate(navKeys, navOptions)
             }

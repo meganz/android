@@ -37,12 +37,15 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mockingDetails
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class MegaNavDisplayTest {
@@ -95,8 +98,12 @@ class MegaNavDisplayTest {
         loginViewModel = mock()
         transferHandler = mock()
 
+        installViewModel(queueEventViewModel)
+    }
+
+    private fun installViewModel(viewModel: QueueEventViewModel) {
         val store = ViewModelStore().apply {
-            put(viewModelKeyFor(QueueEventViewModel::class.java), queueEventViewModel)
+            put(viewModelKeyFor(QueueEventViewModel::class.java), viewModel)
         }
         viewModelStoreOwner = object : ViewModelStoreOwner {
             override val viewModelStore: ViewModelStore = store
@@ -172,6 +179,39 @@ class MegaNavDisplayTest {
 
         assertThat(emittedEvents).contains(event)
     }
+
+    @Test
+    fun `test that equal suppressed dialog events are deferred and re-emitted only once`() {
+        // the spy copies the view model's signal fields, breaking the internal
+        // handled/displayed handshake, so forward those calls to the real instance
+        // to let the queue advance past the first event
+        val realViewModel = QueueEventViewModel(receiver)
+        queueEventViewModel = spy(realViewModel)
+        doAnswer { realViewModel.eventDisplayed() }.whenever(queueEventViewModel).eventDisplayed()
+        doAnswer { realViewModel.eventHandled() }.whenever(queueEventViewModel).eventHandled()
+        installViewModel(queueEventViewModel)
+
+        val backStack = PendingBackStack<NavKey>(NavBackStack(SuppressingNavKey))
+        val event = AppDialogEvent(dialogDestination = SuppressableTarget)
+        eventChannel.trySend { event }
+
+        setContent(backStack)
+        composeRule.waitUntil(timeoutMillis = 2_000) { eventHandledCount() == 1 }
+
+        eventChannel.trySend { AppDialogEvent(dialogDestination = SuppressableTarget) }
+        composeRule.waitUntil(timeoutMillis = 2_000) { eventHandledCount() == 2 }
+        verify(navigationHandler, never()).displayDialog(any())
+
+        composeRule.runOnUiThread {
+            backStack.add(PlainNavKey)
+        }
+        composeRule.waitForIdle()
+
+        assertThat(emittedEvents.filter { it == event }).hasSize(1)
+    }
+
+    private fun eventHandledCount() = mockingDetails(queueEventViewModel).invocations
+        .count { it.method.name == "eventHandled" }
 
     private fun setContent(backStack: PendingBackStack<NavKey>) {
         composeRule.setContent {
