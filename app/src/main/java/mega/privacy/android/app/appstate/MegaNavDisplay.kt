@@ -122,7 +122,9 @@ internal fun MegaNavDisplay(
     ) { queueEvent: QueueEvent ->
 
         if (suppressionType.suppressesEvent(queueEvent)) {
-            deferredEvents.add(queueEvent)
+            if (queueEvent !in deferredEvents) {
+                deferredEvents.add(queueEvent)
+            }
             if (queueEvent is AppDialogEvent) {
                 navigationEventViewModel.eventHandled()
             }
@@ -149,7 +151,7 @@ internal fun MegaNavDisplay(
             events.forEach { event ->
                 if (suppressionType.suppressesEvent(event).not()) {
                     emitNavigationEvent(event)
-                } else {
+                } else if (event !in deferredEvents) {
                     deferredEvents.add(event)
                 }
             }

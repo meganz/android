@@ -35,7 +35,7 @@ paging = "3.5.0"
 paging-compose = "3.5.0"
 splashscreen = "1.2.0"
 browser = "1.10.0"
-nav3 = "1.1.1"
+nav3 = "1.1.2"
 credentials = "1.6.0"
 webkit = "1.16.0"
 
