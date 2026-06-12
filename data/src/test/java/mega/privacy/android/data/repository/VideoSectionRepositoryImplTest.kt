@@ -55,6 +55,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -124,16 +125,19 @@ class VideoSectionRepositoryImplTest {
 
     @Test
     fun `test that get all videos returns successfully`() = runTest {
+        val parentHandle = 200L
         val node = mock<MegaNode> {
             on { isFile }.thenReturn(true)
             on { isFolder }.thenReturn(false)
             on { duration }.thenReturn(100)
+            on { this.parentHandle }.thenReturn(parentHandle)
         }
         val backupNode = mock<MegaNode> {
             on { isFile }.thenReturn(true)
             on { isFolder }.thenReturn(false)
             on { duration }.thenReturn(100)
         }
+        val parentNode = mock<MegaNode> { on { isOutShare }.thenReturn(false) }
         val fileNode = mock<DefaultFileNode>()
         val filter = mock<MegaSearchFilter>()
         val token = mock<MegaCancelToken>()
@@ -166,13 +170,78 @@ class VideoSectionRepositoryImplTest {
         ).thenReturn(fileNode)
         whenever(megaApiGateway.isInBackups(backupNode)).thenReturn(true)
         whenever(megaApiGateway.isInBackups(node)).thenReturn(false)
+        whenever(megaApiGateway.getMegaNodeByHandle(parentHandle)).thenReturn(parentNode)
         whenever(typedVideoNodeMapper(fileNode, node.duration, null)).thenReturn(typedVideoNode)
         initUnderTest()
         val actual = underTest.getAllVideos("", null, null, SortOrder.ORDER_MODIFICATION_DESC)
         assertThat(actual).isNotEmpty()
         assertThat(actual.size).isEqualTo(1)
         assertThat(actual[0]).isEqualTo(typedVideoNode)
+        verify(megaApiGateway, times(1)).getMegaNodeByHandle(parentHandle)
     }
+
+    @Test
+    fun `test that get all videos only calls getMegaNodeByHandle once per unique parent`() =
+        runTest {
+            val parentHandle1 = 100L
+            val parentHandle2 = 200L
+            val node1 = mock<MegaNode> {
+                on { isFile }.thenReturn(true)
+                on { isFolder }.thenReturn(false)
+                on { duration }.thenReturn(100)
+                on { parentHandle }.thenReturn(parentHandle1)
+            }
+            val node2 = mock<MegaNode> {
+                on { isFile }.thenReturn(true)
+                on { isFolder }.thenReturn(false)
+                on { duration }.thenReturn(100)
+                on { parentHandle }.thenReturn(parentHandle1)
+            }
+            val node3 = mock<MegaNode> {
+                on { isFile }.thenReturn(true)
+                on { isFolder }.thenReturn(false)
+                on { duration }.thenReturn(100)
+                on { parentHandle }.thenReturn(parentHandle2)
+            }
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            val parentNode = mock<MegaNode> { on { isOutShare }.thenReturn(false) }
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC)).thenReturn(
+                ORDER_DEFAULT_DESC
+            )
+            whenever(
+                megaSearchFilterMapper(
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.VIDEO
+                )
+            ).thenReturn(filter)
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter,
+                    sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC),
+                    token
+                )
+            ).thenReturn(listOf(node1, node2, node3))
+            whenever(megaApiGateway.isInBackups(any())).thenReturn(false)
+            whenever(megaApiGateway.getMegaNodeByHandle(parentHandle1)).thenReturn(parentNode)
+            whenever(megaApiGateway.getMegaNodeByHandle(parentHandle2)).thenReturn(parentNode)
+            whenever(fileNodeMapper(any(), any(), anyOrNull())).thenReturn(mock<DefaultFileNode>())
+            whenever(
+                typedVideoNodeMapper(
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    anyOrNull()
+                )
+            ).thenReturn(mock())
+            initUnderTest()
+            underTest.getAllVideos("", null, null, SortOrder.ORDER_MODIFICATION_DESC)
+            verify(megaApiGateway, times(1)).getMegaNodeByHandle(parentHandle1)
+            verify(megaApiGateway, times(1)).getMegaNodeByHandle(parentHandle2)
+        }
 
     @Test
     fun `test that get video playlists returns correctly when all set types are SET_TYPE_PLAYLIST`() =
@@ -992,6 +1061,65 @@ class VideoSectionRepositoryImplTest {
         val result = underTest.getFavouritePlaylist(SortOrder.ORDER_NONE)
         assertThat(result).isEqualTo(testFavouritePlaylist)
     }
+
+    @Test
+    fun `test that getFavouritesVideoPlaylist only calls getMegaNodeByHandle once per unique parent`() =
+        runTest {
+            val parentHandle1 = 100L
+            val parentHandle2 = 200L
+            val node1 = mock<MegaNode> {
+                on { isFavourite }.thenReturn(true)
+                on { duration }.thenReturn(100)
+                on { parentHandle }.thenReturn(parentHandle1)
+            }
+            val node2 = mock<MegaNode> {
+                on { isFavourite }.thenReturn(true)
+                on { duration }.thenReturn(100)
+                on { parentHandle }.thenReturn(parentHandle1)
+            }
+            val node3 = mock<MegaNode> {
+                on { isFavourite }.thenReturn(true)
+                on { duration }.thenReturn(100)
+                on { parentHandle }.thenReturn(parentHandle2)
+            }
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            val parentNode = mock<MegaNode> { on { isOutShare }.thenReturn(false) }
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_NONE)).thenReturn(ORDER_DEFAULT_DESC)
+            whenever(
+                megaSearchFilterMapper(
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.VIDEO
+                )
+            ).thenReturn(filter)
+            whenever(
+                megaApiGateway.searchWithFilter(
+                    filter,
+                    sortOrderIntMapper(SortOrder.ORDER_NONE),
+                    token
+                )
+            ).thenReturn(listOf(node1, node2, node3))
+            whenever(megaApiGateway.isInBackups(any())).thenReturn(false)
+            whenever(megaApiGateway.getMegaNodeByHandle(parentHandle1)).thenReturn(parentNode)
+            whenever(megaApiGateway.getMegaNodeByHandle(parentHandle2)).thenReturn(parentNode)
+            whenever(fileNodeMapper(any(), any(), anyOrNull())).thenReturn(mock<DefaultFileNode>())
+            whenever(
+                typedVideoNodeMapper(
+                    anyOrNull(),
+                    any(),
+                    anyOrNull(),
+                    any(),
+                    any(),
+                    anyOrNull()
+                )
+            ).thenReturn(mock())
+            whenever(favouritesVideoPlaylistMapper(anyOrNull())).thenReturn(mock())
+            initUnderTest()
+            underTest.getFavouritePlaylist(SortOrder.ORDER_NONE)
+            verify(megaApiGateway, times(1)).getMegaNodeByHandle(parentHandle1)
+            verify(megaApiGateway, times(1)).getMegaNodeByHandle(parentHandle2)
+        }
 
     @Test
     fun `test that getVideoPlaylistTitles returns correct list of titles`() = runTest {

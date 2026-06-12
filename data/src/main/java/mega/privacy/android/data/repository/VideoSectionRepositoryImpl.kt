@@ -80,6 +80,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
     ): List<TypedVideoNode> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
+            val outShareStatusByParentHandle = mutableMapOf<Long, Boolean>()
             getAllVideoMegaNodes(
                 searchQuery = searchQuery,
                 tag = tag,
@@ -88,12 +89,13 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             ).mapNotNull { megaNode ->
                 megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()])
                     ?.let { fileNode ->
-                        val isOutShared =
-                            megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
                         typedVideoNodeMapper(
                             fileNode = fileNode,
                             duration = megaNode.duration,
-                            isOutShared = isOutShared
+                            isOutShared = isParentOutShared(
+                                megaNode.parentHandle,
+                                outShareStatusByParentHandle
+                            )
                         )
                     }
             }
@@ -128,6 +130,13 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         megaNode = this, requireSerializedData = false, offline = offline
     )
 
+    private suspend fun isParentOutShared(
+        parentHandle: Long,
+        outShareCache: MutableMap<Long, Boolean>,
+    ): Boolean = outShareCache.getOrPut(parentHandle) {
+        megaApiGateway.getMegaNodeByHandle(parentHandle)?.isOutShare == true
+    }
+
     override suspend fun getVideoPlaylists(sortOrder: SortOrder): List<VideoPlaylist> =
         withContext(ioDispatcher) {
             val offlineItems = getAllOfflineNodeHandle()
@@ -142,6 +151,7 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
         sortOrder: SortOrder,
         offlineItems: Map<String, Offline>,
     ): FavouritesVideoPlaylist {
+        val outShareStatusByParentHandle = mutableMapOf<Long, Boolean>()
         val favouriteVideos =
             getAllVideoMegaNodes(
                 order = sortOrder
@@ -149,12 +159,13 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
                 .mapNotNull { megaNode ->
                     megaNode.convertToFileNode(offlineItems[megaNode.handle.toString()])
                         ?.let { fileNode ->
-                            val isOutShared =
-                                megaApiGateway.getMegaNodeByHandle(megaNode.parentHandle)?.isOutShare == true
                             typedVideoNodeMapper(
                                 fileNode = fileNode,
                                 duration = megaNode.duration,
-                                isOutShared = isOutShared
+                                isOutShared = isParentOutShared(
+                                    megaNode.parentHandle,
+                                    outShareStatusByParentHandle
+                                )
                             )
                         }
                 }
