@@ -895,6 +895,37 @@ class PendingBackStackNavigationHandlerTest {
         assertThat(backStack.last()).isEqualTo(ParameterizedDialogDestination("A"))
     }
 
+    @Test
+    fun `test that displayDialog while fetch nodes is in progress does not duplicate pending dialog key`() {
+        underTest.onRootNodeChange(RootNodeState(exists = false))
+
+        underTest.displayDialog(DialogDestination1)
+        underTest.displayDialog(DialogDestination1)
+
+        assertThat(backStack.pending.count { it == DialogDestination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that pending key already on the back stack is not duplicated when root node arrives`() {
+        underTest.onRootNodeChange(RootNodeState(exists = false))
+        underTest.navigate(Destination1)
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        underTest.onRootNodeChange(RootNodeState(exists = true))
+
+        assertThat(backStack.count { it == Destination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that logout does not duplicate no-session key present on both back stack and pending`() {
+        backStack.add(OptionalNoSessionNavKey1)
+        backStack.pending += OptionalNoSessionNavKey1
+
+        underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
+
+        assertThat(backStack.count { it == OptionalNoSessionNavKey1 }).isEqualTo(1)
+    }
+
     private data object DialogDestination1 : DialogNavKey
     private data object DialogDestination2 : DialogNavKey
 

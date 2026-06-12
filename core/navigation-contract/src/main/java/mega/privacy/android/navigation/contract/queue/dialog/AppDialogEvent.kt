@@ -9,7 +9,7 @@ import mega.privacy.android.navigation.contract.queue.QueueEvent
  *
  * @property dialogDestination
  */
-class AppDialogEvent(
+data class AppDialogEvent(
     val dialogDestination: NavKey,
 ) : QueueEvent {
     override val suppressableKey: NavKey?
