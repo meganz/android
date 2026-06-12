@@ -17,6 +17,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.feature.videoeditor.components.BlockingProgressDialog
 
 /**
  * Blocking modal shown while the source video is fetched from MEGA into the cache, before the editor

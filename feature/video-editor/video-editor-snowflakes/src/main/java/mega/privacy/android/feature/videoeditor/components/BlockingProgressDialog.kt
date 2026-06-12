@@ -1,5 +1,8 @@
-package mega.privacy.android.feature.videoeditor.presentation.editor.ui
+package mega.privacy.android.feature.videoeditor.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,24 +14,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.TextOnlyButtonM3
-import mega.android.core.ui.components.indicators.MegaAnimatedLinearProgressIndicator
 import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 
 /**
- * Shared shell for the editor's blocking progress dialogs ([PrepareVideoDialog],
- * [ExportProgressDialog]): a centered card with a title, an optional ellipsized
+ * Shared shell for the editor's blocking progress dialogs: a centered card with a title, an optional ellipsized
  * supporting line, a status row annotated with the percentage, a determinate
  * progress bar, and a Cancel action.
  *
@@ -44,7 +56,7 @@ import mega.android.core.ui.theme.values.TextColor
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun BlockingProgressDialog(
+fun BlockingProgressDialog(
     title: String,
     percent: Int,
     onCancel: () -> Unit,
@@ -92,11 +104,11 @@ internal fun BlockingProgressDialog(
                     MegaText(
                         text = "$percent%",
                         style = AppTheme.typography.titleSmall,
-                        textColor = TextColor.Brand,
+                        textColor = TextColor.Primary,
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                MegaAnimatedLinearProgressIndicator(
+                CustomProgressBar(
                     indicatorProgress = percent / 100f,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -108,5 +120,53 @@ internal fun BlockingProgressDialog(
                 )
             }
         }
+    }
+}
+
+@Composable
+internal fun CustomProgressBar(
+    indicatorProgress: Float,
+    modifier: Modifier = Modifier,
+) {
+    val isInPreview = LocalInspectionMode.current
+    var progress by remember { mutableFloatStateOf(if (isInPreview) indicatorProgress else 0f) }
+    val progressAnimation by animateFloatAsState(
+        targetValue = progress,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = FastOutSlowInEasing
+        ),
+        label = "Progress Animation"
+    )
+
+    LinearProgressIndicator(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(8.dp)
+            .clip(RoundedCornerShape(20.dp)),
+        progress = { progressAnimation.coerceAtLeast(0.0f) },
+        color = DSTokens.colors.support.success,
+        strokeCap = StrokeCap.Square,
+        trackColor = DSTokens.colors.background.surface2,
+        gapSize = 0.dp,
+        drawStopIndicator = {}
+    )
+
+    LaunchedEffect(indicatorProgress) {
+        progress = indicatorProgress
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun ExportProgressDialogPreview() {
+    AndroidThemeForPreviews {
+        BlockingProgressDialog(
+            percent = 42,
+            title = "Saving",
+            description = "Holiday in Queenstown.mp4",
+            statusContent = { },
+            onCancel = {},
+        )
     }
 }

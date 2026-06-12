@@ -7,6 +7,7 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.feature.videoeditor.components.BlockingProgressDialog
 
 /**
  * Modal dialog shown while encoding the edited copy. [onCancel] cancels the export; the user's
