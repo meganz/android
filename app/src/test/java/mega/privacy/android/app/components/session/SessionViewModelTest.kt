@@ -92,4 +92,14 @@ internal class SessionViewModelTest {
 
         verify(retryConnectionsAndSignalPresenceUseCase).invoke()
     }
+
+    @Test
+    fun `test that retry connections and signal presence swallows use case failure`() = runTest {
+        whenever(retryConnectionsAndSignalPresenceUseCase())
+            .thenThrow(RuntimeException("ChatNotInitialized"))
+
+        underTest.retryConnectionsAndSignalPresence()
+
+        verify(retryConnectionsAndSignalPresenceUseCase).invoke()
+    }
 }
