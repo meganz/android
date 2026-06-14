@@ -227,7 +227,74 @@ implementation(files("../analytics-core-release.aar"))
 implementation(files("../analytics-annotations-release.aar"))
 ```
 
-### 7.3 Disable Library Dependencies
+### 7.3 Disable Private Maven Repositories and Build Core UI Library Locally
+
+The root `build.gradle.kts` declares several private MEGA Artifactory maven repositories inside the `allprojects { repositories { ... } }` block. GitHub users cannot access these, so comment them all out:
+
+- `mega-sdk-android` — not needed, the SDK is built locally (section 7.1)
+- `mobile-analytics` — not needed, built locally (section 7.2)
+- `core-ui` — built locally (see below)
+- `dev-tools` and `karma` — MEGA-internal dev tools, not required to build the app
+- `mega-telephoto` and `mega-ucrop-n-edit` — replaced with public libraries (section 7.5)
+
+Comment out the following blocks (leave `google()`, `mavenCentral()`, `jitpack.io`, and `flatDir` untouched):
+
+```kotlin
+//        maven {
+//            url =
+//                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-sdk-android")
+//        }
+//        maven {
+//            url =
+//                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mobile-analytics")
+//        }
+//        maven {
+//            url =
+//                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/core-ui")
+//        }
+//        maven {
+//            url =
+//                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/dev-tools")
+//        }
+//        maven {
+//            url =
+//                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/karma")
+//        }
+//        maven {
+//            url =
+//                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-telephoto")
+//        }
+//        maven {
+//            url =
+//                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-ucrop-n-edit")
+//        }
+```
+
+Then build the Core UI library from source and depend on the generated AARs:
+
+1. Download and build the [Core UI](https://github.com/meganz/android-core-ui) source code:
+
+```bash
+git clone --recursive https://github.com/meganz/android-core-ui.git
+cd android-core-ui
+./gradlew --no-daemon :core-ui:assembleRelease :core-ui-tokens:assembleRelease
+```
+
+2. Copy the following generated libraries to the root of the MEGA codebase:
+   - `core-ui/build/outputs/aar/core-ui-release.aar`
+   - `core-ui-tokens/build/outputs/aar/core-ui-tokens-release.aar`
+
+3. Modify MEGA code to depend on the local AAR files:
+   - Search for `implementation(lib.mega.core.ui)` and `implementation(lib.mega.core.ui.tokens)` throughout the project and replace all occurrences with the code below. Note: You may need to add `..` to the path if the `build.gradle.kts` is in a subproject.
+
+```kotlin
+//    implementation(lib.mega.core.ui)
+//    implementation(lib.mega.core.ui.tokens)
+implementation(files("../core-ui-release.aar"))
+implementation(files("../core-ui-tokens-release.aar"))
+```
+
+### 7.4 Disable Library Dependencies
 
 1. In the root `build.gradle.kts`, comment out the following code:
 
@@ -256,17 +323,17 @@ resolutionStrategy {
 }
 ```
 
-### 7.4 Use Public Dependencies
+### 7.5 Use Public Dependencies
 
 In `lib.versions.toml`, replace dependencies of **Telephoto** and **uCrop** with their publicly available versions from their official GitHub repositories.
 
-### 7.5 Firebase (GMS build only)
+### 7.6 Firebase (GMS build only)
 
 1. Copy `app/src/gms/google-services.json.example` to `app/src/gms/google-services.json`
 2. Create a Firebase project and add Android apps for `mega.privacy.android.app` and `mega.privacy.android.app.qa`
 3. Replace the placeholder values in `google-services.json` with your project's config
 
-### 7.6 Run the Project
+### 7.7 Run the Project
 
 Open the project with Android Studio, let it build the project, and click **Run**.
 
