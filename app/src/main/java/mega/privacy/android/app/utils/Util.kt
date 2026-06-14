@@ -1061,8 +1061,8 @@ object Util {
         val tasks = am.appTasks
         for (task in tasks) {
             val taskInfo = task.taskInfo
-            if (taskInfo.id != -1) {  // Task is running
-                return taskInfo.topActivity!!.className.contains(className!!)
+            if (taskInfo?.id != -1) {  // Task is running
+                return className?.let { taskInfo?.topActivity?.className?.contains(it) } == true
             }
         }
 
