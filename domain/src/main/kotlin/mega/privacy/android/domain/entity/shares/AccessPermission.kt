@@ -36,3 +36,9 @@ enum class AccessPermission {
  */
 fun AccessPermission.hasWritePermission() =
     this == AccessPermission.OWNER || this == AccessPermission.READWRITE || this == AccessPermission.FULL
+
+/**
+ * Returns true if the user has full access permission
+ */
+fun AccessPermission.hasFullAccessPermission() =
+    this == AccessPermission.OWNER || this == AccessPermission.FULL

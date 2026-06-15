@@ -57,6 +57,12 @@ data class AddVideoToPlaylistNavKey(val addedVideoIds: List<NodeId>) : ExplorerN
 }
 
 @Serializable
+data object SelectSyncFolderNavKey : ExplorerNavKey
+
+@Serializable
+data class SelectStopBackupDestinationNavKey(val folderName: String?) : ExplorerNavKey
+
+@Serializable
 data class CopyNavKey(val nodeIds: List<NodeId>) : ExplorerNavKey {
     companion object {
         const val RESULT = "CopyNavKey::result"

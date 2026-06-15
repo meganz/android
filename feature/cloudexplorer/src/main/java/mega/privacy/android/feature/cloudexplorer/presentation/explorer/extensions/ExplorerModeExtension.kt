@@ -45,7 +45,7 @@ val ExplorerMode.actionStringId: Int
         ExplorerMode.ShareFilesToChat -> sharedR.string.context_send
         ExplorerMode.Move -> sharedR.string.general_move
         ExplorerMode.Copy -> sharedR.string.general_copy
-        ExplorerMode.SelectCUFolder -> sharedR.string.cloud_explorer_use_this_folder_button
+        ExplorerMode.SelectCUFolder, ExplorerMode.SelectSyncFolder, ExplorerMode.SelectStopBackupDestination -> sharedR.string.cloud_explorer_use_this_folder_button
 
         ExplorerMode.Import,
         ExplorerMode.AlbumImport,

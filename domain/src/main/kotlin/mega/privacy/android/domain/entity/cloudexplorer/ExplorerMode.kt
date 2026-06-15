@@ -11,12 +11,16 @@ package mega.privacy.android.domain.entity.cloudexplorer
  * @property isIncomingAvailable Whether the Incoming Shares tab is available in this mode.
  * @property isChatAvailable Whether the Chat tab is available in this mode.
  * @property isVideoPicker Whether only video files can be selected. Non-video files are shown disabled.
+ * @property requiresFullAccessShares Whether incoming shares need full access permission to be
+ *   selectable or navigable (e.g. syncing a shared folder requires full access), instead of the
+ *   default write permission.
  */
 enum class ExplorerMode(
     val isFolderPicker: Boolean,
     val isIncomingAvailable: Boolean,
     val isChatAvailable: Boolean,
     val isVideoPicker: Boolean,
+    val requiresFullAccessShares: Boolean = false,
 ) {
     /** Upload files shared from an external app to a MEGA folder. */
     ShareFilesToMega(
@@ -104,5 +108,22 @@ enum class ExplorerMode(
         isIncomingAvailable = false,
         isChatAvailable = false,
         isVideoPicker = true,
+    ),
+
+    /** Select the MEGA folder to be synced when creating a new sync. */
+    SelectSyncFolder(
+        isFolderPicker = true,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+        requiresFullAccessShares = true,
+    ),
+
+    /** Select the destination to move a backup folder to when stopping a backup. */
+    SelectStopBackupDestination(
+        isFolderPicker = true,
+        isIncomingAvailable = false,
+        isChatAvailable = false,
+        isVideoPicker = false,
     ),
 }
