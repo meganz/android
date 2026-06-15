@@ -56,8 +56,13 @@ private val thumbEndPadding = 8.dp
 /** Vertical inset at each end of the track so the thumb never sits flush against the toolbar or bottom edge. */
 private val thumbTrackVerticalInset = 4.dp
 
-/** Minimum chunk count (not line count) to show the scrollbar. */
-private const val MINIMUM_ITEMS_FOR_SCROLLBAR = 2
+/**
+ * Minimum chunk count to compose the scrollbar at all. A single chunk can still span many screens
+ * (view mode caps chunks at ~50k chars, so e.g. an XML file under that size is one tall chunk), so
+ * this only filters out empty content; whether the thumb is actually visible is decided by
+ * [LazyListState.canScrollForward]/[LazyListState.canScrollBackward] via `thumbVisible`.
+ */
+private const val MINIMUM_ITEMS_FOR_SCROLLBAR = 1
 
 /** Step size for scrolling large lists; avoids hitting platform scroll-offset limit in one jump. */
 private const val SCROLL_STEP_ITEMS = 25_000
@@ -82,7 +87,7 @@ fun TextEditorFastScrollbar(
     state: LazyListState,
     itemCount: Int,
     modifier: Modifier = Modifier,
-    tooltipText: ((currentIndex: Int) -> String)? = null,
+    tooltipText: ((chunkIndex: Int, fractionWithinChunk: Float) -> String)? = null,
 ) {
     if (!shouldShowScrollbar(itemCount)) return
 
@@ -115,9 +120,10 @@ fun TextEditorFastScrollbar(
             calculateScrollProportion(
                 firstVisibleItemIndex = state.firstVisibleItemIndex,
                 firstVisibleItemScrollOffset = state.firstVisibleItemScrollOffset,
-                lastVisibleItemIndex = visibleItems.lastOrNull()?.index,
                 firstVisibleItemSize = visibleItems.firstOrNull()?.size?.toFloat(),
                 itemCount = itemCount,
+                canScrollForward = state.canScrollForward,
+                canScrollBackward = state.canScrollBackward,
             )
         }
     }
@@ -134,7 +140,15 @@ fun TextEditorFastScrollbar(
     val latestTooltipText = rememberUpdatedState(tooltipText)
     val tooltipString by remember(state, itemCount) {
         derivedStateOf {
-            if (thumbVisible) latestTooltipText.value?.invoke(state.firstVisibleItemIndex) else null
+            if (thumbVisible) {
+                // How far the first visible chunk has scrolled past the top, so the caller can
+                // interpolate the actual top line within the chunk instead of always reporting the
+                // chunk's start line (which never changes for a single-chunk file).
+                val size = state.layoutInfo.visibleItemsInfo.firstOrNull()?.size?.toFloat() ?: 0f
+                val fractionWithinChunk =
+                    if (size > 0f) (state.firstVisibleItemScrollOffset / size).coerceIn(0f, 1f) else 0f
+                latestTooltipText.value?.invoke(state.firstVisibleItemIndex, fractionWithinChunk)
+            } else null
         }
     }
 
@@ -284,31 +298,37 @@ fun TextEditorFastScrollbar(
 /**
  * Calculates the 0..1 scroll proportion for the fast-scrollbar thumb.
  *
- * Returns 1f when the last visible item is the final item in the list. Otherwise computes a
- * continuous proportion that incorporates the sub-item pixel offset for smooth thumb tracking.
+ * The end of the track is pinned to the *actual* bottom of the list ([canScrollForward] == false),
+ * not to the last item merely becoming visible. With very tall chunks — e.g. a JSON file whose single
+ * long line is split into 50k-char chunks that each wrap over many screens — the last chunk appears a
+ * screen or more before the real bottom; keying on its visibility made the thumb jump to the end and
+ * stop following the finger (AND-23767 / T21378947). Otherwise the proportion is continuous, using the
+ * first visible item's sub-item pixel offset so the thumb tracks the scroll smoothly.
  *
  * @param firstVisibleItemIndex  Index of the first fully or partially visible item.
  * @param firstVisibleItemScrollOffset  Pixel offset of the first visible item from the top of the viewport.
- * @param lastVisibleItemIndex  Index of the last visible item, or null if the layout has no items yet.
  * @param firstVisibleItemSize  Height in pixels of the first visible item, or null if unavailable.
  * @param itemCount  Total number of items in the list.
+ * @param canScrollForward  Whether the list can still scroll down; false only at the true bottom.
+ * @param canScrollBackward  Whether the list can scroll up; false only at the true top.
  */
 internal fun calculateScrollProportion(
     firstVisibleItemIndex: Int,
     firstVisibleItemScrollOffset: Int,
-    lastVisibleItemIndex: Int?,
     firstVisibleItemSize: Float?,
     itemCount: Int,
+    canScrollForward: Boolean,
+    canScrollBackward: Boolean,
 ): Float {
+    if (itemCount <= 0) return 0f
+    // Pin to the ends only when the list is genuinely there. A non-scrollable list (content fits the
+    // viewport) can scroll neither way — keep the thumb at the top rather than snapping it to the end.
+    if (!canScrollForward) return if (canScrollBackward) 1f else 0f
     val itemCountFloat = itemCount.toFloat().coerceAtLeast(1f)
-    val lastIndex = lastVisibleItemIndex ?: firstVisibleItemIndex
-    return if (lastIndex >= itemCount - 1) 1f
-    else {
-        val itemSize = (firstVisibleItemSize ?: 1f).coerceAtLeast(1f)
-        val itemProgress = firstVisibleItemScrollOffset / itemSize
-        val continuousIndex = firstVisibleItemIndex.toFloat() + itemProgress
-        (continuousIndex / itemCountFloat).coerceIn(0f, 1f)
-    }
+    val itemSize = (firstVisibleItemSize ?: 1f).coerceAtLeast(1f)
+    val itemProgress = firstVisibleItemScrollOffset / itemSize
+    val continuousIndex = firstVisibleItemIndex.toFloat() + itemProgress
+    return (continuousIndex / itemCountFloat).coerceIn(0f, 1f)
 }
 
 /**
@@ -345,7 +365,9 @@ internal fun calculateScrollTarget(proportion: Float, itemCount: Int): ScrollTar
 }
 
 /**
- * Whether the scrollbar should be shown for the given [itemCount] (chunk count, not line count).
+ * Whether the scrollbar should be composed for the given [itemCount] (chunk count, not line count).
+ * Returns true for any non-empty list — even a single chunk, which can still span many screens. The
+ * thumb only becomes visible when the list is actually scrollable (see `thumbVisible`).
  */
 internal fun shouldShowScrollbar(itemCount: Int): Boolean =
     itemCount >= MINIMUM_ITEMS_FOR_SCROLLBAR

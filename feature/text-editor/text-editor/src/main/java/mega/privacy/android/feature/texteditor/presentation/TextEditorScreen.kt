@@ -380,8 +380,20 @@ fun TextEditorScreen(
                             modifier = Modifier
                                 .align(Alignment.CenterEnd)
                                 .fillMaxHeight(),
-                            tooltipText = { index ->
-                                lineTooltipTemplate.format(chunkStartLineProvider(index).coerceAtLeast(1))
+                            tooltipText = { chunkIndex, fractionWithinChunk ->
+                                val startLine = chunkStartLineProvider(chunkIndex).coerceAtLeast(1)
+                                // First line of the next chunk (or one past the last line) bounds this
+                                // chunk's line range; interpolating with the in-chunk scroll fraction
+                                // gives the actual top line even when the whole file is one chunk.
+                                val nextStartLine = if (chunkIndex + 1 < chunkCount) {
+                                    chunkStartLineProvider(chunkIndex + 1)
+                                } else {
+                                    uiState.totalLineCount + 1
+                                }
+                                val line = (startLine +
+                                    ((nextStartLine - startLine) * fractionWithinChunk).toInt())
+                                    .coerceIn(1, uiState.totalLineCount.coerceAtLeast(1))
+                                lineTooltipTemplate.format(line)
                             },
                         )
                     }
