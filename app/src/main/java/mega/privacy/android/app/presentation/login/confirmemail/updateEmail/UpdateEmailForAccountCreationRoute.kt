@@ -51,6 +51,7 @@ import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSignUpLinkError
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.EMAIL_CHAR_LIMIT
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -181,6 +182,7 @@ internal fun UpdateEmailForAccountCreationScreen(
                         onEmailInputChanged(it)
                     },
                     keyboardType = KeyboardType.Email,
+                    maxCharLimit = EMAIL_CHAR_LIMIT,
                     errorText = when {
                         uiState.isEmailValid == false -> stringResource(id = sharedR.string.login_invalid_email_error_message)
                         accountExists -> stringResource(sharedR.string.sign_up_account_existed_error_message)

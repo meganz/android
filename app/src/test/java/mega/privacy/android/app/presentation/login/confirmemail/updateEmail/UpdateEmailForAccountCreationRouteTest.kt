@@ -12,6 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.presentation.login.confirmemail.model.ResendSignUpLinkError
+import mega.privacy.android.app.presentation.login.createaccount.CreateAccountViewModel.Companion.EMAIL_CHAR_LIMIT
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
@@ -74,6 +75,21 @@ class UpdateEmailForAccountCreationRouteTest {
             onNode(hasSetTextAction()).performTextInput(email)
 
             verify(onEmailInputChanged).invoke(email)
+        }
+    }
+
+    @Test
+    fun `test that the email input is truncated when input exceeds the character limit`() {
+        val longEmail = "a".repeat(EMAIL_CHAR_LIMIT + 10)
+        with(composeRule) {
+            val onEmailInputChanged = mock<(String?) -> Unit>()
+            setScreen(
+                onEmailInputChanged = onEmailInputChanged
+            )
+
+            onNode(hasSetTextAction()).performTextInput(longEmail)
+
+            verify(onEmailInputChanged).invoke(longEmail.take(EMAIL_CHAR_LIMIT))
         }
     }
 

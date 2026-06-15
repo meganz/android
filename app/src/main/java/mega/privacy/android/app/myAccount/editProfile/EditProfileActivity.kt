@@ -7,6 +7,7 @@ import android.content.res.Configuration
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -96,6 +97,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         private const val EMAIL_SIZE = 12F
         private const val PADDING_LEFT_STATE = 8F
         private const val MAX_NAME_LENGTH = 40
+        private const val MAX_EMAIL_LENGTH = 190
 
         private const val CHANGE_NAME_SHOWN = "CHANGE_NAME_SHOWN"
         private const val FIRST_NAME_TYPED = "FIRST_NAME_TYPED"
@@ -739,6 +741,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 quitEditTextError(dialogBinding.emailLayout, dialogBinding.emailErrorIcon)
 
                 dialogBinding.emailField.apply {
+                    // Set InputFilter to enforce maxLength from XML
+                    setFilters(arrayOf(InputFilter.LengthFilter(MAX_EMAIL_LENGTH)))
+
                     setText(email ?: viewModel.getEmail())
                     requestFocus()
                     setSelection(0, text.toString().length)
