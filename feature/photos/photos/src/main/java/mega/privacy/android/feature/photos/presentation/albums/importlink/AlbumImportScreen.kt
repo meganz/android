@@ -50,7 +50,7 @@ import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.components.dialogs.MegaDialogProperties
 import mega.android.core.ui.components.divider.SubtleDivider
-import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
+import mega.android.core.ui.components.indicators.SmallInfiniteSpinnerIndicator
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.surface.RowSurface
 import mega.android.core.ui.components.surface.SurfaceColor
@@ -58,7 +58,9 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.StorageState
@@ -506,6 +508,7 @@ private fun RenameAlbumDialog(
     )
 }
 
+@CombinedThemePreviews
 @Composable
 private fun ImportAlbumDialog() {
     Dialog(
@@ -518,20 +521,25 @@ private fun ImportAlbumDialog() {
             RowSurface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                    .clip(shape = RoundedCornerShape(4.dp)),
                 surfaceColor = SurfaceColor.PageBackground,
                 content = {
-                    LargeInfiniteSpinnerIndicator()
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        SmallInfiniteSpinnerIndicator(
+                            iconColor = IconColor.Accent
+                        )
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
 
-                    MegaText(
-                        text = stringResource(id = sharedR.string.album_import_saving_dialog_progress_text),
-                        style = AppTheme.typography.bodyMedium,
-                        textColor = TextColor.Secondary
-                    )
+                        MegaText(
+                            text = stringResource(id = sharedR.string.album_import_saving_dialog_progress_text),
+                            style = AppTheme.typography.bodyMedium,
+                            textColor = TextColor.Secondary
+                        )
+                    }
                 },
             )
         },
