@@ -12,8 +12,9 @@ class HomeWidgetOrderTest {
             HomeWidgetOrder.MyAccount,
             HomeWidgetOrder.Banner,
             HomeWidgetOrder.Recents,
-            HomeWidgetOrder.ViewedLinks,
             HomeWidgetOrder.ContinueWhereLeftOff,
+            HomeWidgetOrder.DoMoreWithMega,
+            HomeWidgetOrder.ViewedLinks,
         ).inOrder()
     }
 }

@@ -9,6 +9,7 @@ enum class HomeWidgetOrder {
     MyAccount,
     Banner,
     Recents,
-    ViewedLinks,
     ContinueWhereLeftOff,
+    DoMoreWithMega,
+    ViewedLinks,
 }
