@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
@@ -182,6 +183,7 @@ internal fun ContinueWhereLeftOffListScreen(
                             title = item.title,
                             nodeHandle = item.nodeHandle,
                             icon = iconForType(item.type),
+                            isSensitive = item.isSensitive,
                             onItemClicked = { viewModel.onItemClicked(item.nodeHandle, item.type) },
                         )
                     }
@@ -221,6 +223,7 @@ internal fun ContinueWhereLeftOffListScreen(
                             nodeHandle = item.nodeHandle,
                             duration = item.duration,
                             icon = iconForType(item.type),
+                            isSensitive = item.isSensitive,
                             onItemClicked = { viewModel.onItemClicked(item.nodeHandle, item.type) },
                         )
                     }
@@ -305,12 +308,17 @@ private fun ContinueWhereLeftOffListItem(
     title: String,
     nodeHandle: Long,
     @DrawableRes icon: Int,
+    isSensitive: Boolean,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            // Dim the whole row for hidden items so icon-only files (e.g. text) are also
+            // visibly marked, mirroring the carousel; the thumbnail blur below only affects
+            // real image previews.
+            .alpha(if (isSensitive) 0.5f else 1f)
             .clickable { onItemClicked() }
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -320,6 +328,7 @@ private fun ContinueWhereLeftOffListItem(
             defaultImage = icon,
             contentDescription = title,
             layoutType = ThumbnailLayoutType.List,
+            blurImage = isSensitive,
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(8.dp)),
@@ -343,12 +352,17 @@ private fun ContinueWhereLeftOffGridItem(
     nodeHandle: Long,
     duration: String?,
     @DrawableRes icon: Int,
+    isSensitive: Boolean,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
+            // Dim the whole card for hidden items so icon-only files (e.g. text) are also
+            // visibly marked, mirroring the carousel; the thumbnail blur below only affects
+            // real image previews.
+            .alpha(if (isSensitive) 0.5f else 1f)
             .clickable { onItemClicked() },
     ) {
         BoxSurface(
@@ -364,6 +378,7 @@ private fun ContinueWhereLeftOffGridItem(
                 defaultImage = icon,
                 contentDescription = title,
                 layoutType = ThumbnailLayoutType.Grid,
+                blurImage = isSensitive,
                 modifier = Modifier.matchParentSize(),
             )
             if (!duration.isNullOrEmpty()) {
@@ -399,12 +414,14 @@ private fun ContinueWhereLeftOffListItemPreview() {
                 title = "Falastin36_press_trailer.mov",
                 nodeHandle = 1L,
                 icon = IconPackR.drawable.ic_video_medium_solid,
+                isSensitive = false,
                 onItemClicked = {},
             )
             ContinueWhereLeftOffListItem(
                 title = "Interview Agnes Varda.pdf",
                 nodeHandle = 2L,
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
+                isSensitive = true,
                 onItemClicked = {},
             )
         }
@@ -421,6 +438,7 @@ private fun ContinueWhereLeftOffGridItemPreview() {
                 nodeHandle = 1L,
                 duration = "1:34",
                 icon = IconPackR.drawable.ic_video_medium_solid,
+                isSensitive = false,
                 onItemClicked = {},
                 modifier = Modifier.width(140.dp),
             )
@@ -429,6 +447,7 @@ private fun ContinueWhereLeftOffGridItemPreview() {
                 nodeHandle = 2L,
                 duration = null,
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
+                isSensitive = true,
                 onItemClicked = {},
                 modifier = Modifier.width(140.dp),
             )
