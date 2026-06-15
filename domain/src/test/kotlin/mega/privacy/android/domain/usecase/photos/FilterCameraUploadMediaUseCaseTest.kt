@@ -4,7 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.repository.CameraUploadsRepository
 import mega.privacy.android.domain.repository.PhotosRepository
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandlesUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,6 +25,8 @@ class FilterCameraUploadMediaUseCaseTest {
     private lateinit var underTest: FilterCameraUploadMediaUseCase
 
     private val photosRepository = mock<PhotosRepository>()
+    private val getCameraUploadsSyncHandlesUseCase = mock<GetCameraUploadsSyncHandlesUseCase>()
+    private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val cameraUploadFolderId = NodeId(longValue = 1L)
     private val mediaUploadFolderId = NodeId(longValue = 2L)
 
@@ -34,12 +38,17 @@ class FilterCameraUploadMediaUseCaseTest {
         whenever(
             photosRepository.getMediaUploadFolderId()
         ) doReturn mediaUploadFolderId.longValue
-        underTest = FilterCameraUploadMediaUseCase(photosRepository = photosRepository)
+        whenever(cameraUploadsRepository.getInvalidHandle()) doReturn -1L
+        underTest = FilterCameraUploadMediaUseCase(
+            photosRepository = photosRepository,
+            getCameraUploadsSyncHandlesUseCase = getCameraUploadsSyncHandlesUseCase,
+            cameraUploadsRepository = cameraUploadsRepository,
+        )
     }
 
     @AfterEach
     fun tearDown() {
-        reset(photosRepository)
+        reset(photosRepository, getCameraUploadsSyncHandlesUseCase, cameraUploadsRepository)
     }
 
     @Test
@@ -121,5 +130,58 @@ class FilterCameraUploadMediaUseCaseTest {
         verify(photosRepository, times(1)).getCameraUploadFolderId()
         verify(photosRepository, times(1)).getMediaUploadFolderId()
         verifyNoMoreInteractions(photosRepository)
+    }
+
+    @Test
+    fun `test that server resolved handles are used when local folder ids are null`() = runTest {
+        whenever(photosRepository.getCameraUploadFolderId()) doReturn null
+        whenever(photosRepository.getMediaUploadFolderId()) doReturn null
+        whenever(getCameraUploadsSyncHandlesUseCase()) doReturn Pair(
+            cameraUploadFolderId.longValue,
+            mediaUploadFolderId.longValue
+        )
+        val cameraUploadPhoto = mock<TypedFileNode> {
+            on { parentId } doReturn cameraUploadFolderId
+        }
+        val mediaUploadPhoto = mock<TypedFileNode> {
+            on { parentId } doReturn mediaUploadFolderId
+        }
+        val filteredPhoto = mock<TypedFileNode> {
+            on { parentId } doReturn NodeId(longValue = 3L)
+        }
+
+        val actual = underTest(listOf(cameraUploadPhoto, mediaUploadPhoto, filteredPhoto))
+
+        assertThat(actual).containsExactly(cameraUploadPhoto, mediaUploadPhoto)
+    }
+
+    @Test
+    fun `test that empty list is returned when local folder ids are null and no camera uploads folder exists on server`() =
+        runTest {
+            whenever(photosRepository.getCameraUploadFolderId()) doReturn null
+            whenever(photosRepository.getMediaUploadFolderId()) doReturn null
+            whenever(getCameraUploadsSyncHandlesUseCase()) doReturn null
+            val photo = mock<TypedFileNode> {
+                on { parentId } doReturn cameraUploadFolderId
+            }
+
+            val actual = underTest(listOf(photo))
+
+            assertThat(actual).isEmpty()
+        }
+
+    @Test
+    fun `test that invalid server handles are ignored when local folder ids are null`() = runTest {
+        val invalidHandle = -1L
+        whenever(photosRepository.getCameraUploadFolderId()) doReturn null
+        whenever(photosRepository.getMediaUploadFolderId()) doReturn null
+        whenever(getCameraUploadsSyncHandlesUseCase()) doReturn Pair(invalidHandle, invalidHandle)
+        val photo = mock<TypedFileNode> {
+            on { parentId } doReturn NodeId(longValue = invalidHandle)
+        }
+
+        val actual = underTest(listOf(photo))
+
+        assertThat(actual).isEmpty()
     }
 }
