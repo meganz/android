@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -453,7 +454,6 @@ fun PhotosNodeGridViewV2(
                 PhotosNodeContentType.PhotoNode -> {
                     PhotoNodeBodyV2(
                         modifier = Modifier.animateItem(),
-                        spanCount = spanCount,
                         node = item,
                         isPreview = isPreview,
                         isSelected = item.id in selectedPhotoIds,
@@ -561,7 +561,6 @@ private fun HeaderBodyV2(
 
 @Composable
 private fun PhotoNodeBodyV2(
-    spanCount: Int,
     node: PhotosNodeContentItemV2,
     isPreview: Boolean,
     isSelected: Boolean,
@@ -572,13 +571,10 @@ private fun PhotoNodeBodyV2(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val windowInfo = LocalWindowInfo.current
-    val density = LocalDensity.current
-    val photosNodeSize = remember(spanCount) {
-        with(density) {
-            (windowInfo.containerSize.width / spanCount).toDp()
-        }
-    }
+    // Size each cell from its actual column width (fillMaxWidth + square aspect)
+    // rather than the full window width / spanCount. On tablets the left nav rail
+    // makes the grid narrower than the window, so a window-based square height
+    // exceeded the real column width and left a white band below every row.
     val thumbnailRequest = remember(node.id) {
         MediaThumbnailRequest(
             id = node.id,
@@ -593,7 +589,8 @@ private fun PhotoNodeBodyV2(
         MediaType.Image -> {
             ImagePhotosNode(
                 modifier = modifier
-                    .size(photosNodeSize)
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
                     .testTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG),
                 thumbnailRequest = thumbnailRequest,
                 isSensitive = isHiddenNodesEnabled && node.isSensitive,
@@ -608,7 +605,8 @@ private fun PhotoNodeBodyV2(
         MediaType.Video -> {
             VideoPhotosNode(
                 modifier = modifier
-                    .size(photosNodeSize)
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
                     .testTag(VIDEO_NODE_BODY_IMAGE_NODE_TAG),
                 duration = node.duration,
                 thumbnailRequest = thumbnailRequest,
