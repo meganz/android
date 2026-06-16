@@ -103,6 +103,7 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsed
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
@@ -260,6 +261,7 @@ class VideoPlayerViewModelV2Test {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
     private var fakeMonitorConnectivityFlow = MutableSharedFlow<Boolean>()
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
@@ -334,6 +336,7 @@ class VideoPlayerViewModelV2Test {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             playerErrorTypeMapper = playerErrorTypeMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
             args = testArgs,
         )
     }
@@ -348,6 +351,7 @@ class VideoPlayerViewModelV2Test {
             fileName = "",
             collectionTitle = null,
             collectionId = null,
+            serializedData = null,
         )
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
         whenever(monitorSubFolderMediaDiscoverySettingsUseCase()).thenReturn(flowOf(true))
@@ -356,6 +360,7 @@ class VideoPlayerViewModelV2Test {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(fakeMonitorShowHiddenItemsFlow)
         runBlocking {
             whenever(isHiddenNodesOnboardedUseCase()).thenReturn(false)
+            whenever(isUserLoggedInUseCase()).thenReturn(false)
         }
         whenever(monitorVideoRepeatModeUseCase()).thenReturn(flowOf(RepeatToggleMode.REPEAT_NONE))
         whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
@@ -421,6 +426,7 @@ class VideoPlayerViewModelV2Test {
             broadcastTransferOverQuotaUseCase,
             monitorConnectivityUseCase,
             getFeatureFlagValueUseCase,
+            isUserLoggedInUseCase,
         )
     }
 
@@ -3032,6 +3038,78 @@ class VideoPlayerViewModelV2Test {
             underTest.initVideoPlayerData(intent)
             advanceUntilIdle()
             assertThat(analyticsExtension.events.filterIsInstance<VideoPlaybackMp4StartedEvent>()).isNotEmpty()
+        }
+
+    @Test
+    fun `test that isFromLink is true when adapter type is FILE_LINK_ADAPTER`() = runTest {
+        testArgs = testArgs.copy(adapterType = FILE_LINK_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromLink).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when adapter type is FOLDER_LINK_ADAPTER`() = runTest {
+        testArgs = testArgs.copy(adapterType = FOLDER_LINK_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromLink).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when adapter type is FROM_ALBUM_SHARING`() = runTest {
+        testArgs = testArgs.copy(adapterType = FROM_ALBUM_SHARING)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromLink).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is false when adapter type is not a link adapter`() = runTest {
+        testArgs = testArgs.copy(adapterType = FILE_BROWSER_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromLink).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isLoggedIn is set to true when IsUserLoggedInUseCase returns true`() = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isLoggedIn).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isLoggedIn is set to false when IsUserLoggedInUseCase returns false`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()).thenReturn(false)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isLoggedIn).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isLoggedIn remains false when IsUserLoggedInUseCase throws an exception`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()).thenThrow(RuntimeException("login check error"))
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isLoggedIn).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
         }
 
     companion object {

@@ -135,6 +135,7 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsed
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFingerprintUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetLocalFolderLinkUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.HttpServerStartUseCase
@@ -264,6 +265,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     private val playerErrorTypeMapper: PlayerErrorTypeMapper,
     @Assisted private val args: Args,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<VideoPlayerUiState>
@@ -271,6 +273,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             VideoPlayerUiState(
                 fileLinkUrl = args.fileLinkUrl,
                 localFilePath = args.localFilePath,
+                serializedData = args.serializedData,
             )
         )
 
@@ -292,9 +295,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
 
     init {
         uiState.update {
-            it.copy(
-                nodeSourceType = adapterTypeToNodeSourceType(),
-            )
+            it.copy(nodeSourceType = adapterTypeToNodeSourceType())
         }
         setupTransferListener()
 
@@ -304,6 +305,17 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         updateNameWhenNodeUpdates()
         monitorConnectivity()
         loadPipFeatureFlag()
+        loadLinkAndLoginState()
+    }
+
+    private fun loadLinkAndLoginState() {
+        viewModelScope.launch {
+            val isFromLink = args.adapterType == FILE_LINK_ADAPTER
+                    || args.adapterType == FOLDER_LINK_ADAPTER
+                    || args.adapterType == FROM_ALBUM_SHARING
+            val isLoggedIn = runCatching { isUserLoggedInUseCase() }.getOrDefault(false)
+            uiState.update { it.copy(isFromLink = isFromLink, isLoggedIn = isLoggedIn) }
+        }
     }
 
     private fun loadPipFeatureFlag() {
@@ -1942,6 +1954,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         val fileName: String,
         val collectionTitle: String?,
         val collectionId: Long?,
+        val serializedData: String?,
     )
 }
 

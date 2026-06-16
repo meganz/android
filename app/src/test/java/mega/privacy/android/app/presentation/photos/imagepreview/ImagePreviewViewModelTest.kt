@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.imagepreview.IsEditableImageUseCase
 import mega.privacy.android.domain.usecase.imagepreview.IsEditableVideoUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
@@ -136,6 +137,7 @@ class ImagePreviewViewModelTest {
     @Suppress("DEPRECATION")
     private val getNodeByHandle: GetNodeByHandle = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase = mock()
     private val isEditableImageUseCase = IsEditableImageUseCase()
     private val isEditableVideoUseCase = IsEditableVideoUseCase()
 
@@ -185,6 +187,7 @@ class ImagePreviewViewModelTest {
         getNodeAccessPermission,
         getNodeByHandle,
         getFeatureFlagValueUseCase,
+        isUserLoggedInUseCase,
     ).also {
         imageNodeFetchers.clear()
         underTest.consumeTransferEvent()
@@ -229,6 +232,7 @@ class ImagePreviewViewModelTest {
             isEditableImageUseCase = isEditableImageUseCase,
             isEditableVideoUseCase = isEditableVideoUseCase,
             largeBundleHolder = largeBundleHolder,
+            isUserLoggedInUseCase = isUserLoggedInUseCase,
             context = mock(),
         )
     }
@@ -814,7 +818,11 @@ class ImagePreviewViewModelTest {
         mimeType: String,
     ) = runTest {
         val imageNode = mock<ImageNode> {
-            on { type } doReturn VideoFileTypeInfo(mimeType, mimeType.substringAfterLast("/"), Duration.parse("10s"))
+            on { type } doReturn VideoFileTypeInfo(
+                mimeType,
+                mimeType.substringAfterLast("/"),
+                Duration.parse("10s")
+            )
             on { id } doReturn NodeId(123L)
         }
         whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
@@ -1042,6 +1050,75 @@ class ImagePreviewViewModelTest {
             assertThat(state.imageNodes).hasSize(1)
         }
     }
+
+    @Test
+    fun `test that isFromLink is true when fetcher source is FILE_LINK`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.FILE_LINK)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when fetcher source is FOLDER_LINK`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.FOLDER_LINK)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is true when fetcher source is ALBUM_SHARING`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.ALBUM_SHARING)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isFromLink is false when fetcher source is not a link source`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isLoggedIn is set to true when isUserLoggedInUseCase returns true`() = runTest {
+        whenever(isUserLoggedInUseCase()).thenReturn(true)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isLoggedIn).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isLoggedIn is set to false when isUserLoggedInUseCase returns false`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()).thenReturn(false)
+            initViewModel()
+            underTest.state.test {
+                assertThat(expectMostRecentItem().isLoggedIn).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isLoggedIn remains false when isUserLoggedInUseCase throws an exception`() =
+        runTest {
+            whenever(isUserLoggedInUseCase()).thenThrow(RuntimeException("login check error"))
+            initViewModel()
+            underTest.state.test {
+                assertThat(expectMostRecentItem().isLoggedIn).isFalse()
+            }
+        }
 
     private fun createNonSensitiveNode(): ImageNode {
         return mock<ImageNode> {

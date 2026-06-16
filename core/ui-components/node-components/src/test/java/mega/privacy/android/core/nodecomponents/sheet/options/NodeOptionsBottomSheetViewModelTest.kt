@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
@@ -72,6 +73,8 @@ class NodeOptionsBottomSheetViewModelTest {
     private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
     private val zipFileTypedNodeMapper = mock<ZipFileTypedNodeMapper>()
     private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
+    private val getPublicNodeFromSerializedDataUseCase =
+        mock<GetPublicNodeFromSerializedDataUseCase>()
 
     private val sampleFileNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
@@ -97,6 +100,7 @@ class NodeOptionsBottomSheetViewModelTest {
         partiallyExpand: Boolean = true,
         publicLinkUrl: String? = null,
         localFilePath: String? = null,
+        serializedData: String? = null,
     ) {
         viewModel = NodeOptionsBottomSheetViewModel(
             nodeBottomSheetActionMapper = nodeBottomSheetActionMapper,
@@ -118,11 +122,13 @@ class NodeOptionsBottomSheetViewModelTest {
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             getFileByPathUseCase = getFileByPathUseCase,
+            getPublicNodeFromSerializedDataUseCase = getPublicNodeFromSerializedDataUseCase,
             nodeId = nodeId,
             nodeSourceType = nodeSourceType,
             partiallyExpand = partiallyExpand,
             publicLinkUrl = publicLinkUrl,
             localFilePath = localFilePath,
+            serializedData = serializedData,
         )
     }
 
@@ -683,5 +689,86 @@ class NodeOptionsBottomSheetViewModelTest {
                     listOf(groupTwoOrderOne, groupTwoOrderTwo),
                 ).inOrder()
             }
+        }
+
+    @Test
+    fun `test that getPublicNodeFromSerializedDataUseCase is called as fallback when getPublicNodeByIdUseCase returns null for FOLDER_LINK with serializedData`() =
+        runTest {
+            val serializedData = "serialized_node_data"
+            val mockPublicLinkFile = mock<PublicLinkFile>()
+            whenever(getPublicNodeByIdUseCase(any())).thenReturn(null)
+            whenever(getPublicNodeFromSerializedDataUseCase(serializedData)).thenReturn(
+                mockPublicLinkFile
+            )
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = listOf(element = mockPublicLinkFile),
+                    existingItems = null,
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                    isPublicNodes = false,
+                    showPublicLinkCreationTime = false,
+                    highlightedNodeId = null,
+                    highlightedNames = null,
+                    isContactVerificationOn = false
+                )
+            ).thenReturn(emptyList())
+
+            initViewModel(
+                nodeId = sampleFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.FOLDER_LINK,
+                serializedData = serializedData,
+            )
+
+            verify(getPublicNodeFromSerializedDataUseCase).invoke(serializedData)
+        }
+
+    @Test
+    fun `test that getPublicNodeFromSerializedDataUseCase is not called when getPublicNodeByIdUseCase returns a node for FOLDER_LINK`() =
+        runTest {
+            whenever(getPublicNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = listOf(element = sampleFileNode),
+                    existingItems = null,
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                    isPublicNodes = false,
+                    showPublicLinkCreationTime = false,
+                    highlightedNodeId = null,
+                    highlightedNames = null,
+                    isContactVerificationOn = false
+                )
+            ).thenReturn(emptyList())
+
+            initViewModel(
+                nodeId = sampleFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.FOLDER_LINK,
+                serializedData = "serialized_node_data",
+            )
+
+            verify(getPublicNodeFromSerializedDataUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that getPublicNodeFromSerializedDataUseCase is not called when serializedData is null for FOLDER_LINK`() =
+        runTest {
+            whenever(getPublicNodeByIdUseCase(any())).thenReturn(null)
+
+            initViewModel(
+                nodeId = sampleFileNode.id.longValue,
+                nodeSourceType = NodeSourceType.FOLDER_LINK,
+                serializedData = null,
+            )
+
+            verify(getPublicNodeFromSerializedDataUseCase, never()).invoke(any())
         }
 }

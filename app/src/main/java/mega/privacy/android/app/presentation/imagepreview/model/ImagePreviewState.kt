@@ -25,4 +25,6 @@ internal data class ImagePreviewState(
     val isBusinessAccountExpired: Boolean = false,
     val isOnline: Boolean = false,
     val openPhotoEditorEvent: StateEventWithContent<Pair<ImageNode, String>> = consumed(),
+    val isFromLink: Boolean = false,
+    val isLoggedIn: Boolean = false,
 )

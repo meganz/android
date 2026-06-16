@@ -21,6 +21,7 @@ data class NodeOptionsBottomSheetNavKey(
     val partiallyExpand: Boolean = true,
     val publicLinkUrl: String? = null,
     val localFilePath: String? = null,
+    val serializedData: String? = null,
 ) : NoSessionNavKey.Optional {
 
     companion object {
@@ -47,11 +48,12 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
             hiltViewModel<NodeOptionsBottomSheetViewModel, NodeOptionsBottomSheetViewModel.Factory>(
                 creationCallback = { factory ->
                     factory.create(
-                        it.nodeHandle,
-                        it.nodeSourceType,
-                        it.partiallyExpand,
-                        it.publicLinkUrl,
-                        it.localFilePath,
+                        nodeId = it.nodeHandle,
+                        nodeSourceType = it.nodeSourceType,
+                        partiallyExpand = it.partiallyExpand,
+                        publicLinkUrl = it.publicLinkUrl,
+                        localFilePath = it.localFilePath,
+                        serializedData = it.serializedData,
                     )
                 }
             )
