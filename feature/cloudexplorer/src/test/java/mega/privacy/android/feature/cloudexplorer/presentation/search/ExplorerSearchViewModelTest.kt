@@ -42,11 +42,10 @@ class ExplorerSearchViewModelTest {
         reset(monitorRecentSearchesUseCase, saveRecentSearchUseCase, clearRecentSearchesUseCase)
     }
 
-    private fun createViewModel(recentSearchesEnabled: Boolean = true) = ExplorerSearchViewModel(
+    private fun createViewModel() = ExplorerSearchViewModel(
         monitorRecentSearchesUseCase = monitorRecentSearchesUseCase,
         saveRecentSearchUseCase = saveRecentSearchUseCase,
         clearRecentSearchesUseCase = clearRecentSearchesUseCase,
-        args = ExplorerSearchViewModel.Args(recentSearchesEnabled = recentSearchesEnabled),
     )
 
     @Test
@@ -77,27 +76,21 @@ class ExplorerSearchViewModelTest {
     }
 
     @Test
-    fun `test that a settled non-blank query is saved to recent searches`() = runTest {
+    fun `test that saveRecentSearch saves a non-blank query to the use case`() = runTest {
         val underTest = createViewModel()
 
-        underTest.uiState.test {
-            underTest.onQueryChanged(QUERY)
-            advanceUntilIdle()
-            cancelAndIgnoreRemainingEvents()
-        }
+        underTest.saveRecentSearch(QUERY)
+        advanceUntilIdle()
 
         verify(saveRecentSearchUseCase).invoke(QUERY)
     }
 
     @Test
-    fun `test that a blank query is not saved to recent searches`() = runTest {
+    fun `test that saveRecentSearch ignores a blank query`() = runTest {
         val underTest = createViewModel()
 
-        underTest.uiState.test {
-            underTest.onQueryChanged("   ")
-            advanceUntilIdle()
-            cancelAndIgnoreRemainingEvents()
-        }
+        underTest.saveRecentSearch("   ")
+        advanceUntilIdle()
 
         verify(saveRecentSearchUseCase, never()).invoke(any())
     }
@@ -116,19 +109,6 @@ class ExplorerSearchViewModelTest {
             val state = expectMostRecentItem() as ExplorerSearchUiState.Data
             assertThat(state.debouncedQuery).isNull()
         }
-    }
-
-    @Test
-    fun `test that a query is not saved when recent searches are disabled`() = runTest {
-        val underTest = createViewModel(recentSearchesEnabled = false)
-
-        underTest.uiState.test {
-            underTest.onQueryChanged(QUERY)
-            advanceUntilIdle()
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        verify(saveRecentSearchUseCase, never()).invoke(any())
     }
 
     @Test

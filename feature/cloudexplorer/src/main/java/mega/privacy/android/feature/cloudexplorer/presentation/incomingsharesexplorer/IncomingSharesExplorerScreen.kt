@@ -184,7 +184,7 @@ internal fun TabsScope.IncomingExplorerTab(
             title = stringResource(sharedR.string.general_title_incoming_shares),
             testTag = INCOMING_TAB_TAG,
         ),
-    ) { _, modifier ->
+    ) { isActive, modifier ->
         if (showSearch) {
             IncomingSharesExplorerSearchContent(
                 query = searchQuery,
@@ -198,6 +198,7 @@ internal fun TabsScope.IncomingExplorerTab(
                     onNavigate = onNavigate,
                 ),
                 onCloseSearch = onCloseSearch,
+                recentSearchesEnabled = isActive,
                 modifier = modifier,
             )
         } else {

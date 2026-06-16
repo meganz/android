@@ -212,7 +212,7 @@ internal fun TabsScope.FavouritesExplorerTab(
             title = stringResource(sharedR.string.video_section_title_favourite_playlist),
             testTag = FAVOURITES_TAB_TAG,
         ),
-    ) { _, modifier ->
+    ) { isActive, modifier ->
         if (showSearch) {
             FavouritesExplorerSearchContent(
                 query = searchQuery,
@@ -232,6 +232,7 @@ internal fun TabsScope.FavouritesExplorerTab(
                     onNavigate = onNavigate,
                 ),
                 onCloseSearch = onCloseSearch,
+                recentSearchesEnabled = isActive,
                 modifier = modifier,
             )
         } else {

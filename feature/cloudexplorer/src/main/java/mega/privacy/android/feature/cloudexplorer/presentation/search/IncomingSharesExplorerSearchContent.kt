@@ -19,8 +19,14 @@ internal fun IncomingSharesExplorerSearchContent(
     onQueryChanged: (String) -> Unit,
     onNavigateToFolderPath: (List<NodeId>) -> Unit,
     onCloseSearch: () -> Unit,
+    recentSearchesEnabled: Boolean,
     modifier: Modifier = Modifier,
-) = ExplorerSearchContent(query, onQueryChanged, modifier) { debouncedQuery ->
+) = ExplorerSearchContent(
+    query,
+    onQueryChanged,
+    modifier,
+    recentSearchesEnabled
+) { debouncedQuery ->
     val viewModel = hiltViewModel<IncomingSharesExplorerViewModel>()
     val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
 

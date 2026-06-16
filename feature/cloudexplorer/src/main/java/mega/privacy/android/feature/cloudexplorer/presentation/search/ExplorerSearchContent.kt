@@ -41,13 +41,20 @@ internal fun ExplorerSearchContent(
     @StringRes landingDescription: Int = sharedR.string.search_landing_subtitle,
     content: @Composable (debouncedQuery: String?) -> Unit,
 ) {
-    val searchViewModel =
-        hiltViewModel<ExplorerSearchViewModel, ExplorerSearchViewModel.Factory> { factory ->
-            factory.create(ExplorerSearchViewModel.Args(recentSearchesEnabled = recentSearchesEnabled))
-        }
-    LaunchedEffect(query) { searchViewModel.onQueryChanged(query) }
+    val searchViewModel = hiltViewModel<ExplorerSearchViewModel>()
     val searchUiState by searchViewModel.uiState.collectAsStateWithLifecycle()
     val searchData = searchUiState as? ExplorerSearchUiState.Data
+    val debouncedQuery = searchData?.debouncedQuery
+
+    LaunchedEffect(query) { searchViewModel.onQueryChanged(query) }
+
+    // Record a recent search only once the debounced value matches this tab's own input, so the
+    // shared ViewModel's leftover query from another tab (e.g. chat) is never saved on attach.
+    if (recentSearchesEnabled) {
+        LaunchedEffect(debouncedQuery, query) {
+            if (debouncedQuery == query) searchViewModel.saveRecentSearch(debouncedQuery)
+        }
+    }
 
     if (query.isNullOrBlank()) {
         val recentSearches = searchData?.recentSearches.orEmpty()
@@ -76,7 +83,7 @@ internal fun ExplorerSearchContent(
         return
     }
 
-    content(searchData?.debouncedQuery)
+    content(debouncedQuery)
 }
 
 /**

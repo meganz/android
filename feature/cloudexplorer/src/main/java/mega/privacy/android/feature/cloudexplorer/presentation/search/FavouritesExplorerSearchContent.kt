@@ -25,8 +25,14 @@ internal fun FavouritesExplorerSearchContent(
     disabledNodeIds: Set<NodeId>,
     onNavigateToFolderPath: (List<NodeId>) -> Unit,
     onCloseSearch: () -> Unit,
+    recentSearchesEnabled: Boolean,
     modifier: Modifier = Modifier,
-) = ExplorerSearchContent(query, onQueryChanged, modifier) { debouncedQuery ->
+) = ExplorerSearchContent(
+    query,
+    onQueryChanged,
+    modifier,
+    recentSearchesEnabled
+) { debouncedQuery ->
     val viewModel =
         hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
             factory.create(FavouritesExplorerViewModel.Args(showFiles = !isFolderPicker))

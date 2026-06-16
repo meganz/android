@@ -2,6 +2,7 @@ package mega.privacy.android.feature.cloudexplorer.presentation.explorer
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -133,6 +134,7 @@ internal fun ExplorerScreen(
         modifier = modifier
             .testTag(CLOUD_EXPLORER_VIEW_TAG)
             .fillMaxSize()
+            .imePadding()
             .semantics { testTagsAsResourceId = true },
         topBar = {
             if (showSearch) {
@@ -244,7 +246,7 @@ internal fun ExplorerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            beyondViewportPageCount = 1,
+            beyondViewportPageCount = if (showSearch) 0 else 1,
             hideTabs = isInnerNavigation || showSearch,
             pagerScrollEnabled = !showSearch,
             cells = {
@@ -253,7 +255,7 @@ internal fun ExplorerScreen(
                         title = stringResource(sharedR.string.general_section_cloud_drive),
                         testTag = CLOUD_TAB_TAG
                     ),
-                ) { _, modifier ->
+                ) { isActive, modifier ->
                     if (showSearch) {
                         NodesExplorerSearchContent(
                             query = searchText,
@@ -272,6 +274,7 @@ internal fun ExplorerScreen(
                                 onNavigate = onNavigate,
                             ),
                             onCloseSearch = onCloseSearch,
+                            recentSearchesEnabled = isActive,
                             modifier = modifier,
                         )
                     } else {
