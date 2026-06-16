@@ -155,68 +155,23 @@ git log develop..HEAD --oneline
 
 ### Step 3 — Generate MR description
 
-Run:
-```bash
-echo "=== COMMITS ===" && git log develop..HEAD --oneline && echo "=== DIFF ===" && git diff develop...HEAD
-```
+**Follow the `/generate-mr-description` flow defined in
+`.claude/skills/generate-mr-description/SKILL.md` verbatim** (its "Gather branch
+changes", "Analyze the changes", and "Write the description in this exact format"
+steps). That skill is the single source of truth for the diff command, the
+analysis rules (what/why/key-changes, test-file skip list, TODO markers), the
+description template, and the writing guidelines — do not re-implement or
+duplicate them here. Future updates to the template or analysis rules live there.
 
-Analyze the output and extract:
-- **What** changed — use commit messages as semantic hints
-- **Why** it changed — infer from commit messages and code context
-- **Key Changes** — meaningful logic/behavior changes only; **skip test-only files** (`*Test.kt`, `*Spec.kt`, `_test`, `.spec`)
-- **TODOs** — scan added lines (`+`) for `//TODO`, `// TODO`, `#TODO`, `FIXME`, or `HACK` markers
+If `.claude/skills/generate-mr-description/SKILL.md` cannot be found (moved or
+renamed), do not silently improvise — ask the developer for the MR description
+(or point you at the relocated skill) before pushing.
 
-Write the description in this exact format:
-
-```
-#### Summary
-<1-3 sentence overview of what this MR does and why. Explain how it differs from the current implementation>
-
-#### Key Changes
-- <change 1>
-- <change 2>
-
-#### Benefits
-- <benefit 1>
-- <benefit 2>
-
-#### Cons / Risks (if any)
-- <con or risk — omit this section entirely if none>
-
-#### TODOs for Next MR
-- <//TODO or FIXME items found, or "None">
-
-#### Why are we making this change?
-
-#### What features are impacted?
-
-#### If the MR has more than 10 files, please provide a valid reason.
-
-## Screenshot/Screen-recording comparisons
-
-| Before | After |
-|--------|-------|
-|        |       |
-
-## Resources
-
-[Android MR Checklist](https://confluence.developers.mega.co.nz/display/MOB/Android+MR+Checklist)
-
-## Gitlab MR shortcuts
-
-- jenkins rebuild - Run build again
-- deliver_qa - Send build to firebase
-
-Documentation: [Android CI/CD Pipeline Commands](https://confluence.developers.mega.co.nz/pages/viewpage.action?pageId=37651416)
-
-Closes <Jira Ticket Number>
-```
-
-Writing guidelines:
-- Use present tense ("Add", "Fix", "Refactor")
-- Be concise — reviewers skim MR descriptions
-- Don't pad with filler phrases
-- Be honest about cons/risks — don't just list positives
+Differences for this skill:
+- Produce the description in-memory for the push in Step 4; do **not** use that
+  skill's `--output` option.
+- The description must be flattened to a single line for the GitLab push option —
+  see Step 4 for the exact `\n` escaping rules.
 
 ### Step 3.5 — Weblate string sync (gate BEFORE push)
 
