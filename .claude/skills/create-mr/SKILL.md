@@ -218,6 +218,63 @@ Writing guidelines:
 - Don't pad with filler phrases
 - Be honest about cons/risks — don't just list positives
 
+### Step 3.5 — Weblate string sync (gate BEFORE push)
+
+New Android string resources must exist as a per-branch Weblate component
+(`strings_shared-<sanitized-branch>`) **before** the MR is opened, so translators can start
+work and reviewers can see the component. Do this here — not as an after-the-fact manual step.
+
+1. **Detect new/changed strings** in the shared strings file vs `origin/develop` (use
+   `origin/develop`, not local `develop`, which is often stale). Match added/changed
+   `<string>` and `<plurals>` entries only:
+   ```bash
+   git fetch -q origin develop
+   git diff origin/develop...HEAD -- \
+     resources/string-resources/src/main/res/values/strings_shared.xml \
+     | grep -E '^\+' | grep -E '<string |<plurals ' || true
+   ```
+   - If the output is **empty** → no new/changed strings. Skip this step silently and
+     continue to Step 4.
+   - If the output is **non-empty** → new/changed strings exist; continue below.
+
+2. **Gate on the Weblate upload.** The per-branch component must exist before the MR. Run the
+   full `/weblate` flow now (see `.claude/skills/weblate/SKILL.md`). Note the worktree-aware
+   branch handling there: `/weblate` derives the feature branch from the current working
+   directory and passes it explicitly via `gitlabBranch`, so it works from a worktree without
+   any main-repo checkout dance.
+
+   Prompt the user with `AskUserQuestion`:
+   - **Question**: `This branch adds/changes shared strings. Upload to Weblate before creating the MR?`
+   - **Options**:
+     - `Upload now` — run the `/weblate` flow end-to-end, then continue to Step 4 once the
+       per-branch component exists.
+     - `Already uploaded` — skip the upload (the component already exists from an earlier run)
+       and continue to Step 4.
+     - `Skip (not recommended)` — continue to Step 4 without uploading. Warn the user that the
+       MR will reference a Weblate component that does not yet exist, and they must run
+       `/weblate` before the MR is merged.
+
+3. **Keep the description consistent.** When new/changed strings are detected, append a
+   `🌐 New Strings — Weblate Sync Required` callout to the MR description generated in Step 3
+   (above the `## Resources` block), matching the wording used by the `android-code-review`
+   report section in `.claude/skills/android-code-review/SKILL.md`. The callout MUST include the
+   **Weblate component link** so reviewers/translators can open the strings directly. Build the
+   slug from `$FEATURE_BRANCH` the same way `/weblate` does (`re.sub("[^A-Za-z0-9]+","",branch).lower()`):
+   ```
+   #### 🌐 New Strings — Weblate Sync Required
+   > New string keys were detected in this branch.
+   > `string_key_one`, `string_key_two`
+   > Weblate component: https://translate.developers.mega.co.nz/projects/android/strings_shared-<slug>/
+   ```
+   If the upload was performed in this step, state that the component already exists; if the
+   user chose `Skip`, state that `/weblate` must be run before merge. Omit the callout entirely
+   when no new strings were detected.
+
+4. **Label the MR.** When new/changed strings are detected (regardless of the upload choice
+   above), the MR MUST carry the GitLab label **`Weblate strings resource`** (it already exists
+   in this project, id 379). Remember this and add it as an extra `-o "merge_request.label=Weblate strings resource"`
+   push option in Step 4. Do NOT add the label when no new strings were detected.
+
 ### Step 4 — Push and create MR
 
 Run `git push` using the Bash tool with GitLab push options.
@@ -250,7 +307,11 @@ WIP label behaviour (in priority order):
 1. If `--no-wip-label` was passed → do not append the label option
 2. Otherwise (default, or `--wip-label` explicitly passed) → append `-o "merge_request.label=WIP"`
 
-The `merge_request.label` push option can be repeated to add multiple labels; only `WIP` is added by this skill. The label must already exist in the GitLab project (it does for this repo).
+Weblate label behaviour:
+- If Step 3.5 detected new/changed strings → also append `-o "merge_request.label=Weblate strings resource"`.
+- Otherwise do not add it.
+
+The `merge_request.label` push option can be repeated to add multiple labels (e.g. both `WIP` and `Weblate strings resource`). Each label must already exist in the GitLab project — `WIP` and `Weblate strings resource` (id 379) both do for this repo.
 
 ### Step 5 — Confirm
 

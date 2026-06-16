@@ -40,6 +40,52 @@ The Weblate API config is in `transifex/weblate/translate.json`:
 
 ## Steps
 
+### Step 0 — Derive the feature branch (worktree-aware)
+
+The Weblate upload script derives the branch component slug from git, but it does so by
+`chdir`-ing to the **main** repo root (`transifex/weblate/python/android.py` `get_branch_name()`).
+When the feature branch is checked out in a git **worktree**, the main checkout is on a
+*different* branch, so the wrong slug is derived (or a `master`/`main`/`develop` branch is
+rejected by `python/lang.py` `upload()`).
+
+To make this worktree-safe, derive the feature branch from the **current working directory**
+once, up front, and reuse it everywhere below (slug derivation in Step 5a, screenshot naming
+in Step 5b, and the upload in Step 4):
+
+```bash
+# Run from the worktree/checkout that has the feature branch checked out (the current dir).
+FEATURE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+```
+
+This value is passed explicitly to the upload script via the `gitlabBranch` environment
+variable in Step 4 (`gitlabBranch=$FEATURE_BRANCH ./transifex/weblate/lang.sh ...`).
+
+> **Prerequisite (separate repo — `transifex/weblate`):** `get_branch_name()` currently only
+> honours `gitlabBranch` as a *fallback* when the `git symbolic-ref` call fails. For the
+> explicit value to take effect from a worktree, `transifex/weblate/python/android.py` must
+> **prefer** `gitlabBranch` when it is set. Required one-line change at
+> `transifex/weblate/python/android.py:393` (`get_branch_name()`):
+>
+> ```python
+> def get_branch_name():
+>     branch_name = os.getenv("gitlabBranch", "")   # <-- prefer explicit env var first
+>     if not branch_name:
+>         cur_path = os.getcwd()
+>         try:
+>             os.chdir(script_dir + "../../../")
+>             branch_name = subprocess.check_output(['git', 'symbolic-ref', '--short', '-q', 'HEAD'], universal_newlines=True).strip()
+>         except (subprocess.CalledProcessError, FileNotFoundError):
+>             branch_name = ""
+>         finally:
+>             os.chdir(cur_path)
+>     return re.sub("[^A-Za-z0-9]+", "", branch_name).lower()
+> ```
+>
+> Until that change lands, a worktree upload will still read the main checkout's branch. As a
+> stop-gap you can temporarily check out the feature branch in the main repo, but that is
+> exactly the dance this skill aims to remove. This repo (`android`) **cannot** edit
+> `transifex/weblate` — coordinate the one-line change with the Weblate tooling owner.
+
 ### Step 1 — Pull latest in the Weblate repo
 
 The `transifex/weblate/` directory is a separate git repository. Pull latest:
@@ -50,11 +96,12 @@ cd transifex/weblate && git pull
 
 ### Step 2 — Extract new strings from the current branch
 
-Run a diff against develop to find newly added string lines (including their comment descriptions)
-in the shared strings file:
+Run a diff against `origin/develop` to find newly added string lines (including their comment
+descriptions) in the shared strings file. Use `origin/develop` (not local `develop`) as the
+base, since the local `develop` ref is often stale:
 
 ```bash
-git diff develop -- resources/string-resources/src/main/res/values/strings_shared.xml
+git diff origin/develop -- resources/string-resources/src/main/res/values/strings_shared.xml
 ```
 
 Parse the diff output to extract all added lines (lines starting with `+` that are not `+++`).
@@ -84,10 +131,12 @@ indentation inside `<resources>`.
 that will be uploaded and wait for explicit confirmation before proceeding. The upload to
 Weblate is not easily reversible.
 
-Once the user confirms, run the upload script from the project root:
+Once the user confirms, run the upload script from the project root. Pass the feature branch
+derived in Step 0 explicitly via the `gitlabBranch` environment variable so the correct
+per-branch component slug is used even from a git worktree (see Step 0 prerequisite):
 
 ```bash
-./transifex/weblate/lang.sh -a android -u -f strings.xml -c strings_shared
+gitlabBranch="$FEATURE_BRANCH" ./transifex/weblate/lang.sh -a android -u -f strings.xml -c strings_shared
 ```
 
 This will:
@@ -133,10 +182,10 @@ matching the logic in `transifex/weblate/python/android.py`:
 re.sub("[^A-Za-z0-9]+", "", branch_name).lower()
 ```
 
-Get the current branch name and derive the component slug:
+Use the feature branch derived in Step 0 (`$FEATURE_BRANCH`) — **not** `git branch --show-current`
+run from an arbitrary directory — so the slug is correct from a worktree:
 ```bash
-BRANCH=$(git branch --show-current)
-SANITIZED=$(echo "$BRANCH" | sed 's/[^A-Za-z0-9]//g' | tr '[:upper:]' '[:lower:]')
+SANITIZED=$(echo "$FEATURE_BRANCH" | sed 's/[^A-Za-z0-9]//g' | tr '[:upper:]' '[:lower:]')
 COMPONENT_SLUG="strings_shared-${SANITIZED}"
 ```
 
@@ -151,8 +200,8 @@ Extract the Jira ticket ID from the branch name (e.g., `AND-23288` from
 `lh/AND-23288-move-ads-free-intro-to-shared-ads`) and use it as the screenshot name:
 
 ```bash
-TICKET=$(echo "$BRANCH" | grep -oE 'AND-[0-9]+')
-SCREENSHOT_NAME="${TICKET:-$(echo "$BRANCH" | sed 's|.*/||')}.png"
+TICKET=$(echo "$FEATURE_BRANCH" | grep -oE 'AND-[0-9]+')
+SCREENSHOT_NAME="${TICKET:-$(echo "$FEATURE_BRANCH" | sed 's|.*/||')}.png"
 sips -Z 1200 "<screenshot_path>" --out /tmp/weblate_screenshot.png
 ```
 
