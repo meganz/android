@@ -256,7 +256,15 @@ internal fun ExplorerScreen(
                             isFileSelectionEnabled = isFileSelectionEnabled,
                             videosOnly = videosOnly,
                             disabledNodeIds = disabledNodeIds,
-                            onFolderClick = onFolderClick,
+                            onNavigateToFolderPath = navigateToFolderPath(
+                                nodeSourceType = uiStateShared.nodeSourceType,
+                                explorerMode = explorerMode,
+                                startNavKey = startNavKey,
+                                shareUris = shareUris,
+                                disabledNodeIds = disabledNodeIds.toList(),
+                                protectedUserTap = protectedUserTap,
+                                onNavigate = onNavigate,
+                            ),
                             onCloseSearch = onCloseSearch,
                             modifier = modifier,
                         )
@@ -363,6 +371,31 @@ internal fun ExplorerScreen(
                 onDismiss = {
                     showNewFolderDialog = false
                 }
+            )
+        }
+    }
+}
+
+internal fun navigateToFolderPath(
+    nodeSourceType: NodeSourceType,
+    explorerMode: ExplorerMode,
+    startNavKey: ExplorerNavKey,
+    shareUris: List<UriPath>?,
+    disabledNodeIds: List<NodeId> = emptyList(),
+    protectedUserTap: (() -> Unit) -> Unit,
+    onNavigate: (NavKey) -> Unit,
+): (List<NodeId>) -> Unit = { nodeIds ->
+    protectedUserTap {
+        nodeIds.forEach { nodeId ->
+            onNavigate(
+                NodesExplorerNavKey(
+                    nodeId = nodeId,
+                    nodeSourceType = nodeSourceType,
+                    explorerMode = explorerMode,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris,
+                    disabledNodeIds = disabledNodeIds,
+                )
             )
         }
     }

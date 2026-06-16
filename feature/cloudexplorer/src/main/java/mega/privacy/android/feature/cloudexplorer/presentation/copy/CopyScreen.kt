@@ -36,19 +36,17 @@ internal fun CopyScreen(
 
         if (uiState.targetPath.isNotEmpty()) {
             LaunchedOnceEffect {
-                buildList {
-                    uiState.targetPath.forEach { nodeId ->
-                        add(
-                            NodesExplorerNavKey(
-                                nodeId = nodeId,
-                                nodeSourceType = uiState.nodeSourceType,
-                                explorerMode = ExplorerMode.Copy,
-                                startNavKey = startNavKey,
-                                shareUris = null,
-                            )
+                onNavigate(
+                    uiState.targetPath.map { nodeId ->
+                        NodesExplorerNavKey(
+                            nodeId = nodeId,
+                            nodeSourceType = uiState.nodeSourceType,
+                            explorerMode = ExplorerMode.Copy,
+                            startNavKey = startNavKey,
+                            shareUris = null,
                         )
                     }
-                }.also { onNavigate(it) }
+                )
             }
         }
 

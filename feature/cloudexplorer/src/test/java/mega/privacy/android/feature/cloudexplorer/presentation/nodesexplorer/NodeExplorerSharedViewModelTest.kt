@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -16,12 +17,14 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNavigationStack
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -36,7 +39,10 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -55,6 +61,7 @@ class NodeExplorerSharedViewModelTest {
     private val nodeViewItemMapper = mock<NodeViewItemMapper>()
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
+    private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
 
     private val nodeId = NodeId(1234L)
     private val nodeSourceType = NodeSourceType.INCOMING_SHARES
@@ -70,6 +77,7 @@ class NodeExplorerSharedViewModelTest {
             nodeViewItemMapper,
             searchUseCase,
             nodeSourceTypeToSearchTargetMapper,
+            getNodeNavigationStackUseCase,
         )
         whenever(monitorStorageStateUseCase()) doReturn flowOf()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf()
@@ -92,6 +100,7 @@ class NodeExplorerSharedViewModelTest {
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
+            getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
             args = args,
             loadNodesImpl = loadNodesImpl,
             refreshNodesImpl = refreshNodesImpl
@@ -135,6 +144,62 @@ class NodeExplorerSharedViewModelTest {
 
         assertThat(viewModel.nodeExplorerSharedUiState.value.searchItems).isEqualTo(items)
     }
+
+    @Test
+    fun `test that onSearchQuery sets searchLoadingState to Loading for a new query`() = runTest {
+        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
+        wheneverBlocking { searchUseCase(any(), any(), any()) } doReturn emptyList()
+        wheneverBlocking {
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+        } doReturn emptyList()
+        initViewModel()
+
+        // A completed search leaves the state FullyLoaded.
+        viewModel.onSearchQuery("first")
+        advanceUntilIdle()
+        assertThat(viewModel.nodeExplorerSharedUiState.value.searchLoadingState)
+            .isEqualTo(NodesLoadingState.FullyLoaded)
+
+        // A new query flips it back to Loading while the (suspended) search runs.
+        val gate = CompletableDeferred<List<TypedNode>>()
+        wheneverBlocking { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
+        viewModel.onSearchQuery("second")
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.searchLoadingState)
+            .isEqualTo(NodesLoadingState.Loading)
+
+        gate.complete(emptyList())
+    }
+
+    @Test
+    fun `test that resolveSearchResultStack returns the path from the use case`() = runTest {
+        val target = NodeId(5L)
+        val path = listOf(NodeId(1L), NodeId(3L), target)
+        wheneverBlocking { getNodeNavigationStackUseCase(target) } doReturn
+                NodeNavigationStack(stack = path, isUnderRootNode = true)
+
+        assertThat(viewModel.resolveSearchResultStack(target)).isEqualTo(path)
+    }
+
+    @Test
+    fun `test that resolveSearchResultStack falls back to the node id when the path is empty`() =
+        runTest {
+            val target = NodeId(5L)
+            wheneverBlocking { getNodeNavigationStackUseCase(target) } doReturn NodeNavigationStack()
+
+            assertThat(viewModel.resolveSearchResultStack(target)).containsExactly(target)
+        }
+
+    @Test
+    fun `test that resolveSearchResultStack falls back to the node id when the use case throws`() =
+        runTest {
+            val target = NodeId(5L)
+            wheneverBlocking { getNodeNavigationStackUseCase(target) } doAnswer {
+                throw RuntimeException("boom")
+            }
+
+            assertThat(viewModel.resolveSearchResultStack(target)).containsExactly(target)
+        }
 
     @ParameterizedTest
     @MethodSource("storageStates")
@@ -306,6 +371,7 @@ private class TestNodeExplorerSharedViewModel(
     getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
+    getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
     args: Args,
     private val loadNodesImpl: () -> Unit = {},
     private val refreshNodesImpl: () -> Unit = {},
@@ -318,6 +384,7 @@ private class TestNodeExplorerSharedViewModel(
     getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
+    getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
     args = args,
 ) {
     override fun loadNodes() = loadNodesImpl()

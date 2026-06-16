@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -42,6 +43,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
+    getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
     @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -52,6 +54,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
+    getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
     args = args,
 ) {
 

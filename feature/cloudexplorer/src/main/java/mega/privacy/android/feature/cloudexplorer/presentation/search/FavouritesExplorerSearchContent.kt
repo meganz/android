@@ -23,7 +23,7 @@ internal fun FavouritesExplorerSearchContent(
     isFileSelectionEnabled: Boolean,
     videosOnly: Boolean,
     disabledNodeIds: Set<NodeId>,
-    onFolderClick: (NodeId) -> Unit,
+    onNavigateToFolderPath: (List<NodeId>) -> Unit,
     onCloseSearch: () -> Unit,
     modifier: Modifier = Modifier,
 ) = ExplorerSearchContent(query, onQueryChanged, modifier) { debouncedQuery ->
@@ -39,10 +39,11 @@ internal fun FavouritesExplorerSearchContent(
         isFolderPicker = isFolderPicker,
         onNavigateBack = {},
         consumeNavigateBack = {},
-        onFolderClick = {
-            onFolderClick(it)
-            onCloseSearch()
-        },
+        onFolderClick = rememberSearchResultFolderClick(
+            viewModel,
+            onNavigateToFolderPath,
+            onCloseSearch
+        ),
         onRefreshNodes = {},
         selectionState = nodeSelectionState,
         isSelectionModeEnabled = isFileSelectionEnabled,

@@ -9,10 +9,9 @@ import kotlinx.coroutines.flow.flow
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -20,8 +19,7 @@ import javax.inject.Inject
 internal class CopyViewModel @Inject constructor(
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     private val getCopyLatestTargetPathUseCase: GetCopyLatestTargetPathUseCase,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
+    private val getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
 ) : ViewModel() {
 
     val uiState: StateFlow<CopyUiState> by lazy(LazyThreadSafetyMode.NONE) {
@@ -56,24 +54,18 @@ internal class CopyViewModel @Inject constructor(
             ?.takeIf { it != -1L } ?: return ResumeTarget()
         val targetId = NodeId(targetHandle)
         if (targetId == rootNodeId) return ResumeTarget()
-        val targetNode = runCatching { getNodeByIdUseCase(targetId) }
-            .onFailure { Timber.e(it) }
-            .getOrNull() ?: return ResumeTarget()
-        val ancestors = runCatching { getAncestorsIdsUseCase(targetNode) }
+        val navigationPath = runCatching { getNodeNavigationStackUseCase(targetId) }
             .onFailure { Timber.e(it) }
             .getOrNull()
-            .orEmpty()
-        return if (rootNodeId in ancestors) {
-            ResumeTarget(
-                path = ancestors.takeWhile { it != rootNodeId }.reversed() + targetId,
-                sourceType = NodeSourceType.CLOUD_DRIVE,
-            )
-        } else {
-            ResumeTarget(
-                path = ancestors.reversed() + targetId,
-                sourceType = NodeSourceType.INCOMING_SHARES,
-            )
-        }
+            ?.takeIf { it.stack.isNotEmpty() } ?: return ResumeTarget()
+        return ResumeTarget(
+            path = navigationPath.stack,
+            sourceType = if (navigationPath.isUnderRootNode) {
+                NodeSourceType.CLOUD_DRIVE
+            } else {
+                NodeSourceType.INCOMING_SHARES
+            },
+        )
     }
 
     private data class ResumeTarget(

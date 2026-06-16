@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.FAVOURITES_TAB_TAG
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.search.FavouritesExplorerSearchContent
@@ -221,7 +222,15 @@ internal fun TabsScope.FavouritesExplorerTab(
                 isFileSelectionEnabled = isSelectionModeEnabled,
                 videosOnly = videosOnly,
                 disabledNodeIds = disabledNodeIds,
-                onFolderClick = onFolderClick,
+                onNavigateToFolderPath = navigateToFolderPath(
+                    nodeSourceType = uiStateShared.nodeSourceType,
+                    explorerMode = explorerMode,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris,
+                    disabledNodeIds = disabledNodeIds.toList(),
+                    protectedUserTap = protectedUserTap,
+                    onNavigate = onNavigate,
+                ),
                 onCloseSearch = onCloseSearch,
                 modifier = modifier,
             )

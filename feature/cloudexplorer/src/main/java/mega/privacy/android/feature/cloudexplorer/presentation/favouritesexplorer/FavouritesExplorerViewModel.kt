@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -38,6 +39,7 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
+    getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
     private val getAllFavoritesUseCase: GetAllFavoritesUseCase,
     @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
@@ -49,6 +51,7 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
+    getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.FAVOURITES,

@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -43,6 +44,7 @@ abstract class NodeExplorerSharedViewModel(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val searchUseCase: SearchUseCase,
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
+    private val getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
     private val args: Args,
 ) : ViewModel() {
 
@@ -143,6 +145,11 @@ abstract class NodeExplorerSharedViewModel(
      * emits on change) so a configuration change keeps the previous results.
      */
     fun onSearchQuery(query: String?) {
+        if (!query.isNullOrBlank()) {
+            _nodedExplorerSharedUiState.update { state ->
+                state.copy(searchLoadingState = NodesLoadingState.Loading)
+            }
+        }
         searchQuery.value = query
     }
 
@@ -155,6 +162,18 @@ abstract class NodeExplorerSharedViewModel(
             searchQuery.filterNotNull().collectLatest { search(it) }
         }
     }
+
+    /**
+     * Resolves the folder path (top-down, including [nodeId]) to push so navigating to a search
+     * result reproduces its hierarchy and Back walks the real directory tree instead of jumping to
+     * the root.
+     */
+    suspend fun resolveSearchResultStack(nodeId: NodeId): List<NodeId> =
+        runCatching { getNodeNavigationStackUseCase(nodeId).stack }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
+            .orEmpty()
+            .ifEmpty { listOf(nodeId) }
 
     /**
      * Runs a recursive search for [query] scoped to this source ([Args.nodeId]/[Args.nodeSourceType])

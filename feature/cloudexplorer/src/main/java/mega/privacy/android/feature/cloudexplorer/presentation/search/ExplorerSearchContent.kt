@@ -7,12 +7,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -72,6 +76,25 @@ internal fun ExplorerSearchContent(
     }
 
     content(searchData?.debouncedQuery)
+}
+
+/**
+ * Builds the search-result folder-click callback: resolves the tapped folder's full ancestor chain
+ * via [NodeExplorerSharedViewModel.resolveSearchResultStack], navigates to it and closes search.
+ */
+@Composable
+internal fun rememberSearchResultFolderClick(
+    viewModel: NodeExplorerSharedViewModel,
+    onNavigateToFolderPath: (List<NodeId>) -> Unit,
+    onCloseSearch: () -> Unit,
+): (NodeId) -> Unit {
+    val coroutineScope = rememberCoroutineScope()
+    return { nodeId ->
+        coroutineScope.launch {
+            onNavigateToFolderPath(viewModel.resolveSearchResultStack(nodeId))
+            onCloseSearch()
+        }
+    }
 }
 
 @Composable

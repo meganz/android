@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_TAG
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.search.IncomingSharesExplorerSearchContent
@@ -111,7 +112,7 @@ internal fun IncomingSharesExplorerContent(
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
                 onItemClicked = { onItemClicked(it) },
-                enabled = isSelectionModeEnabled || (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() == true,
+                enabled = isSelectionModeEnabled || (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() != false,
                 enableClick = true,
             )
         },
@@ -129,7 +130,7 @@ internal fun IncomingSharesExplorerContent(
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
                 label = it.nodeLabel,
-                enabled = isSelectionModeEnabled || (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() == true,
+                enabled = isSelectionModeEnabled || (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() != false,
             )
         },
         onRefreshNodes = onRefreshNodes,
@@ -188,7 +189,14 @@ internal fun TabsScope.IncomingExplorerTab(
             IncomingSharesExplorerSearchContent(
                 query = searchQuery,
                 onQueryChanged = onSearchQueryChanged,
-                onFolderClick = onFolderClick,
+                onNavigateToFolderPath = navigateToFolderPath(
+                    nodeSourceType = uiStateShared.nodeSourceType,
+                    explorerMode = explorerMode,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris,
+                    protectedUserTap = protectedUserTap,
+                    onNavigate = onNavigate,
+                ),
                 onCloseSearch = onCloseSearch,
                 modifier = modifier,
             )

@@ -435,7 +435,7 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 fileUriEvent = fileUriEvent,
                 onCloseExplorerScreen = { onCloseExplorerScreen(key.startNavKey) },
                 onNavigateBack = { onNavigateBack(key) },
-                onNavigate = { onNavigate(it) },
+                onNavigate = onNavigate,
                 onStartUpload = onStartUpload,
                 onFileUriConsumed = onFileUriConsumed,
                 onSelectFolder = onFolderSelected,

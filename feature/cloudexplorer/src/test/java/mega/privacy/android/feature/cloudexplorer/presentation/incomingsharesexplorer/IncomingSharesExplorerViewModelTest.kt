@@ -13,12 +13,13 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
+import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
@@ -48,6 +49,7 @@ class IncomingSharesExplorerViewModelTest {
     private val getIncomingSharesChildrenNodeUseCase = mock<GetIncomingSharesChildrenNodeUseCase>()
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
+    private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
 
 
     @BeforeEach
@@ -89,6 +91,7 @@ class IncomingSharesExplorerViewModelTest {
             getIncomingSharesChildrenNodeUseCase = getIncomingSharesChildrenNodeUseCase,
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
+            getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
         )
     }
