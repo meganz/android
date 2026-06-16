@@ -1,272 +1,168 @@
 package mega.privacy.android.data.preferences.security
 
+import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.cryptography.DecryptData
-import mega.privacy.android.data.cryptography.EncryptData
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.NullSource
-import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.Mockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
-import org.mockito.kotlin.verifyBlocking
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
+import java.util.UUID
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class PasscodeDataStoreTest {
+@RunWith(AndroidJUnit4::class)
+@Config(sdk = [34])
+class PasscodeDataStoreTest {
+
+    private val context = ApplicationProvider.getApplicationContext<Context>()
+    private lateinit var dataStore: DataStore<Preferences>
     private lateinit var underTest: PasscodeDataStore
+    private lateinit var fileName: String
 
-    private val encryptData = mock<EncryptData>()
-    private val decryptData = mock<DecryptData>()
-    private val preferences = mock<Preferences> {
-        on { get<String>(any()) }.thenReturn("encrypted data")
-    }
-    private val dataStore = mock<DataStore<Preferences>> {
-        on { data }.thenReturn(flow {
-            emit(preferences)
-            awaitCancellation()
-        })
-    }
-
-    @BeforeAll
-    internal fun initialise() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-    @BeforeEach
-    internal fun setUp() {
-        Mockito.clearInvocations(encryptData, decryptData)
-        underTest = PasscodeDataStore(
-            dataStore = dataStore,
-            encryptData = encryptData,
-            decryptData = decryptData,
+    @Before
+    fun setUp() {
+        fileName = "passcode-test-${UUID.randomUUID()}"
+        dataStore = PreferenceDataStoreFactory.create(
+            scope = CoroutineScope(UnconfinedTestDispatcher()),
+            produceFile = { context.preferencesDataStoreFile(fileName) }
         )
+        underTest = PasscodeDataStore(dataStore = dataStore)
     }
 
-    @AfterAll
-    internal fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
-    @Test
-    internal fun `test that failed attempts are encrypted`() = runTest {
-        val input = 8
-
-        underTest.setFailedAttempts(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
+    @After
+    fun tearDown() {
+        context.preferencesDataStoreFile(fileName).delete()
     }
 
     @Test
-    internal fun `test that failed attempts are decrypted`() = runTest {
-        val expected = 5
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
+    fun `test that failed attempts round trips`() = runTest {
+        underTest.setFailedAttempts(8)
         underTest.monitorFailedAttempts().test {
-            assertThat(awaitItem()).isEqualTo(expected)
+            assertThat(awaitItem()).isEqualTo(8)
         }
     }
 
     @Test
-    internal fun `test that passcode is encrypted`() = runTest {
-        val input = "My passcode"
-
-        underTest.setPasscode(input)
-
-        verifyBlocking(encryptData) { invoke(input) }
+    fun `test that passcode round trips`() = runTest {
+        val passcode = "My passcode"
+        underTest.setPasscode(passcode)
+        assertThat(underTest.getPasscode()).isEqualTo(passcode)
     }
 
     @Test
-    internal fun `test that passcode is decrypted`() = runTest {
-        val expected = "My passcode"
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
-
-        assertThat(underTest.getPasscode()).isEqualTo(expected)
-    }
-
-    @Test
-    internal fun `test that locked state is encrypted`() = runTest {
-        val input = true
-
-        underTest.setLockedState(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
-    }
-
-    @Test
-    internal fun `test that locked state is decrypted`() = runTest {
-        val expected = false
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
-        underTest.monitorLockState().test {
-            assertThat(awaitItem()).isEqualTo(expected)
-        }
-    }
-
-    @Test
-    internal fun `test that passcode enabled state is encrypted`() = runTest {
-        val input = true
-
-        underTest.setPasscodeEnabledState(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
-    }
-
-    @Test
-    internal fun `test that passcode enabled state is decrypted`() = runTest {
-        val expected = false
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
-        underTest.monitorPasscodeEnabledState().test {
-            assertThat(awaitItem()).isEqualTo(expected)
-        }
-    }
-
-    @Test
-    internal fun `test that passcode timeout is encrypted`() = runTest {
-        val input = 12345L
-
-        underTest.setPasscodeTimeout(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
-    }
-
-    @Test
-    internal fun `test that passcode time out is decrypted`() = runTest {
-        val expected = 12345L
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
-        underTest.monitorPasscodeTimeOut().test {
-            assertThat(awaitItem()).isEqualTo(expected)
-        }
-    }
-
-    @Test
-    internal fun `test that last background time is encrypted`() = runTest {
-        val input = 6543L
-
-        underTest.setLastBackgroundTime(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
-    }
-
-    @Test
-    internal fun `test that last background time is decrypted`() = runTest {
-        val expected = 6543L
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
-        underTest.monitorLastBackgroundTime().test {
-            assertThat(awaitItem()).isEqualTo(expected)
-        }
-    }
-
-    @Test
-    internal fun `test that null background time is encrypted as null`() = runTest {
-        underTest.setLastBackgroundTime(null)
-
-        verifyBlocking(encryptData) { invoke(null) }
-    }
-
-    @Test
-    internal fun `test that null passcode is encrypted as null`() = runTest {
+    fun `test that null passcode clears the value`() = runTest {
+        underTest.setPasscode("something")
         underTest.setPasscode(null)
-
-        verifyBlocking(encryptData) { invoke(null) }
+        assertThat(underTest.getPasscode()).isNull()
     }
 
     @Test
-    internal fun `test that null passcode timeout is encrypted as null`() = runTest {
+    fun `test that locked state round trips`() = runTest {
+        underTest.setLockedState(true)
+        underTest.monitorLockState().test {
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that passcode enabled state round trips`() = runTest {
+        underTest.setPasscodeEnabledState(true)
+        underTest.monitorPasscodeEnabledState().test {
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that passcode timeout round trips`() = runTest {
+        underTest.setPasscodeTimeout(12345L)
+        underTest.monitorPasscodeTimeOut().test {
+            assertThat(awaitItem()).isEqualTo(12345L)
+        }
+    }
+
+    @Test
+    fun `test that null passcode timeout clears the value`() = runTest {
+        underTest.setPasscodeTimeout(12345L)
         underTest.setPasscodeTimeout(null)
-
-        verifyBlocking(encryptData) { invoke(null) }
+        underTest.monitorPasscodeTimeOut().test {
+            assertThat(awaitItem()).isNull()
+        }
     }
 
     @Test
-    internal fun `test that passcode type is encrypted`() = runTest {
-        val input = "4"
-
-        underTest.setPasscodeType(input)
-
-        verifyBlocking(encryptData) { invoke(input) }
+    fun `test that last background time round trips`() = runTest {
+        underTest.setLastBackgroundTime(6543L)
+        underTest.monitorLastBackgroundTime().test {
+            assertThat(awaitItem()).isEqualTo(6543L)
+        }
     }
 
     @Test
-    internal fun `test that passcode type is decrypted`() = runTest {
-        val expected = "6"
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
+    fun `test that null last background time clears the value`() = runTest {
+        underTest.setLastBackgroundTime(6543L)
+        underTest.setLastBackgroundTime(null)
+        underTest.monitorLastBackgroundTime().test {
+            assertThat(awaitItem()).isNull()
+        }
+    }
 
+    @Test
+    fun `test that passcode type round trips`() = runTest {
+        underTest.setPasscodeType("4")
         underTest.monitorPasscodeType().test {
-            assertThat(awaitItem()).isEqualTo(expected)
+            assertThat(awaitItem()).isEqualTo("4")
         }
     }
 
     @Test
-    internal fun `test that null passcode type is encrypted as null`() = runTest {
+    fun `test that null passcode type clears the value`() = runTest {
+        underTest.setPasscodeType("4")
         underTest.setPasscodeType(null)
-
-        verifyBlocking(encryptData) { invoke(null) }
+        underTest.monitorPasscodeType().test {
+            assertThat(awaitItem()).isNull()
+        }
     }
 
     @Test
-    internal fun `test that biometric enabled state is encrypted`() = runTest {
-        val input = true
-
-        underTest.setBiometricsEnabled(input)
-
-        verifyBlocking(encryptData) { invoke(input.toString()) }
-    }
-
-    @Test
-    internal fun `test that biometric enabled state is decrypted`() = runTest {
-        val expected = true
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
-
+    fun `test that biometric enabled state round trips`() = runTest {
+        underTest.setBiometricsEnabled(true)
         underTest.monitorBiometricEnabledState().test {
-            assertThat(awaitItem()).isEqualTo(expected)
+            assertThat(awaitItem()).isTrue()
         }
     }
 
     @Test
-    internal fun `test that null biometric enabled state is encrypted as null`() = runTest {
+    fun `test that null biometric enabled state clears the value`() = runTest {
+        underTest.setBiometricsEnabled(true)
         underTest.setBiometricsEnabled(null)
-
-        verifyBlocking(encryptData) { invoke(null) }
+        underTest.monitorBiometricEnabledState().test {
+            assertThat(awaitItem()).isNull()
+        }
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = [true, false])
-    internal fun `test that configuration change status is encrypted`(isConfigurationChanged: Boolean) =
-        runTest {
-            underTest.setConfigurationChangedStatus(isConfigurationChanged = isConfigurationChanged)
-
-            verifyBlocking(encryptData) { invoke(isConfigurationChanged.toString()) }
-        }
-
-    @ParameterizedTest
-    @ValueSource(strings = ["true", "false"])
-    @NullSource
-    internal fun `test that configuration change status is decrypted`(value: String?) = runTest {
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(value) }
-
+    @Test
+    fun `test that configuration change status round trips`() = runTest {
+        underTest.setConfigurationChangedStatus(true)
         underTest.monitorConfigurationChangedStatus().test {
-            assertThat(expectMostRecentItem()).isEqualTo(value?.toBooleanStrictOrNull() ?: false)
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that configuration change status defaults to false`() = runTest {
+        underTest.monitorConfigurationChangedStatus().test {
+            assertThat(awaitItem()).isFalse()
         }
     }
 }

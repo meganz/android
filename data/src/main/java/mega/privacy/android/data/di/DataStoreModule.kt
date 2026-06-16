@@ -25,7 +25,7 @@ import mega.privacy.android.data.preferences.mediaTimelinePreferenceFileName
 import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPreferenceDataStoreMigration
 import mega.privacy.android.data.preferences.migration.CredentialsPreferencesMigration
 import mega.privacy.android.data.preferences.qaAccountCacheDataStoreName
-import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
+import mega.privacy.android.data.preferences.security.PasscodeDatastoreV1ToV2Migration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
 import mega.privacy.android.data.preferences.viewedLinksSortPreferenceFileName
 import mega.privacy.android.data.qualifier.ContinueWhereLeftOffSortPreference
@@ -74,18 +74,18 @@ internal object DataStoreModule {
     fun providePasscodeDataStore(
         @ApplicationContext context: Context,
         @IoDispatcher ioDispatcher: CoroutineDispatcher,
-        passcodeDatastoreMigration: PasscodeDatastoreMigration,
-    ): DataStore<Preferences> =
-        PreferenceDataStoreFactory.create(
-            corruptionHandler = ReplaceFileCorruptionHandler(
-                produceNewData = { emptyPreferences() }
-            ),
-            migrations = listOf(
-                passcodeDatastoreMigration
-            ),
-            scope = CoroutineScope(ioDispatcher),
-            produceFile = { context.preferencesDataStoreFile(passcodeDatastoreName) }
-        )
+        masterKey: MasterKey?,
+        v1ToV2Migration: PasscodeDatastoreV1ToV2Migration,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.createEncrypted(
+        corruptionHandler = ReplaceFileCorruptionHandler(
+            produceNewData = { emptyPreferences() }
+        ),
+        migrations = listOf(v1ToV2Migration),
+        scope = CoroutineScope(ioDispatcher),
+        masterKey = masterKey,
+        context = context,
+        fileName = passcodeDatastoreName
+    )
 
     @Singleton
     @Provides
