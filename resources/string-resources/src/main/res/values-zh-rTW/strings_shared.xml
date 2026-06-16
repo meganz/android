@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">您裝置上的儲存空間不足</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">發生未知錯誤。請聯繫support&#64;mega.io。</string>
+    <string name="general_sync_message_unknown_error">發生未知錯誤。請前往 https://mega.nz/support 聯繫客服</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">由於MEGA資料夾位於垃圾筒中，因此資料夾無法同步或備份</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -1095,7 +1095,7 @@
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
     <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">可設定垃圾筒清空排程7天至10年</string>
     <!-- Benefit: Priority support -->
-    <string name="pro_plan_benefit_priority_support">優先的支援</string>
+    <string name="pro_plan_benefit_priority_support">專屬支援</string>
     <!-- Subscription page information section title at the bottom of the page-->
     <string name="choose_account_screen_subscription_information_title">訂閱詳情</string>
     <!-- Subscription page information section description at the bottom of the page explaining how the subscription will be renewed and its price-->
@@ -2402,4 +2402,7 @@
     <string name="send_contacts">發送聯絡人</string>
     <string name="contacts_groups_title">群組</string>
     <string name="contacts_groups_create_error">建立對話時發生錯誤</string>
+    <string name="home_do_more_with_mega_camera_uploads">相機上傳</string>
+    <string name="home_do_more_with_mega_add_contact">新增聯絡人</string>
+    <string name="home_do_more_with_mega_schedule_meeting">安排會議</string>
 </resources>

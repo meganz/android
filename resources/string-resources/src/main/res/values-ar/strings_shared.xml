@@ -2834,4 +2834,21 @@
     <string name="contacts_groups_create_error">حدث خطأ أثناء إنشاء المحادثة</string>
     <string name="contacts_groups_search_hint">بحث في المجموعات</string>
     <string name="public_link_auth_alert_description_external_file">احفظ هذا الملف بأمان ويمكنك الوصول إليه في أي وقت</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="zero">%1$d تم اختياره</item>
+        <item quantity="one">%1$d تم اختياره</item>
+        <item quantity="two">%1$d تم اختيارهما</item>
+        <item quantity="few">%1$d تم اختيارهم</item>
+        <item quantity="many">%1$d تم اختيارهم</item>
+        <item quantity="other">%1$d تم اختيارهم</item>
+    </plurals>
+    <string name="search_placeholder_chat">ابحث في المحادثة</string>
+    <string name="search_landing_chat_explorer_subtitle">ابحث في جهات الاتصال والمحادثات والاجتماعات</string>
+    <string name="home_do_more_with_mega_title">قم بالمزيد مع ميغا MEGA</string>
+    <string name="home_do_more_with_mega_camera_uploads">ترفيعات الكاميرا</string>
+    <string name="home_do_more_with_mega_add_contact">إضافة جهة اتصال</string>
+    <string name="home_do_more_with_mega_add_sync">أضف مزامنة</string>
+    <string name="home_do_more_with_mega_scan_document">مسح المستند الكترونياً</string>
+    <string name="home_do_more_with_mega_create_album">إنشاء ألبوم</string>
+    <string name="home_do_more_with_mega_schedule_meeting">جدول اجتماع</string>
 </resources>

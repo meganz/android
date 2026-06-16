@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">您设备上的存储空间不足</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">出现未知错误。请联系support&#64;mega.io。</string>
+    <string name="general_sync_message_unknown_error">发生未知错误。请联系技术支持，网址：https://mega.nz/support</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">由于MEGA文件夹位于回收站中，文件夹无法同步或备份</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -2413,4 +2413,9 @@
     </plurals>
     <string name="home_cwlo_clear_history_dialog_title">清除历史记录</string>
     <string name="home_cwlo_clear_history_dialog_message">您确定要清除历史记录吗？此操作无法撤销。</string>
+    <string name="search_placeholder_chat">在聊天中搜索</string>
+    <string name="search_landing_chat_explorer_subtitle">搜索联系人、聊天和会议</string>
+    <string name="home_do_more_with_mega_camera_uploads">相机上传</string>
+    <string name="home_do_more_with_mega_add_contact">添加联系人</string>
+    <string name="home_do_more_with_mega_schedule_meeting">安排会议</string>
 </resources>
