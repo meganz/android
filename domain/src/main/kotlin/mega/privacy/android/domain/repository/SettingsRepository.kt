@@ -23,7 +23,7 @@ interface SettingsRepository {
     /**
      * Check if the automatic approval of incoming contact requests using contact links is enabled or disabled
      *
-     * If the option has never been set, the error code will be MegaError::API_ENOENT.
+     * If the option has never been set, it is treated as enabled, matching the server default behaviour.
      *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      *

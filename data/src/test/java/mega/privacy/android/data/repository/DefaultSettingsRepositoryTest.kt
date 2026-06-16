@@ -524,4 +524,77 @@ internal class DefaultSettingsRepositoryTest {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
         }
+
+    @ParameterizedTest(name = "flag: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that getContactLinksOption returns the request flag when the request succeeds`(
+        flagValue: Boolean,
+    ) = runTest {
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
+            on { flag }.thenReturn(flagValue)
+        }
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+
+        whenever(megaApiGateway.getContactLinksOption(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        assertThat(underTest.getContactLinksOption()).isEqualTo(flagValue)
+    }
+
+    @Test
+    fun `test that getContactLinksOption returns true when the option has never been set`() =
+        runTest {
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+                on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+
+            whenever(megaApiGateway.getContactLinksOption(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+
+            assertThat(underTest.getContactLinksOption()).isTrue()
+        }
+
+    @Test
+    fun `test that getContactLinksOption throws an exception when the request fails`() = runTest {
+        val api = mock<MegaApiJava>()
+        val request = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION)
+        }
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_EFAILED)
+        }
+
+        whenever(megaApiGateway.getContactLinksOption(any())).thenAnswer {
+            (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                api,
+                request,
+                error
+            )
+        }
+
+        assertThrows<MegaException> {
+            underTest.getContactLinksOption()
+        }
+    }
 }

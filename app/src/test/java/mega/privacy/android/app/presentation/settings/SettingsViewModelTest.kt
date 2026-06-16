@@ -24,7 +24,6 @@ import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
@@ -311,9 +310,7 @@ class SettingsViewModelTest {
         runTest {
             monitorContactLinksOptionUseCase.stub {
                 on { invoke() }.thenAnswer {
-                    throw SettingNotFoundException(
-                        -1
-                    )
+                    throw RuntimeException("Error fetching QR setting")
                 }
             }
 

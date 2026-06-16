@@ -52,7 +52,6 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_VA
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
-import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
@@ -127,11 +126,8 @@ internal class DefaultSettingsRepository @Inject constructor(
                         continuation.resumeWith(Result.success(request.flag))
                     }
 
-                    API_ENOENT -> continuation.failWithException(
-                        SettingNotFoundException(
-                            error.errorCode, error.errorString
-                        )
-                    )
+                    // The server treats the option as enabled when it has never been set
+                    API_ENOENT -> continuation.resumeWith(Result.success(true))
 
                     else -> continuation.failWithError(
                         error,
