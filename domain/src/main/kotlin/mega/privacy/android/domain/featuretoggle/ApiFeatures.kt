@@ -261,6 +261,19 @@ enum class ApiFeatures(
         description = "Enable ComposeUI MyAccountUsageFragment",
         singleCheckPerRun = true,
         defaultValue = false,
+    ),
+
+    /**
+     * Use the cloud explorer as the MEGA folder picker for sync and stop backup flows
+     *
+     * Activate this flag to select the remote folder of a new sync (including incoming shares)
+     * and the destination of a stopped backup with the cloud explorer
+     */
+    SyncUseCloudExplorerPicker(
+        experimentName = "sce",
+        description = "Use the cloud explorer as the MEGA folder picker for sync and stop backup",
+        defaultValue = false,
+        singleCheckPerRun = true,
     );
 
     companion object : FeatureFlagValueProvider {
