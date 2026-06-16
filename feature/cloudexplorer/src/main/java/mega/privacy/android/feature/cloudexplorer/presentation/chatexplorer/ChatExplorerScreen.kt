@@ -10,13 +10,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,6 +71,7 @@ private fun ChatExplorerContent(
     onNewGroupChatClick: () -> Unit,
     onChatToggled: (chatId: Long) -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     when (uiState) {
         ChatExplorerUiState.Loading -> LoadingState(modifier = modifier)
@@ -85,6 +91,7 @@ private fun ChatExplorerContent(
                 onChatToggled = onChatToggled,
                 onNewGroupChatClick = onNewGroupChatClick,
                 modifier = modifier,
+                listState = listState,
             )
         }
     }
@@ -144,8 +151,10 @@ internal fun ChatExplorerList(
     onChatToggled: (chatId: Long) -> Unit,
     modifier: Modifier = Modifier,
     onNewGroupChatClick: (() -> Unit)? = null,
+    listState: LazyListState = rememberLazyListState(),
 ) {
     LazyColumn(
+        state = listState,
         modifier = modifier
             .fillMaxWidth()
             .testTag(CHAT_EXPLORER_LIST_TAG),
@@ -192,6 +201,26 @@ internal fun ChatExplorerList(
                 )
             }
         }
+    }
+}
+
+/**
+ * Index of [chatId] within [ChatExplorerList]'s LazyColumn, mirroring its item order, or null if absent.
+ */
+private fun ChatExplorerUiState.Items.indexOfChat(chatId: Long): Int? = when {
+    noteToSelf?.id == chatId -> 1
+    else -> {
+        val noteToSelfCount = if (noteToSelf == null) 0 else 1
+
+        recents.indexOfFirst { it.id == chatId }.takeIf { it >= 0 }
+            ?.let { 2 + noteToSelfCount + it }
+            ?: others.indexOfFirst { it.id == chatId }.takeIf { it >= 0 }
+                ?.let {
+                    val recentsBlock =
+                        if (recents.isEmpty()) 0 else 1 + recents.size // header + items
+
+                    2 + noteToSelfCount + recentsBlock + it
+                }
     }
 }
 
@@ -275,8 +304,22 @@ internal fun TabsScope.ChatExplorerTab(
 ) {
     val viewModel = hiltViewModel<ChatExplorerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
     LaunchedEffect((uiState as? ChatExplorerUiState.Data)?.isEmpty) {
         onHasContentChanged((uiState as? ChatExplorerUiState.Data)?.isEmpty == false)
+    }
+    var selectionBeforeSearch by remember { mutableStateOf(selectionState.selectedChatIds) }
+    LaunchedEffect(showSearch) {
+        if (showSearch) {
+            selectionBeforeSearch = selectionState.selectedChatIds
+            return@LaunchedEffect
+        }
+        val index = (uiState as? ChatExplorerUiState.Data)?.items?.let { items ->
+            (selectionState.selectedChatIds - selectionBeforeSearch)
+                .mapNotNull { items.indexOfChat(it) }
+                .maxOrNull()
+        } ?: return@LaunchedEffect
+        listState.scrollToItem(index)
     }
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackBarHostState.current
@@ -356,6 +399,7 @@ internal fun TabsScope.ChatExplorerTab(
                 onNewGroupChatClick = { onNavigate(CreateGroupChatNavKey) },
                 onChatToggled = selectionState::toggleSelection,
                 modifier = modifier,
+                listState = listState,
             )
         }
     }

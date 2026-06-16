@@ -246,6 +246,7 @@ internal fun ExplorerScreen(
                 .padding(paddingValues),
             beyondViewportPageCount = 1,
             hideTabs = isInnerNavigation || showSearch,
+            pagerScrollEnabled = !showSearch,
             cells = {
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(
