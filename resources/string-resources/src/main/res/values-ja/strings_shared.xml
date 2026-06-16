@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">デバイスのストレージ容量が不十分です</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">不明なエラーが発生しました。support&#64;mega.ioにご連絡ください。</string>
+    <string name="general_sync_message_unknown_error">不明なエラーが発生しました。サポート（https://mega.nz/support）にお問い合わせください。</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">MEGAフォルダはごみ箱にあるため、フォルダを同期またはバックアップできません</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -2414,4 +2414,13 @@
     </plurals>
     <string name="home_cwlo_clear_history_dialog_title">履歴を消去</string>
     <string name="home_cwlo_clear_history_dialog_message">履歴を消去してもよろしいですか？この操作は元に戻せません。</string>
+    <string name="search_placeholder_chat">チャットを検索</string>
+    <string name="search_landing_chat_explorer_subtitle">連絡先、チャット、ミーティングを検索</string>
+    <string name="home_do_more_with_mega_camera_uploads">カメラアップロード</string>
+    <string name="home_do_more_with_mega_add_contact">連絡先を追加</string>
+    <string name="home_do_more_with_mega_schedule_meeting">ミーティングをスケジュール</string>
+    <string name="home_do_more_with_mega_title">MEGAでもっとできること</string>
+    <string name="home_do_more_with_mega_add_sync">同期を追加</string>
+    <string name="home_do_more_with_mega_scan_document">文書をスキャン</string>
+    <string name="home_do_more_with_mega_create_album">アルバムの作成</string>
 </resources>

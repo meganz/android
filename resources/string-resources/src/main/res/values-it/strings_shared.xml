@@ -2563,4 +2563,7 @@
     <string name="send_contacts">Invia contatti</string>
     <string name="contacts_groups_title">Gruppi</string>
     <string name="contacts_groups_create_error">Un errore è avvenuto durante la creazione della chat</string>
+    <string name="home_do_more_with_mega_camera_uploads">Caricamenti da fotocamera</string>
+    <string name="home_do_more_with_mega_add_contact">Aggiungi contatto</string>
+    <string name="home_do_more_with_mega_schedule_meeting">Programma meeting</string>
 </resources>

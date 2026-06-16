@@ -2392,4 +2392,24 @@
     <string name="send_contacts">연락처 보내기</string>
     <string name="contacts_groups_title">그룹</string>
     <string name="contacts_groups_create_error">대화를 만드는 중 오류가 발생했습니다</string>
+    <string name="home_do_more_with_mega_camera_uploads">카메라 업로드</string>
+    <string name="home_do_more_with_mega_add_contact">연락처 추가</string>
+    <string name="home_do_more_with_mega_schedule_meeting">회의 예약</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="other">%1$d 선택됨</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">그룹 검색</string>
+    <string name="contacts_groups_empty_title">그룹 없음</string>
+    <string name="public_link_auth_alert_description_external_file">이 파일을 안전하게 보관하고 언제든지 접근하세요</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="other">[A]%1$s[/A] 님이 [B]항목 %2$d개를 수정하였습니다.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">기록 삭제</string>
+    <string name="home_cwlo_clear_history_dialog_message">기록을 지우시겠습니까? 이것은 되돌릴 수 없습니다.</string>
+    <string name="search_placeholder_chat">채팅에서 검색</string>
+    <string name="search_landing_chat_explorer_subtitle">연락처, 대화, 그리고 회의 검색</string>
+    <string name="home_do_more_with_mega_title">MEGA와 더 많은 것을 하기</string>
+    <string name="home_do_more_with_mega_add_sync">동기화 추가</string>
+    <string name="home_do_more_with_mega_scan_document">문서 스캔</string>
+    <string name="home_do_more_with_mega_create_album">사진첩 만들기</string>
 </resources>

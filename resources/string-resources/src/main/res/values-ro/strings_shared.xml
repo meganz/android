@@ -2574,4 +2574,7 @@
     <string name="send_contacts">Trimite contacte</string>
     <string name="contacts_groups_title">Grupuri</string>
     <string name="contacts_groups_create_error">A apărut o eroare la crearea chatului</string>
+    <string name="home_do_more_with_mega_camera_uploads">Încărcări cameră</string>
+    <string name="home_do_more_with_mega_add_contact">Adaugă un contact</string>
+    <string name="home_do_more_with_mega_schedule_meeting">Planifică o întâlnire</string>
 </resources>

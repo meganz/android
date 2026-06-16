@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">No hay suficiente espacio de almacenamiento en su dispositivo</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Se ha producido un error. Ponte en contacto con support&#64;mega.io.</string>
+    <string name="general_sync_message_unknown_error">Se ha producido un error. Contacta con soporte en https://mega.nz/support</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Los archivos de esta carpeta no se pueden sincronizar ni se puede hacer un backup porque la carpeta de MEGA está en la Papelera</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -2559,4 +2559,15 @@
         <item quantity="many">[A]%1$s [/A][B]ha actualizado %2$d de elementos.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]ha actualizado %2$d elementos.[/B]</item>
     </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Borrar historial</string>
+    <string name="home_cwlo_clear_history_dialog_message">¿Estás seguro de que quieres borrar tu historial? Esta operación no se puede deshacer.</string>
+    <string name="search_placeholder_chat">Buscar en el chat</string>
+    <string name="search_landing_chat_explorer_subtitle">Buscar contactos, chats y reuniones</string>
+    <string name="home_do_more_with_mega_title">Sácale más partido a MEGA</string>
+    <string name="home_do_more_with_mega_camera_uploads">Subidas de la cámara</string>
+    <string name="home_do_more_with_mega_add_contact">Añadir contacto</string>
+    <string name="home_do_more_with_mega_add_sync">Añadir sincronización</string>
+    <string name="home_do_more_with_mega_scan_document">Escanear</string>
+    <string name="home_do_more_with_mega_create_album">Crear álbum</string>
+    <string name="home_do_more_with_mega_schedule_meeting">Programar reunión</string>
 </resources>

@@ -87,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Abonelik iptal edildi</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Aboneliğinizi iptal edemedik. Yardım için lütfen support&#64;mega.io ile iletişime geçin.</string>
+    <string name="cancel_subscription_error">Aboneliğinizi iptal edemedik. Yardım için lütfen https://mega.nz/support sayfasından iletişime geçin.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Diğer tüm oturumları kapat</string>
     <!-- Message after kill all opened sessions -->
@@ -718,7 +718,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">Geçersiz e-posta adresi veya şifre. Lütfen tekrar deneyin.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Hesabınız Hizmet Şartları ihlalleri nedeniyle askıya alındı. Lütfen support&#64;mega.io ile iletişime geçin.</string>
+    <string name="error_account_suspended">Hesabınız Hizmet Şartları ihlalleri nedeniyle askıya alındı. Destek için lütfen https://mega.nz/support sayfasından ile iletişime geçin</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Giriş yapmak için çok fazla başarısız deneme oldu, lütfen bir saat bekleyin.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -4611,7 +4611,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Şarjınız %%%1$d’nin altında olduğu için yükleme duraklatıldı</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Kamera yüklemeleri çalışmayı durdurdu. Çözmek için kamera yüklemelerini yeniden etkinleştirmeyi deneyin. Sorun devam ederse support&#64;mega.io ile iletişime geçin.</string>
+    <string name="photos_camera_uploads_general_issue">Kamera yüklemeleri çalışmayı durdurdu. Çözmek için kamera yüklemelerini yeniden etkinleştirmeyi deneyin. Sorun devam ederse destek ile https://mega.nz/support sayfasından ile iletişime geçin</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Kamera yüklemeleri devam ediyor, %1$d dosya beklemede</item>

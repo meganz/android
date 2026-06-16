@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">L’espace de stockage est insuffisant sur votre appareil</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Un erreur inconnue est survenue. Contactez support&#64;mega.io.</string>
+    <string name="general_sync_message_unknown_error">Une erreur inconnue est survenue. Contactez l\’assistance via https://mega.nz/support</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Le dossier ne peut ni être synchronisé ni sauvegardé, car le dossier MEGA est dans la Corbeille</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -2587,4 +2587,15 @@
         <item quantity="many">[A]%1$s [/A][B]a mis à jour %2$d éléments.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]a mis à jour %2$d éléments.[/B]</item>
     </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Effacer l\’historique</string>
+    <string name="home_cwlo_clear_history_dialog_message">Êtes-vous sûr de vouloir effacer votre historique ? Cela ne peut pas être annulé.</string>
+    <string name="search_placeholder_chat">Rechercher dans la discussion</string>
+    <string name="search_landing_chat_explorer_subtitle">Recherchez des contacts, des discussions et des réunions</string>
+    <string name="home_do_more_with_mega_title">Faites-en plus avec MEGA</string>
+    <string name="home_do_more_with_mega_camera_uploads">Téléversements de l’appareil photo</string>
+    <string name="home_do_more_with_mega_add_contact">Ajouter un contact</string>
+    <string name="home_do_more_with_mega_add_sync">Ajouter une synchronisation</string>
+    <string name="home_do_more_with_mega_scan_document">Scanner un document</string>
+    <string name="home_do_more_with_mega_create_album">Créer un album</string>
+    <string name="home_do_more_with_mega_schedule_meeting">Programmer une réunion</string>
 </resources>

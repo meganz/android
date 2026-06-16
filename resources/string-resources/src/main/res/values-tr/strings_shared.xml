@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Cihazınızda yeterli depolama alanı yok</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Bilinmeyen bir hata oluştu. Lütfen support&#64;mega.io ile iletişime geçin.</string>
+    <string name="general_sync_message_unknown_error">Bilinmeyen bir hata oluştu. Destek için lütfen https://mega.nz/support sayfasından iletişime geçin</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">MEGA klasörü Çöp kutusunda olduğu için klasör senkronize edilemez veya yedeklenemez</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -2508,4 +2508,13 @@
     </plurals>
     <string name="home_cwlo_clear_history_dialog_title">Geçmişi temizle</string>
     <string name="home_cwlo_clear_history_dialog_message">Geçmişinizi temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
+    <string name="search_placeholder_chat">Sohbette ara</string>
+    <string name="search_landing_chat_explorer_subtitle">Kişileri, sohbetleri ve toplantıları ara</string>
+    <string name="home_do_more_with_mega_camera_uploads">Kamera yüklemeleri</string>
+    <string name="home_do_more_with_mega_add_contact">Kişi ekle</string>
+    <string name="home_do_more_with_mega_schedule_meeting">Toplantı planla</string>
+    <string name="home_do_more_with_mega_title">MEGA ile daha fazlasını yapın</string>
+    <string name="home_do_more_with_mega_add_sync">Senkronizasyon ekle</string>
+    <string name="home_do_more_with_mega_scan_document">Belge tara</string>
+    <string name="home_do_more_with_mega_create_album">Albüm oluştur</string>
 </resources>

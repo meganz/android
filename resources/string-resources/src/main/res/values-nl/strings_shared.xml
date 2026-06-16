@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Onvoldoende opslagruimte op uw apparaat</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Er is een onbekende fout opgetreden. Neem contact op support&#64;mega.io.</string>
+    <string name="general_sync_message_unknown_error">Er is een onbekende fout opgetreden. Neem contact op met https://mega.nz/support</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">De map kan niet worden gesynchroniseerd of er kan geen back-up van worden gemaakt omdat de MEGA-map zich in de Prullenbak bevindt</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -2492,4 +2492,26 @@
     <string name="send_contacts">Verstuur contacten</string>
     <string name="contacts_groups_title">Groepen</string>
     <string name="contacts_groups_create_error">Er is een fout opgetreden toen u het gesprek creëerde</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="one">%%1$d geselecteerd</item>
+        <item quantity="other">%1$d geselecteerd</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">Groepen zoeken</string>
+    <string name="contacts_groups_empty_title">Geen groepen</string>
+    <string name="public_link_auth_alert_description_external_file">Bewaar dit bestand veilig en raadpleeg het op elk gewenst moment</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one">[A]%1$s [/A][B]heeft %2$d item bijgewerkt.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]heeft %2$d items bijgewerkt.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Geschiedenis wissen</string>
+    <string name="home_cwlo_clear_history_dialog_message">Weet u zeker dat u uw browsegeschiedenis wilt wissen? Dit kan niet ongedaan gemaakt worden.</string>
+    <string name="search_placeholder_chat">Zoeken in Chat</string>
+    <string name="search_landing_chat_explorer_subtitle">Zoek in contacten, chats en vergaderingen</string>
+    <string name="home_do_more_with_mega_camera_uploads">Camera uploads</string>
+    <string name="home_do_more_with_mega_add_contact">Contact toevoegen</string>
+    <string name="home_do_more_with_mega_schedule_meeting">Plan vergadering</string>
+    <string name="home_do_more_with_mega_title">Meer doen met MEGA</string>
+    <string name="home_do_more_with_mega_add_sync">Synchronisatie toevoegen</string>
+    <string name="home_do_more_with_mega_scan_document">Document scannen</string>
+    <string name="home_do_more_with_mega_create_album">Album aanmaken</string>
 </resources>

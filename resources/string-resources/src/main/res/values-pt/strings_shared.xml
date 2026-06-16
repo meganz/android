@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">Não há espaço de armazenamento suficiente no seu dispositivo</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">Ocorreu um erro desconhecido - entre em contato com support&#64;mega.io.</string>
+    <string name="general_sync_message_unknown_error">Ocorreu um erro desconhecido - entre em contato com o Suporte em https://mega.nz/support</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">Não é possível sincronizar ou fazer backup porque a pasta no MEGA está na Lixeira</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -2597,4 +2597,13 @@
     </plurals>
     <string name="home_cwlo_clear_history_dialog_title">Limpar histórico</string>
     <string name="home_cwlo_clear_history_dialog_message">Você tem certeza de que quer deletar o seu histórico? Esta ação não pode ser desfeita.</string>
+    <string name="home_do_more_with_mega_camera_uploads">Uploads da câmera</string>
+    <string name="home_do_more_with_mega_add_contact">Adicionar novo contato</string>
+    <string name="home_do_more_with_mega_schedule_meeting">Programar reunião</string>
+    <string name="search_placeholder_chat">Pesquisar em Chat</string>
+    <string name="search_landing_chat_explorer_subtitle">Pesquisar contatos, chats e reuniões</string>
+    <string name="home_do_more_with_mega_title">Faça mais com o MEGA</string>
+    <string name="home_do_more_with_mega_add_sync">Adicionar sincronização</string>
+    <string name="home_do_more_with_mega_scan_document">Escanear documento</string>
+    <string name="home_do_more_with_mega_create_album">Criar álbum</string>
 </resources>
