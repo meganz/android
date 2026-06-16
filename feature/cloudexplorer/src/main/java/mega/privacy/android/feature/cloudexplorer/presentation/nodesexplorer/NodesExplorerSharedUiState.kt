@@ -18,6 +18,7 @@ data class NodesExplorerSharedUiState(
     val items: List<NodeViewItem<TypedNode>> = emptyList(),
     val searchLoadingState: NodesLoadingState = NodesLoadingState.FullyLoaded,
     val searchItems: List<NodeViewItem<TypedNode>> = emptyList(),
+    val searchedQuery: String? = null,
     val isHiddenNodeSettingsLoading: Boolean = true,
     val showHiddenNodes: Boolean = false,
     val isHiddenNodesEnabled: Boolean = false,

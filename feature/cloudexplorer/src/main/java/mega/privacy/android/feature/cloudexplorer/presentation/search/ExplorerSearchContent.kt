@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -125,9 +126,15 @@ internal fun SearchLoadingState(modifier: Modifier = Modifier) {
  * Projects the search slice of the shared browse state onto the [NodesExplorerSharedUiState.items]/
  * [NodesExplorerSharedUiState.nodesLoadingState] the content composables render, so search reuses
  * the browse content without leaking into the browse list.
+ *
+ * Stays [NodesLoadingState.Loading] until the results match [query] (debounce window + in-flight
+ * search), so the empty-results view never flashes before the real results arrive.
  */
-internal fun NodesExplorerSharedUiState.asSearchState() =
-    copy(items = searchItems, nodesLoadingState = searchLoadingState)
+internal fun NodesExplorerSharedUiState.asSearchState(query: String?) =
+    copy(
+        items = searchItems,
+        nodesLoadingState = if (query == searchedQuery) searchLoadingState else NodesLoadingState.Loading,
+    )
 
 
 internal const val EXPLORER_SEARCH_RECENT_TAG = "explorer_search:recent"

@@ -30,11 +30,14 @@ internal fun NodesExplorerSearchContent(
     val viewModel = hiltViewModel<NodesExplorerViewModel>()
     val uiState by viewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
     val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
-    LaunchedEffect(debouncedQuery) { viewModel.onSearchQuery(debouncedQuery) }
+
+    LaunchedEffect(debouncedQuery, query) {
+        if (debouncedQuery == query) viewModel.onSearchQuery(debouncedQuery)
+    }
 
     NodesExplorerScreenContent(
         uiState = uiState,
-        uiStateShared = uiStateShared.asSearchState(),
+        uiStateShared = uiStateShared.asSearchState(query),
         onNavigateBack = {},
         consumeNavigateBack = {},
         onFolderClick = rememberSearchResultFolderClick(

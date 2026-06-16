@@ -145,7 +145,7 @@ abstract class NodeExplorerSharedViewModel(
      * emits on change) so a configuration change keeps the previous results.
      */
     fun onSearchQuery(query: String?) {
-        if (!query.isNullOrBlank()) {
+        if (!query.isNullOrBlank() && query != _nodedExplorerSharedUiState.value.searchedQuery) {
             _nodedExplorerSharedUiState.update { state ->
                 state.copy(searchLoadingState = NodesLoadingState.Loading)
             }
@@ -186,12 +186,10 @@ abstract class NodeExplorerSharedViewModel(
                 state.copy(
                     searchItems = emptyList(),
                     searchLoadingState = NodesLoadingState.FullyLoaded,
+                    searchedQuery = query,
                 )
             }
             return
-        }
-        _nodedExplorerSharedUiState.update { state ->
-            state.copy(searchLoadingState = NodesLoadingState.Loading)
         }
         val nodes = runCatching {
             searchUseCase(
@@ -216,6 +214,7 @@ abstract class NodeExplorerSharedViewModel(
             state.copy(
                 searchItems = items,
                 searchLoadingState = NodesLoadingState.FullyLoaded,
+                searchedQuery = query,
             )
         }
     }

@@ -46,7 +46,6 @@ import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -126,8 +125,8 @@ class NodeExplorerSharedViewModelTest {
         val nodes = listOf<TypedNode>(mock())
         val items = listOf<NodeViewItem<TypedNode>>(mock())
         whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
-        wheneverBlocking { searchUseCase(any(), any(), any()) } doReturn nodes
-        wheneverBlocking {
+        whenever { searchUseCase(any(), any(), any()) } doReturn nodes
+        whenever {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = nodeSourceType,
@@ -148,8 +147,8 @@ class NodeExplorerSharedViewModelTest {
     @Test
     fun `test that onSearchQuery sets searchLoadingState to Loading for a new query`() = runTest {
         whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
-        wheneverBlocking { searchUseCase(any(), any(), any()) } doReturn emptyList()
-        wheneverBlocking {
+        whenever { searchUseCase(any(), any(), any()) } doReturn emptyList()
+        whenever {
             nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
         } doReturn emptyList()
         initViewModel()
@@ -162,7 +161,7 @@ class NodeExplorerSharedViewModelTest {
 
         // A new query flips it back to Loading while the (suspended) search runs.
         val gate = CompletableDeferred<List<TypedNode>>()
-        wheneverBlocking { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
+        whenever { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
         viewModel.onSearchQuery("second")
 
         assertThat(viewModel.nodeExplorerSharedUiState.value.searchLoadingState)
@@ -172,10 +171,71 @@ class NodeExplorerSharedViewModelTest {
     }
 
     @Test
+    fun `test that search records searchedQuery once the results settle`() = runTest {
+        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
+        whenever { searchUseCase(any(), any(), any()) } doReturn emptyList()
+        whenever {
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+        } doReturn emptyList()
+        initViewModel()
+
+        viewModel.onSearchQuery("doc")
+        advanceUntilIdle()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.searchedQuery).isEqualTo("doc")
+    }
+
+    @Test
+    fun `test that searchedQuery still trails the query while the search is running`() = runTest {
+        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
+        whenever { searchUseCase(any(), any(), any()) } doReturn emptyList()
+        whenever {
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+        } doReturn emptyList()
+        initViewModel()
+
+        viewModel.onSearchQuery("first")
+        advanceUntilIdle()
+
+        val gate = CompletableDeferred<List<TypedNode>>()
+        whenever { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
+        viewModel.onSearchQuery("second")
+
+        // The in-flight query has not produced results yet, so searchedQuery still points at "first".
+        assertThat(viewModel.nodeExplorerSharedUiState.value.searchedQuery).isEqualTo("first")
+
+        gate.complete(emptyList())
+    }
+
+    @Test
+    fun `test that onSearchQuery keeps results without Loading when re-issuing the current query`() =
+        runTest {
+            whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
+            whenever { searchUseCase(any(), any(), any()) } doReturn emptyList()
+            whenever {
+                nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+            } doReturn emptyList()
+            initViewModel()
+
+            viewModel.onSearchQuery("doc")
+            advanceUntilIdle()
+
+            // Re-issuing the already-searched query must not blink back to Loading.
+            val gate = CompletableDeferred<List<TypedNode>>()
+            whenever { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
+            viewModel.onSearchQuery("doc")
+
+            assertThat(viewModel.nodeExplorerSharedUiState.value.searchLoadingState)
+                .isEqualTo(NodesLoadingState.FullyLoaded)
+
+            gate.complete(emptyList())
+        }
+
+    @Test
     fun `test that resolveSearchResultStack returns the path from the use case`() = runTest {
         val target = NodeId(5L)
         val path = listOf(NodeId(1L), NodeId(3L), target)
-        wheneverBlocking { getNodeNavigationStackUseCase(target) } doReturn
+        whenever { getNodeNavigationStackUseCase(target) } doReturn
                 NodeNavigationStack(stack = path, isUnderRootNode = true)
 
         assertThat(viewModel.resolveSearchResultStack(target)).isEqualTo(path)
@@ -185,7 +245,7 @@ class NodeExplorerSharedViewModelTest {
     fun `test that resolveSearchResultStack falls back to the node id when the path is empty`() =
         runTest {
             val target = NodeId(5L)
-            wheneverBlocking { getNodeNavigationStackUseCase(target) } doReturn NodeNavigationStack()
+            whenever { getNodeNavigationStackUseCase(target) } doReturn NodeNavigationStack()
 
             assertThat(viewModel.resolveSearchResultStack(target)).containsExactly(target)
         }
@@ -194,7 +254,7 @@ class NodeExplorerSharedViewModelTest {
     fun `test that resolveSearchResultStack falls back to the node id when the use case throws`() =
         runTest {
             val target = NodeId(5L)
-            wheneverBlocking { getNodeNavigationStackUseCase(target) } doAnswer {
+            whenever { getNodeNavigationStackUseCase(target) } doAnswer {
                 throw RuntimeException("boom")
             }
 

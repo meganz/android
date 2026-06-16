@@ -32,10 +32,13 @@ internal fun FavouritesExplorerSearchContent(
             factory.create(FavouritesExplorerViewModel.Args(showFiles = !isFolderPicker))
         }
     val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
-    LaunchedEffect(debouncedQuery) { viewModel.onSearchQuery(debouncedQuery) }
+
+    LaunchedEffect(debouncedQuery, query) {
+        if (debouncedQuery == query) viewModel.onSearchQuery(debouncedQuery)
+    }
 
     FavouritesExplorerContent(
-        uiStateShared = uiStateShared.asSearchState(),
+        uiStateShared = uiStateShared.asSearchState(query),
         isFolderPicker = isFolderPicker,
         onNavigateBack = {},
         consumeNavigateBack = {},
