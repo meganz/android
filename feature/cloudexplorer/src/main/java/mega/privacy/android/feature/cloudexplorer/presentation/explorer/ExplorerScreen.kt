@@ -123,6 +123,11 @@ internal fun ExplorerScreen(
         isInnerNavigation || selectedTabIndex == CLOUD_TAB_INDEX -> uiStateShared.items.isNotEmpty()
         else -> tabHasContent[selectedTabIndex] == true
     }
+    val hasSelection = when {
+        !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
+        selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
+        else -> false
+    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -190,7 +195,7 @@ internal fun ExplorerScreen(
             }
         },
         bottomBar = {
-            if (!isProcessingAction && !showSearch) {
+            if (!isProcessingAction && (!showSearch || hasSelection)) {
                 InlineAnchoredButtonGroup(
                     modifier = Modifier.testTag(ACTION_BUTTONS_VIEW_TAG),
                     primaryButtonText = stringResource(explorerMode.actionStringId),
