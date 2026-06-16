@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,7 +23,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldState
@@ -459,54 +462,64 @@ private fun CollapsingTopBar(
     onBack: () -> Unit,
     onOpenNodeOptions: (() -> Unit)?,
 ) {
-    Layout(
-        content = {
-            Box(
-                modifier = Modifier.onGloballyPositioned { coordinates ->
-                    scrollBarState.topBarHeightPx = coordinates.size.height.toFloat()
-                },
-            ) {
-                val onTitleClick: () -> Unit = remember(scope, lazyListState, scrollBarState) {
-                    {
-                        scope.launch {
-                            lazyListState.animateScrollToItem(0)
-                            scrollBarState.topBarOffsetPx = 0f
+    Column {
+        // Reserve the status-bar height permanently via a window-insets modifier so the content and
+        // the fast-scroll thumb never slide under the system status bar when the toolbar collapses
+        // (AND-23898 / AND-23897). consumeWindowInsets below stops MegaTopAppBar from re-applying the
+        // same top inset, letting the collapsing toolbar shrink all the way to zero behind this spacer.
+        // No background needed: MegaScaffold already paints pageBackground behind the top bar.
+        Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
+        Layout(
+            content = {
+                Box(
+                    modifier = Modifier.onGloballyPositioned { coordinates ->
+                        scrollBarState.topBarHeightPx = coordinates.size.height.toFloat()
+                    },
+                ) {
+                    val onTitleClick: () -> Unit = remember(scope, lazyListState, scrollBarState) {
+                        {
+                            scope.launch {
+                                lazyListState.animateScrollToItem(0)
+                                scrollBarState.topBarOffsetPx = 0f
+                            }
+                            Unit
                         }
-                        Unit
+                    }
+                    val onClose = remember(viewModel) {
+                        { viewModel.handleClose() }
+                    }
+                    val onSaveToolbar = remember(viewModel) {
+                        { viewModel.saveFile() }
+                    }
+                    when (mode) {
+                        TextEditorMode.Edit, TextEditorMode.Create -> TextEditorEditModeTopAppBar(
+                            title = fileName,
+                            onClose = onClose,
+                            onSave = onSaveToolbar,
+                            onMenuAction = viewModel::onMenuAction,
+                            onTitleClick = onTitleClick,
+                        )
+
+                        else -> TextEditorViewModeTopAppBar(
+                            title = fileName,
+                            onBack = viewModel::handleClose,
+                            onMenuAction = viewModel::onMenuAction,
+                            onOpenNodeOptions = onOpenNodeOptions,
+                            onTitleClick = onTitleClick,
+                        )
                     }
                 }
-                val onClose = remember(viewModel) {
-                    { viewModel.handleClose() }
-                }
-                val onSaveToolbar = remember(viewModel) {
-                    { viewModel.saveFile() }
-                }
-                when (mode) {
-                    TextEditorMode.Edit, TextEditorMode.Create -> TextEditorEditModeTopAppBar(
-                        title = fileName,
-                        onClose = onClose,
-                        onSave = onSaveToolbar,
-                        onMenuAction = viewModel::onMenuAction,
-                        onTitleClick = onTitleClick,
-                    )
-
-                    else -> TextEditorViewModeTopAppBar(
-                        title = fileName,
-                        onBack = viewModel::handleClose,
-                        onMenuAction = viewModel::onMenuAction,
-                        onOpenNodeOptions = onOpenNodeOptions,
-                        onTitleClick = onTitleClick,
-                    )
-                }
+            },
+            modifier = Modifier
+                .clipToBounds()
+                .consumeWindowInsets(WindowInsets.statusBars),
+        ) { measurables, constraints ->
+            val placeable = measurables[0].measure(constraints.copy(minHeight = 0))
+            val visibleHeight =
+                (placeable.height + scrollBarState.topBarOffsetPx.toInt()).coerceAtLeast(0)
+            layout(constraints.maxWidth, visibleHeight) {
+                placeable.placeRelative(0, scrollBarState.topBarOffsetPx.toInt())
             }
-        },
-        modifier = Modifier.clipToBounds(),
-    ) { measurables, constraints ->
-        val placeable = measurables[0].measure(constraints.copy(minHeight = 0))
-        val visibleHeight =
-            (placeable.height + scrollBarState.topBarOffsetPx.toInt()).coerceAtLeast(0)
-        layout(constraints.maxWidth, visibleHeight) {
-            placeable.placeRelative(0, scrollBarState.topBarOffsetPx.toInt())
         }
     }
 }
