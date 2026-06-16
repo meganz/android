@@ -44,7 +44,6 @@ interface DatabaseHandler {
      * @param askSetDownloadLocation true if should ask, false otherwise.
      */
     var askSetDownloadLocation: Boolean
-    val useHttpsOnly: String?
 
     /**
      * Flag to determine whether user should be shown a copyright page
@@ -71,8 +70,6 @@ interface DatabaseHandler {
      * @param transferQueueStatus True if the queue is paused, false otherwise.
      */
     var transferQueueStatus: Boolean
-    val showNotifOff: String?
-    val autoPlayEnabled: String?
     var sdCardUri: String?
 
     /**
@@ -94,7 +91,6 @@ interface DatabaseHandler {
     fun setPreferredSortCloud(order: String?)
     fun setPreferredSortCameraUpload(order: String?)
     fun setPreferredSortOthers(order: String?)
-    fun setLastCloudFolder(folderHandle: String)
     fun setAccountDetailsTimeStamp()
     fun resetAccountDetailsTimeStamp()
     fun setExtendedAccountDetailsTimestamp()
@@ -102,9 +98,7 @@ interface DatabaseHandler {
     fun setStorageAskAlways(storageAskAlways: Boolean)
     fun setStorageDownloadLocation(storageDownloadLocation: String?)
     fun setAttrAskSizeDownload(askSizeDownload: String?)
-    fun setUseHttpsOnly(useHttpsOnly: Boolean)
     fun setShowCopyright(showCopyright: Boolean)
-    fun setShowNotifOff(showNotifOff: Boolean)
     fun setLastPublicHandle(handle: Long)
     fun setLastPublicHandleTimeStamp(lastPublicHandleTimeStamp: Long)
     fun setLastPublicHandleTimeStamp()

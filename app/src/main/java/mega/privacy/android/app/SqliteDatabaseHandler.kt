@@ -872,31 +872,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setLastCloudFolder(folderHandle: String) {
-        val selectQuery = "SELECT * FROM $TABLE_PREFERENCES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_PREFERENCES SET $KEY_LAST_CLOUD_FOLDER_HANDLE= '${
-                            encrypt(folderHandle)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                    Timber.d(
-                        "KEY_LAST_CLOUD_FOLDER_HANDLE UPLOAD FOLDER: %s",
-                        UPDATE_PREFERENCES_TABLE
-                    )
-                } else {
-                    values.put(KEY_LAST_CLOUD_FOLDER_HANDLE, encrypt(folderHandle))
-                    writableDatabase.insert(TABLE_PREFERENCES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
     override fun setAccountDetailsTimeStamp() {
         setAccountDetailsTimeStamp(System.currentTimeMillis() / 1000)
     }
@@ -1182,42 +1157,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun setUseHttpsOnly(useHttpsOnly: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTES_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_USE_HTTPS_ONLY='${encrypt(useHttpsOnly.toString())}' WHERE $KEY_ID ='1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
-                    Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
-                } else {
-                    values.put(KEY_USE_HTTPS_ONLY, encrypt(useHttpsOnly.toString()))
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override val useHttpsOnly: String?
-        get() {
-            val selectQuery =
-                "SELECT $KEY_USE_HTTPS_ONLY FROM $TABLE_ATTRIBUTES WHERE $KEY_ID = '1'"
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        return decrypt(cursor.getString(0))
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return "false"
-        }
-
     override fun setShowCopyright(showCopyright: Boolean) {
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
@@ -1252,25 +1191,6 @@ class SqliteDatabaseHandler @Inject constructor(
             }
             return true
         }
-
-    override fun setShowNotifOff(showNotifOff: Boolean) {
-        val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_ATTRIBUTES_TABLE =
-                        "UPDATE $TABLE_ATTRIBUTES SET $KEY_SHOW_NOTIF_OFF='${encrypt(showNotifOff.toString())}' WHERE $KEY_ID ='1'"
-                    writableDatabase.execSQL(UPDATE_ATTRIBUTES_TABLE)
-                } else {
-                    values.put(KEY_SHOW_NOTIF_OFF, encrypt(showNotifOff.toString()))
-                    writableDatabase.insert(TABLE_ATTRIBUTES, SQLiteDatabase.CONFLICT_NONE, values)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
 
     override fun setLastPublicHandle(handle: Long) {
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
@@ -1391,22 +1311,6 @@ class SqliteDatabaseHandler @Inject constructor(
             )
         }
 
-    override val showNotifOff: String?
-        get() {
-            val selectQuery =
-                "SELECT $KEY_SHOW_NOTIF_OFF FROM $TABLE_ATTRIBUTES WHERE $KEY_ID = '1'"
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        return decrypt(cursor.getString(0))
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return "true"
-        }
-
     override fun setInvalidateSdkCache(invalidateSdkCache: Boolean) {
         val selectQuery = "SELECT * FROM $TABLE_ATTRIBUTES"
         val values = ContentValues()
@@ -1494,21 +1398,6 @@ class SqliteDatabaseHandler @Inject constructor(
         legacyDatabaseMigration.onCreate(writableDatabase)
     }
 
-    override val autoPlayEnabled: String?
-        get() {
-            val selectQuery =
-                "SELECT $KEY_AUTO_PLAY FROM $TABLE_PREFERENCES WHERE $KEY_ID = '1'"
-            try {
-                readableDatabase.query(selectQuery).use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        return decrypt(cursor.getString(0))
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return "false"
-        }
     override var sdCardUri: String?
         get() = getStringValue(TABLE_PREFERENCES, KEY_SD_CARD_URI, "")
         set(sdCardUri) {
