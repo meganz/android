@@ -77,7 +77,6 @@ import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
 import okhttp3.OkHttpClient
-import org.webrtc.ContextUtils
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -304,7 +303,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         }
 
         myAccountInfo.resetDefaults()
-        ContextUtils.initialize(applicationContext)
 
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
 
