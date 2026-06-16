@@ -1,5 +1,5 @@
 ---
-name: summry_release_testrail
+name: summary_release_testrail
 description: >
   Summarise a release's Failed / Feedback TestRail cases and post the standard
   "Android team" notice to Slack. Takes a version (e.g. v16.8), finds the matching
@@ -8,8 +8,8 @@ description: >
   and TestRail links, then sends the message to a given #channel or thread reply.
   If no Failed/Feedback cases are found, it sends nothing.
 triggers:
-  - /summry_release_testrail
-  - summry release testrail
+  - /summary_release_testrail
+  - summary release testrail
   - summarise release testrail
   - release testrail slack notice
 ---
@@ -19,9 +19,9 @@ triggers:
 Generates and posts the standard release-quality notice, e.g.:
 
 ```
-/summry_release_testrail v16.8                       (posts to #android-dev-team, the default)
-/summry_release_testrail v16.8 → #some-other-channel  (override the channel)
-/summry_release_testrail v16.8 → reply to <thread permalink>
+/summary_release_testrail v16.8                       (posts to #android-dev-team, the default)
+/summary_release_testrail v16.8 → #some-other-channel  (override the channel)
+/summary_release_testrail v16.8 → reply to <thread permalink>
 ```
 
 The message format is fixed (see **Step 6**). The skill does everything:
@@ -242,8 +242,10 @@ so the user can decide whether to fix the mention before posting.
 - **To a thread reply:** parse the channel ID and the parent `message_ts` from
   the permalink (`.../archives/<channel_id>/p<ts>` → insert a dot 6 digits from
   the end of `<ts>`), then `slack_send_message(channel_id, message,
-  thread_ts=<parent_ts>)`. Add `reply_broadcast=true` only if the user asks to
-  also send it to the channel.
+  thread_ts=<parent_ts>, reply_broadcast=true)`. **`reply_broadcast=true` is the
+  default for thread replies** — it ticks Slack's "Also send to #channel" box so
+  the notice is visible in the channel as well as the thread. Only drop it if the
+  user explicitly asks to keep the reply inside the thread.
 
 Return the resulting message link to the user.
 
