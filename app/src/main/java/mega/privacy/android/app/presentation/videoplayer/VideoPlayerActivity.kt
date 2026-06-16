@@ -58,6 +58,7 @@ import mega.privacy.android.app.presentation.videoplayer.navigation.videoPlayerE
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getRequest
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -121,6 +122,7 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                                 INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID,
                                 -1L
                             ) else null,
+                        serializedData = intent.getStringExtra(EXTRA_SERIALIZE_STRING)
                     )
                 )
             }
@@ -197,10 +199,12 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
             val snackbarEventsState by snackbarEventsViewModel.snackbarEventState
                 .collectAsStateWithLifecycle()
 
+            val isFromLinkWithoutLogin = uiState.isFromLink && !uiState.isLoggedIn
             LegacyActivityScaffold(
                 container = { content ->
                     MegaAppContainer(
                         themeMode = mode,
+                        isSessionRequired = !isFromLinkWithoutLogin,
                         finishOnSessionRefresh = false,
                         content = content,
                     )

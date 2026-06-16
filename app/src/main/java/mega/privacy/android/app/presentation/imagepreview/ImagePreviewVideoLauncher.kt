@@ -81,7 +81,8 @@ class ImagePreviewVideoLauncher @Inject constructor(
                     viewType = viewType,
                     isMediaQueueAvailable = isMediaQueueAvailable,
                     collectionTitle = albumTitle,
-                    collectionId = albumId
+                    collectionId = albumId,
+                    serializedData = typedFileNode.serializedData
                 )
             }
         }.onFailure { Timber.e(it) }

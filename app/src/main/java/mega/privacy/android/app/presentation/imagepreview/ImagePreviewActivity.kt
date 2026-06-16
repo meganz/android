@@ -205,11 +205,14 @@ class ImagePreviewActivity : BaseActivity() {
         Analytics.tracker.trackEvent(PhotoPreviewScreenEvent)
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.state.collectAsStateWithLifecycle()
+            val isFromLinkWithoutLogin = uiState.isFromLink && !uiState.isLoggedIn
             // Host a nav3 scaffold so the viewer can navigate to other destinations (e.g. the video editor)
             LegacyActivityScaffold(
                 container = { content ->
                     SharedAppContainer(
                         themeMode = themeMode,
+                        isSessionRequired = !isFromLinkWithoutLogin,
                         useLegacyStatusBarColor = false,
                         finishOnSessionRefresh = false,
                         content = content,

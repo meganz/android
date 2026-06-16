@@ -68,6 +68,7 @@ import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.imagepreview.IsEditableImageUseCase
 import mega.privacy.android.domain.usecase.imagepreview.IsEditableVideoUseCase
+import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
@@ -127,6 +128,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val isEditableImageUseCase: IsEditableImageUseCase,
     private val isEditableVideoUseCase: IsEditableVideoUseCase,
     private val largeBundleHolder: LargeBundleHolder,
+    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -160,6 +162,17 @@ class ImagePreviewViewModel @Inject constructor(
         viewModelScope.launch {
             handleInitFlow()
             monitorOfflineNodeUpdates()
+        }
+        loadLinkAndLoginState()
+    }
+
+    private fun loadLinkAndLoginState() {
+        viewModelScope.launch {
+            val isFromLink = imagePreviewFetcherSource == ImagePreviewFetcherSource.FILE_LINK
+                    || imagePreviewFetcherSource == ImagePreviewFetcherSource.FOLDER_LINK
+                    || imagePreviewFetcherSource == ImagePreviewFetcherSource.ALBUM_SHARING
+            val isLoggedIn = runCatching { isUserLoggedInUseCase() }.getOrDefault(false)
+            _state.update { it.copy(isFromLink = isFromLink, isLoggedIn = isLoggedIn) }
         }
     }
 

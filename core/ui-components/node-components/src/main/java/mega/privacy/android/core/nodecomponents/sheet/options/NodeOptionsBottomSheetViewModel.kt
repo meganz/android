@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.file.GetFileByPathUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
@@ -81,11 +82,13 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
     private val getFileByPathUseCase: GetFileByPathUseCase,
     private val zipFileTypedNodeMapper: ZipFileTypedNodeMapper,
+    private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     @Assisted private val nodeId: Long,
     @Assisted private val nodeSourceType: NodeSourceType,
     @Assisted private val partiallyExpand: Boolean,
     @Assisted("publicLinkUrl") private val publicLinkUrl: String?,
     @Assisted("localFilePath") private val localFilePath: String?,
+    @Assisted("serializedData") private val serializedData: String?,
 ) : ViewModel() {
 
     private var offlineMonitorJob: Job? = null
@@ -190,7 +193,13 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
                 }
             }
 
-            NodeSourceType.FOLDER_LINK -> getPublicNodeByIdUseCase(nodeId)
+            NodeSourceType.FOLDER_LINK -> {
+                getPublicNodeByIdUseCase(nodeId) ?: run {
+                    Timber.d("getPublicNodeByIdUseCase returned null for nodeId=$nodeId, trying serializedData fallback")
+                    serializedData?.let { getPublicNodeFromSerializedDataUseCase(it) }
+                }
+            }
+
             else -> getNodeByIdUseCase(nodeId)
         }
     }.getOrNull()
@@ -291,6 +300,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             partiallyExpand: Boolean,
             @Assisted("publicLinkUrl") publicLinkUrl: String?,
             @Assisted("localFilePath") localFilePath: String?,
+            @Assisted("serializedData") serializedData: String?,
         ): NodeOptionsBottomSheetViewModel
     }
 }
