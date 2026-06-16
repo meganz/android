@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":shared:nodes"))
     implementation(project(":shared:search"))
     implementation(project(":shared:account"))
+    implementation(project(":shared:sync"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
