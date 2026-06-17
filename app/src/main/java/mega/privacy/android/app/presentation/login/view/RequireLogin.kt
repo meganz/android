@@ -87,7 +87,6 @@ import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.signin.external.ui.GoogleSignInButton
-import mega.privacy.android.feature.signin.external.ui.GoogleSignInButtonPlaceholder
 import mega.privacy.android.legacy.core.ui.controls.keyboard.keyboardAsState
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.shared.original.core.ui.model.KeyboardState
@@ -359,19 +358,11 @@ fun RequireLogin(
                 },
             )
 
-            // Google Sign-In section — gated by feature flag
+            // Google Sign-In section — gated by feature flag. No loading content, so the
+            // login screen renders nothing while the flag resolves instead of a shimmer
+            // placeholder that lingers (e.g. after logout). AND-23890.
             FeatureFlagGate(
                 feature = ApiFeatures.GoogleSignIn,
-                loading = {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OrDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    GoogleSignInButtonPlaceholder(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                    )
-                },
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
                 OrDivider(
