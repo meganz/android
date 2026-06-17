@@ -22,12 +22,12 @@ interface AccountPreferencesGateway {
     /**
      * Set last target path of copy
      */
-    suspend fun setLatestTargetPathCopyPreference(path: Long)
+    suspend fun setLatestTargetCopyPreference(path: Long)
 
     /**
      * Get last target path of copy
      */
-    fun getLatestTargetPathCopyPreference(): Flow<Long?>
+    fun getLatestTargetCopyPreference(): Flow<Long?>
 
     /**
      * Set timestamp of last target path of copy
@@ -42,12 +42,12 @@ interface AccountPreferencesGateway {
     /**
      * Set last target path of move
      */
-    suspend fun setLatestTargetPathMovePreference(path: Long)
+    suspend fun setLatestTargetMovePreference(path: Long)
 
     /**
      * Get last target path of move
      */
-    fun getLatestTargetPathMovePreference(): Flow<Long?>
+    fun getLatestTargetMovePreference(): Flow<Long?>
 
     /**
      * Set timestamp of last target path of move

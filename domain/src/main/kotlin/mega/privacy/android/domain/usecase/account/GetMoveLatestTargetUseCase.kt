@@ -5,9 +5,9 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import javax.inject.Inject
 
 /**
- * Get latest target path of copy
+ * Get latest target path of move
  */
-class GetCopyLatestTargetPathUseCase @Inject constructor(
+class GetMoveLatestTargetUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
 ) {
@@ -15,7 +15,7 @@ class GetCopyLatestTargetPathUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke(): Long? {
-        val path = accountRepository.getLatestTargetPathCopyPreference()
+        val path = accountRepository.getLatestTargetMovePreference()
         return path?.takeIf { !isNodeInRubbishOrDeletedUseCase(it) }
     }
 }

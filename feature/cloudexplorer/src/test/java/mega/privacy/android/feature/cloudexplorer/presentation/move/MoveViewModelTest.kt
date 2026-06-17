@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNavigationStack
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.picker.TargetNodePickerUiState
 import org.junit.jupiter.api.BeforeEach
@@ -31,14 +31,14 @@ internal class MoveViewModelTest {
     private lateinit var underTest: MoveViewModel
 
     private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
-    private val getMoveLatestTargetPathUseCase = mock<GetMoveLatestTargetPathUseCase>()
+    private val getMoveLatestTargetUseCase = mock<GetMoveLatestTargetUseCase>()
     private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
 
     @BeforeEach
     fun setUp() {
         reset(
             getRootNodeIdUseCase,
-            getMoveLatestTargetPathUseCase,
+            getMoveLatestTargetUseCase,
             getNodeNavigationStackUseCase,
         )
     }
@@ -46,7 +46,7 @@ internal class MoveViewModelTest {
     private fun initUnderTest() {
         underTest = MoveViewModel(
             getRootNodeIdUseCase = getRootNodeIdUseCase,
-            getMoveLatestTargetPathUseCase = getMoveLatestTargetPathUseCase,
+            getMoveLatestTargetUseCase = getMoveLatestTargetUseCase,
             getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
         )
     }
@@ -62,7 +62,7 @@ internal class MoveViewModelTest {
         runTest(testDispatcher) {
             val root = NodeId(1L)
             getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getMoveLatestTargetPathUseCase.stub { onBlocking { invoke() } doReturn null }
+            getMoveLatestTargetUseCase.stub { onBlocking { invoke() } doReturn null }
             initUnderTest()
 
             underTest.uiState.test {
@@ -76,7 +76,7 @@ internal class MoveViewModelTest {
     fun `test that uiState falls back to NodeId minus one when root use case returns null`() =
         runTest(testDispatcher) {
             getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn null }
-            getMoveLatestTargetPathUseCase.stub { onBlocking { invoke() } doReturn null }
+            getMoveLatestTargetUseCase.stub { onBlocking { invoke() } doReturn null }
             initUnderTest()
 
             underTest.uiState.test {
@@ -93,7 +93,7 @@ internal class MoveViewModelTest {
             val parent = NodeId(3L)
             val target = NodeId(4L)
             getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getMoveLatestTargetPathUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
+            getMoveLatestTargetUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
             getNodeNavigationStackUseCase.stub {
                 onBlocking { invoke(target) } doReturn NodeNavigationStack(
                     stack = listOf(parent, target),
@@ -116,7 +116,7 @@ internal class MoveViewModelTest {
             val shareRoot = NodeId(99L)
             val target = NodeId(4L)
             getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getMoveLatestTargetPathUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
+            getMoveLatestTargetUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
             getNodeNavigationStackUseCase.stub {
                 onBlocking { invoke(target) } doReturn NodeNavigationStack(
                     stack = listOf(shareRoot, target),
@@ -138,7 +138,7 @@ internal class MoveViewModelTest {
             val root = NodeId(1L)
             val target = NodeId(4L)
             getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getMoveLatestTargetPathUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
+            getMoveLatestTargetUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
             getNodeNavigationStackUseCase.stub { onBlocking { invoke(any()) } doReturn NodeNavigationStack() }
             initUnderTest()
 
@@ -152,7 +152,7 @@ internal class MoveViewModelTest {
         runTest(testDispatcher) {
             val root = NodeId(1L)
             getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getMoveLatestTargetPathUseCase.stub { onBlocking { invoke() } doReturn root.longValue }
+            getMoveLatestTargetUseCase.stub { onBlocking { invoke() } doReturn root.longValue }
             initUnderTest()
 
             underTest.uiState.test {
@@ -165,7 +165,7 @@ internal class MoveViewModelTest {
         runTest(testDispatcher) {
             val root = NodeId(1L)
             getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getMoveLatestTargetPathUseCase.stub {
+            getMoveLatestTargetUseCase.stub {
                 onBlocking { invoke() } doAnswer { throw RuntimeException("boom") }
             }
             initUnderTest()

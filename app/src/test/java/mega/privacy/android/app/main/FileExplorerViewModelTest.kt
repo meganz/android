@@ -31,8 +31,8 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetUseCase
+import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -67,8 +67,8 @@ internal class FileExplorerViewModelTest {
 
     private lateinit var underTest: FileExplorerViewModel
 
-    private val getCopyLatestTargetPathUseCase = mock<GetCopyLatestTargetPathUseCase>()
-    private val getMoveLatestTargetPathUseCase = mock<GetMoveLatestTargetPathUseCase>()
+    private val getCopyLatestTargetUseCase = mock<GetCopyLatestTargetUseCase>()
+    private val getMoveLatestTargetUseCase = mock<GetMoveLatestTargetUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val attachNodeUseCase = mock<AttachNodeUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
@@ -92,8 +92,8 @@ internal class FileExplorerViewModelTest {
         underTest = FileExplorerViewModel(
             ioDispatcher = testDispatcher,
             monitorStorageStateEventUseCase = mock(),
-            getCopyLatestTargetPathUseCase = getCopyLatestTargetPathUseCase,
-            getMoveLatestTargetPathUseCase = getMoveLatestTargetPathUseCase,
+            getCopyLatestTargetUseCase = getCopyLatestTargetUseCase,
+            getMoveLatestTargetUseCase = getMoveLatestTargetUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             attachNodeUseCase = attachNodeUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
@@ -115,8 +115,8 @@ internal class FileExplorerViewModelTest {
     fun resetMocks() {
         savedStateHandle = SavedStateHandle(mapOf())
         reset(
-            getCopyLatestTargetPathUseCase,
-            getMoveLatestTargetPathUseCase,
+            getCopyLatestTargetUseCase,
+            getMoveLatestTargetUseCase,
             getNodeAccessPermission,
             attachNodeUseCase,
             getNodeByIdUseCase,

@@ -1151,36 +1151,69 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that getLatestTargetPathCopyPreference is not invoked whenever latestTargetTimeStamp is over 60 minutes old`() =
+    fun `test that getLatestTargetCopyPreference is not invoked whenever latestTargetTimeStamp is over 60 minutes old`() =
         runTest {
             val latestTargetTimestamp = System.currentTimeMillis().minus(3700000)
             whenever(accountPreferencesGateway.getLatestTargetTimestampCopyPreference()).thenReturn(
                 flowOf(latestTargetTimestamp)
             )
-            underTest.getLatestTargetPathCopyPreference()
-            verify(accountPreferencesGateway, never()).getLatestTargetPathCopyPreference()
+            underTest.getLatestTargetCopyPreference()
+            verify(accountPreferencesGateway, never()).getLatestTargetCopyPreference()
         }
 
     @Test
-    fun `test that getLatestTargetPathCopyPreference is invoked whenever latestTargetTimeStamp is less than 60 minutes old`() =
+    fun `test that getLatestTargetCopyPreference is invoked whenever latestTargetTimeStamp is less than 60 minutes old`() =
         runTest {
             val latestTargetTimestamp = System.currentTimeMillis().minus(3500000)
             whenever(accountPreferencesGateway.getLatestTargetTimestampCopyPreference()).thenReturn(
                 flowOf(latestTargetTimestamp)
             )
-            whenever(accountPreferencesGateway.getLatestTargetPathCopyPreference()).thenReturn(
+            whenever(accountPreferencesGateway.getLatestTargetCopyPreference()).thenReturn(
                 flowOf(1234)
             )
-            underTest.getLatestTargetPathCopyPreference()
-            verify(accountPreferencesGateway).getLatestTargetPathCopyPreference()
+            underTest.getLatestTargetCopyPreference()
+            verify(accountPreferencesGateway).getLatestTargetCopyPreference()
         }
 
     @Test
-    fun `test that setLatestTargetPathCopyPreference is invoked when setLatestTargetPathPreference called`() =
+    fun `test that setLatestTargetCopyPreference is invoked when setLatestTargetPathPreference called`() =
         runTest {
             val handle = 1234L
-            underTest.setLatestTargetPathCopyPreference(handle)
-            verify(accountPreferencesGateway).setLatestTargetPathCopyPreference(handle)
+            underTest.setLatestTargetCopyPreference(handle)
+            verify(accountPreferencesGateway).setLatestTargetCopyPreference(handle)
+        }
+
+    @Test
+    fun `test that getLatestTargetMovePreference is not invoked whenever latestTargetTimeStamp is over 60 minutes old`() =
+        runTest {
+            val latestTargetTimestamp = System.currentTimeMillis().minus(3700000)
+            whenever(accountPreferencesGateway.getLatestTargetTimestampMovePreference()).thenReturn(
+                flowOf(latestTargetTimestamp)
+            )
+            underTest.getLatestTargetMovePreference()
+            verify(accountPreferencesGateway, never()).getLatestTargetMovePreference()
+        }
+
+    @Test
+    fun `test that getLatestTargetMovePreference is invoked whenever latestTargetTimeStamp is less than 60 minutes old`() =
+        runTest {
+            val latestTargetTimestamp = System.currentTimeMillis().minus(3500000)
+            whenever(accountPreferencesGateway.getLatestTargetTimestampMovePreference()).thenReturn(
+                flowOf(latestTargetTimestamp)
+            )
+            whenever(accountPreferencesGateway.getLatestTargetMovePreference()).thenReturn(
+                flowOf(1234)
+            )
+            underTest.getLatestTargetMovePreference()
+            verify(accountPreferencesGateway).getLatestTargetMovePreference()
+        }
+
+    @Test
+    fun `test that setLatestTargetMovePreference is invoked when setLatestTargetMovePreference called`() =
+        runTest {
+            val handle = 1234L
+            underTest.setLatestTargetMovePreference(handle)
+            verify(accountPreferencesGateway).setLatestTargetMovePreference(handle)
         }
 
     @Test

@@ -28,10 +28,10 @@ import javax.inject.Inject
 private const val ACCOUNT_PREFERENCE = "ACCOUNT_PREFERENCE"
 private const val accountPreferenceFileName = ACCOUNT_PREFERENCE
 private const val SHOW_2FA_DIALOG = "SHOW_2FA_DIALOG"
-private const val LATEST_TARGET_PATH_COPY = "LATEST_TARGET_PATH_COPY"
-private const val LATEST_TARGET_PATH_MOVE = "LATEST_TARGET_PATH_MOVE"
-private const val LATEST_TARGET_PATH_TIMESTAMP_COPY = "LATEST_TARGET_PATH_TIMESTAMP_COPY"
-private const val LATEST_TARGET_PATH_TIMESTAMP_MOVE = "LATEST_TARGET_PATH_TIMESTAMP_MOVE"
+private const val LATEST_TARGET_COPY = "LATEST_TARGET_PATH_COPY"
+private const val LATEST_TARGET_MOVE = "LATEST_TARGET_PATH_MOVE"
+private const val LATEST_TARGET_TIMESTAMP_COPY = "LATEST_TARGET_PATH_TIMESTAMP_COPY"
+private const val LATEST_TARGET_TIMESTAMP_MOVE = "LATEST_TARGET_PATH_TIMESTAMP_MOVE"
 private const val LAST_REGISTERED_EMAIL = "LAST_REGISTERED_EMAIL"
 
 private val Context.accountPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
@@ -53,12 +53,12 @@ class AccountPreferencesDataStore @Inject constructor(
 ) : AccountPreferencesGateway {
 
     private val show2FADialog = booleanPreferencesKey(SHOW_2FA_DIALOG)
-    private val latestTargetPathCopyPreferenceKey = longPreferencesKey(LATEST_TARGET_PATH_COPY)
-    private val latestTargetPathMovePreferenceKey = longPreferencesKey(LATEST_TARGET_PATH_MOVE)
-    private val latestTargetPathTimestampCopyPreferenceKey =
-        longPreferencesKey(LATEST_TARGET_PATH_TIMESTAMP_COPY)
-    private val latestTargetPathTimestampMovePreferenceKey =
-        longPreferencesKey(LATEST_TARGET_PATH_TIMESTAMP_MOVE)
+    private val latestTargetCopyPreferenceKey = longPreferencesKey(LATEST_TARGET_COPY)
+    private val latestTargetMovePreferenceKey = longPreferencesKey(LATEST_TARGET_MOVE)
+    private val latestTargetTimestampCopyPreferenceKey =
+        longPreferencesKey(LATEST_TARGET_TIMESTAMP_COPY)
+    private val latestTargetTimestampMovePreferenceKey =
+        longPreferencesKey(LATEST_TARGET_TIMESTAMP_MOVE)
     private val lastRegisteredEmailPreferenceKey =
         stringPreferencesKey(LAST_REGISTERED_EMAIL)
 
@@ -78,41 +78,41 @@ class AccountPreferencesDataStore @Inject constructor(
                 }
             }.map { it[show2FADialog] ?: false }
 
-    override suspend fun setLatestTargetPathCopyPreference(path: Long) {
+    override suspend fun setLatestTargetCopyPreference(path: Long) {
         context.accountPreferencesDataStore.edit {
-            it[latestTargetPathCopyPreferenceKey] = path
+            it[latestTargetCopyPreferenceKey] = path
         }
     }
 
-    override fun getLatestTargetPathCopyPreference(): Flow<Long?> =
-        context.accountPreferencesDataStore.monitor(latestTargetPathCopyPreferenceKey)
+    override fun getLatestTargetCopyPreference(): Flow<Long?> =
+        context.accountPreferencesDataStore.monitor(latestTargetCopyPreferenceKey)
 
     override suspend fun setLatestTargetTimestampCopyPreference(timestamp: Long) {
         context.accountPreferencesDataStore.edit {
-            it[latestTargetPathTimestampCopyPreferenceKey] = timestamp
+            it[latestTargetTimestampCopyPreferenceKey] = timestamp
         }
     }
 
     override fun getLatestTargetTimestampCopyPreference(): Flow<Long?> =
-        context.accountPreferencesDataStore.monitor(latestTargetPathTimestampCopyPreferenceKey)
+        context.accountPreferencesDataStore.monitor(latestTargetTimestampCopyPreferenceKey)
 
-    override suspend fun setLatestTargetPathMovePreference(path: Long) {
+    override suspend fun setLatestTargetMovePreference(path: Long) {
         context.accountPreferencesDataStore.edit {
-            it[latestTargetPathMovePreferenceKey] = path
+            it[latestTargetMovePreferenceKey] = path
         }
     }
 
-    override fun getLatestTargetPathMovePreference(): Flow<Long?> =
-        context.accountPreferencesDataStore.monitor(latestTargetPathMovePreferenceKey)
+    override fun getLatestTargetMovePreference(): Flow<Long?> =
+        context.accountPreferencesDataStore.monitor(latestTargetMovePreferenceKey)
 
     override suspend fun setLatestTargetTimestampMovePreference(timestamp: Long) {
         context.accountPreferencesDataStore.edit {
-            it[latestTargetPathTimestampMovePreferenceKey] = timestamp
+            it[latestTargetTimestampMovePreferenceKey] = timestamp
         }
     }
 
     override fun getLatestTargetTimestampMovePreference(): Flow<Long?> =
-        context.accountPreferencesDataStore.monitor(latestTargetPathTimestampMovePreferenceKey)
+        context.accountPreferencesDataStore.monitor(latestTargetTimestampMovePreferenceKey)
 
     override suspend fun clearPreferences() {
         withContext(ioDispatcher) {

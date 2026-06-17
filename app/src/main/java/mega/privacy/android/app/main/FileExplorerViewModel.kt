@@ -43,8 +43,8 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetUseCase
+import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
@@ -70,8 +70,8 @@ import javax.inject.Inject
 class FileExplorerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val getCopyLatestTargetPathUseCase: GetCopyLatestTargetPathUseCase,
-    private val getMoveLatestTargetPathUseCase: GetMoveLatestTargetPathUseCase,
+    private val getCopyLatestTargetUseCase: GetCopyLatestTargetUseCase,
+    private val getMoveLatestTargetUseCase: GetMoveLatestTargetUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val attachNodeUseCase: AttachNodeUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
@@ -530,7 +530,7 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun getCopyTargetPath() {
         viewModelScope.launch {
-            latestCopyTargetPath = runCatching { getCopyLatestTargetPathUseCase() }.getOrNull()
+            latestCopyTargetPath = runCatching { getCopyLatestTargetUseCase() }.getOrNull()
             latestCopyTargetPath?.let {
                 val accessPermission =
                     runCatching { getNodeAccessPermission(NodeId(it)) }.getOrNull()
@@ -549,7 +549,7 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun getMoveTargetPath() {
         viewModelScope.launch {
-            latestMoveTargetPath = runCatching { getMoveLatestTargetPathUseCase() }.getOrNull()
+            latestMoveTargetPath = runCatching { getMoveLatestTargetUseCase() }.getOrNull()
             latestMoveTargetPath?.let {
                 val accessPermission =
                     runCatching { getNodeAccessPermission(NodeId(it)) }.getOrNull()

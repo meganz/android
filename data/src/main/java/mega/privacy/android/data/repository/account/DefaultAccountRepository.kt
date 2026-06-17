@@ -10,10 +10,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -916,35 +916,35 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun setLatestTargetPathCopyPreference(path: Long) = withContext(ioDispatcher) {
-        accountPreferencesGateway.setLatestTargetPathCopyPreference(path)
+    override suspend fun setLatestTargetCopyPreference(path: Long) = withContext(ioDispatcher) {
+        accountPreferencesGateway.setLatestTargetCopyPreference(path)
         accountPreferencesGateway.setLatestTargetTimestampCopyPreference(System.currentTimeMillis())
     }
 
-    override suspend fun getLatestTargetPathCopyPreference(): Long? {
+    override suspend fun getLatestTargetCopyPreference(): Long? {
         val timestamp =
             accountPreferencesGateway.getLatestTargetTimestampCopyPreference().firstOrNull()
         return timestamp?.let {
-            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_PATH_VALID_DURATION)
+            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_VALID_DURATION)
                 null
             else
-                accountPreferencesGateway.getLatestTargetPathCopyPreference().firstOrNull()
+                accountPreferencesGateway.getLatestTargetCopyPreference().firstOrNull()
         }
     }
 
-    override suspend fun setLatestTargetPathMovePreference(path: Long) {
-        accountPreferencesGateway.setLatestTargetPathMovePreference(path)
+    override suspend fun setLatestTargetMovePreference(path: Long) {
+        accountPreferencesGateway.setLatestTargetMovePreference(path)
         accountPreferencesGateway.setLatestTargetTimestampMovePreference(System.currentTimeMillis())
     }
 
-    override suspend fun getLatestTargetPathMovePreference(): Long? {
+    override suspend fun getLatestTargetMovePreference(): Long? {
         val timestamp =
             accountPreferencesGateway.getLatestTargetTimestampMovePreference().firstOrNull()
         return timestamp?.let {
-            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_PATH_VALID_DURATION)
+            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_VALID_DURATION)
                 null
             else
-                accountPreferencesGateway.getLatestTargetPathMovePreference().firstOrNull()
+                accountPreferencesGateway.getLatestTargetMovePreference().firstOrNull()
         }
     }
 
@@ -1596,6 +1596,6 @@ internal class DefaultAccountRepository @Inject constructor(
             "settings_audio_background_play_enabled"
         private const val KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled"
         private const val KEY_AUDIO_REPEAT_MODE = "settings_audio_repeat_mode"
-        private const val LATEST_TARGET_PATH_VALID_DURATION = 60
+        private const val LATEST_TARGET_VALID_DURATION = 60
     }
 }

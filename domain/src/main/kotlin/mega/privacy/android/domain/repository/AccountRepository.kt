@@ -392,22 +392,22 @@ interface AccountRepository {
     /**
      * Set last target path of copy
      */
-    suspend fun setLatestTargetPathCopyPreference(path: Long)
+    suspend fun setLatestTargetCopyPreference(path: Long)
 
     /**
      * Get last target path of copy
      */
-    suspend fun getLatestTargetPathCopyPreference(): Long?
+    suspend fun getLatestTargetCopyPreference(): Long?
 
     /**
      * Set last target path of move
      */
-    suspend fun setLatestTargetPathMovePreference(path: Long)
+    suspend fun setLatestTargetMovePreference(path: Long)
 
     /**
      * Get last target path of move
      */
-    suspend fun getLatestTargetPathMovePreference(): Long?
+    suspend fun getLatestTargetMovePreference(): Long?
 
     /**
      *  Notify the user has successfully skipped the password check
