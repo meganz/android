@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -36,13 +35,14 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_TAG
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolder
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.rememberVisibleItems
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.search.IncomingSharesExplorerSearchContent
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
-import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewIncomingShareFolderNodeUiItem
@@ -71,13 +71,7 @@ internal fun IncomingSharesExplorerContent(
         onConsumed = consumeNavigateBack,
     ) { onNavigateBack() }
 
-    val visibleItems = remember(showHiddenNodes, items) {
-        return@remember if (showHiddenNodes || !isHiddenNodesEnabled) {
-            items
-        } else {
-            items.filterNot { it.isSensitive }
-        }
-    }
+    val visibleItems = rememberVisibleItems()
 
     val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
         when {
@@ -166,19 +160,14 @@ internal fun TabsScope.IncomingExplorerTab(
     LaunchedEffect(uiStateShared.items.isEmpty()) {
         onHasContentChanged(uiStateShared.items.isNotEmpty())
     }
-    val onFolderClick: (NodeId) -> Unit = { nodeId ->
-        protectedUserTap {
-            onNavigate(
-                NodesExplorerNavKey(
-                    nodeId = nodeId,
-                    nodeSourceType = uiStateShared.nodeSourceType,
-                    explorerMode = explorerMode,
-                    startNavKey = startNavKey,
-                    shareUris = shareUris,
-                )
-            )
-        }
-    }
+    val onFolderClick = navigateToFolder(
+        nodeSourceType = uiStateShared.nodeSourceType,
+        explorerMode = explorerMode,
+        startNavKey = startNavKey,
+        shareUris = shareUris,
+        protectedUserTap = protectedUserTap,
+        onNavigate = onNavigate,
+    )
     addTextTabWithScrollableContent(
         tabItem = TabItems(
             title = stringResource(sharedR.string.general_title_incoming_shares),

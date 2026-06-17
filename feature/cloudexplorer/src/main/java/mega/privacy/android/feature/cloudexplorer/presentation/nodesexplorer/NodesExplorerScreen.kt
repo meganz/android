@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -24,18 +23,18 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
-import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
+import mega.privacy.android.feature.cloudexplorer.presentation.components.ExplorerNodeGridItem
+import mega.privacy.android.feature.cloudexplorer.presentation.components.ExplorerNodeListItem
+import mega.privacy.android.feature.cloudexplorer.presentation.components.explorerNodeClick
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.rememberVisibleItems
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.DiscardScanWarningDialogNavKey
@@ -49,8 +48,6 @@ import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeU
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.SelectableNodeItem
-import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -203,86 +200,41 @@ internal fun NodesExplorerScreenContent(
         onConsumed = consumeNavigateBack,
     ) { onNavigateBack() }
 
-    val visibleItems = remember(showHiddenNodes, items.hashCode()) {
-        return@remember if (showHiddenNodes || !isHiddenNodesEnabled) {
-            items
-        } else {
-            items.filterNot { it.isSensitive }
-        }
-    }
-
-    val nodeUiItems = remember(visibleItems, selectionState.selectedNodeIds) {
-        visibleItems.map {
-            SelectableNodeItem(it, selectionState.selectedNodeIds.contains(it.id))
-        }
-    }
-
-    val onItemClicked: (SelectableNodeItem<TypedNode>) -> Unit = { item ->
-        when {
-            // Pre-added nodes are shown checked but disabled; ignore taps.
-            item.id in disabledNodeIds -> Unit
-
-            item.isFolderNode -> {
-                onFolderClick(item.id)
-                selectionState.deselectAll()
-            }
-
-            // Only videos can be added to a playlist; ignore taps on other files.
-            videosOnly && !item.isVideoNode -> Unit
-
-            isSelectionModeEnabled -> selectionState.toggleSelection(item.id)
-        }
-    }
+    val visibleItems = rememberVisibleItems()
+    val onItemClicked = explorerNodeClick(
+        selectionState = selectionState,
+        disabledNodeIds = disabledNodeIds,
+        videosOnly = videosOnly,
+        isSelectionModeEnabled = isSelectionModeEnabled,
+        onFolderClick = onFolderClick,
+    )
     NodeViewWithHeader(
-        items = nodeUiItems,
+        items = visibleItems,
         nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         nodesLoadingState = nodesLoadingState,
         emptyView = emptyView,
         itemListView = {
-            val isAlreadyAdded = it.id in disabledNodeIds
-            val isUnsupportedFile = videosOnly && !it.isFolderNode && !it.isVideoNode
-            val isDisabled = isAlreadyAdded || isUnsupportedFile
-            CloudExplorerListViewItem(
-                title = it.title.text,
-                subtitle = it.subtitle.text(),
-                icon = it.iconRes,
-                description = it.formattedDescription?.text,
-                tags = it.tags,
-                thumbnailData = it.thumbnailData,
-                isSelected = it.isSelected || isAlreadyAdded,
-                isInSelectionMode = isSelectionModeEnabled && (it.node is FileNode),
-                showIsVerified = it.showIsVerified,
-                isTakenDown = it.isTakenDown,
-                label = it.nodeLabel,
+            ExplorerNodeListItem(
+                item = it,
+                isSelected = selectionState.selectedNodeIds.contains(it.id),
+                isSelectionModeEnabled = isSelectionModeEnabled,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
+                videosOnly = videosOnly,
+                disabledNodeIds = disabledNodeIds,
                 showLink = it.showLink,
-                isSensitive = it.isSensitive && isHiddenNodesEnabled,
-                showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
-                isHighlighted = it.isHighlighted,
                 onItemClicked = { onItemClicked(it) },
-                enabled = (it.isFolderNode || isSelectionModeEnabled) && !isDisabled,
             )
         },
         itemGridView = {
-            val isAlreadyAdded = it.id in disabledNodeIds
-            val isUnsupportedFile = videosOnly && !it.isFolderNode && !it.isVideoNode
-            val isDisabled = isAlreadyAdded || isUnsupportedFile
-            CloudExplorerGridViewItem(
-                name = it.title.text,
-                iconRes = it.iconRes,
-                thumbnailData = it.thumbnailData,
-                isTakenDown = it.isTakenDown,
-                duration = it.duration,
-                isSelected = it.isSelected || isAlreadyAdded,
-                isInSelectionMode = isSelectionModeEnabled && (it.node is FileNode),
-                isFolderNode = it.isFolderNode,
-                isVideoNode = it.isVideoNode,
-                onClick = { onItemClicked(it) },
-                isSensitive = it.isSensitive && isHiddenNodesEnabled,
-                showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
-                isHighlighted = it.isHighlighted,
+            ExplorerNodeGridItem(
+                item = it,
+                isSelected = selectionState.selectedNodeIds.contains(it.id),
+                isSelectionModeEnabled = isSelectionModeEnabled,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
+                videosOnly = videosOnly,
+                disabledNodeIds = disabledNodeIds,
                 showLink = it.showLink,
-                label = it.nodeLabel,
-                enabled = (it.isFolderNode || isSelectionModeEnabled) && !isDisabled,
+                onItemClicked = { onItemClicked(it) },
             )
         },
         onRefreshNodes = onRefreshNodes,

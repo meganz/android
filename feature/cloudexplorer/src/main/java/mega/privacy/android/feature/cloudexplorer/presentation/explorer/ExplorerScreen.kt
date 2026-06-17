@@ -40,6 +40,7 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerTab
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.rememberChatExplorerSelectionState
@@ -49,6 +50,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplore
 import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingExplorerTab
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreenContent
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.search.NodesExplorerSearchContent
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
@@ -57,6 +59,7 @@ import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.search.presentation.component.SearchTopAppBar
@@ -227,20 +230,15 @@ internal fun ExplorerScreen(
             }
         }
     ) { paddingValues ->
-        val onFolderClick: (NodeId) -> Unit = { nodeId ->
-            protectedUserTap {
-                onNavigate(
-                    NodesExplorerNavKey(
-                        nodeId = nodeId,
-                        nodeSourceType = uiStateShared.nodeSourceType,
-                        explorerMode = explorerMode,
-                        startNavKey = startNavKey,
-                        shareUris = shareUris,
-                        disabledNodeIds = disabledNodeIds.toList(),
-                    )
-                )
-            }
-        }
+        val onFolderClick: (NodeId) -> Unit = navigateToFolder(
+            nodeSourceType = uiStateShared.nodeSourceType,
+            explorerMode = explorerMode,
+            startNavKey = startNavKey,
+            shareUris = shareUris,
+            disabledNodeIds = disabledNodeIds.toList(),
+            protectedUserTap = protectedUserTap,
+            onNavigate = onNavigate,
+        )
 
         MegaCollapsibleTabRow(
             modifier = Modifier
@@ -385,6 +383,29 @@ internal fun ExplorerScreen(
     }
 }
 
+internal fun navigateToFolder(
+    nodeSourceType: NodeSourceType,
+    explorerMode: ExplorerMode,
+    startNavKey: ExplorerNavKey,
+    shareUris: List<UriPath>?,
+    disabledNodeIds: List<NodeId> = emptyList(),
+    protectedUserTap: (() -> Unit) -> Unit,
+    onNavigate: (NavKey) -> Unit,
+): (NodeId) -> Unit = { nodeId ->
+    protectedUserTap {
+        onNavigate(
+            NodesExplorerNavKey(
+                nodeId = nodeId,
+                nodeSourceType = nodeSourceType,
+                explorerMode = explorerMode,
+                startNavKey = startNavKey,
+                shareUris = shareUris,
+                disabledNodeIds = disabledNodeIds,
+            )
+        )
+    }
+}
+
 internal fun navigateToFolderPath(
     nodeSourceType: NodeSourceType,
     explorerMode: ExplorerMode,
@@ -393,22 +414,33 @@ internal fun navigateToFolderPath(
     disabledNodeIds: List<NodeId> = emptyList(),
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
-): (List<NodeId>) -> Unit = { nodeIds ->
-    protectedUserTap {
-        nodeIds.forEach { nodeId ->
-            onNavigate(
-                NodesExplorerNavKey(
-                    nodeId = nodeId,
-                    nodeSourceType = nodeSourceType,
-                    explorerMode = explorerMode,
-                    startNavKey = startNavKey,
-                    shareUris = shareUris,
-                    disabledNodeIds = disabledNodeIds,
-                )
-            )
+): (List<NodeId>) -> Unit {
+    val navigateToFolder = navigateToFolder(
+        nodeSourceType = nodeSourceType,
+        explorerMode = explorerMode,
+        startNavKey = startNavKey,
+        shareUris = shareUris,
+        disabledNodeIds = disabledNodeIds,
+        protectedUserTap = protectedUserTap,
+        onNavigate = onNavigate,
+    )
+    return { nodeIds -> nodeIds.forEach(navigateToFolder) }
+}
+
+/**
+ * The items to render after applying the hidden-nodes filter: sensitive nodes are dropped unless
+ * the user opted to show them or the hidden-nodes feature is off. Shared by every explorer source so
+ * the filtering rule stays in one place.
+ */
+@Composable
+internal fun NodesExplorerSharedUiState.rememberVisibleItems(): List<NodeViewItem<TypedNode>> =
+    remember(showHiddenNodes, items) {
+        if (showHiddenNodes || !isHiddenNodesEnabled) {
+            items
+        } else {
+            items.filterNot { it.isSensitive }
         }
     }
-}
 
 internal const val CLOUD_EXPLORER_VIEW_TAG = "cloud_explorer_view"
 internal const val ACTION_BUTTONS_VIEW_TAG = "$CLOUD_EXPLORER_VIEW_TAG:action_buttons"

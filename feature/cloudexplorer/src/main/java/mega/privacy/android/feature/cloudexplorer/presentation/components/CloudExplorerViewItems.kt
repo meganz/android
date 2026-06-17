@@ -7,9 +7,15 @@ import androidx.compose.ui.text.TextStyle
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.shared.nodes.components.NodeGridViewItem
 import mega.privacy.android.shared.nodes.components.NodeListViewItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
+import mega.privacy.android.shared.nodes.model.text
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 
 /**
  * Cloud explorer list row: forwards to [NodeListViewItem] with cloud explorer defaults
@@ -115,4 +121,107 @@ internal fun CloudExplorerGridViewItem(
         showLink = showLink,
         label = label,
     )
+}
+
+/**
+ * List row for a browsed node, shared by the cloud-drive and favourites sources. Pre-added nodes
+ * ([disabledNodeIds]) render checked-but-disabled, and in video-only mode non-video files are
+ * disabled. [showLink] is opted into per source.
+ */
+@Composable
+internal fun ExplorerNodeListItem(
+    item: NodeViewItem<TypedNode>,
+    isSelected: Boolean,
+    isSelectionModeEnabled: Boolean,
+    isHiddenNodesEnabled: Boolean,
+    videosOnly: Boolean,
+    disabledNodeIds: Set<NodeId>,
+    onItemClicked: () -> Unit,
+    showLink: Boolean = false,
+) {
+    val isAlreadyAdded = item.id in disabledNodeIds
+    val isUnsupportedFile = videosOnly && !item.isFolderNode && !item.isVideoNode
+    val isDisabled = isAlreadyAdded || isUnsupportedFile
+    CloudExplorerListViewItem(
+        title = item.title.text,
+        subtitle = item.subtitle.text(),
+        icon = item.iconRes,
+        description = item.formattedDescription?.text,
+        tags = item.tags,
+        thumbnailData = item.thumbnailData,
+        isSelected = isSelected || isAlreadyAdded,
+        isInSelectionMode = isSelectionModeEnabled && (item.node is FileNode),
+        showIsVerified = item.showIsVerified,
+        isTakenDown = item.isTakenDown,
+        label = item.nodeLabel,
+        showLink = showLink,
+        isSensitive = item.isSensitive && isHiddenNodesEnabled,
+        showBlurEffect = item.showBlurEffect && isHiddenNodesEnabled,
+        isHighlighted = item.isHighlighted,
+        onItemClicked = onItemClicked,
+        enabled = (item.isFolderNode || isSelectionModeEnabled) && !isDisabled,
+    )
+}
+
+/**
+ * Grid cell counterpart of [ExplorerNodeListItem].
+ */
+@Composable
+internal fun ExplorerNodeGridItem(
+    item: NodeViewItem<TypedNode>,
+    isSelected: Boolean,
+    isSelectionModeEnabled: Boolean,
+    isHiddenNodesEnabled: Boolean,
+    videosOnly: Boolean,
+    disabledNodeIds: Set<NodeId>,
+    onItemClicked: () -> Unit,
+    showLink: Boolean = false,
+) {
+    val isAlreadyAdded = item.id in disabledNodeIds
+    val isUnsupportedFile = videosOnly && !item.isFolderNode && !item.isVideoNode
+    val isDisabled = isAlreadyAdded || isUnsupportedFile
+    CloudExplorerGridViewItem(
+        name = item.title.text,
+        iconRes = item.iconRes,
+        thumbnailData = item.thumbnailData,
+        isTakenDown = item.isTakenDown,
+        duration = item.duration,
+        isSelected = isSelected || isAlreadyAdded,
+        isInSelectionMode = isSelectionModeEnabled && (item.node is FileNode),
+        isFolderNode = item.isFolderNode,
+        isVideoNode = item.isVideoNode,
+        onClick = onItemClicked,
+        isSensitive = item.isSensitive && isHiddenNodesEnabled,
+        showBlurEffect = item.showBlurEffect && isHiddenNodesEnabled,
+        isHighlighted = item.isHighlighted,
+        showLink = showLink,
+        label = item.nodeLabel,
+        enabled = (item.isFolderNode || isSelectionModeEnabled) && !isDisabled,
+    )
+}
+
+/**
+ * Tap handler shared by the cloud-drive and favourites lists: folders open (clearing any selection),
+ * pre-added nodes and unsupported (non-video, in video-only mode) files ignore taps, and files
+ * toggle selection when selection is enabled.
+ */
+internal fun explorerNodeClick(
+    selectionState: NodeSelectionState,
+    disabledNodeIds: Set<NodeId>,
+    videosOnly: Boolean,
+    isSelectionModeEnabled: Boolean,
+    onFolderClick: (NodeId) -> Unit,
+): (NodeViewItem<TypedNode>) -> Unit = { item ->
+    when {
+        item.id in disabledNodeIds -> Unit
+
+        item.isFolderNode -> {
+            onFolderClick(item.id)
+            selectionState.deselectAll()
+        }
+
+        videosOnly && !item.isVideoNode -> Unit
+
+        isSelectionModeEnabled -> selectionState.toggleSelection(item.id)
+    }
 }

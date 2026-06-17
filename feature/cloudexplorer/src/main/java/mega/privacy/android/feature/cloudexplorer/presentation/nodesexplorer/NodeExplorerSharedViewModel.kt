@@ -48,13 +48,13 @@ abstract class NodeExplorerSharedViewModel(
     private val args: Args,
 ) : ViewModel() {
 
-    private val _nodedExplorerSharedUiState = MutableStateFlow(NodesExplorerSharedUiState())
-    val nodeExplorerSharedUiState = _nodedExplorerSharedUiState.asStateFlow()
+    private val _nodeExplorerSharedUiState = MutableStateFlow(NodesExplorerSharedUiState())
+    val nodeExplorerSharedUiState = _nodeExplorerSharedUiState.asStateFlow()
 
     private val searchQuery = MutableStateFlow<String?>(null)
 
     init {
-        _nodedExplorerSharedUiState.update { state ->
+        _nodeExplorerSharedUiState.update { state ->
             state.copy(
                 currentFolderId = args.nodeId,
                 nodeSourceType = args.nodeSourceType
@@ -75,7 +75,7 @@ abstract class NodeExplorerSharedViewModel(
             }.catch { Timber.e(it) }
                 .collectLatest { change ->
                     if (change == NodeChanges.Remove) {
-                        _nodedExplorerSharedUiState.update { state -> state.copy(navigateBack = triggered) }
+                        _nodeExplorerSharedUiState.update { state -> state.copy(navigateBack = triggered) }
                     } else {
                         refreshNodes()
                     }
@@ -88,7 +88,7 @@ abstract class NodeExplorerSharedViewModel(
             monitorStorageStateUseCase().collectLatest { storageState ->
                 val isStorageOverQuota = storageState == StorageState.Red
                         || storageState == StorageState.PayWall
-                _nodedExplorerSharedUiState.update { state ->
+                _nodeExplorerSharedUiState.update { state ->
                     state.copy(isStorageOverQuota = isStorageOverQuota)
                 }
             }
@@ -103,7 +103,7 @@ abstract class NodeExplorerSharedViewModel(
                 monitorShowHiddenItemsUseCase()
                     .catch { Timber.e(it) },
             ) { isHiddenNodesEnabled, showHiddenItems ->
-                _nodedExplorerSharedUiState.update { state ->
+                _nodeExplorerSharedUiState.update { state ->
                     state.copy(
                         isHiddenNodeSettingsLoading = false,
                         isHiddenNodesEnabled = isHiddenNodesEnabled,
@@ -122,12 +122,12 @@ abstract class NodeExplorerSharedViewModel(
                 nodeList = nodes,
                 nodeSourceType = args.nodeSourceType,
                 highlightedNodeId = null,
-                isHiddenNodesEnabled = _nodedExplorerSharedUiState.value.isHiddenNodesEnabled,
+                isHiddenNodesEnabled = _nodeExplorerSharedUiState.value.isHiddenNodesEnabled,
                 highlightedNames = null,
                 isContactVerificationOn = contactVerificationEnabled(),
             )
 
-            _nodedExplorerSharedUiState.update { state ->
+            _nodeExplorerSharedUiState.update { state ->
                 state.copy(
                     items = nodeUiItems,
                     nodesLoadingState = nodesLoadingState,
@@ -145,8 +145,8 @@ abstract class NodeExplorerSharedViewModel(
      * emits on change) so a configuration change keeps the previous results.
      */
     fun onSearchQuery(query: String?) {
-        if (!query.isNullOrBlank() && query != _nodedExplorerSharedUiState.value.searchedQuery) {
-            _nodedExplorerSharedUiState.update { state ->
+        if (!query.isNullOrBlank() && query != _nodeExplorerSharedUiState.value.searchedQuery) {
+            _nodeExplorerSharedUiState.update { state ->
                 state.copy(searchLoadingState = NodesLoadingState.Loading)
             }
         }
@@ -182,7 +182,7 @@ abstract class NodeExplorerSharedViewModel(
      */
     private suspend fun search(query: String?) {
         if (query.isNullOrBlank()) {
-            _nodedExplorerSharedUiState.update { state ->
+            _nodeExplorerSharedUiState.update { state ->
                 state.copy(
                     searchItems = emptyList(),
                     searchLoadingState = NodesLoadingState.FullyLoaded,
@@ -206,11 +206,11 @@ abstract class NodeExplorerSharedViewModel(
             nodeList = nodes,
             nodeSourceType = args.nodeSourceType,
             highlightedNodeId = null,
-            isHiddenNodesEnabled = _nodedExplorerSharedUiState.value.isHiddenNodesEnabled,
+            isHiddenNodesEnabled = _nodeExplorerSharedUiState.value.isHiddenNodesEnabled,
             highlightedNames = null,
             isContactVerificationOn = contactVerificationEnabled(),
         )
-        _nodedExplorerSharedUiState.update { state ->
+        _nodeExplorerSharedUiState.update { state ->
             state.copy(
                 searchItems = items,
                 searchLoadingState = NodesLoadingState.FullyLoaded,
@@ -220,7 +220,7 @@ abstract class NodeExplorerSharedViewModel(
     }
 
     fun onNavigateBackEventConsumed() {
-        _nodedExplorerSharedUiState.update { state ->
+        _nodeExplorerSharedUiState.update { state ->
             state.copy(navigateBack = consumed)
         }
     }
