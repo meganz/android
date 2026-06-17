@@ -98,7 +98,7 @@ import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
+import mega.privacy.android.app.presentation.videoplayer.ComposeVideoPlayerViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
@@ -127,8 +127,8 @@ import mega.privacy.mobile.analytics.event.SpeedSelectedDialogEvent
     ExperimentalMaterial3Api::class,
 )
 @Composable
-internal fun VideoPlayerScreen(
-    viewModel: VideoPlayerViewModelV2,
+internal fun ComposeVideoPlayerScreen(
+    viewModel: ComposeVideoPlayerViewModel,
     player: ExoPlayer?,
     playQueueButtonClicked: () -> Unit,
     onMoreActionsClicked: () -> Unit,
