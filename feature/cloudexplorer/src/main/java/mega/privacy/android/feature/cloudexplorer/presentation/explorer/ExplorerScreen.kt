@@ -231,11 +231,17 @@ internal fun ExplorerScreen(
                     primaryButtonText = stringResource(explorerMode.actionStringId),
                     onPrimaryButtonClick = {
                         protectedUserTap {
-                            Analytics.tracker.trackEvent(
-                                confirmedTabEvent(selectedTabIndex, uiStateShared.nodeSourceType)
-                            )
                             if (showSearch) {
-                                Analytics.tracker.trackEvent(CloudExplorerConfirmedSearchButtonPressedEvent)
+                                Analytics.tracker.trackEvent(
+                                    CloudExplorerConfirmedSearchButtonPressedEvent
+                                )
+                            } else {
+                                Analytics.tracker.trackEvent(
+                                    confirmedTabEvent(
+                                        selectedTabIndex,
+                                        uiStateShared.nodeSourceType
+                                    )
+                                )
                             }
                             when {
                                 explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX ->
