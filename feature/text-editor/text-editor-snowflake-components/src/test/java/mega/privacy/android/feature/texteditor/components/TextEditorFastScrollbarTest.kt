@@ -14,6 +14,7 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 0,
             firstVisibleItemSize = 100f,
             itemCount = 100,
+            viewportSize = 400,
             canScrollForward = false,
             canScrollBackward = true,
         )
@@ -29,11 +30,62 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 0,
             firstVisibleItemSize = 100f,
             itemCount = 4,
+            viewportSize = 400,
             canScrollForward = true,
             canScrollBackward = true,
         )
         assertThat(result).isWithin(0.001f).of(0.5f)
         assertThat(result).isLessThan(1f)
+    }
+
+    @Test
+    fun `test that calculateScrollProportion tracks within a single tall chunk using its scrollable travel`() {
+        // Regression for the single-line / single-chunk jump (AND-23767 / T21378947): with one chunk the
+        // thumb must ramp continuously to the end. Travel = itemSize - viewport = 1000 - 400 = 600, so a
+        // 300px offset is halfway (0.5), not 300/1000 = 0.3 which then snapped to 1f at the true bottom.
+        val result = calculateScrollProportion(
+            firstVisibleItemIndex = 0,
+            firstVisibleItemScrollOffset = 300,
+            firstVisibleItemSize = 1000f,
+            itemCount = 1,
+            viewportSize = 400,
+            canScrollForward = true,
+            canScrollBackward = true,
+        )
+        assertThat(result).isWithin(0.001f).of(0.5f)
+    }
+
+    @Test
+    fun `test that calculateScrollProportion reaches 1f at the end of a single tall chunk without a snap`() {
+        // At the last scrollable pixel of the only chunk (offset == travel) the proportion is already 1f,
+        // so flipping canScrollForward to false at the true bottom does not move the thumb (no jump).
+        val result = calculateScrollProportion(
+            firstVisibleItemIndex = 0,
+            firstVisibleItemScrollOffset = 600,
+            firstVisibleItemSize = 1000f,
+            itemCount = 1,
+            viewportSize = 400,
+            canScrollForward = true,
+            canScrollBackward = true,
+        )
+        assertThat(result).isEqualTo(1f)
+    }
+
+    @Test
+    fun `test that calculateScrollProportion normalises the last chunk by its travel so it reaches the end continuously`() {
+        // First visible item is the last of 4 chunks; travel = 1000 - 400 = 600. Halfway through that
+        // travel the thumb is at (3 + 0.5) / 4 = 0.875 and keeps climbing to 1f, instead of stalling at
+        // (3 + 0.3) / 4 = 0.825 and snapping to 1f when canScrollForward flips at the bottom.
+        val result = calculateScrollProportion(
+            firstVisibleItemIndex = 3,
+            firstVisibleItemScrollOffset = 300,
+            firstVisibleItemSize = 1000f,
+            itemCount = 4,
+            viewportSize = 400,
+            canScrollForward = true,
+            canScrollBackward = true,
+        )
+        assertThat(result).isWithin(0.001f).of(0.875f)
     }
 
     @Test
@@ -43,6 +95,7 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 0,
             firstVisibleItemSize = 100f,
             itemCount = 2,
+            viewportSize = 400,
             canScrollForward = false,
             canScrollBackward = false,
         )
@@ -56,6 +109,7 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 0,
             firstVisibleItemSize = 100f,
             itemCount = 100,
+            viewportSize = 400,
             canScrollForward = true,
             canScrollBackward = false,
         )
@@ -69,6 +123,7 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 0,
             firstVisibleItemSize = 100f,
             itemCount = 100,
+            viewportSize = 400,
             canScrollForward = true,
             canScrollBackward = true,
         )
@@ -82,6 +137,7 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 50,
             firstVisibleItemSize = 100f,
             itemCount = 100,
+            viewportSize = 400,
             canScrollForward = true,
             canScrollBackward = true,
         )
@@ -95,6 +151,7 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 0,
             firstVisibleItemSize = null,
             itemCount = 100,
+            viewportSize = 400,
             canScrollForward = true,
             canScrollBackward = true,
         )
@@ -108,6 +165,7 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 0,
             firstVisibleItemSize = 0f,
             itemCount = 100,
+            viewportSize = 400,
             canScrollForward = true,
             canScrollBackward = true,
         )
@@ -121,6 +179,7 @@ internal class TextEditorFastScrollbarTest {
             firstVisibleItemScrollOffset = 0,
             firstVisibleItemSize = null,
             itemCount = 0,
+            viewportSize = 400,
             canScrollForward = false,
             canScrollBackward = false,
         )
