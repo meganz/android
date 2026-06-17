@@ -1,5 +1,9 @@
 package mega.privacy.android.shared.original.core.ui.controls.chat
 
+import androidx.compose.ui.autofill.ContentDataType
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.input.TextFieldValue
@@ -25,5 +29,24 @@ class ChatTextFieldTest {
             )
         }
         composeRule.onNodeWithTag(CHAT_TEXT_FIELD_EMOJI_ICON).assertExists()
+    }
+
+    @Test
+    fun `test that chat text field opts out of autofill`() {
+        composeRule.setContent {
+            ChatTextField(
+                textFieldValue = TextFieldValue("Hello world"),
+                onTextChange = {},
+                onEmojiClick = {},
+                isEmojiPickerShown = false,
+                isExpanded = false
+            )
+        }
+        composeRule.onNodeWithTag(CHAT_TEXT_FIELD_TEXT_TAG).assert(
+            SemanticsMatcher.expectValue(
+                SemanticsProperties.ContentDataType,
+                ContentDataType.None
+            )
+        )
     }
 }
