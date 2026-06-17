@@ -914,6 +914,24 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun checkNodeAccessibility(nodeId: NodeId) = withContext(ioDispatcher) {
+        val node = getMegaNodeByHandle(nodeId, true)
+        requireNotNull(node) { "Node not found for handle ${nodeId.longValue}" }
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> continuation.resumeWith(Result.success(Unit))
+                        else -> continuation.resumeWith(
+                            Result.failure(megaExceptionMapper(error, "checkNodeAccessibility"))
+                        )
+                    }
+                }
+            )
+            megaApiGateway.getDownloadUrl(node, listener)
+        }
+    }
+
     override suspend fun disableExport(nodeToDisable: NodeId) = withContext(ioDispatcher) {
         val node = getMegaNodeByHandle(nodeToDisable, true)
         requireNotNull(node) { "Node to disable export with handle ${nodeToDisable.longValue} not found" }

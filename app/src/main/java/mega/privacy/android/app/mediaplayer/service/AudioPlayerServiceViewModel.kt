@@ -77,6 +77,7 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_MINIMUM_PLAY
 import mega.privacy.android.domain.entity.continuewhereleftoff.CWLO_NEAR_COMPLETION_THRESHOLD_MS
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -125,6 +126,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SaveAudioPlay
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodeAccessibilityUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -205,6 +207,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val checkNodeAccessibilityUseCase: CheckNodeAccessibilityUseCase,
     monitorAudioBackgroundPlayEnabledUseCase: MonitorAudioBackgroundPlayEnabledUseCase,
     monitorAudioShuffleEnabledUseCase: MonitorAudioShuffleEnabledUseCase,
     monitorAudioRepeatModeUseCase: MonitorAudioRepeatModeUseCase,
@@ -954,7 +957,20 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun onPlayerError() {
         playerRetry++
-        retry.value = playerRetry <= MAX_RETRY
+        if (playerRetry == 1) {
+            sharingScope.launch {
+                runCatching { checkNodeAccessibilityUseCase(NodeId(playingHandle)) }
+                    .onFailure { exception ->
+                        if (exception is BlockedMegaException) {
+                            error.postValue(exception)
+                            return@launch
+                        }
+                    }
+                retry.value = true
+            }
+        } else {
+            retry.value = playerRetry <= MAX_RETRY
+        }
     }
 
     /**

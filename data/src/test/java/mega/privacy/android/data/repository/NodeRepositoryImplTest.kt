@@ -1792,6 +1792,47 @@ internal class NodeRepositoryImplTest {
         assertThat(underTest.getFullNodePathById(nodeId)).isEqualTo(expected)
     }
 
+    @Test
+    fun `test that checkNodeAccessibility completes successfully when API_OK is returned`() = runTest {
+        val megaNode = mock<MegaNode>()
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+        whenever(megaApiGateway.getDownloadUrl(any(), any())).thenAnswer {
+            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
+            )
+        }
+
+        assertDoesNotThrow { underTest.checkNodeAccessibility(nodeId) }
+    }
+
+    @Test
+    fun `test that checkNodeAccessibility throws IllegalArgumentException when node is not found`() =
+        runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
+            whenever(megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
+
+            assertThrows<IllegalArgumentException> { underTest.checkNodeAccessibility(nodeId) }
+        }
+
+    @Test
+    fun `test that checkNodeAccessibility throws exception when API returns non-OK error`() = runTest {
+        val megaNode = mock<MegaNode>()
+        val expectedException = MegaException(MegaError.API_EBLOCKED, "blocked")
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+        whenever(megaExceptionMapper(any(), anyOrNull(), anyOrNull())).thenReturn(expectedException)
+        whenever(megaApiGateway.getDownloadUrl(any(), any())).thenAnswer {
+            (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock(),
+                error = mock { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) },
+            )
+        }
+
+        assertThrows<MegaException> { underTest.checkNodeAccessibility(nodeId) }
+    }
+
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),
         Arguments.of(NodeId(2L)),

@@ -124,6 +124,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackT
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodeAccessibilityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -261,6 +262,7 @@ class VideoPlayerViewModelV2Test {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val checkNodeAccessibilityUseCase = mock<CheckNodeAccessibilityUseCase>()
     private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
     private var fakeMonitorConnectivityFlow = MutableSharedFlow<Boolean>()
     private val testHandle: Long = 123456
@@ -326,6 +328,7 @@ class VideoPlayerViewModelV2Test {
             isNodeInBackupsNodeUseCase = isNodeInBackupsNodeUseCase,
             isNodeInCloudDriveUseCase = isNodeInCloudDriveUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            checkNodeAccessibilityUseCase = checkNodeAccessibilityUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             isParticipatingInChatCallUseCase = isParticipatingInChatCallUseCase,
             trackPlaybackPositionUseCase = trackPlaybackPositionUseCase,
@@ -426,6 +429,7 @@ class VideoPlayerViewModelV2Test {
             broadcastTransferOverQuotaUseCase,
             monitorConnectivityUseCase,
             getFeatureFlagValueUseCase,
+            checkNodeAccessibilityUseCase,
             isUserLoggedInUseCase,
         )
     }
@@ -1627,6 +1631,38 @@ class VideoPlayerViewModelV2Test {
             underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
             underTest.uiState.test {
                 assertThat(awaitItem().playerErrorType).isEqualTo(PlayerErrorType.FILE_NOT_SUPPORTED)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that blockedError is triggered on first onPlayerError when checkNodeAccessibilityUseCase throws BlockedMegaException`() =
+        runTest {
+            whenever(checkNodeAccessibilityUseCase(any())).thenAnswer {
+                throw BlockedMegaException(
+                    0,
+                    "blocked"
+                )
+            }
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().blockedError).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that retryEvent is triggered on second onPlayerError when within retry limit`() =
+        runTest {
+            initViewModel()
+            // First error launches an async coroutine (playerRetry == 1); do NOT advance so
+            // the assertion is driven only by the second error's synchronous else-if branch.
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryEvent).isEqualTo(triggered)
                 cancelAndConsumeRemainingEvents()
             }
         }

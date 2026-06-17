@@ -626,6 +626,15 @@ interface NodeRepository {
     ): String
 
     /**
+     * Check if a node is accessible by probing its download URL.
+     *
+     * Throws [mega.privacy.android.domain.exception.BlockedMegaException] if the node is taken down (API_EBLOCKED).
+     *
+     * @param nodeId [NodeId] of the node to check
+     */
+    suspend fun checkNodeAccessibility(nodeId: NodeId)
+
+    /**
      * Launches a request to stop sharing a file/folder
      *
      * @param nodeToDisable the node's [NodeId] to stop sharing

@@ -28,6 +28,7 @@ import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.DefaultLoadControl
@@ -43,6 +44,7 @@ import androidx.media3.exoplayer.text.TextOutput
 import androidx.media3.exoplayer.text.TextRenderer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
+import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
 import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.ui.PlayerNotificationManager
 import androidx.media3.ui.PlayerView
@@ -227,7 +229,10 @@ class MediaPlayerFacade @Inject constructor(
     }
 
     private val upstreamDataSourceFactory by lazy {
-        DefaultDataSource.Factory(context).setTransferListener(loggingTransferListener)
+        val httpFactory = DefaultHttpDataSource.Factory()
+            .setConnectTimeoutMs(5_000)
+            .setReadTimeoutMs(5_000)
+        DefaultDataSource.Factory(context, httpFactory).setTransferListener(loggingTransferListener)
     }
 
     private val cacheEventListener = object : CacheDataSource.EventListener {
@@ -260,6 +265,7 @@ class MediaPlayerFacade @Inject constructor(
 
     private val mediaSourceFactory by lazy {
         ProgressiveMediaSource.Factory(dataSourceFactory)
+            .setLoadErrorHandlingPolicy(DefaultLoadErrorHandlingPolicy(2))
     }
 
     private var bufferingStartTime: Long = 0L

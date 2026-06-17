@@ -2935,6 +2935,17 @@ interface MegaApiGateway {
     )
 
     /**
+     * Probes the download URL for a node to verify it is accessible.
+     *
+     * @param node MegaNode to check
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getDownloadUrl(
+        node: MegaNode,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
      * Returns the name previously set for a device
      *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER

@@ -156,6 +156,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SavePlaybackT
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodeAccessibilityUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -254,6 +255,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     private val isNodeInBackupsNodeUseCase: IsNodeInBackupsUseCase,
     private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val checkNodeAccessibilityUseCase: CheckNodeAccessibilityUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
     private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
@@ -1367,7 +1369,18 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             errorCode = errorCode,
             isConnected = uiState.value.isConnected,
         )
-        if (playerRetry <= MAX_RETRY) {
+        if (playerRetry == 1) {
+            viewModelScope.launch {
+                runCatching { checkNodeAccessibilityUseCase(NodeId(uiState.value.currentPlayingHandle)) }
+                    .onFailure { exception ->
+                        if (exception is BlockedMegaException) {
+                            uiState.update { it.copy(blockedError = triggered) }
+                            return@launch
+                        }
+                    }
+                uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
+            }
+        } else if (playerRetry <= MAX_RETRY) {
             uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
         } else {
             uiState.update { it.copy(retryFailedEvent = triggered, playerErrorType = errorType) }
