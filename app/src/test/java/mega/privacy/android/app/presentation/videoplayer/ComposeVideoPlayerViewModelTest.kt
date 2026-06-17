@@ -22,7 +22,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.TimberJUnit5Extension
-import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -197,7 +196,6 @@ class ComposeVideoPlayerViewModelTest {
     private lateinit var underTest: ComposeVideoPlayerViewModel
 
     private val context = mock<Context>()
-    private val mediaPlayerGateway = mock<MediaPlayerGateway>()
     private val videoPlayerItemMapper = mock<VideoPlayerItemMapper>()
     private val getVideoNodeByHandleUseCase = mock<GetVideoNodeByHandleUseCase>()
     private val getVideoNodesUseCase = mock<GetVideoNodesUseCase>()
@@ -259,6 +257,7 @@ class ComposeVideoPlayerViewModelTest {
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
+    private val mediaPlayerManager = mock<MediaPlayerManager>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private var fakeMonitorConnectivityFlow = MutableSharedFlow<Boolean>()
     private val testHandle: Long = 123456
@@ -274,9 +273,13 @@ class ComposeVideoPlayerViewModelTest {
     private fun initViewModel() {
         fakeMonitorTransferEventsFlow = MutableSharedFlow()
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
+        whenever(
+            mediaPlayerManager.createPlayer(
+                any(), any(), any(), any(), any(), any(), any()
+            )
+        ).thenReturn(mock())
         underTest = ComposeVideoPlayerViewModel(
             context = context,
-            mediaPlayerGateway = mediaPlayerGateway,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
             mainDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
@@ -333,6 +336,7 @@ class ComposeVideoPlayerViewModelTest {
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             playerErrorTypeMapper = playerErrorTypeMapper,
+            mediaPlayerManager = mediaPlayerManager,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             args = testArgs,
         )
@@ -368,7 +372,6 @@ class ComposeVideoPlayerViewModelTest {
     fun resetMocks() {
         reset(
             context,
-            mediaPlayerGateway,
             videoPlayerItemMapper,
             getVideoNodeByHandleUseCase,
             getVideoNodesUseCase,
@@ -421,6 +424,7 @@ class ComposeVideoPlayerViewModelTest {
             broadcastTransferOverQuotaUseCase,
             monitorConnectivityUseCase,
             getFeatureFlagValueUseCase,
+            mediaPlayerManager,
         )
     }
 
@@ -1309,7 +1313,7 @@ class ComposeVideoPlayerViewModelTest {
             initViewModel()
             underTest.setRepeatToggleModeForPlayer(testMode)
             verify(setVideoRepeatModeUseCase).invoke(testMode.ordinal)
-            verify(mediaPlayerGateway).setRepeatToggleMode(testMode)
+            verify(mediaPlayerManager).setRepeatToggleMode(testMode)
         }
 
     @Test
@@ -1342,7 +1346,7 @@ class ComposeVideoPlayerViewModelTest {
                 val testMediaItem = MediaItem.Builder()
                     .setMediaId(expectedId.toString())
                     .build()
-                whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+                whenever(mediaPlayerManager.getCurrentMediaItem()).thenReturn(testMediaItem)
                 underTest.saveVideoWatchedTime()
 
                 verify(saveVideoRecentlyWatchedUseCase).invoke(
@@ -1428,12 +1432,12 @@ class ComposeVideoPlayerViewModelTest {
 
             underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
             advanceUntilIdle()
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
 
             underTest.initVideoPlayerData(intent.toVideoPlayerLaunchSource())
             advanceUntilIdle()
 
-            verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+            verify(mediaPlayerManager, never()).setPlayWhenReady(true)
         }
 
     @Test
@@ -1450,23 +1454,23 @@ class ComposeVideoPlayerViewModelTest {
                 fileName = testFileName
             )
             initViewModel()
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
 
             underTest.initVideoPlayerData(intent.toVideoPlayerLaunchSource())
             advanceUntilIdle()
 
-            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            verify(mediaPlayerManager).setPlayWhenReady(true)
         }
 
     @Test
     fun `test that pauseForBackground sets Paused and isAutoReplay when player was playing`() =
         runTest {
-            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            whenever(mediaPlayerManager.getPlayWhenReady()).thenReturn(true)
             initViewModel()
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
             underTest.pauseForBackground()
             advanceUntilIdle()
-            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            verify(mediaPlayerManager).setPlayWhenReady(false)
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
@@ -1478,12 +1482,12 @@ class ComposeVideoPlayerViewModelTest {
     @Test
     fun `test that pauseForBackground does not set isAutoReplay when player was already paused`() =
         runTest {
-            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            whenever(mediaPlayerManager.getPlayWhenReady()).thenReturn(false)
             initViewModel()
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
             underTest.pauseForBackground()
             advanceUntilIdle()
-            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
+            verify(mediaPlayerManager, never()).setPlayWhenReady(any())
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
@@ -1495,16 +1499,16 @@ class ComposeVideoPlayerViewModelTest {
     @Test
     fun `test that pauseForBackground does not drive gateway pause when user already paused`() =
         runTest {
-            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            whenever(mediaPlayerManager.getPlayWhenReady()).thenReturn(true)
             initViewModel()
             underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
             advanceUntilIdle()
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
 
             underTest.pauseForBackground()
             advanceUntilIdle()
 
-            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
+            verify(mediaPlayerManager, never()).setPlayWhenReady(any())
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
@@ -1516,12 +1520,12 @@ class ComposeVideoPlayerViewModelTest {
     @Test
     fun `test that pausePlaybackNonUserInitiated does not mark paused by user so focus gain can resume`() =
         runTest {
-            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            whenever(mediaPlayerManager.getPlayWhenReady()).thenReturn(true)
             initViewModel()
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
             underTest.pausePlaybackNonUserInitiated()
             advanceUntilIdle()
-            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            verify(mediaPlayerManager).setPlayWhenReady(false)
             // ExoPlayer reports app-driven setPlayWhenReady as USER_REQUEST; allowUpdatePausedByUser
             // is cleared for this pause so the next callback does not flip isPausedByUser.
             underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
@@ -1532,14 +1536,14 @@ class ComposeVideoPlayerViewModelTest {
     @Test
     fun `test that pausePlaybackNonUserInitiated when already paused keeps shouldResumeOnAudioFocusGain false if user paused`() =
         runTest {
-            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            whenever(mediaPlayerManager.getPlayWhenReady()).thenReturn(false)
             initViewModel()
             underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
             advanceUntilIdle()
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
             underTest.pausePlaybackNonUserInitiated()
             advanceUntilIdle()
-            verify(mediaPlayerGateway, never()).setPlayWhenReady(any())
+            verify(mediaPlayerManager, never()).setPlayWhenReady(any())
             assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
         }
 
@@ -1550,10 +1554,10 @@ class ComposeVideoPlayerViewModelTest {
             underTest.updatePlaybackState(MediaPlaybackState.Paused)
             underTest.updatePlaybackStateWithReplay(false)
             advanceUntilIdle()
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
             underTest.handleAutoReplayIfPaused()
             advanceUntilIdle()
-            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            verify(mediaPlayerManager).setPlayWhenReady(true)
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Playing)
@@ -1567,10 +1571,10 @@ class ComposeVideoPlayerViewModelTest {
         initViewModel()
         underTest.updatePlaybackState(MediaPlaybackState.Paused)
         advanceUntilIdle()
-        clearInvocations(mediaPlayerGateway)
+        clearInvocations(mediaPlayerManager)
         underTest.handleAutoReplayIfPaused()
         advanceUntilIdle()
-        verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+        verify(mediaPlayerManager, never()).setPlayWhenReady(true)
     }
 
     @Test
@@ -1708,7 +1712,7 @@ class ComposeVideoPlayerViewModelTest {
             initViewModel()
             underTest.updateCurrentSpeedPlaybackItem(item)
             testScheduler.advanceUntilIdle()
-            verify(mediaPlayerGateway).updatePlaybackSpeed(item)
+            verify(mediaPlayerManager).updatePlaybackSpeed(item)
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.currentSpeedPlayback.speed).isEqualTo(item.speed)
@@ -1735,7 +1739,7 @@ class ComposeVideoPlayerViewModelTest {
             initViewModel()
             underTest.updatePlaybackStateWithReplay(value)
             advanceUntilIdle()
-            verify(mediaPlayerGateway).setPlayWhenReady(value)
+            verify(mediaPlayerManager).setPlayWhenReady(value)
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.mediaPlaybackState).isEqualTo(
@@ -1751,7 +1755,7 @@ class ComposeVideoPlayerViewModelTest {
 
     @Test
     fun `test that getCurrentPlayingPosition returns as expected`() = runTest {
-        whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(100)
+        whenever(mediaPlayerManager.getCurrentPlayingPosition()).thenReturn(100)
         whenever(durationInSecondsTextMapper(100.milliseconds)).thenReturn(testDurationString)
         initViewModel()
         val actual = underTest.getCurrentPlayingPosition()
@@ -1764,7 +1768,7 @@ class ComposeVideoPlayerViewModelTest {
             initVideoPlayerItem(it.toLong(), it.toString())
         }
         underTest.seekToByHandle(1, testItems)
-        verify(mediaPlayerGateway).playerSeekTo(1)
+        verify(mediaPlayerManager).playerSeekTo(1)
     }
 
     @Test
@@ -1828,7 +1832,7 @@ class ComposeVideoPlayerViewModelTest {
             initViewModel()
             underTest.swapItems(1, 2, testItems, mediaItems)
             underTest.updateItemsAfterReorder()
-            verify(mediaPlayerGateway).buildPlaySources(any())
+            verify(mediaPlayerManager).buildPlaySources(any())
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
@@ -1944,7 +1948,7 @@ class ComposeVideoPlayerViewModelTest {
             val selectHandles = listOf(1L, 2L)
             initViewModel()
             underTest.removeSelectedItems(selectHandles, testItems, mediaItems)
-            verify(mediaPlayerGateway).buildPlaySources(any())
+            verify(mediaPlayerManager).buildPlaySources(any())
             advanceUntilIdle()
             underTest.uiState.test {
                 val actual = awaitItem()
@@ -2006,7 +2010,7 @@ class ComposeVideoPlayerViewModelTest {
         value: Boolean,
     ) = runTest {
         initViewModel()
-        whenever(mediaPlayerGateway.mediaPlayerIsPlaying()).thenReturn(value)
+        whenever(mediaPlayerManager.mediaPlayerIsPlaying()).thenReturn(value)
         val actual = underTest.isMediaPlayerPlaying()
         assertThat(actual).isEqualTo(value)
     }
@@ -2019,7 +2023,7 @@ class ComposeVideoPlayerViewModelTest {
         val testMediaItem = MediaItem.Builder()
             .setMediaId(testHandle.toString())
             .build()
-        whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(testMediaItem)
+        whenever(mediaPlayerManager.getCurrentMediaItem()).thenReturn(testMediaItem)
         whenever(getVideoNodeByHandleUseCase(any(), any())).thenReturn(mock())
         initViewModel()
         underTest.onMediaItemTransition(testHandle.toString(), isUpdateName)
@@ -2073,7 +2077,7 @@ class ComposeVideoPlayerViewModelTest {
             initViewModel()
             underTest.initVideoPlayerData(intent.toVideoPlayerLaunchSource())
 
-            verify(mediaPlayerGateway).playerSeekToPositionInMs(100)
+            verify(mediaPlayerManager).playerSeekToPositionInMs(100)
             assertThat(underTest.uiState.value.showPlaybackDialog).isFalse()
             assertThat(underTest.uiState.value.playbackPosition).isNull()
         }
@@ -2083,7 +2087,7 @@ class ComposeVideoPlayerViewModelTest {
     fun `test that behaviour is as expected after onPlaybackStateChanged is invoked`(
         state: Int,
     ) = runTest {
-        whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+        whenever(mediaPlayerManager.getPlayWhenReady()).thenReturn(false)
         initViewModel()
         underTest.updatePlaybackState(
             if (state == MEDIA_PLAYER_STATE_ENDED) {
@@ -2094,7 +2098,7 @@ class ComposeVideoPlayerViewModelTest {
         )
         underTest.onPlaybackStateChanged(state)
         if (state == MEDIA_PLAYER_STATE_READY) {
-            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            verify(mediaPlayerManager).setPlayWhenReady(true)
         } else {
             underTest.uiState.test {
                 assertThat(awaitItem().mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
@@ -2107,9 +2111,9 @@ class ComposeVideoPlayerViewModelTest {
         runTest {
             val handle = 12345L
             val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
-            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
-            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(60_000L)
-            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(58_000L)
+            whenever(mediaPlayerManager.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerManager.getCurrentItemDuration()).thenReturn(60_000L)
+            whenever(mediaPlayerManager.getCurrentPlayingPosition()).thenReturn(58_000L)
             initViewModel()
             underTest.updatePlaybackState(MediaPlaybackState.Playing)
 
@@ -2123,9 +2127,9 @@ class ComposeVideoPlayerViewModelTest {
         runTest {
             val handle = 12345L
             val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
-            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
-            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(60_000L)
-            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(50_000L)
+            whenever(mediaPlayerManager.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerManager.getCurrentItemDuration()).thenReturn(60_000L)
+            whenever(mediaPlayerManager.getCurrentPlayingPosition()).thenReturn(50_000L)
             initViewModel()
             underTest.updatePlaybackState(MediaPlaybackState.Playing)
 
@@ -2144,9 +2148,9 @@ class ComposeVideoPlayerViewModelTest {
         runTest {
             val handle = 12345L
             val mediaItem = MediaItem.Builder().setMediaId(handle.toString()).build()
-            whenever(mediaPlayerGateway.getCurrentMediaItem()).thenReturn(mediaItem)
-            whenever(mediaPlayerGateway.getCurrentItemDuration()).thenReturn(10_000L)
-            whenever(mediaPlayerGateway.getCurrentPlayingPosition()).thenReturn(10_000L)
+            whenever(mediaPlayerManager.getCurrentMediaItem()).thenReturn(mediaItem)
+            whenever(mediaPlayerManager.getCurrentItemDuration()).thenReturn(10_000L)
+            whenever(mediaPlayerManager.getCurrentPlayingPosition()).thenReturn(10_000L)
             initViewModel()
             underTest.updatePlaybackState(MediaPlaybackState.Playing)
 
@@ -2177,7 +2181,7 @@ class ComposeVideoPlayerViewModelTest {
             initViewModel()
             underTest.updateShowSubtitleDialog(true)
             testScheduler.advanceUntilIdle()
-            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            verify(mediaPlayerManager).setPlayWhenReady(false)
             underTest.uiState.test {
                 assertThat(awaitItem().showSubTitlesOptions).isTrue()
                 cancelAndConsumeRemainingEvents()
@@ -2199,27 +2203,27 @@ class ComposeVideoPlayerViewModelTest {
     @Test
     fun `test that updateShowSubtitleDialog false does not resume playback when user was paused before opening subtitle dialog`() =
         runTest {
-            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            whenever(mediaPlayerManager.getPlayWhenReady()).thenReturn(false)
             initViewModel()
             underTest.updateShowSubtitleDialog(true)
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
 
             underTest.updateShowSubtitleDialog(false)
 
-            verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+            verify(mediaPlayerManager, never()).setPlayWhenReady(true)
         }
 
     @Test
     fun `test that updateShowSubtitleDialog false resumes playback when video was playing before opening subtitle dialog`() =
         runTest {
-            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            whenever(mediaPlayerManager.getPlayWhenReady()).thenReturn(true)
             initViewModel()
             underTest.updateShowSubtitleDialog(true)
-            clearInvocations(mediaPlayerGateway)
+            clearInvocations(mediaPlayerManager)
 
             underTest.updateShowSubtitleDialog(false)
 
-            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            verify(mediaPlayerManager).setPlayWhenReady(true)
         }
 
     @Test
@@ -2231,7 +2235,7 @@ class ComposeVideoPlayerViewModelTest {
                 underTest.updateShowSubtitleDialog(true)
                 assertThat(awaitItem().showSubTitlesOptions).isTrue()
                 underTest.navigateToSelectSubtitle()
-                verify(mediaPlayerGateway).setPlayWhenReady(false)
+                verify(mediaPlayerManager).setPlayWhenReady(false)
                 assertThat(awaitItem().showSubTitlesOptions).isFalse()
             }
         }
@@ -2270,7 +2274,7 @@ class ComposeVideoPlayerViewModelTest {
         assertThat(analyticsExtension.events.first()).isInstanceOf(
             OffOptionForHideSubtitlePressedEvent::class.java
         )
-        verify(mediaPlayerGateway).hideSubtitle()
+        verify(mediaPlayerManager).hideSubtitle()
         underTest.uiState.test {
             assertThat(awaitItem().subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.Off)
             cancelAndConsumeRemainingEvents()
@@ -2283,7 +2287,7 @@ class ComposeVideoPlayerViewModelTest {
             initViewModel()
             underTest.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem)
             advanceUntilIdle()
-            verify(mediaPlayerGateway).showSubtitle()
+            verify(mediaPlayerManager).showSubtitle()
             underTest.uiState.test {
                 assertThat(awaitItem().subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.AddSubtitleItem)
                 cancelAndConsumeRemainingEvents()
@@ -2303,7 +2307,7 @@ class ComposeVideoPlayerViewModelTest {
                 mockSubtitleInfo
             )
             advanceUntilIdle()
-            verify(mediaPlayerGateway).addSubtitle(testUrl)
+            verify(mediaPlayerManager).addSubtitle(testUrl)
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.subtitleSelectedStatus).isEqualTo(SubtitleSelectedStatus.AddSubtitleItem)
@@ -2407,7 +2411,7 @@ class ComposeVideoPlayerViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.repeatToggleMode).isEqualTo(mode)
-                verify(mediaPlayerGateway).setRepeatToggleMode(mode)
+                verify(mediaPlayerManager).setRepeatToggleMode(mode)
                 cancelAndConsumeRemainingEvents()
             }
         }

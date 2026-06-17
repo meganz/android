@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -48,8 +49,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.di.mediaplayer.VideoPlayer
-import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
@@ -190,7 +189,6 @@ import kotlin.time.Duration.Companion.seconds
 @HiltViewModel(assistedFactory = ComposeVideoPlayerViewModel.Factory::class)
 class ComposeVideoPlayerViewModel @AssistedInject constructor(
     @ApplicationContext private val context: Context,
-    @VideoPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -247,6 +245,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val playerErrorTypeMapper: PlayerErrorTypeMapper,
+    private val mediaPlayerManager: MediaPlayerManager,
     @Assisted private val args: Args,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
@@ -274,6 +273,23 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private var isPausedByUser = false
     private var allowUpdatePausedByUser = true
     private var wasPlayingBeforeSubtitleDialog = false
+
+    /**
+     * The [ExoPlayer] owned by this ViewModel and shared with the UI. Built by [MediaPlayerManager]
+     * eagerly so the gateway's player is ready before [initVideoPlayerData] builds the playback
+     * sources, and released in [onCleared] — its lifetime is tied to this route's ViewModel.
+     */
+    val player: ExoPlayer = mediaPlayerManager.createPlayer(
+        onMetadataChanged = { title, artist, album ->
+            updateMetadata(Metadata(title, artist, album, uiState.value.currentPlayingItemName ?: ""))
+        },
+        onMediaItemTransition = ::onMediaItemTransition,
+        onRepeatModeChanged = ::updateRepeatToggleMode,
+        onPlayWhenReadyChanged = ::onPlayWhenReadyChanged,
+        onPlaybackStateChanged = ::onPlaybackStateChanged,
+        onPlayerError = ::onPlayerError,
+        onVideoSizeChanged = ::updateCurrentPlayingVideoSize,
+    )
 
     init {
         uiState.update {
@@ -429,9 +445,9 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             buildPlaybackSources(launchSource)
             trackPlaybackPositionUseCase {
                 PlaybackInformation(
-                    mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong(),
-                    mediaPlayerGateway.getCurrentItemDuration(),
-                    mediaPlayerGateway.getCurrentPlayingPosition()
+                    mediaPlayerManager.getCurrentMediaItem()?.mediaId?.toLong(),
+                    mediaPlayerManager.getCurrentItemDuration(),
+                    mediaPlayerManager.getCurrentPlayingPosition()
                 )
             }
         }
@@ -565,7 +581,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private fun buildPlaybackSourcesForPlayer(mediaPlaySources: MediaPlaySources) =
         viewModelScope.launch(mainDispatcher) {
             Timber.d("Playback sources: ${mediaPlaySources.mediaItems.size} items")
-            with(mediaPlayerGateway) {
+            with(mediaPlayerManager) {
                 buildPlaySources(mediaPlaySources)
                 setPlayWhenReady(
                     mediaPlaySources.isRestartPlaying &&
@@ -1047,6 +1063,16 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     override fun onCleared() {
         super.onCleared()
         clear()
+        mediaPlayerManager.release()
+    }
+
+    /**
+     * Retry playback after a player error.
+     */
+    fun retry() {
+        viewModelScope.launch {
+            mediaPlayerManager.retry()
+        }
     }
 
     /**
@@ -1074,9 +1100,9 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
      * it after position has wrapped to 0. In that case the ticker path is the source of truth.
      */
     private fun saveRecentlyUsedItemIfQualifies() {
-        val handle = mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLongOrNull() ?: return
-        val duration = mediaPlayerGateway.getCurrentItemDuration()
-        val position = mediaPlayerGateway.getCurrentPlayingPosition()
+        val handle = mediaPlayerManager.getCurrentMediaItem()?.mediaId?.toLongOrNull() ?: return
+        val duration = mediaPlayerManager.getCurrentItemDuration()
+        val position = mediaPlayerManager.getCurrentPlayingPosition()
         // Duration not yet known: cannot evaluate, leave the CWLO index untouched.
         if (duration <= 0L) return
         val qualifies = position > CWLO_MINIMUM_PLAYBACK_THRESHOLD_MS
@@ -1147,7 +1173,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         //If hasCheckedPlaybackPosition is true, avoid checking playback position again
         if (!hasCheckedPlaybackPosition && isCheckPlaybackPosition) {
             // Pause the video before check playback position
-            mediaPlayerGateway.setPlayWhenReady(false)
+            mediaPlayerManager.setPlayWhenReady(false)
             checkPlaybackPositionBeforePlayback(handle) {
                 // Apply the seek here, inside the callback, where the position is guaranteed
                 // to already be stored in state. This avoids the race condition where ExoPlayer
@@ -1155,7 +1181,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 // cause applyPendingSavedPlaybackPositionSeek() in onPlaybackStateChanged to be
                 // a no-op and silently discard the saved position (especially for local/offline files).
                 applyPendingSavedPlaybackPositionSeek()
-                mediaPlayerGateway.setPlayWhenReady(true)
+                mediaPlayerManager.setPlayWhenReady(true)
             }
         } else {
             applyPendingSavedPlaybackPositionSeek()
@@ -1194,13 +1220,13 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private fun applyPendingSavedPlaybackPositionSeek() {
         val position = uiState.value.playbackPosition ?: return
         if (position <= 0L) return
-        mediaPlayerGateway.playerSeekToPositionInMs(position)
+        mediaPlayerManager.playerSeekToPositionInMs(position)
         uiState.update { it.copy(playbackPosition = null) }
     }
 
     private fun ensurePlayingAfterPlaybackPositionHandling() {
-        if (!mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser) {
-            mediaPlayerGateway.setPlayWhenReady(true)
+        if (!mediaPlayerManager.getPlayWhenReady() && !isPausedByUser) {
+            mediaPlayerManager.setPlayWhenReady(true)
         }
     }
 
@@ -1215,19 +1241,19 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             MEDIA_PLAYER_STATE_READY -> {
                 applyPendingSavedPlaybackPositionSeek()
                 if (playbackState == MediaPlaybackState.Paused
-                    && !mediaPlayerGateway.getPlayWhenReady()
+                    && !mediaPlayerManager.getPlayWhenReady()
                     && !uiState.value.isAutoReplay
                     && !uiState.value.showSubTitlesOptions
                     && !isPausedByUser
                 ) {
-                    mediaPlayerGateway.setPlayWhenReady(true)
+                    mediaPlayerManager.setPlayWhenReady(true)
                 }
             }
         }
     }
 
     internal fun setRepeatToggleModeForPlayer(mode: RepeatToggleMode) = viewModelScope.launch {
-        mediaPlayerGateway.setRepeatToggleMode(mode)
+        mediaPlayerManager.setRepeatToggleMode(mode)
         setVideoRepeatModeUseCase(mode.ordinal)
     }
 
@@ -1235,7 +1261,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         viewModelScope.launch {
             runCatching { monitorVideoRepeatModeUseCase().first() }.onSuccess { mode ->
                 updateRepeatToggleMode(mode)
-                mediaPlayerGateway.setRepeatToggleMode(mode)
+                mediaPlayerManager.setRepeatToggleMode(mode)
             }.onFailure { Timber.e(it) }
         }
     }
@@ -1245,7 +1271,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
 
     internal fun saveVideoWatchedTime() {
         val watchedAt = Instant.now().toEpochMilli() / 1000
-        mediaPlayerGateway.getCurrentMediaItem()?.mediaId?.toLong()?.let { handle ->
+        mediaPlayerManager.getCurrentMediaItem()?.mediaId?.toLong()?.let { handle ->
             viewModelScope.launch {
                 runCatching {
                     saveVideoRecentlyWatchedUseCase(
@@ -1260,10 +1286,10 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     }
 
     internal fun pauseForBackground() {
-        val wasPlaying = mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser
+        val wasPlaying = mediaPlayerManager.getPlayWhenReady() && !isPausedByUser
         if (wasPlaying) {
             allowUpdatePausedByUser = false
-            mediaPlayerGateway.setPlayWhenReady(false)
+            mediaPlayerManager.setPlayWhenReady(false)
         }
         uiState.update {
             it.copy(
@@ -1280,9 +1306,9 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
      * transient interruptions. If the player was already not playing, only UI state is set to pause.
      */
     internal fun pausePlaybackNonUserInitiated() {
-        if (mediaPlayerGateway.getPlayWhenReady()) {
+        if (mediaPlayerManager.getPlayWhenReady()) {
             allowUpdatePausedByUser = false
-            mediaPlayerGateway.setPlayWhenReady(false)
+            mediaPlayerManager.setPlayWhenReady(false)
         }
         updatePlaybackState(MediaPlaybackState.Paused)
     }
@@ -1358,12 +1384,12 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     }
 
     internal fun updateCurrentSpeedPlaybackItem(item: SpeedPlaybackItem) {
-        mediaPlayerGateway.updatePlaybackSpeed(item)
+        mediaPlayerManager.updatePlaybackSpeed(item)
         uiState.update { it.copy(currentSpeedPlayback = item) }
     }
 
     internal fun isMediaPlayerPlaying() =
-        runCatching { mediaPlayerGateway.mediaPlayerIsPlaying() }.getOrDefault(false)
+        runCatching { mediaPlayerManager.mediaPlayerIsPlaying() }.getOrDefault(false)
 
     /**
      * Capture the screenshot when video playing.
@@ -1475,10 +1501,10 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     internal fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
 
     internal fun updatePlaybackStateWithReplay(value: Boolean) {
-        if (mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser) {
+        if (mediaPlayerManager.getPlayWhenReady() && !isPausedByUser) {
             allowUpdatePausedByUser = false
         }
-        mediaPlayerGateway.setPlayWhenReady(value)
+        mediaPlayerManager.setPlayWhenReady(value)
         uiState.update {
             it.copy(
                 mediaPlaybackState = if (value) {
@@ -1494,7 +1520,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     internal fun seekToByHandle(handle: Long, items: List<VideoPlayerItem> = uiState.value.items) {
         val index = items.indexOfFirst { it.nodeHandle == handle }
         if (index in items.indices) {
-            mediaPlayerGateway.playerSeekTo(index)
+            mediaPlayerManager.playerSeekTo(index)
         }
     }
 
@@ -1546,12 +1572,12 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 nameToDisplay = null
             )
             uiState.update { it.copy(mediaPlaySources = mediaPlaySources) }
-            mediaPlayerGateway.buildPlaySources(mediaPlaySources)
+            mediaPlayerManager.buildPlaySources(mediaPlaySources)
         }
     }
 
     internal fun getCurrentPlayingPosition() =
-        mediaPlayerGateway.getCurrentPlayingPosition().formatToString(durationInSecondsTextMapper)
+        mediaPlayerManager.getCurrentPlayingPosition().formatToString(durationInSecondsTextMapper)
 
     private fun Long.formatToString(durationInSecondsTextMapper: DurationInSecondsTextMapper) =
         durationInSecondsTextMapper(this.milliseconds)
@@ -1685,7 +1711,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             )
         }
 
-        mediaPlayerGateway.buildPlaySources(mediaPlaySources)
+        mediaPlayerManager.buildPlaySources(mediaPlaySources)
     }
 
     internal fun updateFullscreen(value: Boolean) {
@@ -1756,14 +1782,14 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
 
             SubtitleSelectedStatus.SelectMatchedItem -> onAutoMatchItemClicked(info)
         }
-        if (!mediaPlayerGateway.getPlayWhenReady())
-            mediaPlayerGateway.setPlayWhenReady(true)
+        if (!mediaPlayerManager.getPlayWhenReady())
+            mediaPlayerManager.setPlayWhenReady(true)
     }
 
     private fun onOffItemClicked() {
         if (uiState.value.subtitleSelectedStatus != SubtitleSelectedStatus.Off) {
             Analytics.tracker.trackEvent(OffOptionForHideSubtitlePressedEvent)
-            mediaPlayerGateway.hideSubtitle()
+            mediaPlayerManager.hideSubtitle()
         }
 
         uiState.update {
@@ -1775,7 +1801,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     }
 
     private fun onAddedSubtitleOptionClicked() {
-        mediaPlayerGateway.showSubtitle()
+        mediaPlayerManager.showSubtitle()
         uiState.update {
             it.copy(
                 showSubTitlesOptions = false,
@@ -1803,7 +1829,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     }
 
     private fun addSubtitleAndUpdatePlaybackSources(url: String) {
-        mediaPlayerGateway.addSubtitle(url)
+        mediaPlayerManager.addSubtitle(url)
         updatePlaySourcesAfterSubtitleChange(uiState.value.currentPlayingIndex ?: 0)
     }
 
@@ -1814,7 +1840,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
                 newIndexForCurrentItem = currentPlayingIndex,
                 nameToDisplay = null
             )
-            mediaPlayerGateway.buildPlaySources(newSources)
+            mediaPlayerManager.buildPlaySources(newSources)
         }
     }
 
@@ -1823,7 +1849,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         val addedInfo = uiState.value.addedSubtitleInfo
 
         if (matchedInfo != null && addedInfo == null) {
-            mediaPlayerGateway.showSubtitle()
+            mediaPlayerManager.showSubtitle()
         } else {
             val url = matchedInfo?.url ?: info?.url
             if (url != null) addSubtitleAndUpdatePlaybackSources(url)
@@ -1858,11 +1884,11 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
 
     internal fun updateShowSubtitleDialog(value: Boolean) {
         if (value) {
-            wasPlayingBeforeSubtitleDialog = mediaPlayerGateway.getPlayWhenReady()
-            mediaPlayerGateway.setPlayWhenReady(false)
+            wasPlayingBeforeSubtitleDialog = mediaPlayerManager.getPlayWhenReady()
+            mediaPlayerManager.setPlayWhenReady(false)
         } else {
             if (wasPlayingBeforeSubtitleDialog) {
-                mediaPlayerGateway.setPlayWhenReady(true)
+                mediaPlayerManager.setPlayWhenReady(true)
             }
             wasPlayingBeforeSubtitleDialog = false
         }
