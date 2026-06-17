@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.clouddrive.ui
+package mega.privacy.android.app.presentation.photos.timeline.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
