@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
-import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -330,9 +329,6 @@ class ImagePreviewActivity : BaseActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Draw behind display cutouts.
             window.attributes.layoutInDisplayCutoutMode = LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
-
-            // No scrim behind transparent navigation bar.
-            window.setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS)
 
             // System bars use fade by default to hide/show. Make them slide instead.
             val insetsController = WindowCompat.getInsetsController(window, window.decorView)
