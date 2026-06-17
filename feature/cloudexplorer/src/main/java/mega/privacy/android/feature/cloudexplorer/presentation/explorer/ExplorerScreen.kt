@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -37,6 +38,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -63,6 +65,16 @@ import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.search.presentation.component.SearchTopAppBar
+import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
+import mega.privacy.mobile.analytics.event.CloudExplorerCancelButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudExplorerCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudExplorerConfirmedChatButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudExplorerConfirmedCloudButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudExplorerConfirmedFavouritesButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudExplorerConfirmedIncomingButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudExplorerConfirmedSearchButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudExplorerScreenEvent
+import mega.privacy.mobile.analytics.event.CloudExplorerSearchButtonPressedEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -102,6 +114,13 @@ internal fun ExplorerScreen(
     }
     val protectedUserTap: (() -> Unit) -> Unit = { action -> if (!isProcessingAction) action() }
 
+    // Inner folder navigation re-enters this screen for each folder; only the top-level
+    // presentation counts as the explorer being opened.
+    LaunchedEffect(Unit) {
+        if (!isInnerNavigation) {
+            Analytics.tracker.trackEvent(CloudExplorerScreenEvent)
+        }
+    }
 
     BackHandler(enabled = showSearch) { onCloseSearch() }
     val coroutineScope = rememberCoroutineScope()
@@ -169,7 +188,12 @@ internal fun ExplorerScreen(
                     navigationType = if (isInnerNavigation) {
                         AppBarNavigationType.Back { protectedUserTap { onNavigateBack() } }
                     } else {
-                        AppBarNavigationType.Close { protectedUserTap { onNavigateBack() } }
+                        AppBarNavigationType.Close {
+                            protectedUserTap {
+                                Analytics.tracker.trackEvent(CloudExplorerCloseButtonPressedEvent)
+                                onNavigateBack()
+                            }
+                        }
                     },
                     title = when {
                         chatExplorerSelectionState.selectedItemsCount > 0 -> chatExplorerSelectionState.selectedItemsCount.toString()
@@ -190,6 +214,7 @@ internal fun ExplorerScreen(
                             add(
                                 MenuActionWithClick(CommonMenuAction.Search) {
                                     if (!isProcessingAction) {
+                                        Analytics.tracker.trackEvent(CloudExplorerSearchButtonPressedEvent)
                                         showSearch = true
                                     }
                                 }
@@ -206,6 +231,12 @@ internal fun ExplorerScreen(
                     primaryButtonText = stringResource(explorerMode.actionStringId),
                     onPrimaryButtonClick = {
                         protectedUserTap {
+                            Analytics.tracker.trackEvent(
+                                confirmedTabEvent(selectedTabIndex, uiStateShared.nodeSourceType)
+                            )
+                            if (showSearch) {
+                                Analytics.tracker.trackEvent(CloudExplorerConfirmedSearchButtonPressedEvent)
+                            }
                             when {
                                 explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX ->
                                     onChatsSelected()
@@ -225,7 +256,12 @@ internal fun ExplorerScreen(
                         else -> false
                     },
                     textOnlyButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
-                    onTextOnlyButtonClick = { protectedUserTap { onCloseExplorerScreen() } },
+                    onTextOnlyButtonClick = {
+                        protectedUserTap {
+                            Analytics.tracker.trackEvent(CloudExplorerCancelButtonPressedEvent)
+                            onCloseExplorerScreen()
+                        }
+                    },
                 )
             }
         }
@@ -381,6 +417,25 @@ internal fun ExplorerScreen(
             )
         }
     }
+}
+
+/**
+ * Resolves the confirmation analytics event for the section the picked destination belongs to.
+ * The selected tab drives the choice at the top level; inner folder navigation hides the tabs, so
+ * the node source type is used as a fallback to keep incoming/favourites attribution correct.
+ */
+internal fun confirmedTabEvent(
+    selectedTabIndex: Int,
+    nodeSourceType: NodeSourceType,
+): EventIdentifier = when {
+    selectedTabIndex == CHAT_TAB_INDEX -> CloudExplorerConfirmedChatButtonPressedEvent
+    selectedTabIndex == INCOMING_TAB_INDEX || nodeSourceType == NodeSourceType.INCOMING_SHARES ->
+        CloudExplorerConfirmedIncomingButtonPressedEvent
+
+    selectedTabIndex == FAVOURITES_TAB_INDEX || nodeSourceType == NodeSourceType.FAVOURITES ->
+        CloudExplorerConfirmedFavouritesButtonPressedEvent
+
+    else -> CloudExplorerConfirmedCloudButtonPressedEvent
 }
 
 internal fun navigateToFolder(
