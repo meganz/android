@@ -11,24 +11,16 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.feature.cloudexplorer.presentation.addvideotoplaylist.AddVideoToPlaylistScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.addvideotoplaylist.AddVideoToPlaylistViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.copy.CopyScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.copy.CopyViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.importalbum.ImportAlbumScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.importalbum.ImportAlbumViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.importnodes.ImportScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.importnodes.ImportViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.move.MoveScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.move.MoveViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.selectcufolder.SelectCUFolderScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.selectcufolder.SelectCUFolderViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.sharefilestochat.ShareFilesToChatScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.sharefilestochat.ShareFilesToChatViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.picker.NodePickerScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.picker.NodePickerViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.picker.TargetNodePickerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.files.ShareFilesToMegaViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.text.ShareTextToMegaScreen
@@ -42,6 +34,7 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.AddVideoToPlaylistNavKey
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.CopyResult
+import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.ImportAlbumNavKey
 import mega.privacy.android.navigation.destination.ImportNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
@@ -78,26 +71,29 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             val onSelectCUFolder: (NodeId) -> Unit = { nodeId ->
                 navigationHandler.returnResult(SelectCUFolderNavKey.RESULT, nodeId)
             }
-            selectCUFolderDestination(
+            nodePickerDestination<SelectCUFolderNavKey>(
+                explorerMode = ExplorerMode.SelectCUFolder,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onSelectFolder = onSelectCUFolder,
+                onFolderPicked = onSelectCUFolder,
             )
             val onImportFolder: (NodeId) -> Unit = { nodeId ->
                 navigationHandler.returnResult(ImportNavKey.RESULT, nodeId)
             }
-            importDestination(
+            nodePickerDestination<ImportNavKey>(
+                explorerMode = ExplorerMode.Import,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onSelectFolder = onImportFolder,
+                onFolderPicked = onImportFolder,
             )
             val onImportAlbumFolder: (NodeId) -> Unit = { nodeId ->
                 navigationHandler.returnResult(ImportAlbumNavKey.RESULT, nodeId)
             }
-            importAlbumDestination(
+            nodePickerDestination<ImportAlbumNavKey>(
+                explorerMode = ExplorerMode.AlbumImport,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onSelectFolder = onImportAlbumFolder,
+                onFolderPicked = onImportAlbumFolder,
             )
             val onCopyResult: (CopyResult) -> Unit = { result ->
                 navigationHandler.returnResult(CopyNavKey.RESULT, result)
@@ -118,18 +114,27 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             val onFilesPicked: (List<NodeId>) -> Unit = { nodeIds ->
                 navigationHandler.returnResult(ShareFilesToChatNavKey.RESULT, nodeIds)
             }
-            shareFilesToChatDestination(
+            nodePickerDestination<ShareFilesToChatNavKey>(
+                explorerMode = ExplorerMode.ShareFilesToChat,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onFilesPicked = onFilesPicked,
+                onFilesPicked = { key, nodeIds ->
+                    onFilesPicked(nodeIds)
+                    navigationHandler.remove(key)
+                },
             )
             val onVideosPicked: (List<NodeId>) -> Unit = { nodeIds ->
                 navigationHandler.returnResult(AddVideoToPlaylistNavKey.RESULT, nodeIds)
             }
-            addVideoToPlaylistDestination(
+            nodePickerDestination<AddVideoToPlaylistNavKey>(
+                explorerMode = ExplorerMode.AddVideosToPlaylist,
                 onNavigateBack = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
-                onVideosPicked = onVideosPicked,
+                disabledNodeIds = { it.addedVideoIds.toSet() },
+                onFilesPicked = { key, nodeIds ->
+                    onVideosPicked(nodeIds)
+                    navigationHandler.remove(key)
+                },
             )
             nodeExplorerDestination(
                 onCloseExplorerScreen = { navigationHandler.backTo(it, true) },
@@ -194,59 +199,31 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         }
     }
 
-    fun EntryProviderScope<NavKey>.selectCUFolderDestination(
-        onNavigateBack: (NavKey) -> Unit,
-        onNavigate: (NavKey) -> Unit,
-        onSelectFolder: (NodeId) -> Unit,
+    /**
+     * Registers a [NodePickerScreen] destination for a flow that opens at the cloud-drive root and
+     * picks either a destination folder ([onFolderPicked]) or a set of files ([onFilesPicked]).
+     */
+    private inline fun <reified K : ExplorerNavKey> EntryProviderScope<NavKey>.nodePickerDestination(
+        explorerMode: ExplorerMode,
+        noinline onNavigateBack: (NavKey) -> Unit,
+        noinline onNavigate: (NavKey) -> Unit,
+        crossinline disabledNodeIds: (K) -> Set<NodeId> = { emptySet() },
+        noinline onFolderPicked: (NodeId) -> Unit = {},
+        crossinline onFilesPicked: (K, List<NodeId>) -> Unit = { _, _ -> },
     ) {
-        entry<SelectCUFolderNavKey> { key ->
-            val viewModel = hiltViewModel<SelectCUFolderViewModel>()
+        entry<K> { key ->
+            val viewModel = hiltViewModel<NodePickerViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            SelectCUFolderScreen(
+            NodePickerScreen(
                 uiState = uiState,
                 startNavKey = key,
+                explorerMode = explorerMode,
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
-                onSelectFolder = onSelectFolder,
-            )
-        }
-    }
-
-    fun EntryProviderScope<NavKey>.importDestination(
-        onNavigateBack: (NavKey) -> Unit,
-        onNavigate: (NavKey) -> Unit,
-        onSelectFolder: (NodeId) -> Unit,
-    ) {
-        entry<ImportNavKey> { key ->
-            val viewModel = hiltViewModel<ImportViewModel>()
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            ImportScreen(
-                uiState = uiState,
-                startNavKey = key,
-                onNavigateBack = { onNavigateBack(key) },
-                onNavigate = onNavigate,
-                onSelectFolder = onSelectFolder,
-            )
-        }
-    }
-
-    fun EntryProviderScope<NavKey>.importAlbumDestination(
-        onNavigateBack: (NavKey) -> Unit,
-        onNavigate: (NavKey) -> Unit,
-        onSelectFolder: (NodeId) -> Unit,
-    ) {
-        entry<ImportAlbumNavKey> { key ->
-            val viewModel = hiltViewModel<ImportAlbumViewModel>()
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            ImportAlbumScreen(
-                uiState = uiState,
-                startNavKey = key,
-                onNavigateBack = { onNavigateBack(key) },
-                onNavigate = onNavigate,
-                onSelectFolder = onSelectFolder,
+                disabledNodeIds = disabledNodeIds(key),
+                onFolderPicked = onFolderPicked,
+                onFilesPicked = { onFilesPicked(key, it) },
             )
         }
     }
@@ -288,44 +265,6 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         }
     }
 
-    fun EntryProviderScope<NavKey>.shareFilesToChatDestination(
-        onNavigateBack: (NavKey) -> Unit,
-        onNavigate: (NavKey) -> Unit,
-        onFilesPicked: (List<NodeId>) -> Unit,
-    ) {
-        entry<ShareFilesToChatNavKey> { key ->
-            val viewModel = hiltViewModel<ShareFilesToChatViewModel>()
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            ShareFilesToChatScreen(
-                uiState = uiState,
-                startNavKey = key,
-                onFilesPicked = onFilesPicked,
-                onNavigateBack = { onNavigateBack(key) },
-                onNavigate = onNavigate,
-            )
-        }
-    }
-
-    fun EntryProviderScope<NavKey>.addVideoToPlaylistDestination(
-        onNavigateBack: (NavKey) -> Unit,
-        onNavigate: (NavKey) -> Unit,
-        onVideosPicked: (List<NodeId>) -> Unit,
-    ) {
-        entry<AddVideoToPlaylistNavKey> { key ->
-            val viewModel = hiltViewModel<AddVideoToPlaylistViewModel>()
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-            AddVideoToPlaylistScreen(
-                uiState = uiState,
-                startNavKey = key,
-                onVideosPicked = onVideosPicked,
-                onNavigateBack = { onNavigateBack(key) },
-                onNavigate = onNavigate,
-            )
-        }
-    }
-
     fun EntryProviderScope<NavKey>.copyDestination(
         onNavigateBack: (NavKey) -> Unit,
         onNavigate: (List<NavKey>) -> Unit,
@@ -335,9 +274,10 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             val viewModel = hiltViewModel<CopyViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            CopyScreen(
+            TargetNodePickerScreen(
                 uiState = uiState,
                 startNavKey = key,
+                explorerMode = ExplorerMode.Copy,
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 onSelectFolder = { target ->
@@ -356,14 +296,16 @@ class CloudExplorerFeatureDestination : FeatureDestination {
             val viewModel = hiltViewModel<MoveViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            MoveScreen(
+            TargetNodePickerScreen(
                 uiState = uiState,
                 startNavKey = key,
+                explorerMode = ExplorerMode.Move,
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigate = onNavigate,
                 onSelectFolder = { target ->
                     onMoveResult(MoveResult(nodeIds = key.nodeIds, target = target))
                 },
+                disabledTargetId = key.disabledTargetId,
             )
         }
     }

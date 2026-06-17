@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
+import mega.privacy.android.feature.cloudexplorer.presentation.picker.TargetNodePickerUiState
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -50,10 +51,10 @@ internal class MoveViewModelTest {
         )
     }
 
-    private suspend fun app.cash.turbine.ReceiveTurbine<MoveUiState>.awaitData(): MoveUiState.Data {
-        var state: MoveUiState = awaitItem()
-        if (state is MoveUiState.Loading) state = awaitItem()
-        return state as MoveUiState.Data
+    private suspend fun app.cash.turbine.ReceiveTurbine<TargetNodePickerUiState>.awaitData(): TargetNodePickerUiState.Data {
+        var state: TargetNodePickerUiState = awaitItem()
+        if (state is TargetNodePickerUiState.Loading) state = awaitItem()
+        return state as TargetNodePickerUiState.Data
     }
 
     @Test

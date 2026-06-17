@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.cloudexplorer.presentation.importnodes
+package mega.privacy.android.feature.cloudexplorer.presentation.picker
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -20,15 +20,21 @@ import org.mockito.kotlin.stub
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class ImportViewModelTest {
+internal class NodePickerViewModelTest {
 
-    private lateinit var underTest: ImportViewModel
+    private lateinit var underTest: NodePickerViewModel
 
     private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
 
     @BeforeEach
     fun setUp() {
         reset(getRootNodeIdUseCase)
+    }
+
+    private suspend fun app.cash.turbine.ReceiveTurbine<NodePickerUiState>.awaitData(): NodePickerUiState.Data {
+        var state: NodePickerUiState = awaitItem()
+        if (state is NodePickerUiState.Loading) state = awaitItem()
+        return state as NodePickerUiState.Data
     }
 
     @Test
@@ -38,14 +44,10 @@ internal class ImportViewModelTest {
             getRootNodeIdUseCase.stub {
                 onBlocking { invoke() } doReturn expectedRoot
             }
-            underTest = ImportViewModel(getRootNodeIdUseCase)
+            underTest = NodePickerViewModel(getRootNodeIdUseCase)
 
             underTest.uiState.test {
-                var state: ImportUiState = awaitItem()
-                if (state is ImportUiState.Loading) {
-                    state = awaitItem()
-                }
-                assertThat(state).isEqualTo(ImportUiState.Data(rootNodeId = expectedRoot))
+                assertThat(awaitData().rootNodeId).isEqualTo(expectedRoot)
             }
         }
 
@@ -55,14 +57,10 @@ internal class ImportViewModelTest {
             getRootNodeIdUseCase.stub {
                 onBlocking { invoke() } doReturn null
             }
-            underTest = ImportViewModel(getRootNodeIdUseCase)
+            underTest = NodePickerViewModel(getRootNodeIdUseCase)
 
             underTest.uiState.test {
-                var state: ImportUiState = awaitItem()
-                if (state is ImportUiState.Loading) {
-                    state = awaitItem()
-                }
-                assertThat(state).isEqualTo(ImportUiState.Data(rootNodeId = NodeId(-1)))
+                assertThat(awaitData().rootNodeId).isEqualTo(NodeId(-1))
             }
         }
 
@@ -72,14 +70,10 @@ internal class ImportViewModelTest {
             getRootNodeIdUseCase.stub {
                 onBlocking { invoke() } doAnswer { throw RuntimeException("boom") }
             }
-            underTest = ImportViewModel(getRootNodeIdUseCase)
+            underTest = NodePickerViewModel(getRootNodeIdUseCase)
 
             underTest.uiState.test {
-                var state: ImportUiState = awaitItem()
-                if (state is ImportUiState.Loading) {
-                    state = awaitItem()
-                }
-                assertThat(state).isEqualTo(ImportUiState.Data(rootNodeId = NodeId(-1)))
+                assertThat(awaitData().rootNodeId).isEqualTo(NodeId(-1))
             }
         }
 

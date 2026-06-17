@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.shared.nodes.extension.orInvalid
 import mega.privacy.android.domain.usecase.file.CreateTextFileWithContentUseCase
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
@@ -49,11 +49,7 @@ class ShareTextToMegaViewModel @Inject constructor(
     }
 
     private fun rootNodeIdFlow() = flow {
-        emit(
-            runCatching { getRootNodeIdUseCase() }
-                .onFailure { Timber.e(it) }
-                .getOrNull() ?: NodeId(-1)
-        )
+        emit(getRootNodeIdUseCase.orInvalid())
     }
 
     /**
