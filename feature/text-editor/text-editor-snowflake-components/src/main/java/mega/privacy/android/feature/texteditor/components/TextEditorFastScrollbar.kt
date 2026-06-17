@@ -116,12 +116,14 @@ fun TextEditorFastScrollbar(
     // must be a remember key to keep the lambda up to date when the chunk count changes.
     val scrollProportion by remember(state, itemCount) {
         derivedStateOf {
-            val visibleItems = state.layoutInfo.visibleItemsInfo
+            val layoutInfo = state.layoutInfo
+            val visibleItems = layoutInfo.visibleItemsInfo
             calculateScrollProportion(
                 firstVisibleItemIndex = state.firstVisibleItemIndex,
                 firstVisibleItemScrollOffset = state.firstVisibleItemScrollOffset,
                 firstVisibleItemSize = visibleItems.firstOrNull()?.size?.toFloat(),
                 itemCount = itemCount,
+                viewportSize = layoutInfo.viewportEndOffset - layoutInfo.viewportStartOffset,
                 canScrollForward = state.canScrollForward,
                 canScrollBackward = state.canScrollBackward,
             )
@@ -309,6 +311,7 @@ fun TextEditorFastScrollbar(
  * @param firstVisibleItemScrollOffset  Pixel offset of the first visible item from the top of the viewport.
  * @param firstVisibleItemSize  Height in pixels of the first visible item, or null if unavailable.
  * @param itemCount  Total number of items in the list.
+ * @param viewportSize  Main-axis size of the viewport in pixels (its scrollable extent).
  * @param canScrollForward  Whether the list can still scroll down; false only at the true bottom.
  * @param canScrollBackward  Whether the list can scroll up; false only at the true top.
  */
@@ -317,6 +320,7 @@ internal fun calculateScrollProportion(
     firstVisibleItemScrollOffset: Int,
     firstVisibleItemSize: Float?,
     itemCount: Int,
+    viewportSize: Int,
     canScrollForward: Boolean,
     canScrollBackward: Boolean,
 ): Float {
@@ -326,7 +330,16 @@ internal fun calculateScrollProportion(
     if (!canScrollForward) return if (canScrollBackward) 1f else 0f
     val itemCountFloat = itemCount.toFloat().coerceAtLeast(1f)
     val itemSize = (firstVisibleItemSize ?: 1f).coerceAtLeast(1f)
-    val itemProgress = firstVisibleItemScrollOffset / itemSize
+    // While the first visible item is also the last item, it can only scroll until its tail reaches the
+    // viewport bottom — its remaining travel is (itemSize - viewport), not the full itemSize. Dividing by
+    // the full itemSize leaves a viewport-sized gap below the thumb that never closes until canScrollForward
+    // flips at the true bottom, which then snaps the thumb straight to 1f. With few chunks that gap is large
+    // — most visibly a single wrapped line (one tall chunk), where the thumb sits near the middle a screen
+    // from the end and then jumps to the bottom (and back when scrolling up again). Normalising the last
+    // item by its real travel keeps the thumb continuous all the way to the end (AND-23767 / T21378947).
+    val isLastItem = firstVisibleItemIndex >= itemCount - 1
+    val itemTravel = if (isLastItem) (itemSize - viewportSize).coerceAtLeast(1f) else itemSize
+    val itemProgress = (firstVisibleItemScrollOffset / itemTravel).coerceIn(0f, 1f)
     val continuousIndex = firstVisibleItemIndex.toFloat() + itemProgress
     return (continuousIndex / itemCountFloat).coerceIn(0f, 1f)
 }
