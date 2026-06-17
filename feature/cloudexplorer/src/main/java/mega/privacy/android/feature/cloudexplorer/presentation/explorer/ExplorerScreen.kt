@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -35,6 +34,7 @@ import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
@@ -114,9 +114,7 @@ internal fun ExplorerScreen(
     }
     val protectedUserTap: (() -> Unit) -> Unit = { action -> if (!isProcessingAction) action() }
 
-    // Inner folder navigation re-enters this screen for each folder; only the top-level
-    // presentation counts as the explorer being opened.
-    LaunchedEffect(Unit) {
+    LaunchedOnceEffect {
         if (!isInnerNavigation) {
             Analytics.tracker.trackEvent(CloudExplorerScreenEvent)
         }
@@ -425,11 +423,6 @@ internal fun ExplorerScreen(
     }
 }
 
-/**
- * Resolves the confirmation analytics event for the section the picked destination belongs to.
- * The selected tab drives the choice at the top level; inner folder navigation hides the tabs, so
- * the node source type is used as a fallback to keep incoming/favourites attribution correct.
- */
 internal fun confirmedTabEvent(
     selectedTabIndex: Int,
     nodeSourceType: NodeSourceType,
