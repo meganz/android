@@ -2405,4 +2405,21 @@
     <string name="home_do_more_with_mega_camera_uploads">相機上傳</string>
     <string name="home_do_more_with_mega_add_contact">新增聯絡人</string>
     <string name="home_do_more_with_mega_schedule_meeting">安排會議</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="other">已選擇%1$d個</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">搜尋群組</string>
+    <string name="contacts_groups_empty_title">沒有群組</string>
+    <string name="public_link_auth_alert_description_external_file">請妥善保管此檔案，以便隨時存取</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="other">[A]%1$s [/A][B]已更新%2$d個項目。[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">清除紀錄</string>
+    <string name="home_cwlo_clear_history_dialog_message">確定要清除紀錄嗎？此操作無法復原。</string>
+    <string name="search_placeholder_chat">在對話中搜尋</string>
+    <string name="search_landing_chat_explorer_subtitle">搜尋通訊錄、對話、會議</string>
+    <string name="home_do_more_with_mega_title">MEGA助您提升生產力</string>
+    <string name="home_do_more_with_mega_add_sync">新增同步</string>
+    <string name="home_do_more_with_mega_scan_document">掃描文件</string>
+    <string name="home_do_more_with_mega_create_album">建立相簿</string>
 </resources>
