@@ -7,7 +7,7 @@ import java.io.File
  */
 interface CacheRepository {
     /**
-     * Get Cache Size
+     * Get the cache size in bytes as reported by the system App info screen.
      */
     suspend fun getCacheSize(): Long
 

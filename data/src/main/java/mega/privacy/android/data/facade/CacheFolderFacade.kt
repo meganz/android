@@ -1,6 +1,9 @@
 package mega.privacy.android.data.facade
 
+import android.app.usage.StorageStatsManager
 import android.content.Context
+import android.os.Process
+import android.os.storage.StorageManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -80,12 +83,23 @@ internal class CacheFolderFacade @Inject constructor(
 
     override suspend fun getCacheSize(): Long = withContext(ioDispatcher) {
         Timber.d("getCacheSize")
+        runCatching {
+            context.getSystemService(StorageStatsManager::class.java)
+                .queryStatsForUid(StorageManager.UUID_DEFAULT, Process.myUid())
+                .cacheBytes
+        }.getOrElse { error ->
+            Timber.w(error, "Unable to query cache size from StorageStatsManager")
+            getCacheSizeFromFiles()
+        }
+    }
+
+    private suspend fun getCacheSizeFromFiles(): Long {
         val cacheIntDir = context.cacheDir
         val cacheExtDir = context.externalCacheDir
         cacheIntDir?.let {
             Timber.d("Path to check internal: ${it.absolutePath}")
         }
-        fileGateway.getTotalSize(cacheIntDir).plus(fileGateway.getTotalSize(cacheExtDir))
+        return fileGateway.getTotalSize(cacheIntDir).plus(fileGateway.getTotalSize(cacheExtDir))
     }
 
     override suspend fun clearCache() {
