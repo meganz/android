@@ -171,6 +171,7 @@ import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransfer
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
+import mega.privacy.android.navigation.PendingFileLinkPreviewAutoOpen
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
@@ -268,6 +269,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     @Assisted private val args: Args,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
+    private val pendingFileLinkPreviewAutoOpen: PendingFileLinkPreviewAutoOpen,
 ) : ViewModel() {
 
     val uiState: StateFlow<VideoPlayerUiState>
@@ -278,6 +280,14 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                 serializedData = args.serializedData,
             )
         )
+
+    /**
+     * Arm the file link preview to auto-open once the link reloads after a logged-out
+     * "Save to MEGA" sign in, so the user lands back on this video.
+     */
+    fun armPendingPreviewAutoOpen() {
+        pendingFileLinkPreviewAutoOpen.arm()
+    }
 
     private var needStopStreamingServer = false
     private var playerRetry = 0

@@ -19,6 +19,7 @@ data class LoginNavKey(
  * @param initialEmail if set, the email field will be pre-filled with this value
  */
 @Serializable
+@Parcelize
 data class CreateAccountNavKey(
     val initialEmail: String? = null,
-) : NoSessionNavKey.Mandatory
+) : NoSessionNavKey.Mandatory, Parcelable
