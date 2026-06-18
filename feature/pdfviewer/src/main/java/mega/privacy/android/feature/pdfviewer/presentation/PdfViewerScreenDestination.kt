@@ -3,6 +3,7 @@ package mega.privacy.android.feature.pdfviewer.presentation
 import android.content.Intent
 import androidx.activity.compose.LocalActivity
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,13 +16,14 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.buildDownloadAwareActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.pdfviewer.presentation.components.startPdfFileShareIntent
 import mega.privacy.android.feature.pdfviewer.presentation.components.startPdfPublicLinkShareIntent
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
@@ -93,6 +95,17 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             navigationHandler = navigationHandler,
         )
 
+        val downloadAwareActionHandler =
+            remember(singleNodeActionHandler, nodeOptionsActionViewModel) {
+                buildDownloadAwareActionHandler(
+                    delegate = singleNodeActionHandler,
+                    onDownload = { node ->
+                        nodeOptionsActionViewModel.updateSelectedNodes(listOf(node))
+                        nodeOptionsActionViewModel.downloadNode(withStartMessage = true)
+                    },
+                )
+            }
+
         val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
         // Push the current PDF node into the action ViewModel so it can compute the
@@ -109,9 +122,19 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
-            nodeActionHandler = singleNodeActionHandler,
+            nodeActionHandler = downloadAwareActionHandler,
             onTransfer = onTransfer,
         )
+
+        // "Save to MEGA" on a file-link PDF (floating toolbar / More sheet) routes through
+        // SaveToMegaActionClickHandler, which raises loginRequiredEvent when logged out.
+        // Consume it here to prompt sign in / sign up, mirroring the file-link screen.
+        EventEffect(
+            event = nodeActionState.loginRequiredEvent,
+            onConsumed = nodeOptionsActionViewModel::resetLoginRequiredEvent,
+        ) {
+            showLoginRequiredSheet = true
+        }
 
         EventEffect(
             event = uiState.dismissEvent,
@@ -175,7 +198,7 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             // common actions matching the design.
             bottomBarActions = nodeActionState.visibleActions
                 .filterNot { it is CommonMenuAction.More },
-            singleNodeActionHandler = singleNodeActionHandler,
+            singleNodeActionHandler = downloadAwareActionHandler,
             // Reuse one Share action for the two surfaces that have something to share:
             //  • file link  → share the original public-link URL (mirrors the file-link screen);
             //  • external   → share the file itself via its content URI (mirrors legacy share).
@@ -200,20 +223,51 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
         )
 
         if (showLoginRequiredSheet) {
-            PublicLinkAuthAlertBottomSheet(
-                type = PublicLinkType.ExternalFile,
+            // A file-link PDF resumes to its public link after auth; an external file
+            // resumes to its content URI so the user can tap Save again.
+            val isFileLink = navKey.publicLinkUrl != null
+            val stashPendingDeepLink: () -> Unit = {
+                if (isFileLink) {
+                    activity.setPendingDeepLink(navKey.publicLinkUrl)
+                } else {
+                    activity.setPendingDeepLink(navKey.contentUri, navKey.mimeType)
+                }
+            }
+            PdfViewerLoginRequiredSheet(
+                isFileLink = isFileLink,
                 onSignupClicked = {
                     showLoginRequiredSheet = false
-                    activity.setPendingDeepLink(navKey.contentUri, navKey.mimeType)
+                    stashPendingDeepLink()
                     navigationHandler.navigate(CreateAccountNavKey())
                 },
                 onLoginClicked = {
                     showLoginRequiredSheet = false
-                    activity.setPendingDeepLink(navKey.contentUri, navKey.mimeType)
+                    stashPendingDeepLink()
                     navigationHandler.navigate(LoginNavKey())
                 },
                 onDismissSheet = { showLoginRequiredSheet = false },
             )
         }
     }
+}
+
+/**
+ * Login / sign-up prompt shown when a logged-out user taps "Save to MEGA" or the
+ * external-file upload action. A file-link PDF uses [PublicLinkType.File]; an external
+ * file uses [PublicLinkType.ExternalFile].
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun PdfViewerLoginRequiredSheet(
+    isFileLink: Boolean,
+    onSignupClicked: () -> Unit,
+    onLoginClicked: () -> Unit,
+    onDismissSheet: () -> Unit,
+) {
+    PublicLinkAuthAlertBottomSheet(
+        type = if (isFileLink) PublicLinkType.File else PublicLinkType.ExternalFile,
+        onSignupClicked = onSignupClicked,
+        onLoginClicked = onLoginClicked,
+        onDismissSheet = onDismissSheet,
+    )
 }

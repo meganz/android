@@ -26,12 +26,13 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsedItemIfQualifiesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
@@ -1128,7 +1129,7 @@ class PdfViewerViewModelTest {
     }
 
     @Test
-    fun `test that currentNode is resolved from the public link for FILE_LINK source`() = runTest {
+    fun `test that currentNode is wrapped in PublicLinkFile for FILE_LINK source`() = runTest {
         val publicUrl = "https://mega.nz/file/abc"
         val fileLinkArgs = defaultArgs.copy(
             nodeSourceType = NodeSourceType.FILE_LINK,
@@ -1141,7 +1142,9 @@ class PdfViewerViewModelTest {
         advanceUntilIdle()
 
         underTest.state.test {
-            assertThat(awaitItem().currentNode).isEqualTo(node)
+            val currentNode = awaitItem().currentNode
+            assertThat(currentNode).isInstanceOf(PublicLinkFile::class.java)
+            assertThat((currentNode as PublicLinkFile).node).isEqualTo(node)
         }
         verifyNoInteractions(getNodeByIdUseCase)
     }

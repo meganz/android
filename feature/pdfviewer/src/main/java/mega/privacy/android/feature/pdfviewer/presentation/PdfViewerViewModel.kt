@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -45,8 +46,8 @@ import mega.privacy.android.domain.usecase.continuewhereleftoff.SaveRecentlyUsed
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
@@ -755,6 +756,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         return runCatching { getPublicNodeUseCase(url) }
             .onFailure { Timber.e(it, "Failed to resolve public node for file-link toolbar") }
             .getOrNull()
+            ?.let { PublicLinkFile(it, null) }
     }
 
     private suspend fun loadOfflineFallbackNode(nodeId: NodeId): TypedNode? {
