@@ -3261,7 +3261,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">以視覺化格狀佈局開啟僅包含圖片或影片的資料夾。透過縮圖瀏覽媒體，並依日期進行篩選。</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">由於此資料夾僅包含圖片和影片，我們已自動以媒體檢視開啟。您可以透過更具沉浸感的佈局來欣賞您的影像內容。您可以在設定中停用此功能。</string>
+    <string name="cloud_drive_media_discovery_banner_context">由於此資料夾僅包含圖片和影片，我們已自動以媒體檢視開啟。您可以透過更具沉浸感的版面配置來欣賞您的影像內容。您可以在設定中停用此功能。</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">設定</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
