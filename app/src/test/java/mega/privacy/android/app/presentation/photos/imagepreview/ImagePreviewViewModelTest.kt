@@ -1082,6 +1082,16 @@ class ImagePreviewViewModelTest {
     }
 
     @Test
+    fun `test that isFromLink is true when fetcher source is PUBLIC_FILE`() = runTest {
+        whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+            .thenReturn(ImagePreviewFetcherSource.PUBLIC_FILE)
+        initViewModel()
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isFromLink).isTrue()
+        }
+    }
+
+    @Test
     fun `test that isFromLink is false when fetcher source is not a link source`() = runTest {
         whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
             .thenReturn(ImagePreviewFetcherSource.TIMELINE)

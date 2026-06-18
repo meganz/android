@@ -171,6 +171,7 @@ class ImagePreviewViewModel @Inject constructor(
             val isFromLink = imagePreviewFetcherSource == ImagePreviewFetcherSource.FILE_LINK
                     || imagePreviewFetcherSource == ImagePreviewFetcherSource.FOLDER_LINK
                     || imagePreviewFetcherSource == ImagePreviewFetcherSource.ALBUM_SHARING
+                    || imagePreviewFetcherSource == ImagePreviewFetcherSource.PUBLIC_FILE
             val isLoggedIn = runCatching { isUserLoggedInUseCase() }.getOrDefault(false)
             _state.update { it.copy(isFromLink = isFromLink, isLoggedIn = isLoggedIn) }
         }
