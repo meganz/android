@@ -46,11 +46,35 @@ class LegacyActivityNavigationHandler(
     }
 
     override fun navigate(destination: NavKey, navOptions: NavOptions?) {
-        backStack.add(destination)
+        navigate(listOf(destination), navOptions)
     }
 
     override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
+        applyNavOptions(navOptions, destinations)
         backStack.addAll(destinations)
+    }
+
+    private fun applyNavOptions(navOptions: NavOptions?, destinations: List<NavKey>) {
+        navOptions ?: return
+        if (navOptions.launchSingleTop) {
+            val top = backStack.takeLast(destinations.size)
+            if (top.size == destinations.size &&
+                top.zip(destinations).all { (a, b) -> a::class == b::class }
+            ) {
+                repeat(destinations.size) { backStack.removeLastOrNull() }
+            }
+        }
+        val popUpTo = navOptions.popUpTo ?: return
+        val popUpToKey = if (popUpTo.routeClass == null) {
+            backStack.firstOrNull()
+        } else {
+            backStack.lastOrNull { it::class == popUpTo.routeClass }
+        } ?: return
+        // Pop without triggering onEmptyBackStack: the destinations are added right after.
+        val index = backStack.indexOfLast { it == popUpToKey }
+        if (index == -1) return
+        val removeCount = backStack.size - index - if (popUpTo.inclusive) 0 else 1
+        repeat(removeCount.coerceAtLeast(0)) { backStack.removeLastOrNull() }
     }
 
     override fun backTo(destination: NavKey, inclusive: Boolean) {

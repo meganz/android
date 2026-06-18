@@ -63,7 +63,7 @@ fun LegacyActivityScaffold(
     appDialogDestinations: Set<AppDialogDestinations> = emptySet(),
     onEmptyBackStack: () -> Unit = {},
     excludeOwnDestination: KClass<out FeatureDestination>? = null,
-    overlayContent: @Composable () -> Unit = {},
+    overlayContent: @Composable (handler: NavigationHandler) -> Unit = {},
     transitionSpec: AnimatedContentTransitionScope<*>.() -> ContentTransform = { fadeTransition },
     popTransitionSpec: AnimatedContentTransitionScope<*>.() -> ContentTransform = { fadeTransition },
     entryContent: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit,
@@ -128,7 +128,7 @@ fun LegacyActivityScaffold(
                 event = transferState.transferEvent,
                 onConsumeEvent = appTransferViewModel::consumedTransferEvent,
             )
-            overlayContent()
+            overlayContent(navigationHandler)
         }
     }
 }

@@ -95,7 +95,7 @@ import timber.log.Timber
 
 /**
  * Compose screen wrapping [ChatTabsView] for use in ChatActivity (Nav3).
- * Replaces [ChatTabsFragment] when hosted in the new single-activity architecture.
+ * Hosted as the chat tabs entry of the chat host's LegacyActivityScaffold.
  */
 @Composable
 internal fun ChatTabsScreen(
