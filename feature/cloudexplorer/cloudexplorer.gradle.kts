@@ -13,6 +13,12 @@ android {
         abortOnError = true
     }
     namespace = "mega.privacy.android.feature.cloudexplorer"
+
+    testOptions {
+        unitTests {
+            targetSdk = 34
+        }
+    }
 }
 
 dependencies {
@@ -35,6 +41,7 @@ dependencies {
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
+    testImplementation(project(":core:analytics:analytics-test"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)

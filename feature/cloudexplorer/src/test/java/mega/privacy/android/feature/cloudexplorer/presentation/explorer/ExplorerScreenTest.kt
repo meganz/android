@@ -1,0 +1,167 @@
+package mega.privacy.android.feature.cloudexplorer.presentation.explorer
+
+import android.content.Context
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
+import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.MutableStateFlow
+import mega.android.core.ui.model.LocalizedText
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
+import mega.privacy.android.navigation.destination.CopyNavKey
+import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
+import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.resources.R as sharedR
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+
+@RunWith(AndroidJUnit4::class)
+internal class ExplorerScreenTest {
+
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
+
+    private val viewModel = mock<NodesExplorerViewModel>()
+    private val viewModelStore = mock<ViewModelStore> {
+        on { get(argThat<String> { contains(NodesExplorerViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
+    }
+    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
+        on { viewModelStore } doReturn viewModelStore
+    }
+
+    @Test
+    fun `test that the action buttons are shown when no action is processing`() {
+        setContent(isProcessingAction = false)
+
+        composeTestRule.onNodeWithTag(ACTION_BUTTONS_VIEW_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the action buttons are hidden while an action is processing`() {
+        setContent(isProcessingAction = true)
+
+        composeTestRule.onNodeWithTag(ACTION_BUTTONS_VIEW_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the folder name is shown as the title in inner navigation`() {
+        setContent(uiState = NodesExplorerUiState(folderName = LocalizedText.Literal(FOLDER_NAME)))
+
+        composeTestRule.onNodeWithText(FOLDER_NAME).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that clicking the action button in folder picker mode picks the current folder`() {
+        var pickedFolderId: NodeId? = null
+        setContent(
+            uiStateShared = sharedUiState(currentFolderId = CURRENT_FOLDER_ID),
+            onFolderPicked = { pickedFolderId = it },
+        )
+
+        composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_copy)).performClick()
+
+        assertThat(pickedFolderId).isEqualTo(CURRENT_FOLDER_ID)
+    }
+
+    @Test
+    fun `test that clicking the cancel button closes the explorer`() {
+        var closed = false
+        setContent(onCloseExplorerScreen = { closed = true })
+
+        composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_dialog_cancel_button))
+            .performClick()
+
+        assertThat(closed).isTrue()
+    }
+
+    @Test
+    fun `test that the action button is disabled when the current folder is the disabled target`() {
+        setContent(
+            uiStateShared = sharedUiState(currentFolderId = CURRENT_FOLDER_ID),
+            disabledTargetId = CURRENT_FOLDER_ID,
+        )
+
+        composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_copy)).assertIsNotEnabled()
+    }
+
+    private fun setContent(
+        uiState: NodesExplorerUiState = NodesExplorerUiState(isRoot = false),
+        uiStateShared: NodesExplorerSharedUiState = sharedUiState(),
+        isProcessingAction: Boolean = false,
+        disabledTargetId: NodeId? = null,
+        onFolderPicked: (NodeId) -> Unit = {},
+        onCloseExplorerScreen: () -> Unit = {},
+    ) {
+        whenever(viewModel.nodesExplorerUiState).thenReturn(MutableStateFlow(uiState))
+        whenever(viewModel.nodeExplorerSharedUiState).thenReturn(MutableStateFlow(uiStateShared))
+
+        composeTestRule.setContent {
+            AndroidThemeForPreviews {
+                CompositionLocalProvider(
+                    LocalViewModelStoreOwner provides viewModelStoreOwner,
+                    LocalNodeHeaderPreviewData provides NodeHeaderItemUiState.Data(
+                        viewType = ViewType.LIST,
+                        nodeSortConfiguration = NodeSortConfiguration.default,
+                    ),
+                ) {
+                    ExplorerScreen(
+                        explorerMode = ExplorerMode.Copy,
+                        startNavKey = CopyNavKey(emptyList()),
+                        isInnerNavigation = true,
+                        nodeExplorerId = NodeId(-1),
+                        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                        onCloseExplorerScreen = onCloseExplorerScreen,
+                        onNavigateBack = {},
+                        onNavigate = {},
+                        isProcessingAction = isProcessingAction,
+                        disabledTargetId = disabledTargetId,
+                        onFolderPicked = onFolderPicked,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun sharedUiState(
+        currentFolderId: NodeId = NodeId(-1),
+    ) = NodesExplorerSharedUiState(
+        currentFolderId = currentFolderId,
+        nodesLoadingState = NodesLoadingState.FullyLoaded,
+        isHiddenNodeSettingsLoading = false,
+    )
+
+    private fun actionLabel(resId: Int): String =
+        ApplicationProvider.getApplicationContext<Context>().getString(resId)
+
+    private companion object {
+        const val FOLDER_NAME = "Test folder"
+        val CURRENT_FOLDER_ID = NodeId(99)
+    }
+}

@@ -64,7 +64,7 @@ import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
-private fun ChatExplorerContent(
+internal fun ChatExplorerContent(
     uiState: ChatExplorerUiState,
     isProcessingAction: Boolean,
     selectedChatIds: Set<Long>,
