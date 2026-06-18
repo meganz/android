@@ -40,6 +40,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
@@ -98,7 +100,7 @@ fun PasscodeView(
 
     val activity = LocalActivity.current
     BackHandler {
-        activity?.finishAffinity()
+        activity?.moveTaskToBack(true)
     }
 
     MegaScaffold(
@@ -129,7 +131,7 @@ fun PasscodeView(
                             .build()
                     }
 
-                    LaunchedEffect(key1 = Unit) {
+                    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
                         Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
                         showBiometricAuth(
                             passcodeUnlockViewModel::unlockWithBiometrics,

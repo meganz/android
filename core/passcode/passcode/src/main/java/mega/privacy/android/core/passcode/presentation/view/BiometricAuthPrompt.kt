@@ -32,10 +32,13 @@ internal fun biometricAuthPrompt(
         }
 
         override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-            if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
-                activity?.finish()
-            } else {
-                onError()
+            when (errorCode) {
+                BiometricPrompt.ERROR_USER_CANCELED,
+                BiometricPrompt.ERROR_CANCELED,
+                    -> activity?.moveTaskToBack(true)
+
+                // "Use passcode" negative button or any other error: fall back to passcode entry.
+                else -> onError()
             }
         }
 
