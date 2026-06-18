@@ -74,6 +74,7 @@
     <mega.privacy.android.app.presentation.settings.MegaSwitchPreference
         android:key="settings_chat_rich_links_enable"
         android:title="@string/option_enable_chat_rich_preview"
+        android:summary="@string/chat_settings_link_preview_summary"
         app:singleLineTitle="false"
         android:defaultValue="false"
         app:allowDividerAbove="true"

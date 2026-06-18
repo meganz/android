@@ -3009,4 +3009,6 @@
         <item quantity="one">Your PRO membership plan expired %1$d day ago</item>
         <item quantity="other">Your PRO membership plan expired %1$d days ago</item>
     </plurals>
+    <!-- Summary for the link preview setting in chat settings screen.  -->
+    <string name="chat_settings_link_preview_summary">Generates a preview of the links you send in chat. Note that retrieving these previews isn’t protected by zero-knowledge encryption.</string>
 </resources>
