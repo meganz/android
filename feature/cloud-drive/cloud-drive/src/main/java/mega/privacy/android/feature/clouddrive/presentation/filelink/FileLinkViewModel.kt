@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkUiState
+import mega.privacy.android.navigation.PendingFileLinkPreviewAutoOpen
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
@@ -46,6 +47,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
     private val queryAdsUseCase: QueryAdsUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val pendingFileLinkPreviewAutoOpen: PendingFileLinkPreviewAutoOpen,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -63,6 +65,8 @@ internal class FileLinkViewModel @AssistedInject constructor(
         when (action) {
             is FileLinkAction.DecryptionKeyEntered -> onDecryptionKeyEntered(action.key)
             FileLinkAction.DecryptionKeyDialogDismissed -> onDecryptionKeyDialogDismissed()
+            FileLinkAction.AutoOpenPreviewConsumed ->
+                _uiState.update { it.copy(autoOpenPreview = false) }
         }
     }
 
@@ -88,6 +92,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
                     val thumbnailData = node.previewPath?.let { path ->
                         runCatching { ThumbnailUriRequest(UriPath.fromFile(File(path))) }.getOrNull()
                     }
+                    val autoOpenPreview = pendingFileLinkPreviewAutoOpen.consume()
                     _uiState.update {
                         it.copy(
                             contentState = FileLinkContentState.Loaded(
@@ -97,6 +102,7 @@ internal class FileLinkViewModel @AssistedInject constructor(
                                 isVideo = node.type is VideoFileTypeInfo,
                             ),
                             fileNode = PublicLinkFile(node, null),
+                            autoOpenPreview = autoOpenPreview,
                         )
                     }
                     saveViewedFileLink(url, node)

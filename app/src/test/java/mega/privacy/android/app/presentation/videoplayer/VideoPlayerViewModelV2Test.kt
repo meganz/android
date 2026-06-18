@@ -137,6 +137,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCas
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.navigation.PendingFileLinkPreviewAutoOpen
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.BACKUPS_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_BROWSER_ADAPTER
@@ -262,6 +263,7 @@ class VideoPlayerViewModelV2Test {
     private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
+    private val pendingFileLinkPreviewAutoOpen = PendingFileLinkPreviewAutoOpen()
     private var fakeMonitorConnectivityFlow = MutableSharedFlow<Boolean>()
     private val testHandle: Long = 123456
     private val testFileName = "test.mp4"
@@ -337,6 +339,7 @@ class VideoPlayerViewModelV2Test {
             playerErrorTypeMapper = playerErrorTypeMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             isUserLoggedInUseCase = isUserLoggedInUseCase,
+            pendingFileLinkPreviewAutoOpen = pendingFileLinkPreviewAutoOpen,
             args = testArgs,
         )
     }

@@ -5,13 +5,13 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import kotlin.time.Duration.Companion.seconds
-import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.RecentlyViewedLinkType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.ViewedLink
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
@@ -25,7 +25,7 @@ import mega.privacy.android.domain.usecase.viewedlinks.RemoveViewedLinkByUrlUseC
 import mega.privacy.android.domain.usecase.viewedlinks.SaveViewedLinkUseCase
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.filelink.model.FileLinkContentState
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.navigation.PendingFileLinkPreviewAutoOpen
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -40,6 +40,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -54,6 +55,7 @@ internal class FileLinkViewModelTest {
     private val queryAdsUseCase: QueryAdsUseCase = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val durationInSecondsTextMapper = DurationInSecondsTextMapper()
+    private val pendingFileLinkPreviewAutoOpen = PendingFileLinkPreviewAutoOpen()
 
     private lateinit var underTest: FileLinkViewModel
 
@@ -80,6 +82,7 @@ internal class FileLinkViewModelTest {
             queryAdsUseCase = queryAdsUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
+            pendingFileLinkPreviewAutoOpen = pendingFileLinkPreviewAutoOpen,
             args = FileLinkViewModel.Args(uriString = uriString),
         )
     }
@@ -151,6 +154,37 @@ internal class FileLinkViewModelTest {
             val loaded = state.contentState as FileLinkContentState.Loaded
             assertThat(loaded.formattedDuration).isEqualTo("2:50")
             assertThat(loaded.isVideo).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that autoOpenPreview is true when the link preview is armed`() = runTest {
+        val url = "https://mega.nz/file/abc#key"
+        val node = mockFileNode()
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(getPublicNodeUseCase(url)).thenReturn(node)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+        pendingFileLinkPreviewAutoOpen.arm()
+        initViewModel(uriString = url)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().autoOpenPreview).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that autoOpenPreview is false when the link preview is not armed`() = runTest {
+        val url = "https://mega.nz/file/abc#key"
+        val node = mockFileNode()
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(getPublicNodeUseCase(url)).thenReturn(node)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.ViewedLinks)).thenReturn(false)
+        initViewModel(uriString = url)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().autoOpenPreview).isFalse()
         }
     }
 

@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -93,6 +94,14 @@ internal fun FileLinkScreen(
     val context = LocalContext.current
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
     val coroutineScope = rememberCoroutineScope()
+
+    // Resume a logged-out "Save to MEGA" flow: once the link reloads after login, open its preview.
+    LaunchedEffect(uiState.autoOpenPreview, uiState.fileNode) {
+        if (uiState.autoOpenPreview && uiState.fileNode != null) {
+            openedFileNode = uiState.fileNode
+            onProcessAction(FileLinkAction.AutoOpenPreviewConsumed)
+        }
+    }
 
     FileLinkScreenContent(
         uiState = uiState,

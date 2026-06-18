@@ -1,24 +1,40 @@
 package mega.privacy.android.app.presentation.videoplayer.navigation
 
+import android.app.Activity
+import android.os.Parcelable
+import androidx.activity.compose.LocalActivity
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import kotlinx.serialization.Serializable
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModelV2
 import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerScreen
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CreateAccountNavKey
+import mega.privacy.android.navigation.destination.LoginNavKey
+import mega.privacy.android.shared.nodes.sheet.PublicLinkAuthAlertBottomSheet
+import mega.privacy.android.shared.nodes.sheet.PublicLinkType
 
 @Serializable
 internal data object VideoPlayerScreenNavKey : NavKey
 
+@OptIn(ExperimentalMaterial3Api::class)
 internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
     navigationHandler: NavigationHandler,
     viewModel: VideoPlayerViewModelV2,
@@ -32,7 +48,9 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
     onEnterPip: () -> Unit,
 ) {
     entry<VideoPlayerScreenNavKey> {
+        val activity = LocalActivity.current
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        var showLoginRequiredSheet by rememberSaveable { mutableStateOf(false) }
         LaunchedEffect(Unit) {
             handleAutoReplayIfPaused()
         }
@@ -52,12 +70,42 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             viewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
         )
+        val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
             nodeActionHandler = nodeActionHandler,
             onTransfer = onTransfer,
         )
+
+        // Logged-out "Save to MEGA" raises loginRequiredEvent; prompt sign in / sign up.
+        EventEffect(
+            event = nodeActionState.loginRequiredEvent,
+            onConsumed = nodeOptionsActionViewModel::resetLoginRequiredEvent,
+        ) {
+            showLoginRequiredSheet = true
+        }
+
+        if (showLoginRequiredSheet) {
+            PublicLinkAuthAlertBottomSheet(
+                type = PublicLinkType.File,
+                onSignupClicked = {
+                    showLoginRequiredSheet = false
+                    uiState.fileLinkUrl?.let { url ->
+                        viewModel.armPendingPreviewAutoOpen()
+                        activity.launchAuthForFileLink(url, CreateAccountNavKey())
+                    }
+                },
+                onLoginClicked = {
+                    showLoginRequiredSheet = false
+                    uiState.fileLinkUrl?.let { url ->
+                        viewModel.armPendingPreviewAutoOpen()
+                        activity.launchAuthForFileLink(url, LoginNavKey())
+                    }
+                },
+                onDismissSheet = { showLoginRequiredSheet = false },
+            )
+        }
 
         VideoPlayerScreen(
             viewModel = viewModel,
@@ -71,4 +119,23 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             onEnterPip = onEnterPip,
         )
     }
+}
+
+/**
+ * Open [MegaActivity] at the requested auth screen, stashing the file link as a pending deep link
+ * so it reopens after sign in. The standalone player has no auth destinations of its own.
+ */
+private fun <T> Activity?.launchAuthForFileLink(
+    fileLinkUrl: String,
+    authDestination: T,
+) where T : NavKey, T : Parcelable {
+    val activity = this ?: return
+    val intent = MegaActivity.getIntentWithExtraDestinations(activity, listOf(authDestination))
+        .apply {
+            action = ACTION_PENDING_DEEP_LINK
+            data = fileLinkUrl.toUri()
+        }
+    activity.startActivity(intent)
+    // Authentication happens in MegaActivity, which reopens the file link and this video.
+    activity.finish()
 }
