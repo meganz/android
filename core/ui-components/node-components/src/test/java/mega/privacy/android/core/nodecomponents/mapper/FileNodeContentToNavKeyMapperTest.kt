@@ -167,7 +167,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceData = NodeSourceData.FolderLink,
+            nodeSourceData = NodeSourceData.FolderLink(),
             isPDFViewerEnabled = true
         )
 
@@ -510,7 +510,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceData = NodeSourceData.FolderLink
+            nodeSourceData = NodeSourceData.FolderLink()
         )
 
         val expected = LegacyMediaPlayerNavKey(
@@ -523,6 +523,47 @@ class FileNodeContentToNavKeyMapperTest {
             parentHandle = parentHandle,
             fileHandle = nodeHandle,
             fileTypeInfo = fileTypeInfo
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that AudioOrVideo content maps to LegacyMediaPlayerNavKey with FolderLink url sets publicLinkUrl`() {
+        val publicUrl = "https://mega.nz/folder/abc#key"
+        val nodeHandle = 555L
+        val parentHandle = 444L
+        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+        val nodeContentUri = NodeContentUri.LocalContentUri(File("/path/to/video.mp4"))
+        val fileName = "folder_link_video.mp4"
+        val fileTypeInfo = VideoFileTypeInfo("video/mp4", "mp4", 60.seconds)
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            parentId = parentHandle,
+            name = fileName,
+            fileTypeInfo = fileTypeInfo
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.FOLDER_LINK))
+            .thenReturn(expectedViewType)
+
+        val content = FileNodeContent.AudioOrVideo(uri = nodeContentUri)
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.FolderLink(url = publicUrl)
+        )
+
+        val expected = LegacyMediaPlayerNavKey(
+            nodeHandle = nodeHandle,
+            nodeContentUri = nodeContentUri,
+            nodeSourceType = expectedViewType,
+            sortOrder = SortOrder.ORDER_NONE,
+            isFolderLink = true,
+            fileName = fileName,
+            parentHandle = parentHandle,
+            fileHandle = nodeHandle,
+            fileTypeInfo = fileTypeInfo,
+            publicLinkUrl = publicUrl
         )
         assertThat(result).isEqualTo(expected)
     }

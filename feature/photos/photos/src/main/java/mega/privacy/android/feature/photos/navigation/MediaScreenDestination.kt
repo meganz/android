@@ -512,7 +512,7 @@ fun EntryProviderScope<NavKey>.albumImports(
                 }
             },
             onPreviewPhoto = {
-                navigationHandler.navigate(AlbumImportPreviewNavKey(photoId = it.id))
+                navigationHandler.navigate(AlbumImportPreviewNavKey(photoId = it.id, albumLink = args.link))
             },
             onNavigateFileExplorer = {
                 if (uiState.isCloudExplorerAvailable) {

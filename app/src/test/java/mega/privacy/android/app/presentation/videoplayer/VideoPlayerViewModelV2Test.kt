@@ -3120,6 +3120,27 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
+    fun `test that isAlbumSharingLink is true when adapter type is FROM_ALBUM_SHARING`() = runTest {
+        testArgs = testArgs.copy(adapterType = FROM_ALBUM_SHARING)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isAlbumSharingLink).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isAlbumSharingLink is false when adapter type is not FROM_ALBUM_SHARING`() =
+        runTest {
+            testArgs = testArgs.copy(adapterType = FILE_BROWSER_ADAPTER)
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isAlbumSharingLink).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that isLoggedIn is set to true when IsUserLoggedInUseCase returns true`() = runTest {
         whenever(isUserLoggedInUseCase()).thenReturn(true)
         initViewModel()

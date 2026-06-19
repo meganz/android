@@ -41,6 +41,7 @@ class ImagePreviewVideoLauncher @Inject constructor(
         adapterType: Int = Constants.FROM_IMAGE_VIEWER,
         albumTitle: String? = null,
         albumId: Long? = null,
+        publicLinkUrl: String? = null,
     ) {
         runCatching {
             val viewType = when (source) {
@@ -82,7 +83,8 @@ class ImagePreviewVideoLauncher @Inject constructor(
                     isMediaQueueAvailable = isMediaQueueAvailable,
                     collectionTitle = albumTitle,
                     collectionId = albumId,
-                    serializedData = typedFileNode.serializedData
+                    serializedData = typedFileNode.serializedData,
+                    publicLinkUrl = publicLinkUrl,
                 )
             }
         }.onFailure { Timber.e(it) }

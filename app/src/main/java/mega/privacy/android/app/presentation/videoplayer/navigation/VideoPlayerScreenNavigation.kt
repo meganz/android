@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.videoplayer.view.VideoPlayerScreen
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -87,19 +88,28 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
         }
 
         if (showLoginRequiredSheet) {
+            // Both folder links and album sharing map to FOLDER_LINK; album sharing is
+            // distinguished via isAlbumSharingLink for correct PublicLinkType display.
+            val isFolderLink = uiState.nodeSourceType == NodeSourceType.FOLDER_LINK
+            val isAlbumLink = uiState.isAlbumSharingLink
+            val publicLinkType = when {
+                isAlbumLink -> PublicLinkType.Album
+                isFolderLink -> PublicLinkType.Folder
+                else -> PublicLinkType.File
+            }
             PublicLinkAuthAlertBottomSheet(
-                type = PublicLinkType.File,
+                type = publicLinkType,
                 onSignupClicked = {
                     showLoginRequiredSheet = false
                     uiState.fileLinkUrl?.let { url ->
-                        viewModel.armPendingPreviewAutoOpen()
+                        if (!isFolderLink) viewModel.armPendingPreviewAutoOpen()
                         activity.launchAuthForFileLink(url, CreateAccountNavKey())
                     }
                 },
                 onLoginClicked = {
                     showLoginRequiredSheet = false
                     uiState.fileLinkUrl?.let { url ->
-                        viewModel.armPendingPreviewAutoOpen()
+                        if (!isFolderLink) viewModel.armPendingPreviewAutoOpen()
                         activity.launchAuthForFileLink(url, LoginNavKey())
                     }
                 },

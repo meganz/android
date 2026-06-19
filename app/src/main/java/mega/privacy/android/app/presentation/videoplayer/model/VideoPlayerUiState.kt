@@ -76,6 +76,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isInPipMode whether the video player is currently displayed in PIP mode
  * @property isFromLink whether the video was opened from a public link (file link, folder link, or album sharing)
  * @property isLoggedIn whether the user is currently logged in; used together with [isFromLink] to determine if session validation is required
+ * @property isAlbumSharingLink whether the video was opened from an album sharing link specifically (as opposed to a folder link)
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -131,5 +132,6 @@ data class VideoPlayerUiState(
     val isInPipMode: Boolean = false,
     val isFromLink: Boolean = false,
     val isLoggedIn: Boolean = false,
+    val isAlbumSharingLink: Boolean = false,
     val serializedData: String? = null,
 )

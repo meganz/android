@@ -903,7 +903,8 @@ class ImagePreviewViewModel @Inject constructor(
             imageNode = imageNode,
             source = imagePreviewFetcherSource,
             albumTitle = params.getString(AlbumContentImageNodeFetcher.ALBUM_TITLE),
-            albumId = params.getLong(AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID)
+            albumId = params.getLong(AlbumContentImageNodeFetcher.CUSTOM_ALBUM_ID),
+            publicLinkUrl = savedStateHandle[IMAGE_PREVIEW_PUBLIC_LINK_URL],
         )
     }
 
@@ -982,5 +983,6 @@ class ImagePreviewViewModel @Inject constructor(
         const val PARAMS_CURRENT_IMAGE_NODE_ID_VALUE = "currentImageNodeIdValue"
         const val IMAGE_PREVIEW_IS_FOREIGN = "image_preview_is_foreign"
         const val IMAGE_PREVIEW_ADD_TO_ALBUM = "image_preview_add_to_album"
+        const val IMAGE_PREVIEW_PUBLIC_LINK_URL = "image_preview_public_link_url"
     }
 }

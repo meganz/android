@@ -19,9 +19,9 @@ sealed class NodeSourceData(
     )
 
     /**
-     * Folder link node source type
+     * Folder link node source type with the public folder link URL
      */
-    data object FolderLink : NodeSourceData(
+    data class FolderLink(val url: String? = null) : NodeSourceData(
         nodeSourceType = NodeSourceType.FOLDER_LINK
     )
 

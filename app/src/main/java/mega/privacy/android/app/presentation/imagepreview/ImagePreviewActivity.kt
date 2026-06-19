@@ -777,6 +777,7 @@ class ImagePreviewActivity : BaseActivity() {
             params: Map<String, Any> = mapOf(),
             isForeign: Boolean = false,
             enableAddToAlbum: Boolean = false,
+            publicLinkUrl: String? = null,
         ): Intent {
             val paramsKey = context.largeBundleHolder.put(
                 bundleOf(*params.toList().toTypedArray())
@@ -788,6 +789,7 @@ class ImagePreviewActivity : BaseActivity() {
                 putExtra(FETCHER_PARAMS, paramsKey)
                 putExtra(IMAGE_PREVIEW_IS_FOREIGN, isForeign)
                 putExtra(IMAGE_PREVIEW_ADD_TO_ALBUM, enableAddToAlbum)
+                putExtra(ImagePreviewViewModel.IMAGE_PREVIEW_PUBLIC_LINK_URL, publicLinkUrl)
             }
         }
 

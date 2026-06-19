@@ -229,7 +229,10 @@ data class AlbumContentPreviewNavKey(
 ) : NavKey
 
 @Serializable
-data class AlbumImportPreviewNavKey(val photoId: Long) : NoSessionNavKey.Optional
+data class AlbumImportPreviewNavKey(
+    val photoId: Long,
+    val albumLink: String? = null,
+) : NoSessionNavKey.Optional
 
 @Serializable
 data class LegacyAlbumCoverSelectionNavKey(val albumId: Long) : NavKey {

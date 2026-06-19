@@ -307,7 +307,10 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
 
     init {
         uiState.update {
-            it.copy(nodeSourceType = adapterTypeToNodeSourceType())
+            it.copy(
+                nodeSourceType = adapterTypeToNodeSourceType(),
+                isAlbumSharingLink = args.adapterType == FROM_ALBUM_SHARING,
+            )
         }
         setupTransferListener()
 
