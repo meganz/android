@@ -7,10 +7,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -103,81 +105,89 @@ internal fun AchievementsInfoView(
             modifier = modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(MaterialTheme.colors.grey_020_dark_grey)
+                .background(MaterialTheme.colors.surface)
+                .verticalScroll(scrollState)
         ) {
 
-            // Center Icon
-            Box(
+            // Grey header behind the icon and title
+            Column(
                 modifier = Modifier
-                    .padding(top = 48.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .wrapContentSize()
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colors.grey_020_dark_grey)
             ) {
-                Image(
-                    modifier = Modifier
-                        .semantics {
-                            contentDescription = attributes.name
-                        }
-                        .testTag(AchievementsInfoViewTestTags.MAIN_ICON)
-                        .wrapContentSize()
-                        .align(Alignment.Center),
-                    painter = painterResource(id = attributes.iconResourceId),
-                    contentDescription = "Main"
-                )
 
-                if (uiState.isAchievementAwarded) {
+                // Center Icon
+                Box(
+                    modifier = Modifier
+                        .padding(top = 48.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .wrapContentSize()
+                ) {
                     Image(
                         modifier = Modifier
-                            .testTag(AchievementsInfoViewTestTags.CHECK_ICON)
+                            .semantics {
+                                contentDescription = attributes.name
+                            }
+                            .testTag(AchievementsInfoViewTestTags.MAIN_ICON)
                             .wrapContentSize()
-                            .align(Alignment.TopStart),
-                        painter = painterResource(id = R.drawable.ic_check_achievements),
-                        contentDescription = "Main"
+                            .align(Alignment.Center),
+                        painter = painterResource(id = attributes.iconResourceId),
+                        contentDescription = null
+                    )
+
+                    if (uiState.isAchievementAwarded) {
+                        Image(
+                            modifier = Modifier
+                                .testTag(AchievementsInfoViewTestTags.CHECK_ICON)
+                                .wrapContentSize()
+                                .align(Alignment.TopStart),
+                            painter = painterResource(id = R.drawable.ic_check_achievements),
+                            contentDescription = null
+                        )
+                    }
+                }
+
+                // Title
+                Box(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .wrapContentSize()
+                        .align(Alignment.CenterHorizontally)
+                        .conditional(uiState.isAchievementAwarded.not()) {
+                            this.background(Color.Transparent)
+                        }
+                        .conditional(uiState.isAchievementAwarded && uiState.isAchievementAlmostExpired) {
+                            this
+                                .background(Color.Transparent, RoundedCornerShape(5.dp))
+                                .border(1.dp, MaterialTheme.colors.red_600_red_300)
+                        }
+                        .conditional(uiState.isAchievementAwarded && uiState.isAchievementAlmostExpired.not()) {
+                            this
+                                .background(
+                                    MaterialTheme.colors.white_transparent,
+                                    RoundedCornerShape(5.dp)
+                                )
+                                .border(1.dp, MaterialTheme.colors.grey_alpha_012_white_alpha_012)
+                        }
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .testTag(AchievementsInfoViewTestTags.TITLE)
+                            .padding(vertical = 8.dp, horizontal = 12.dp)
+                            .align(Alignment.Center),
+                        text = getAchievementTitle(uiState = uiState),
+                        style = MaterialTheme.typography.body2.copy(
+                            letterSpacing = 0.sp,
+                            color = getAchievementTitleColor(uiState = uiState)
+                        )
                     )
                 }
-            }
-
-            // Title
-            Box(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .wrapContentSize()
-                    .align(Alignment.CenterHorizontally)
-                    .conditional(uiState.isAchievementAwarded.not()) {
-                        this.background(Color.Transparent)
-                    }
-                    .conditional(uiState.isAchievementAwarded && uiState.isAchievementAlmostExpired) {
-                        this
-                            .background(Color.Transparent, RoundedCornerShape(5.dp))
-                            .border(1.dp, MaterialTheme.colors.red_600_red_300)
-                    }
-                    .conditional(uiState.isAchievementAwarded && uiState.isAchievementAlmostExpired.not()) {
-                        this
-                            .background(
-                                MaterialTheme.colors.white_transparent,
-                                RoundedCornerShape(5.dp)
-                            )
-                            .border(1.dp, MaterialTheme.colors.grey_alpha_012_white_alpha_012)
-                    }
-            ) {
-                Text(
-                    modifier = Modifier
-                        .testTag(AchievementsInfoViewTestTags.TITLE)
-                        .padding(vertical = 8.dp, horizontal = 12.dp)
-                        .align(Alignment.Center),
-                    text = getAchievementTitle(uiState = uiState),
-                    style = MaterialTheme.typography.body2.copy(
-                        letterSpacing = 0.sp,
-                        color = getAchievementTitleColor(uiState = uiState)
-                    )
-                )
             }
 
             // How it Works Section
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colors.surface)
+                    .fillMaxWidth()
             ) {
                 Text(
                     modifier = Modifier

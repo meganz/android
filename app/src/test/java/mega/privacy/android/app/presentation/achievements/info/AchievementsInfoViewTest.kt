@@ -10,6 +10,7 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
@@ -45,6 +46,24 @@ class AchievementsInfoViewTest {
         AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL,
         AchievementType.MEGA_ACHIEVEMENT_WELCOME
     )
+
+    @Test
+    @Config(qualifiers = "w1280dp-h360dp-xhdpi")
+    fun `test that subtitle content can be scrolled into view`() {
+        composeTestRule.setContent {
+            AchievementsInfoView(
+                modifier = Modifier,
+                uiState = AchievementsInfoUIState(
+                    achievementType = AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL,
+                    awardStorageInBytes = oneHundredMbInBytes,
+                )
+            )
+        }
+
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.SUBTITLE)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
 
     @Test
     fun `test that toolbar should render with correct title`() {
