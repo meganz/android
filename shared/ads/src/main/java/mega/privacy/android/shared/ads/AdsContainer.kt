@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,18 +19,22 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.currentStateAsState
+import com.google.android.libraries.ads.mobile.sdk.MobileAds
 import com.google.android.libraries.ads.mobile.sdk.banner.AdView
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAd
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdEventCallback
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
 import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
+import kotlinx.coroutines.delay
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.mobile.analytics.event.AdsBannerCloseAdsButtonPressedEvent
 import timber.log.Timber
+
+private const val MOBILE_ADS_INIT_POLL_INTERVAL_MS = 300L
 
 /**
  * Container for the Ads.
@@ -47,8 +52,18 @@ fun AdsContainer(
     var handledState by remember { mutableStateOf(Lifecycle.State.INITIALIZED) }
     var handledRequest by remember { mutableStateOf<BannerAdRequest?>(null) }
     var adLoaded by remember { mutableStateOf(false) }
+    var isMobileAdsInitialized by remember { mutableStateOf(MobileAds.isInitialized) }
 
-    if (request != null) {
+    LaunchedEffect(request) {
+        if (request != null && !isMobileAdsInitialized) {
+            while (!MobileAds.isInitialized) {
+                delay(MOBILE_ADS_INIT_POLL_INTERVAL_MS)
+            }
+            isMobileAdsInitialized = true
+        }
+    }
+
+    if (request != null && isMobileAdsInitialized) {
         Box(modifier = modifier) {
             AndroidView(modifier = Modifier.align(Alignment.Center), factory = { context ->
                 AdView(context)
@@ -107,7 +122,6 @@ fun AdsContainer(
                         .size(16.dp),
                 )
             }
-
         }
     }
 }
