@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.os.Vibrator
 import android.os.VibratorManager
-import androidx.datastore.preferences.preferencesDataStoreFile
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -252,8 +251,8 @@ internal class QAModule {
     @Provides
     @IntoSet
     @ExcludeFileName
-    fun provideFeatureFlagPreferencesFileName(@ApplicationContext context: Context): String =
-        context.preferencesDataStoreFile(FEATURE_FLAG_PREFERENCES).name
+    fun provideFeatureFlagPreferencesFileName(): String =
+        "$FEATURE_FLAG_PREFERENCES.preferences_pb"
 
     @Provides
     @IntoSet
