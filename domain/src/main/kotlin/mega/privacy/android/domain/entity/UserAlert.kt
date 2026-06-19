@@ -431,7 +431,7 @@ data class UpdatedSharedNodesAlert(
  * @property createdTime
  * @property isOwnChange
  * @property heading
- * @property title
+ * @property planName the Pro plan name the payment was for, e.g. "Pro I"
  */
 data class PaymentSucceededAlert(
     override val id: Long,
@@ -439,7 +439,7 @@ data class PaymentSucceededAlert(
     override val createdTime: Long,
     override val isOwnChange: Boolean,
     override val heading: String?,
-    val title: String?,
+    val planName: String?,
 ) : UserAlert, CustomAlert {}
 
 /**
@@ -450,7 +450,7 @@ data class PaymentSucceededAlert(
  * @property createdTime
  * @property isOwnChange
  * @property heading
- * @property title
+ * @property planName the Pro plan name the payment was for, e.g. "Pro I"
  */
 data class PaymentFailedAlert(
     override val id: Long,
@@ -458,7 +458,7 @@ data class PaymentFailedAlert(
     override val createdTime: Long,
     override val isOwnChange: Boolean,
     override val heading: String?,
-    val title: String?,
+    val planName: String?,
 ) : UserAlert, CustomAlert {}
 
 /**
@@ -469,7 +469,7 @@ data class PaymentFailedAlert(
  * @property createdTime
  * @property isOwnChange
  * @property heading
- * @property title
+ * @property endTimestamp the Pro plan expiry time, in seconds
  */
 data class PaymentReminderAlert(
     override val id: Long,
@@ -477,7 +477,7 @@ data class PaymentReminderAlert(
     override val createdTime: Long,
     override val isOwnChange: Boolean,
     override val heading: String?,
-    val title: String?,
+    val endTimestamp: Long,
 ) : UserAlert, CustomAlert {}
 
 /**

@@ -32,6 +32,8 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAle
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.shared.resources.R as SharedR
 
+private const val SECONDS_IN_A_DAY = 86400L
+
 internal fun UserAlert.title(): (Context) -> String = when (this) {
     is IncomingPendingContactRequestAlert -> { context ->
         context.getString(R.string.title_contact_request_notification)
@@ -81,16 +83,31 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
         context.getString(R.string.title_incoming_contact_request)
     }
 
-    is PaymentSucceededAlert -> { _ ->
-        title ?: ""
+    is PaymentSucceededAlert -> { context ->
+        context.getString(SharedR.string.notifications_payment_succeeded_title, planName ?: "")
     }
 
-    is PaymentFailedAlert -> { _ ->
-        title ?: ""
+    is PaymentFailedAlert -> { context ->
+        context.getString(SharedR.string.notifications_payment_failed_title, planName ?: "")
     }
 
-    is PaymentReminderAlert -> { _ ->
-        title ?: ""
+    is PaymentReminderAlert -> { context ->
+        val nowInSeconds = System.currentTimeMillis() / 1000
+        val days = ((endTimestamp - nowInSeconds) / SECONDS_IN_A_DAY).toInt()
+        if (endTimestamp < nowInSeconds) {
+            val daysAgo = -days
+            context.resources.getQuantityString(
+                SharedR.plurals.notifications_payment_reminder_expired,
+                daysAgo,
+                daysAgo,
+            )
+        } else {
+            context.resources.getQuantityString(
+                SharedR.plurals.notifications_payment_reminder_will_expire,
+                days,
+                days,
+            )
+        }
     }
 
     is TakeDownAlert -> { context ->

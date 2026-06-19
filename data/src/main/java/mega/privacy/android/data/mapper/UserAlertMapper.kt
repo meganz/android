@@ -48,6 +48,8 @@ import java.time.ZonedDateTime
 import javax.inject.Inject
 
 private const val CREATED_TIME_INDEX = 0L
+private const val PAYMENT_PLAN_NAME_INDEX = 0L
+private const val PAYMENT_EXPIRY_TIME_INDEX = 1L
 
 internal class UserAlertMapper @Inject constructor() {
     suspend operator fun invoke(
@@ -341,7 +343,7 @@ internal suspend fun toUserAlert(
                 createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
                 isOwnChange = megaUserAlert.isOwnChange,
                 heading = megaUserAlert.heading,
-                title = megaUserAlert.title,
+                planName = megaUserAlert.getString(PAYMENT_PLAN_NAME_INDEX),
             )
         }
 
@@ -352,7 +354,7 @@ internal suspend fun toUserAlert(
                 createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
                 isOwnChange = megaUserAlert.isOwnChange,
                 heading = megaUserAlert.heading,
-                title = megaUserAlert.title,
+                planName = megaUserAlert.getString(PAYMENT_PLAN_NAME_INDEX),
             )
         }
 
@@ -363,7 +365,7 @@ internal suspend fun toUserAlert(
                 createdTime = megaUserAlert.getTimestamp(CREATED_TIME_INDEX),
                 isOwnChange = megaUserAlert.isOwnChange,
                 heading = megaUserAlert.heading,
-                title = megaUserAlert.title,
+                endTimestamp = megaUserAlert.getTimestamp(PAYMENT_EXPIRY_TIME_INDEX),
             )
         }
 
