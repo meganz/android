@@ -25,6 +25,8 @@ data class NodesExplorerSharedUiState(
     val navigateBack: StateEvent = consumed,
     val isStorageOverQuota: Boolean = false,
     val isSelectionModeEnabled: Boolean = false,
+    val isConnected: Boolean = true,
+    val noConnectionEvent: StateEvent = consumed,
 ) {
     val isLoading = nodesLoadingState == NodesLoadingState.Loading || isHiddenNodeSettingsLoading
 }

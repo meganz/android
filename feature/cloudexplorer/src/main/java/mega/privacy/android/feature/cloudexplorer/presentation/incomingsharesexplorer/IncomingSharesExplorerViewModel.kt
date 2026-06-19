@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarning
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
@@ -32,6 +33,7 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getIncomingSharesChildrenNodeUseCase: GetIncomingSharesChildrenNodeUseCase,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -43,6 +45,7 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
+    monitorConnectivityUseCase = monitorConnectivityUseCase,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.INCOMING_SHARES,

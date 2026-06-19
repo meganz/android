@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
@@ -63,6 +64,7 @@ class NodesExplorerViewModelTest {
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
     private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private val nodeId = NodeId(rootNodeHandle)
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -89,6 +91,7 @@ class NodesExplorerViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
+        whenever(monitorConnectivityUseCase()) doReturn emptyFlow()
         wheneverBlocking { getNodesByIdInChunkUseCase(nodeId) } doReturn emptyFlow()
         wheneverBlocking { getNodeInfoByIdUseCase(nodeId) } doReturn defaultNodeInfo
         wheneverBlocking { getRootNodeIdUseCase() } doReturn null
@@ -108,6 +111,7 @@ class NodesExplorerViewModelTest {
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             args = args
         )

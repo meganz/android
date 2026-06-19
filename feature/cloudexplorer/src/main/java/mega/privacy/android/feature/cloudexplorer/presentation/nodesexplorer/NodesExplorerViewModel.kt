@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.shared.nodes.R as NodesR
@@ -44,6 +45,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -55,6 +57,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
+    monitorConnectivityUseCase = monitorConnectivityUseCase,
     args = args,
 ) {
 

@@ -23,6 +23,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
@@ -135,6 +136,16 @@ internal fun ExplorerScreen(
         }
     val uiState by viewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
     val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    val showNoConnectionSnackbar: () -> Unit = {
+        coroutineScope.launch {
+            snackbarHostState?.showAutoDurationSnackbar(
+                resources.getString(sharedR.string.error_no_internet_title)
+            )
+        }
+    }
+    val onConnectedNavigate: (NavKey) -> Unit = { navKey ->
+        if (uiStateShared.isConnected) onNavigate(navKey) else showNoConnectionSnackbar()
+    }
     val chatExplorerSelectionState = rememberChatExplorerSelectionState()
     val nodeSelectionState = rememberNodeSelectionState()
     val isFileSelectionEnabled = !explorerMode.isFolderPicker
@@ -149,6 +160,11 @@ internal fun ExplorerScreen(
         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
         else -> false
     }
+
+    EventEffect(
+        event = uiStateShared.noConnectionEvent,
+        onConsumed = viewModel::onNoConnectionEventConsumed,
+    ) { showNoConnectionSnackbar() }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -203,7 +219,11 @@ internal fun ExplorerScreen(
                             add(
                                 MenuActionWithClick(NewFolderMenuAction) {
                                     if (!isProcessingAction) {
-                                        showNewFolderDialog = true
+                                        if (uiStateShared.isConnected) {
+                                            showNewFolderDialog = true
+                                        } else {
+                                            showNoConnectionSnackbar()
+                                        }
                                     }
                                 }
                             )
@@ -212,8 +232,12 @@ internal fun ExplorerScreen(
                             add(
                                 MenuActionWithClick(CommonMenuAction.Search) {
                                     if (!isProcessingAction) {
-                                        Analytics.tracker.trackEvent(CloudExplorerSearchButtonPressedEvent)
-                                        showSearch = true
+                                        if (uiStateShared.isConnected) {
+                                            Analytics.tracker.trackEvent(CloudExplorerSearchButtonPressedEvent)
+                                            showSearch = true
+                                        } else {
+                                            showNoConnectionSnackbar()
+                                        }
                                     }
                                 }
                             )
@@ -229,6 +253,10 @@ internal fun ExplorerScreen(
                     primaryButtonText = stringResource(explorerMode.actionStringId),
                     onPrimaryButtonClick = {
                         protectedUserTap {
+                            if (!uiStateShared.isConnected) {
+                                showNoConnectionSnackbar()
+                                return@protectedUserTap
+                            }
                             if (showSearch) {
                                 Analytics.tracker.trackEvent(
                                     CloudExplorerConfirmedSearchButtonPressedEvent
@@ -277,7 +305,7 @@ internal fun ExplorerScreen(
             shareUris = shareUris,
             disabledNodeIds = disabledNodeIds.toList(),
             protectedUserTap = protectedUserTap,
-            onNavigate = onNavigate,
+            onNavigate = onConnectedNavigate,
         )
 
         MegaCollapsibleTabRow(
@@ -309,7 +337,7 @@ internal fun ExplorerScreen(
                                 shareUris = shareUris,
                                 disabledNodeIds = disabledNodeIds.toList(),
                                 protectedUserTap = protectedUserTap,
-                                onNavigate = onNavigate,
+                                onNavigate = onConnectedNavigate,
                             ),
                             onCloseSearch = onCloseSearch,
                             recentSearchesEnabled = isActive,
@@ -341,7 +369,7 @@ internal fun ExplorerScreen(
                         onSearchQueryChanged = onSearchQueryChanged,
                         onCloseSearch = onCloseSearch,
                         protectedUserTap = protectedUserTap,
-                        onNavigate = onNavigate,
+                        onNavigate = onConnectedNavigate,
                         onNavigateBack = onNavigateBack,
                         onHasContentChanged = { tabHasContent[INCOMING_TAB_INDEX] = it },
                     )
@@ -356,7 +384,7 @@ internal fun ExplorerScreen(
                         onSearchQueryChanged = onSearchQueryChanged,
                         onCloseSearch = onCloseSearch,
                         protectedUserTap = protectedUserTap,
-                        onNavigate = onNavigate,
+                        onNavigate = onConnectedNavigate,
                         onNavigateBack = onNavigateBack,
                         selectionState = nodeSelectionState,
                         isSelectionModeEnabled = isFileSelectionEnabled,
@@ -377,7 +405,7 @@ internal fun ExplorerScreen(
                         onPrepareChatsConsumed = onPrepareChatsConsumed,
                         onChatsReadyToShare = onChatsReadyToShare,
                         onCloseExplorerScreen = onCloseExplorerScreen,
-                        onNavigate = onNavigate,
+                        onNavigate = onConnectedNavigate,
                         monitorResult = monitorResult,
                         clearResult = clearResult,
                         onHasContentChanged = { tabHasContent[CHAT_TAB_INDEX] = it },

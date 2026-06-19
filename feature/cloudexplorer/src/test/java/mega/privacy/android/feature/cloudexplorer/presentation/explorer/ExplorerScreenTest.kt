@@ -91,6 +91,22 @@ internal class ExplorerScreenTest {
     }
 
     @Test
+    fun `test that clicking the action button does not pick the folder when offline`() {
+        var pickedFolderId: NodeId? = null
+        setContent(
+            uiStateShared = sharedUiState(
+                currentFolderId = CURRENT_FOLDER_ID,
+                isConnected = false,
+            ),
+            onFolderPicked = { pickedFolderId = it },
+        )
+
+        composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_copy)).performClick()
+
+        assertThat(pickedFolderId).isNull()
+    }
+
+    @Test
     fun `test that clicking the cancel button closes the explorer`() {
         var closed = false
         setContent(onCloseExplorerScreen = { closed = true })
@@ -151,10 +167,12 @@ internal class ExplorerScreenTest {
 
     private fun sharedUiState(
         currentFolderId: NodeId = NodeId(-1),
+        isConnected: Boolean = true,
     ) = NodesExplorerSharedUiState(
         currentFolderId = currentFolderId,
         nodesLoadingState = NodesLoadingState.FullyLoaded,
         isHiddenNodeSettingsLoading = false,
+        isConnected = isConnected,
     )
 
     private fun actionLabel(resId: Int): String =

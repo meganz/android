@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
@@ -40,6 +41,7 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getAllFavoritesUseCase: GetAllFavoritesUseCase,
     @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
@@ -52,6 +54,7 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
+    monitorConnectivityUseCase = monitorConnectivityUseCase,
     args = Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.FAVOURITES,

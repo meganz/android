@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -61,6 +62,7 @@ class NodeExplorerSharedViewModelTest {
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
     private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private val nodeId = NodeId(1234L)
     private val nodeSourceType = NodeSourceType.INCOMING_SHARES
@@ -77,11 +79,13 @@ class NodeExplorerSharedViewModelTest {
             searchUseCase,
             nodeSourceTypeToSearchTargetMapper,
             getNodeNavigationStackUseCase,
+            monitorConnectivityUseCase,
         )
         whenever(monitorStorageStateUseCase()) doReturn flowOf()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf()
         whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf()
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
+        whenever(monitorConnectivityUseCase()) doReturn emptyFlow()
 
         initViewModel()
     }
@@ -100,6 +104,7 @@ class NodeExplorerSharedViewModelTest {
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             args = args,
             loadNodesImpl = loadNodesImpl,
             refreshNodesImpl = refreshNodesImpl
@@ -404,6 +409,70 @@ class NodeExplorerSharedViewModelTest {
         }
     }
 
+    @Test
+    fun `test that isConnected mirrors connectivity changes`() = runTest {
+        val connectivityFlow = MutableStateFlow(true)
+        whenever(monitorConnectivityUseCase()) doReturn connectivityFlow
+
+        initViewModel()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.isConnected).isTrue()
+
+        connectivityFlow.value = false
+        advanceUntilIdle()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.isConnected).isFalse()
+    }
+
+    @Test
+    fun `test that noConnectionEvent is triggered when the screen opens offline`() = runTest {
+        whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that noConnectionEvent stays consumed when the screen opens online`() = runTest {
+        whenever(monitorConnectivityUseCase()) doReturn flowOf(true)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent).isEqualTo(consumed)
+    }
+
+    @Test
+    fun `test that noConnectionEvent stays consumed when connection is lost after opening online`() =
+        runTest {
+            val connectivityFlow = MutableStateFlow(true)
+            whenever(monitorConnectivityUseCase()) doReturn connectivityFlow
+
+            initViewModel()
+            advanceUntilIdle()
+
+            connectivityFlow.value = false
+            advanceUntilIdle()
+
+            assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent)
+                .isEqualTo(consumed)
+        }
+
+    @Test
+    fun `test that onNoConnectionEventConsumed consumes the event`() = runTest {
+        whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
+
+        initViewModel()
+        advanceUntilIdle()
+        assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent).isEqualTo(triggered)
+
+        viewModel.onNoConnectionEventConsumed()
+
+        assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent).isEqualTo(consumed)
+    }
+
     private fun storageStates() = listOf(
         arrayOf<Any>(StorageState.Red, true),
         arrayOf<Any>(StorageState.PayWall, true),
@@ -432,6 +501,7 @@ private class TestNodeExplorerSharedViewModel(
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     args: Args,
     private val loadNodesImpl: () -> Unit = {},
     private val refreshNodesImpl: () -> Unit = {},
@@ -445,6 +515,7 @@ private class TestNodeExplorerSharedViewModel(
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
+    monitorConnectivityUseCase = monitorConnectivityUseCase,
     args = args,
 ) {
     override fun loadNodes() = loadNodesImpl()

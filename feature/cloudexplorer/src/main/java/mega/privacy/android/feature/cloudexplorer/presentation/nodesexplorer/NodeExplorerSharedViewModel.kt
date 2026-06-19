@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -45,6 +46,7 @@ abstract class NodeExplorerSharedViewModel(
     private val searchUseCase: SearchUseCase,
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val args: Args,
 ) : ViewModel() {
 
@@ -63,6 +65,32 @@ abstract class NodeExplorerSharedViewModel(
         monitorHiddenNodes()
         monitorStorageOverQuota()
         monitorSearchQuery()
+        monitorConnectivity()
+    }
+
+    private fun monitorConnectivity() {
+        viewModelScope.launch {
+            var isFirstEmission = true
+            monitorConnectivityUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { isConnected ->
+                    _nodeExplorerSharedUiState.update { state ->
+                        state.copy(
+                            isConnected = isConnected,
+                            noConnectionEvent = if (isFirstEmission && !isConnected) {
+                                triggered
+                            } else {
+                                state.noConnectionEvent
+                            },
+                        )
+                    }
+                    isFirstEmission = false
+                }
+        }
+    }
+
+    fun onNoConnectionEventConsumed() {
+        _nodeExplorerSharedUiState.update { state -> state.copy(noConnectionEvent = consumed) }
     }
 
     fun monitorNodeUpdates() {

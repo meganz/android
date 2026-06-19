@@ -10,10 +10,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
@@ -97,10 +100,18 @@ internal fun rememberSearchResultFolderClick(
     onCloseSearch: () -> Unit,
 ): (NodeId) -> Unit {
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
+    val resources = LocalResources.current
     return { nodeId ->
         coroutineScope.launch {
-            onNavigateToFolderPath(viewModel.resolveSearchResultStack(nodeId))
-            onCloseSearch()
+            if (viewModel.nodeExplorerSharedUiState.value.isConnected) {
+                onNavigateToFolderPath(viewModel.resolveSearchResultStack(nodeId))
+                onCloseSearch()
+            } else {
+                snackbarHostState?.showAutoDurationSnackbar(
+                    resources.getString(sharedR.string.error_no_internet_title)
+                )
+            }
         }
     }
 }

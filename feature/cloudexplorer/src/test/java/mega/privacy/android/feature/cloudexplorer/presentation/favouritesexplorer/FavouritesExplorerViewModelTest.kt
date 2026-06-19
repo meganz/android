@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -55,6 +56,7 @@ class FavouritesExplorerViewModelTest {
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
     private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -72,6 +74,7 @@ class FavouritesExplorerViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(any(), any())) doReturn emptyFlow()
+        whenever(monitorConnectivityUseCase()) doReturn emptyFlow()
         whenever(getAllFavoritesUseCase()) doReturn emptyFlow()
         wheneverBlocking {
             nodeViewItemMapper(
@@ -96,6 +99,7 @@ class FavouritesExplorerViewModelTest {
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
             args = FavouritesExplorerViewModel.Args(showFiles),
         )
