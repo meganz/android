@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -53,7 +54,8 @@ class NewFolderNodeDialogViewModelTest {
         reset(
             validateFolderNameUseCase,
             createFolderNodeUseCase,
-            getRootNodeUseCase
+            getRootNodeUseCase,
+            snackbarEventQueue
         )
     }
 
@@ -192,6 +194,7 @@ class NewFolderNodeDialogViewModelTest {
         verify(getRootNodeUseCase).invoke()
         verify(validateFolderNameUseCase).invoke(eq(folderName), eq(null))
         verify(createFolderNodeUseCase).invoke(eq(folderName), eq(null))
+        verify(snackbarEventQueue).queueMessage(sharedR.string.folder_not_created_error_message)
     }
 
     @Test
@@ -210,6 +213,7 @@ class NewFolderNodeDialogViewModelTest {
         assertThat(state.folderCreatedEvent.triggeredContent()).isNull()
         verify(validateFolderNameUseCase).invoke(eq(folderName), eq(parentNodeId))
         verify(createFolderNodeUseCase).invoke(eq(folderName), eq(parentNodeId))
+        verify(snackbarEventQueue).queueMessage(sharedR.string.folder_not_created_error_message)
     }
 
     @Test

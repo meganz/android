@@ -62,6 +62,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.NewFolderDialogNavKey
 import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -76,7 +77,7 @@ import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
-import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
+import mega.privacy.android.shared.nodes.dialog.newfolder.rememberNewFolderResult
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.selection.NodeSelectionState
@@ -123,7 +124,6 @@ internal fun CloudDriveContent(
     overQuotaStatusViewModel: OverQuotaStatusViewModel = hiltViewModel(),
 ) {
     val overQuotaUiState by overQuotaStatusViewModel.uiState.collectAsStateWithLifecycle()
-    var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -133,6 +133,19 @@ internal fun CloudDriveContent(
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     val uploadUrisEventState = rememberUploadUrisEventState()
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+
+    rememberNewFolderResult(
+        monitorResult = navigationHandler::monitorResult,
+        clearResult = navigationHandler::clearResult,
+        onFolderCreated = { folderId ->
+            navigationHandler.navigate(
+                CloudDriveNavKey(
+                    nodeHandle = folderId.longValue,
+                    nodeSourceType = uiState.nodeSourceType
+                )
+            )
+        },
+    )
 
     val captureHandler = rememberCaptureHandler(
         onPhotoCaptured = { uri ->
@@ -398,7 +411,9 @@ internal fun CloudDriveContent(
                             captureHandler.onCaptureClicked()
                         },
                         onNewFolderClicked = {
-                            showNewFolderDialog = true
+                            navigationHandler.navigate(
+                                NewFolderDialogNavKey(parentNodeId = uiState.currentFolderId)
+                            )
                         },
                         onNewTextFileClicked = {
                             navigationHandler.navigate(
@@ -411,34 +426,6 @@ internal fun CloudDriveContent(
                         onDismissSheet = {
                             onToggleShowUploadOptionsBottomSheet(false)
                         },
-                    )
-                }
-
-                if (showNewFolderDialog) {
-                    NewFolderNodeDialog(
-                        parentNode = uiState.currentFolderId,
-                        onCreateFolder = { folderId ->
-                            showNewFolderDialog = false
-                            coroutineScope.launch {
-                                if (folderId != null) {
-                                    navigationHandler.navigate(
-                                        CloudDriveNavKey(
-                                            nodeHandle = folderId.longValue,
-                                            nodeSourceType = uiState.nodeSourceType
-                                        )
-                                    )
-                                } else {
-                                    snackbarHostState?.showAutoDurationSnackbar(
-                                        resources.getString(
-                                            sharedR.string.folder_not_created_error_message
-                                        )
-                                    )
-                                }
-                            }
-                        },
-                        onDismiss = {
-                            showNewFolderDialog = false
-                        }
                     )
                 }
 

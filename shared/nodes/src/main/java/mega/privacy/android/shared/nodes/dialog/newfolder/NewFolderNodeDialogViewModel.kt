@@ -52,8 +52,12 @@ class NewFolderNodeDialogViewModel @Inject constructor(
             runCatching { createFolderNodeUseCase(folderName, parentOrRootNodeId) }
                 .getOrNull()
         }.onSuccess { folderId ->
-            _uiState.update { it.copy(folderCreatedEvent = triggered(folderId)) }
-            snackbarEventQueue.queueMessage(sharedR.string.folder_created_success_message)
+            if (folderId != null) {
+                _uiState.update { it.copy(folderCreatedEvent = triggered(folderId)) }
+                snackbarEventQueue.queueMessage(sharedR.string.folder_created_success_message)
+            } else {
+                snackbarEventQueue.queueMessage(sharedR.string.folder_not_created_error_message)
+            }
         }.onFailure { e ->
             Timber.e(e)
             _uiState.update { it.copy(errorEvent = triggered(e)) }

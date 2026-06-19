@@ -59,9 +59,10 @@ import mega.privacy.android.feature.cloudexplorer.presentation.search.NodesExplo
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.menu.NewFolderMenuAction
 import mega.privacy.android.navigation.destination.ExplorerNavKey
+import mega.privacy.android.navigation.destination.NewFolderDialogNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
-import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
+import mega.privacy.android.shared.nodes.dialog.newfolder.rememberNewFolderResult
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -104,7 +105,6 @@ internal fun ExplorerScreen(
     clearResult: (String) -> Unit = {},
 ) {
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
-    var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
     var showSearch by rememberSaveable { mutableStateOf(false) }
     // Raw search-field text is host UI state; each tab owns its own search ViewModel + content.
     var searchText by rememberSaveable { mutableStateOf("") }
@@ -122,9 +122,6 @@ internal fun ExplorerScreen(
     }
 
     BackHandler(enabled = showSearch) { onCloseSearch() }
-    val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = LocalSnackBarHostState.current
-    val resources = LocalResources.current
     val viewModel =
         hiltViewModel<NodesExplorerViewModel, NodesExplorerViewModel.Factory> { factory ->
             factory.create(
@@ -136,6 +133,9 @@ internal fun ExplorerScreen(
         }
     val uiState by viewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
     val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
+    val resources = LocalResources.current
     val showNoConnectionSnackbar: () -> Unit = {
         coroutineScope.launch {
             snackbarHostState?.showAutoDurationSnackbar(
@@ -160,6 +160,23 @@ internal fun ExplorerScreen(
         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
         else -> false
     }
+
+    rememberNewFolderResult(
+        monitorResult = monitorResult,
+        clearResult = clearResult,
+        onFolderCreated = { folderId ->
+            onNavigate(
+                NodesExplorerNavKey(
+                    nodeId = folderId,
+                    nodeSourceType = uiStateShared.nodeSourceType,
+                    explorerMode = explorerMode,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris,
+                    disabledNodeIds = disabledNodeIds.toList(),
+                )
+            )
+        },
+    )
 
     EventEffect(
         event = uiStateShared.noConnectionEvent,
@@ -220,7 +237,11 @@ internal fun ExplorerScreen(
                                 MenuActionWithClick(NewFolderMenuAction) {
                                     if (!isProcessingAction) {
                                         if (uiStateShared.isConnected) {
-                                            showNewFolderDialog = true
+                                            onNavigate(
+                                                NewFolderDialogNavKey(
+                                                    parentNodeId = uiStateShared.currentFolderId
+                                                )
+                                            )
                                         } else {
                                             showNoConnectionSnackbar()
                                         }
@@ -418,36 +439,6 @@ internal fun ExplorerScreen(
                 true
             }
         )
-
-        if (showNewFolderDialog) {
-            NewFolderNodeDialog(
-                parentNode = uiStateShared.currentFolderId,
-                onCreateFolder = { folderId ->
-                    showNewFolderDialog = false
-                    coroutineScope.launch {
-                        folderId?.let {
-                            onNavigate(
-                                NodesExplorerNavKey(
-                                    nodeId = it,
-                                    nodeSourceType = uiStateShared.nodeSourceType,
-                                    explorerMode = explorerMode,
-                                    startNavKey = startNavKey,
-                                    shareUris = shareUris,
-                                    disabledNodeIds = disabledNodeIds.toList(),
-                                )
-                            )
-                        } ?: snackbarHostState?.showAutoDurationSnackbar(
-                            resources.getString(
-                                sharedR.string.folder_not_created_error_message
-                            )
-                        )
-                    }
-                },
-                onDismiss = {
-                    showNewFolderDialog = false
-                }
-            )
-        }
     }
 }
 

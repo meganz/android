@@ -20,6 +20,7 @@ import mega.privacy.android.app.consent.ConsentDialogDestinations
 import mega.privacy.android.app.deeplinks.DeepLinksDialogDestinations
 import mega.privacy.android.app.main.dialog.link.OpenLinkDialogDestinations
 import mega.privacy.android.app.main.dialog.newfile.NewTextFileDialogDestinations
+import mega.privacy.android.app.main.dialog.newfolder.NewFolderDialogDestinations
 import mega.privacy.android.app.myAccount.navigation.MyAccountDeepLinkHandler
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
@@ -161,6 +162,7 @@ internal class AppModule {
             WhatsNewDialogDestinations,
             OpenLinkDialogDestinations,
             NewTextFileDialogDestinations,
+            NewFolderDialogDestinations,
             DiscardScanWarningDialogDestinations,
         )
 

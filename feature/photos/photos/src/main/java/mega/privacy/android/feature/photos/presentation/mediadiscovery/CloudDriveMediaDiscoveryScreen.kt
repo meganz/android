@@ -96,6 +96,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
+import mega.privacy.android.navigation.destination.NewFolderDialogNavKey
 import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.OpenLinkDialogNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -103,7 +104,7 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
-import mega.privacy.android.shared.nodes.dialog.newfolder.NewFolderNodeDialog
+import mega.privacy.android.shared.nodes.dialog.newfolder.rememberNewFolderResult
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as sharedR
@@ -144,10 +145,22 @@ fun CloudDriveMediaDiscoveryRoute(
     val snackbarHostState = LocalSnackBarHostState.current
 
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
     var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     val uploadUrisEventState = rememberUploadUrisEventState()
     val parentId = NodeId(viewModel.folderId)
+
+    rememberNewFolderResult(
+        monitorResult = navigationHandler::monitorResult,
+        clearResult = navigationHandler::clearResult,
+        onFolderCreated = { folderId ->
+            navigationHandler.navigate(
+                CloudDriveNavKey(
+                    nodeHandle = folderId.longValue,
+                    nodeSourceType = uiState.nodeSourceType
+                )
+            )
+        },
+    )
     val uploadHandler = rememberUploadHandler(
         parentId = parentId,
         onFilesSelected = { uris ->
@@ -230,7 +243,9 @@ fun CloudDriveMediaDiscoveryRoute(
         onUploadFolderClicked = { uploadHandler.onUploadFolderClicked() },
         onScanDocumentClicked = { scanDocumentViewModel.prepareDocumentScanner() },
         onCaptureClicked = { captureHandler.onCaptureClicked() },
-        onNewFolderClicked = { showNewFolderDialog = true },
+        onNewFolderClicked = {
+            navigationHandler.navigate(NewFolderDialogNavKey(parentNodeId = parentId))
+        },
         onNewTextFileClicked = {
             navigationHandler.navigate(NewTextFileDialogNavKey(parentNodeId = parentId))
         },
@@ -262,24 +277,6 @@ fun CloudDriveMediaDiscoveryRoute(
             pitagTrigger = PitagTrigger.NotApplicable
         },
     )
-
-    if (showNewFolderDialog) {
-        NewFolderNodeDialog(
-            parentNode = parentId,
-            onCreateFolder = { folderId ->
-                showNewFolderDialog = false
-                if (folderId != null) {
-                    navigationHandler.navigate(
-                        CloudDriveNavKey(
-                            nodeHandle = folderId.longValue,
-                            nodeSourceType = uiState.nodeSourceType
-                        )
-                    )
-                }
-            },
-            onDismiss = { showNewFolderDialog = false }
-        )
-    }
 
 
     @SuppressLint("ComposeViewModelForwarding")
