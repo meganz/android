@@ -19,6 +19,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewVideoLauncher
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_NODE_FETCHER_SOURCE
+import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.IMAGE_PREVIEW_PUBLIC_LINK_URL
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.ImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
@@ -82,8 +83,10 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -1128,6 +1131,27 @@ class ImagePreviewViewModelTest {
             underTest.state.test {
                 assertThat(expectMostRecentItem().isLoggedIn).isFalse()
             }
+        }
+
+    @Test
+    fun `test that playVideo passes publicLinkUrl from savedStateHandle to imagePreviewVideoLauncher`() =
+        runTest {
+            val expectedUrl = "https://mega.nz/album/test#key"
+            whenever(savedStateHandle.get<String>(IMAGE_PREVIEW_PUBLIC_LINK_URL))
+                .thenReturn(expectedUrl)
+            val context = mock<Context>()
+            val imageNode = mock<ImageNode>()
+            underTest.playVideo(context, imageNode)
+            advanceUntilIdle()
+            verify(imagePreviewVideoLauncher).launchVideoScreen(
+                context = any(),
+                imageNode = any(),
+                source = any(),
+                adapterType = any(),
+                albumTitle = anyOrNull(),
+                albumId = anyOrNull(),
+                publicLinkUrl = eq(expectedUrl),
+            )
         }
 
     private fun createNonSensitiveNode(): ImageNode {

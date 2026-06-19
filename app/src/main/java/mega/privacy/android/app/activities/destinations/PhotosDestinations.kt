@@ -86,6 +86,7 @@ fun EntryProviderScope<NavKey>.legacyAlbumImportPreview(
                 imageSource = ImagePreviewFetcherSource.ALBUM_SHARING,
                 menuOptionsSource = ImagePreviewMenuSource.ALBUM_SHARING,
                 anchorImageNodeId = NodeId(args.photoId),
+                publicLinkUrl = args.albumLink,
             )
 
             context.startActivity(intent)

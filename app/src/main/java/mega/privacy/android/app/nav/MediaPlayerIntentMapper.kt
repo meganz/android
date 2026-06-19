@@ -33,7 +33,6 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import javax.inject.Inject
 
 /**
@@ -42,7 +41,6 @@ import javax.inject.Inject
 class MediaPlayerIntentMapper @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
 ) {
     /**
      * Create media player intent
@@ -73,17 +71,10 @@ class MediaPlayerIntentMapper @Inject constructor(
         publicLinkUrl: String? = null,
         localFilePath: String? = null,
     ): Intent {
-        // VideoPlayerRevamp was not enabled with "Enabled for anonymous users" when it launched,
-        // so unauthenticated users (e.g. public link viewers) would always fall back to the legacy
-        // player. To avoid a breaking change for users already on that flag, a separate flag
-        // (VideoPlayerRevampPublicLink) controls the revamped player for non-logged-in sessions.
+        // VideoPlayerRevampPublicLink is enabled for all users (anonymous and authenticated) in
+        // this version, so it is used as the single condition for opening the revamped player.
         val useRevamp = runCatching {
-            val isLoggedIn = isUserLoggedInUseCase()
-            val revampFlag = if (isLoggedIn)
-                ApiFeatures.VideoPlayerRevamp
-            else
-                ApiFeatures.VideoPlayerRevampPublicLink
-            getFeatureFlagValueUseCase(revampFlag)
+            getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerRevampPublicLink)
         }.getOrDefault(false)
         val intent = getIntent(context, fileTypeInfo, useRevamp).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)

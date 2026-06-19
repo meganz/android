@@ -46,6 +46,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         val nodeIds = (nodeSourceData as? NodeSourceData.RecentsBucket)?.nodeIds
         val isInShare = (nodeSourceData as? NodeSourceData.RecentsBucket)?.isInShare ?: false
         val publicUrl = (nodeSourceData as? NodeSourceData.FileLink)?.url
+            ?: (nodeSourceData as? NodeSourceData.FolderLink)?.url
 
         return when (content) {
             is FileNodeContent.Pdf -> if (isPDFViewerEnabled.not()) {

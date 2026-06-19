@@ -252,7 +252,7 @@ internal fun FolderLinkScreen(
     uiState.openedFileNode?.let { fileNode ->
         HandleNodeAction3(
             typedFileNode = fileNode,
-            nodeSourceData = NodeSourceData.FolderLink,
+            nodeSourceData = NodeSourceData.FolderLink(url = uiState.url),
             onNavigate = onNavigate,
             onActionHandled = { onProcessAction(FolderLinkAction.OpenedFileNodeHandled) },
             onDownloadEvent = onTransfer,
