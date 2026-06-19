@@ -249,6 +249,146 @@ internal class TextEditorFastScrollbarTest {
     }
 
     @Test
+    fun `test that calculateScrollOffset maps a single chunk onto its real travel not full height`() {
+        // Single chunk: travel = 1000 - 400 = 600. Midpoint of the drag is 300px, not 0.5 * 1000 = 500px.
+        val result = calculateScrollOffset(
+            offsetFraction = 0.5f,
+            itemSizePx = 1000,
+            viewportSizePx = 400,
+            isLastItem = true,
+        )
+        assertThat(result).isEqualTo(300)
+    }
+
+    @Test
+    fun `test that calculateScrollOffset maps the last chunk onto its real travel`() {
+        // Last chunk of many: travel = 800 - 300 = 500. Midpoint is 250px.
+        val result = calculateScrollOffset(
+            offsetFraction = 0.5f,
+            itemSizePx = 800,
+            viewportSizePx = 300,
+            isLastItem = true,
+        )
+        assertThat(result).isEqualTo(250)
+    }
+
+    @Test
+    fun `test that calculateScrollOffset uses the full chunk height for a middle chunk`() {
+        // A non-last chunk scrolls its whole height before the next chunk takes over: 0.5 * 1000 = 500.
+        val result = calculateScrollOffset(
+            offsetFraction = 0.5f,
+            itemSizePx = 1000,
+            viewportSizePx = 400,
+            isLastItem = false,
+        )
+        assertThat(result).isEqualTo(500)
+    }
+
+    @Test
+    fun `test that calculateScrollOffset produces a tiny offset for barely scrollable content`() {
+        // travel = 500 - 480 = 20; midpoint of the drag is 10px.
+        val result = calculateScrollOffset(
+            offsetFraction = 0.5f,
+            itemSizePx = 500,
+            viewportSizePx = 480,
+            isLastItem = true,
+        )
+        assertThat(result).isEqualTo(10)
+    }
+
+    @Test
+    fun `test that calculateScrollOffset maps offsetFraction of 1 to the true bottom`() {
+        // Full drag lands exactly on the last scrollable pixel: travel = 1000 - 400 = 600.
+        val result = calculateScrollOffset(
+            offsetFraction = 1f,
+            itemSizePx = 1000,
+            viewportSizePx = 400,
+            isLastItem = true,
+        )
+        assertThat(result).isEqualTo(600)
+    }
+
+    @Test
+    fun `test that calculateScrollOffset maps offsetFraction below 1 strictly below the bottom leaving no dead zone`() {
+        // 0.9 of travel (600) = 540, strictly below the bottom — so dragging up from the bottom moves the
+        // content immediately instead of staying clamped (no dead zone at the end of the track).
+        val result = calculateScrollOffset(
+            offsetFraction = 0.9f,
+            itemSizePx = 1000,
+            viewportSizePx = 400,
+            isLastItem = true,
+        )
+        assertThat(result).isEqualTo(540)
+        assertThat(result).isLessThan(600)
+    }
+
+    @Test
+    fun `test that calculateScrollOffset clamps travel to zero when the viewport exceeds the chunk`() {
+        // Non-scrollable last chunk (content fits): no travel, so the offset is pinned to 0.
+        val result = calculateScrollOffset(
+            offsetFraction = 1f,
+            itemSizePx = 300,
+            viewportSizePx = 400,
+            isLastItem = true,
+        )
+        assertThat(result).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that the drag inverse round-trips a middle chunk scroll position back to the same offset`() {
+        // The thumb stays aligned with the content only if mapping a scroll position to a proportion and
+        // back lands on the same place. Middle chunk: index 1 of 3, 300px into a 1000px chunk.
+        val itemCount = 3
+        val itemSize = 1000f
+        val viewport = 400
+        val proportion = calculateScrollProportion(
+            firstVisibleItemIndex = 1,
+            firstVisibleItemScrollOffset = 300,
+            firstVisibleItemSize = itemSize,
+            itemCount = itemCount,
+            viewportSize = viewport,
+            canScrollForward = true,
+            canScrollBackward = true,
+        )
+        val target = calculateScrollTarget(proportion, itemCount)
+        val offset = calculateScrollOffset(
+            offsetFraction = target.offsetFraction,
+            itemSizePx = itemSize.toInt(),
+            viewportSizePx = viewport,
+            isLastItem = target.index == itemCount - 1,
+        )
+        assertThat(target.index).isEqualTo(1)
+        assertThat(offset).isEqualTo(300)
+    }
+
+    @Test
+    fun `test that the drag inverse round-trips a last chunk scroll position using its real travel`() {
+        // Last chunk: index 2 of 3, 300px into its 600px travel (1000 - 400). Forward and inverse both
+        // normalise by travel, so the round-trip returns the last index and the same 300px offset.
+        val itemCount = 3
+        val itemSize = 1000f
+        val viewport = 400
+        val proportion = calculateScrollProportion(
+            firstVisibleItemIndex = 2,
+            firstVisibleItemScrollOffset = 300,
+            firstVisibleItemSize = itemSize,
+            itemCount = itemCount,
+            viewportSize = viewport,
+            canScrollForward = true,
+            canScrollBackward = true,
+        )
+        val target = calculateScrollTarget(proportion, itemCount)
+        val offset = calculateScrollOffset(
+            offsetFraction = target.offsetFraction,
+            itemSizePx = itemSize.toInt(),
+            viewportSizePx = viewport,
+            isLastItem = target.index == itemCount - 1,
+        )
+        assertThat(target.index).isEqualTo(2)
+        assertThat(offset).isEqualTo(300)
+    }
+
+    @Test
     fun `test that shouldShowScrollbar returns false when itemCount is 0`() {
         assertThat(shouldShowScrollbar(0)).isFalse()
     }

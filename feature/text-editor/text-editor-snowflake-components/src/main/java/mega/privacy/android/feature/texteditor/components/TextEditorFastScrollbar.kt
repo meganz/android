@@ -28,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,11 +40,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import mega.android.core.ui.tokens.theme.DSTokens
+import kotlin.math.roundToInt
 
 private val thumbHeight = 40.dp
 private const val HIDE_DELAY_MILLIS = 900
@@ -64,19 +60,17 @@ private val thumbTrackVerticalInset = 4.dp
  */
 private const val MINIMUM_ITEMS_FOR_SCROLLBAR = 1
 
-/** Step size for scrolling large lists; avoids hitting platform scroll-offset limit in one jump. */
-private const val SCROLL_STEP_ITEMS = 25_000
-
-/** Delay between scroll steps (ms) so layout can settle and we can scroll further. */
-private const val SCROLL_STEP_DELAY_MS = 16L
-
 /**
  * Fast-scroll bar for the text editor LazyColumn.
  *
  * - Uses proportion = firstVisibleItemIndex / itemCount (with continuous offset) so the bar
  *   never shows 100% until the list is actually at the end.
- * - For large lists, [scrollToItem] is done in steps to get past platform scroll limits (~172k
- *   when scroll offset in pixels overflows Int); each step scrolls a batch of items then yields.
+ * - While dragging, the thumb and tooltip follow the finger directly (via the live drag target),
+ *   not the settled scroll state, so they track 1:1 and don't jitter while a heavy chunk remeasures.
+ *   On release both resume reflecting the real scroll position.
+ * - A drag scrolls via [LazyListState.requestScrollToItem]: synchronous and coalescing, so rapid
+ *   drag deltas overwrite the pending request instead of cancelling a scroll coroutine per frame,
+ *   and snapping by index sidesteps the platform pixel-scroll limit.
  * - Incorporates [LazyListState.firstVisibleItemScrollOffset] for smooth thumb updates on scroll.
  * - Positions the thumb with [thumbEndPadding] from the right edge (matches core-ui scrollbar).
  * - Uses the lambda form of [Modifier.offset] so thumb position updates run in the layout phase
@@ -92,7 +86,6 @@ fun TextEditorFastScrollbar(
     if (!shouldShowScrollbar(itemCount)) return
 
     val density = LocalDensity.current
-    val coroutineScope = rememberCoroutineScope()
 
     val thumbHeightPixels = remember(density) { with(density) { thumbHeight.toPx() } }
 
@@ -100,8 +93,13 @@ fun TextEditorFastScrollbar(
 
     var thumbPressed by remember { mutableStateOf(false) }
 
-    // Plain mutable holder so assigning a new job does not trigger recomposition.
-    val scrollJobHolder = remember { object { var job: Job? = null } }
+    // While dragging, holds the finger's proportion so the thumb tracks it directly; null otherwise,
+    // falling back to the real scroll proportion. Read in the offset lambda (layout phase).
+    var dragProportion by remember { mutableStateOf<Float?>(null) }
+
+    // While dragging, holds the chunk + fraction the finger is scrubbing to, so the tooltip leads the
+    // finger instead of trailing the settled scroll position; null otherwise.
+    var dragTooltipTarget by remember { mutableStateOf<DragTooltipTarget?>(null) }
 
     // Drag state: captures scroll proportion at drag-start and accumulates raw deltas.
     // Plain object (not MutableState) to avoid recomposition on updates.
@@ -143,13 +141,28 @@ fun TextEditorFastScrollbar(
     val tooltipString by remember(state, itemCount) {
         derivedStateOf {
             if (thumbVisible) {
-                // How far the first visible chunk has scrolled past the top, so the caller can
-                // interpolate the actual top line within the chunk instead of always reporting the
-                // chunk's start line (which never changes for a single-chunk file).
-                val size = state.layoutInfo.visibleItemsInfo.firstOrNull()?.size?.toFloat() ?: 0f
-                val fractionWithinChunk =
-                    if (size > 0f) (state.firstVisibleItemScrollOffset / size).coerceIn(0f, 1f) else 0f
-                latestTooltipText.value?.invoke(state.firstVisibleItemIndex, fractionWithinChunk)
+                val dragTarget = dragTooltipTarget
+                if (dragTarget != null) {
+                    // Mid-drag: report where the finger is scrubbing to.
+                    latestTooltipText.value?.invoke(
+                        dragTarget.chunkIndex,
+                        dragTarget.fractionWithinChunk
+                    )
+                } else {
+                    // Fraction the first visible chunk has scrolled past the top, so the caller can
+                    // interpolate the top line within the chunk rather than its (fixed) start line.
+                    val size =
+                        state.layoutInfo.visibleItemsInfo.firstOrNull()?.size?.toFloat() ?: 0f
+                    val fractionWithinChunk =
+                        if (size > 0f) (state.firstVisibleItemScrollOffset / size).coerceIn(
+                            0f,
+                            1f
+                        ) else 0f
+                    latestTooltipText.value?.invoke(
+                        state.firstVisibleItemIndex,
+                        fractionWithinChunk
+                    )
+                }
             } else null
         }
     }
@@ -187,10 +200,12 @@ fun TextEditorFastScrollbar(
                 .fillMaxWidth()
                 .height(thumbHeight)
                 // Lambda form: state reads deferred to layout phase — no recomposition on scroll.
+                // During a drag the thumb follows the finger; otherwise the real scroll position.
                 .offset {
+                    val proportion = dragProportion ?: scrollProportion
                     IntOffset(
                         x = 0,
-                        y = (scrollableHeightPixels * scrollProportion).roundToInt(),
+                        y = (scrollableHeightPixels * proportion).roundToInt(),
                     )
                 },
             contentAlignment = Alignment.CenterEnd,
@@ -216,45 +231,57 @@ fun TextEditorFastScrollbar(
                                     thumbPressed = true
                                     dragState.startProportion = scrollProportion
                                     dragState.accumulatedPx = 0f
+                                    dragProportion = scrollProportion
                                 },
-                                onDragEnd = { thumbPressed = false },
-                                onDragCancel = { thumbPressed = false },
+                                onDragEnd = {
+                                    thumbPressed = false
+                                    dragProportion = null
+                                    dragTooltipTarget = null
+                                },
+                                onDragCancel = {
+                                    thumbPressed = false
+                                    dragProportion = null
+                                    dragTooltipTarget = null
+                                },
                             ) { change, dragAmount ->
                                 if (scrollableHeightPixels > 0 && itemCount > 0) {
                                     change.consume()
                                     dragState.accumulatedPx += dragAmount
-                                    val rawProportion = dragState.startProportion + dragState.accumulatedPx / scrollableHeightPixels
-                                    val dragProportion = rawProportion.coerceIn(0f, 1f)
-                                    // Map the drag to a continuous position inside the list so the thumb
-                                    // tracks the finger smoothly instead of snapping to whole chunks. The
-                                    // fractional part is converted to a pixel offset within the target chunk.
-                                    val target = calculateScrollTarget(dragProportion, itemCount)
-                                    scrollJobHolder.job?.cancel()
-                                    scrollJobHolder.job = coroutineScope.launch {
-                                        // Approximate the target chunk height with the first visible chunk's
-                                        // measured height; chunks are near-uniform so this keeps the offset
-                                        // close enough for a fast-scroll thumb without measuring the target.
-                                        val chunkSizePx = state.layoutInfo.visibleItemsInfo
-                                            .firstOrNull()?.size ?: 0
-                                        val scrollOffset = (target.offsetFraction * chunkSizePx).roundToInt()
-                                        var current = state.firstVisibleItemIndex
-                                        if (target.index <= current + SCROLL_STEP_ITEMS) {
-                                            state.scrollToItem(target.index, scrollOffset)
-                                        } else {
-                                            var next = (current + SCROLL_STEP_ITEMS).coerceAtMost(target.index)
-                                            var prevIndex = -1
-                                            while (next < target.index) {
-                                                state.scrollToItem(next.coerceIn(0, itemCount - 1))
-                                                delay(SCROLL_STEP_DELAY_MS)
-                                                current = state.firstVisibleItemIndex
-                                                // No progress means scrollToItem hit platform limits; bail to avoid infinite loop.
-                                                if (current >= target.index || current == prevIndex) break
-                                                prevIndex = current
-                                                next = (current + SCROLL_STEP_ITEMS).coerceAtMost(target.index)
-                                            }
-                                            state.scrollToItem(target.index, scrollOffset)
-                                        }
-                                    }
+                                    val proportion = (dragState.startProportion +
+                                            dragState.accumulatedPx / scrollableHeightPixels).coerceIn(
+                                        0f,
+                                        1f
+                                    )
+                                    // Drive the thumb from the finger so it tracks 1:1; the content
+                                    // catches up via the request below. Decoupling them removes the
+                                    // multi-chunk jitter.
+                                    dragProportion = proportion
+                                    // Continuous position within the list (index + sub-item fraction)
+                                    // so the content tracks the finger instead of snapping to chunks.
+                                    val target = calculateScrollTarget(proportion, itemCount)
+                                    // Approximate the target chunk height with the first visible
+                                    // chunk's; chunks are near-uniform, close enough for fast-scroll.
+                                    val chunkSizePx = state.layoutInfo.visibleItemsInfo
+                                        .firstOrNull()?.size ?: 0
+                                    val viewportSizePx = state.layoutInfo.viewportEndOffset -
+                                            state.layoutInfo.viewportStartOffset
+                                    val scrollOffset = calculateScrollOffset(
+                                        offsetFraction = target.offsetFraction,
+                                        itemSizePx = chunkSizePx,
+                                        viewportSizePx = viewportSizePx,
+                                        isLastItem = target.index == itemCount - 1,
+                                    )
+                                    // Feed the tooltip the same target, size-normalised to match the
+                                    // real-scroll path so the label doesn't jump when the drag ends.
+                                    dragTooltipTarget = DragTooltipTarget(
+                                        chunkIndex = target.index,
+                                        fractionWithinChunk = if (chunkSizePx > 0) {
+                                            (scrollOffset.toFloat() / chunkSizePx).coerceIn(0f, 1f)
+                                        } else 0f,
+                                    )
+                                    // Synchronous, coalescing snap on next remeasure: rapid deltas just
+                                    // overwrite the pending request; index snapping sidesteps the pixel limit.
+                                    state.requestScrollToItem(target.index, scrollOffset)
                                 }
                             }
                         }
@@ -345,6 +372,18 @@ internal fun calculateScrollProportion(
 }
 
 /**
+ * Where the finger is scrubbing to during a drag, used to drive the tooltip line label.
+ *
+ * @param chunkIndex  The target chunk (item) index.
+ * @param fractionWithinChunk  How far into that chunk, size-normalised (offset / chunk size, 0f..1f) to
+ *   match the real-scroll tooltip path so the label doesn't jump when the drag ends.
+ */
+private data class DragTooltipTarget(
+    val chunkIndex: Int,
+    val fractionWithinChunk: Float,
+)
+
+/**
  * Target position for a fast-scroll drag: an item [index] plus the fraction of the way [offsetFraction]
  * (0..1) the thumb sits into that item. The fraction is later converted to a pixel scroll offset using
  * the measured item height so the thumb tracks the finger continuously rather than snapping per item.
@@ -375,6 +414,30 @@ internal fun calculateScrollTarget(proportion: Float, itemCount: Int): ScrollTar
     val index = continuousPosition.toInt().coerceIn(0, itemCount - 1)
     val offsetFraction = (continuousPosition - index).coerceIn(0f, 1f)
     return ScrollTarget(index = index, offsetFraction = offsetFraction)
+}
+
+/**
+ * Converts a drag [offsetFraction] within the target chunk into a pixel scroll offset, mirroring the
+ * last-chunk travel normalisation in [calculateScrollProportion].
+ *
+ * The last (and single) chunk only scrolls by `itemSize - viewport` before the list bottoms out, so
+ * mapping onto the full [itemSizePx] would saturate the offset early — scrolling small/last chunks too
+ * fast and leaving a dead zone at the track's end. Non-last chunks use their full height. Keeping this
+ * the exact inverse of [calculateScrollProportion] is what makes the thumb track the finger 1:1.
+ *
+ * @param offsetFraction  How far into the target chunk the thumb sits, in the range 0f..1f.
+ * @param itemSizePx  Measured height of the target chunk in pixels.
+ * @param viewportSizePx  Main-axis size of the viewport in pixels.
+ * @param isLastItem  Whether the target chunk is the last item in the list.
+ */
+internal fun calculateScrollOffset(
+    offsetFraction: Float,
+    itemSizePx: Int,
+    viewportSizePx: Int,
+    isLastItem: Boolean,
+): Int {
+    val travelPx = (if (isLastItem) itemSizePx - viewportSizePx else itemSizePx).coerceAtLeast(0)
+    return (offsetFraction.coerceIn(0f, 1f) * travelPx).roundToInt()
 }
 
 /**
