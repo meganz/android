@@ -10,9 +10,6 @@
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage">
         <action
-            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
-            app:destination="@id/offlineFragmentCompose" />
-        <action
             android:id="@+id/action_homepage_to_offline_file_info"
             app:destination="@id/offline_file_info_compose" />
         <action
@@ -37,11 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/recentBucketFragment"
-        android:name="mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment">
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
-            app:destination="@id/offlineFragmentCompose" />
-    </fragment>
+        android:name="mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment" />
 
     <fragment
         android:id="@+id/offline_file_info_compose"
@@ -54,28 +47,16 @@
     <fragment
         android:id="@+id/documentSectionFragment"
         android:name="mega.privacy.android.app.presentation.documentsection.DocumentSectionFragment"
-        android:label="DocumentSectionFragment">
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
-            app:destination="@id/offlineFragmentCompose" />
-    </fragment>
+        android:label="DocumentSectionFragment" />
     <fragment
         android:id="@+id/audioSectionFragment"
         android:name="mega.privacy.android.app.presentation.audiosection.AudioSectionFragment"
-        android:label="AudioSectionFragment">
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
-            app:destination="@id/offlineFragmentCompose" />
-    </fragment>
+        android:label="AudioSectionFragment" />
 
     <fragment
         android:id="@+id/videoSectionFragment"
         android:name="mega.privacy.android.app.presentation.videosection.VideoSectionFragment"
-        android:label="VideoSectionFragment">
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
-            app:destination="@id/offlineFragmentCompose" />
-    </fragment>
+        android:label="VideoSectionFragment" />
 
     <fragment
         android:id="@+id/favouritesFragment"
@@ -92,37 +73,5 @@
         <argument
             android:name="parentHandle"
             app:argType="long" />
-    </fragment>
-    <fragment
-        android:id="@+id/offlineFragmentCompose"
-        android:name="mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment"
-        android:label="OfflineFragmentCompose">
-        <argument
-            android:name="path"
-            android:defaultValue="/"
-            app:argType="string" />
-        <argument
-            android:name="rootFolderOnly"
-            android:defaultValue="true"
-            app:argType="boolean" />
-        <argument
-            android:name="parentId"
-            android:defaultValue="-1"
-            app:argType="integer" />
-        <argument
-            android:name="title"
-            android:defaultValue=""
-            app:argType="string" />
-        <argument
-            android:name="fileNames"
-            app:argType="string[]"
-            app:nullable="true"
-            android:defaultValue="@null" />
-        <action
-            android:id="@+id/action_homepage_to_fullscreen_offline_compose"
-            app:destination="@id/offlineFragmentCompose" />
-        <action
-            android:id="@+id/action_homepage_to_offline_file_info"
-            app:destination="@id/offline_file_info_compose" />
     </fragment>
 </navigation>

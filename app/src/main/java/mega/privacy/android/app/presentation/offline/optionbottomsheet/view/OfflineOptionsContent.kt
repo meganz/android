@@ -8,7 +8,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.google.common.io.Files
 import mega.privacy.android.app.presentation.offline.optionbottomsheet.model.OfflineOptionsUiState
-import mega.privacy.android.app.presentation.offline.view.getOfflineNodeDescription
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
