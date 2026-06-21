@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.chat.groupInfo
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -15,11 +14,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ParticipantBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.chat.groupInfo.model.ArchiveChatResult
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState.Companion.FREE_PLAN_PARTICIPANTS_LIMIT
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -30,23 +26,31 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallChanges
 import mega.privacy.android.domain.entity.call.ChatCallStatus
+import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
+import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
+import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
+import mega.privacy.android.domain.usecase.chat.SetChatTitleUseCase
+import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -86,7 +90,11 @@ class GroupChatInfoViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase,
     private val getChatRoomUseCase: GetChatRoomUseCase,
-    private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase
+    private val monitorChatParticipantsUseCase: MonitorChatParticipantsUseCase,
+    private val setChatTitleUseCase: SetChatTitleUseCase,
+    private val archiveChatUseCase: ArchiveChatUseCase,
+    private val updateChatPermissionsUseCase: UpdateChatPermissionsUseCase,
+    private val removeParticipantFromChatUseCase: RemoveParticipantFromChatUseCase,
 ) : ViewModel() {
 
     /**
@@ -209,6 +217,130 @@ class GroupChatInfoViewModel @Inject constructor(
     }
 
     /**
+     * Changes the title of the chat room.
+     *
+     * @param chatId The chat id.
+     * @param title  The new chat room title.
+     */
+    fun setChatTitle(chatId: Long, title: String) {
+        viewModelScope.launch {
+            runCatching {
+                setChatTitleUseCase(chatId, title)
+            }.onFailure { exception ->
+                Timber.e(exception, "Error changing chat title")
+            }
+        }
+    }
+
+    /**
+     * Archives or unarchives the current chat room. The archive state is toggled
+     * based on the chat room's current state.
+     */
+    fun archiveChat() {
+        val chatRoom = _state.value.chatRoom
+        if (chatRoom == null) {
+            Timber.w("Unable to archive chat: chat room is not available")
+            return
+        }
+        val archive = !chatRoom.isArchived
+        val chatTitle = buildChatTitleForFeedback(chatRoom)
+        viewModelScope.launch {
+            runCatching {
+                archiveChatUseCase(chatRoom.chatId, archive)
+            }.onSuccess {
+                if (archive) {
+                    broadcastChatArchivedUseCase(chatTitle)
+                }
+                _state.update {
+                    it.copy(
+                        archiveChatResult = ArchiveChatResult(
+                            success = true,
+                            isArchive = archive,
+                            chatTitle = chatTitle,
+                        )
+                    )
+                }
+            }.onFailure { exception ->
+                Timber.e(exception, "Error archiving chat")
+                _state.update {
+                    it.copy(
+                        archiveChatResult = ArchiveChatResult(
+                            success = false,
+                            isArchive = archive,
+                            chatTitle = chatTitle,
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Builds the chat title used in archive/unarchive feedback messages, truncating
+     * long titles and wrapping non-custom group titles in quotes.
+     */
+    private fun buildChatTitleForFeedback(chatRoom: ChatRoom): String {
+        var chatTitle = chatRoom.title
+        if (chatTitle.length > MAX_LENGTH_CHAT_TITLE) {
+            chatTitle = chatTitle.substring(0, 59) + "..."
+        }
+        if (chatTitle.isNotEmpty() && chatRoom.isGroup && !chatRoom.hasCustomTitle) {
+            chatTitle = "\"$chatTitle\""
+        }
+        return chatTitle
+    }
+
+    /**
+     * Consumes the archive chat result event.
+     */
+    fun onConsumeArchiveChatResult() {
+        _state.update { it.copy(archiveChatResult = null) }
+    }
+
+    /**
+     * Updates the permissions of a participant in the chat room.
+     *
+     * @param chatId     The chat id.
+     * @param handle     The participant handle.
+     * @param permission The new [ChatRoomPermission].
+     */
+    fun updateChatPermissions(chatId: Long, handle: Long, permission: ChatRoomPermission) {
+        viewModelScope.launch {
+            runCatching {
+                updateChatPermissionsUseCase(chatId, NodeId(handle), permission)
+            }.onFailure { exception ->
+                Timber.e(exception, "Error updating chat permissions")
+            }
+        }
+    }
+
+    /**
+     * Removes a participant from the chat room.
+     *
+     * @param chatId The chat id.
+     * @param handle The participant handle.
+     */
+    fun removeParticipant(chatId: Long, handle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                removeParticipantFromChatUseCase(chatId, handle)
+            }.onSuccess {
+                _state.update { it.copy(removeParticipantSuccess = true) }
+            }.onFailure { exception ->
+                Timber.e(exception, "Error removing participant from chat")
+                _state.update { it.copy(removeParticipantSuccess = false) }
+            }
+        }
+    }
+
+    /**
+     * Consumes the remove participant result event.
+     */
+    fun onConsumeRemoveParticipantResult() {
+        _state.update { it.copy(removeParticipantSuccess = null) }
+    }
+
+    /**
      * Method for processing when clicking on the call option
      *
      * @param userHandle Use handle
@@ -310,15 +442,6 @@ class GroupChatInfoViewModel @Inject constructor(
     }
 
     /**
-     * Launch broadcast for a chat archived event
-     *
-     * @param chatTitle [String]
-     */
-    fun launchBroadcastChatArchived(chatTitle: String) = viewModelScope.launch {
-        broadcastChatArchivedUseCase(chatTitle)
-    }
-
-    /**
      * Launch broadcast notifying that should leave a chat
      *
      * @param chatId [Long] ID of the chat to leave.
@@ -399,5 +522,9 @@ class GroupChatInfoViewModel @Inject constructor(
         } else {
             _state.update { it.copy(shouldShowUserLimitsWarning = false) }
         }
+    }
+
+    companion object {
+        private const val MAX_LENGTH_CHAT_TITLE = 60
     }
 }

@@ -652,7 +652,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         } else if (id == R.id.manage_chat_history_group_info_layout) {
             groupChatInfoActivity.openManageChatHistory(chatId);
         } else if (id == R.id.chat_group_contact_properties_archive_layout) {
-            chatController.archiveChat(groupChatInfoActivity.getChat());
+            groupChatInfoActivity.archiveChat();
         } else if (id == R.id.chat_group_contact_properties_layout) {
             if (holderHeader != null) {
                 if (holderHeader.notificationsSwitch.isChecked()) {

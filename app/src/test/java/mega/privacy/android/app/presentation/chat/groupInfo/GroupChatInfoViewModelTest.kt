@@ -16,7 +16,9 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
 import mega.privacy.android.domain.usecase.SetOpenInviteWithChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
@@ -25,8 +27,12 @@ import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.EndCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatRoomUpdatesUseCase
+import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
+import mega.privacy.android.domain.usecase.chat.SetChatTitleUseCase
+import mega.privacy.android.domain.usecase.chat.UpdateChatPermissionsUseCase
 import mega.privacy.android.domain.usecase.chat.participants.MonitorChatParticipantsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
@@ -39,6 +45,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -70,6 +77,10 @@ class GroupChatInfoViewModelTest {
 
     private val monitorCallInChatUseCase = mock<MonitorCallInChatUseCase>()
     private val getChatRoomUseCase = mock<GetChatRoomUseCase>()
+    private val setChatTitleUseCase = mock<SetChatTitleUseCase>()
+    private val archiveChatUseCase = mock<ArchiveChatUseCase>()
+    private val updateChatPermissionsUseCase = mock<UpdateChatPermissionsUseCase>()
+    private val removeParticipantFromChatUseCase = mock<RemoveParticipantFromChatUseCase>()
 
     private val connectivityFlow = MutableSharedFlow<Boolean>()
     private val updatePushNotificationSettings = MutableSharedFlow<Boolean>()
@@ -95,7 +106,11 @@ class GroupChatInfoViewModelTest {
             broadcastChatArchivedUseCase,
             broadcastLeaveChatUseCase,
             monitorCallInChatUseCase,
-            getChatRoomUseCase
+            getChatRoomUseCase,
+            setChatTitleUseCase,
+            archiveChatUseCase,
+            updateChatPermissionsUseCase,
+            removeParticipantFromChatUseCase
         )
         initializeStubbing()
     }
@@ -129,7 +144,11 @@ class GroupChatInfoViewModelTest {
             monitorChatRoomUpdatesUseCase = monitorChatRoomUpdatesUseCase,
             monitorCallInChatUseCase = monitorCallInChatUseCase,
             getChatRoomUseCase = getChatRoomUseCase,
-            monitorChatParticipantsUseCase = monitorChatParticipantsUseCase
+            monitorChatParticipantsUseCase = monitorChatParticipantsUseCase,
+            setChatTitleUseCase = setChatTitleUseCase,
+            archiveChatUseCase = archiveChatUseCase,
+            updateChatPermissionsUseCase = updateChatPermissionsUseCase,
+            removeParticipantFromChatUseCase = removeParticipantFromChatUseCase
         )
     }
 
@@ -298,6 +317,143 @@ class GroupChatInfoViewModelTest {
             assertThat(item.chatRoom).isEqualTo(chat)
         }
     }
+
+    @Test
+    fun `test that setChatTitle invokes setChatTitleUseCase with the given chatId and title`() =
+        runTest {
+            val title = "New group name"
+
+            initializeViewModel()
+            underTest.setChatTitle(chatId, title)
+
+            verify(setChatTitleUseCase).invoke(chatId, title)
+        }
+
+    @Test
+    fun `test that setChatTitle does not crash when setChatTitleUseCase fails`() = runTest {
+        val title = "New group name"
+        whenever(setChatTitleUseCase(chatId, title)).thenThrow(RuntimeException())
+
+        initializeViewModel()
+        underTest.setChatTitle(chatId, title)
+
+        verify(setChatTitleUseCase).invoke(chatId, title)
+    }
+
+    @Test
+    fun `test that archiveChat archives the chat and broadcasts when the chat is not archived`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { chatId } doReturn chatId
+                on { isArchived } doReturn false
+                on { title } doReturn "Group"
+                on { isGroup } doReturn true
+                on { hasCustomTitle } doReturn true
+            }
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            initializeViewModel()
+            underTest.setChatId(chatId)
+
+            underTest.archiveChat()
+
+            verify(archiveChatUseCase).invoke(chatId, true)
+            verify(broadcastChatArchivedUseCase).invoke("Group")
+            underTest.state.test {
+                val result = awaitItem().archiveChatResult
+                assertThat(result?.success).isTrue()
+                assertThat(result?.isArchive).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that archiveChat unarchives the chat without broadcasting when the chat is archived`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { chatId } doReturn chatId
+                on { isArchived } doReturn true
+                on { title } doReturn "Group"
+                on { isGroup } doReturn true
+                on { hasCustomTitle } doReturn true
+            }
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            initializeViewModel()
+            underTest.setChatId(chatId)
+
+            underTest.archiveChat()
+
+            verify(archiveChatUseCase).invoke(chatId, false)
+            verify(broadcastChatArchivedUseCase, never()).invoke(any())
+            underTest.state.test {
+                val result = awaitItem().archiveChatResult
+                assertThat(result?.success).isTrue()
+                assertThat(result?.isArchive).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that archiveChat updates state with failure when archiveChatUseCase fails`() =
+        runTest {
+            val chatRoom = mock<ChatRoom> {
+                on { chatId } doReturn chatId
+                on { isArchived } doReturn false
+                on { title } doReturn "Group"
+                on { isGroup } doReturn true
+                on { hasCustomTitle } doReturn true
+            }
+            whenever(getChatRoomUseCase(chatId)).thenReturn(chatRoom)
+            whenever(archiveChatUseCase(chatId, true)).thenThrow(RuntimeException())
+            initializeViewModel()
+            underTest.setChatId(chatId)
+
+            underTest.archiveChat()
+
+            underTest.state.test {
+                assertThat(awaitItem().archiveChatResult?.success).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that updateChatPermissions invokes the use case with the mapped node id and permission`() =
+        runTest {
+            val handle = 456L
+
+            initializeViewModel()
+            underTest.updateChatPermissions(chatId, handle, ChatRoomPermission.Moderator)
+
+            verify(updateChatPermissionsUseCase).invoke(
+                chatId,
+                NodeId(handle),
+                ChatRoomPermission.Moderator
+            )
+        }
+
+    @Test
+    fun `test that removeParticipant updates state with success when the use case succeeds`() =
+        runTest {
+            val handle = 456L
+
+            initializeViewModel()
+            underTest.removeParticipant(chatId, handle)
+
+            verify(removeParticipantFromChatUseCase).invoke(chatId, handle)
+            underTest.state.test {
+                assertThat(awaitItem().removeParticipantSuccess).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that removeParticipant updates state with failure when the use case fails`() =
+        runTest {
+            val handle = 456L
+            whenever(removeParticipantFromChatUseCase(chatId, handle)).thenThrow(RuntimeException())
+
+            initializeViewModel()
+            underTest.removeParticipant(chatId, handle)
+
+            underTest.state.test {
+                assertThat(awaitItem().removeParticipantSuccess).isFalse()
+            }
+        }
 
     companion object {
         private val testDispatcher = UnconfinedTestDispatcher()
