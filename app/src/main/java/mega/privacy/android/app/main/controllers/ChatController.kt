@@ -7,6 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
@@ -49,6 +50,7 @@ class ChatController @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val dbH: DatabaseHandler,
+    private val activityLifecycleHandler: ActivityLifecycleHandler
 ) {
 
     fun deleteMessages(messages: ArrayList<MegaChatMessage>, chat: MegaChatRoom) {
@@ -89,26 +91,28 @@ class ChatController @Inject constructor(
      * @param option The selected mute option.
      */
     fun muteChat(option: String) {
-        if (context is ChatNotificationsPreferencesActivity) return
+        val currentActivity = activityLifecycleHandler.getCurrentActivity()
+        if (currentActivity is ChatNotificationsPreferencesActivity) return
 
+        val snackbarContext = currentActivity ?: context
         when (option) {
             NOTIFICATIONS_ENABLED -> showSnackbar(
-                context, context.getString(R.string.success_unmuting_a_chat)
+                snackbarContext, context.getString(R.string.success_unmuting_a_chat)
             )
 
             NOTIFICATIONS_DISABLED -> showSnackbar(
-                context, context.getString(R.string.notifications_are_already_muted)
+                snackbarContext, context.getString(R.string.notifications_are_already_muted)
             )
 
             NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING, NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING -> showSnackbar(
-                context, getCorrectStringDependingOnCalendar(option, context)
+                snackbarContext, getCorrectStringDependingOnCalendar(option, context)
             )
 
             else -> {
                 val text = getMutedPeriodString(option)
                 if (!isTextEmpty(text)) {
                     showSnackbar(
-                        context,
+                        snackbarContext,
                         context.getString(R.string.success_muting_a_chat_for_specific_time, text)
                     )
                 }
@@ -640,16 +644,17 @@ class ChatController @Inject constructor(
 
     fun importNodesFromMessages(messages: ArrayList<MegaChatMessage>) {
         Timber.d("importNodesFromMessages")
+        val currentActivity = activityLifecycleHandler.getCurrentActivity() ?: return
 
-        val intent = Intent(context, FileExplorerActivity::class.java)
+        val intent = Intent(currentActivity, FileExplorerActivity::class.java)
         intent.setAction(FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER)
 
         val longArray = messages.mapNotNull { it.msgId }.toLongArray()
 
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray)
 
-        if (context is NodeAttachmentHistoryActivity) {
-            context.startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
+        if (currentActivity is NodeAttachmentHistoryActivity) {
+            currentActivity.startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
         }
     }
 
@@ -658,30 +663,30 @@ class ChatController @Inject constructor(
         typeImport: Int,
     ) {
         Timber.d("importNodesFromAndroidMessages")
-
-        val intent = Intent(context, FileExplorerActivity::class.java)
+        val currentActivity = activityLifecycleHandler.getCurrentActivity() ?: return
+        val intent = Intent(currentActivity, FileExplorerActivity::class.java)
         intent.setAction(FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER)
 
         val longArray = messages.mapNotNull { it?.message?.msgId }.toLongArray()
 
         intent.putExtra("HANDLES_IMPORT_CHAT", longArray)
 
-        if (context is NodeAttachmentHistoryActivity) {
-            context.startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
+        if (currentActivity is NodeAttachmentHistoryActivity) {
+            currentActivity.startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
         }
     }
 
     fun forwardMessages(messagesSelected: ArrayList<MegaChatMessage>, idChat: Long) {
         Timber.d("Number of messages: %d, Chat ID: %d", messagesSelected.size, idChat)
-
+        val currentActivity = activityLifecycleHandler.getCurrentActivity() ?: return
         val idMessages = messagesSelected.mapNotNull { it.msgId }.toLongArray()
 
-        val i = Intent(context, ChatExplorerActivity::class.java)
+        val i = Intent(currentActivity, ChatExplorerActivity::class.java)
         i.putExtra(ID_MESSAGES, idMessages)
         i.putExtra(ID_CHAT_FROM, idChat)
         i.setAction(ACTION_FORWARD_MESSAGES)
-        if (context is NodeAttachmentHistoryActivity) {
-            context.startActivityForResult(i, REQUEST_CODE_SELECT_CHAT)
+        if (currentActivity is NodeAttachmentHistoryActivity) {
+            currentActivity.startActivityForResult(i, REQUEST_CODE_SELECT_CHAT)
         }
     }
 

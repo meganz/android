@@ -44,7 +44,11 @@ class ChatAdvancedNotificationBuilder(
     var megaChatApi: MegaChatApiAndroid = getInstance().getMegaChatApi()
 
     private val chatC: ChatController = ChatController(
-        context = context, megaApi = megaApi, megaChatApi = megaChatApi, dbH = dbH
+        context = context,
+        megaApi = megaApi,
+        megaChatApi = megaChatApi,
+        dbH = dbH,
+        activityLifecycleHandler = getInstance().activityLifecycleHandler
     )
 
     private val numberButtons: String
