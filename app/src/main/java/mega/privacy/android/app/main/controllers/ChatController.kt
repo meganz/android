@@ -8,7 +8,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
@@ -52,13 +51,6 @@ class ChatController @Inject constructor(
     private val dbH: DatabaseHandler,
 ) {
 
-    fun archiveChat(chat: MegaChatRoom) {
-        Timber.d("Chat ID: %s", chat.chatId)
-        if (context is GroupChatInfoActivity) {
-            megaChatApi.archiveChat(chat.chatId, !chat.isArchived, context)
-        }
-    }
-
     fun deleteMessages(messages: ArrayList<MegaChatMessage>, chat: MegaChatRoom) {
         Timber.d("Messages to delete: %s", messages.size)
         for (i in messages.indices) {
@@ -88,27 +80,6 @@ class ChatController @Inject constructor(
 
         if (messageToDelete == null) {
             Timber.d("The message cannot be deleted")
-        }
-    }
-
-    fun alterParticipantsPermissions(chatid: Long, uh: Long, privilege: Int) {
-        Timber.d("Chat ID: %d, User (uh): %d, Priv: %d", chatid, uh, privilege)
-        megaChatApi.updateChatPermissions(
-            chatid, uh, privilege, context as GroupChatInfoActivity?
-        )
-    }
-
-    fun removeParticipant(chatid: Long, uh: Long) {
-        Timber.d("Chat ID: %d, User (uh): %d", chatid, uh)
-        if (context == null) {
-            Timber.w("Context is NULL")
-        }
-        megaChatApi.removeFromChat(chatid, uh, context as GroupChatInfoActivity?)
-    }
-
-    fun changeTitle(chatid: Long, title: String?) {
-        if (context is GroupChatInfoActivity) {
-            megaChatApi.setChatTitle(chatid, title, context)
         }
     }
 

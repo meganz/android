@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
  * @property call                                       The chat call.
  * @property chatRoom                                   The chat room.
  * @property participantUpdated                         [ChatParticipant].
+ * @property archiveChatResult                          Result of an archive/unarchive chat operation, null when there is none to handle.
+ * @property removeParticipantSuccess                   True if a participant was removed, false on error, null when there is none to handle.
  */
 data class GroupInfoState(
     val chatId: Long = -1L,
@@ -31,4 +33,6 @@ data class GroupInfoState(
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,
     val retentionTime: Long? = null,
     val participantUpdated: ChatParticipant? = null,
+    val archiveChatResult: ArchiveChatResult? = null,
+    val removeParticipantSuccess: Boolean? = null,
 )

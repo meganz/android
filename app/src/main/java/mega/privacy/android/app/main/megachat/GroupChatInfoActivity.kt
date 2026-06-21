@@ -280,6 +280,33 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 updateParticipants()
                 invalidateOptionsMenu()
             }
+
+            state.archiveChatResult?.let { result ->
+                when {
+                    result.success && result.isArchive -> finish()
+                    result.success -> {
+                        showSnackbar(getString(R.string.success_unarchive_chat, result.chatTitle))
+                        updateAdapterHeader()
+                    }
+
+                    result.isArchive ->
+                        showSnackbar(getString(R.string.error_archive_chat, result.chatTitle))
+
+                    else ->
+                        showSnackbar(getString(R.string.error_unarchive_chat, result.chatTitle))
+                }
+                viewModel.onConsumeArchiveChatResult()
+            }
+
+            state.removeParticipantSuccess?.let { success ->
+                if (success) {
+                    updateParticipants()
+                    showSnackbar(getString(R.string.remove_participant_success))
+                } else {
+                    showSnackbar(getString(R.string.remove_participant_error))
+                }
+                viewModel.onConsumeRemoveParticipantResult()
+            }
             updateParticipantsWarning()
             val call = state.call
             val chatRoom = state.chatRoom
@@ -508,7 +535,14 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     private fun removeParticipant() =
-        chatController?.removeParticipant(chatHandle, selectedHandleParticipant)
+        viewModel.removeParticipant(chatHandle, selectedHandleParticipant)
+
+    /**
+     * Archives or unarchives the current chat.
+     */
+    fun archiveChat() {
+        viewModel.archiveChat()
+    }
 
     /**
      * Shows change permissions dialog
@@ -586,11 +620,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     private fun changePermissions(newPermissions: Int) {
         Timber.d("New permissions: %s", newPermissions)
-        chatController?.alterParticipantsPermissions(
-            chatHandle,
-            selectedHandleParticipant,
-            newPermissions
-        )
+        val permission = when (newPermissions) {
+            MegaChatRoom.PRIV_MODERATOR -> ChatRoomPermission.Moderator
+            MegaChatRoom.PRIV_STANDARD -> ChatRoomPermission.Standard
+            MegaChatRoom.PRIV_RO -> ChatRoomPermission.ReadOnly
+            else -> ChatRoomPermission.Unknown
+        }
+        viewModel.updateChatPermissions(chatHandle, selectedHandleParticipant, permission)
     }
 
     /**
@@ -779,7 +815,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
             else -> {
                 Timber.d("Positive button pressed - change title")
-                chatController?.changeTitle(chatHandle, title)
+                viewModel.setChatTitle(chatHandle, title)
                 changeTitleDialog?.dismiss()
             }
         }
@@ -848,97 +884,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         Timber.d("onRequestFinish CHAT: %d %d", request.type, e.errorCode)
 
         when (request.type) {
-            MegaChatRequest.TYPE_UPDATE_PEER_PERMISSIONS -> {
-                Timber.d("Permissions changed")
-                var index = -1
-                var participantToUpdate: MegaChatParticipant? = null
-                Timber.d("Participants count: %s", participantsCount)
-                for (i in 0 until participantsCount) {
-                    if (request.userHandle == participants[i.toInt()]?.handle) {
-                        participantToUpdate = participants[i.toInt()]
-                        participantToUpdate?.privilege = request.privilege
-                        index = i.toInt()
-                        break
-                    }
-                }
-
-                if (index != -1 && participantToUpdate != null) {
-                    participants[index] = participantToUpdate
-                    adapter?.updateParticipant(index, participants)
-                }
-            }
-
-            MegaChatRequest.TYPE_ARCHIVE_CHATROOM -> {
-                val chatHandle = request.chatHandle
-                val chat = megaChatApi.getChatRoom(chatHandle)
-                var chatTitle = ChatUtil.getTitleChat(chat)
-                if (chatTitle == null) {
-                    chatTitle = ""
-                } else if (chatTitle.isNotEmpty() && chatTitle.length > MAX_LENGTH_CHAT_TITLE) {
-                    chatTitle = chatTitle.substring(0, 59) + "..."
-                }
-
-                if (chatTitle.isNotEmpty() && chat.isGroup && !chat.hasCustomTitle()) {
-                    chatTitle = "\"" + chatTitle + "\""
-                }
-
-                if (e.errorCode == MegaChatError.ERROR_OK) {
-                    if (request.flag) {
-                        Timber.d("Chat archived")
-                        viewModel.launchBroadcastChatArchived(chatTitle)
-                        finish()
-                    } else {
-                        Timber.d("Chat unarchived")
-                        showSnackbar(getString(R.string.success_unarchive_chat, chatTitle))
-                    }
-                } else if (request.flag) {
-                    Timber.e("ERROR WHEN ARCHIVING CHAT %s", e.errorString)
-                    showSnackbar(getString(R.string.error_archive_chat, chatTitle))
-                } else {
-                    Timber.e("ERROR WHEN UNARCHIVING CHAT %s", e.errorString)
-                    showSnackbar(getString(R.string.error_unarchive_chat, chatTitle))
-                }
-
-                updateAdapterHeader()
-            }
-
-            MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM -> {
-                Timber.d("Remove participant: %s", request.userHandle)
-                Timber.d("My user handle: %s", megaChatApi.myUserHandle)
-
-                if (e.errorCode == MegaChatError.ERROR_OK) {
-                    if (request.userHandle == MegaApiJava.INVALID_HANDLE) {
-                        Timber.d("I left the chatroom")
-                        finish()
-                    } else {
-                        Timber.d("Removed from chat")
-                        megaChatApi.getChatRoom(chatHandle)?.let { chatRoom ->
-                            chat = chatRoom
-                            Timber.d("Peers after onChatListItemUpdate: %s", chatRoom.peerCount)
-                        }
-                        updateParticipants()
-                        showSnackbar(getString(R.string.remove_participant_success))
-                    }
-                } else if (request.userHandle == -1L) {
-                    Timber.e("ERROR WHEN LEAVING CHAT%s", e.errorString)
-                    showSnackbar("Error.Chat not left")
-                } else {
-                    Timber.e("ERROR WHEN TYPE_REMOVE_FROM_CHATROOM %s", e.errorString)
-                    showSnackbar(getString(R.string.remove_participant_error))
-                }
-            }
-
-            MegaChatRequest.TYPE_EDIT_CHATROOM_NAME -> {
-                Timber.d("Change title")
-                if (e.errorCode == MegaChatError.ERROR_OK) {
-                    if (request.text != null) {
-                        updateAdapterHeader()
-                    }
-                } else {
-                    Timber.e("ERROR WHEN TYPE_EDIT_CHATROOM_NAME %s", e.errorString)
-                }
-            }
-
             MegaChatRequest.TYPE_CREATE_CHATROOM -> {
                 Timber.d("Create chat request finish!!!")
                 if (e.errorCode == MegaChatError.ERROR_OK) {
@@ -1588,7 +1533,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     companion object {
         private const val TIMEOUT = 300
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
-        private const val MAX_LENGTH_CHAT_TITLE = 60
         private const val END_CALL_FOR_ALL_DIALOG = "isEndCallForAllDialogShown"
     }
 
