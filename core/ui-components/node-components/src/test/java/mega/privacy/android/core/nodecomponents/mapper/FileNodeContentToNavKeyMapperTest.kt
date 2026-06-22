@@ -379,6 +379,42 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
+    fun `test that TextContent maps to LegacyTextEditorNavKey with FolderLink does not set publicUrl`() {
+        val nodeHandle = 555L
+        val folderUrl = "https://mega.nz/folder/abc#key"
+        val serialized = "serialized-node-data"
+        val expectedViewType = NodeSourceTypeInt.FOLDER_LINK_ADAPTER
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            name = "folder-link.txt",
+            fileTypeInfo = TextFileTypeInfo("text/plain", "txt")
+        )
+        whenever(fileNode.serializedData).thenReturn(serialized)
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.FOLDER_LINK))
+            .thenReturn(expectedViewType)
+
+        val result = underTest(
+            content = FileNodeContent.TextContent,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.FolderLink(url = folderUrl),
+            textEditorMode = TextEditorMode.View
+        )
+
+        // A folder link's URL must NOT be forwarded as publicUrl, otherwise the text editor
+        // resolves it as a public file node and throws PublicNodeException. The editor must
+        // route folder links through the FOLDER_LINK_ADAPTER path instead.
+        val expected = LegacyTextEditorNavKey(
+            nodeHandle = nodeHandle,
+            mode = TextEditorMode.View.value,
+            nodeSourceType = expectedViewType,
+            publicUrl = null,
+            serializedNode = serialized,
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
     fun `test that TextContent maps to LegacyTextEditorNavKey with View mode and default parameters`() {
         val nodeHandle = 123L
         val expectedViewType = NodeSourceTypeInt.INCOMING_SHARES_ADAPTER

@@ -10,8 +10,12 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareDropd
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
@@ -111,5 +115,39 @@ internal class TextEditorNodeOptionsResultHandlerTest {
                 NodeOptionsBottomSheetResult(action = mock<MenuAction>(), node = node)
             )
         ).isFalse()
+    }
+
+    @Test
+    fun `test that buildTextEditorViewModelArgs routes a folder link as folder link even when publicUrl is set`() {
+        val args = buildTextEditorViewModelArgs(
+            LegacyTextEditorNavKey(
+                nodeHandle = 123L,
+                mode = TextEditorMode.View.value,
+                nodeSourceType = FOLDER_LINK_ADAPTER,
+                publicUrl = "https://mega.nz/folder/abc#key",
+            )
+        )
+
+        // A folder link must NOT be treated as a file link: it resolves through the
+        // FOLDER_LINK_ADAPTER path, and the folder URL is never forwarded as a file-link publicUrl.
+        assertThat(args.isFolderLink).isTrue()
+        assertThat(args.publicUrl).isNull()
+        assertThat(args.nodeHandle).isEqualTo(123L)
+    }
+
+    @Test
+    fun `test that buildTextEditorViewModelArgs routes a file link via publicUrl`() {
+        val fileUrl = "https://mega.nz/file/abc#key"
+        val args = buildTextEditorViewModelArgs(
+            LegacyTextEditorNavKey(
+                nodeHandle = 456L,
+                mode = TextEditorMode.View.value,
+                nodeSourceType = FILE_LINK_ADAPTER,
+                publicUrl = fileUrl,
+            )
+        )
+
+        assertThat(args.publicUrl).isEqualTo(fileUrl)
+        assertThat(args.isFolderLink).isFalse()
     }
 }
