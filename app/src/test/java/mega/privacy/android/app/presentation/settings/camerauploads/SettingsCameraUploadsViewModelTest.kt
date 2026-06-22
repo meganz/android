@@ -91,6 +91,8 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsKeepFileNamesAsInDeviceDisabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsKeepFileNamesAsInDeviceEnabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsEnabledEvent
 import org.junit.jupiter.api.BeforeEach
@@ -1079,6 +1081,39 @@ internal class SettingsCameraUploadsViewModelTest {
                 )
             }
         }
+
+        @ParameterizedTest(name = "new keep upload file names state: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the corresponding event is tracked when changing the keep file names state`(
+            shouldKeepUploadFileNames: Boolean,
+        ) = runTest {
+            initializeUnderTest()
+
+            underTest.onKeepFileNamesStateChanged(shouldKeepUploadFileNames)
+
+            assertThat(analyticsExtension.events.first()).isEqualTo(
+                if (shouldKeepUploadFileNames) CameraUploadsKeepFileNamesAsInDeviceEnabledEvent
+                else CameraUploadsKeepFileNamesAsInDeviceDisabledEvent
+            )
+        }
+
+        @Test
+        fun `test that a snackbar is displayed when changing the keep file names state`() =
+            runTest {
+                initializeUnderTest()
+
+                underTest.onKeepFileNamesStateChanged(true)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(
+                            LocalizedText.StringRes(
+                                R.string.message_keep_device_name
+                            )
+                        )
+                    )
+                }
+            }
     }
 
     /**

@@ -62,7 +62,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
             verify(dataStore).setLocationTagsEnabled(false)
             verify(dataStore).setUploadVideoQuality(VideoQuality.ORIGINAL.value)
             verify(dataStore).setChargingRequiredForVideoCompression(true)
-            verify(dataStore).setUploadFileNamesKept(false)
+            verify(dataStore).setUploadFileNamesKept(true)
             verify(dataStore).setVideoCompressionSizeLimit(200)
             verify(dataStore).setFileUploadOption(1003)
             verify(dataStore).setUploadsByWifi(true)

@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.settings.camerauploads
 
 import android.app.Activity.RESULT_OK
 import android.os.Parcelable
-import android.widget.Toast
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -80,7 +79,19 @@ import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicke
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.mobile.analytics.event.CameraUploadsFileUploadPhotosAndVideosSelectedEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsFileUploadPhotosSelectedEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsFileUploadVideosSelectedEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsLocalFolderSelectedEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsOnlyWhileChargingDisabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsOnlyWhileChargingEnabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsTargetFolderIncomingShareSelectedEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsTargetFolderSelectedEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsVideoCompressionRequireChargingDisabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsVideoCompressionRequireChargingEnabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsVideoCompressionSizeLimitChangedEvent
+import mega.privacy.mobile.analytics.event.MediaUploadsLocalFolderSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaUploadsTargetFolderSelectedEvent
 
 /**
  * A Composable that holds views displaying the main Settings Camera Uploads screen
@@ -180,11 +191,13 @@ internal fun SettingsCameraUploadsView(
 
     val cameraUploadsLocalFolderLauncher = launchFolderPicker(
         onFolderSelected = { uri ->
+            Analytics.tracker.trackEvent(CameraUploadsLocalFolderSelectedEvent)
             onLocalPrimaryFolderSelected(UriPath(uri.toString()))
         },
     )
     val mediaUploadsLocalFolderLauncher = launchFolderPicker(
         onFolderSelected = { uri ->
+            Analytics.tracker.trackEvent(MediaUploadsLocalFolderSelectedEvent)
             onLocalSecondaryFolderSelected(UriPath(uri.toString()))
         },
     )
@@ -202,6 +215,7 @@ internal fun SettingsCameraUploadsView(
             if (isTargetFolderFromIncoming) {
                 Analytics.tracker.trackEvent(CameraUploadsTargetFolderIncomingShareSelectedEvent)
             }
+            Analytics.tracker.trackEvent(CameraUploadsTargetFolderSelectedEvent)
             onPrimaryFolderNodeSelected.invoke(primaryFolderNodeId)
         }
     }
@@ -212,6 +226,7 @@ internal fun SettingsCameraUploadsView(
             val secondaryFolderNodeId = NodeId(
                 it.data?.getLongExtra(FileExplorerActivity.EXTRA_MEGA_SELECTED_FOLDER, -1L) ?: -1L
             )
+            Analytics.tracker.trackEvent(MediaUploadsTargetFolderSelectedEvent)
             onSecondaryFolderNodeSelected.invoke(secondaryFolderNodeId)
         }
     }
@@ -232,8 +247,16 @@ internal fun SettingsCameraUploadsView(
     LaunchedEffect(pickedNodeId) {
         val nodeId = pickedNodeId ?: return@LaunchedEffect
         when (cloudExplorerPickerTarget) {
-            CameraUploadsFolderPickerTarget.Primary -> onPrimaryFolderNodeSelected(nodeId)
-            CameraUploadsFolderPickerTarget.Secondary -> onSecondaryFolderNodeSelected(nodeId)
+            CameraUploadsFolderPickerTarget.Primary -> {
+                Analytics.tracker.trackEvent(CameraUploadsTargetFolderSelectedEvent)
+                onPrimaryFolderNodeSelected(nodeId)
+            }
+
+            CameraUploadsFolderPickerTarget.Secondary -> {
+                Analytics.tracker.trackEvent(MediaUploadsTargetFolderSelectedEvent)
+                onSecondaryFolderNodeSelected(nodeId)
+            }
+
             null -> Unit
         }
         cloudExplorerPickerTarget = null
@@ -290,6 +313,13 @@ internal fun SettingsCameraUploadsView(
                     currentUploadOptionUiItem = uiState.uploadOptionUiItem,
                     onOptionSelected = { newUploadOptionUiItem ->
                         showFileUploadPrompt = false
+                        Analytics.tracker.trackEvent(
+                            when (newUploadOptionUiItem) {
+                                UploadOptionUiItem.PhotosOnly -> CameraUploadsFileUploadPhotosSelectedEvent
+                                UploadOptionUiItem.VideosOnly -> CameraUploadsFileUploadVideosSelectedEvent
+                                UploadOptionUiItem.PhotosAndVideos -> CameraUploadsFileUploadPhotosAndVideosSelectedEvent
+                            }
+                        )
                         onUploadOptionUiItemSelected.invoke(newUploadOptionUiItem)
                     },
                     onDismissRequest = { showFileUploadPrompt = false },
@@ -309,6 +339,7 @@ internal fun SettingsCameraUploadsView(
                 VideoCompressionSizeInputDialog(
                     onNewSizeProvided = { newVideoCompressionSize ->
                         showVideoCompressionSizeInputPrompt = false
+                        Analytics.tracker.trackEvent(CameraUploadsVideoCompressionSizeLimitChangedEvent)
                         onNewVideoCompressionSizeLimitProvided.invoke(newVideoCompressionSize)
                     },
                     onDismiss = { showVideoCompressionSizeInputPrompt = false },
@@ -343,7 +374,13 @@ internal fun SettingsCameraUploadsView(
                     )
                     UploadOnlyWhileChargingTile(
                         isChecked = uiState.requireChargingWhenUploadingContent,
-                        onCheckedChange = onChargingWhenUploadingContentStateChanged,
+                        onCheckedChange = { isChecked ->
+                            Analytics.tracker.trackEvent(
+                                if (isChecked) CameraUploadsOnlyWhileChargingEnabledEvent
+                                else CameraUploadsOnlyWhileChargingDisabledEvent
+                            )
+                            onChargingWhenUploadingContentStateChanged(isChecked)
+                        },
                     )
                     FileUploadTile(
                         uploadOptionUiItem = uiState.uploadOptionUiItem,
@@ -365,7 +402,13 @@ internal fun SettingsCameraUploadsView(
                         RequireChargingDuringVideoCompressionTile(
                             maximumNonChargingVideoCompressionSize = uiState.maximumNonChargingVideoCompressionSize,
                             isChecked = uiState.requireChargingDuringVideoCompression,
-                            onCheckedChange = onChargingDuringVideoCompressionStateChanged,
+                            onCheckedChange = { isChecked ->
+                                Analytics.tracker.trackEvent(
+                                    if (isChecked) CameraUploadsVideoCompressionRequireChargingEnabledEvent
+                                    else CameraUploadsVideoCompressionRequireChargingDisabledEvent
+                                )
+                                onChargingDuringVideoCompressionStateChanged(isChecked)
+                            },
                         )
                         if (uiState.requireChargingDuringVideoCompression) {
                             VideoCompressionTile(
@@ -376,14 +419,7 @@ internal fun SettingsCameraUploadsView(
                     }
                     KeepFileNamesTile(
                         isChecked = uiState.shouldKeepUploadFileNames,
-                        onCheckedChange = { shouldKeepFileNames ->
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.message_keep_device_name),
-                                Toast.LENGTH_SHORT,
-                            ).show()
-                            onKeepFileNamesStateChanged.invoke(shouldKeepFileNames)
-                        },
+                        onCheckedChange = onKeepFileNamesStateChanged,
                     )
                     CameraUploadsLocalFolderTile(
                         primaryFolderPath = uiState.primaryFolderPath,

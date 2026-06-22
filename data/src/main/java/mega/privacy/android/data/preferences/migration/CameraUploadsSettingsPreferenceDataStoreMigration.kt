@@ -11,6 +11,7 @@ import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceData
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.qualifier.DatabaseDispatcher
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -49,6 +50,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
      * @param store The latest Preferences
      */
     private suspend fun setDefaults(store: CameraUploadsSettingsPreferenceDataStore) {
+        Timber.d("Old MegaPreferences not found, setting default values to CameraUploadsSettingsPreferenceDataStore")
         store.setValues(
             isCameraUploadsEnabled = null,
             isMediaUploadsEnabled = null,
@@ -58,7 +60,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             mediaUploadsLocalPath = null,
             areLocationTagsEnabled = false,
             uploadVideoQuality = VideoQuality.ORIGINAL.value,
-            areUploadFileNamesKept = false,
+            areUploadFileNamesKept = true,
             isChargingRequiredForVideoCompression = true,
             videoCompressionSizeLimit = GetVideoCompressionSizeLimitUseCase.DEFAULT_SIZE,
             fileUploadOption = 1003,

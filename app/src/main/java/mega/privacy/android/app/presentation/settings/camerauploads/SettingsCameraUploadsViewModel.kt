@@ -90,6 +90,8 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.CameraUploadsEnabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsKeepFileNamesAsInDeviceDisabledEvent
+import mega.privacy.mobile.analytics.event.CameraUploadsKeepFileNamesAsInDeviceEnabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsDisabledEvent
 import mega.privacy.mobile.analytics.event.MediaUploadsEnabledEvent
 import timber.log.Timber
@@ -690,6 +692,12 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                 setUploadFileNamesKeptUseCase(newState)
                 stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
                 _uiState.update { it.copy(shouldKeepUploadFileNames = newState) }
+            }.onSuccess {
+                Analytics.tracker.trackEvent(
+                    if (newState) CameraUploadsKeepFileNamesAsInDeviceEnabledEvent
+                    else CameraUploadsKeepFileNamesAsInDeviceDisabledEvent
+                )
+                showSnackbar(R.string.message_keep_device_name)
             }.onFailure { exception ->
                 Timber.e(exception, "An error occurred when changing the Keep File Names state")
                 showGenericErrorSnackbar()

@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.tiles.UPLOAD
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_COMPRESSION_TILE
 import mega.privacy.android.app.presentation.settings.camerauploads.tiles.VIDEO_QUALITY_TILE
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
 import org.junit.Rule
 import org.junit.Test
@@ -50,6 +51,9 @@ internal class SettingsCameraUploadsViewTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+
+    @get:Rule
+    val analyticsTestRule = AnalyticsTestRule()
 
     @Test
     fun `test that only the toolbar and camera uploads switch is shown when the feature is disabled`() {
@@ -106,7 +110,7 @@ internal class SettingsCameraUploadsViewTest {
     fun `test that the include location tags tile is shown when the selected upload option is photos and videos`() {
         initializeComposeContent(
             isCameraUploadsEnabled = true,
-            uploadOptionUiItem = UploadOptionUiItem.PhotosOnly,
+            uploadOptionUiItem = UploadOptionUiItem.PhotosAndVideos,
         )
 
         composeTestRule.onNodeWithTag(INCLUDE_LOCATION_TAGS_TILE).apply {
