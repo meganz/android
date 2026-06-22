@@ -72,6 +72,19 @@ internal class PersistentFeatureFlagMemoryCache @Inject constructor(
         }
     }
 
+    /**
+     * Clear the persisted snapshot from disk and reset all in-memory state, so the next read
+     * re-seeds from defaults.
+     */
+    override suspend fun clear() {
+        persistedFeatureFlagCache.clear()
+        mutex.withLock {
+            memoryCache.clear()
+            requested.clear()
+            loaded = false
+        }
+    }
+
     private suspend fun ensureLoadedLocked() {
         if (loaded) return
         val fileMap = persistedFeatureFlagCache.read()

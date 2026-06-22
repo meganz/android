@@ -18,4 +18,9 @@ internal interface PersistedFeatureFlagSnapshotGateway {
      * @param snapshot
      */
     suspend fun applySnapshot(snapshot: Map<Feature, Boolean>)
+
+    /**
+     * Clear the persisted snapshot, removing it from disk and any in-memory state.
+     */
+    suspend fun clear()
 }

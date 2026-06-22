@@ -41,4 +41,9 @@ interface FeatureFlagRepository {
      * @param newSnapshot
      */
     suspend fun applySnapshot(newSnapshot: Map<Feature, Boolean>)
+
+    /**
+     * Clear the persisted feature flag snapshot.
+     */
+    suspend fun clearPersistedSnapshot()
 }

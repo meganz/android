@@ -166,6 +166,13 @@ class DefaultFeatureFlagRepositoryTest {
     }
 
     @Test
+    fun `test that clearPersistedSnapshot delegates to the gateway`() = runTest {
+        underTest.clearPersistedSnapshot()
+
+        verify(persistedFeatureFlagSnapshotGateway).clear()
+    }
+
+    @Test
     internal fun `test that two providers with the same simple name are both used`() = runTest {
         val primaryFeature = mock<Feature>()
         val secondaryFeature = mock<Feature>()
