@@ -72,6 +72,7 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
@@ -92,6 +93,10 @@ internal fun ContinueWhereLeftOffListScreen(
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val optionsSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isListView = uiState.currentViewType == ViewType.LIST
+    // Same responsive span count the Cloud Drive grids use (CloudDriveContent), so the CWLO
+    // grid matches the rest of the app: phone 2/4, tablet 3-8 by size and orientation. Cards
+    // keep a consistent size and a wider screen simply adds columns (AND-23926).
+    val gridSpanCount = rememberDynamicSpanCount(isListView = isListView)
     val coroutineScope = rememberCoroutineScope()
     var showClearConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -192,7 +197,7 @@ internal fun ContinueWhereLeftOffListScreen(
 
             else -> {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                    columns = GridCells.Fixed(gridSpanCount),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
@@ -379,7 +384,11 @@ private fun ContinueWhereLeftOffGridItem(
                 contentDescription = title,
                 layoutType = ThumbnailLayoutType.Grid,
                 blurImage = isSensitive,
-                modifier = Modifier.matchParentSize(),
+                // Center the thumbnail rather than forcing it to match the box: a real
+                // thumbnail still fills the box (NodeThumbnailView applies fillMaxSize on
+                // success), while a file-type icon stays at its intended placeholder size
+                // instead of being stretched to the box width in landscape (AND-23926).
+                modifier = Modifier.align(Alignment.Center),
             )
             if (!duration.isNullOrEmpty()) {
                 DurationBadge(

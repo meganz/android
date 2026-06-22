@@ -206,7 +206,11 @@ private fun ContinueWhereLeftOffCard(
                 contentDescription = item.title,
                 layoutType = ThumbnailLayoutType.Grid,
                 blurImage = item.isSensitive,
-                modifier = Modifier.matchParentSize(),
+                // Center the thumbnail rather than forcing it to match the box: a real
+                // thumbnail still fills the box (NodeThumbnailView applies fillMaxSize on
+                // success), while a file-type icon stays at its intended placeholder size
+                // instead of being stretched to the box dimensions (AND-23926).
+                modifier = Modifier.align(Alignment.Center),
             )
             item.duration?.takeIf { it.isNotEmpty() }?.let { duration ->
                 DurationBadge(
