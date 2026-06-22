@@ -1,9 +1,12 @@
 # Tech Spec — Continuous Document Scanner
 
-**Ticket:** AND-23706
+**Epic:** AND-22951 — Multi-page scanning experience (IMDS)
+**Backend ticket:** AND-23706 (merged to `develop`)
 **Module:** `feature/document-scanner/document-scanner`
 **Companion PRD:** [PRD.md](./PRD.md)
-**Last updated:** 2026-05-26
+**Last updated:** 2026-06-22
+
+> **Status (2026-06):** The TFLite detector, model-download infrastructure, stability/smoother, scan-session repository, and `GetScannerLaunchModeUseCase` are **merged to `develop`**. The presentation layer (download/loading UX, camera screen wiring, capture, multi-page, preview, export) is being **built from scratch** — tracked in [§UI/UX task plan](#uiux-task-plan). Sections below describe the full target design; components not yet on `develop` are called out in the task plan.
 
 ## High-level architecture
 
@@ -96,8 +99,24 @@ feature/document-scanner/document-scanner/
 ### Model distribution
 - The ~93 MB `.tflite` is hosted off-app and fetched at runtime, so it never bloats the APK and is never committed to git.
 - `DownloadingScannerModelProvider` downloads it (OkHttp) into `filesDir/scanner-models/midv500_unet.tflite`, streaming to a `.tmp` sidecar and renaming into place only after it passes integrity checks: exact **size** (97,867,228 bytes) and **SHA-256** (`e0c37a9a…b4e55`), both hardcoded. A cached file that fails verification is deleted and re-downloaded.
-- `cachedModelFile()` is a cheap, non-blocking check for the analysis thread; `ensureModelReady()` is the suspending download. It is driven by a `WorkManager` worker (so the fetch survives process death and respects battery / network constraints) and observed by a dedicated prepare screen that shows progress and routes the user to the legacy scanner if the download fails — both land in follow-up MRs.
+- `cachedModelFile()` is a cheap, non-blocking check for the analysis thread; `ensureModelReady()` is the suspending download, driven by `ScannerModelDownloadWorker` (survives process death) and observed by the prepare screen via `WorkInfo.progress`.
+- **Enqueue policy (set by the presentation layer, not the worker — see [§Launch routing](#launch-routing--prepare-screen)):**
+  - Wi-Fi, or cellular **with** consent → enqueue with `NetworkType.CONNECTED` and run now; the user waits on the Loading screen.
+  - Cellular **without** consent (user declined the metered download) → enqueue with `NetworkType.UNMETERED` so WorkManager defers the fetch until Wi-Fi, and route to legacy meanwhile.
+  - Both add `setRequiresBatteryNotLow(true)`. Enqueue as `enqueueUniqueWork(UNIQUE_NAME, KEEP, …)` so tapping "Scan" repeatedly doesn't stack downloads.
 - The current download URL is a **temporary staging link**; before rollout it moves to the production endpoint, ideally via remote config so the model can be swapped without an app update.
+
+### Launch routing & prepare screen
+`GetScannerLaunchModeUseCase` (merged) decides flag/offline/cellular-consent up front and throws `CellularConsentRequiredException` on metered-without-consent. The presentation layer wraps it with the cache check and the download UX:
+
+1. Resolve `ScannerLaunchMode`. `Legacy(reason)` → open ML Kit. `New` → step 2.
+2. `cachedModelFile() != null` → navigate straight to the camera screen.
+3. Not cached → show the **download-confirmation dialog** (Wi-Fi and cellular variants), then either enqueue per the policy above and navigate to the **prepare screen**, or route to legacy.
+4. On `CellularConsentRequiredException`, the dialog's cellular variant decides: consent → persist + immediate download; decline → `UNMETERED` background enqueue + legacy.
+
+> **Routing model decision (UI/UX rebuild):** because the confirmation dialog must show even on Wi-Fi when the model isn't cached, "needs download" is promoted to an explicit routing outcome rather than being folded into `New`. Implement as either an added `ScannerLaunchMode.NeedsDownload` arm or a presentation-side cache gate ahead of `New`; the task plan picks one in the routing ticket.
+
+**Prepare screen** (`PrepareScannerScreen` + VM, new): observes `WorkInfo` for `UNIQUE_NAME`. Renders progress from `WorkInfo.progress` (`KEY_BYTES_DOWNLOADED` / `KEY_TOTAL_BYTES`). `SUCCEEDED` → auto-navigate to the camera screen (unless the user already left for legacy). `FAILED` → read `KEY_FAILURE_REASON` (`permanent` vs `transient`), show the matching message, and offer legacy + retry. A **"Use old scanner"** button routes to legacy **without cancelling the work**, so the download completes in the background.
 
 ### `DefaultStabilityTracker`
 - Per-frame Euclidean corner drift in normalised coords.
@@ -205,22 +224,29 @@ analyseFrame(ImageProxy) ────────►│        │
 2. Internal QA → staff dogfood → 1% / 10% / 100% prod ramp.
 3. Remove the legacy ML Kit scanner code path once 100% has been stable for two release cycles.
 
-## MR plan (this branch → develop)
+## UI/UX task plan
 
-All MRs use ticket **AND-23706**.
+Backend is merged under AND-23706; this plan covers the **presentation layer rebuild** as IMDS tickets under epic **AND-22951**. Each row is one Jira ticket / branch and ships dark behind the `ContinuousDocumentScanner` flag.
 
-| # | Branch | Scope |
-|---|---|---|
-| 0 | `juh/and-23706-docs` | PRD + techspec under `feature/document-scanner/document-scanner/docs/`. Lands first so reviewers can refer to the agreed-upon spec as the code MRs come in. |
-| 1 | `juh/and-23706-tflite-detector` | TFLite detector, stability, smoother, DI, tflite asset, gradle deps |
-| 2 | `juh/and-23706-bitmap-pipeline` | Warper, splitter, hasher, OCR, storage, `CaptureFrameUseCase` |
-| 3 | `juh/and-23706-scan-session-vm` | `ScanSessionViewModel` + state (no dedup yet) |
-| 4a | `juh/and-23706-camera-screen` | `ContinuousScanScreen` (CameraX, 4K analysis, capture, routing, feature flag) |
-| 4b | `juh/and-23706-scan-ui-polish` | Top bar, control bar, status column, page badge, fly-to-thumb |
-| 5a | `juh/and-23706-live-dedup` | Boundary-region dHash + motion gate (no banner yet) |
-| 5b | `juh/and-23706-dedup-sticky-flip` | Sticky window, page-flip detection, DuplicateBanner |
-| 5c | `juh/and-23706-ocr-dedup` | Post-capture OCR dedup + self-improving hash memory |
-| 6 | `juh/and-23706-preview-gallery` | Preview dialog + delete + thumb-strip reorder + pause on preview |
+| # | Ticket | Scope | Depends on |
+|---|---|---|---|
+| **Phase 1 — First-run download & launch UX** | | | |
+| U1 | AND-23983 | Launch routing: promote "needs download" to an explicit outcome; entry-point checks cache + routes to dialog/prepare/legacy. Wraps `GetScannerLaunchModeUseCase`. | backend |
+| U2 | AND-23984 | Download-confirmation dialog (Wi-Fi + cellular variants) + persist cellular consent. | U1 |
+| U3 | AND-23985 | Download enqueue policy: Wi-Fi/consent → `CONNECTED` now; declined-cellular → `UNMETERED` background. `enqueueUniqueWork(KEEP)`. | U2 |
+| U4 | AND-23986 | `PrepareScannerScreen` + VM: `WorkInfo` progress, "use old scanner" (background-continue), failure→legacy+retry, success→auto-enter camera. | U3 |
+| **Phase 2 — Scan camera UX** | | | |
+| U5 | _new_ | Wire `ImageAnalysis` → `TFLiteBoundaryDetector` in `ContinuousScanScreen`; `BoundaryOverlay` + `ScanGuideOverlay`; richer `ScanSessionViewModel` (detect/stability state). Reference the April OpenCV PoC's overlay/VM, retarget to TFLite. | U4 |
+| U6 | _new_ | Scanner chrome: top bar, manual shutter, **"switch back to old scanner"** control. | U5 |
+| U7 | _new_ | Auto-capture-on-stable trigger + capture feedback (flash, fly-to-thumbnail). | U6 |
+| **Phase 3 — Capture pipeline & pages** | | | |
+| U8 | _new_ | Per-capture pipeline: perspective warp + JPEG save + `ScannedPage` → session repo (`CaptureFrameUseCase`, storage, warper — not yet on develop). | U7 |
+| U9 | _new_ | Multi-page UI: page-count badge + thumb strip. | U8 |
+| U10 | _new_ | Preview gallery: view / delete / reorder; unbind CameraX while open. | U9 |
+| **Phase 4 — Export** | | | |
+| U11 | _new_ | Export captured pages to PDF / images + upload to Cloud Drive. | U10 |
+
+**Deferred (not v1):** two-layer dedup (live dHash + OCR Jaccard, PRD §F5), spine-splitting, restoring parked Robolectric tests. Track as follow-ups once the core flow ships.
 
 ## Open items
 

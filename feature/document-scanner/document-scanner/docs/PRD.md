@@ -1,9 +1,10 @@
 # PRD — Continuous Document Scanner
 
-**Ticket:** AND-23706 — Implement the scan feature by using TFLite
+**Epic:** AND-22951 — Multi-page scanning experience (IMDS)
+**Backend ticket:** AND-23706 — Implement the scan feature by using TFLite (merged)
 **Owner:** Juh
-**Status:** In implementation (branch `juh/imdsp10-spine-splitting`)
-**Last updated:** 2026-05-26
+**Status:** Backend (TFLite detector, model download, launch-mode decision) merged to `develop`. UI/UX being built from scratch — see [§F0](#f0-first-run-model-download--launch-routing) and the task plan in [techspec.md](./techspec.md#uiux-task-plan).
+**Last updated:** 2026-06-22
 
 ## Background
 
@@ -35,11 +36,23 @@ MEGA's existing in-app scanner relies on the ML Kit document scanner module, whi
 
 ## Functional requirements
 
+### F0. First-run model download & launch routing
+The ~93 MB model is downloaded on first use, so tapping "Scan" routes through a decision before any camera shows. The routing is owned by `GetScannerLaunchModeUseCase` + the prepare screen:
+
+1. **Feature flag off, or device offline** → open the **legacy ML Kit scanner** (offline can't fetch the model).
+2. **Flag on + online + model already cached** → enter the **new scanner directly**, with a persistent **"switch back to old scanner"** control in the scanner chrome.
+3. **Flag on + online + model not cached** → show a **download-confirmation dialog every first run** (Wi-Fi included, because the artifact is large):
+   - **On Wi-Fi:** `[Download]` → start the download now → **Loading screen**. `[Use old scanner]` → legacy, no download.
+   - **On cellular:** `[Download over cellular]` → persist cellular consent → download now → Loading screen. `[Not on cellular]` → **enqueue a background download constrained to un-metered (Wi-Fi) networks** and route to legacy meanwhile; the model finishes downloading once Wi-Fi is available and the *next* launch lands in the new scanner.
+4. **Loading screen** (download in progress): shows live progress (bytes / total %), and a **"Use old scanner"** button that routes to legacy **while the download keeps running in the background** (the worker is not cancelled). On success it **auto-enters the new scanner**; on permanent or retry-exhausted failure it shows an error and falls back to legacy.
+
+Cellular consent is persisted per-install and never re-asked. The download survives process death (WorkManager) and is integrity-checked (size + SHA-256); a corrupt cache is deleted and re-fetched.
+
 ### F1. Boundary detection
 - A TFLite UNet model (ResNet-34 encoder) runs on every analysis frame.
 - The detected quadrilateral is drawn as a translucent blue overlay with a solid border on top of the camera preview.
 - Detection runs on the GPU delegate when available, CPU fallback otherwise.
-- The ~93 MB model is **downloaded on first use**, not bundled in the APK (keeps install size small). It is cached on device and integrity-checked (size + SHA-256). First scanner launch shows a one-time "preparing" state while it downloads; subsequent launches are instant.
+- The ~93 MB model is **downloaded on first use**, not bundled in the APK (keeps install size small). It is cached on device and integrity-checked (size + SHA-256). The first-run download/consent/loading UX is specified in [§F0](#f0-first-run-model-download--launch-routing); subsequent launches are instant.
 
 ### F2. Auto-capture
 - When the user holds the camera steady on a detected document for ~400 ms, the shutter fires automatically (manual capture also available via the shutter button).
@@ -92,7 +105,8 @@ For every captured frame the pipeline runs (in order):
 | 4K `ImageAnalysis` not supported on enough devices | Fallback chain to `takePicture` already implemented. |
 | ML Kit OCR latency on long pages | OCR runs post-shutter, off the hot path; downscale to 1500 px max edge before OCR. |
 | Power consumption from continuous inference | GPU delegate; analysis throttled to 200 ms; CameraX unbound when preview is open. |
-| First-use model download (~93 MB) fails or is slow on poor networks | Integrity-checked download with atomic cache; show clear "preparing"/retry UX; model fetched once then cached. Consider Wi-Fi-preferred / background prefetch later. |
+| First-use model download (~93 MB) fails or is slow on poor networks | Integrity-checked download with atomic cache; Loading screen with progress + "use old scanner" escape hatch; model fetched once then cached. Cellular-declined downloads are deferred to a Wi-Fi-constrained background job (see [§F0](#f0-first-run-model-download--launch-routing)). |
+| User stuck on Loading screen / unwilling to wait for a 93 MB download | Every download path keeps the legacy scanner reachable (confirmation dialog + Loading screen both offer "use old scanner"); download continues in the background so the wait is one-time. |
 
 ## Rollout
 
