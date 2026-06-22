@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDe
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
 import mega.privacy.android.app.presentation.settings.startscreen.startScreenPreferenceScreen
 import mega.privacy.android.app.presentation.testpassword.navigation.testPasswordLegacyDestination
+import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.app.presentation.videosection.legacyVideoToPlaylistDestination
 import mega.privacy.android.app.presentation.videosection.videoSectionLegacyDestination
 import mega.privacy.android.app.textEditor.legacyTextEditorScreen
@@ -45,11 +46,14 @@ import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeM
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 
 class LegacyCoreActivityFeatureGraph(
     nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+    nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
     megaChatRequestHandler: Lazy<MegaChatRequestHandler>,
     chatManagement: Lazy<ChatManagement>,
     setChatVideoInDeviceUseCase: Lazy<SetChatVideoInDeviceUseCase>,
@@ -87,9 +91,20 @@ class LegacyCoreActivityFeatureGraph(
                 transferHandler
             )
             legacyMediaPlayerScreen(
-                navigationHandler::back,
-                mediaPlayerIntentMapper,
-                snackbarEventQueue,
+                removeDestination = navigationHandler::back,
+                navigateToVideoRoute = { key ->
+                    navigationHandler.navigate(
+                        destination = key,
+                        navOptions = navOptions {
+                            popUpTo<LegacyMediaPlayerNavKey> {
+                                inclusive = true
+                            }
+                        },
+                    )
+                },
+                nav3VideoPlayerRouteLauncher = nav3VideoPlayerRouteLauncher,
+                mediaPlayerIntentMapper = mediaPlayerIntentMapper,
+                snackbarEventQueue = snackbarEventQueue,
             )
             videoSectionLegacyDestination(navigationHandler::back)
             legacyAlbumContentPreview(navigationHandler::back)

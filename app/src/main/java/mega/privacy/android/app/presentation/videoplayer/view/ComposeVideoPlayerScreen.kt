@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.videoplayer.view
 
 import android.Manifest
 import android.app.Activity
+import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.graphics.Bitmap
@@ -47,6 +48,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -67,6 +69,7 @@ import androidx.core.graphics.scale
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.Player
 import androidx.media3.common.Player.STATE_BUFFERING
@@ -97,8 +100,9 @@ import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
 import mega.privacy.android.app.mediaplayer.model.NavigationBarInsets
 import mega.privacy.android.app.mediaplayer.model.NavigationBarPosition
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
 import mega.privacy.android.app.presentation.videoplayer.ComposeVideoPlayerViewModel
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerController
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerSelectSubtitleViewModel
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
@@ -111,14 +115,85 @@ import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.rememberPermissionState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AddSubtitleDialogEvent
+import mega.privacy.mobile.analytics.event.AddSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.AddSubtitlesOptionPressedEvent
 import mega.privacy.mobile.analytics.event.AutoMatchSubtitleOptionPressedEvent
+import mega.privacy.mobile.analytics.event.CancelSelectSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SpeedSelectedDialogEvent
+
+/**
+ * Hosts the Compose video player and its in-place overlays (play queue, subtitle selection),
+ * toggled by `uiState` so all three share the single [viewModel] (and therefore one ExoPlayer and
+ * one playback state). System back collapses the active overlay before leaving the player.
+ *
+ * @param viewModel the shared player ViewModel for this route.
+ * @param onMoreActionsClicked navigate to the node-options bottom sheet.
+ * @param onFinish leave the player (pop the route).
+ */
+@Composable
+internal fun ComposeVideoPlayerRoute(
+    viewModel: ComposeVideoPlayerViewModel,
+    onMoreActionsClicked: () -> Unit,
+    onFinish: () -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    BackHandler(enabled = uiState.navigateToSelectSubtitleScreen || uiState.isPlayQueueVisible) {
+        when {
+            uiState.navigateToSelectSubtitleScreen -> {
+                viewModel.updateNavigateToSelectSubtitle(false)
+                viewModel.updateShowSubtitleDialog(false)
+            }
+
+            uiState.isPlayQueueVisible -> viewModel.updatePlayQueueVisibility(false)
+        }
+    }
+
+    when {
+        uiState.navigateToSelectSubtitleScreen -> {
+            SelectSubtitleOverlay(
+                onAddSubtitle = { info ->
+                    Analytics.tracker.trackEvent(AddSubtitlePressedEvent)
+                    viewModel.updateSubtitleSelectedStatus(SubtitleSelectedStatus.AddSubtitleItem, info)
+                    viewModel.updateNavigateToSelectSubtitle(false)
+                },
+                onClose = {
+                    Analytics.tracker.trackEvent(CancelSelectSubtitlePressedEvent)
+                    viewModel.updateNavigateToSelectSubtitle(false)
+                    viewModel.updateShowSubtitleDialog(false)
+                },
+            )
+        }
+
+        uiState.isPlayQueueVisible -> {
+            ComposeVideoPlayerQueueScreen(
+                viewModel = viewModel,
+                onBack = { viewModel.updatePlayQueueVisibility(false) },
+            )
+        }
+
+        else -> {
+            // Enfoce dark theme for now
+            OriginalTheme(isDark = true) {
+                ComposeVideoPlayerScreen(
+                    viewModel = viewModel,
+                    player = viewModel.player,
+                    playQueueButtonClicked = { viewModel.updatePlayQueueVisibility(true) },
+                    onMoreActionsClicked = onMoreActionsClicked,
+                    onRetry = viewModel::retry,
+                    onFinish = onFinish,
+                    onEnterPip = {},
+                )
+            }
+        }
+    }
+}
 
 @androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(
@@ -398,6 +473,10 @@ internal fun ComposeVideoPlayerScreen(
             player?.removeListener(playerEventListener)
         }
     }
+
+    // Keep the navigation bar transparent over the video and restore the window's original bar
+    // state when leaving the player (see the effect's docs for why this matters here).
+    TransparentNavigationBarEffect(systemUiController)
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -938,4 +1017,47 @@ private fun updateControllerViewPadding(
         }
     }
     controllerView.layoutParams = layoutParams
+}
+
+/**
+ * In-place subtitle selection overlay. Owns its own [VideoPlayerSelectSubtitleViewModel] for the
+ * subtitle list; the result is reported back to the shared player ViewModel via [onAddSubtitle] /
+ * [onClose].
+ */
+@Composable
+private fun SelectSubtitleOverlay(
+    onAddSubtitle: (SubtitleFileInfo?) -> Unit,
+    onClose: () -> Unit,
+) {
+    val context = LocalContext.current
+    val isDark = remember(context) {
+        (context.applicationContext.resources.configuration.uiMode
+                and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    }
+    val systemUiController = rememberSystemUiController()
+    val selectSubtitleViewModel = hiltViewModel<VideoPlayerSelectSubtitleViewModel>()
+    val uiState by selectSubtitleViewModel.uiState.collectAsStateWithLifecycle()
+
+    DisposableEffect(isDark) {
+        systemUiController.isSystemBarsVisible = true
+        systemUiController.setSystemBarsColor(color = Color.Transparent, darkIcons = !isDark)
+        onDispose {
+            systemUiController.setSystemBarsColor(color = Color.Transparent, darkIcons = false)
+        }
+    }
+
+    OriginalTheme(isDark = isDark) {
+        VideoPlayerSelectSubtitleView(
+            uiState = uiState,
+            onLoadSubtitleList = selectSubtitleViewModel::getSubtitleFileInfoList,
+            onSearchTextChange = selectSubtitleViewModel::searchQuery,
+            onItemClicked = selectSubtitleViewModel::itemClickedUpdate,
+            onClearSelectedItem = selectSubtitleViewModel::clearSelectedItem,
+            onAddSubtitle = { info ->
+                onAddSubtitle(info)
+                selectSubtitleViewModel.clearSelectedItem()
+            },
+            onBackPressed = onClose,
+        )
+    }
 }

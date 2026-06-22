@@ -77,6 +77,9 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isFromLink whether the video was opened from a public link (file link, folder link, or album sharing)
  * @property isLoggedIn whether the user is currently logged in; used together with [isFromLink] to determine if session validation is required
  * @property isAlbumSharingLink whether the video was opened from an album sharing link specifically (as opposed to a folder link)
+ * @property isPlayQueueVisible whether the play queue is shown as an in-place overlay (Compose route, which has no separate queue destination)
+ * @property invalidLaunchSourceEvent one-shot event emitted when no valid launch payload was
+ *   available at creation (e.g. after process death); drives the route to navigate back.
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -134,4 +137,6 @@ data class VideoPlayerUiState(
     val isLoggedIn: Boolean = false,
     val isAlbumSharingLink: Boolean = false,
     val serializedData: String? = null,
+    val isPlayQueueVisible: Boolean = false,
+    val invalidLaunchSourceEvent: StateEvent = consumed,
 )

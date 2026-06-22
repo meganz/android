@@ -22,6 +22,10 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
  * @property mediaQueueTitle queue title (search source).
  * @property contactEmail contact email (contact-file source).
  * @property sortOrder sort order for building the queue.
+ * @property fileLinkUrl public file-link URL (file-link source).
+ * @property localFilePath local file path (local-file source).
+ * @property collectionTitle title of the video collection, if launched from one.
+ * @property collectionId id of the video collection, if launched from one.
  */
 data class VideoPlayerLaunchSource(
     val contentUri: Uri?,
@@ -39,4 +43,8 @@ data class VideoPlayerLaunchSource(
     val mediaQueueTitle: String? = null,
     val contactEmail: String? = null,
     val sortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
+    val fileLinkUrl: String? = null,
+    val localFilePath: String? = null,
+    val collectionTitle: String? = null,
+    val collectionId: Long? = null,
 )

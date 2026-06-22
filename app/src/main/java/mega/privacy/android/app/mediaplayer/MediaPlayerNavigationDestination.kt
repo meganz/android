@@ -5,6 +5,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
+import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
@@ -13,6 +14,8 @@ import timber.log.Timber
 
 fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
     removeDestination: () -> Unit,
+    navigateToVideoRoute: (NavKey) -> Unit,
+    nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
     mediaPlayerIntentMapper: MediaPlayerIntentMapper,
     snackbarEventQueue: SnackbarEventQueue,
 ) {
@@ -39,6 +42,15 @@ fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
                 publicLinkUrl = key.publicLinkUrl,
                 localFilePath = key.localFilePath,
             )
+
+            // Route to the Compose video player when the refactor flag is on; the transparent
+            // launcher destination is replaced by the route (popUpTo inclusive) by the caller.
+            val composeRouteKey = nav3VideoPlayerRouteLauncher.routeOrNull(intent)
+            if (composeRouteKey != null) {
+                navigateToVideoRoute(composeRouteKey)
+                return@LaunchedEffect
+            }
+
             if (intent.resolveActivity(context.packageManager) != null) {
                 try {
                     context.startActivity(intent)

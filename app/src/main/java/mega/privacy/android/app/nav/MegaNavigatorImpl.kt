@@ -35,6 +35,7 @@ import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
+import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -128,6 +129,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val settingsNavigator: SettingsNavigatorImpl,
     private val getDomainNameUseCase: GetDomainNameUseCase,
     private val mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+    private val nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val navigationQueue: NavigationEventQueue,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
@@ -373,7 +375,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             )
             withContext(mainDispatcher) {
                 runCatching {
-                    context.startActivity(intent)
+                    launchVideoPlayer(context, intent)
                 }.onFailure { e ->
                     Timber.e(e, "Exception when opening media player activity")
                     Toast.makeText(
@@ -389,6 +391,20 @@ internal class MegaNavigatorImpl @Inject constructor(
     private suspend fun isVideoRevampEnabled(): Boolean =
         runCatching { getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerRevamp) }
             .getOrDefault(false)
+
+    /**
+     * Launch the video player built into [intent]. [Nav3VideoPlayerRouteLauncher] decides whether to
+     * route to the Compose single-activity destination (when the refactor flag is on and [intent]
+     * targets the revamped player); otherwise the activity is started as before.
+     */
+    private suspend fun launchVideoPlayer(context: Context, intent: Intent) {
+        val routeKey = nav3VideoPlayerRouteLauncher.routeOrNull(intent)
+        if (routeKey != null) {
+            navigateForSingleActivity(context, routeKey)
+        } else {
+            context.startActivity(intent)
+        }
+    }
 
     private fun getIntent(
         context: Context,
@@ -444,7 +460,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             publicLinkUrl = publicLinkUrl,
             localFilePath = localFilePath,
         )
-        context.startActivity(intent)
+        launchVideoPlayer(context, intent)
     }
 
     override suspend fun openMediaPlayerActivityFromChat(
@@ -466,7 +482,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         val mimeType =
             if (fileNode.type.extension == "opus") "audio/*" else fileNode.type.mimeType
         nodeContentUriIntentMapper(intent, contentUri, mimeType, fileNode.type.isSupported)
-        context.startActivity(intent)
+        launchVideoPlayer(context, intent)
     }
 
     override suspend fun openMediaPlayerActivityFromChat(
@@ -491,7 +507,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         val mimeType =
             if (fileType.extension == "opus") "audio/*" else fileType.mimeType
         nodeContentUriIntentMapper(intent, contentUri, mimeType, fileType.isSupported)
-        context.startActivity(intent)
+        launchVideoPlayer(context, intent)
     }
 
     override suspend fun openMediaPlayerActivity(
@@ -527,7 +543,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             nodeHandles = nodeHandles,
             enableAddToAlbum = enableAddToAlbum,
         )
-        context.startActivity(intent)
+        launchVideoPlayer(context, intent)
     }
 
     override fun openSyncs(context: Context) {

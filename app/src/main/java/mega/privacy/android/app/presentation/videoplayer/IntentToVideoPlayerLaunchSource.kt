@@ -15,8 +15,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.URL_LOCAL_FILE_PATH
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -45,6 +49,11 @@ internal fun Intent.toVideoPlayerLaunchSource(): VideoPlayerLaunchSource =
         mediaQueueTitle = getStringExtra(INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE),
         contactEmail = getStringExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL),
         sortOrder = sortOrderFromIntent(),
+        fileLinkUrl = getStringExtra(URL_FILE_LINK),
+        localFilePath = getStringExtra(URL_LOCAL_FILE_PATH),
+        collectionTitle = getStringExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE),
+        collectionId = if (hasExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID))
+            getLongExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, -1L) else null,
     )
 
 private fun Intent.sortOrderFromIntent(): SortOrder =

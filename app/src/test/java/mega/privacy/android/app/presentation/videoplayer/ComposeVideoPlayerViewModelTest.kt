@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackStat
 import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
+import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSource
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSize
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -270,7 +271,9 @@ class ComposeVideoPlayerViewModelTest {
     private val expectedCollectionId = 123456L
     private val expectedCollectionTitle = "collection title"
 
-    private fun initViewModel() {
+    private fun initViewModel(
+        initialLaunchSource: VideoPlayerLaunchSource? = null,
+    ) {
         fakeMonitorTransferEventsFlow = MutableSharedFlow()
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)
         whenever(
@@ -339,6 +342,7 @@ class ComposeVideoPlayerViewModelTest {
             mediaPlayerManager = mediaPlayerManager,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             args = testArgs,
+            initialLaunchSource = initialLaunchSource,
         )
     }
 
@@ -463,6 +467,17 @@ class ComposeVideoPlayerViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that onInvalidLaunchSourceConsumed resets invalidLaunchSourceEvent to consumed`() =
+        runTest {
+            initViewModel(initialLaunchSource = null)
+            underTest.onInvalidLaunchSourceConsumed()
+            underTest.uiState.test {
+                assertThat(awaitItem().invalidLaunchSourceEvent).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that isConnected is updated to true when monitorConnectivityUseCase emits true`() =

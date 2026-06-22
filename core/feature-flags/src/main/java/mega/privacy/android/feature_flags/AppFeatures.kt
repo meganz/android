@@ -18,6 +18,15 @@ enum class AppFeatures(override val description: String, private val defaultValu
 
 
     /**
+     * Feature flag to route the revamped video player to its ComposeUI single-activity destination
+     * instead of launching VideoPlayerActivity.
+     */
+    VideoPlayerActivityRefactor(
+        "Open the revamped video player as a Compose route in the single activity",
+        false,
+    ),
+
+    /**
      * Search revamp
      */
     FolderLinkRevamp(

@@ -23,6 +23,9 @@ import mega.privacy.android.app.presentation.meeting.navigation.MeetingFeatureDe
 import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
 import mega.privacy.android.app.presentation.psa.PsaFeatureDestinations
 import mega.privacy.android.app.presentation.settings.SettingsCameraUploadsFeatureDestination
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerLaunchSourceHolder
+import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
+import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerFeatureDestination
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -42,6 +45,7 @@ class FeatureDestinationModule {
     fun provideLegacyCoreActivityFeatureDestination(
         nodeContentUriIntentMapper: NodeContentUriIntentMapper,
         mediaPlayerIntentMapper: MediaPlayerIntentMapper,
+        nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
         megaChatRequestHandler: Lazy<MegaChatRequestHandler>,
         chatManagement: Lazy<ChatManagement>,
         setChatVideoInDeviceUseCase: Lazy<SetChatVideoInDeviceUseCase>,
@@ -52,6 +56,7 @@ class FeatureDestinationModule {
         LegacyCoreActivityFeatureGraph(
             nodeContentUriIntentMapper,
             mediaPlayerIntentMapper,
+            nav3VideoPlayerRouteLauncher,
             megaChatRequestHandler,
             chatManagement,
             setChatVideoInDeviceUseCase,
@@ -64,6 +69,11 @@ class FeatureDestinationModule {
     @IntoSet
     fun provideFileContactFeatureDestination(): FeatureDestination = FileContactFeatureDestination()
 
+    @Provides
+    @IntoSet
+    fun provideVideoPlayerFeatureDestination(
+        launchSourceHolder: VideoPlayerLaunchSourceHolder,
+    ): FeatureDestination = VideoPlayerFeatureDestination(launchSourceHolder)
 
     @Provides
     @IntoSet

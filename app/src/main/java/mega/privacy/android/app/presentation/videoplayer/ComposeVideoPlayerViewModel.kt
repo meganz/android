@@ -247,6 +247,7 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
     private val playerErrorTypeMapper: PlayerErrorTypeMapper,
     private val mediaPlayerManager: MediaPlayerManager,
     @Assisted private val args: Args,
+    @Assisted private val initialLaunchSource: VideoPlayerLaunchSource?,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
@@ -298,13 +299,19 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             )
         }
         setupTransferListener()
-
         handleHiddenNodesUIFlow()
         monitorIsHiddenNodesOnboarded()
-
         updateNameWhenNodeUpdates()
         monitorConnectivity()
         loadPipFeatureFlag()
+        checkLaunchSource()
+    }
+
+    private fun checkLaunchSource() {
+        initialLaunchSource?.let { source ->
+            initVideoPlayerData(source)
+            handleAutoReplayIfPaused()
+        } ?: uiState.update { it.copy(invalidLaunchSourceEvent = triggered) }
     }
 
     private fun loadPipFeatureFlag() {
@@ -1882,6 +1889,13 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
         uiState.update { it.copy(navigateToSelectSubtitleScreen = value) }
     }
 
+    /**
+     * Toggle the in-place play queue overlay (Compose route has no separate queue destination).
+     */
+    internal fun updatePlayQueueVisibility(value: Boolean) {
+        uiState.update { it.copy(isPlayQueueVisible = value) }
+    }
+
     internal fun updateShowSubtitleDialog(value: Boolean) {
         if (value) {
             wasPlayingBeforeSubtitleDialog = mediaPlayerManager.getPlayWhenReady()
@@ -1912,6 +1926,9 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
 
     internal fun onBlockedErrorConsumed() = uiState.update { it.copy(blockedError = consumed) }
 
+    internal fun onInvalidLaunchSourceConsumed() =
+        uiState.update { it.copy(invalidLaunchSourceEvent = consumed) }
+
     companion object {
         private const val MEDIA_PLAYER_STATE_ENDED = 4
         private const val MEDIA_PLAYER_STATE_READY = 3
@@ -1929,7 +1946,10 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(args: Args): ComposeVideoPlayerViewModel
+        fun create(
+            args: Args,
+            initialLaunchSource: VideoPlayerLaunchSource?,
+        ): ComposeVideoPlayerViewModel
     }
 
     data class Args(

@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
+import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
@@ -48,6 +49,7 @@ class MegaNavigatorImplTest {
         mock<SettingsNavigatorImpl>()
     private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
     private val mediaPlayerIntentMapper = mock<MediaPlayerIntentMapper>()
+    private val nav3VideoPlayerRouteLauncher = mock<Nav3VideoPlayerRouteLauncher>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val navigationQueue = mock<NavigationEventQueue>()
     private val activityLifecycleHandler = mock<ActivityLifecycleHandler>()
@@ -68,6 +70,7 @@ class MegaNavigatorImplTest {
             settingsNavigator = settingsNavigator,
             getDomainNameUseCase = getDomainNameUseCase,
             mediaPlayerIntentMapper = mediaPlayerIntentMapper,
+            nav3VideoPlayerRouteLauncher = nav3VideoPlayerRouteLauncher,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             navigationQueue = navigationQueue,
             activityLifecycleHandler = activityLifecycleHandler,
@@ -86,6 +89,7 @@ class MegaNavigatorImplTest {
             settingsNavigator,
             getDomainNameUseCase,
             mediaPlayerIntentMapper,
+            nav3VideoPlayerRouteLauncher,
             getFeatureFlagValueUseCase,
             navigationQueue,
             activityLifecycleHandler,
