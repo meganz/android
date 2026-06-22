@@ -91,7 +91,7 @@ class NodeViewItemMapper @Inject constructor(
                 iconRes = node.getIcon(fileTypeIconMapper),
                 thumbnailData = ThumbnailRequest(
                     id = node.id,
-                ).takeIf { !isFolder }, // folders will use iconRes
+                ).takeIf { !isFolder && !node.isTakenDown }, // folders and taken-down nodes use iconRes
                 accessPermissionIcon = (node as? ShareFolderNode)
                     .getSharesIcon(isContactVerificationOn),
                 showIsVerified = isContactVerificationOn && node.isIncomingShare

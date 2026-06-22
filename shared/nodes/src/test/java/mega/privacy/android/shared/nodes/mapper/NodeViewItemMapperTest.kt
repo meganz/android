@@ -113,6 +113,7 @@ class NodeViewItemMapperTest {
         tags: List<String> = emptyList(),
         size: Long = 1024L,
         label: Int = 0,
+        isTakenDown: Boolean = false,
     ): TypedFileNode = mock {
         whenever(it.id).thenReturn(NodeId(id))
         whenever(it.name).thenReturn(name)
@@ -122,7 +123,7 @@ class NodeViewItemMapperTest {
         whenever(it.isFavourite).thenReturn(isFavourite)
         whenever(it.isMarkedSensitive).thenReturn(isMarkedSensitive)
         whenever(it.isSensitiveInherited).thenReturn(isSensitiveInherited)
-        whenever(it.isTakenDown).thenReturn(false)
+        whenever(it.isTakenDown).thenReturn(isTakenDown)
         whenever(it.isIncomingShare).thenReturn(isIncomingShare)
         whenever(it.isNodeKeyDecrypted).thenReturn(true)
         whenever(it.creationTime).thenReturn(1234567890L)
@@ -273,6 +274,24 @@ class NodeViewItemMapperTest {
         assertThat(nodeUiItem.isSensitive).isFalse()
         assertThat(nodeUiItem.showBlurEffect).isFalse()
         assertThat(nodeUiItem.duration).isNull()
+        assertThat(nodeUiItem.thumbnailData).isNotNull()
+    }
+
+    @Test
+    fun `test that invoke sets thumbnailData to null when file node is taken down`() = runTest {
+        val mockFileNode = createMockFileNode(isTakenDown = true)
+
+        val result = underTest(
+            nodeList = listOf(mockFileNode),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            highlightedNodeId = null,
+            isHiddenNodesEnabled = false,
+            highlightedNames = null,
+            isContactVerificationOn = false,
+        )
+
+        assertThat(result).hasSize(1)
+        assertThat(result[0].thumbnailData).isNull()
     }
 
     @Test
