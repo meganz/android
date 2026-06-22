@@ -22,6 +22,9 @@ class PlayerErrorTypeMapper @Inject constructor() {
                 errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED ->
             PlayerErrorType.FILE_NOT_SUPPORTED
 
+        errorCode == PlaybackException.ERROR_CODE_DECODER_INIT_FAILED ->
+            PlayerErrorType.VIDEO_NOT_RENDERED
+
         !isConnected -> PlayerErrorType.NO_NETWORK
 
         else -> PlayerErrorType.CANNOT_PLAY

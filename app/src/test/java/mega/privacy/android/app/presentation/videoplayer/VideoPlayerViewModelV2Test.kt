@@ -1639,6 +1639,18 @@ class VideoPlayerViewModelV2Test {
         }
 
     @Test
+    fun `test that onPlayerError sets isVideoNotRendered when error type is VIDEO_NOT_RENDERED`() =
+        runTest {
+            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
+            underTest.uiState.test {
+                assertThat(awaitItem().isVideoNotRendered).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that blockedError is triggered on first onPlayerError when checkNodeAccessibilityUseCase throws BlockedMegaException`() =
         runTest {
             whenever(checkNodeAccessibilityUseCase(any())).thenAnswer {
@@ -1652,6 +1664,18 @@ class VideoPlayerViewModelV2Test {
             advanceUntilIdle()
             underTest.uiState.test {
                 assertThat(awaitItem().blockedError).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onPlayerError triggers retryFailedEvent immediately when error type is FILE_NOT_SUPPORTED`() =
+        runTest {
+            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.FILE_NOT_SUPPORTED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryFailedEvent).isEqualTo(triggered)
                 cancelAndConsumeRemainingEvents()
             }
         }

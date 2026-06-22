@@ -1645,6 +1645,30 @@ class ComposeVideoPlayerViewModelTest {
         }
 
     @Test
+    fun `test that onPlayerError sets isVideoNotRendered when error type is VIDEO_NOT_RENDERED`() =
+        runTest {
+            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
+            underTest.uiState.test {
+                assertThat(awaitItem().isVideoNotRendered).isTrue()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onPlayerError does not trigger retryEvent when error type is VIDEO_NOT_RENDERED`() =
+        runTest {
+            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
+            underTest.uiState.test {
+                assertThat(awaitItem().retryEvent).isEqualTo(consumed)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun `the state is updated correctly when monitorAccountDetailUseCase is triggered`() =
         runTest {
             val testAccountType = mock<AccountType> {

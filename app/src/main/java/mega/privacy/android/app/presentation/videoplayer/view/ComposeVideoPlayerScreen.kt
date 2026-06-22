@@ -22,12 +22,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -46,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,6 +62,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.Density
@@ -89,11 +93,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.VideoPlayerRevampPlayerViewBinding
@@ -126,6 +132,8 @@ import mega.privacy.mobile.analytics.event.CancelSelectSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SpeedSelectedDialogEvent
+
+private val VIDEO_NOT_RENDERED_TEXT_OFFSET_Y = 44.dp
 
 /**
  * Hosts the Compose video player and its in-place overlays (play queue, subtitle selection),
@@ -728,6 +736,19 @@ internal fun ComposeVideoPlayerScreen(
                 )
             }
 
+            if (uiState.isVideoNotRendered) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    MegaText(
+                        text = stringResource(sharedR.string.video_player_video_not_rendered),
+                        textColor = if (isControllerViewVisible) TextColor.Secondary else TextColor.Primary,
+                        modifier = Modifier.offset(y = VIDEO_NOT_RENDERED_TEXT_OFFSET_Y),
+                    )
+                }
+            }
+
             resizedBitmap?.let {
                 if (isScreenshotVisible) {
                     Image(
@@ -915,7 +936,7 @@ internal fun ComposeVideoPlayerScreen(
             PlayerErrorType.NO_NETWORK ->
                 sharedR.string.error_no_internet_title to sharedR.string.error_no_internet_message
 
-            PlayerErrorType.CANNOT_PLAY, null ->
+            else ->
                 sharedR.string.error_fail_to_play_video_title to sharedR.string.error_fail_to_play_video_message
         }
         MegaAlertDialog(

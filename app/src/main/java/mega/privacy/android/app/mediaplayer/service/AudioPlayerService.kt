@@ -297,6 +297,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     onPlayerError()
                 }
 
+                override fun onVideoNotRenderedCallback() = Unit
+
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
                 }
             }

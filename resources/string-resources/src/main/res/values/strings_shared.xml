@@ -2989,6 +2989,8 @@
     <string name="home_do_more_with_mega_add_contact">Add contact</string>
     <!-- Label for the "Schedule meeting" shortcut in the "Do more with MEGA" Home section -->
     <string name="home_do_more_with_mega_schedule_meeting">Schedule meeting</string>
+    <!-- Overlay text shown on the video player when the video cannot be rendered -->
+    <string name="video_player_video_not_rendered">This video can’t be displayed</string>
     <!-- Section header for the payment received/unsuccessful notifications in the Notifications screen -->
     <string name="notifications_payment_info_section">Payment info</string>
     <!-- Section header for the payment reminder notification when the plan is about to expire -->

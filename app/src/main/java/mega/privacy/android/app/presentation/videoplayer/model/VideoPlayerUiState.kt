@@ -76,6 +76,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isInPipMode whether the video player is currently displayed in PIP mode
  * @property isFromLink whether the video was opened from a public link (file link, folder link, or album sharing)
  * @property isLoggedIn whether the user is currently logged in; used together with [isFromLink] to determine if session validation is required
+ * @property isVideoNotRendered whether the video cannot be rendered (audio may still play)
  * @property isAlbumSharingLink whether the video was opened from an album sharing link specifically (as opposed to a folder link)
  * @property isPlayQueueVisible whether the play queue is shown as an in-place overlay (Compose route, which has no separate queue destination)
  * @property invalidLaunchSourceEvent one-shot event emitted when no valid launch payload was
@@ -137,6 +138,7 @@ data class VideoPlayerUiState(
     val isLoggedIn: Boolean = false,
     val isAlbumSharingLink: Boolean = false,
     val serializedData: String? = null,
+    val isVideoNotRendered: Boolean = false,
     val isPlayQueueVisible: Boolean = false,
     val invalidLaunchSourceEvent: StateEvent = consumed,
 )

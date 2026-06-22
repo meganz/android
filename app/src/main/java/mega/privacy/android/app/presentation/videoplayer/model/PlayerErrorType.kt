@@ -7,4 +7,5 @@ enum class PlayerErrorType {
     FILE_NOT_SUPPORTED,
     CANNOT_PLAY,
     NO_NETWORK,
+    VIDEO_NOT_RENDERED,
 }

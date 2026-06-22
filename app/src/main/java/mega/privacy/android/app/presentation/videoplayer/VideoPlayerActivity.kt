@@ -22,6 +22,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.AndroidEntryPoint
@@ -317,6 +318,9 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
 
                 override fun onPlayerErrorCallback(errorCode: Int) =
                     videoPlayerViewModelV2.onPlayerError(errorCode)
+
+                override fun onVideoNotRenderedCallback() =
+                    videoPlayerViewModelV2.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
 
                 override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
                     if (videoWidth == 0 || videoHeight == 0) return

@@ -59,4 +59,10 @@ interface MediaPlayerCallback {
      * @param videoHeight video height
      */
     fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int)
+
+    /**
+     * Callback when the media contains a video track but no video renderer is active,
+     * indicating a silent decoder failure (e.g. hardware decoder exceeds capabilities).
+     */
+    fun onVideoNotRenderedCallback()
 }

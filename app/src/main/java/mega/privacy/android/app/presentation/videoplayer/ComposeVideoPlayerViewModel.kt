@@ -56,6 +56,7 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.mapper.PlayerErrorTypeMapper
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerLaunchSource
@@ -1360,10 +1361,15 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             errorCode = errorCode,
             isConnected = uiState.value.isConnected,
         )
-        if (playerRetry <= MAX_RETRY) {
-            uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
-        } else {
-            uiState.update { it.copy(retryFailedEvent = triggered, playerErrorType = errorType) }
+        when {
+            errorType == PlayerErrorType.VIDEO_NOT_RENDERED ->
+                uiState.update { it.copy(isVideoNotRendered = true, playerErrorType = errorType) }
+
+            playerRetry <= MAX_RETRY ->
+                uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
+
+            else ->
+                uiState.update { it.copy(retryFailedEvent = triggered, playerErrorType = errorType) }
         }
     }
 

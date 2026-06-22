@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.videoplayer
 
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
@@ -71,6 +72,10 @@ class MediaPlayerManager @Inject constructor(
             override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
                 if (videoWidth == 0 || videoHeight == 0) return
                 onVideoSizeChanged(VideoSize(videoWidth, videoHeight))
+            }
+
+            override fun onVideoNotRenderedCallback() {
+                onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
             }
         },
     )

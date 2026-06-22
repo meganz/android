@@ -45,6 +45,15 @@ class PlayerErrorTypeMapperTest {
     }
 
     @Test
+    fun `test that VIDEO_NOT_RENDERED is returned when error code is ERROR_CODE_DECODER_INIT_FAILED`() {
+        val result = underTest(
+            errorCode = PlaybackException.ERROR_CODE_DECODER_INIT_FAILED,
+            isConnected = true,
+        )
+        assertThat(result).isEqualTo(PlayerErrorType.VIDEO_NOT_RENDERED)
+    }
+
+    @Test
     fun `test that NO_NETWORK is returned when not connected and error code is not a format error`() {
         val result = underTest(
             errorCode = PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED,

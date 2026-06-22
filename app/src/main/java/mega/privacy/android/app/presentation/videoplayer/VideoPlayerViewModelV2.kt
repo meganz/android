@@ -56,6 +56,7 @@ import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.mapper.PlayerErrorTypeMapper
+import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
@@ -1382,21 +1383,42 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             errorCode = errorCode,
             isConnected = uiState.value.isConnected,
         )
-        if (playerRetry == 1) {
-            viewModelScope.launch {
-                runCatching { checkNodeAccessibilityUseCase(NodeId(uiState.value.currentPlayingHandle)) }
-                    .onFailure { exception ->
-                        if (exception is BlockedMegaException) {
-                            uiState.update { it.copy(blockedError = triggered) }
-                            return@launch
-                        }
-                    }
-                uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
+        when {
+            errorType == PlayerErrorType.VIDEO_NOT_RENDERED -> {
+                uiState.update {
+                    it.copy(
+                        isVideoNotRendered = true,
+                        playerErrorType = errorType
+                    )
+                }
             }
-        } else if (playerRetry <= MAX_RETRY) {
-            uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
-        } else {
-            uiState.update { it.copy(retryFailedEvent = triggered, playerErrorType = errorType) }
+
+            // FILE_NOT_SUPPORTED and max retry exceeded are unrecoverable — skip retry immediately
+            errorType == PlayerErrorType.FILE_NOT_SUPPORTED
+                    || playerRetry > MAX_RETRY -> {
+                pausePlaybackNonUserInitiated()
+                uiState.update {
+                    it.copy(
+                        retryFailedEvent = triggered,
+                        playerErrorType = errorType
+                    )
+                }
+            }
+
+            playerRetry == 1 -> {
+                viewModelScope.launch {
+                    runCatching { checkNodeAccessibilityUseCase(NodeId(uiState.value.currentPlayingHandle)) }
+                        .onFailure { exception ->
+                            if (exception is BlockedMegaException) {
+                                uiState.update { it.copy(blockedError = triggered) }
+                                return@launch
+                            }
+                        }
+                    uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
+                }
+            }
+
+            else -> uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
         }
     }
 

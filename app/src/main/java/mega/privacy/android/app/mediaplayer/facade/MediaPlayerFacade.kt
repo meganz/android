@@ -362,6 +362,12 @@ class MediaPlayerFacade @Inject constructor(
                         ) {
                             switchRendererToTextTrackType()
                         }
+
+                        if (tracks.containsType(C.TRACK_TYPE_VIDEO)
+                            && !tracks.isTypeSelected(C.TRACK_TYPE_VIDEO)
+                        ) {
+                            mediaPlayerCallback.onVideoNotRenderedCallback()
+                        }
                     }
                 })
                 addAnalyticsListener(object :
