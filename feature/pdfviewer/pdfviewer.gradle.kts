@@ -39,6 +39,10 @@ dependencies {
     // Core UI
     implementation(lib.mega.core.ui)
 
+    // Analytics
+    implementation(project(":core:analytics:analytics-tracker"))
+    implementation(lib.mega.analytics)
+
     // Kotlin
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)

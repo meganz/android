@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import mega.privacy.android.analytics.decorator.withScreenViewEvent
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.buildDownloadAwareActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
@@ -26,6 +27,7 @@ import mega.privacy.android.feature.pdfviewer.presentation.components.startPdfFi
 import mega.privacy.android.feature.pdfviewer.presentation.components.startPdfPublicLinkShareIntent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
@@ -34,6 +36,7 @@ import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
 import mega.privacy.android.navigation.setPendingDeepLink
 import mega.privacy.android.shared.nodes.sheet.PublicLinkAuthAlertBottomSheet
 import mega.privacy.android.shared.nodes.sheet.PublicLinkType
+import mega.privacy.mobile.analytics.event.PdfViewerScreenEvent
 
 /**
  * Extension function to register the PDF viewer screen in the navigation graph.
@@ -50,7 +53,11 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
     onOpenNodeOptions: (Long, NodeSourceType, String?) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
-    entry<PdfViewerNavKey> { navKey ->
+    entry<PdfViewerNavKey>(
+        metadata = buildMetadata {
+            withScreenViewEvent(PdfViewerScreenEvent)
+        }
+    ) { navKey ->
         val activity = LocalActivity.current
         var showLoginRequiredSheet by rememberSaveable { mutableStateOf(false) }
         val pdfViewerOnBack: () -> Unit = remember(navKey.isExternalFile, onBack, activity) {

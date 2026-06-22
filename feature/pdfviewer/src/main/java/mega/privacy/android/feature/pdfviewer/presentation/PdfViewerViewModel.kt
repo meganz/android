@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
@@ -62,6 +63,8 @@ import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngine
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngineFactory
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.mobile.analytics.event.PdfViewerSearchMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.PdfViewerSearchPerformedEvent
 import timber.log.Timber
 import java.io.File
 import java.net.URL
@@ -121,6 +124,10 @@ internal class PdfViewerViewModel @AssistedInject constructor(
 
     // results grouped by pageIndex for O(1) lookup in fetchRectsForVisiblePages.
     private var searchMatchesByPage: Map<Int, List<PdfTextMatch>> = emptyMap()
+
+    // The last search hit count this session: keeps the last non-zero count,
+    // falling back to 0 only if no search ever matched. null = no search ran. Logged once on deactivateSearch.
+    private var lastPerformedSearchResultCount: Int? = null
 
     init {
         loadFileExplorerFeatureFlag()
@@ -339,7 +346,8 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 .distinctUntilChanged()
                 .flatMapLatest { query ->
                     if (query.isEmpty()) {
-                        flow { emit(emptyList()) }
+                        // false = not a real search (empty/cleared query), so it must not affect the count.
+                        flow { emit(emptyList<PdfTextMatch>() to false) }
                     } else {
                         flow {
                             val results = runCatching {
@@ -349,11 +357,15 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                                 if (e is CancellationException) throw e
                                 Timber.e(e, "Search error")
                             }.getOrDefault(emptyList())
-                            emit(results)
+                            emit(results to true)
                         }.flowOn(ioDispatcher)
                     }
                 }
-                .collect { results ->
+                .collect { (results, isRealSearch) ->
+                    // Keep the last non-zero hit count (or 0 if no search ever matched) for the analytics event.
+                    if (isRealSearch && (results.isNotEmpty() || lastPerformedSearchResultCount == null)) {
+                        lastPerformedSearchResultCount = results.size
+                    }
                     searchMatchesByPage = results.groupBy { it.pageIndex }
                     val firstMatch = results.firstOrNull()
                     val pdfRects = firstMatch?.let {
@@ -534,10 +546,17 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     }
 
     fun activateSearch() {
+        lastPerformedSearchResultCount = null
+        Analytics.tracker.trackEvent(PdfViewerSearchMenuToolbarEvent)
         _state.update { it.copy(searchState = it.searchState.copy(isSearchActive = true)) }
     }
 
     fun deactivateSearch() {
+        // Report once per session the last matched hit count (0 if none); null means no search ran, so skip.
+        lastPerformedSearchResultCount?.let { resultCount ->
+            Analytics.tracker.trackEvent(PdfViewerSearchPerformedEvent(resultCount = resultCount))
+        }
+        lastPerformedSearchResultCount = null
         clearRectCache()
         _rawQuery.value = ""
         _state.update { it.copy(searchState = PdfViewerSearchState(isSearchActive = false)) }

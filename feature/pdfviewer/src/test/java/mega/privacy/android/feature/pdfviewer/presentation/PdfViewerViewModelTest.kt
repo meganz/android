@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.model.OfflineTypedFileNode
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -49,6 +50,8 @@ import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 import mega.privacy.android.feature.pdfviewer.search.FakePdfSearchEngine
 import mega.privacy.android.feature.pdfviewer.search.PdfSearchEngineFactory
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.mobile.analytics.event.PdfViewerSearchMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.PdfViewerSearchPerformedEvent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -72,6 +75,10 @@ class PdfViewerViewModelTest {
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 
     private val testDispatcher: TestDispatcher get() = extension.testDispatcher
@@ -386,6 +393,17 @@ class PdfViewerViewModelTest {
     }
 
     @Test
+    fun `test that activateSearch tracks PdfViewerSearchMenuToolbarEvent`() = runTest {
+        underTest = initViewModel()
+
+        underTest.activateSearch()
+
+        assertThat(
+            analyticsExtension.events.filterIsInstance<PdfViewerSearchMenuToolbarEvent>()
+        ).isNotEmpty()
+    }
+
+    @Test
     fun `test that deactivateSearch clears all search state`() = runTest {
         underTest = initViewModel()
 
@@ -638,6 +656,195 @@ class PdfViewerViewModelTest {
                 assertThat(state.searchState.results).hasSize(1)
                 assertThat(state.searchState.isSearching).isFalse()
             }
+        }
+
+    @Test
+    fun `test that deactivateSearch tracks PdfViewerSearchPerformedEvent with the last result count`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            // Wait for debounce (300ms) + processing
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            val performedEvents =
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            assertThat(performedEvents).isNotEmpty()
+            assertThat(performedEvents.last().info["resultCount"]).isEqualTo(1)
+        }
+
+    @Test
+    fun `test that PdfViewerSearchPerformedEvent is not tracked while typing without deactivating`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            advanceTimeBy(400)
+            runCurrent()
+
+            assertThat(
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            ).isEmpty()
+        }
+
+    @Test
+    fun `test that deactivateSearch does not track PdfViewerSearchPerformedEvent when no search ran`() =
+        runTest {
+            underTest = initViewModel()
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.deactivateSearch()
+
+            assertThat(
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            ).isEmpty()
+        }
+
+    @Test
+    fun `test that activateSearch resets the previous result count so a new session without a search does not track PdfViewerSearchPerformedEvent`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            // First session performs a real search and reports once on close.
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            // Second session runs no search; the previous count must not be reported again.
+            underTest.activateSearch()
+            underTest.deactivateSearch()
+
+            assertThat(
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            ).hasSize(1)
+        }
+
+    @Test
+    fun `test that deactivateSearch reports the last performed search result count even after the query is cleared`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("abc")
+            advanceTimeBy(400)
+            runCurrent()
+            // User clears the search field before closing; the last real search still counts.
+            underTest.onSearchQueryChanged("")
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            val performedEvents =
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            assertThat(performedEvents).hasSize(1)
+            assertThat(performedEvents.last().info["resultCount"]).isEqualTo(1)
+        }
+
+    @Test
+    fun `test that deactivateSearch reports 0 when the only search returned no results`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = emptyList()
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            underTest.onSearchQueryChanged("xyz")
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            val performedEvents =
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            assertThat(performedEvents).hasSize(1)
+            assertThat(performedEvents.last().info["resultCount"]).isEqualTo(0)
+        }
+
+    @Test
+    fun `test that a trailing zero-result search does not overwrite a previous non-zero count`() =
+        runTest {
+            val fakeEngine = FakePdfSearchEngine()
+            fakeEngine.searchResults = listOf(PdfTextMatch(0, 0, 1, emptyList()))
+
+            whenever(getDataBytesFromUrlUseCase(any())).thenReturn(ByteArray(1))
+
+            underTest = initViewModel(
+                pdfSearchEngineFactory = object : PdfSearchEngineFactory {
+                    override fun create(context: Context) = fakeEngine
+                },
+            )
+            advanceUntilIdle()
+
+            underTest.activateSearch()
+            // First search finds matches.
+            underTest.onSearchQueryChanged("abc")
+            advanceTimeBy(400)
+            runCurrent()
+            // User then types gibberish that matches nothing.
+            fakeEngine.searchResults = emptyList()
+            underTest.onSearchQueryChanged("abcxyz")
+            advanceTimeBy(400)
+            runCurrent()
+            underTest.deactivateSearch()
+
+            val performedEvents =
+                analyticsExtension.events.filterIsInstance<PdfViewerSearchPerformedEvent>()
+            assertThat(performedEvents).hasSize(1)
+            assertThat(performedEvents.last().info["resultCount"]).isEqualTo(1)
         }
 
     @Test
