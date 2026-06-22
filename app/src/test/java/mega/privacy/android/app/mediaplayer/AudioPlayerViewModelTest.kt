@@ -105,6 +105,19 @@ class AudioPlayerViewModelTest {
         }
 
     @Test
+    fun `test that shouldProcessMediaItem returns true for new handle`() = runTest {
+        initUnderTest()
+        assertThat(underTest.shouldProcessMediaItem(testHandle)).isTrue()
+    }
+
+    @Test
+    fun `test that shouldProcessMediaItem returns false when same handle is processed again`() = runTest {
+        initUnderTest()
+        underTest.shouldProcessMediaItem(testHandle)
+        assertThat(underTest.shouldProcessMediaItem(testHandle)).isFalse()
+    }
+
+    @Test
     fun `test that state is updated correctly when checkPlaybackPositionOfPlayingItem invoked, and playback position status is Initial`() =
         runTest {
             val mockPlaybackPositionStatusCallback = mock<(PlaybackPositionStatus) -> Unit>()
@@ -131,6 +144,36 @@ class AudioPlayerViewModelTest {
                 assertThat(actual.currentPlayingItemName).isEqualTo(testName)
                 verify(mockPlaybackPositionStatusCallback).invoke(PlaybackPositionStatus.DialogShowing)
             }
+        }
+
+    @Test
+    fun `test that state is updated correctly when checkPlaybackPositionOfPlayingItem invoked, and playback position status is DialogShowing`() =
+        runTest {
+            val mockPlaybackPositionStatusCallback = mock<(PlaybackPositionStatus) -> Unit>()
+            val testPlaybackInfo = mock<MediaPlaybackInfo> {
+                on { mediaHandle }.thenReturn(testHandle)
+                on { currentPosition }.thenReturn(testPosition)
+            }
+            whenever(getMediaPlaybackInfoUseCase(testHandle)).thenReturn(testPlaybackInfo)
+            initUnderTest()
+
+            underTest.checkPlaybackPositionOfPlayingItem(
+                handle = testHandle,
+                name = testName,
+                status = PlaybackPositionStatus.DialogShowing,
+                isResume = true,
+                playbackPositionStatusCallback = mockPlaybackPositionStatusCallback
+            )
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.showPlaybackDialog).isTrue()
+                assertThat(actual.playbackPosition).isEqualTo(testPosition)
+                assertThat(actual.currentPlayingHandle).isEqualTo(testHandle)
+                assertThat(actual.currentPlayingItemName).isEqualTo(testName)
+                verify(mockPlaybackPositionStatusCallback).invoke(PlaybackPositionStatus.DialogShowing)
+            }
+            verifyNoInteractions(deleteAudioPlaybackInfoUseCase)
         }
 
     @ParameterizedTest(name = "and playback status is {0}")

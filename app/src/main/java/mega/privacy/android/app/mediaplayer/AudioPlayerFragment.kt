@@ -102,12 +102,6 @@ class AudioPlayerFragment : Fragment() {
 
     private var retryFailedDialog: AlertDialog? = null
 
-    /**
-     * Last handle we processed from monitorMediaItemTransitionState(). Used to ignore the
-     * StateFlow replay when the same value emitted again.
-     */
-    private var lastProcessedMediaItemHandle: Long? = null
-
     // top-level inside class
     private var playerGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
@@ -250,8 +244,7 @@ class AudioPlayerFragment : Fragment() {
 
                     viewLifecycleOwner.collectFlow(
                         gateway.monitorMediaItemTransitionState()
-                            .filter { it != lastProcessedMediaItemHandle }) { handle ->
-                        lastProcessedMediaItemHandle = handle
+                            .filter { audioViewModel.shouldProcessMediaItem(it) }) { handle ->
                         handle?.let {
                             val name = gateway.getPlaylistItem(it.toString())?.nodeName
                                 ?: activity?.intent?.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)

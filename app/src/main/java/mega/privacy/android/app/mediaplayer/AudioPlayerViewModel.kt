@@ -29,6 +29,24 @@ class AudioPlayerViewModel @Inject constructor(
     private var playbackPositionStatus = PlaybackPositionStatus.Initial
     private var playbackPositionJob: Job? = null
 
+    /**
+     * Tracks the last media item handle for which playback-position logic was triggered.
+     * Kept in the ViewModel (not the Fragment) so it survives configuration changes (e.g. rotation)
+     * and prevents the StateFlow replay from re-triggering the dialog or re-seeking.
+     */
+    private var lastProcessedMediaItemHandle: Long? = null
+
+    /**
+     * Returns `true` and records [handle] if it has not been processed before, or `false` if it
+     * was already processed. Used by the Fragment to deduplicate StateFlow replays across
+     * configuration changes without exposing mutable state.
+     */
+    internal fun shouldProcessMediaItem(handle: Long?): Boolean {
+        if (handle == lastProcessedMediaItemHandle) return false
+        lastProcessedMediaItemHandle = handle
+        return true
+    }
+
     init {
         val defaultSpeedItem = AudioSpeedPlaybackItem.entries.find {
             it.speed == mediaPlayerGateway.getCurrentPlaybackSpeed()
@@ -61,15 +79,16 @@ class AudioPlayerViewModel @Inject constructor(
                 when (status) {
                     PlaybackPositionStatus.Initial -> {
                         playbackPositionStatus = PlaybackPositionStatus.DialogShowing
-                        uiState.update {
-                            it.copy(
-                                showPlaybackDialog = true,
-                                playbackPosition = playbackPosition,
-                                currentPlayingHandle = handle,
-                                currentPlayingItemName = name
-                            )
-                        }
+                        showPlaybackPositionDialog(handle, name, playbackPosition)
                         playbackPositionStatusCallback(playbackPositionStatus)
+                    }
+
+                    PlaybackPositionStatus.DialogShowing -> {
+                        // Defense-in-depth: handles any edge case where this function is called
+                        // while the dialog is already showing (e.g. a code path that bypasses the
+                        // shouldProcessMediaItem filter). Normally unreachable on screen rotation.
+                        showPlaybackPositionDialog(handle, name, playbackPosition)
+                        playbackPositionStatusCallback(PlaybackPositionStatus.DialogShowing)
                     }
 
                     else -> updatePlaybackPositionStatus(
@@ -80,6 +99,17 @@ class AudioPlayerViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun showPlaybackPositionDialog(handle: Long, name: String, position: Long) {
+        uiState.update {
+            it.copy(
+                showPlaybackDialog = true,
+                playbackPosition = position,
+                currentPlayingHandle = handle,
+                currentPlayingItemName = name
+            )
         }
     }
 
