@@ -14,6 +14,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCaseImpl
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCaseImpl
+import mega.privacy.android.feature.sync.initialisation.ResumeSyncsAfterStorageStateEventInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import javax.inject.Singleton
 
 @Module
@@ -39,5 +41,11 @@ internal interface SyncDomainModule {
         @IntoSet
         fun provideClearSyncSolvedIssuesLogoutTask(task: ClearSyncSolvedIssuesLogoutTask): LogoutTask =
             task
+
+        @Provides
+        @IntoSet
+        fun provideResumeSyncsAfterStorageStateEventInitialiser(
+            initialiser: ResumeSyncsAfterStorageStateEventInitialiser,
+        ): PostLoginInitialiser = initialiser
     }
 }

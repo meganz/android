@@ -412,7 +412,7 @@ internal class SyncFoldersViewModelTest {
         }
 
     @Test
-    fun `test that view model pause run click pauses sync if sync is not paused`() = runTest {
+    fun `test that pause run clicked pauses sync when sync is syncing`() = runTest {
         val syncUiItem = getSyncUiItem(SyncStatus.SYNCING)
         initViewModel()
 
@@ -423,8 +423,30 @@ internal class SyncFoldersViewModelTest {
     }
 
     @Test
-    fun `test that view model pause run clicked runs sync if sync is paused`() = runTest {
+    fun `test that pause run clicked pauses sync when sync is synced`() = runTest {
+        val syncUiItem = getSyncUiItem(SyncStatus.SYNCED)
+        initViewModel()
+
+        underTest.handleAction(SyncFoldersAction.PauseRunClicked(syncUiItem))
+
+        verify(pauseSyncUseCase).invoke(syncUiItem.id)
+        verify(setUserPausedSyncsUseCase).invoke(syncUiItem.id, true)
+    }
+
+    @Test
+    fun `test that pause run clicked resumes sync when sync is paused`() = runTest {
         val syncUiItem = getSyncUiItem(SyncStatus.PAUSED)
+        initViewModel()
+
+        underTest.handleAction(SyncFoldersAction.PauseRunClicked(syncUiItem))
+
+        verify(resumeSyncUseCase).invoke(syncUiItem.id)
+        verify(setUserPausedSyncsUseCase).invoke(syncUiItem.id, false)
+    }
+
+    @Test
+    fun `test that pause run clicked resumes sync when sync has error status`() = runTest {
+        val syncUiItem = getSyncUiItem(SyncStatus.ERROR)
         initViewModel()
 
         underTest.handleAction(SyncFoldersAction.PauseRunClicked(syncUiItem))

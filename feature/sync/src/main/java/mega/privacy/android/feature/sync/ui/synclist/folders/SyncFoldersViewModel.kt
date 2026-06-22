@@ -435,7 +435,11 @@ internal class SyncFoldersViewModel @Inject constructor(
             is SyncFoldersAction.PauseRunClicked -> {
                 viewModelScope.launch {
                     runCatching {
-                        if (action.syncUiItem.status != SyncStatus.PAUSED) {
+                        if (action.syncUiItem.status in arrayOf(
+                                SyncStatus.SYNCING,
+                                SyncStatus.SYNCED,
+                            )
+                        ) {
                             pauseSyncUseCase(action.syncUiItem.id)
                             setUserPausedSyncsUseCase(action.syncUiItem.id, true)
                         } else {
