@@ -180,7 +180,7 @@ private fun buildTextEditorIntent(context: Context, navKey: LegacyTextEditorNavK
 /**
  * Builds [TextEditorComposeViewModel.Args] from [navKey].
  */
-private fun buildTextEditorViewModelArgs(
+internal fun buildTextEditorViewModelArgs(
     navKey: LegacyTextEditorNavKey,
 ): TextEditorComposeViewModel.Args {
     val nodeSourceType = navKey.nodeSourceType
@@ -210,6 +210,12 @@ private fun buildTextEditorViewModelArgs(
                 localPath = navKey.localPath,
             )
         }
+        // Folder link and file link are routed as distinct cases by source type. Folder link is
+        // matched first so it is resolved via the folder API by handle (isFolderLink), and never
+        // as a public file node through the publicUrl branch — which would call getPublicNode()
+        // on a folder URL and throw PublicNodeException.
+        nodeSourceType == FOLDER_LINK_ADAPTER -> cloudNodeArgs(navKey, isFolderLink = true)
+        // File link: resolved from its public URL via getPublicNode().
         navKey.publicUrl != null ->
             TextEditorComposeViewModel.Args(
                 nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
@@ -221,23 +227,33 @@ private fun buildTextEditorViewModelArgs(
                 showSendToChat = false,
                 publicUrl = navKey.publicUrl,
             )
-        else -> {
-            val nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE
-            val mode = textEditorModeFromValue(navKey.mode)
-            TextEditorComposeViewModel.Args(
-                nodeHandle = nodeHandle,
-                mode = mode,
-                fileName = navKey.fileName,
-                inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
-                showDownload = shouldShowDownload(nodeSourceType),
-                showShare = shouldShowShare(nodeSourceType),
-                showSendToChat = shouldShowSendToChat(nodeSourceType),
-                isFromSharedFolder = isFromSharedFolder(nodeSourceType),
-                fromHome = navKey.fromHome,
-                isFolderLink = nodeSourceType == FOLDER_LINK_ADAPTER,
-            )
-        }
+        // Regular Cloud Drive / shares / rubbish node.
+        else -> cloudNodeArgs(navKey, isFolderLink = false)
     }
+}
+
+/**
+ * Builds [TextEditorComposeViewModel.Args] for a Cloud Drive node or a folder-link node. Both share
+ * the same source-type-derived menu visibility and differ only by [isFolderLink], which makes the
+ * ViewModel resolve the node via the folder API (folder link) instead of the main API (Cloud Drive).
+ */
+private fun cloudNodeArgs(
+    navKey: LegacyTextEditorNavKey,
+    isFolderLink: Boolean,
+): TextEditorComposeViewModel.Args {
+    val nodeSourceType = navKey.nodeSourceType
+    return TextEditorComposeViewModel.Args(
+        nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
+        mode = textEditorModeFromValue(navKey.mode),
+        fileName = navKey.fileName,
+        inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
+        showDownload = shouldShowDownload(nodeSourceType),
+        showShare = shouldShowShare(nodeSourceType),
+        showSendToChat = shouldShowSendToChat(nodeSourceType),
+        isFromSharedFolder = isFromSharedFolder(nodeSourceType),
+        fromHome = navKey.fromHome,
+        isFolderLink = isFolderLink,
+    )
 }
 
 /**

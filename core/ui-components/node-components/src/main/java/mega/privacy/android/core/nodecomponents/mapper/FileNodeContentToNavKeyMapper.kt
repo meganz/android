@@ -94,7 +94,11 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 nodeHandle = fileNode.id.longValue,
                 mode = textEditorMode.value,
                 nodeSourceType = viewType,
-                publicUrl = publicUrl,
+                // Only a file-link URL may be forwarded as publicUrl: the text editor treats a
+                // non-null publicUrl as a public *file* link and resolves it via getPublicNode().
+                // A folder link's URL is a folder link, so it must be resolved through the
+                // FOLDER_LINK_ADAPTER path instead; passing it here throws PublicNodeException.
+                publicUrl = (nodeSourceData as? NodeSourceData.FileLink)?.url,
                 serializedNode = fileNode.serializedData,
             )
 
