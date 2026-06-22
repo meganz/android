@@ -104,4 +104,35 @@ class PersistedFeatureFlagCacheTest {
 
         assertThat(underTest.read()).isEqualTo(mapOf("a" to false))
     }
+
+    @Test
+    fun `test that clear deletes the persisted file`() = runTest {
+        underTest.write(mapOf("a" to true))
+        assertThat(cacheFile.exists()).isTrue()
+
+        underTest.clear()
+
+        assertThat(cacheFile.exists()).isFalse()
+        assertThat(underTest.read()).isEmpty()
+    }
+
+    @Test
+    fun `test that clear is a no-op when the file does not exist`() = runTest {
+        underTest.clear()
+
+        assertThat(cacheFile.exists()).isFalse()
+    }
+
+    @Test
+    fun `test that clear is a no-op when the gateway cannot locate the file`() = runTest {
+        val nullGateway = mock<CacheGateway> {
+            on { getCacheFile(any(), any()) }.thenReturn(null)
+        }
+        underTest = PersistedFeatureFlagCache(
+            ioDispatcher = UnconfinedTestDispatcher(),
+            cacheGateway = nullGateway,
+        )
+
+        underTest.clear()
+    }
 }

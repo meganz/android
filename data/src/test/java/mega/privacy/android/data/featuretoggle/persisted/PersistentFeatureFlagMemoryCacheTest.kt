@@ -125,6 +125,27 @@ class PersistentFeatureFlagMemoryCacheTest {
             verify(persistedFeatureFlagCache, never()).read()
         }
 
+    @Test
+    fun `test that clear deletes the persisted on-disk cache`() = runTest {
+        underTest.clear()
+
+        verify(persistedFeatureFlagCache).clear()
+    }
+
+    @Test
+    fun `test that clear resets in-memory state so subsequent reads re-seed from the file`() =
+        runTest {
+            whenever(defaultProvider.isEnabled(any())).thenReturn(false)
+            underTest.applySnapshot(mapOf(TestFeature.A to true))
+            assertThat(underTest.enabled(TestFeature.A)).isTrue()
+
+            underTest.clear()
+            persistedSnapshot = mapOf(keyOf(TestFeature.A) to false)
+
+            assertThat(underTest.enabled(TestFeature.A)).isFalse()
+            verify(persistedFeatureFlagCache).read()
+        }
+
     private fun keyOf(feature: Feature): String =
         "${feature::class.java.name}#${feature.name}"
 

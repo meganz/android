@@ -53,6 +53,22 @@ internal class PersistedFeatureFlagCache @Inject constructor(
         }
     }
 
+    /**
+     * Delete the persisted feature flag file from disk. The call is silently dropped if the
+     * file cannot be located or removed.
+     */
+    suspend fun clear() {
+        withContext(ioDispatcher) {
+            runCatching {
+                val file = cacheGateway.getCacheFile(CACHE_FOLDER, CACHE_FILE)
+                    ?: return@runCatching
+                if (file.exists()) file.delete()
+            }.onFailure {
+                Timber.w(it, "Failed to clear persisted feature flags")
+            }
+        }
+    }
+
     private companion object {
         const val CACHE_FOLDER = "featureflags"
         const val CACHE_FILE = "persisted_feature_flags.json"

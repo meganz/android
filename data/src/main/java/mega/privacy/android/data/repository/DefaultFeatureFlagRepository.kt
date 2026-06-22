@@ -50,6 +50,10 @@ internal class DefaultFeatureFlagRepository @Inject constructor(
         withContext(ioDispatcher) { persistedFeatureFlagSnapshotGateway.currentSnapshot() }
 
     override suspend fun applySnapshot(newSnapshot: Map<Feature, Boolean>) {
-        withContext(ioDispatcher){ persistedFeatureFlagSnapshotGateway.applySnapshot(newSnapshot)}
+        withContext(ioDispatcher) { persistedFeatureFlagSnapshotGateway.applySnapshot(newSnapshot) }
+    }
+
+    override suspend fun clearPersistedSnapshot() {
+        withContext(ioDispatcher) { persistedFeatureFlagSnapshotGateway.clear() }
     }
 }
