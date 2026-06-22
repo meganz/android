@@ -48,7 +48,15 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
                 getChildNodeUseCase(
                     parentNodeId = NodeId(parentNodeHandle),
                     name = currentNode.name
-                )?.let { conflictNode ->
+                )?.takeUnless { conflictNode ->
+                    // A node never collides with itself, and for a MOVE a node
+                    // already living in the target folder is being moved to its
+                    // current location. Neither is a real collision (AND-23958);
+                    // resolving such a "collision" would delete the user's file.
+                    conflictNode.id == currentNode.id ||
+                            (type == NodeNameCollisionType.MOVE
+                                    && currentNode.parentId.longValue == parentNodeHandle)
+                }?.let { conflictNode ->
                     conflictNodes[nodeHandle] = createNodeNameCollision(
                         currentNode = currentNode,
                         parent = parent,
