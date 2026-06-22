@@ -14,11 +14,19 @@ package mega.privacy.android.feature.documentscanner.domain.launchmode
 sealed interface ScannerLaunchMode {
 
     /**
-     * Feature flag is on and either Wi-Fi is available or the user has already
-     * consented to using cellular data. The presentation layer ensures the
-     * model is cached (via the WorkManager flow) and then opens the camera.
+     * Feature flag is on and the model is already cached, so the scanner can
+     * open immediately — this works even offline, since no download is needed.
+     * The presentation layer routes straight to the camera.
      */
     data object New : ScannerLaunchMode
+
+    /**
+     * Feature flag is on, the model is not cached yet, and the device is online
+     * on a network we may download over (Wi-Fi, or cellular with prior consent).
+     * The presentation layer shows the download-confirmation dialog / prepare
+     * screen before the camera.
+     */
+    data object NeedsDownload : ScannerLaunchMode
 
     /** The new scanner is not appropriate; route to the legacy ML Kit scanner. */
     data class Legacy(val reason: LegacyReason) : ScannerLaunchMode
@@ -34,4 +42,7 @@ enum class LegacyReason {
 
     /** User said "no" to the cellular-consent prompt this session. */
     UserDeclined,
+
+    /** Launch-mode resolution failed unexpectedly; fall back to legacy as a safety net. */
+    Unknown,
 }

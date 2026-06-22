@@ -2,7 +2,7 @@ package mega.privacy.android.feature.documentscanner.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.feature.documentscanner.presentation.screen.ContinuousScanScreen
+import mega.privacy.android.feature.documentscanner.presentation.screen.ScannerRouterScreen
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -24,8 +24,6 @@ private fun EntryProviderScope<NavKey>.continuousScanScreen(
     navigationHandler: NavigationHandler,
 ) {
     entry<ContinuousScanNavKey> {
-        ContinuousScanScreen(
-            onClose = { navigationHandler.back() },
-        )
+        ScannerRouterScreen(navigationHandler = navigationHandler)
     }
 }
