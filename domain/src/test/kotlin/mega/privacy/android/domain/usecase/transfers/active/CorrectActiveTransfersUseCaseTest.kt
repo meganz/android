@@ -168,6 +168,34 @@ internal class CorrectActiveTransfersUseCaseTest {
         }
 
     @Test
+    fun `test that active transfers not in progress are partitioned into finished and cancelled by file existence`() =
+        runTest {
+            stubActiveTransfers(false)
+            stubTransfers()
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(mockedActiveTransfers)
+            val inProgress = subSetTransfers()
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgress)
+            val expected = mockedActiveTransfers.filter { activeTransfer ->
+                inProgress.map { it.uniqueId }.contains(activeTransfer.uniqueId).not()
+            }
+            Truth.assertThat(expected.size).isGreaterThan(1)
+            val existing = expected.take(expected.size / 2)
+            val missing = expected - existing.toSet()
+            Truth.assertThat(existing).isNotEmpty()
+            Truth.assertThat(missing).isNotEmpty()
+            existing.forEach {
+                whenever(fileSystemRepository.doesUriPathExist(UriPath(it.localPath))) doReturn true
+            }
+            missing.forEach {
+                whenever(fileSystemRepository.doesUriPathExist(UriPath(it.localPath))) doReturn false
+            }
+            underTest(TransferType.GENERAL_UPLOAD)
+            verify(setActiveTransfersAsFinishedUseCase).invoke(existing, false)
+            verify(setActiveTransfersAsFinishedUseCase).invoke(missing, true)
+        }
+
+    @Test
     fun `test that active transfers finished and not in progress are not set as cancelled`() =
         runTest {
             stubActiveTransfers(true)

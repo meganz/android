@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.transfer.isSafDownload
 import mega.privacy.android.domain.entity.transfer.isVoiceClip
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -70,9 +71,17 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         if (notInProgressActiveTransfers.isNotEmpty()) {
             //Set not in progress as finished. We are not sure if they have been cancelled or failed, we check the existence of the file to set it as cancelled as best effort approach
             transferRepository.apply {
-                val (fileExists, fileNotExists) = notInProgressActiveTransfers
-                    .filterIsInstance<Transfer>() //Completed transfers are finished by definition, doesn't need to update its finished status
-                    .partition { fileSystemRepository.doesUriPathExist(UriPath(it.localPath)) }
+                //Completed transfers are finished by definition, doesn't need to update its finished status.
+                //Check file existence with bounded parallelism: doesUriPathExist hits the file system, so doing it
+                //sequentially for many transfers (e.g. a large folder upload) can ANR (AND-20589), while unbounded
+                //parallelism would spawn one coroutine per transfer. mapAsync caps concurrency (ParallelWithLimit(10)).
+                val existenceResults = notInProgressActiveTransfers
+                    .filterIsInstance<Transfer>()
+                    .mapAsync { transfer ->
+                        transfer to fileSystemRepository.doesUriPathExist(UriPath(transfer.localPath))
+                    }
+                val fileExists = existenceResults.filter { it.second }.map { it.first }
+                val fileNotExists = existenceResults.filterNot { it.second }.map { it.first }
                 fileExists.takeIf { it.isNotEmpty() }?.let {
                     setActiveTransfersAsFinishedUseCase(it, cancelled = false)
                 }
