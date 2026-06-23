@@ -12,8 +12,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.domain.usecase.GetPreviousSimulatedLastActiveDateUseCase
+import mega.privacy.android.app.domain.usecase.SimulateUserLastActiveDateUseCase
 import mega.privacy.android.app.presentation.account.model.QAAccountSwitchEvent
 import mega.privacy.android.app.presentation.account.model.QAAccountUiState
+import mega.privacy.android.app.presentation.account.model.SimulateLastActiveDateResult
 import mega.privacy.android.data.gateway.QAAccountCacheGateway
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -34,6 +37,8 @@ class QAAccountViewModel @Inject constructor(
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
     private val fastLoginUseCase: FastLoginUseCase,
     private val chatLogoutUseCase: ChatLogoutUseCase,
+    private val simulateUserLastActiveDateUseCase: SimulateUserLastActiveDateUseCase,
+    private val getPreviousSimulatedLastActiveDateUseCase: GetPreviousSimulatedLastActiveDateUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(QAAccountUiState())
@@ -224,5 +229,75 @@ class QAAccountViewModel @Inject constructor(
         }.onFailure { e ->
             Timber.e(e, "Error getting remark")
         }.getOrNull()
+    }
+
+    /**
+     * Simulate the selected last active date, or reject it (invalid event) when it equals the previous one.
+     *
+     * @param lastActiveTimestamp the selected last active time, in epoch seconds.
+     */
+    fun onSimulateUserLastActiveDateSelected(lastActiveTimestamp: Long) {
+        if (lastActiveTimestamp == _uiState.value.previousLastActiveTimestamp) {
+            Timber.d("InactiveQA selected date equals previous lastActiveTs=$lastActiveTimestamp, rejected")
+            _uiState.update {
+                it.copy(simulateLastActiveDateResultEvent = triggered(SimulateLastActiveDateResult.Invalid))
+            }
+            return
+        }
+        viewModelScope.launch {
+            runCatching {
+                simulateUserLastActiveDateUseCase(lastActiveTimestamp)
+            }.onSuccess {
+                Timber.d("InactiveQA setDevOptForPurge success, lastActiveTs=$lastActiveTimestamp")
+                _uiState.update {
+                    it.copy(simulateLastActiveDateResultEvent = triggered(SimulateLastActiveDateResult.Success))
+                }
+            }.onFailure { e ->
+                Timber.e(e, "InactiveQA setDevOptForPurge failed, lastActiveTs=$lastActiveTimestamp")
+                _uiState.update {
+                    it.copy(simulateLastActiveDateResultEvent = triggered(SimulateLastActiveDateResult.Failure))
+                }
+            }
+        }
+    }
+
+    /**
+     * Consume the simulate user last active date result event
+     */
+    fun consumeSimulateLastActiveDateResultEvent() {
+        _uiState.update { it.copy(simulateLastActiveDateResultEvent = consumed()) }
+    }
+
+    /**
+     * Prepare to show the simulate-last-active-date picker.
+     *
+     * Reads the previously simulated last active timestamp and emits it through
+     * [QAAccountUiState.prepareSimulateDateEvent] so the UI can show the picker with that date as
+     * its default selection.
+     *
+     * Useful for QA to avoid picking the same date again (which produces an already-acknowledged
+     * purge timestamp that the SDK suppresses).
+     */
+    fun prepareSimulateUserLastActiveDate() {
+        viewModelScope.launch {
+            val previousLastActive = runCatching {
+                getPreviousSimulatedLastActiveDateUseCase()
+            }.onFailure {
+                Timber.e(it, "InactiveQA failed to get previous simulated last active date")
+            }.getOrNull()
+            _uiState.update {
+                it.copy(
+                    previousLastActiveTimestamp = previousLastActive,
+                    prepareSimulateDateEvent = triggered(previousLastActive),
+                )
+            }
+        }
+    }
+
+    /**
+     * Consume the prepare simulate date event
+     */
+    fun consumePrepareSimulateDateEvent() {
+        _uiState.update { it.copy(prepareSimulateDateEvent = consumed()) }
     }
 }

@@ -12,7 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -25,17 +27,20 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.account.QAAccountViewModel
 import mega.privacy.android.app.presentation.account.model.QAAccountSwitchEvent
+import mega.privacy.android.app.presentation.account.model.SimulateLastActiveDateResult
 import mega.privacy.android.app.presentation.featureflag.FeatureFlagActivity
 import mega.privacy.android.app.presentation.login.QALoginFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.canBeHandled
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -60,10 +65,13 @@ class QASettingsFragment : PreferenceFragmentCompat() {
     private val saveAccountPreferenceKey = "settings_qa_save_account"
     private val openLoginPreferenceKey = "settings_qa_open_login"
     private val accountCacheCategoryKey = "settings_qa_account_cache_category"
+    private val simulateUserLastActiveDatePreferenceKey = "settings_qa_simulate_user_last_active_date"
 
     private var accountCacheCategory: PreferenceCategory? = null
     private var saveAccountPreference: Preference? = null
     private var openLoginPreference: Preference? = null
+    private var materialDatePicker: MaterialDatePicker<Long>? = null
+    private var isPreparingDatePicker = false
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences_qa, rootKey)
@@ -74,15 +82,40 @@ class QASettingsFragment : PreferenceFragmentCompat() {
         setupAccountManagement()
         observeAccountList()
         observeAccountSwitchSuccess()
+        observeSimulateLastActiveDateResult()
+        observePrepareSimulateDate()
     }
 
     override fun onDestroyView() {
         accountCacheCategory?.removeAll()
+        materialDatePicker?.dismiss()
+        materialDatePicker = null
+        isPreparingDatePicker = false
         super.onDestroyView()
     }
 
 
     private fun setupAccountManagement() {
+        // Add Tools category
+        val simulatorCategory = PreferenceCategory(requireContext()).apply {
+            title = getString(R.string.settings_qa_tools_category)
+        }
+        preferenceScreen.addPreference(simulatorCategory)
+
+        // Add simulate user last active date item
+        val simulateUserLastActiveDatePref = Preference(requireContext()).apply {
+            key = simulateUserLastActiveDatePreferenceKey
+            title = getString(R.string.settings_qa_simulate_user_last_active_date)
+            summary = getString(R.string.settings_qa_simulate_user_last_active_date_summary)
+        }
+        simulatorCategory.addPreference(simulateUserLastActiveDatePref)
+
+        // Add switch account category
+        val switchAccountCategory = PreferenceCategory(requireContext()).apply {
+            title = getString(R.string.settings_qa_switch_account_category)
+        }
+        preferenceScreen.addPreference(switchAccountCategory)
+
         // Add open login button
         val openLoginPref = Preference(requireContext()).apply {
             key = openLoginPreferenceKey
@@ -90,7 +123,7 @@ class QASettingsFragment : PreferenceFragmentCompat() {
             summary = getString(R.string.settings_qa_open_login_summary)
         }
         openLoginPreference = openLoginPref
-        preferenceScreen.addPreference(openLoginPref)
+        switchAccountCategory.addPreference(openLoginPref)
 
         // Add save account button
         val saveAccountPref = Preference(requireContext()).apply {
@@ -99,7 +132,7 @@ class QASettingsFragment : PreferenceFragmentCompat() {
             summary = getString(R.string.settings_qa_save_current_account_summary)
         }
         saveAccountPreference = saveAccountPref
-        preferenceScreen.addPreference(saveAccountPref)
+        switchAccountCategory.addPreference(saveAccountPref)
 
         // Add account cache category
         val accountCacheCat = PreferenceCategory(requireContext()).apply {
@@ -318,6 +351,26 @@ class QASettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
+    private fun observeSimulateLastActiveDateResult() {
+        collectFlow(accountViewModel.uiState.map { it.simulateLastActiveDateResultEvent }
+            .distinctUntilChanged()) { event ->
+            if (event is StateEventWithContentTriggered) {
+                val (message, length) = when (event.content) {
+                    SimulateLastActiveDateResult.Success ->
+                        R.string.settings_qa_operation_success to Snackbar.LENGTH_SHORT
+
+                    SimulateLastActiveDateResult.Invalid ->
+                        R.string.settings_qa_simulate_date_must_differ to Snackbar.LENGTH_LONG
+
+                    SimulateLastActiveDateResult.Failure ->
+                        R.string.settings_qa_operation_failed to Snackbar.LENGTH_LONG
+                }
+                Snackbar.make(listView, getString(message), length).show()
+                accountViewModel.consumeSimulateLastActiveDateResultEvent()
+            }
+        }
+    }
+
     private fun navigateToMainActivity() {
         runCatching {
             context?.let {
@@ -363,6 +416,11 @@ class QASettingsFragment : PreferenceFragmentCompat() {
 
             openLoginPreferenceKey -> {
                 openLoginScreen()
+                true
+            }
+
+            simulateUserLastActiveDatePreferenceKey -> {
+                showSimulateUserLastActiveDateDialog()
                 true
             }
 
@@ -417,5 +475,72 @@ class QASettingsFragment : PreferenceFragmentCompat() {
     private fun openLoginScreen() {
         val fragment = QALoginFragment()
         fragment.show(parentFragmentManager, "qa_login")
+    }
+
+    /**
+     * Ask the ViewModel to prepare the simulate-last-active-date picker. The previously simulated
+     * date is read off the main thread and delivered back through
+     * [QAAccountUiState.prepareSimulateDateEvent], which [observePrepareSimulateDate] turns into the
+     * actual picker. Keeping the read in the ViewModel preserves the unidirectional data flow.
+     */
+    private fun showSimulateUserLastActiveDateDialog() {
+        // Guard set synchronously so rapid taps cannot each request a picker and open multiple ones.
+        if (isPreparingDatePicker || materialDatePicker != null) return
+        isPreparingDatePicker = true
+        accountViewModel.prepareSimulateUserLastActiveDate()
+    }
+
+    private fun observePrepareSimulateDate() {
+        collectFlow(accountViewModel.uiState.map { it.prepareSimulateDateEvent }
+            .distinctUntilChanged()) { event ->
+            if (event is StateEventWithContentTriggered) {
+                showSimulateDatePicker(event.content)
+                accountViewModel.consumePrepareSimulateDateEvent()
+            }
+        }
+    }
+
+    /**
+     * Show a date picker to simulate the user's last active date. On confirm, the selected date is
+     * sent to the SDK. If a date was previously simulated (derived from the last acknowledged
+     * purge), the picker defaults to one day before it; otherwise it defaults to the current day.
+     * Picking the exact same date as last time is rejected, because it produces an
+     * already-acknowledged purge timestamp that the SDK would suppress.
+     *
+     * @param previousLastActive the previously simulated last active time (epoch seconds), or null.
+     */
+    private fun showSimulateDatePicker(previousLastActive: Long?) {
+        if (materialDatePicker != null) {
+            isPreparingDatePicker = false
+            return
+        }
+        val defaultSelectionMillis = if (previousLastActive != null) {
+            TimeUnit.SECONDS.toMillis(previousLastActive) - TimeUnit.DAYS.toMillis(1)
+        } else {
+            MaterialDatePicker.todayInUtcMilliseconds() - TimeUnit.DAYS.toMillis(1)
+        }
+
+        materialDatePicker = MaterialDatePicker.Builder.datePicker()
+            .setTheme(R.style.MaterialCalendarTheme)
+            .setPositiveButtonText(getString(sharedR.string.general_ok))
+            .setNegativeButtonText(getString(sharedR.string.general_dialog_cancel_button))
+            .setTitleText(getString(R.string.settings_qa_simulate_user_last_active_date))
+            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
+            .setSelection(defaultSelectionMillis)
+            .build()
+            .apply {
+                addOnDismissListener {
+                    materialDatePicker = null
+                    isPreparingDatePicker = false
+                }
+                addOnPositiveButtonClickListener { selection ->
+                    val epochSeconds = TimeUnit.MILLISECONDS.toSeconds(selection)
+                    accountViewModel.onSimulateUserLastActiveDateSelected(epochSeconds)
+                }
+                show(
+                    this@QASettingsFragment.parentFragmentManager,
+                    "qa_simulate_user_last_active_date"
+                )
+            }
     }
 }

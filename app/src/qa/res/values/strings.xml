@@ -22,4 +22,11 @@
     <string name="settings_qa_current_account">Current</string>
     <string name="settings_qa_add_remark">Add Remark</string>
     <string name="settings_qa_remark_hint">Enter remark</string>
-</resources>                                                               
+    <string name="settings_qa_switch_account_category">Switch Account</string>
+    <string name="settings_qa_tools_category">Tools</string>
+    <string name="settings_qa_simulate_user_last_active_date">Simulate user last active date</string>
+    <string name="settings_qa_simulate_user_last_active_date_summary">The selected date must be after the last upload date and different from the previously set date</string>
+    <string name="settings_qa_operation_success">Operation completed successfully</string>
+    <string name="settings_qa_operation_failed">Operation failed, please try again</string>
+    <string name="settings_qa_simulate_date_must_differ">Please pick a date different from the last one</string>
+</resources>

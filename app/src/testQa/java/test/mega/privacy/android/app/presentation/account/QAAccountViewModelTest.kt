@@ -10,8 +10,11 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetPreviousSimulatedLastActiveDateUseCase
+import mega.privacy.android.app.domain.usecase.SimulateUserLastActiveDateUseCase
 import mega.privacy.android.app.presentation.account.QAAccountViewModel
 import mega.privacy.android.app.presentation.account.model.QAAccountSwitchEvent
+import mega.privacy.android.app.presentation.account.model.SimulateLastActiveDateResult
 import mega.privacy.android.data.gateway.QAAccountCacheGateway
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -41,6 +44,9 @@ class QAAccountViewModelTest {
     private val getAccountCredentialsUseCase = mock<GetAccountCredentialsUseCase>()
     private val fastLoginUseCase = mock<FastLoginUseCase>()
     private val chatLogoutUseCase = mock<ChatLogoutUseCase>()
+    private val simulateUserLastActiveDateUseCase = mock<SimulateUserLastActiveDateUseCase>()
+    private val getPreviousSimulatedLastActiveDateUseCase =
+        mock<GetPreviousSimulatedLastActiveDateUseCase>()
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
 
@@ -53,6 +59,7 @@ class QAAccountViewModelTest {
         private const val TEST_REMARK = "Test remark"
         private const val TEST_HANDLE = "123456789"
         private const val TEST_TIME_STAMP = 123456789L
+        private const val LAST_ACTIVE_TS = 1_700_000_000L
 
         private fun createTestCredentials(
             email: String? = TEST_EMAIL,
@@ -77,7 +84,9 @@ class QAAccountViewModelTest {
             qaAccountCacheGateway = qaAccountCacheGateway,
             getAccountCredentialsUseCase = getAccountCredentialsUseCase,
             fastLoginUseCase = fastLoginUseCase,
-            chatLogoutUseCase = chatLogoutUseCase
+            chatLogoutUseCase = chatLogoutUseCase,
+            simulateUserLastActiveDateUseCase = simulateUserLastActiveDateUseCase,
+            getPreviousSimulatedLastActiveDateUseCase = getPreviousSimulatedLastActiveDateUseCase,
         )
         scheduler.advanceUntilIdle()
     }
@@ -396,7 +405,9 @@ class QAAccountViewModelTest {
             qaAccountCacheGateway = qaAccountCacheGateway,
             getAccountCredentialsUseCase = getAccountCredentialsUseCase,
             fastLoginUseCase = fastLoginUseCase,
-            chatLogoutUseCase = chatLogoutUseCase
+            chatLogoutUseCase = chatLogoutUseCase,
+            simulateUserLastActiveDateUseCase = simulateUserLastActiveDateUseCase,
+            getPreviousSimulatedLastActiveDateUseCase = getPreviousSimulatedLastActiveDateUseCase,
         )
         scheduler.advanceUntilIdle()
 
@@ -439,4 +450,53 @@ class QAAccountViewModelTest {
             assertNotNull(state.accountSwitchEvent)
         }
     }
+
+    @Test
+    fun `test that onSimulateUserLastActiveDateSelected triggers success event when use case succeeds`() =
+        runTest {
+            underTest.onSimulateUserLastActiveDateSelected(LAST_ACTIVE_TS)
+            scheduler.advanceUntilIdle()
+
+            verify(simulateUserLastActiveDateUseCase).invoke(LAST_ACTIVE_TS)
+            underTest.uiState.test {
+                val event = awaitItem().simulateLastActiveDateResultEvent
+                assertIs<StateEventWithContentTriggered<SimulateLastActiveDateResult>>(event)
+                assertEquals(SimulateLastActiveDateResult.Success, event.content)
+            }
+        }
+
+    @Test
+    fun `test that onSimulateUserLastActiveDateSelected triggers invalid event and skips use case when date equals previous`() =
+        runTest {
+            whenever(getPreviousSimulatedLastActiveDateUseCase()).thenReturn(LAST_ACTIVE_TS)
+            underTest.prepareSimulateUserLastActiveDate()
+            scheduler.advanceUntilIdle()
+
+            underTest.onSimulateUserLastActiveDateSelected(LAST_ACTIVE_TS)
+            scheduler.advanceUntilIdle()
+
+            verify(simulateUserLastActiveDateUseCase, times(0)).invoke(any())
+            underTest.uiState.test {
+                val event = awaitItem().simulateLastActiveDateResultEvent
+                assertIs<StateEventWithContentTriggered<SimulateLastActiveDateResult>>(event)
+                assertEquals(SimulateLastActiveDateResult.Invalid, event.content)
+            }
+        }
+
+    @Test
+    fun `test that prepareSimulateUserLastActiveDate emits previous last active from use case`() =
+        runTest {
+            whenever(getPreviousSimulatedLastActiveDateUseCase()).thenReturn(LAST_ACTIVE_TS)
+
+            underTest.prepareSimulateUserLastActiveDate()
+            scheduler.advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                val event = state.prepareSimulateDateEvent
+                assertIs<StateEventWithContentTriggered<Long?>>(event)
+                assertEquals(LAST_ACTIVE_TS, event.content)
+                assertEquals(LAST_ACTIVE_TS, state.previousLastActiveTimestamp)
+            }
+        }
 }
