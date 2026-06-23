@@ -432,6 +432,12 @@ internal class SyncFoldersViewModel @Inject constructor(
                 dismissConfirmRemoveSyncFolderDialog()
             }
 
+            is SyncFoldersAction.OnStopBackupMoveDestinationSelectionStarted -> {
+                // Hide the dialog without clearing syncUiItemToRemove, which is still needed to
+                // complete the move once a destination is selected. See AND-22622.
+                _uiState.update { it.copy(showConfirmRemoveSyncFolderDialog = false) }
+            }
+
             is SyncFoldersAction.PauseRunClicked -> {
                 viewModelScope.launch {
                     runCatching {

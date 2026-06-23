@@ -24,5 +24,13 @@ internal sealed interface SyncFoldersAction {
 
     data object OnRemoveFolderDialogDismissed : SyncFoldersAction
 
+    /**
+     * Dispatched when the user picks "Move folder to Cloud drive" on the stop-backup dialog.
+     * Hides the confirmation dialog immediately (so a second quick tap cannot re-open the
+     * destination picker) while keeping the folder to remove for the move that completes once a
+     * destination is selected.
+     */
+    data object OnStopBackupMoveDestinationSelectionStarted : SyncFoldersAction
+
     data object SnackBarShown : SyncFoldersAction
 }

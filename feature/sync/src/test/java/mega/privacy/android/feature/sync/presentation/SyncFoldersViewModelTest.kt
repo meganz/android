@@ -363,6 +363,30 @@ internal class SyncFoldersViewModelTest {
         }
 
     @Test
+    fun `test that starting move destination selection hides the dialog but keeps the folder to remove`() =
+        runTest {
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(MutableStateFlow(null))
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
+            initViewModel()
+            underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
+
+            underTest.uiState.test {
+                val dialogVisible = awaitItem()
+                assertThat(dialogVisible.showConfirmRemoveSyncFolderDialog).isTrue()
+                assertThat(dialogVisible.syncUiItemToRemove).isEqualTo(syncUiItem)
+
+                underTest.handleAction(
+                    SyncFoldersAction.OnStopBackupMoveDestinationSelectionStarted
+                )
+
+                val dialogHidden = awaitItem()
+                assertThat(dialogHidden.showConfirmRemoveSyncFolderDialog).isFalse()
+                assertThat(dialogHidden.syncUiItemToRemove).isEqualTo(syncUiItem)
+            }
+        }
+
+    @Test
     fun `test that confirm the remove action for a Backup with delete option removes folder pair and delete remote folder`() =
         runTest {
             whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)

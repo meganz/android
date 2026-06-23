@@ -97,7 +97,14 @@ internal fun SyncFoldersRoute(
                         onDismiss = {
                             viewModel.handleAction(OnRemoveFolderDialogDismissed)
                         },
-                        onSelectStopBackupDestinationClicked = onSelectStopBackupDestinationClicked,
+                        onSelectStopBackupDestinationClicked = { folderName ->
+                            // Hide the dialog before opening the picker so a second quick tap on
+                            // "Move folder to Cloud drive" cannot re-open it. See AND-22622.
+                            viewModel.handleAction(
+                                SyncFoldersAction.OnStopBackupMoveDestinationSelectionStarted
+                            )
+                            onSelectStopBackupDestinationClicked(folderName)
+                        },
                         folderName = syncUiItemToRemove.folderPairName,
                     )
                 }
