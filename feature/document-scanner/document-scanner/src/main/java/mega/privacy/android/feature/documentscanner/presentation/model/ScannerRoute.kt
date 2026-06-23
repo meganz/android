@@ -25,6 +25,6 @@ sealed interface ScannerRoute {
      */
     data object NeedsCellularConsent : ScannerRoute
 
-    /** Fall back to the legacy ML Kit scanner via `LegacyDocumentScanNavKey`. */
+    /** Fall back to the legacy ML Kit scanner via `LegacyScanDocumentNavKey`. */
     data class UseLegacy(val reason: LegacyReason) : ScannerRoute
 }

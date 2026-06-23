@@ -1,20 +1,22 @@
 package mega.privacy.android.feature.documentscanner.presentation.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
+import mega.android.core.ui.tokens.theme.DSTokens
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.documentscanner.presentation.ScannerRouterViewModel
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
-import mega.privacy.android.navigation.contract.navkey.LegacyDocumentScanNavKey
+import mega.privacy.android.navigation.contract.navkey.LegacyScanDocumentNavKey
 import timber.log.Timber
 
 /**
@@ -41,7 +43,7 @@ internal fun ScannerRouterScreen(
             // The legacy ML Kit scanner is launched by an app-shell handler that
             // owns the ActivityResultLauncher and services this key.
             // TODO(AND-23987): handler lands with the global legacy-scan launch ticket.
-            navigationHandler.navigate(LegacyDocumentScanNavKey)
+            navigationHandler.navigate(LegacyScanDocumentNavKey)
             navigationHandler.remove(ContinuousScanNavKey)
         }
 
@@ -60,9 +62,11 @@ internal fun ScannerRouterScreen(
 @Composable
 private fun LoadingState() {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(DSTokens.colors.background.pageBackground),
         contentAlignment = Alignment.Center,
     ) {
-        CircularProgressIndicator()
+        LargeInfiniteSpinnerIndicator()
     }
 }

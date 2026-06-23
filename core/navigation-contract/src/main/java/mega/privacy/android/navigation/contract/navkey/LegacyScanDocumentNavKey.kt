@@ -13,4 +13,4 @@ import kotlinx.serialization.Serializable
  * launcher and services this key.
  */
 @Serializable
-data object LegacyDocumentScanNavKey : NavKey
+data object LegacyScanDocumentNavKey : NavKey
