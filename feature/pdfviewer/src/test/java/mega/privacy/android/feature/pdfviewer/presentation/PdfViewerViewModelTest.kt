@@ -10,6 +10,7 @@ import de.palm.composestateevents.consumed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
@@ -23,8 +24,11 @@ import mega.privacy.android.core.nodecomponents.model.OfflineTypedFileNode
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -35,6 +39,7 @@ import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
@@ -81,6 +86,7 @@ class PdfViewerViewModelTest {
     private val saveRecentlyUsedItemIfQualifiesUseCase =
         mock<SaveRecentlyUsedItemIfQualifiesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
+    private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
@@ -112,6 +118,7 @@ class PdfViewerViewModelTest {
             monitorConnectivityUseCase,
             saveRecentlyUsedItemIfQualifiesUseCase,
             monitorOfflineNodeUpdatesUseCase,
+            monitorNodeUpdatesUseCase,
             getFeatureFlagValueUseCase,
             getNodeByIdUseCase,
             getPublicNodeUseCase,
@@ -131,6 +138,7 @@ class PdfViewerViewModelTest {
         whenever(getLastPageViewedInPdfUseCase(12345L)).thenReturn(1)
         whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.CloudExplorer) }.thenReturn(false)
     }
 
@@ -149,6 +157,7 @@ class PdfViewerViewModelTest {
             getDataBytesFromUrlUseCase = getDataBytesFromUrlUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             saveRecentlyUsedItemIfQualifiesUseCase = saveRecentlyUsedItemIfQualifiesUseCase,
             ioDispatcher = testDispatcher,
             applicationScope = CoroutineScope(testDispatcher),
@@ -1196,4 +1205,58 @@ class PdfViewerViewModelTest {
             }
             verifyNoInteractions(getNodeByIdUseCase)
         }
+
+    @Test
+    fun `test that init refreshes title and currentNode when the open node is renamed`() = runTest {
+        val renamedNode = mock<TypedFileNode> {
+            on { name }.thenReturn("Renamed Document.pdf")
+        }
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(renamedNode)
+        val updatedNode = mock<Node> {
+            on { id }.thenReturn(NodeId(12345L))
+        }
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(
+            flowOf(NodeUpdate(mapOf(updatedNode to listOf(NodeChanges.Name))))
+        )
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.title).isEqualTo("Renamed Document.pdf")
+            assertThat(state.currentNode).isEqualTo(renamedNode)
+        }
+    }
+
+    @Test
+    fun `test that init does not refresh current node when update is for a different node`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { name }.thenReturn("Test Document.pdf")
+        }
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(node)
+        val otherNode = mock<Node> {
+            on { id }.thenReturn(NodeId(99999L))
+        }
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(
+            flowOf(NodeUpdate(mapOf(otherNode to listOf(NodeChanges.Name))))
+        )
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().title).isEqualTo("Test Document.pdf")
+        }
+        // loadCurrentNode runs once at init only; the unrelated update is filtered out.
+        verifyBlocking(getNodeByIdUseCase) { invoke(NodeId(12345L)) }
+    }
+
+    @Test
+    fun `test that init does not monitor node updates for external files`() = runTest {
+        underTest = initViewModel(args = externalFileArgs)
+        advanceUntilIdle()
+
+        verifyNoInteractions(monitorNodeUpdatesUseCase)
+    }
 }

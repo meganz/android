@@ -25,9 +25,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -48,6 +51,7 @@ import mega.privacy.android.domain.usecase.file.GetDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
@@ -79,6 +83,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val getDataBytesFromUrlUseCase: GetDataBytesFromUrlUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val saveRecentlyUsedItemIfQualifiesUseCase: SaveRecentlyUsedItemIfQualifiesUseCase,
@@ -124,6 +129,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
         observeConnectivity()
         monitorOfflineNodeAvailability()
         loadCurrentNode()
+        monitorNodeUpdates()
     }
 
     private fun loadFileExplorerFeatureFlag() {
@@ -727,7 +733,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * No-op for external files (no MEGA node).
      */
     private fun loadCurrentNode() {
-        if (args.isExternalFile || args.nodeHandle == -1L) return
+        if (args.isExternalFile || args.nodeHandle == INVALID_NODE_HANDLE) return
         viewModelScope.launch {
             val node: TypedNode? = when (args.nodeSourceType) {
                 NodeSourceType.FILE_LINK -> loadPublicLinkNode()
@@ -747,8 +753,21 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                 }
             }
             node ?: return@launch
-            _state.update { it.copy(currentNode = node) }
+            _state.update { it.copy(currentNode = node, title = node.name) }
         }
+    }
+
+    /**
+     * Refreshes the title and current node when the open node changes elsewhere (rename, or a
+     * permission change on another device / web), keeping the toolbar and action list in sync.
+     */
+    private fun monitorNodeUpdates() {
+        if (args.isExternalFile || args.nodeHandle == INVALID_NODE_HANDLE) return
+        monitorNodeUpdatesUseCase()
+            .filter { update -> update.changes.keys.any { it.id.longValue == args.nodeHandle } }
+            .onEach { loadCurrentNode() }
+            .catch { Timber.e(it, "PDF viewer: node updates flow failed") }
+            .launchIn(viewModelScope)
     }
 
     private suspend fun loadPublicLinkNode(): TypedNode? {
@@ -804,5 +823,8 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private companion object {
         /** Number of pages to prefetch on each side of the current page. */
         const val PREFETCH_RADIUS = 1
+
+        /** Sentinel node handle used for external files that have no MEGA node. */
+        const val INVALID_NODE_HANDLE = -1L
     }
 }
