@@ -284,14 +284,14 @@ class MyAccountHomeViewModelTest {
         }
 
     @Test
-    fun `test that refreshAccountInfo calls getExtendedAccountDetail with sessions enabled`() =
+    fun `test that refreshAccountInfo calls getExtendedAccountDetail with sessions and purchases enabled`() =
         runTest {
             advanceUntilIdle()
 
             verify(getExtendedAccountDetail).invoke(
                 forceRefresh = true,
                 sessions = true,
-                purchases = false,
+                purchases = true,
                 transactions = false,
             )
         }

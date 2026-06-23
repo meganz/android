@@ -261,7 +261,7 @@ class MyAccountHomeViewModel @Inject constructor(
                 getExtendedAccountDetail(
                     forceRefresh = true,
                     sessions = true,
-                    purchases = false,
+                    purchases = true,
                     transactions = false,
                 )
             }.onFailure {
