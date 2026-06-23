@@ -59,6 +59,7 @@ sealed interface CloudDriveUiState {
      * @property nodeSourceType
      * @property hasWritePermission
      * @property inactivityMonths
+     * @property purgeTimestamp
      */
     data class Data(
         override val title: LocalizedText,
@@ -75,12 +76,14 @@ sealed interface CloudDriveUiState {
         override val nodeSourceType: NodeSourceType,
         val hasWritePermission: Boolean,
         val inactivityMonths: Int? = null,
+        val purgeTimestamp: Long? = null,
     ) : CloudDriveUiState {
 
         /**
-         * Flag to determine if inactivity banner should be shown
+         * Flag to determine if inactivity banner should be shown. It is shown whenever an inactive
+         * purge event has been received (regardless of the computed months, which may be 0).
          */
-        val showInactivityBanner = (inactivityMonths ?: 0) > 0
+        val showInactivityBanner = inactivityMonths != null
 
         /**
          * True if upload is allowed in the current folder

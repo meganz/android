@@ -60,6 +60,8 @@ class SimulateUserLastActiveDateUseCaseTest {
     companion object {
         /** A safely positive epoch-seconds value (~2024) for the selected last active date. */
         private val LAST_ACTIVE_SECONDS = TimeUnit.DAYS.toSeconds(20_000)
+
+        // Todo: Will be replaced with MegaApiJava constants in the next version
         private const val PURGE_REASON_INACTIVE = 4
     }
 }

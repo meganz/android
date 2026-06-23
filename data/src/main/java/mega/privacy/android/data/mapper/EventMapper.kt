@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.CommitDbEvent
 import mega.privacy.android.domain.entity.DisconnectEvent
 import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.entity.KeyModifiedEvent
+import mega.privacy.android.domain.entity.LastPurgeEvent
 import mega.privacy.android.domain.entity.MediaInfoReadyEvent
 import mega.privacy.android.domain.entity.MiscFlagsReadyEvent
 import mega.privacy.android.domain.entity.NodesCurrentEvent
@@ -118,10 +119,28 @@ internal class EventMapper @Inject constructor(
             )
         }
 
+        MegaEvent.EVENT_LAST_PURGE -> {
+            LastPurgeEvent(
+                handle = megaEvent.handle,
+                ts = megaEvent.getNumber(KEY_TS),
+                reason = megaEvent.getNumber(KEY_REASON).toInt(),
+                warningTs = KEY_WARNING_TS.takeIf(megaEvent::hasNumber)?.let(megaEvent::getNumber),
+                lastActiveTs = KEY_LAST_ACTIVE_TS.takeIf(megaEvent::hasNumber)
+                    ?.let(megaEvent::getNumber),
+            )
+        }
+
         else -> {
             UnknownEvent(
                 handle = megaEvent.handle,
             )
         }
+    }
+
+    companion object {
+        private const val KEY_TS = "ts"
+        private const val KEY_REASON = "reason"
+        private const val KEY_WARNING_TS = "warningTs"
+        private const val KEY_LAST_ACTIVE_TS = "lastActiveTs"
     }
 }

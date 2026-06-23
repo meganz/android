@@ -74,6 +74,26 @@ data class TransfersResumedEvent(
     val uniqueIds: List<Int>,
 ) : Event
 
+/**
+ * Sub type of [Event] for the last purge event (EVENT_LAST_PURGE).
+ *
+ * Fired when account data was purged by MEGA.
+ *
+ * @property ts the Unix timestamp (seconds) of the purge, to pass back when acknowledging.
+ * @property reason the purge reason code (see PurgeReason in the SDK).
+ * @property warningTs the Unix timestamp (seconds) of the first inactivity warning, or null
+ *                     when not present (only set for the inactive reason).
+ * @property lastActiveTs the Unix timestamp (seconds) of the user's last activity prior to the
+ *                        warning, or null when not present (only set alongside [warningTs]).
+ */
+data class LastPurgeEvent(
+    override val handle: Long,
+    val ts: Long,
+    val reason: Int,
+    val warningTs: Long?,
+    val lastActiveTs: Long?,
+) : Event
+
 data class UnknownEvent(
     override val handle: Long,
 ) : Event

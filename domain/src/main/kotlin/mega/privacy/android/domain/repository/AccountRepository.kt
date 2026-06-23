@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
@@ -822,4 +823,37 @@ interface AccountRepository {
      * @return Flow of Boolean
      */
     fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean>
+
+    /**
+     * Acknowledge the last purge notification so it is not shown again on any device.
+     *
+     * @param ts the Unix timestamp (seconds) of the purge to acknowledge, taken from the
+     *           last purge event.
+     */
+    suspend fun setLastPurgeAcknowledged(ts: Long)
+
+    /**
+     * Monitor the account inactivity status, derived from the last purge event
+     * (EVENT_LAST_PURGE) for the inactive reason.
+     *
+     * @return a [Flow] emitting [AccountInactivity] when an inactive-reason purge event is
+     *         received, or null otherwise.
+     */
+    fun monitorAccountInactivity(): Flow<AccountInactivity?>
+
+    /**
+     * Monitor the purge timestamp whose inactivity banner has been suppressed (dismissed) for the
+     * current session. In-memory, app-scoped state; resets on app restart.
+     *
+     * @return a [Flow] of the suppressed purge timestamp (seconds), or null if none.
+     */
+    fun monitorSuppressedPurgeTimestamp(): Flow<Long?>
+
+    /**
+     * Suppress the inactivity banner for the given purge timestamp for the current session, so it
+     * is not shown again until the next app launch.
+     *
+     * @param ts the purge timestamp (seconds) to suppress.
+     */
+    fun setSuppressedPurgeTimestamp(ts: Long)
 }

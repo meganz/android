@@ -1154,6 +1154,9 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.setUserAttribute(type, value, listener)
 
+    override fun setLastPurgeAcknowledged(ts: Long, listener: MegaRequestListenerInterface) =
+        megaApi.setLastPurgeAcknowledged(ts, listener)
+
     override fun querySignupLink(link: String, listener: MegaRequestListenerInterface) =
         megaApi.querySignupLink(link, listener)
 

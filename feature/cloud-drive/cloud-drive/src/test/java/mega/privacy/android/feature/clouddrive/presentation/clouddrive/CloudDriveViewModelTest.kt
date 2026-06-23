@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -44,6 +45,9 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.clouddrive.FetchNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.account.AcknowledgeLastPurgeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountInactivityUseCase
+import mega.privacy.android.domain.usecase.account.SuppressPurgeTimestampUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -100,6 +104,9 @@ class CloudDriveViewModelTest {
     private val folderNodeId = NodeId(folderNodeHandle)
     private val mockTracker: AnalyticsTracker = mock()
     private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
+    private val monitorAccountInactivityUseCase = mock<MonitorAccountInactivityUseCase>()
+    private val acknowledgeLastPurgeUseCase = mock<AcknowledgeLastPurgeUseCase>()
+    private val suppressPurgeTimestampUseCase = mock<SuppressPurgeTimestampUseCase>()
     private lateinit var testScheduler: TestCoroutineScheduler
 
     @Before
@@ -107,6 +114,7 @@ class CloudDriveViewModelTest {
         testScheduler = TestCoroutineScheduler()
         Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
         Analytics.initialise(mockTracker)
+        whenever(monitorAccountInactivityUseCase()).thenReturn(MutableStateFlow(null))
     }
 
     @After
@@ -132,6 +140,9 @@ class CloudDriveViewModelTest {
             monitorSortCloudOrderUseCase,
             mockTracker,
             containsMediaItemUseCase,
+            monitorAccountInactivityUseCase,
+            acknowledgeLastPurgeUseCase,
+            suppressPurgeTimestampUseCase,
         )
         Analytics.initialise(null)
     }
@@ -167,6 +178,9 @@ class CloudDriveViewModelTest {
             getNodeAccessPermission = getNodeAccessPermission,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
             containsMediaItemUseCase = containsMediaItemUseCase,
+            monitorAccountInactivityUseCase = monitorAccountInactivityUseCase,
+            acknowledgeLastPurgeUseCase = acknowledgeLastPurgeUseCase,
+            suppressPurgeTimestampUseCase = suppressPurgeTimestampUseCase,
             args = args,
         )
     }
@@ -503,6 +517,35 @@ class CloudDriveViewModelTest {
 
         verify(setViewTypeUseCase).invoke(ViewType.GRID)
     }
+
+    @Test
+    fun `test that ui state reflects the account inactivity emitted by the use case`() = runTest {
+        val inactivity = AccountInactivity(inactivityMonths = 2, purgeTimestamp = 123L)
+        whenever(monitorAccountInactivityUseCase())
+            .thenReturn(MutableStateFlow(inactivity))
+        setupTestData(emptyList())
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitDataState()
+            assertThat(state.inactivityMonths).isEqualTo(2)
+            assertThat(state.purgeTimestamp).isEqualTo(123L)
+        }
+    }
+
+    @Test
+    fun `test that InactivityBannerDismissed action suppresses and acknowledges the purge timestamp`() =
+        runTest {
+            val purgeTimestamp = 456L
+            val underTest = createViewModel()
+
+            underTest.processAction(CloudDriveAction.InactivityBannerDismissed(purgeTimestamp))
+            advanceUntilIdle()
+
+            verify(suppressPurgeTimestampUseCase).invoke(purgeTimestamp)
+            verify(acknowledgeLastPurgeUseCase).invoke(purgeTimestamp)
+        }
 
     @Test
     fun `test that monitorViewType updates currentViewType in ui state`() = runTest {

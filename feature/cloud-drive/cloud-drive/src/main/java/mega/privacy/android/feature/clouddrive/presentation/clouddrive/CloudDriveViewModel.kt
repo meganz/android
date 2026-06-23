@@ -38,6 +38,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -49,6 +50,9 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.account.AcknowledgeLastPurgeUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountInactivityUseCase
+import mega.privacy.android.domain.usecase.account.SuppressPurgeTimestampUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -119,6 +123,9 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
+    private val monitorAccountInactivityUseCase: MonitorAccountInactivityUseCase,
+    private val acknowledgeLastPurgeUseCase: AcknowledgeLastPurgeUseCase,
+    private val suppressPurgeTimestampUseCase: SuppressPurgeTimestampUseCase,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -126,7 +133,8 @@ class CloudDriveViewModel @AssistedInject constructor(
         combine(
             stateDataFlow(),
             stateUpdatesFlow(),
-        ) { stateData, stateUpdates ->
+            accountInactivityFlow,
+        ) { stateData, stateUpdates, accountInactivity ->
             CloudDriveUiState.Data(
                 isCloudDriveRoot = args.isRootNode(),
                 nodeSourceType = args.nodeSourceType,
@@ -141,6 +149,8 @@ class CloudDriveViewModel @AssistedInject constructor(
                 navigateBack = stateUpdates.navigateBackEvent,
                 selectedSortOrder = stateUpdates.sortOrder,
                 selectedSortConfiguration = stateUpdates.sortConfiguration,
+                inactivityMonths = accountInactivity?.inactivityMonths,
+                purgeTimestamp = accountInactivity?.purgeTimestamp,
             )
 
         }.asUiStateFlow(
@@ -247,6 +257,9 @@ class CloudDriveViewModel @AssistedInject constructor(
         backNavigationHandledChannel.receiveAsFlow().map { consumed }
     ).stateIn(viewModelScope, SharingStarted.Eagerly, consumed)
 
+    private val accountInactivityFlow: Flow<AccountInactivity?> =
+        monitorAccountInactivityUseCase().catch { Timber.e(it) }
+
     private val monitorSortOrderFlow: SharedFlow<SortOrder> by lazy(LazyThreadSafetyMode.NONE) {
         monitorSortCloudOrderUseCase()
             .filterNotNull()
@@ -350,6 +363,23 @@ class CloudDriveViewModel @AssistedInject constructor(
         when (action) {
             is CloudDriveAction.ChangeViewTypeClicked -> onChangeViewTypeClicked(action.newViewType)
             is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
+            is CloudDriveAction.InactivityBannerDismissed ->
+                onInactivityBannerDismissed(action.purgeTimestamp)
+        }
+    }
+
+    private fun onInactivityBannerDismissed(purgeTimestamp: Long) {
+        // Optimistically hide the banner app-wide for the rest of the session, then acknowledge
+        // on the server. On failure the event simply re-fires on the next session.
+        suppressPurgeTimestampUseCase(purgeTimestamp)
+        viewModelScope.launch {
+            runCatching {
+                acknowledgeLastPurgeUseCase(purgeTimestamp)
+            }.onSuccess {
+                Timber.d("InactiveBanner setLastPurgeAcknowledged success, purgeTs=$purgeTimestamp")
+            }.onFailure {
+                Timber.e(it, "InactiveBanner setLastPurgeAcknowledged failed, purgeTs=$purgeTimestamp")
+            }
         }
     }
 

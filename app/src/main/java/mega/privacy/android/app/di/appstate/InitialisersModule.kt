@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutInit
 import mega.privacy.android.app.sslverification.initialiser.SSLErrorMonitorInitialiser
 import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.logging.Logger
+import mega.privacy.android.domain.usecase.account.MonitorAccountInactivityUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -53,6 +54,15 @@ class InitialisersModule {
     @IntoSet
     fun provideHistoricalProcessExitReasonsUseCaseInitialiser(getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase): AppStartInitialiser =
         AppStartInitialiserAction { getHistoricalProcessExitReasonsUseCase() }
+
+    /**
+     * Starts caching the one-shot last purge event at app start, so it is collected before the
+     * SDK fires EVENT_LAST_PURGE during login / fetch nodes and is available to late subscribers.
+     */
+    @Provides
+    @IntoSet
+    fun provideMonitorAccountInactivityInitialiser(monitorAccountInactivityUseCase: MonitorAccountInactivityUseCase): AppStartInitialiser =
+        AppStartInitialiserAction { monitorAccountInactivityUseCase() }
 
     @Provides
     @IntoSet

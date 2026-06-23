@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.CommitDbEvent
 import mega.privacy.android.domain.entity.DisconnectEvent
 import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.entity.KeyModifiedEvent
+import mega.privacy.android.domain.entity.LastPurgeEvent
 import mega.privacy.android.domain.entity.MediaInfoReadyEvent
 import mega.privacy.android.domain.entity.MiscFlagsReadyEvent
 import mega.privacy.android.domain.entity.NodesCurrentEvent
@@ -88,6 +89,7 @@ class EventMapperTest {
         arrayOf(MegaEvent.EVENT_BUSINESS_STATUS, BusinessStatusEvent::class),
         arrayOf(MegaEvent.EVENT_KEY_MODIFIED, KeyModifiedEvent::class),
         arrayOf(MegaEvent.EVENT_MISC_FLAGS_READY, MiscFlagsReadyEvent::class),
+        arrayOf(MegaEvent.EVENT_LAST_PURGE, LastPurgeEvent::class),
         arrayOf(100, UnknownEvent::class),
     )
 
@@ -128,5 +130,47 @@ class EventMapperTest {
 
 
         assertThat(underTest(megaEvent)).isInstanceOf(TransfersResumedEvent::class.java)
+    }
+
+    @Test
+    fun `test that EVENT_LAST_PURGE maps all fields when warningTs and lastActiveTs are present`() {
+        megaEvent.stub {
+            on { type }.thenReturn(MegaEvent.EVENT_LAST_PURGE)
+            on { handle }.thenReturn(99L)
+            on { getNumber("ts") }.thenReturn(1_700_000_000L)
+            on { getNumber("reason") }.thenReturn(4L)
+            on { hasNumber("warningTs") }.thenReturn(true)
+            on { getNumber("warningTs") }.thenReturn(1_699_000_000L)
+            on { hasNumber("lastActiveTs") }.thenReturn(true)
+            on { getNumber("lastActiveTs") }.thenReturn(1_690_000_000L)
+        }
+
+        val actual = underTest(megaEvent)
+
+        assertThat(actual).isInstanceOf(LastPurgeEvent::class.java)
+        actual as LastPurgeEvent
+        assertThat(actual.handle).isEqualTo(99L)
+        assertThat(actual.ts).isEqualTo(1_700_000_000L)
+        assertThat(actual.reason).isEqualTo(4)
+        assertThat(actual.warningTs).isEqualTo(1_699_000_000L)
+        assertThat(actual.lastActiveTs).isEqualTo(1_690_000_000L)
+    }
+
+    @Test
+    fun `test that EVENT_LAST_PURGE maps warningTs and lastActiveTs to null when absent`() {
+        megaEvent.stub {
+            on { type }.thenReturn(MegaEvent.EVENT_LAST_PURGE)
+            on { getNumber("ts") }.thenReturn(1_700_000_000L)
+            on { getNumber("reason") }.thenReturn(4L)
+            on { hasNumber("warningTs") }.thenReturn(false)
+            on { hasNumber("lastActiveTs") }.thenReturn(false)
+        }
+
+        val actual = underTest(megaEvent)
+
+        assertThat(actual).isInstanceOf(LastPurgeEvent::class.java)
+        actual as LastPurgeEvent
+        assertThat(actual.warningTs).isNull()
+        assertThat(actual.lastActiveTs).isNull()
     }
 }

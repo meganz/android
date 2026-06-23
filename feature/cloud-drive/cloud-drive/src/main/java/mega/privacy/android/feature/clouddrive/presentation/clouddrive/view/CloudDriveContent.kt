@@ -235,10 +235,12 @@ internal fun CloudDriveContent(
                 ),
                 actionButtonText = stringResource(sharedR.string.general_learn_more),
                 onActionButtonClick = {
-                    // Todo: Add action
+                    megaNavigator.launchUrl(context, ACCOUNT_EXPIRY_LEARN_MORE_URI)
                 },
                 onCancelButtonClick = {
-                    // Todo: Close and update
+                    inactivityBannerData.purgeTimestamp?.let { ts ->
+                        onAction(CloudDriveAction.InactivityBannerDismissed(ts))
+                    }
                 },
             )
         }
@@ -476,3 +478,9 @@ internal fun NodeSortOption.trackAnalyticsEvent() {
 
     Analytics.tracker.trackEvent(event)
 }
+
+/**
+ * Help article shown when the user taps "Learn more" on the account inactivity banner.
+ */
+private const val ACCOUNT_EXPIRY_LEARN_MORE_URI =
+    "https://help.mega.io/accounts/create-account/account-expiry"

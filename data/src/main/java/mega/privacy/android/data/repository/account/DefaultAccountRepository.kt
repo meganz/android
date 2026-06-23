@@ -48,11 +48,13 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
+import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.account.AccountInactivityMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
@@ -68,7 +70,9 @@ import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.LastPurgeEvent
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
@@ -180,8 +184,11 @@ internal class DefaultAccountRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     @ExcludeFileName val excludeFileNames: Set<String>,
     private val getDomainNameUseCase: GetDomainNameUseCase,
+    private val eventMapper: EventMapper,
+    private val accountInactivityMapper: AccountInactivityMapper,
 ) : AccountRepository, LogoutTask {
     private val accountDetail = MutableStateFlow(AccountDetail())
+    private val suppressedPurgeTimestamp = MutableStateFlow<Long?>(null)
 
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -903,6 +910,7 @@ internal class DefaultAccountRepository @Inject constructor(
         myAccountInfoFacade.resetAccountInfo()
         onLogoutSuccess()
     }
+
     override suspend fun update2FADialogPreference(show2FA: Boolean) =
         withContext(ioDispatcher) { accountPreferencesGateway.setDisplay2FADialog(show2FA) }
 
@@ -1583,6 +1591,27 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override fun monitorIsUnverifiedBusinessAccount(): Flow<Boolean> {
         return appEventGateway.monitorIsUnverifiedBusinessAccount()
+    }
+
+    override suspend fun setLastPurgeAcknowledged(ts: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("setLastPurgeAcknowledged") { }
+            megaApiGateway.setLastPurgeAcknowledged(ts, listener)
+        }
+    }
+
+    override fun monitorAccountInactivity(): Flow<AccountInactivity?> =
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnEvent>()
+            .mapNotNull { (event) -> event?.let(eventMapper::invoke) }
+            .filterIsInstance<LastPurgeEvent>()
+            .mapNotNull(accountInactivityMapper::invoke)
+
+    override fun monitorSuppressedPurgeTimestamp(): Flow<Long?> =
+        suppressedPurgeTimestamp.asStateFlow()
+
+    override fun setSuppressedPurgeTimestamp(ts: Long) {
+        suppressedPurgeTimestamp.value = ts
     }
 
     companion object {

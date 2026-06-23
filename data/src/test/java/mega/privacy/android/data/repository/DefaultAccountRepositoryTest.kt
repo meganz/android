@@ -32,6 +32,7 @@ import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.account.AccountInactivityMapper
 import mega.privacy.android.data.mapper.account.RecoveryKeyToFileMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
@@ -41,10 +42,13 @@ import mega.privacy.android.data.mapper.contact.UserVisibilityMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsIntMapper
 import mega.privacy.android.data.mapper.settings.CookieSettingsMapper
+import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.LastPurgeEvent
+import mega.privacy.android.domain.entity.account.AccountInactivity
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -81,6 +85,7 @@ import nz.mega.sdk.MegaError.API_EINTERNAL
 import nz.mega.sdk.MegaPricing
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -151,6 +156,8 @@ class DefaultAccountRepositoryTest {
         }
     private val accountDetailMapper = mock<AccountDetailMapper>()
     private val storageStateMapper = mock<StorageStateMapper>()
+    private val eventMapper = mock<EventMapper>()
+    private val accountInactivityMapper = mock<AccountInactivityMapper>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -217,6 +224,7 @@ class DefaultAccountRepositoryTest {
             storageStateMapper,
             uiPreferencesGateway,
             getDomainNameUseCase,
+            accountInactivityMapper,
         )
         whenever(
             accountDetailMapper(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
@@ -263,6 +271,8 @@ class DefaultAccountRepositoryTest {
             uiPreferencesGateway = uiPreferencesGateway,
             excludeFileNames = excludeFileNames,
             getDomainNameUseCase = getDomainNameUseCase,
+            eventMapper = eventMapper,
+            accountInactivityMapper = accountInactivityMapper,
         )
 
     }
@@ -2473,4 +2483,113 @@ class DefaultAccountRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that setLastPurgeAcknowledged succeeds when MegaApi returns API_OK`() = runTest {
+        val ts = 1_700_000_000L
+        val megaError = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        val megaRequest = mock<MegaRequest>()
+        whenever(
+            megaApiGateway.setLastPurgeAcknowledged(ts = eq(ts), listener = any())
+        ).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaRequest,
+                megaError,
+            )
+        }
+
+        underTest.setLastPurgeAcknowledged(ts)
+
+        verify(megaApiGateway).setLastPurgeAcknowledged(ts = eq(ts), listener = any())
+    }
+
+    @Test
+    fun `test that setLastPurgeAcknowledged throws MegaException when MegaApi returns an error`() =
+        runTest {
+            val ts = 1_700_000_000L
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EACCESS)
+            }
+            val megaRequest = mock<MegaRequest>()
+            whenever(
+                megaApiGateway.setLastPurgeAcknowledged(ts = eq(ts), listener = any())
+            ).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.setLastPurgeAcknowledged(ts)
+            }
+        }
+
+    @Test
+    fun `test that monitorSuppressedPurgeTimestamp emits the timestamp set by setSuppressedPurgeTimestamp`() =
+        runTest {
+            val ts = 1_700_000_000L
+
+            underTest.monitorSuppressedPurgeTimestamp().test {
+                assertThat(awaitItem()).isNull()
+
+                underTest.setSuppressedPurgeTimestamp(ts)
+
+                assertThat(awaitItem()).isEqualTo(ts)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitorAccountInactivity emits the account inactivity mapped from a last purge event`() =
+        runTest {
+            val megaEvent = mock<MegaEvent>()
+            val lastPurgeEvent = LastPurgeEvent(
+                handle = 1L,
+                ts = 1_700_000_000L,
+                reason = REASON_INACTIVE,
+                warningTs = null,
+                lastActiveTs = 1_704_067_200L,
+            )
+            val expected = AccountInactivity(inactivityMonths = 3, purgeTimestamp = 1_700_000_000L)
+            whenever(megaApiGateway.globalUpdates)
+                .thenReturn(flowOf(GlobalUpdate.OnEvent(megaEvent)))
+            whenever(eventMapper(megaEvent)).thenReturn(lastPurgeEvent)
+            whenever(accountInactivityMapper(lastPurgeEvent)).thenReturn(expected)
+
+            underTest.monitorAccountInactivity().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that monitorAccountInactivity does not emit when the mapper returns null`() =
+        runTest {
+            val megaEvent = mock<MegaEvent>()
+            val lastPurgeEvent = LastPurgeEvent(
+                handle = 1L,
+                ts = 1_700_000_000L,
+                reason = REASON_NOT_INACTIVE,
+                warningTs = null,
+                lastActiveTs = 0L,
+            )
+            whenever(megaApiGateway.globalUpdates)
+                .thenReturn(flowOf(GlobalUpdate.OnEvent(megaEvent)))
+            whenever(eventMapper(megaEvent)).thenReturn(lastPurgeEvent)
+            whenever(accountInactivityMapper(lastPurgeEvent)).thenReturn(null)
+
+            underTest.monitorAccountInactivity().test {
+                awaitComplete()
+            }
+        }
+
+    private companion object {
+        private const val REASON_INACTIVE = 4
+        private const val REASON_NOT_INACTIVE = 1
+    }
 }

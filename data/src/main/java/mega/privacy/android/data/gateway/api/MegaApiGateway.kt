@@ -2311,6 +2311,18 @@ interface MegaApiGateway {
     fun setUserAttribute(type: Int, value: String, listener: MegaRequestListenerInterface)
 
     /**
+     * Acknowledge the last purge notification so it is not shown again on any device.
+     *
+     * When the user dismisses the purge notification, call this with the timestamp from
+     * EVENT_LAST_PURGE (getNumber("ts")). The value is stored in the
+     * USER_ATTR_LAST_PURGE_ACKNOWLEDGED user attribute.
+     *
+     * @param ts Unix timestamp of the purge to acknowledge (from EVENT_LAST_PURGE).
+     * @param listener MegaRequestListener to track this request.
+     */
+    fun setLastPurgeAcknowledged(ts: Long, listener: MegaRequestListenerInterface)
+
+    /**
      * Set a private attribute of the current user
      *
      * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER

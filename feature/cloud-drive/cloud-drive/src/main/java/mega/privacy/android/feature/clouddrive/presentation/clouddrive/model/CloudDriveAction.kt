@@ -19,4 +19,10 @@ sealed interface CloudDriveAction {
      */
     data object NavigateBackEventConsumed : CloudDriveAction
 
+    /**
+     * Inactivity banner dismissed action. Acknowledges the purge so it is not shown again.
+     * @property purgeTimestamp the Unix timestamp (seconds) of the purge to acknowledge.
+     */
+    data class InactivityBannerDismissed(val purgeTimestamp: Long) : CloudDriveAction
+
 }
