@@ -29,18 +29,10 @@ class MyAccountInfo @Inject constructor(
         const val HAS_SESSIONS_DETAILS = 0x020
     }
 
-    var usedPercentage = INVALID_VALUE
     var usedStorage = INVALID_VALUE.toLong()
     var accountType = INVALID_VALUE
     var usedFormatted = ""
-    var totalFormatted = ""
     var formattedUsedRubbish = ""
-
-    var isBusinessAlertShown = false
-    private var wasBusinessAlertAlreadyShown = false
-
-    var lastSessionFormattedDate: String? = null
-    var createSessionTimeStamp = INVALID_VALUE.toLong()
 
     /**
      * Resets all values by default.
@@ -48,18 +40,10 @@ class MyAccountInfo @Inject constructor(
      * and call it each time the account logs out.
      */
     fun resetDefaults() {
-        usedPercentage = INVALID_VALUE
         usedStorage = INVALID_VALUE.toLong()
         accountType = INVALID_VALUE
         usedFormatted = ""
-        totalFormatted = ""
         formattedUsedRubbish = ""
-
-        isBusinessAlertShown = false
-        wasBusinessAlertAlreadyShown = false
-
-        lastSessionFormattedDate = null
-        createSessionTimeStamp = INVALID_VALUE.toLong()
     }
 
     fun setAccountDetails(accountInfo: MegaAccountDetails, numDetails: Int, context: Context) {
@@ -73,22 +57,14 @@ class MyAccountInfo @Inject constructor(
         val pro = numDetails and HAS_PRO_DETAILS != 0
 
         if (storage) {
-            val totalStorage = accountInfo.storageMax
-
             if (megaApi.rubbishNode != null) {
                 val usedRubbish =
                     accountInfo.getStorageUsed(megaApi.rubbishNode?.handle ?: INVALID_HANDLE)
                 formattedUsedRubbish = getSizeString(usedRubbish, context)
             }
 
-            totalFormatted = getSizeString(totalStorage, context)
             usedStorage = accountInfo.storageUsed
             usedFormatted = getSizeString(usedStorage, context)
-            usedPercentage = 0
-
-            if (totalStorage != 0L) {
-                usedPercentage = (100 * usedStorage / totalStorage).toInt()
-            }
         }
 
         if (pro) {
@@ -97,6 +73,4 @@ class MyAccountInfo @Inject constructor(
 
         Timber.d("pro level: ${accountInfo.proLevel}")
     }
-
-    fun wasNotBusinessAlertShownYet(): Boolean = !wasBusinessAlertAlreadyShown
 }

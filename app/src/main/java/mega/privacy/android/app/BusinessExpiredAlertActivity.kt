@@ -10,7 +10,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.presentation.business.BusinessExpiredAlertScreen
 import mega.privacy.android.app.presentation.business.BusinessExpiredAlertViewModel
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
@@ -27,9 +26,6 @@ class BusinessExpiredAlertActivity : FragmentActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
-
-    @Inject
-    lateinit var myAccountInfo: MyAccountInfo
 
     private val viewModel: BusinessExpiredAlertViewModel by viewModels()
 
@@ -58,10 +54,5 @@ class BusinessExpiredAlertActivity : FragmentActivity() {
                 }
             }
         }
-    }
-
-    override fun onDestroy() {
-        myAccountInfo.isBusinessAlertShown = false
-        super.onDestroy()
     }
 }

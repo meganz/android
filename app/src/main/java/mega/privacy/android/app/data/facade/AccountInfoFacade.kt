@@ -4,7 +4,6 @@ import android.content.Context
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -40,18 +39,9 @@ class AccountInfoFacade @Inject constructor(
         val sessions =
             request.numDetails and MyAccountInfo.HAS_SESSIONS_DETAILS != 0
         if (sessions) {
-            val megaAccountSession = megaAccountDetails.getSession(0) ?: return
+            megaAccountDetails.getSession(0) ?: return
             Timber.d("getMegaAccountSESSION not Null")
             db.get().setExtendedAccountDetailsTimestamp()
-            val mostRecentSession: Long = megaAccountSession.mostRecentUsage
-            val date: String = TimeUtils.formatDateAndTime(
-                context,
-                mostRecentSession,
-                TimeUtils.DATE_LONG_FORMAT
-            )
-            myAccountInfo.lastSessionFormattedDate = date
-            myAccountInfo.createSessionTimeStamp = megaAccountSession.creationTimestamp
-            Timber.d("onRequest TYPE_ACCOUNT_DETAILS: %s", myAccountInfo.usedPercentage)
         }
     }
 
