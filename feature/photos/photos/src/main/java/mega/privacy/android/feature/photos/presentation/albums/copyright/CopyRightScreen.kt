@@ -27,6 +27,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.shared.resources.R as sharedR
@@ -61,6 +62,7 @@ fun CopyRightScreen(
             MegaIcon(
                 painter = painterResource(R.drawable.ic_copyright),
                 contentDescription = null,
+                tint = IconColor.Primary,
                 modifier = Modifier.size(120.dp),
             )
 
