@@ -19,10 +19,12 @@ import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore.Companion.REQUEST_PHONE_NUMBER_FILE
 import mega.privacy.android.data.preferences.base.createEncrypted
 import mega.privacy.android.data.preferences.cameraUploadsSettingsPreferenceDataStoreName
+import mega.privacy.android.data.preferences.chatSettingsPreferenceDataStoreName
 import mega.privacy.android.data.preferences.continueWhereLeftOffSortPreferenceFileName
 import mega.privacy.android.data.preferences.credentialDataStoreName
 import mega.privacy.android.data.preferences.mediaTimelinePreferenceFileName
 import mega.privacy.android.data.preferences.migration.CameraUploadsSettingsPreferenceDataStoreMigration
+import mega.privacy.android.data.preferences.migration.ChatSettingsPreferenceDataStoreMigration
 import mega.privacy.android.data.preferences.migration.CredentialsPreferencesMigration
 import mega.privacy.android.data.preferences.qaAccountCacheDataStoreName
 import mega.privacy.android.data.preferences.security.PasscodeDatastoreV1ToV2Migration
@@ -106,6 +108,29 @@ internal object DataStoreModule {
             produceFile = {
                 context.preferencesDataStoreFile(
                     cameraUploadsSettingsPreferenceDataStoreName
+                )
+            }
+        )
+
+    @Singleton
+    @Provides
+    @Named(chatSettingsPreferenceDataStoreName)
+    fun provideChatSettingsPreferenceDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        migration: ChatSettingsPreferenceDataStoreMigration,
+    ): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }
+            ),
+            migrations = listOf(
+                migration
+            ),
+            scope = CoroutineScope(ioDispatcher),
+            produceFile = {
+                context.preferencesDataStoreFile(
+                    chatSettingsPreferenceDataStoreName
                 )
             }
         )

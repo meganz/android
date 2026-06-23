@@ -74,6 +74,7 @@ import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
@@ -91,6 +92,7 @@ import mega.privacy.android.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
 import mega.privacy.android.data.preferences.ChatPreferencesDataStore
+import mega.privacy.android.data.preferences.ChatSettingsPreferenceDataStore
 import mega.privacy.android.data.preferences.CredentialsPreferencesDataStore
 import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
 import mega.privacy.android.data.preferences.InAppUpdatePreferencesDatastore
@@ -292,6 +294,10 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindCameraUploadsSettingsPreferenceGateway(implementation: CameraUploadsSettingsPreferenceDataStore): CameraUploadsSettingsPreferenceGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindChatSettingsPreferenceGateway(implementation: ChatSettingsPreferenceDataStore): ChatSettingsPreferenceGateway
 
     @Binds
     @Singleton
