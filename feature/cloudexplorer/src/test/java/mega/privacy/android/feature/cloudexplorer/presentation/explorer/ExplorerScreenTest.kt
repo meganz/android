@@ -3,6 +3,7 @@ package mega.privacy.android.feature.cloudexplorer.presentation.explorer
 import android.content.Context
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -131,11 +132,34 @@ internal class ExplorerScreenTest {
         composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_copy)).assertIsNotEnabled()
     }
 
+    @Test
+    fun `test that the action button is disabled when picker restrictions disallow picking`() {
+        setContent(
+            nodeExplorerId = CURRENT_FOLDER_ID,
+            pickerRestrictions = ExplorerPickerRestrictions(isPickEnabled = false),
+        )
+
+        composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_copy))
+            .assertIsNotEnabled()
+    }
+
+    @Test
+    fun `test that the action button is enabled when picker restrictions allow picking`() {
+        setContent(
+            nodeExplorerId = CURRENT_FOLDER_ID,
+            disabledTargetId = CURRENT_FOLDER_ID,
+            pickerRestrictions = ExplorerPickerRestrictions(isPickEnabled = true),
+        )
+
+        composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_copy)).assertIsEnabled()
+    }
+
     private fun setContent(
         uiState: NodeExplorerUiState = dataState(),
         nodeExplorerId: NodeId = NodeId(-1),
         isProcessingAction: Boolean = false,
         disabledTargetId: NodeId? = null,
+        pickerRestrictions: ExplorerPickerRestrictions? = null,
         onFolderPicked: (NodeId) -> Unit = {},
         onCloseExplorerScreen: () -> Unit = {},
     ) {
@@ -161,6 +185,7 @@ internal class ExplorerScreenTest {
                         onNavigate = {},
                         isProcessingAction = isProcessingAction,
                         disabledTargetId = disabledTargetId,
+                        pickerRestrictions = pickerRestrictions,
                         onFolderPicked = onFolderPicked,
                     )
                 }

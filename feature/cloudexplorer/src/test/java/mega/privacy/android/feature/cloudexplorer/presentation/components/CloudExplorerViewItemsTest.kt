@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import org.junit.Rule
 import org.junit.Test
@@ -53,15 +54,50 @@ internal class CloudExplorerViewItemsTest {
         assertThat(clicked).isTrue()
     }
 
+    @Test
+    fun `test that clicking a restricted list item still invokes the callback`() {
+        var clicked = false
+        setContent {
+            ExplorerNodeListItemUnderTest(
+                restrictedNodeIds = setOf(NodeId(1L)),
+                onItemClicked = { clicked = true },
+            )
+        }
+
+        composeTestRule.onNodeWithText(FOLDER_NAME).performClick()
+
+        assertThat(clicked).isTrue()
+    }
+
+    @Test
+    fun `test that clicking an already added list item does not invoke the callback`() {
+        var clicked = false
+        setContent {
+            ExplorerNodeListItemUnderTest(
+                disabledNodeIds = setOf(NodeId(1L)),
+                onItemClicked = { clicked = true },
+            )
+        }
+
+        composeTestRule.onNodeWithText(FOLDER_NAME).performClick()
+
+        assertThat(clicked).isFalse()
+    }
+
     @Composable
-    private fun ExplorerNodeListItemUnderTest(onItemClicked: () -> Unit) {
+    private fun ExplorerNodeListItemUnderTest(
+        disabledNodeIds: Set<NodeId> = emptySet(),
+        restrictedNodeIds: Set<NodeId> = emptySet(),
+        onItemClicked: () -> Unit,
+    ) {
         ExplorerNodeListItem(
             item = previewFolderNodeUiItem(1L, name = FOLDER_NAME),
             isSelected = false,
             isSelectionModeEnabled = false,
             isHiddenNodesEnabled = false,
             videosOnly = false,
-            disabledNodeIds = emptySet(),
+            disabledNodeIds = disabledNodeIds,
+            restrictedNodeIds = restrictedNodeIds,
             onItemClicked = onItemClicked,
         )
     }

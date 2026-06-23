@@ -88,6 +88,7 @@ internal fun ExplorerScreen(
     tabIndex: Int = CLOUD_TAB_INDEX,
     disabledTargetId: NodeId? = null,
     disabledNodeIds: Set<NodeId> = emptySet(),
+    pickerRestrictions: ExplorerPickerRestrictions? = null,
     onFolderPicked: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
     onChatsSelected: () -> Unit = {},
@@ -282,7 +283,8 @@ internal fun ExplorerScreen(
                     },
                     primaryButtonEnabled = when {
                         !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
-                        selectedTabIndex == CLOUD_TAB_INDEX -> nodeExplorerId != disabledTargetId
+                        selectedTabIndex == CLOUD_TAB_INDEX -> pickerRestrictions?.isPickEnabled
+                            ?: (nodeExplorerId != disabledTargetId)
                         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
                         else -> false
                     },
@@ -327,6 +329,10 @@ internal fun ExplorerScreen(
                     onConnectivityChanged = { isConnected = it },
                     onLoadingChanged = { tabLoading[CLOUD_TAB_INDEX] = it },
                     onNoConnection = showNoConnectionSnackbar,
+                    restrictedNodeIds = pickerRestrictions?.restrictedNodeIds.orEmpty(),
+                    onRestrictedNodeClick = {
+                        pickerRestrictions?.onRestrictedNodeClick?.invoke(it)
+                    },
                 )
                 if (!isInnerNavigation && explorerMode.isIncomingAvailable) {
                     IncomingExplorerTab(

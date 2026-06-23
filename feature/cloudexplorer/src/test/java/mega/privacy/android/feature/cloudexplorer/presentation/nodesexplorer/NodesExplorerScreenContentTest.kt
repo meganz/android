@@ -5,10 +5,12 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
@@ -118,11 +120,33 @@ internal class NodesExplorerScreenContentTest {
         assertThat(consumed).isTrue()
     }
 
+    @Test
+    fun `test that clicking a restricted folder invokes the restricted callback instead of navigating`() {
+        var clickedFolderId: NodeId? = null
+        var restrictedNodeId: NodeId? = null
+        setContent(
+            uiState = nodeExplorerDataState(
+                items = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME)),
+            ),
+            restrictedNodeIds = setOf(NodeId(1L)),
+            onFolderClick = { clickedFolderId = it },
+            onRestrictedNodeClick = { restrictedNodeId = it },
+        )
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        assertThat(restrictedNodeId).isEqualTo(NodeId(1L))
+        assertThat(clickedFolderId).isNull()
+    }
+
     private fun setContent(
         uiState: NodeExplorerUiState,
         viewType: ViewType = ViewType.LIST,
         onNavigateBack: () -> Unit = {},
         consumeNavigateBack: () -> Unit = {},
+        onFolderClick: (NodeId) -> Unit = {},
+        restrictedNodeIds: Set<NodeId> = emptySet(),
+        onRestrictedNodeClick: (NodeId) -> Unit = {},
     ) {
         composeTestRule.setContent {
             AndroidThemeForPreviews {
@@ -136,8 +160,10 @@ internal class NodesExplorerScreenContentTest {
                         uiState = uiState,
                         onNavigateBack = onNavigateBack,
                         consumeNavigateBack = consumeNavigateBack,
-                        onFolderClick = {},
+                        onFolderClick = onFolderClick,
                         onRefreshNodes = {},
+                        restrictedNodeIds = restrictedNodeIds,
+                        onRestrictedNodeClick = onRestrictedNodeClick,
                     )
                 }
             }

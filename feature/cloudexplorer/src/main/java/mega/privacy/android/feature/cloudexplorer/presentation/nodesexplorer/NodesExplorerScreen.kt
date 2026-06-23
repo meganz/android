@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.ExplorerNodeGridItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.ExplorerNodeListItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.explorerNodeClick
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerPickerRestrictions
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.rememberVisibleItems
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
@@ -75,6 +76,7 @@ internal fun NodesExplorerScreen(
     onFilesPicked: (List<NodeId>) -> Unit = {},
     disabledTargetId: NodeId? = null,
     disabledNodeIds: Set<NodeId> = emptySet(),
+    pickerRestrictions: ExplorerPickerRestrictions? = null,
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
 ) {
@@ -115,6 +117,7 @@ internal fun NodesExplorerScreen(
         shareUris = shareUris,
         disabledTargetId = disabledTargetId,
         disabledNodeIds = disabledNodeIds,
+        pickerRestrictions = pickerRestrictions,
         onCloseExplorerScreen = onCancelExplorerScreen,
         isProcessingAction = isProcessingAction,
         onFolderPicked = { nodeId ->
@@ -150,6 +153,11 @@ internal fun NodesExplorerScreen(
                         || explorerMode == ExplorerMode.AlbumImport -> {
                     onSelectFolder(nodeId)
                     onCloseExplorerScreen()
+                }
+
+                explorerMode == ExplorerMode.SelectSyncFolder
+                        || explorerMode == ExplorerMode.SelectStopBackupDestination -> {
+                    onSelectFolder(nodeId)
                 }
 
                 else -> {}
@@ -194,6 +202,8 @@ internal fun NodesExplorerScreenContent(
     isSelectionModeEnabled: Boolean = false,
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
+    restrictedNodeIds: Set<NodeId> = emptySet(),
+    onRestrictedNodeClick: (NodeId) -> Unit = {},
     emptyView: @Composable () -> Unit = {
         if (uiState is NodeExplorerUiState.Data && !uiState.isRoot) EmptyFolder() else EmptyRoot()
     },
@@ -212,6 +222,8 @@ internal fun NodesExplorerScreenContent(
                 videosOnly = videosOnly,
                 isSelectionModeEnabled = isSelectionModeEnabled,
                 onFolderClick = onFolderClick,
+                restrictedNodeIds = restrictedNodeIds,
+                onRestrictedNodeClick = onRestrictedNodeClick,
             )
 
             EventEffect(
@@ -232,6 +244,7 @@ internal fun NodesExplorerScreenContent(
                         isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                         videosOnly = videosOnly,
                         disabledNodeIds = disabledNodeIds,
+                        restrictedNodeIds = restrictedNodeIds,
                         showLink = it.showLink,
                         onItemClicked = { onItemClicked(it) },
                     )
@@ -244,6 +257,7 @@ internal fun NodesExplorerScreenContent(
                         isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                         videosOnly = videosOnly,
                         disabledNodeIds = disabledNodeIds,
+                        restrictedNodeIds = restrictedNodeIds,
                         showLink = it.showLink,
                         onItemClicked = { onItemClicked(it) },
                     )

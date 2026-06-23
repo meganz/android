@@ -30,6 +30,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.shares.hasFullAccessPermission
 import mega.privacy.android.domain.entity.shares.hasWritePermission
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
@@ -61,6 +62,7 @@ internal fun IncomingSharesExplorerContent(
     onFolderClick: (NodeId) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
+    requiresFullAccessShares: Boolean = false,
     emptyView: @Composable () -> Unit = { EmptyFolder() },
 ) {
     val snackbarHostState = LocalSnackBarHostState.current
@@ -79,9 +81,19 @@ internal fun IncomingSharesExplorerContent(
             val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
                 when {
                     item.isFolderNode -> {
-                        if ((item.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() == false) {
+                        if ((item.node as? ShareFolderNode)?.shareData?.access
+                                ?.satisfies(requiresFullAccessShares) == false
+                        ) {
                             coroutineScope.launch {
-                                snackbarHostState?.showSnackbar(resources.getString(sharedR.string.general_read_only_folder_warning))
+                                snackbarHostState?.showSnackbar(
+                                    resources.getString(
+                                        if (requiresFullAccessShares) {
+                                            sharedR.string.general_sync_share_non_full_access
+                                        } else {
+                                            sharedR.string.general_read_only_folder_warning
+                                        }
+                                    )
+                                )
                             }
                         } else {
                             onFolderClick(item.id)
@@ -115,7 +127,8 @@ internal fun IncomingSharesExplorerContent(
                         showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                         isHighlighted = it.isHighlighted,
                         onItemClicked = { onItemClicked(it) },
-                        enabled = (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() != false,
+                        enabled = (it.node as? ShareFolderNode)?.shareData?.access
+                            ?.satisfies(requiresFullAccessShares) != false,
                         enableClick = true,
                     )
                 },
@@ -133,7 +146,8 @@ internal fun IncomingSharesExplorerContent(
                         showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                         isHighlighted = it.isHighlighted,
                         label = it.nodeLabel,
-                        enabled = (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() != false,
+                        enabled = (it.node as? ShareFolderNode)?.shareData?.access
+                            ?.satisfies(requiresFullAccessShares) != false,
                     )
                 },
                 onRefreshNodes = onRefreshNodes,
@@ -142,6 +156,9 @@ internal fun IncomingSharesExplorerContent(
         }
     }
 }
+
+private fun AccessPermission.satisfies(requiresFullAccess: Boolean) =
+    if (requiresFullAccess) hasFullAccessPermission() else hasWritePermission()
 
 @Composable
 private fun EmptyFolder() {
@@ -210,6 +227,7 @@ internal fun TabsScope.IncomingExplorerTab(
         } else {
             IncomingSharesExplorerContent(
                 uiState = uiState,
+                requiresFullAccessShares = explorerMode.requiresFullAccessShares,
                 onNavigateBack = { protectedUserTap { onNavigateBack() } },
                 consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
                 onFolderClick = navigateToFolder(

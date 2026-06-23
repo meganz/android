@@ -50,6 +50,8 @@ internal fun TabsScope.CloudExplorerTab(
     onConnectivityChanged: (Boolean) -> Unit,
     onLoadingChanged: (Boolean) -> Unit,
     onNoConnection: () -> Unit,
+    restrictedNodeIds: Set<NodeId> = emptySet(),
+    onRestrictedNodeClick: (NodeId) -> Unit = {},
 ) {
     val viewModel =
         hiltViewModel<NodesExplorerViewModel, NodesExplorerViewModel.Factory> { factory ->
@@ -121,6 +123,8 @@ internal fun TabsScope.CloudExplorerTab(
                 isSelectionModeEnabled = isFileSelectionEnabled,
                 disabledNodeIds = disabledNodeIds,
                 videosOnly = videosOnly,
+                restrictedNodeIds = restrictedNodeIds,
+                onRestrictedNodeClick = onRestrictedNodeClick,
                 modifier = modifier,
             )
         }

@@ -79,6 +79,69 @@ internal class ExplorerNodeClickTest {
         assertThat(selectionState.selectedNodeIds).isEmpty()
     }
 
+    @Test
+    fun `test that clicking a restricted folder invokes the restricted callback and does not navigate`() {
+        var clickedFolder: NodeId? = null
+        var restrictedNode: NodeId? = null
+        val selectionState = NodeSelectionState(initialSelectedIds = setOf(NodeId(99L)))
+        val click = explorerNodeClick(
+            selectionState = selectionState,
+            disabledNodeIds = emptySet(),
+            videosOnly = false,
+            isSelectionModeEnabled = true,
+            onFolderClick = { clickedFolder = it },
+            restrictedNodeIds = setOf(FOLDER_ID),
+            onRestrictedNodeClick = { restrictedNode = it },
+        )
+
+        click(previewFolderNodeUiItem(FOLDER_ID.longValue))
+
+        assertThat(restrictedNode).isEqualTo(FOLDER_ID)
+        assertThat(clickedFolder).isNull()
+        assertThat(selectionState.selectedNodeIds).containsExactly(NodeId(99L))
+    }
+
+    @Test
+    fun `test that clicking a restricted file invokes the restricted callback instead of toggling selection`() {
+        var restrictedNode: NodeId? = null
+        val selectionState = NodeSelectionState()
+        val click = explorerNodeClick(
+            selectionState = selectionState,
+            disabledNodeIds = emptySet(),
+            videosOnly = false,
+            isSelectionModeEnabled = true,
+            onFolderClick = {},
+            restrictedNodeIds = setOf(FILE_ID),
+            onRestrictedNodeClick = { restrictedNode = it },
+        )
+
+        click(previewFileNodeUiItem(FILE_ID.longValue))
+
+        assertThat(restrictedNode).isEqualTo(FILE_ID)
+        assertThat(selectionState.selectedNodeIds).isEmpty()
+    }
+
+    @Test
+    fun `test that clicking a node that is both disabled and restricted does nothing`() {
+        var clickedFolder: NodeId? = null
+        var restrictedNode: NodeId? = null
+        val selectionState = NodeSelectionState()
+        val click = explorerNodeClick(
+            selectionState = selectionState,
+            disabledNodeIds = setOf(FOLDER_ID),
+            videosOnly = false,
+            isSelectionModeEnabled = true,
+            onFolderClick = { clickedFolder = it },
+            restrictedNodeIds = setOf(FOLDER_ID),
+            onRestrictedNodeClick = { restrictedNode = it },
+        )
+
+        click(previewFolderNodeUiItem(FOLDER_ID.longValue))
+
+        assertThat(clickedFolder).isNull()
+        assertThat(restrictedNode).isNull()
+    }
+
     private companion object {
         val FOLDER_ID = NodeId(1L)
         val FILE_ID = NodeId(10L)

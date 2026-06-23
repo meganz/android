@@ -138,10 +138,12 @@ internal fun ExplorerNodeListItem(
     disabledNodeIds: Set<NodeId>,
     onItemClicked: () -> Unit,
     showLink: Boolean = false,
+    restrictedNodeIds: Set<NodeId> = emptySet(),
 ) {
     val isAlreadyAdded = item.id in disabledNodeIds
     val isUnsupportedFile = videosOnly && !item.isFolderNode && !item.isVideoNode
-    val isDisabled = isAlreadyAdded || isUnsupportedFile
+    val isRestricted = item.id in restrictedNodeIds
+    val isDisabled = isAlreadyAdded || isUnsupportedFile || isRestricted
     CloudExplorerListViewItem(
         title = item.title.text,
         subtitle = item.subtitle.text(),
@@ -160,6 +162,7 @@ internal fun ExplorerNodeListItem(
         isHighlighted = item.isHighlighted,
         onItemClicked = onItemClicked,
         enabled = (item.isFolderNode || isSelectionModeEnabled) && !isDisabled,
+        enableClick = ((item.isFolderNode || isSelectionModeEnabled) && !isDisabled) || isRestricted,
     )
 }
 
@@ -176,10 +179,12 @@ internal fun ExplorerNodeGridItem(
     disabledNodeIds: Set<NodeId>,
     onItemClicked: () -> Unit,
     showLink: Boolean = false,
+    restrictedNodeIds: Set<NodeId> = emptySet(),
 ) {
     val isAlreadyAdded = item.id in disabledNodeIds
     val isUnsupportedFile = videosOnly && !item.isFolderNode && !item.isVideoNode
-    val isDisabled = isAlreadyAdded || isUnsupportedFile
+    val isRestricted = item.id in restrictedNodeIds
+    val isDisabled = isAlreadyAdded || isUnsupportedFile || isRestricted
     CloudExplorerGridViewItem(
         name = item.title.text,
         iconRes = item.iconRes,
@@ -211,9 +216,13 @@ internal fun explorerNodeClick(
     videosOnly: Boolean,
     isSelectionModeEnabled: Boolean,
     onFolderClick: (NodeId) -> Unit,
+    restrictedNodeIds: Set<NodeId> = emptySet(),
+    onRestrictedNodeClick: (NodeId) -> Unit = {},
 ): (NodeViewItem<TypedNode>) -> Unit = { item ->
     when {
         item.id in disabledNodeIds -> Unit
+
+        item.id in restrictedNodeIds -> onRestrictedNodeClick(item.id)
 
         item.isFolderNode -> {
             onFolderClick(item.id)

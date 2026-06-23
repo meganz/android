@@ -115,11 +115,58 @@ internal class IncomingSharesExplorerContentTest {
         assertThat(consumed).isTrue()
     }
 
+    @Test
+    fun `test that clicking a read write folder does not navigate when full access is required`() {
+        var clickedFolderId: NodeId? = null
+        setContent(
+            uiState = nodeExplorerDataState(
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                items = listOf(
+                    previewIncomingShareFolderNodeUiItem(
+                        id = 1L,
+                        name = FOLDER_NAME,
+                        access = AccessPermission.READWRITE,
+                    ),
+                ),
+            ),
+            requiresFullAccessShares = true,
+            onFolderClick = { clickedFolderId = it },
+        )
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        assertThat(clickedFolderId).isNull()
+    }
+
+    @Test
+    fun `test that clicking a full access folder navigates when full access is required`() {
+        var clickedFolderId: NodeId? = null
+        setContent(
+            uiState = nodeExplorerDataState(
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                items = listOf(
+                    previewIncomingShareFolderNodeUiItem(
+                        id = 1L,
+                        name = FOLDER_NAME,
+                        access = AccessPermission.FULL,
+                    ),
+                ),
+            ),
+            requiresFullAccessShares = true,
+            onFolderClick = { clickedFolderId = it },
+        )
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        assertThat(clickedFolderId).isEqualTo(NodeId(1L))
+    }
+
     private fun setContent(
         uiState: NodeExplorerUiState,
         onFolderClick: (NodeId) -> Unit = {},
         onNavigateBack: () -> Unit = {},
         consumeNavigateBack: () -> Unit = {},
+        requiresFullAccessShares: Boolean = false,
     ) {
         composeTestRule.setContent {
             AndroidThemeForPreviews {
@@ -135,6 +182,7 @@ internal class IncomingSharesExplorerContentTest {
                         consumeNavigateBack = consumeNavigateBack,
                         onFolderClick = onFolderClick,
                         onRefreshNodes = {},
+                        requiresFullAccessShares = requiresFullAccessShares,
                     )
                 }
             }
