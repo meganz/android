@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -20,7 +20,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +37,6 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
@@ -107,11 +109,8 @@ internal fun ExplorerScreen(
         showSearch = false
     }
     val protectedUserTap: (() -> Unit) -> Unit = { action -> if (!isProcessingAction) action() }
-    var folderName by remember { mutableStateOf<LocalizedText>(LocalizedText.Literal("")) }
-    var isConnected by remember { mutableStateOf(true) }
-    val tabHasContent = remember { mutableStateMapOf<Int, Boolean>() }
-    val tabLoading = remember { mutableStateMapOf<Int, Boolean>() }
-    val selectedTabLoading = tabLoading[selectedTabIndex] == true
+    val viewModel = hiltViewModel<ExplorerViewModel>()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
     val resources = LocalResources.current
@@ -123,11 +122,10 @@ internal fun ExplorerScreen(
         }
     }
     val onConnectedNavigate: (NavKey) -> Unit = { navKey ->
-        if (isConnected) onNavigate(navKey) else showNoConnectionSnackbar()
+        if (uiState.isConnected) onNavigate(navKey) else showNoConnectionSnackbar()
     }
     val chatExplorerSelectionState = rememberChatExplorerSelectionState()
     val nodeSelectionState = rememberNodeSelectionState()
-    val currentListHasContent = tabHasContent[selectedTabIndex] == true
     val hasSelection = when {
         !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
@@ -139,6 +137,13 @@ internal fun ExplorerScreen(
             Analytics.tracker.trackEvent(CloudExplorerScreenEvent)
         }
     }
+
+    LaunchedEffect(selectedTabIndex) { viewModel.onTabSelected(selectedTabIndex) }
+
+    EventEffect(
+        event = uiState.noConnectionEvent,
+        onConsumed = viewModel::onNoConnectionEventConsumed,
+    ) { showNoConnectionSnackbar() }
 
     BackHandler(enabled = showSearch) { onCloseSearch() }
 
@@ -173,7 +178,7 @@ internal fun ExplorerScreen(
                         isInnerNavigation ->
                             stringResource(
                                 sharedR.string.search_placeholder_folder,
-                                folderName.text
+                                uiState.folderName.text
                             )
 
                         selectedTabIndex == INCOMING_TAB_INDEX ->
@@ -203,9 +208,9 @@ internal fun ExplorerScreen(
                         }
                     },
                     title = when {
-                        selectedTabLoading -> stringResource(explorerMode.titleStringId)
+                        uiState.isLoading -> stringResource(explorerMode.titleStringId)
                         chatExplorerSelectionState.selectedItemsCount > 0 -> chatExplorerSelectionState.selectedItemsCount.toString()
-                        isInnerNavigation -> folderName.text
+                        isInnerNavigation -> uiState.folderName.text
                         else -> stringResource(explorerMode.titleStringId)
                     },
                     actions = buildList {
@@ -213,7 +218,7 @@ internal fun ExplorerScreen(
                             add(
                                 MenuActionWithClick(NewFolderMenuAction) {
                                     if (!isProcessingAction) {
-                                        if (isConnected) {
+                                        if (uiState.isConnected) {
                                             onNavigate(
                                                 NewFolderDialogNavKey(
                                                     parentNodeId = nodeExplorerId
@@ -226,11 +231,11 @@ internal fun ExplorerScreen(
                                 }
                             )
                         }
-                        if (currentListHasContent) {
+                        if (uiState.hasContent) {
                             add(
                                 MenuActionWithClick(CommonMenuAction.Search) {
                                     if (!isProcessingAction) {
-                                        if (isConnected) {
+                                        if (uiState.isConnected) {
                                             Analytics.tracker.trackEvent(
                                                 CloudExplorerSearchButtonPressedEvent
                                             )
@@ -247,13 +252,13 @@ internal fun ExplorerScreen(
             }
         },
         bottomBar = {
-            if (!selectedTabLoading && !isProcessingAction && (!showSearch || hasSelection)) {
+            if (!uiState.isLoading && !isProcessingAction && (!showSearch || hasSelection)) {
                 InlineAnchoredButtonGroup(
                     modifier = Modifier.testTag(ACTION_BUTTONS_VIEW_TAG),
                     primaryButtonText = stringResource(explorerMode.actionStringId),
                     onPrimaryButtonClick = {
                         protectedUserTap {
-                            if (!isConnected) {
+                            if (!viewModel.uiState.value.isConnected) {
                                 showNoConnectionSnackbar()
                                 return@protectedUserTap
                             }
@@ -285,6 +290,7 @@ internal fun ExplorerScreen(
                         !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
                         selectedTabIndex == CLOUD_TAB_INDEX -> pickerRestrictions?.isPickEnabled
                             ?: (nodeExplorerId != disabledTargetId)
+
                         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
                         else -> false
                     },
@@ -324,11 +330,6 @@ internal fun ExplorerScreen(
                     isFileSelectionEnabled = !explorerMode.isFolderPicker,
                     disabledNodeIds = disabledNodeIds,
                     videosOnly = explorerMode.isVideoPicker,
-                    onHasContentChanged = { tabHasContent[CLOUD_TAB_INDEX] = it },
-                    onFolderNameChanged = { folderName = it },
-                    onConnectivityChanged = { isConnected = it },
-                    onLoadingChanged = { tabLoading[CLOUD_TAB_INDEX] = it },
-                    onNoConnection = showNoConnectionSnackbar,
                     restrictedNodeIds = pickerRestrictions?.restrictedNodeIds.orEmpty(),
                     onRestrictedNodeClick = {
                         pickerRestrictions?.onRestrictedNodeClick?.invoke(it)
@@ -346,9 +347,6 @@ internal fun ExplorerScreen(
                         protectedUserTap = protectedUserTap,
                         onNavigate = onConnectedNavigate,
                         onNavigateBack = onNavigateBack,
-                        onHasContentChanged = { tabHasContent[INCOMING_TAB_INDEX] = it },
-                        onLoadingChanged = { tabLoading[INCOMING_TAB_INDEX] = it },
-                        onConnectivityChanged = { isConnected = it },
                     )
                 }
                 if (!isInnerNavigation) {
@@ -367,9 +365,6 @@ internal fun ExplorerScreen(
                         isSelectionModeEnabled = !explorerMode.isFolderPicker,
                         disabledNodeIds = disabledNodeIds,
                         videosOnly = explorerMode.isVideoPicker,
-                        onHasContentChanged = { tabHasContent[FAVOURITES_TAB_INDEX] = it },
-                        onLoadingChanged = { tabLoading[FAVOURITES_TAB_INDEX] = it },
-                        onConnectivityChanged = { isConnected = it },
                     )
                 }
                 if (!isInnerNavigation && explorerMode.isChatAvailable) {
@@ -387,9 +382,6 @@ internal fun ExplorerScreen(
                         onNavigate = onConnectedNavigate,
                         monitorResult = monitorResult,
                         clearResult = clearResult,
-                        onHasContentChanged = { tabHasContent[CHAT_TAB_INDEX] = it },
-                        onLoadingChanged = { tabLoading[CHAT_TAB_INDEX] = it },
-                        onConnectivityChanged = { isConnected = it },
                     )
                 }
             },

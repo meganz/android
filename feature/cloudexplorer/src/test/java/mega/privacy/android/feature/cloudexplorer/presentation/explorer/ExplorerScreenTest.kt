@@ -49,11 +49,13 @@ internal class ExplorerScreenTest {
     val analyticsRule = AnalyticsTestRule()
 
     private val viewModel = mock<NodesExplorerViewModel>()
-    private val viewModelStore = mock<ViewModelStore> {
-        on { get(argThat<String> { contains(NodesExplorerViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
-    }
-    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
-        on { viewModelStore } doReturn viewModelStore
+
+    private fun viewModelStoreOwner(coordinator: ExplorerViewModel): ViewModelStoreOwner {
+        val store = mock<ViewModelStore> {
+            on { get(argThat<String> { contains(NodesExplorerViewModel::class.java.canonicalName.orEmpty()) }) } doReturn viewModel
+            on { get(argThat<String> { contains(ExplorerViewModel::class.java.canonicalName.orEmpty()) }) } doReturn coordinator
+        }
+        return mock { on { viewModelStore } doReturn store }
     }
 
     @Test
@@ -99,10 +101,8 @@ internal class ExplorerScreenTest {
     fun `test that clicking the action button does not pick the folder when offline`() {
         var pickedFolderId: NodeId? = null
         setContent(
-            uiState = dataState(
-                currentFolderId = CURRENT_FOLDER_ID,
-                isConnected = false,
-            ),
+            uiState = dataState(currentFolderId = CURRENT_FOLDER_ID),
+            isConnected = false,
             onFolderPicked = { pickedFolderId = it },
         )
 
@@ -160,15 +160,17 @@ internal class ExplorerScreenTest {
         isProcessingAction: Boolean = false,
         disabledTargetId: NodeId? = null,
         pickerRestrictions: ExplorerPickerRestrictions? = null,
+        isConnected: Boolean = true,
         onFolderPicked: (NodeId) -> Unit = {},
         onCloseExplorerScreen: () -> Unit = {},
     ) {
         whenever(viewModel.uiState).thenReturn(MutableStateFlow(uiState))
+        val owner = viewModelStoreOwner(stubExplorerViewModel(isConnected = isConnected))
 
         composeTestRule.setContent {
             AndroidThemeForPreviews {
                 CompositionLocalProvider(
-                    LocalViewModelStoreOwner provides viewModelStoreOwner,
+                    LocalViewModelStoreOwner provides owner,
                     LocalNodeHeaderPreviewData provides NodeHeaderItemUiState.Data(
                         viewType = ViewType.LIST,
                         nodeSortConfiguration = NodeSortConfiguration.default,
@@ -195,10 +197,8 @@ internal class ExplorerScreenTest {
 
     private fun dataState(
         currentFolderId: NodeId = NodeId(-1),
-        isConnected: Boolean = true,
     ) = nodeExplorerDataState(
         currentFolderId = currentFolderId,
-        isConnected = isConnected,
         isRoot = false,
     )
 

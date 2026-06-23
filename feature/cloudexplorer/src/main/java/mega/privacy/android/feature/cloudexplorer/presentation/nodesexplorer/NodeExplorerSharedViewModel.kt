@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.coroutine.asUiStateFlow
@@ -35,7 +34,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -62,7 +60,6 @@ abstract class NodeExplorerSharedViewModel(
     private val searchUseCase: SearchUseCase,
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
-    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val args: Args,
 ) : ViewModel() {
 
@@ -80,7 +77,6 @@ abstract class NodeExplorerSharedViewModel(
 
     private val searchQueryChannel = Channel<String?>(Channel.CONFLATED)
     private val navigateBackChannel = Channel<StateEvent>(Channel.CONFLATED)
-    private val noConnectionChannel = Channel<StateEvent>(Channel.CONFLATED)
     private val manualRefreshChannel = Channel<Unit>(Channel.CONFLATED)
 
     private val nodeUpdates: Flow<NodeChanges> by lazy {
@@ -120,16 +116,6 @@ abstract class NodeExplorerSharedViewModel(
         .catch { Timber.e(it) }
         .onStart { emit(false) }
 
-    private val connectivityFlow = monitorConnectivityUseCase()
-        .catch { Timber.e(it) }
-        .withIndex()
-        .onEach { (index, isConnected) ->
-            if (index == 0 && !isConnected) noConnectionChannel.trySend(triggered)
-        }
-        .map { it.value }
-        .onStart { emit(true) }
-
-    private val noConnectionFlow = noConnectionChannel.receiveAsFlow().onStart { emit(consumed) }
     private val navigateBackFlow = navigateBackChannel.receiveAsFlow().onStart { emit(consumed) }
 
     private val searchFlow: Flow<SearchState> = combine(
@@ -175,15 +161,9 @@ abstract class NodeExplorerSharedViewModel(
         hiddenEnabledFlow,
         showHiddenFlow,
         storageOverQuotaFlow,
-        connectivityFlow,
-    ) { isHiddenNodesEnabled, showHiddenNodes, isStorageOverQuota, isConnected ->
-        Global(isHiddenNodesEnabled, showHiddenNodes, isStorageOverQuota, isConnected)
+    ) { isHiddenNodesEnabled, showHiddenNodes, isStorageOverQuota ->
+        Global(isHiddenNodesEnabled, showHiddenNodes, isStorageOverQuota)
     }
-
-    private val eventsFlow: Flow<Events> = combine(
-        navigateBackFlow,
-        noConnectionFlow,
-    ) { navigateBack, noConnectionEvent -> Events(navigateBack, noConnectionEvent) }
 
     val uiState: StateFlow<NodeExplorerUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
@@ -191,8 +171,8 @@ abstract class NodeExplorerSharedViewModel(
             searchFlow,
             folderInfoFlow,
             globalFlow,
-            eventsFlow,
-        ) { items, search, folderInfo, global, events ->
+            navigateBackFlow,
+        ) { items, search, folderInfo, global, navigateBack ->
             if (items.loadingState == NodesLoadingState.Loading) {
                 NodeExplorerUiState.Loading
             } else {
@@ -207,9 +187,7 @@ abstract class NodeExplorerSharedViewModel(
                     showHiddenNodes = global.showHiddenNodes,
                     isHiddenNodesEnabled = global.isHiddenNodesEnabled,
                     isStorageOverQuota = global.isStorageOverQuota,
-                    isConnected = global.isConnected,
-                    navigateBack = events.navigateBack,
-                    noConnectionEvent = events.noConnectionEvent,
+                    navigateBack = navigateBack,
                     folderName = folderInfo.folderName,
                     isRoot = folderInfo.isRoot,
                 )
@@ -288,51 +266,8 @@ abstract class NodeExplorerSharedViewModel(
         navigateBackChannel.trySend(consumed)
     }
 
-    fun onNoConnectionEventConsumed() {
-        noConnectionChannel.trySend(consumed)
-    }
-
     data class Args(
         val nodeId: NodeId,
         val nodeSourceType: NodeSourceType,
-    )
-
-    private data class MappedItems(
-        val items: List<NodeViewItem<TypedNode>>,
-        val loadingState: NodesLoadingState,
-    )
-
-    private data class SearchResult(
-        val nodes: List<TypedNode>,
-        val loadingState: NodesLoadingState,
-        val query: String?,
-    )
-
-    private data class SearchState(
-        val items: List<NodeViewItem<TypedNode>>,
-        val loadingState: NodesLoadingState,
-        val query: String?,
-    )
-
-    private data class Global(
-        val isHiddenNodesEnabled: Boolean,
-        val showHiddenNodes: Boolean,
-        val isStorageOverQuota: Boolean,
-        val isConnected: Boolean,
-    )
-
-    private data class FolderInfo(
-        val folderName: LocalizedText,
-        val isRoot: Boolean,
-    )
-
-    private data class Events(
-        val navigateBack: StateEvent,
-        val noConnectionEvent: StateEvent,
-    )
-
-    data class NodesResult(
-        val nodes: List<TypedNode>,
-        val loadingState: NodesLoadingState,
     )
 }

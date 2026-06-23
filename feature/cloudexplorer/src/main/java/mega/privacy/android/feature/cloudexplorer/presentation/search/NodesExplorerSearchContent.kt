@@ -23,6 +23,7 @@ internal fun NodesExplorerSearchContent(
     isFileSelectionEnabled: Boolean,
     videosOnly: Boolean,
     disabledNodeIds: Set<NodeId>,
+    isConnected: Boolean,
     onNavigateToFolderPath: (List<NodeId>) -> Unit,
     onCloseSearch: () -> Unit,
     recentSearchesEnabled: Boolean,
@@ -46,6 +47,7 @@ internal fun NodesExplorerSearchContent(
         consumeNavigateBack = {},
         onFolderClick = rememberSearchResultFolderClick(
             viewModel,
+            isConnected,
             onNavigateToFolderPath,
             onCloseSearch
         ),

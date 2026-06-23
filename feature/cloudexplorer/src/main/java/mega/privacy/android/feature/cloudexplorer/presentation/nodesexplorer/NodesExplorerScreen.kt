@@ -350,9 +350,7 @@ internal fun previewNodeExplorerData(
     showHiddenNodes = false,
     isHiddenNodesEnabled = false,
     isStorageOverQuota = false,
-    isConnected = true,
     navigateBack = consumed,
-    noConnectionEvent = consumed,
     folderName = LocalizedText.Literal(""),
     isRoot = true,
 )

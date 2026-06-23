@@ -21,9 +21,7 @@ internal fun nodeExplorerDataState(
     showHiddenNodes: Boolean = false,
     isHiddenNodesEnabled: Boolean = false,
     isStorageOverQuota: Boolean = false,
-    isConnected: Boolean = true,
     navigateBack: StateEvent = consumed,
-    noConnectionEvent: StateEvent = consumed,
     folderName: LocalizedText = LocalizedText.Literal(""),
     isRoot: Boolean = true,
 ) = NodeExplorerUiState.Data(
@@ -37,9 +35,7 @@ internal fun nodeExplorerDataState(
     showHiddenNodes = showHiddenNodes,
     isHiddenNodesEnabled = isHiddenNodesEnabled,
     isStorageOverQuota = isStorageOverQuota,
-    isConnected = isConnected,
     navigateBack = navigateBack,
-    noConnectionEvent = noConnectionEvent,
     folderName = folderName,
     isRoot = isRoot,
 )

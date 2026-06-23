@@ -67,7 +67,6 @@ internal class ChatExplorerContentTest {
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
                 searchResults = ChatExplorerUiState.Items.Empty,
-                isConnected = true,
             ),
         )
 
@@ -147,7 +146,6 @@ internal class ChatExplorerContentTest {
         newChatCreatedEvent = consumed(),
         chatsReadyToShareEvent = consumed(),
         searchResults = ChatExplorerUiState.Items.Empty,
-        isConnected = true,
     )
 
     private fun groupChat(id: Long, isEnabled: Boolean = true) = ChatExplorerUiItem.GroupChat(

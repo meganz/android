@@ -91,6 +91,7 @@ internal class NodesExplorerSearchContentTest {
                     isFileSelectionEnabled = true,
                     videosOnly = false,
                     disabledNodeIds = emptySet(),
+                    isConnected = true,
                     onNavigateToFolderPath = {},
                     onCloseSearch = {},
                     recentSearchesEnabled = true,

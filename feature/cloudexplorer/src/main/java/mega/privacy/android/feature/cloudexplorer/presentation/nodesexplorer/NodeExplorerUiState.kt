@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.TabSignal
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 
 /**
@@ -30,10 +31,51 @@ sealed interface NodeExplorerUiState {
         val showHiddenNodes: Boolean,
         val isHiddenNodesEnabled: Boolean,
         val isStorageOverQuota: Boolean,
-        val isConnected: Boolean,
         val navigateBack: StateEvent,
-        val noConnectionEvent: StateEvent,
         val folderName: LocalizedText,
         val isRoot: Boolean,
     ) : NodeExplorerUiState
 }
+
+internal fun NodeExplorerUiState.toTabSignal(): TabSignal =
+    when (this) {
+        NodeExplorerUiState.Loading -> TabSignal(isLoading = true)
+        is NodeExplorerUiState.Data -> TabSignal(
+            isLoading = false,
+            hasContent = items.isNotEmpty(),
+            folderName = folderName,
+        )
+    }
+
+internal data class MappedItems(
+    val items: List<NodeViewItem<TypedNode>>,
+    val loadingState: NodesLoadingState,
+)
+
+internal data class SearchResult(
+    val nodes: List<TypedNode>,
+    val loadingState: NodesLoadingState,
+    val query: String?,
+)
+
+internal data class SearchState(
+    val items: List<NodeViewItem<TypedNode>>,
+    val loadingState: NodesLoadingState,
+    val query: String?,
+)
+
+internal data class Global(
+    val isHiddenNodesEnabled: Boolean,
+    val showHiddenNodes: Boolean,
+    val isStorageOverQuota: Boolean,
+)
+
+internal data class FolderInfo(
+    val folderName: LocalizedText,
+    val isRoot: Boolean,
+)
+
+data class NodesResult(
+    val nodes: List<TypedNode>,
+    val loadingState: NodesLoadingState,
+)

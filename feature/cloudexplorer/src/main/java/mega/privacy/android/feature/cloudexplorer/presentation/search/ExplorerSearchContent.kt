@@ -96,6 +96,7 @@ internal fun ExplorerSearchContent(
 @Composable
 internal fun rememberSearchResultFolderClick(
     viewModel: NodeExplorerSharedViewModel,
+    isConnected: Boolean,
     onNavigateToFolderPath: (List<NodeId>) -> Unit,
     onCloseSearch: () -> Unit,
 ): (NodeId) -> Unit {
@@ -104,10 +105,6 @@ internal fun rememberSearchResultFolderClick(
     val resources = LocalResources.current
     return { nodeId ->
         coroutineScope.launch {
-            val isConnected = when (val state = viewModel.uiState.value) {
-                NodeExplorerUiState.Loading -> true
-                is NodeExplorerUiState.Data -> state.isConnected
-            }
             if (isConnected) {
                 onNavigateToFolderPath(viewModel.resolveSearchResultStack(nodeId))
                 onCloseSearch()

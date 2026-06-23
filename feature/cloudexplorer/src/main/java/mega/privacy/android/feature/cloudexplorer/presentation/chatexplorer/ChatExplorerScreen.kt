@@ -53,7 +53,9 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.chat.ChatStatus
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CHAT_TAB_INDEX
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CHAT_TAB_TAG
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.search.ChatExplorerSearchContent
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -300,12 +302,11 @@ internal fun TabsScope.ChatExplorerTab(
     onNavigate: (NavKey) -> Unit,
     monitorResult: (String) -> Flow<Any?>,
     clearResult: (String) -> Unit,
-    onHasContentChanged: (Boolean) -> Unit = {},
-    onLoadingChanged: (Boolean) -> Unit = {},
-    onConnectivityChanged: (Boolean) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<ChatExplorerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val signal = remember(uiState) { uiState.toTabSignal() }
+    val explorerViewModel = hiltViewModel<ExplorerViewModel>()
     val listState = rememberLazyListState()
     var selectionBeforeSearch by remember { mutableStateOf(selectionState.selectedChatIds) }
     val resources = LocalResources.current
@@ -318,17 +319,12 @@ internal fun TabsScope.ChatExplorerTab(
         onCloseExplorerScreen = onCloseExplorerScreen,
     )
 
+    LaunchedEffect(signal) { explorerViewModel.onTabSignal(CHAT_TAB_INDEX, signal) }
+
     when (val state = uiState) {
-        ChatExplorerUiState.Loading -> LaunchedEffect(Unit) {
-            onLoadingChanged(true)
-            onHasContentChanged(false)
-            onConnectivityChanged(true)
-        }
+        ChatExplorerUiState.Loading -> Unit
 
         is ChatExplorerUiState.Data -> {
-            LaunchedEffect(Unit) { onLoadingChanged(false) }
-            LaunchedEffect(state.isEmpty) { onHasContentChanged(!state.isEmpty) }
-            LaunchedEffect(state.isConnected) { onConnectivityChanged(state.isConnected) }
             EventEffect(
                 event = state.newChatCreatedEvent,
                 onConsumed = viewModel::onNewChatCreatedConsumed,
@@ -498,7 +494,6 @@ private fun ChatExplorerContentPreview(
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
                 searchResults = ChatExplorerUiState.Items.Empty,
-                isConnected = true,
             ),
             isProcessingAction = isProcessingAction,
             selectedChatIds = setOf(11L),
@@ -543,7 +538,6 @@ private fun ChatExplorerEmptyListPreview() {
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
                 searchResults = ChatExplorerUiState.Items.Empty,
-                isConnected = true,
             ),
             isProcessingAction = false,
             selectedChatIds = emptySet(),

@@ -88,6 +88,7 @@ internal class IncomingSharesExplorerSearchContentTest {
             ) {
                 IncomingSharesExplorerSearchContent(
                     query = QUERY,
+                    isConnected = true,
                     onQueryChanged = {},
                     onNavigateToFolderPath = {},
                     onCloseSearch = {},

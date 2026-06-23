@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -35,6 +36,8 @@ import mega.privacy.android.domain.entity.shares.hasWritePermission
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_INDEX
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.INCOMING_TAB_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolder
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
@@ -42,6 +45,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.remember
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.previewNodeExplorerData
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.toTabSignal
 import mega.privacy.android.feature.cloudexplorer.presentation.search.IncomingSharesExplorerSearchContent
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
@@ -181,26 +185,14 @@ internal fun TabsScope.IncomingExplorerTab(
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
-    onHasContentChanged: (Boolean) -> Unit = {},
-    onLoadingChanged: (Boolean) -> Unit = {},
-    onConnectivityChanged: (Boolean) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<IncomingSharesExplorerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val signal = remember(uiState) { uiState.toTabSignal() }
+    val explorerViewModel = hiltViewModel<ExplorerViewModel>()
+    val explorerUiState by explorerViewModel.uiState.collectAsStateWithLifecycle()
 
-    when (val state = uiState) {
-        NodeExplorerUiState.Loading -> LaunchedEffect(Unit) {
-            onLoadingChanged(true)
-            onHasContentChanged(false)
-            onConnectivityChanged(true)
-        }
-
-        is NodeExplorerUiState.Data -> {
-            LaunchedEffect(Unit) { onLoadingChanged(false) }
-            LaunchedEffect(state.items.isEmpty()) { onHasContentChanged(state.items.isNotEmpty()) }
-            LaunchedEffect(state.isConnected) { onConnectivityChanged(state.isConnected) }
-        }
-    }
+    LaunchedEffect(signal) { explorerViewModel.onTabSignal(INCOMING_TAB_INDEX, signal) }
 
     addTextTabWithScrollableContent(
         tabItem = TabItems(
@@ -211,6 +203,7 @@ internal fun TabsScope.IncomingExplorerTab(
         if (showSearch) {
             IncomingSharesExplorerSearchContent(
                 query = searchQuery,
+                isConnected = explorerUiState.isConnected,
                 onQueryChanged = onSearchQueryChanged,
                 onNavigateToFolderPath = navigateToFolderPath(
                     nodeSourceType = NodeSourceType.INCOMING_SHARES,

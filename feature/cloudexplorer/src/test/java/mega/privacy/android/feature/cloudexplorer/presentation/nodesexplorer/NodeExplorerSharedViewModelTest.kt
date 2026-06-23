@@ -27,13 +27,11 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel.NodesResult
 import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeViewItem
@@ -67,7 +65,6 @@ class NodeExplorerSharedViewModelTest {
     private val searchUseCase = mock<SearchUseCase>()
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
     private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
-    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private val nodeId = NodeId(1234L)
     private val nodeSourceType = NodeSourceType.INCOMING_SHARES
@@ -84,13 +81,11 @@ class NodeExplorerSharedViewModelTest {
             searchUseCase,
             nodeSourceTypeToSearchTargetMapper,
             getNodeNavigationStackUseCase,
-            monitorConnectivityUseCase,
         )
         whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
-        whenever(monitorConnectivityUseCase()) doReturn emptyFlow()
         whenever {
             nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
         } doReturn emptyList()
@@ -109,7 +104,6 @@ class NodeExplorerSharedViewModelTest {
             searchUseCase = searchUseCase,
             nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
             getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
-            monitorConnectivityUseCase = monitorConnectivityUseCase,
             args = args,
         )
     }
@@ -130,7 +124,6 @@ class NodeExplorerSharedViewModelTest {
             assertThat(actual.showHiddenNodes).isFalse()
             assertThat(actual.items).isEmpty()
             assertThat(actual.navigateBack).isEqualTo(consumed)
-            assertThat(actual.isConnected).isTrue()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -352,62 +345,6 @@ class NodeExplorerSharedViewModelTest {
         }
     }
 
-    @Test
-    fun `test that isConnected mirrors connectivity changes`() = runTest {
-        val connectivityFlow = MutableStateFlow(true)
-        whenever(monitorConnectivityUseCase()) doReturn connectivityFlow
-
-        initViewModel()
-
-        viewModel.uiState.test {
-            assertThat(awaitDataUntil { it.isConnected }.isConnected).isTrue()
-            connectivityFlow.value = false
-            assertThat(awaitDataUntil { !it.isConnected }.isConnected).isFalse()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that noConnectionEvent is triggered when the screen opens offline`() = runTest {
-        whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
-
-        initViewModel()
-
-        viewModel.uiState.test {
-            val actual = awaitDataUntil { it.noConnectionEvent == triggered }
-            assertThat(actual.noConnectionEvent).isEqualTo(triggered)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that noConnectionEvent stays consumed when the screen opens online`() = runTest {
-        whenever(monitorConnectivityUseCase()) doReturn flowOf(true)
-
-        initViewModel()
-
-        viewModel.uiState.test {
-            val actual = awaitDataUntil { it.isConnected }
-            assertThat(actual.noConnectionEvent).isEqualTo(consumed)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that onNoConnectionEventConsumed consumes the event`() = runTest {
-        whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
-
-        initViewModel()
-
-        viewModel.uiState.test {
-            awaitDataUntil { it.noConnectionEvent == triggered }
-            viewModel.onNoConnectionEventConsumed()
-            val actual = awaitDataUntil { it.noConnectionEvent == consumed }
-            assertThat(actual.noConnectionEvent).isEqualTo(consumed)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
     private suspend fun ReceiveTurbine<NodeExplorerUiState>.awaitData(): NodeExplorerUiState.Data {
         var item = awaitItem()
         while (item !is NodeExplorerUiState.Data) {
@@ -445,7 +382,6 @@ private class TestNodeExplorerSharedViewModel(
     searchUseCase: SearchUseCase,
     nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
-    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     args: Args,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -457,7 +393,6 @@ private class TestNodeExplorerSharedViewModel(
     searchUseCase = searchUseCase,
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
-    monitorConnectivityUseCase = monitorConnectivityUseCase,
     args = args,
 ) {
     var nodesResult = NodesResult(emptyList(), NodesLoadingState.FullyLoaded)

@@ -16,6 +16,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexp
 @Composable
 internal fun IncomingSharesExplorerSearchContent(
     query: String?,
+    isConnected: Boolean,
     onQueryChanged: (String) -> Unit,
     onNavigateToFolderPath: (List<NodeId>) -> Unit,
     onCloseSearch: () -> Unit,
@@ -40,6 +41,7 @@ internal fun IncomingSharesExplorerSearchContent(
         consumeNavigateBack = {},
         onFolderClick = rememberSearchResultFolderClick(
             viewModel,
+            isConnected,
             onNavigateToFolderPath,
             onCloseSearch
         ),

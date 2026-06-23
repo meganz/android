@@ -10,7 +10,6 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -30,11 +29,9 @@ import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -69,12 +66,6 @@ internal class ChatExplorerViewModelTest {
     private val get1On1ChatIdUseCase = mock<Get1On1ChatIdUseCase>()
     private val sendTextMessageUseCase = mock<SendTextMessageUseCase>()
     private val chatExplorerUiItemMapper = mock<ChatExplorerUiItemMapper>()
-    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-
-    @BeforeEach
-    fun stubConnectivity() {
-        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
-    }
 
     @AfterEach
     fun resetMocks() {
@@ -88,7 +79,6 @@ internal class ChatExplorerViewModelTest {
             get1On1ChatIdUseCase,
             sendTextMessageUseCase,
             chatExplorerUiItemMapper,
-            monitorConnectivityUseCase,
         )
     }
 
@@ -102,7 +92,6 @@ internal class ChatExplorerViewModelTest {
         get1On1ChatIdUseCase = get1On1ChatIdUseCase,
         sendTextMessageUseCase = sendTextMessageUseCase,
         chatExplorerUiItemMapper = chatExplorerUiItemMapper,
-        monitorConnectivityUseCase = monitorConnectivityUseCase,
     )
 
     private suspend fun stubChatLists(
