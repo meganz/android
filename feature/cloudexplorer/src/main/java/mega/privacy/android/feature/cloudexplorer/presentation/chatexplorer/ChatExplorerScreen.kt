@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +61,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
 import mega.privacy.android.shared.chats.components.ChatExplorerListItemView
+import mega.privacy.android.shared.chats.components.ChatsViewSkeleton
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -76,7 +76,12 @@ internal fun ChatExplorerContent(
     listState: LazyListState = rememberLazyListState(),
 ) {
     when (uiState) {
-        ChatExplorerUiState.Loading -> LoadingState(modifier = modifier)
+        ChatExplorerUiState.Loading -> ChatsViewSkeleton(
+            modifier = modifier.testTag(
+                CHAT_EXPLORER_LOADING_TAG
+            ),
+        )
+
         is ChatExplorerUiState.Data -> if (uiState.isEmpty) {
             EmptyView(
                 data = uiState,
@@ -96,18 +101,6 @@ internal fun ChatExplorerContent(
                 listState = listState,
             )
         }
-    }
-}
-
-@Composable
-private fun LoadingState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .testTag(CHAT_EXPLORER_LOADING_TAG),
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
     }
 }
 

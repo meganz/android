@@ -47,6 +47,7 @@ import mega.privacy.android.navigation.destination.NewTextFileDialogNavKey
 import mega.privacy.android.navigation.destination.NewURLFileDialogNavKey
 import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
@@ -209,7 +210,7 @@ internal fun NodesExplorerScreenContent(
     },
 ) {
     when (uiState) {
-        NodeExplorerUiState.Loading -> emptyView()
+        NodeExplorerUiState.Loading -> NodesViewSkeleton()
         is NodeExplorerUiState.Data -> {
             val visibleItems = rememberVisibleItems(
                 items = uiState.items,

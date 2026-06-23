@@ -50,6 +50,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.search.IncomingSh
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewIncomingShareFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
@@ -74,7 +75,7 @@ internal fun IncomingSharesExplorerContent(
     val resources = LocalResources.current
 
     when (uiState) {
-        NodeExplorerUiState.Loading -> emptyView()
+        NodeExplorerUiState.Loading -> NodesViewSkeleton()
         is NodeExplorerUiState.Data -> {
             val isHiddenNodesEnabled = uiState.isHiddenNodesEnabled
             val visibleItems = rememberVisibleItems(
