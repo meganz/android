@@ -15,9 +15,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -26,6 +28,7 @@ import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -48,6 +51,7 @@ import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeU
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -180,66 +184,75 @@ internal fun NodesExplorerScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NodesExplorerScreenContent(
-    uiState: NodesExplorerUiState,
-    uiStateShared: NodesExplorerSharedUiState,
+    uiState: NodeExplorerUiState,
     onNavigateBack: () -> Unit,
     consumeNavigateBack: () -> Unit,
     onFolderClick: (NodeId) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
     selectionState: NodeSelectionState = rememberNodeSelectionState(),
-    isSelectionModeEnabled: Boolean = uiStateShared.isSelectionModeEnabled,
+    isSelectionModeEnabled: Boolean = false,
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
     emptyView: @Composable () -> Unit = {
-        if (uiState.isRoot) EmptyRoot() else EmptyFolder()
+        if (uiState is NodeExplorerUiState.Data && !uiState.isRoot) EmptyFolder() else EmptyRoot()
     },
-) = with(uiStateShared) {
-    EventEffect(
-        event = navigateBack,
-        onConsumed = consumeNavigateBack,
-    ) { onNavigateBack() }
+) {
+    when (uiState) {
+        NodeExplorerUiState.Loading -> emptyView()
+        is NodeExplorerUiState.Data -> {
+            val visibleItems = rememberVisibleItems(
+                items = uiState.items,
+                showHiddenNodes = uiState.showHiddenNodes,
+                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+            )
+            val onItemClicked = explorerNodeClick(
+                selectionState = selectionState,
+                disabledNodeIds = disabledNodeIds,
+                videosOnly = videosOnly,
+                isSelectionModeEnabled = isSelectionModeEnabled,
+                onFolderClick = onFolderClick,
+            )
 
-    val visibleItems = rememberVisibleItems()
-    val onItemClicked = explorerNodeClick(
-        selectionState = selectionState,
-        disabledNodeIds = disabledNodeIds,
-        videosOnly = videosOnly,
-        isSelectionModeEnabled = isSelectionModeEnabled,
-        onFolderClick = onFolderClick,
-    )
-    NodeViewWithHeader(
-        items = visibleItems,
-        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-        nodesLoadingState = nodesLoadingState,
-        emptyView = emptyView,
-        itemListView = {
-            ExplorerNodeListItem(
-                item = it,
-                isSelected = selectionState.selectedNodeIds.contains(it.id),
-                isSelectionModeEnabled = isSelectionModeEnabled,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                videosOnly = videosOnly,
-                disabledNodeIds = disabledNodeIds,
-                showLink = it.showLink,
-                onItemClicked = { onItemClicked(it) },
+            EventEffect(
+                event = uiState.navigateBack,
+                onConsumed = consumeNavigateBack,
+            ) { onNavigateBack() }
+
+            NodeViewWithHeader(
+                items = visibleItems,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                nodesLoadingState = uiState.nodesLoadingState,
+                emptyView = emptyView,
+                itemListView = {
+                    ExplorerNodeListItem(
+                        item = it,
+                        isSelected = selectionState.selectedNodeIds.contains(it.id),
+                        isSelectionModeEnabled = isSelectionModeEnabled,
+                        isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                        videosOnly = videosOnly,
+                        disabledNodeIds = disabledNodeIds,
+                        showLink = it.showLink,
+                        onItemClicked = { onItemClicked(it) },
+                    )
+                },
+                itemGridView = {
+                    ExplorerNodeGridItem(
+                        item = it,
+                        isSelected = selectionState.selectedNodeIds.contains(it.id),
+                        isSelectionModeEnabled = isSelectionModeEnabled,
+                        isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                        videosOnly = videosOnly,
+                        disabledNodeIds = disabledNodeIds,
+                        showLink = it.showLink,
+                        onItemClicked = { onItemClicked(it) },
+                    )
+                },
+                onRefreshNodes = onRefreshNodes,
+                modifier = modifier,
             )
-        },
-        itemGridView = {
-            ExplorerNodeGridItem(
-                item = it,
-                isSelected = selectionState.selectedNodeIds.contains(it.id),
-                isSelectionModeEnabled = isSelectionModeEnabled,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                videosOnly = videosOnly,
-                disabledNodeIds = disabledNodeIds,
-                showLink = it.showLink,
-                onItemClicked = { onItemClicked(it) },
-            )
-        },
-        onRefreshNodes = onRefreshNodes,
-        modifier = modifier,
-    )
+        }
+    }
 }
 
 @Composable
@@ -271,10 +284,7 @@ private fun NodesExplorerScreenContentEmptyPreview() {
             ),
         ) {
             NodesExplorerScreenContent(
-                uiState = NodesExplorerUiState(),
-                uiStateShared = NodesExplorerSharedUiState(
-                    nodesLoadingState = NodesLoadingState.FullyLoaded,
-                ),
+                uiState = previewNodeExplorerData(),
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},
@@ -297,13 +307,11 @@ private fun NodesExplorerScreenContentPreview(
             ),
         ) {
             NodesExplorerScreenContent(
-                uiState = NodesExplorerUiState(),
-                uiStateShared = NodesExplorerSharedUiState(
-                    nodesLoadingState = NodesLoadingState.FullyLoaded,
-                    isSelectionModeEnabled = true,
+                uiState = previewNodeExplorerData(
                     items = (1..4L).map { previewFolderNodeUiItem(it) }
                             + (10..15L).map { previewFileNodeUiItem(it) }
                 ),
+                isSelectionModeEnabled = true,
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},
@@ -312,6 +320,28 @@ private fun NodesExplorerScreenContentPreview(
         }
     }
 }
+
+/** Builds a fully-loaded [NodeExplorerUiState.Data] for previews across the explorer screens. */
+internal fun previewNodeExplorerData(
+    items: List<NodeViewItem<TypedNode>> = emptyList(),
+    nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+) = NodeExplorerUiState.Data(
+    currentFolderId = NodeId(-1),
+    nodeSourceType = nodeSourceType,
+    items = items,
+    nodesLoadingState = NodesLoadingState.FullyLoaded,
+    searchItems = emptyList(),
+    searchLoadingState = NodesLoadingState.FullyLoaded,
+    searchedQuery = null,
+    showHiddenNodes = false,
+    isHiddenNodesEnabled = false,
+    isStorageOverQuota = false,
+    isConnected = true,
+    navigateBack = consumed,
+    noConnectionEvent = consumed,
+    folderName = LocalizedText.Literal(""),
+    isRoot = true,
+)
 
 internal const val NODES_EXPLORER_VIEW_TAG = "nodes_explorer_view"
 internal const val NODES_EXPLORER_EMPTY_VIEW_TAG = "$NODES_EXPLORER_VIEW_TAG:empty_view"

@@ -25,7 +25,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -39,7 +39,8 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigate
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.rememberVisibleItems
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.previewNodeExplorerData
 import mega.privacy.android.feature.cloudexplorer.presentation.search.IncomingSharesExplorerSearchContent
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
@@ -54,82 +55,92 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun IncomingSharesExplorerContent(
-    uiStateShared: NodesExplorerSharedUiState,
+    uiState: NodeExplorerUiState,
     onNavigateBack: () -> Unit,
     consumeNavigateBack: () -> Unit,
     onFolderClick: (NodeId) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
     emptyView: @Composable () -> Unit = { EmptyFolder() },
-) = with(uiStateShared) {
+) {
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
     val resources = LocalResources.current
 
-    EventEffect(
-        event = navigateBack,
-        onConsumed = consumeNavigateBack,
-    ) { onNavigateBack() }
-
-    val visibleItems = rememberVisibleItems()
-
-    val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
-        when {
-            item.isFolderNode -> {
-                if ((item.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() == false) {
-                    coroutineScope.launch {
-                        snackbarHostState?.showSnackbar(resources.getString(sharedR.string.general_read_only_folder_warning))
+    when (uiState) {
+        NodeExplorerUiState.Loading -> emptyView()
+        is NodeExplorerUiState.Data -> {
+            val isHiddenNodesEnabled = uiState.isHiddenNodesEnabled
+            val visibleItems = rememberVisibleItems(
+                items = uiState.items,
+                showHiddenNodes = uiState.showHiddenNodes,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
+            )
+            val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
+                when {
+                    item.isFolderNode -> {
+                        if ((item.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() == false) {
+                            coroutineScope.launch {
+                                snackbarHostState?.showSnackbar(resources.getString(sharedR.string.general_read_only_folder_warning))
+                            }
+                        } else {
+                            onFolderClick(item.id)
+                        }
                     }
-                } else {
-                    onFolderClick(item.id)
                 }
             }
+
+            EventEffect(
+                event = uiState.navigateBack,
+                onConsumed = consumeNavigateBack,
+            ) { onNavigateBack() }
+
+            NodeViewWithHeader(
+                items = visibleItems,
+                nodeSourceType = uiState.nodeSourceType,
+                nodesLoadingState = uiState.nodesLoadingState,
+                emptyView = emptyView,
+                itemListView = {
+                    CloudExplorerListViewItem(
+                        title = it.title.text,
+                        subtitle = it.subtitle.text(),
+                        icon = it.iconRes,
+                        description = it.formattedDescription?.text,
+                        tags = it.tags,
+                        thumbnailData = it.thumbnailData,
+                        isTakenDown = it.isTakenDown,
+                        showIsVerified = it.showIsVerified,
+                        label = it.nodeLabel,
+                        isSensitive = it.isSensitive && isHiddenNodesEnabled,
+                        showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
+                        isHighlighted = it.isHighlighted,
+                        onItemClicked = { onItemClicked(it) },
+                        enabled = (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() != false,
+                        enableClick = true,
+                    )
+                },
+                itemGridView = {
+                    CloudExplorerGridViewItem(
+                        name = it.title.text,
+                        iconRes = it.iconRes,
+                        thumbnailData = it.thumbnailData,
+                        isTakenDown = it.isTakenDown,
+                        duration = it.duration,
+                        isFolderNode = it.isFolderNode,
+                        isVideoNode = it.isVideoNode,
+                        onClick = { onItemClicked(it) },
+                        isSensitive = it.isSensitive && isHiddenNodesEnabled,
+                        showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
+                        isHighlighted = it.isHighlighted,
+                        label = it.nodeLabel,
+                        enabled = (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() != false,
+                    )
+                },
+                onRefreshNodes = onRefreshNodes,
+                modifier = modifier,
+            )
         }
     }
-    NodeViewWithHeader(
-        items = visibleItems,
-        nodeSourceType = uiStateShared.nodeSourceType,
-        nodesLoadingState = nodesLoadingState,
-        emptyView = emptyView,
-        itemListView = {
-            CloudExplorerListViewItem(
-                title = it.title.text,
-                subtitle = it.subtitle.text(),
-                icon = it.iconRes,
-                description = it.formattedDescription?.text,
-                tags = it.tags,
-                thumbnailData = it.thumbnailData,
-                isTakenDown = it.isTakenDown,
-                showIsVerified = it.showIsVerified,
-                label = it.nodeLabel,
-                isSensitive = it.isSensitive && isHiddenNodesEnabled,
-                showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
-                isHighlighted = it.isHighlighted,
-                onItemClicked = { onItemClicked(it) },
-                enabled = isSelectionModeEnabled || (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() != false,
-                enableClick = true,
-            )
-        },
-        itemGridView = {
-            CloudExplorerGridViewItem(
-                name = it.title.text,
-                iconRes = it.iconRes,
-                thumbnailData = it.thumbnailData,
-                isTakenDown = it.isTakenDown,
-                duration = it.duration,
-                isFolderNode = it.isFolderNode,
-                isVideoNode = it.isVideoNode,
-                onClick = { onItemClicked(it) },
-                isSensitive = it.isSensitive && isHiddenNodesEnabled,
-                showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
-                isHighlighted = it.isHighlighted,
-                label = it.nodeLabel,
-                enabled = isSelectionModeEnabled || (it.node as? ShareFolderNode)?.shareData?.access?.hasWritePermission() != false,
-            )
-        },
-        onRefreshNodes = onRefreshNodes,
-        modifier = modifier,
-    )
 }
 
 @Composable
@@ -154,20 +165,26 @@ internal fun TabsScope.IncomingExplorerTab(
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
     onHasContentChanged: (Boolean) -> Unit = {},
+    onLoadingChanged: (Boolean) -> Unit = {},
+    onConnectivityChanged: (Boolean) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<IncomingSharesExplorerViewModel>()
-    val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiStateShared.items.isEmpty()) {
-        onHasContentChanged(uiStateShared.items.isNotEmpty())
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    when (val state = uiState) {
+        NodeExplorerUiState.Loading -> LaunchedEffect(Unit) {
+            onLoadingChanged(true)
+            onHasContentChanged(false)
+            onConnectivityChanged(true)
+        }
+
+        is NodeExplorerUiState.Data -> {
+            LaunchedEffect(Unit) { onLoadingChanged(false) }
+            LaunchedEffect(state.items.isEmpty()) { onHasContentChanged(state.items.isNotEmpty()) }
+            LaunchedEffect(state.isConnected) { onConnectivityChanged(state.isConnected) }
+        }
     }
-    val onFolderClick = navigateToFolder(
-        nodeSourceType = uiStateShared.nodeSourceType,
-        explorerMode = explorerMode,
-        startNavKey = startNavKey,
-        shareUris = shareUris,
-        protectedUserTap = protectedUserTap,
-        onNavigate = onNavigate,
-    )
+
     addTextTabWithScrollableContent(
         tabItem = TabItems(
             title = stringResource(sharedR.string.general_title_incoming_shares),
@@ -179,7 +196,7 @@ internal fun TabsScope.IncomingExplorerTab(
                 query = searchQuery,
                 onQueryChanged = onSearchQueryChanged,
                 onNavigateToFolderPath = navigateToFolderPath(
-                    nodeSourceType = uiStateShared.nodeSourceType,
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES,
                     explorerMode = explorerMode,
                     startNavKey = startNavKey,
                     shareUris = shareUris,
@@ -192,10 +209,17 @@ internal fun TabsScope.IncomingExplorerTab(
             )
         } else {
             IncomingSharesExplorerContent(
-                uiStateShared = uiStateShared,
+                uiState = uiState,
                 onNavigateBack = { protectedUserTap { onNavigateBack() } },
                 consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
-                onFolderClick = onFolderClick,
+                onFolderClick = navigateToFolder(
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                    explorerMode = explorerMode,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris,
+                    protectedUserTap = protectedUserTap,
+                    onNavigate = onNavigate,
+                ),
                 onRefreshNodes = viewModel::refreshNodes,
                 modifier = modifier,
             )
@@ -214,9 +238,7 @@ private fun EmptyFolderPreview() {
             ),
         ) {
             IncomingSharesExplorerContent(
-                uiStateShared = NodesExplorerSharedUiState(
-                    nodesLoadingState = NodesLoadingState.FullyLoaded,
-                ),
+                uiState = previewNodeExplorerData(nodeSourceType = NodeSourceType.INCOMING_SHARES),
                 onNavigateBack = {},
                 consumeNavigateBack = {},
                 onFolderClick = {},
@@ -239,10 +261,9 @@ private fun IncomingSharesExplorerFolderDestinationScreenPreview(
             ),
         ) {
             IncomingSharesExplorerContent(
-                uiStateShared = NodesExplorerSharedUiState(
-                    nodesLoadingState = NodesLoadingState.FullyLoaded,
-                    isSelectionModeEnabled = false,
-                    items = previewFolders()
+                uiState = previewNodeExplorerData(
+                    items = previewFolders(),
+                    nodeSourceType = NodeSourceType.INCOMING_SHARES,
                 ),
                 onNavigateBack = {},
                 consumeNavigateBack = {},

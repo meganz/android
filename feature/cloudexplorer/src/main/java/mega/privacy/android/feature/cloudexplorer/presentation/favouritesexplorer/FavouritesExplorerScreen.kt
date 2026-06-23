@@ -22,7 +22,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.ExplorerNodeGridItem
@@ -33,7 +33,8 @@ import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigate
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.navigateToFolderPath
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.rememberVisibleItems
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.previewNodeExplorerData
 import mega.privacy.android.feature.cloudexplorer.presentation.search.FavouritesExplorerSearchContent
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ExplorerNavKey
@@ -48,7 +49,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun FavouritesExplorerContent(
-    uiStateShared: NodesExplorerSharedUiState,
+    uiState: NodeExplorerUiState,
     isFolderPicker: Boolean,
     onNavigateBack: () -> Unit,
     consumeNavigateBack: () -> Unit,
@@ -60,50 +61,59 @@ internal fun FavouritesExplorerContent(
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
     emptyView: @Composable () -> Unit = { EmptyFolder(isFolderPicker) },
-) = with(uiStateShared) {
-    EventEffect(
-        event = navigateBack,
-        onConsumed = consumeNavigateBack,
-    ) { onNavigateBack() }
+) {
+    when (uiState) {
+        NodeExplorerUiState.Loading -> emptyView()
+        is NodeExplorerUiState.Data -> {
+            EventEffect(
+                event = uiState.navigateBack,
+                onConsumed = consumeNavigateBack,
+            ) { onNavigateBack() }
 
-    val visibleItems = rememberVisibleItems()
-    val onItemClicked = explorerNodeClick(
-        selectionState = selectionState,
-        disabledNodeIds = disabledNodeIds,
-        videosOnly = videosOnly,
-        isSelectionModeEnabled = isSelectionModeEnabled,
-        onFolderClick = onFolderClick,
-    )
-    NodeViewWithHeader(
-        items = visibleItems,
-        nodeSourceType = uiStateShared.nodeSourceType,
-        nodesLoadingState = nodesLoadingState,
-        emptyView = emptyView,
-        itemListView = {
-            ExplorerNodeListItem(
-                item = it,
-                isSelected = selectionState.selectedNodeIds.contains(it.id),
-                isSelectionModeEnabled = isSelectionModeEnabled,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                videosOnly = videosOnly,
-                disabledNodeIds = disabledNodeIds,
-                onItemClicked = { onItemClicked(it) },
+            val visibleItems = rememberVisibleItems(
+                items = uiState.items,
+                showHiddenNodes = uiState.showHiddenNodes,
+                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
             )
-        },
-        itemGridView = {
-            ExplorerNodeGridItem(
-                item = it,
-                isSelected = selectionState.selectedNodeIds.contains(it.id),
-                isSelectionModeEnabled = isSelectionModeEnabled,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                videosOnly = videosOnly,
+            val onItemClicked = explorerNodeClick(
+                selectionState = selectionState,
                 disabledNodeIds = disabledNodeIds,
-                onItemClicked = { onItemClicked(it) },
+                videosOnly = videosOnly,
+                isSelectionModeEnabled = isSelectionModeEnabled,
+                onFolderClick = onFolderClick,
             )
-        },
-        onRefreshNodes = onRefreshNodes,
-        modifier = modifier,
-    )
+            NodeViewWithHeader(
+                items = visibleItems,
+                nodeSourceType = uiState.nodeSourceType,
+                nodesLoadingState = uiState.nodesLoadingState,
+                emptyView = emptyView,
+                itemListView = {
+                    ExplorerNodeListItem(
+                        item = it,
+                        isSelected = selectionState.selectedNodeIds.contains(it.id),
+                        isSelectionModeEnabled = isSelectionModeEnabled,
+                        isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                        videosOnly = videosOnly,
+                        disabledNodeIds = disabledNodeIds,
+                        onItemClicked = { onItemClicked(it) },
+                    )
+                },
+                itemGridView = {
+                    ExplorerNodeGridItem(
+                        item = it,
+                        isSelected = selectionState.selectedNodeIds.contains(it.id),
+                        isSelectionModeEnabled = isSelectionModeEnabled,
+                        isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                        videosOnly = videosOnly,
+                        disabledNodeIds = disabledNodeIds,
+                        onItemClicked = { onItemClicked(it) },
+                    )
+                },
+                onRefreshNodes = onRefreshNodes,
+                modifier = modifier,
+            )
+        }
+    }
 }
 
 @Composable
@@ -141,6 +151,8 @@ internal fun TabsScope.FavouritesExplorerTab(
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
     onHasContentChanged: (Boolean) -> Unit = {},
+    onLoadingChanged: (Boolean) -> Unit = {},
+    onConnectivityChanged: (Boolean) -> Unit = {},
 ) {
     val viewModel =
         hiltViewModel<FavouritesExplorerViewModel, FavouritesExplorerViewModel.Factory> { factory ->
@@ -148,19 +160,22 @@ internal fun TabsScope.FavouritesExplorerTab(
                 args = FavouritesExplorerViewModel.Args(showFiles = !explorerMode.isFolderPicker)
             )
         }
-    val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiStateShared.items.isEmpty()) {
-        onHasContentChanged(uiStateShared.items.isNotEmpty())
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    when (val state = uiState) {
+        NodeExplorerUiState.Loading -> LaunchedEffect(Unit) {
+            onLoadingChanged(true)
+            onHasContentChanged(false)
+            onConnectivityChanged(true)
+        }
+
+        is NodeExplorerUiState.Data -> {
+            LaunchedEffect(Unit) { onLoadingChanged(false) }
+            LaunchedEffect(state.items.isEmpty()) { onHasContentChanged(state.items.isNotEmpty()) }
+            LaunchedEffect(state.isConnected) { onConnectivityChanged(state.isConnected) }
+        }
     }
-    val onFolderClick = navigateToFolder(
-        nodeSourceType = uiStateShared.nodeSourceType,
-        explorerMode = explorerMode,
-        startNavKey = startNavKey,
-        shareUris = shareUris,
-        disabledNodeIds = disabledNodeIds.toList(),
-        protectedUserTap = protectedUserTap,
-        onNavigate = onNavigate,
-    )
+
     addTextTabWithScrollableContent(
         tabItem = TabItems(
             title = stringResource(sharedR.string.video_section_title_favourite_playlist),
@@ -177,7 +192,7 @@ internal fun TabsScope.FavouritesExplorerTab(
                 videosOnly = videosOnly,
                 disabledNodeIds = disabledNodeIds,
                 onNavigateToFolderPath = navigateToFolderPath(
-                    nodeSourceType = uiStateShared.nodeSourceType,
+                    nodeSourceType = NodeSourceType.FAVOURITES,
                     explorerMode = explorerMode,
                     startNavKey = startNavKey,
                     shareUris = shareUris,
@@ -191,11 +206,19 @@ internal fun TabsScope.FavouritesExplorerTab(
             )
         } else {
             FavouritesExplorerContent(
-                uiStateShared = uiStateShared,
+                uiState = uiState,
                 isFolderPicker = explorerMode.isFolderPicker,
                 onNavigateBack = { protectedUserTap { onNavigateBack() } },
                 consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
-                onFolderClick = onFolderClick,
+                onFolderClick = navigateToFolder(
+                    nodeSourceType = NodeSourceType.FAVOURITES,
+                    explorerMode = explorerMode,
+                    startNavKey = startNavKey,
+                    shareUris = shareUris,
+                    disabledNodeIds = disabledNodeIds.toList(),
+                    protectedUserTap = protectedUserTap,
+                    onNavigate = onNavigate,
+                ),
                 onRefreshNodes = viewModel::refreshNodes,
                 selectionState = selectionState,
                 isSelectionModeEnabled = isSelectionModeEnabled,
@@ -220,9 +243,7 @@ private fun EmptyFolderPreview(
             ),
         ) {
             FavouritesExplorerContent(
-                uiStateShared = NodesExplorerSharedUiState(
-                    nodesLoadingState = NodesLoadingState.FullyLoaded,
-                ),
+                uiState = previewNodeExplorerData(nodeSourceType = NodeSourceType.FAVOURITES),
                 isFolderPicker = isFolderPicker,
                 onNavigateBack = {},
                 consumeNavigateBack = {},
@@ -246,10 +267,9 @@ private fun FavouritesExplorerFolderDestinationScreenPreview(
             ),
         ) {
             FavouritesExplorerContent(
-                uiStateShared = NodesExplorerSharedUiState(
-                    nodesLoadingState = NodesLoadingState.FullyLoaded,
-                    isSelectionModeEnabled = false,
-                    items = previewFolders()
+                uiState = previewNodeExplorerData(
+                    items = previewFolders(),
+                    nodeSourceType = NodeSourceType.FAVOURITES,
                 ),
                 isFolderPicker = true,
                 onNavigateBack = {},

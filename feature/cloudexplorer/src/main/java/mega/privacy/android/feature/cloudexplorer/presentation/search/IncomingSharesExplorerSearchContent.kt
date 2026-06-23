@@ -28,14 +28,14 @@ internal fun IncomingSharesExplorerSearchContent(
     recentSearchesEnabled
 ) { debouncedQuery ->
     val viewModel = hiltViewModel<IncomingSharesExplorerViewModel>()
-    val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(debouncedQuery, query) {
         if (debouncedQuery == query) viewModel.onSearchQuery(debouncedQuery)
     }
 
     IncomingSharesExplorerContent(
-        uiStateShared = uiStateShared.asSearchState(query),
+        uiState = uiState.asSearchState(query),
         onNavigateBack = {},
         consumeNavigateBack = {},
         onFolderClick = rememberSearchResultFolderClick(

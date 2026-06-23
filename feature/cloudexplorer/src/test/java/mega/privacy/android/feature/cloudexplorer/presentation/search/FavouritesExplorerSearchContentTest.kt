@@ -15,7 +15,8 @@ import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.nodeExplorerDataState
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
@@ -56,12 +57,11 @@ internal class FavouritesExplorerSearchContentTest {
             )
         }
         val favouritesViewModel = mock<FavouritesExplorerViewModel> {
-            on { nodeExplorerSharedUiState } doReturn MutableStateFlow(
-                NodesExplorerSharedUiState(
+            on { uiState } doReturn MutableStateFlow<NodeExplorerUiState>(
+                nodeExplorerDataState(
                     searchItems = searchItems,
                     searchedQuery = QUERY,
                     searchLoadingState = NodesLoadingState.FullyLoaded,
-                    isHiddenNodeSettingsLoading = false,
                 )
             )
         }

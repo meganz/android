@@ -301,33 +301,16 @@ internal fun TabsScope.ChatExplorerTab(
     monitorResult: (String) -> Flow<Any?>,
     clearResult: (String) -> Unit,
     onHasContentChanged: (Boolean) -> Unit = {},
+    onLoadingChanged: (Boolean) -> Unit = {},
+    onConnectivityChanged: (Boolean) -> Unit = {},
 ) {
     val viewModel = hiltViewModel<ChatExplorerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
-    LaunchedEffect((uiState as? ChatExplorerUiState.Data)?.isEmpty) {
-        onHasContentChanged((uiState as? ChatExplorerUiState.Data)?.isEmpty == false)
-    }
     var selectionBeforeSearch by remember { mutableStateOf(selectionState.selectedChatIds) }
-    LaunchedEffect(showSearch) {
-        if (showSearch) {
-            selectionBeforeSearch = selectionState.selectedChatIds
-            return@LaunchedEffect
-        }
-        val index = (uiState as? ChatExplorerUiState.Data)?.items?.let { items ->
-            (selectionState.selectedChatIds - selectionBeforeSearch)
-                .mapNotNull { items.indexOfChat(it) }
-                .maxOrNull()
-        } ?: return@LaunchedEffect
-        listState.scrollToItem(index)
-    }
     val resources = LocalResources.current
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
-    val newChatCreatedEvent =
-        (uiState as? ChatExplorerUiState.Data)?.newChatCreatedEvent ?: consumed()
-    val chatsReadyToShareEvent =
-        (uiState as? ChatExplorerUiState.Data)?.chatsReadyToShareEvent ?: consumed()
     val newGroupChatResult by monitorResult(CreateGroupChatNavKey.KEY)
         .collectAsStateWithLifecycle(initialValue = null)
     val onSharedToChats = rememberOnSharedToChats(
@@ -335,35 +318,58 @@ internal fun TabsScope.ChatExplorerTab(
         onCloseExplorerScreen = onCloseExplorerScreen,
     )
 
+    when (val state = uiState) {
+        ChatExplorerUiState.Loading -> LaunchedEffect(Unit) {
+            onLoadingChanged(true)
+            onHasContentChanged(false)
+            onConnectivityChanged(true)
+        }
+
+        is ChatExplorerUiState.Data -> {
+            LaunchedEffect(Unit) { onLoadingChanged(false) }
+            LaunchedEffect(state.isEmpty) { onHasContentChanged(!state.isEmpty) }
+            LaunchedEffect(state.isConnected) { onConnectivityChanged(state.isConnected) }
+            EventEffect(
+                event = state.newChatCreatedEvent,
+                onConsumed = viewModel::onNewChatCreatedConsumed,
+            ) { chatId ->
+                if (chatId !in selectionState.selectedChatIds) {
+                    selectionState.toggleSelection(chatId)
+                }
+                coroutineScope.launch {
+                    snackbarHostState?.showAutoDurationSnackbar(
+                        resources.getString(sharedR.string.general_new_group_chat_created)
+                    )
+                }
+            }
+            EventEffect(
+                event = state.chatsReadyToShareEvent,
+                onConsumed = viewModel::onChatsReadyToShareConsumed,
+            ) { chatIds ->
+                if (shareTextToMegaNavKey != null) {
+                    onSharedToChats(chatIds)
+                } else {
+                    onChatsReadyToShare(chatIds)
+                }
+            }
+            LaunchedEffect(showSearch) {
+                if (showSearch) {
+                    selectionBeforeSearch = selectionState.selectedChatIds
+                    return@LaunchedEffect
+                }
+                val index = (selectionState.selectedChatIds - selectionBeforeSearch)
+                    .mapNotNull { state.items.indexOfChat(it) }
+                    .maxOrNull() ?: return@LaunchedEffect
+
+                listState.scrollToItem(index)
+            }
+        }
+    }
+
     LaunchedEffect(newGroupChatResult) {
         (newGroupChatResult as? CreateGroupChatNavKey.NewGroupChatResult)?.let { result ->
             clearResult(CreateGroupChatNavKey.KEY)
             viewModel.onContactsSelectedForGroupChat(result)
-        }
-    }
-
-    EventEffect(
-        event = newChatCreatedEvent,
-        onConsumed = viewModel::onNewChatCreatedConsumed,
-    ) { chatId ->
-        if (chatId !in selectionState.selectedChatIds) {
-            selectionState.toggleSelection(chatId)
-        }
-        coroutineScope.launch {
-            snackbarHostState?.showAutoDurationSnackbar(
-                resources.getString(sharedR.string.general_new_group_chat_created)
-            )
-        }
-    }
-
-    EventEffect(
-        event = chatsReadyToShareEvent,
-        onConsumed = viewModel::onChatsReadyToShareConsumed,
-    ) { chatIds ->
-        if (shareTextToMegaNavKey != null) {
-            onSharedToChats(chatIds)
-        } else {
-            onChatsReadyToShare(chatIds)
         }
     }
 
@@ -492,6 +498,7 @@ private fun ChatExplorerContentPreview(
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
                 searchResults = ChatExplorerUiState.Items.Empty,
+                isConnected = true,
             ),
             isProcessingAction = isProcessingAction,
             selectedChatIds = setOf(11L),
@@ -536,6 +543,7 @@ private fun ChatExplorerEmptyListPreview() {
                 newChatCreatedEvent = consumed(),
                 chatsReadyToShareEvent = consumed(),
                 searchResults = ChatExplorerUiState.Items.Empty,
+                isConnected = true,
             ),
             isProcessingAction = false,
             selectedChatIds = emptySet(),

@@ -12,11 +12,11 @@ import de.palm.composestateevents.triggered
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.nodeExplorerDataState
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewIncomingShareFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
@@ -34,10 +34,7 @@ internal class IncomingSharesExplorerContentTest {
     @Test
     fun `test that the empty view is shown when there are no incoming shares`() {
         setContent(
-            uiStateShared = NodesExplorerSharedUiState(
-                nodeSourceType = NodeSourceType.INCOMING_SHARES,
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-            ),
+            uiState = nodeExplorerDataState(nodeSourceType = NodeSourceType.INCOMING_SHARES),
         )
 
         composeTestRule.onNodeWithTag(NODES_EXPLORER_EMPTY_VIEW_TAG).assertIsDisplayed()
@@ -46,9 +43,8 @@ internal class IncomingSharesExplorerContentTest {
     @Test
     fun `test that incoming shares are shown and the empty view is hidden when there are nodes`() {
         setContent(
-            uiStateShared = NodesExplorerSharedUiState(
+            uiState = nodeExplorerDataState(
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
                 items = listOf(previewIncomingShareFolderNodeUiItem(1L, name = FOLDER_NAME)),
             ),
         )
@@ -62,9 +58,8 @@ internal class IncomingSharesExplorerContentTest {
     fun `test that clicking a folder with write access navigates into it`() {
         var clickedFolderId: NodeId? = null
         setContent(
-            uiStateShared = NodesExplorerSharedUiState(
+            uiState = nodeExplorerDataState(
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
                 items = listOf(
                     previewIncomingShareFolderNodeUiItem(
                         id = 1L,
@@ -85,9 +80,8 @@ internal class IncomingSharesExplorerContentTest {
     fun `test that clicking a read only folder does not navigate into it`() {
         var clickedFolderId: NodeId? = null
         setContent(
-            uiStateShared = NodesExplorerSharedUiState(
+            uiState = nodeExplorerDataState(
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
                 items = listOf(
                     previewIncomingShareFolderNodeUiItem(
                         id = 1L,
@@ -109,9 +103,8 @@ internal class IncomingSharesExplorerContentTest {
         var navigatedBack = false
         var consumed = false
         setContent(
-            uiStateShared = NodesExplorerSharedUiState(
+            uiState = nodeExplorerDataState(
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
                 navigateBack = triggered,
             ),
             onNavigateBack = { navigatedBack = true },
@@ -123,7 +116,7 @@ internal class IncomingSharesExplorerContentTest {
     }
 
     private fun setContent(
-        uiStateShared: NodesExplorerSharedUiState,
+        uiState: NodeExplorerUiState,
         onFolderClick: (NodeId) -> Unit = {},
         onNavigateBack: () -> Unit = {},
         consumeNavigateBack: () -> Unit = {},
@@ -137,7 +130,7 @@ internal class IncomingSharesExplorerContentTest {
                     ),
                 ) {
                     IncomingSharesExplorerContent(
-                        uiStateShared = uiStateShared,
+                        uiState = uiState,
                         onNavigateBack = onNavigateBack,
                         consumeNavigateBack = consumeNavigateBack,
                         onFolderClick = onFolderClick,

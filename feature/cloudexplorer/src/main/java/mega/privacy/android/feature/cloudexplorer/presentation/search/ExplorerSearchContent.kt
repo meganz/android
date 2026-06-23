@@ -21,7 +21,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.search.presentation.component.RecentSearchesView
@@ -104,7 +104,11 @@ internal fun rememberSearchResultFolderClick(
     val resources = LocalResources.current
     return { nodeId ->
         coroutineScope.launch {
-            if (viewModel.nodeExplorerSharedUiState.value.isConnected) {
+            val isConnected = when (val state = viewModel.uiState.value) {
+                NodeExplorerUiState.Loading -> true
+                is NodeExplorerUiState.Data -> state.isConnected
+            }
+            if (isConnected) {
                 onNavigateToFolderPath(viewModel.resolveSearchResultStack(nodeId))
                 onCloseSearch()
             } else {
@@ -141,18 +145,20 @@ internal fun SearchLoadingState(modifier: Modifier = Modifier) {
 }
 
 /**
- * Projects the search slice of the shared browse state onto the [NodesExplorerSharedUiState.items]/
- * [NodesExplorerSharedUiState.nodesLoadingState] the content composables render, so search reuses
+ * Projects the search slice of the shared browse state onto the [NodeExplorerUiState.Data.items]/
+ * [NodeExplorerUiState.Data.nodesLoadingState] the content composables render, so search reuses
  * the browse content without leaking into the browse list.
  *
  * Stays [NodesLoadingState.Loading] until the results match [query] (debounce window + in-flight
  * search), so the empty-results view never flashes before the real results arrive.
  */
-internal fun NodesExplorerSharedUiState.asSearchState(query: String?) =
-    copy(
+internal fun NodeExplorerUiState.asSearchState(query: String?): NodeExplorerUiState = when (this) {
+    NodeExplorerUiState.Loading -> NodeExplorerUiState.Loading
+    is NodeExplorerUiState.Data -> copy(
         items = searchItems,
         nodesLoadingState = if (query == searchedQuery) searchLoadingState else NodesLoadingState.Loading,
     )
+}
 
 
 internal const val EXPLORER_SEARCH_RECENT_TAG = "explorer_search:recent"

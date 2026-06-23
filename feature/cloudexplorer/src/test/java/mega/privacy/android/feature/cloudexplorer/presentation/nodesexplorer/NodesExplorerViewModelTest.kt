@@ -1,13 +1,11 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer
 
-import androidx.annotation.Nullable
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -34,19 +32,19 @@ import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodesExplorerViewModelTest {
 
@@ -92,9 +90,12 @@ class NodesExplorerViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
         whenever(monitorConnectivityUseCase()) doReturn emptyFlow()
-        wheneverBlocking { getNodesByIdInChunkUseCase(nodeId) } doReturn emptyFlow()
-        wheneverBlocking { getNodeInfoByIdUseCase(nodeId) } doReturn defaultNodeInfo
-        wheneverBlocking { getRootNodeIdUseCase() } doReturn null
+        whenever { getNodesByIdInChunkUseCase(nodeId) } doReturn flowOf(emptyList<TypedNode>() to false)
+        whenever { getNodeInfoByIdUseCase(nodeId) } doReturn defaultNodeInfo
+        whenever { getRootNodeIdUseCase() } doReturn null
+        whenever {
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+        } doReturn emptyList()
     }
 
     private fun initViewModel() {
@@ -113,25 +114,16 @@ class NodesExplorerViewModelTest {
             getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>(),
-            args = args
+            args = args,
         )
-    }
-
-    @Test
-    fun `test that initial state is correct`() = runTest {
-        initViewModel()
-
-        viewModel.nodesExplorerUiState.test {
-            assertThat(awaitItem().folderName).isEqualTo(LocalizedText.Literal(""))
-        }
     }
 
     @Test
     fun `test that nodes are loaded`() = runTest {
         val nodes = listOf<TypedNode>(mock())
-        val nodeUiItems = emptyList<NodeViewItem<TypedNode>>()
+        val nodeUiItems = listOf<NodeViewItem<TypedNode>>(mock())
 
-        whenever(getNodesByIdInChunkUseCase(nodeId)) doReturn flowOf(nodes to false)
+        whenever { getNodesByIdInChunkUseCase(nodeId) } doReturn flowOf(nodes to false)
         whenever(
             nodeViewItemMapper(
                 nodeList = nodes,
@@ -144,16 +136,19 @@ class NodesExplorerViewModelTest {
         ) doReturn nodeUiItems
 
         initViewModel()
-        advanceUntilIdle()
 
-        verify(getNodesByIdInChunkUseCase, times(1)).invoke(nodeId)
-        assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
+        viewModel.uiState.test {
+            val actual = awaitDataUntil { it.items.isNotEmpty() }
+            assertThat(actual.items).isEqualTo(nodeUiItems)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(getNodesByIdInChunkUseCase).invoke(nodeId)
     }
 
     @Test
     fun `test that nodes are refreshed`() = runTest {
         val nodes = listOf<TypedNode>(mock())
-        val nodeUiItems = emptyList<NodeViewItem<TypedNode>>()
+        val nodeUiItems = listOf<NodeViewItem<TypedNode>>(mock())
 
         whenever(getFileBrowserNodeChildrenUseCase(nodeId.longValue)) doReturn nodes
         whenever(
@@ -169,11 +164,14 @@ class NodesExplorerViewModelTest {
 
         initViewModel()
 
-        viewModel.refreshNodes()
-        advanceUntilIdle()
-
+        viewModel.uiState.test {
+            awaitData()
+            viewModel.refreshNodes()
+            val actual = awaitDataUntil { it.items.isNotEmpty() }
+            assertThat(actual.items).isEqualTo(nodeUiItems)
+            cancelAndIgnoreRemainingEvents()
+        }
         verify(getFileBrowserNodeChildrenUseCase).invoke(nodeId.longValue)
-        assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
     }
 
     @Test
@@ -182,36 +180,30 @@ class NodesExplorerViewModelTest {
             on { name } doReturn "folderName"
             on { isNodeKeyDecrypted } doReturn true
         }
-
         whenever(getNodeInfoByIdUseCase(nodeId)) doReturn nodeInfo
 
         initViewModel()
 
-        viewModel.nodesExplorerUiState.test {
-            assertThat(awaitItem().folderName).isEqualTo(LocalizedText.Literal("folderName"))
+        viewModel.uiState.test {
+            val actual = awaitDataUntil { it.folderName == LocalizedText.Literal("folderName") }
+            assertThat(actual.folderName).isEqualTo(LocalizedText.Literal("folderName"))
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @ParameterizedTest
-    @Nullable
     @ValueSource(longs = [5432, rootNodeHandle])
     fun `test that isRoot is updated`(
-        rootId: Long?,
+        rootId: Long,
     ) = runTest {
-        val nodeId = rootId?.let { NodeId(rootId) }
-
-        whenever(getRootNodeIdUseCase()) doReturn nodeId
+        whenever(getRootNodeIdUseCase()) doReturn NodeId(rootId)
 
         initViewModel()
 
-        viewModel.nodesExplorerUiState.test {
-            assertThat(awaitItem().isRoot).also {
-                if (rootId == null || rootId == rootNodeHandle) {
-                    it.isTrue()
-                } else {
-                    it.isFalse()
-                }
-            }
+        viewModel.uiState.test {
+            val actual = awaitData()
+            assertThat(actual.isRoot).isEqualTo(rootId == rootNodeHandle)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -220,8 +212,8 @@ class NodesExplorerViewModelTest {
         val nodes = listOf<TypedNode>(mock())
         val items = listOf<NodeViewItem<TypedNode>>(mock())
         whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.ROOT_NODES
-        wheneverBlocking { searchUseCase(any(), any(), any()) } doReturn nodes
-        wheneverBlocking {
+        whenever { searchUseCase(any(), any(), any()) } doReturn nodes
+        whenever {
             nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = nodeSourceType,
@@ -233,18 +225,34 @@ class NodesExplorerViewModelTest {
         } doReturn items
 
         initViewModel()
-        viewModel.onSearchQuery("doc")
-        advanceUntilIdle()
 
-        assertThat(viewModel.nodeExplorerSharedUiState.value.searchItems).isEqualTo(items)
+        viewModel.uiState.test {
+            awaitData()
+            viewModel.onSearchQuery("doc")
+            val actual = awaitDataUntil { it.searchItems.isNotEmpty() }
+            assertThat(actual.searchItems).isEqualTo(items)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    private suspend fun ReceiveTurbine<NodeExplorerUiState>.awaitData(): NodeExplorerUiState.Data {
+        var item = awaitItem()
+        while (item !is NodeExplorerUiState.Data) {
+            item = awaitItem()
+        }
+        return item
+    }
+
+    private suspend fun ReceiveTurbine<NodeExplorerUiState>.awaitDataUntil(
+        predicate: (NodeExplorerUiState.Data) -> Boolean,
+    ): NodeExplorerUiState.Data {
+        while (true) {
+            val item = awaitItem()
+            if (item is NodeExplorerUiState.Data && predicate(item)) return item
+        }
     }
 
     companion object {
         private const val rootNodeHandle = 1234L
-        private val testDispatcher = UnconfinedTestDispatcher()
-
-        @JvmField
-        @RegisterExtension
-        val extension = CoroutineMainDispatcherExtension(testDispatcher)
     }
 }

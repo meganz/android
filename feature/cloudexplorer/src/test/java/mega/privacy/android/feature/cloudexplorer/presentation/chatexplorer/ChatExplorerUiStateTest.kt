@@ -68,6 +68,7 @@ internal class ChatExplorerUiStateTest {
         newChatCreatedEvent = consumed(),
         chatsReadyToShareEvent = consumed(),
         searchResults = ChatExplorerUiState.Items.Empty,
+        isConnected = true,
     )
 
     @Test

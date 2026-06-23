@@ -9,10 +9,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NODES_EXPLORER_EMPTY_VIEW_TAG
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.nodeExplorerDataState
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
@@ -29,24 +29,14 @@ internal class FavouritesExplorerContentTest {
 
     @Test
     fun `test that the empty view is shown when there are no favourites in file picker mode`() {
-        setContent(
-            isFolderPicker = false,
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-            ),
-        )
+        setContent(isFolderPicker = false, uiState = nodeExplorerDataState())
 
         composeTestRule.onNodeWithTag(NODES_EXPLORER_EMPTY_VIEW_TAG).assertIsDisplayed()
     }
 
     @Test
     fun `test that the empty view is shown when there are no favourites in folder picker mode`() {
-        setContent(
-            isFolderPicker = true,
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-            ),
-        )
+        setContent(isFolderPicker = true, uiState = nodeExplorerDataState())
 
         composeTestRule.onNodeWithTag(NODES_EXPLORER_EMPTY_VIEW_TAG).assertIsDisplayed()
     }
@@ -55,8 +45,7 @@ internal class FavouritesExplorerContentTest {
     fun `test that favourites are shown and the empty view is hidden when there are nodes`() {
         setContent(
             isFolderPicker = false,
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
+            uiState = nodeExplorerDataState(
                 items = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME)),
             ),
         )
@@ -72,10 +61,7 @@ internal class FavouritesExplorerContentTest {
         var consumed = false
         setContent(
             isFolderPicker = false,
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-                navigateBack = triggered,
-            ),
+            uiState = nodeExplorerDataState(navigateBack = triggered),
             onNavigateBack = { navigatedBack = true },
             consumeNavigateBack = { consumed = true },
         )
@@ -86,7 +72,7 @@ internal class FavouritesExplorerContentTest {
 
     private fun setContent(
         isFolderPicker: Boolean,
-        uiStateShared: NodesExplorerSharedUiState,
+        uiState: NodeExplorerUiState,
         onNavigateBack: () -> Unit = {},
         consumeNavigateBack: () -> Unit = {},
     ) {
@@ -99,7 +85,7 @@ internal class FavouritesExplorerContentTest {
                     ),
                 ) {
                     FavouritesExplorerContent(
-                        uiStateShared = uiStateShared,
+                        uiState = uiState,
                         isFolderPicker = isFolderPicker,
                         onNavigateBack = onNavigateBack,
                         consumeNavigateBack = consumeNavigateBack,

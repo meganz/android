@@ -9,7 +9,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
@@ -28,24 +27,14 @@ internal class NodesExplorerScreenContentTest {
 
     @Test
     fun `test that the empty view is shown when the root folder has no nodes`() {
-        setContent(
-            uiState = NodesExplorerUiState(isRoot = true),
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-            ),
-        )
+        setContent(uiState = nodeExplorerDataState(isRoot = true))
 
         composeTestRule.onNodeWithTag(NODES_EXPLORER_EMPTY_VIEW_TAG).assertIsDisplayed()
     }
 
     @Test
     fun `test that the empty view is shown when a sub folder has no nodes`() {
-        setContent(
-            uiState = NodesExplorerUiState(isRoot = false),
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-            ),
-        )
+        setContent(uiState = nodeExplorerDataState(isRoot = false))
 
         composeTestRule.onNodeWithTag(NODES_EXPLORER_EMPTY_VIEW_TAG).assertIsDisplayed()
     }
@@ -53,9 +42,7 @@ internal class NodesExplorerScreenContentTest {
     @Test
     fun `test that nodes are shown and the empty view is hidden when there are nodes`() {
         setContent(
-            uiState = NodesExplorerUiState(),
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
+            uiState = nodeExplorerDataState(
                 items = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME))
                         + previewFileNodeUiItem(10L),
             ),
@@ -69,9 +56,7 @@ internal class NodesExplorerScreenContentTest {
     @Test
     fun `test that sensitive nodes are hidden when hidden nodes are enabled and not shown`() {
         setContent(
-            uiState = NodesExplorerUiState(),
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
+            uiState = nodeExplorerDataState(
                 isHiddenNodesEnabled = true,
                 showHiddenNodes = false,
                 items = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME).copy(isSensitive = true)),
@@ -84,9 +69,7 @@ internal class NodesExplorerScreenContentTest {
     @Test
     fun `test that sensitive nodes are shown when the user opted to show hidden nodes`() {
         setContent(
-            uiState = NodesExplorerUiState(),
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
+            uiState = nodeExplorerDataState(
                 isHiddenNodesEnabled = true,
                 showHiddenNodes = true,
                 items = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME).copy(isSensitive = true)),
@@ -99,9 +82,7 @@ internal class NodesExplorerScreenContentTest {
     @Test
     fun `test that sensitive nodes are shown when the hidden nodes feature is disabled`() {
         setContent(
-            uiState = NodesExplorerUiState(),
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
+            uiState = nodeExplorerDataState(
                 isHiddenNodesEnabled = false,
                 showHiddenNodes = false,
                 items = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME).copy(isSensitive = true)),
@@ -114,9 +95,7 @@ internal class NodesExplorerScreenContentTest {
     @Test
     fun `test that nodes are rendered in grid view`() {
         setContent(
-            uiState = NodesExplorerUiState(),
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
+            uiState = nodeExplorerDataState(
                 items = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME)),
             ),
             viewType = ViewType.GRID,
@@ -130,11 +109,7 @@ internal class NodesExplorerScreenContentTest {
         var navigatedBack = false
         var consumed = false
         setContent(
-            uiState = NodesExplorerUiState(),
-            uiStateShared = NodesExplorerSharedUiState(
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-                navigateBack = triggered,
-            ),
+            uiState = nodeExplorerDataState(navigateBack = triggered),
             onNavigateBack = { navigatedBack = true },
             consumeNavigateBack = { consumed = true },
         )
@@ -144,8 +119,7 @@ internal class NodesExplorerScreenContentTest {
     }
 
     private fun setContent(
-        uiState: NodesExplorerUiState,
-        uiStateShared: NodesExplorerSharedUiState,
+        uiState: NodeExplorerUiState,
         viewType: ViewType = ViewType.LIST,
         onNavigateBack: () -> Unit = {},
         consumeNavigateBack: () -> Unit = {},
@@ -160,7 +134,6 @@ internal class NodesExplorerScreenContentTest {
                 ) {
                     NodesExplorerScreenContent(
                         uiState = uiState,
-                        uiStateShared = uiStateShared,
                         onNavigateBack = onNavigateBack,
                         consumeNavigateBack = consumeNavigateBack,
                         onFolderClick = {},

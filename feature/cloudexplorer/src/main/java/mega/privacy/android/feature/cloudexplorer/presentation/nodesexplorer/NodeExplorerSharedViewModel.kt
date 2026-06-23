@@ -2,18 +2,30 @@ package mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -31,164 +43,228 @@ import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import timber.log.Timber
 
 /**
- * Shared ViewModel for node explorer screens (cloud, incoming shares, favourites).
+ * Shared ViewModel for node explorer screens (cloud, incoming shares, favourites). Builds the whole
+ * [uiState] reactively from the source's [nodesFlow] plus the shared monitors; subclasses only
+ * supply how nodes are fetched plus the folder title/root flags.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 abstract class NodeExplorerSharedViewModel(
-    private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
-    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
-    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
-    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
+    monitorStorageStateUseCase: MonitorStorageStateUseCase,
+    monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val nodeViewItemMapper: NodeViewItemMapper,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val searchUseCase: SearchUseCase,
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
-    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val args: Args,
 ) : ViewModel() {
 
-    private val _nodeExplorerSharedUiState = MutableStateFlow(NodesExplorerSharedUiState())
-    val nodeExplorerSharedUiState = _nodeExplorerSharedUiState.asStateFlow()
+    /** Raw nodes for this source, with the current loading progress. */
+    protected abstract val nodesFlow: Flow<NodesResult>
 
-    private val searchQuery = MutableStateFlow<String?>(null)
+    /** The folder title for this source. Non-cloud sources emit a blank/source-level title. */
+    protected abstract val folderNameFlow: Flow<LocalizedText>
 
-    init {
-        _nodeExplorerSharedUiState.update { state ->
-            state.copy(
-                currentFolderId = args.nodeId,
-                nodeSourceType = args.nodeSourceType
-            )
-        }
-        monitorHiddenNodes()
-        monitorStorageOverQuota()
-        monitorSearchQuery()
-        monitorConnectivity()
-    }
+    /** Whether the current folder is the source root. Non-cloud sources emit `true`. */
+    protected abstract val isRootNodeFlow: Flow<Boolean>
 
-    private fun monitorConnectivity() {
-        viewModelScope.launch {
-            var isFirstEmission = true
-            monitorConnectivityUseCase()
+    /** Sources that need a manual refetch on SDK node updates opt in; reactive sources leave `false`. */
+    protected open val monitorsNodeUpdates: Boolean = true
+
+    private val searchQueryChannel = Channel<String?>(Channel.CONFLATED)
+    private val navigateBackChannel = Channel<StateEvent>(Channel.CONFLATED)
+    private val noConnectionChannel = Channel<StateEvent>(Channel.CONFLATED)
+    private val manualRefreshChannel = Channel<Unit>(Channel.CONFLATED)
+
+    private val nodeUpdates: Flow<NodeChanges> by lazy {
+        if (monitorsNodeUpdates) {
+            monitorNodeUpdatesByIdUseCase(args.nodeId, args.nodeSourceType)
                 .catch { Timber.e(it) }
-                .collectLatest { isConnected ->
-                    _nodeExplorerSharedUiState.update { state ->
-                        state.copy(
-                            isConnected = isConnected,
-                            noConnectionEvent = if (isFirstEmission && !isConnected) {
-                                triggered
-                            } else {
-                                state.noConnectionEvent
-                            },
-                        )
-                    }
-                    isFirstEmission = false
-                }
+        } else {
+            emptyFlow()
         }
     }
 
-    fun onNoConnectionEventConsumed() {
-        _nodeExplorerSharedUiState.update { state -> state.copy(noConnectionEvent = consumed) }
+    /**
+     * A tick subclasses fold into [nodesFlow] to refetch — fired by pull-to-refresh and by non-removal
+     * SDK node updates. Node removals route to [navigateBackFlow] instead. Lazy so it is wired after
+     * subclass construction (it reads the overridable [monitorsNodeUpdates]).
+     */
+    protected val refreshSignal: Flow<Unit> by lazy {
+        merge(
+            manualRefreshChannel.receiveAsFlow(),
+            nodeUpdates
+                .onEach { if (it == NodeChanges.Remove) navigateBackChannel.trySend(triggered) }
+                .filter { it != NodeChanges.Remove }
+                .map { },
+        )
     }
 
-    fun monitorNodeUpdates() {
-        viewModelScope.launch {
-            monitorNodeUpdatesByIdUseCase(
-                nodeId = args.nodeId,
-                nodeSourceType = args.nodeSourceType,
-            ).onStart {
-                loadNodes()
-            }.catch { Timber.e(it) }
-                .collectLatest { change ->
-                    if (change == NodeChanges.Remove) {
-                        _nodeExplorerSharedUiState.update { state -> state.copy(navigateBack = triggered) }
-                    } else {
-                        refreshNodes()
-                    }
-                }
+    private val hiddenEnabledFlow = monitorHiddenNodesEnabledUseCase()
+        .catch { Timber.e(it) }
+        .onStart { emit(false) }
+
+    private val showHiddenFlow = monitorShowHiddenItemsUseCase()
+        .catch { Timber.e(it) }
+        .onStart { emit(false) }
+
+    private val storageOverQuotaFlow = monitorStorageStateUseCase()
+        .map { it == StorageState.Red || it == StorageState.PayWall }
+        .catch { Timber.e(it) }
+        .onStart { emit(false) }
+
+    private val connectivityFlow = monitorConnectivityUseCase()
+        .catch { Timber.e(it) }
+        .withIndex()
+        .onEach { (index, isConnected) ->
+            if (index == 0 && !isConnected) noConnectionChannel.trySend(triggered)
         }
+        .map { it.value }
+        .onStart { emit(true) }
+
+    private val noConnectionFlow = noConnectionChannel.receiveAsFlow().onStart { emit(consumed) }
+    private val navigateBackFlow = navigateBackChannel.receiveAsFlow().onStart { emit(consumed) }
+
+    private val searchFlow: Flow<SearchState> = combine(
+        searchQueryChannel.receiveAsFlow()
+            .onStart { emit(null) }
+            .distinctUntilChanged()
+            .flatMapLatest { query -> searchResults(query) },
+        hiddenEnabledFlow,
+    ) { result, isHiddenNodesEnabled ->
+        SearchState(
+            items = if (result.loadingState == NodesLoadingState.Loading) {
+                emptyList()
+            } else {
+                mapNodes(result.nodes, isHiddenNodesEnabled)
+            },
+            loadingState = result.loadingState,
+            query = result.query,
+        )
     }
 
-    private fun monitorStorageOverQuota() {
-        viewModelScope.launch {
-            monitorStorageStateUseCase().collectLatest { storageState ->
-                val isStorageOverQuota = storageState == StorageState.Red
-                        || storageState == StorageState.PayWall
-                _nodeExplorerSharedUiState.update { state ->
-                    state.copy(isStorageOverQuota = isStorageOverQuota)
-                }
-            }
-        }
-    }
-
-    private fun monitorHiddenNodes() {
-        viewModelScope.launch {
-            combine(
-                monitorHiddenNodesEnabledUseCase()
-                    .catch { Timber.e(it) },
-                monitorShowHiddenItemsUseCase()
-                    .catch { Timber.e(it) },
-            ) { isHiddenNodesEnabled, showHiddenItems ->
-                _nodeExplorerSharedUiState.update { state ->
-                    state.copy(
-                        isHiddenNodeSettingsLoading = false,
-                        isHiddenNodesEnabled = isHiddenNodesEnabled,
-                        showHiddenNodes = showHiddenItems
-                    )
-                }
-            }.collect()
-        }
-    }
-
-    protected fun setItems(
-        nodes: List<TypedNode>, nodesLoadingState: NodesLoadingState,
-    ) {
-        viewModelScope.launch {
-            val nodeUiItems = nodeViewItemMapper(
-                nodeList = nodes,
-                nodeSourceType = args.nodeSourceType,
-                highlightedNodeId = null,
-                isHiddenNodesEnabled = _nodeExplorerSharedUiState.value.isHiddenNodesEnabled,
-                highlightedNames = null,
-                isContactVerificationOn = contactVerificationEnabled(),
+    private val mappedItemsFlow: Flow<MappedItems> by lazy {
+        combine(
+            nodesFlow.onStart { emit(NodesResult(emptyList(), NodesLoadingState.Loading)) },
+            hiddenEnabledFlow,
+        ) { result, isHiddenNodesEnabled ->
+            MappedItems(
+                items = mapNodes(result.nodes, isHiddenNodesEnabled),
+                loadingState = result.loadingState,
             )
+        }
+    }
 
-            _nodeExplorerSharedUiState.update { state ->
-                state.copy(
-                    items = nodeUiItems,
-                    nodesLoadingState = nodesLoadingState,
+    private val folderInfoFlow: Flow<FolderInfo> by lazy {
+        combine(folderNameFlow, isRootNodeFlow) { folderName, isRoot ->
+            FolderInfo(
+                folderName,
+                isRoot
+            )
+        }
+    }
+
+    private val globalFlow: Flow<Global> = combine(
+        hiddenEnabledFlow,
+        showHiddenFlow,
+        storageOverQuotaFlow,
+        connectivityFlow,
+    ) { isHiddenNodesEnabled, showHiddenNodes, isStorageOverQuota, isConnected ->
+        Global(isHiddenNodesEnabled, showHiddenNodes, isStorageOverQuota, isConnected)
+    }
+
+    private val eventsFlow: Flow<Events> = combine(
+        navigateBackFlow,
+        noConnectionFlow,
+    ) { navigateBack, noConnectionEvent -> Events(navigateBack, noConnectionEvent) }
+
+    val uiState: StateFlow<NodeExplorerUiState> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            mappedItemsFlow,
+            searchFlow,
+            folderInfoFlow,
+            globalFlow,
+            eventsFlow,
+        ) { items, search, folderInfo, global, events ->
+            if (items.loadingState == NodesLoadingState.Loading) {
+                NodeExplorerUiState.Loading
+            } else {
+                NodeExplorerUiState.Data(
+                    currentFolderId = args.nodeId,
+                    nodeSourceType = args.nodeSourceType,
+                    items = items.items,
+                    nodesLoadingState = items.loadingState,
+                    searchItems = search.items,
+                    searchLoadingState = search.loadingState,
+                    searchedQuery = search.query,
+                    showHiddenNodes = global.showHiddenNodes,
+                    isHiddenNodesEnabled = global.isHiddenNodesEnabled,
+                    isStorageOverQuota = global.isStorageOverQuota,
+                    isConnected = global.isConnected,
+                    navigateBack = events.navigateBack,
+                    noConnectionEvent = events.noConnectionEvent,
+                    folderName = folderInfo.folderName,
+                    isRoot = folderInfo.isRoot,
                 )
             }
-        }
+        }.asUiStateFlow(viewModelScope, NodeExplorerUiState.Loading)
     }
+
+    private suspend fun mapNodes(
+        nodes: List<TypedNode>,
+        isHiddenNodesEnabled: Boolean,
+    ): List<NodeViewItem<TypedNode>> = nodeViewItemMapper(
+        nodeList = nodes,
+        nodeSourceType = args.nodeSourceType,
+        highlightedNodeId = null,
+        isHiddenNodesEnabled = isHiddenNodesEnabled,
+        highlightedNames = null,
+        isContactVerificationOn = contactVerificationEnabled(),
+    )
 
     private suspend fun contactVerificationEnabled() =
         runCatching { getContactVerificationWarningUseCase() }.getOrDefault(false)
 
-    /**
-     * Sets the query whose matches [NodesExplorerSharedUiState.searchItems] exposes. Pass `null`/blank
-     * when the search is closed. Re-issuing the same query is ignored (the backing [StateFlow] only
-     * emits on change) so a configuration change keeps the previous results.
-     */
-    fun onSearchQuery(query: String?) {
-        if (!query.isNullOrBlank() && query != _nodeExplorerSharedUiState.value.searchedQuery) {
-            _nodeExplorerSharedUiState.update { state ->
-                state.copy(searchLoadingState = NodesLoadingState.Loading)
-            }
+    private fun searchResults(query: String?): Flow<SearchResult> = when {
+        query.isNullOrBlank() -> flowOf(
+            SearchResult(
+                emptyList(),
+                NodesLoadingState.FullyLoaded,
+                query
+            )
+        )
+
+        else -> flow {
+            emit(SearchResult(emptyList(), NodesLoadingState.Loading, query))
+            val nodes = runCatching {
+                searchUseCase(
+                    parentHandle = args.nodeId,
+                    nodeSourceType = args.nodeSourceType,
+                    searchParameters = SearchParameters(
+                        query = query,
+                        searchTarget = nodeSourceTypeToSearchTargetMapper(args.nodeSourceType),
+                        description = query,
+                    ),
+                )
+            }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
+            emit(SearchResult(nodes, NodesLoadingState.FullyLoaded, query))
         }
-        searchQuery.value = query
     }
 
     /**
-     * Runs the search for the latest [searchQuery]; [collectLatest] cancels the previous search when
-     * a new query arrives.
+     * Sets the query whose matches [NodeExplorerUiState.Data.searchItems] exposes. Pass `null`/blank
+     * when the search is closed. Re-issuing the same query is ignored ([distinctUntilChanged]) so a
+     * configuration change keeps the previous results.
      */
-    private fun monitorSearchQuery() {
-        viewModelScope.launch {
-            searchQuery.filterNotNull().collectLatest { search(it) }
-        }
+    fun onSearchQuery(query: String?) {
+        viewModelScope.launch { searchQueryChannel.send(query) }
     }
 
     /**
@@ -203,61 +279,60 @@ abstract class NodeExplorerSharedViewModel(
             .orEmpty()
             .ifEmpty { listOf(nodeId) }
 
-    /**
-     * Runs a recursive search for [query] scoped to this source ([Args.nodeId]/[Args.nodeSourceType])
-     * and folds the matches into [NodesExplorerSharedUiState.searchItems], kept separate from
-     * [NodesExplorerSharedUiState.items] so the browse list stays unfiltered.
-     */
-    private suspend fun search(query: String?) {
-        if (query.isNullOrBlank()) {
-            _nodeExplorerSharedUiState.update { state ->
-                state.copy(
-                    searchItems = emptyList(),
-                    searchLoadingState = NodesLoadingState.FullyLoaded,
-                    searchedQuery = query,
-                )
-            }
-            return
-        }
-        val nodes = runCatching {
-            searchUseCase(
-                parentHandle = args.nodeId,
-                nodeSourceType = args.nodeSourceType,
-                searchParameters = SearchParameters(
-                    query = query,
-                    searchTarget = nodeSourceTypeToSearchTargetMapper(args.nodeSourceType),
-                    description = query,
-                ),
-            )
-        }.onFailure { Timber.e(it) }.getOrDefault(emptyList())
-        val items = nodeViewItemMapper(
-            nodeList = nodes,
-            nodeSourceType = args.nodeSourceType,
-            highlightedNodeId = null,
-            isHiddenNodesEnabled = _nodeExplorerSharedUiState.value.isHiddenNodesEnabled,
-            highlightedNames = null,
-            isContactVerificationOn = contactVerificationEnabled(),
-        )
-        _nodeExplorerSharedUiState.update { state ->
-            state.copy(
-                searchItems = items,
-                searchLoadingState = NodesLoadingState.FullyLoaded,
-                searchedQuery = query,
-            )
-        }
+    /** Pull-to-refresh: refetches this source's nodes through [refreshSignal]. */
+    fun refreshNodes() {
+        manualRefreshChannel.trySend(Unit)
     }
 
     fun onNavigateBackEventConsumed() {
-        _nodeExplorerSharedUiState.update { state ->
-            state.copy(navigateBack = consumed)
-        }
+        navigateBackChannel.trySend(consumed)
     }
 
-    abstract fun loadNodes()
-    abstract fun refreshNodes()
+    fun onNoConnectionEventConsumed() {
+        noConnectionChannel.trySend(consumed)
+    }
 
     data class Args(
         val nodeId: NodeId,
         val nodeSourceType: NodeSourceType,
+    )
+
+    private data class MappedItems(
+        val items: List<NodeViewItem<TypedNode>>,
+        val loadingState: NodesLoadingState,
+    )
+
+    private data class SearchResult(
+        val nodes: List<TypedNode>,
+        val loadingState: NodesLoadingState,
+        val query: String?,
+    )
+
+    private data class SearchState(
+        val items: List<NodeViewItem<TypedNode>>,
+        val loadingState: NodesLoadingState,
+        val query: String?,
+    )
+
+    private data class Global(
+        val isHiddenNodesEnabled: Boolean,
+        val showHiddenNodes: Boolean,
+        val isStorageOverQuota: Boolean,
+        val isConnected: Boolean,
+    )
+
+    private data class FolderInfo(
+        val folderName: LocalizedText,
+        val isRoot: Boolean,
+    )
+
+    private data class Events(
+        val navigateBack: StateEvent,
+        val noConnectionEvent: StateEvent,
+    )
+
+    data class NodesResult(
+        val nodes: List<TypedNode>,
+        val loadingState: NodesLoadingState,
     )
 }

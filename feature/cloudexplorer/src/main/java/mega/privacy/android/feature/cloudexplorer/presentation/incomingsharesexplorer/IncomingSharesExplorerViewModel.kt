@@ -1,27 +1,33 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer
 
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onStart
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
+import timber.log.Timber
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class IncomingSharesExplorerViewModel @Inject constructor(
     monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
@@ -52,24 +58,20 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     ),
 ) {
 
-    private val _incomingSharesExplorerInternalUiState =
-        MutableStateFlow(IncomingSharesExplorerUiState())
-    val incomingSharesExplorerUiState = _incomingSharesExplorerInternalUiState.asStateFlow()
+    override val folderNameFlow: Flow<LocalizedText> = flowOf(LocalizedText.Literal(""))
 
-    init {
-        monitorNodeUpdates()
-    }
+    override val isRootNodeFlow: Flow<Boolean> = flowOf(true)
 
-    override fun loadNodes() {
-        viewModelScope.launch {
-            setItems(
-                nodes = getIncomingSharesChildrenNodeUseCase(-1),
-                nodesLoadingState = NodesLoadingState.FullyLoaded
-            )
+    override val nodesFlow: Flow<NodesResult> = refreshSignal
+        .onStart { emit(Unit) }
+        .flatMapLatest {
+            flow {
+                emit(
+                    NodesResult(
+                        nodes = getIncomingSharesChildrenNodeUseCase(-1),
+                        loadingState = NodesLoadingState.FullyLoaded,
+                    )
+                )
+            }.catch { Timber.e(it) }
         }
-    }
-
-    override fun refreshNodes() {
-        loadNodes()
-    }
 }

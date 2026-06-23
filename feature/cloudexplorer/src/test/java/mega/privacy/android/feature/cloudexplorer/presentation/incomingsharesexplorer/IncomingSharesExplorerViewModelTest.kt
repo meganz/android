@@ -1,16 +1,16 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer
 
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -20,23 +20,25 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
 import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IncomingSharesExplorerViewModelTest {
 
@@ -52,7 +54,6 @@ class IncomingSharesExplorerViewModelTest {
     private val nodeSourceTypeToSearchTargetMapper = mock<NodeSourceTypeToSearchTargetMapper>()
     private val getNodeNavigationStackUseCase = mock<GetNodeNavigationStackUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-
 
     @BeforeEach
     fun setUp() {
@@ -71,16 +72,9 @@ class IncomingSharesExplorerViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(any(), any())) doReturn emptyFlow()
         whenever(monitorConnectivityUseCase()) doReturn emptyFlow()
-        wheneverBlocking { getIncomingSharesChildrenNodeUseCase(any()) } doReturn emptyList()
-        wheneverBlocking {
-            nodeViewItemMapper(
-                nodeList = emptyList(),
-                nodeSourceType = NodeSourceType.INCOMING_SHARES,
-                highlightedNodeId = null,
-                isHiddenNodesEnabled = false,
-                highlightedNames = null,
-                isContactVerificationOn = false,
-            )
+        whenever { getIncomingSharesChildrenNodeUseCase(any()) } doReturn emptyList()
+        whenever {
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
         } doReturn emptyList()
     }
 
@@ -101,22 +95,12 @@ class IncomingSharesExplorerViewModelTest {
     }
 
     @Test
-    fun `test that initial state is correct`() = runTest {
-        initViewModel()
-        viewModel.incomingSharesExplorerUiState.test {
-            assertThat(awaitItem()).isNotNull()
-        }
-    }
-
-    @Test
     fun `test that nodes are loaded`() = runTest {
-        val nodes = emptyList<ShareNode>()
-        val nodeUiItems = emptyList<NodeViewItem<TypedNode>>()
-
-        whenever(getIncomingSharesChildrenNodeUseCase(any())) doReturn nodes
+        val nodeUiItems = listOf<NodeViewItem<TypedNode>>(mock())
+        whenever { getIncomingSharesChildrenNodeUseCase(-1) } doReturn emptyList()
         whenever(
             nodeViewItemMapper(
-                nodeList = nodes,
+                nodeList = emptyList(),
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
                 highlightedNodeId = null,
                 isHiddenNodesEnabled = false,
@@ -126,44 +110,37 @@ class IncomingSharesExplorerViewModelTest {
         ) doReturn nodeUiItems
 
         initViewModel()
-        advanceUntilIdle()
 
-        verify(getIncomingSharesChildrenNodeUseCase, times(1)).invoke(-1L)
-        assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
+        viewModel.uiState.test {
+            val actual = awaitDataUntil { it.items.isNotEmpty() }
+            assertThat(actual.items).isEqualTo(nodeUiItems)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(getIncomingSharesChildrenNodeUseCase).invoke(-1)
     }
 
     @Test
     fun `test that nodes are refreshed`() = runTest {
-        val nodes = emptyList<ShareNode>()
-        val nodeUiItems = emptyList<NodeViewItem<TypedNode>>()
-
-        whenever(getIncomingSharesChildrenNodeUseCase(any())) doReturn nodes
-        whenever(
-            nodeViewItemMapper(
-                nodeList = nodes,
-                nodeSourceType = NodeSourceType.INCOMING_SHARES,
-                highlightedNodeId = null,
-                isHiddenNodesEnabled = true,
-                highlightedNames = null,
-                isContactVerificationOn = false,
-            )
-        ) doReturn nodeUiItems
+        whenever { getIncomingSharesChildrenNodeUseCase(-1) } doReturn emptyList()
 
         initViewModel()
-        advanceUntilIdle()
 
-        viewModel.refreshNodes()
-        advanceUntilIdle()
-
-        verify(getIncomingSharesChildrenNodeUseCase, times(2)).invoke(-1L)
-        assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
+        viewModel.uiState.test {
+            awaitDataUntil { it.nodesLoadingState == NodesLoadingState.FullyLoaded }
+            viewModel.refreshNodes()
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(getIncomingSharesChildrenNodeUseCase, times(2)).invoke(-1)
     }
 
-    companion object {
-        private val testDispatcher = UnconfinedTestDispatcher()
-
-        @JvmField
-        @RegisterExtension
-        val extension = CoroutineMainDispatcherExtension(testDispatcher)
+    private suspend fun ReceiveTurbine<NodeExplorerUiState>.awaitDataUntil(
+        predicate: (NodeExplorerUiState.Data) -> Boolean,
+    ): NodeExplorerUiState.Data {
+        while (true) {
+            val item = awaitItem()
+            if (item is NodeExplorerUiState.Data && predicate(item)) return item
+        }
     }
+
 }

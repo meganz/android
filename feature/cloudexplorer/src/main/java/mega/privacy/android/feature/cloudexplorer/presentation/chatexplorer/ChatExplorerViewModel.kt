@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
@@ -27,8 +28,8 @@ import mega.privacy.android.domain.usecase.chat.GetArchivedChatListItemsUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.explorer.GetVisibleContactsWithoutChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerViewModel.Companion.RECENT_CHATS_LIMIT
-import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 import mega.privacy.android.shared.chats.model.ChatExplorerUiItem
 import timber.log.Timber
@@ -45,6 +46,7 @@ internal class ChatExplorerViewModel @Inject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val sendTextMessageUseCase: SendTextMessageUseCase,
     private val chatExplorerUiItemMapper: ChatExplorerUiItemMapper,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     private val newChatCreatedChannel = Channel<StateEventWithContent<Long>>(Channel.BUFFERED)
@@ -57,8 +59,9 @@ internal class ChatExplorerViewModel @Inject constructor(
             chatItemsFlow(),
             searchQueryChannel.receiveAsFlow().onStart { emit(null) }.distinctUntilChanged(),
             newChatCreatedChannel.receiveAsFlow().onStart { emit(consumed()) },
-            chatsReadyToShareChannel.receiveAsFlow().onStart { emit(consumed()) }
-        ) { chats, search, newChatCreatedEvent, chatsReadyToShareEvent ->
+            chatsReadyToShareChannel.receiveAsFlow().onStart { emit(consumed()) },
+            monitorConnectivityUseCase().catch { Timber.e(it) }.onStart { emit(true) },
+        ) { chats, search, newChatCreatedEvent, chatsReadyToShareEvent, isConnected ->
             ChatExplorerUiState.Data(
                 items = chats,
                 searchResults = if (search == null || search.query.isBlank()) {
@@ -68,6 +71,7 @@ internal class ChatExplorerViewModel @Inject constructor(
                 },
                 newChatCreatedEvent = newChatCreatedEvent,
                 chatsReadyToShareEvent = chatsReadyToShareEvent,
+                isConnected = isConnected,
             )
         }.catch { e -> Timber.e(e, "Failed to assemble chat explorer state") }
             .asUiStateFlow(viewModelScope, ChatExplorerUiState.Loading)

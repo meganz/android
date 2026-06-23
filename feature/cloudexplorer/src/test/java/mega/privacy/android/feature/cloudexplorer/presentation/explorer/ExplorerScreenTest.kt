@@ -21,11 +21,10 @@ import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.nodeExplorerDataState
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
@@ -72,7 +71,12 @@ internal class ExplorerScreenTest {
 
     @Test
     fun `test that the folder name is shown as the title in inner navigation`() {
-        setContent(uiState = NodesExplorerUiState(folderName = LocalizedText.Literal(FOLDER_NAME)))
+        setContent(
+            uiState = nodeExplorerDataState(
+                folderName = LocalizedText.Literal(FOLDER_NAME),
+                isRoot = false,
+            ),
+        )
 
         composeTestRule.onNodeWithText(FOLDER_NAME).assertIsDisplayed()
     }
@@ -81,7 +85,7 @@ internal class ExplorerScreenTest {
     fun `test that clicking the action button in folder picker mode picks the current folder`() {
         var pickedFolderId: NodeId? = null
         setContent(
-            uiStateShared = sharedUiState(currentFolderId = CURRENT_FOLDER_ID),
+            nodeExplorerId = CURRENT_FOLDER_ID,
             onFolderPicked = { pickedFolderId = it },
         )
 
@@ -94,7 +98,7 @@ internal class ExplorerScreenTest {
     fun `test that clicking the action button does not pick the folder when offline`() {
         var pickedFolderId: NodeId? = null
         setContent(
-            uiStateShared = sharedUiState(
+            uiState = dataState(
                 currentFolderId = CURRENT_FOLDER_ID,
                 isConnected = false,
             ),
@@ -120,7 +124,7 @@ internal class ExplorerScreenTest {
     @Test
     fun `test that the action button is disabled when the current folder is the disabled target`() {
         setContent(
-            uiStateShared = sharedUiState(currentFolderId = CURRENT_FOLDER_ID),
+            nodeExplorerId = CURRENT_FOLDER_ID,
             disabledTargetId = CURRENT_FOLDER_ID,
         )
 
@@ -128,15 +132,14 @@ internal class ExplorerScreenTest {
     }
 
     private fun setContent(
-        uiState: NodesExplorerUiState = NodesExplorerUiState(isRoot = false),
-        uiStateShared: NodesExplorerSharedUiState = sharedUiState(),
+        uiState: NodeExplorerUiState = dataState(),
+        nodeExplorerId: NodeId = NodeId(-1),
         isProcessingAction: Boolean = false,
         disabledTargetId: NodeId? = null,
         onFolderPicked: (NodeId) -> Unit = {},
         onCloseExplorerScreen: () -> Unit = {},
     ) {
-        whenever(viewModel.nodesExplorerUiState).thenReturn(MutableStateFlow(uiState))
-        whenever(viewModel.nodeExplorerSharedUiState).thenReturn(MutableStateFlow(uiStateShared))
+        whenever(viewModel.uiState).thenReturn(MutableStateFlow(uiState))
 
         composeTestRule.setContent {
             AndroidThemeForPreviews {
@@ -151,7 +154,7 @@ internal class ExplorerScreenTest {
                         explorerMode = ExplorerMode.Copy,
                         startNavKey = CopyNavKey(emptyList()),
                         isInnerNavigation = true,
-                        nodeExplorerId = NodeId(-1),
+                        nodeExplorerId = nodeExplorerId,
                         nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                         onCloseExplorerScreen = onCloseExplorerScreen,
                         onNavigateBack = {},
@@ -165,14 +168,13 @@ internal class ExplorerScreenTest {
         }
     }
 
-    private fun sharedUiState(
+    private fun dataState(
         currentFolderId: NodeId = NodeId(-1),
         isConnected: Boolean = true,
-    ) = NodesExplorerSharedUiState(
+    ) = nodeExplorerDataState(
         currentFolderId = currentFolderId,
-        nodesLoadingState = NodesLoadingState.FullyLoaded,
-        isHiddenNodeSettingsLoading = false,
         isConnected = isConnected,
+        isRoot = false,
     )
 
     private fun actionLabel(resId: Int): String =

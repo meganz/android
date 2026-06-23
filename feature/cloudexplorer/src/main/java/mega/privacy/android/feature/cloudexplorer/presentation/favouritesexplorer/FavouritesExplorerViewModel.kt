@@ -1,16 +1,17 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer
 
-import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
@@ -18,18 +19,18 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeNavigationStackUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel.Args
 import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import timber.log.Timber
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = FavouritesExplorerViewModel.Factory::class)
 class FavouritesExplorerViewModel @AssistedInject constructor(
     monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
@@ -55,40 +56,35 @@ class FavouritesExplorerViewModel @AssistedInject constructor(
     nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
     monitorConnectivityUseCase = monitorConnectivityUseCase,
-    args = Args(
+    args = NodeExplorerSharedViewModel.Args(
         nodeId = NodeId(-1),
         nodeSourceType = NodeSourceType.FAVOURITES,
     ),
 ) {
 
-    private val _favouritesExplorerInternalUiState = MutableStateFlow(FavouritesExplorerUiState())
-    val favouritesExplorerUiState = _favouritesExplorerInternalUiState.asStateFlow()
+    // Favourites are served by an already-reactive use case, so no SDK node-update monitoring.
+    override val monitorsNodeUpdates: Boolean = false
 
-    init {
-        _favouritesExplorerInternalUiState.update { state -> state.copy(showFiles = args.showFiles) }
-        loadNodes()
-    }
+    override val folderNameFlow: Flow<LocalizedText> = flowOf(LocalizedText.Literal(""))
 
-    override fun loadNodes() {
-        viewModelScope.launch {
+    override val isRootNodeFlow: Flow<Boolean> = flowOf(true)
+
+    override val nodesFlow: Flow<NodesResult> = refreshSignal
+        .onStart { emit(Unit) }
+        .flatMapLatest {
             getAllFavoritesUseCase()
-                .catch { Timber.e(it) }
-                .collectLatest { nodes ->
-                    setItems(
+                .map { nodes ->
+                    NodesResult(
                         nodes = if (args.showFiles) {
                             nodes
                         } else {
                             nodes.filterIsInstance<TypedFolderNode>()
                         },
-                        nodesLoadingState = NodesLoadingState.FullyLoaded,
+                        loadingState = NodesLoadingState.FullyLoaded,
                     )
                 }
+                .catch { Timber.e(it) }
         }
-    }
-
-    override fun refreshNodes() {
-        loadNodes()
-    }
 
     @AssistedFactory
     interface Factory {

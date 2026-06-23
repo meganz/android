@@ -3,14 +3,13 @@ package mega.privacy.android.feature.cloudexplorer.presentation.explorer
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerSharedUiState
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerUiState
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerUiState
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.nodeExplorerDataState
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -37,23 +36,17 @@ internal fun explorerViewModelStoreOwner(
 private fun String.keyOf(type: Class<*>) = contains(type.canonicalName.orEmpty())
 
 internal fun stubNodesExplorerViewModel(): NodesExplorerViewModel = mock {
-    on { nodesExplorerUiState } doReturn MutableStateFlow(NodesExplorerUiState())
-    on { nodeExplorerSharedUiState } doReturn MutableStateFlow(loadedSharedState())
+    on { uiState } doReturn MutableStateFlow<NodeExplorerUiState>(nodeExplorerDataState())
 }
 
 internal fun stubIncomingSharesExplorerViewModel(): IncomingSharesExplorerViewModel = mock {
-    on { nodeExplorerSharedUiState } doReturn MutableStateFlow(loadedSharedState())
+    on { uiState } doReturn MutableStateFlow<NodeExplorerUiState>(nodeExplorerDataState())
 }
 
 internal fun stubFavouritesExplorerViewModel(): FavouritesExplorerViewModel = mock {
-    on { nodeExplorerSharedUiState } doReturn MutableStateFlow(loadedSharedState())
+    on { uiState } doReturn MutableStateFlow<NodeExplorerUiState>(nodeExplorerDataState())
 }
 
 internal fun stubChatExplorerViewModel(): ChatExplorerViewModel = mock {
     on { uiState } doReturn MutableStateFlow(ChatExplorerUiState.Loading)
 }
-
-private fun loadedSharedState() = NodesExplorerSharedUiState(
-    nodesLoadingState = NodesLoadingState.FullyLoaded,
-    isHiddenNodeSettingsLoading = false,
-)

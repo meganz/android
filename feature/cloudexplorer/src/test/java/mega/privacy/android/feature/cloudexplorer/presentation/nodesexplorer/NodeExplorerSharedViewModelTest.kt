@@ -1,18 +1,21 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer
 
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -30,13 +33,14 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel.NodesResult
 import mega.privacy.android.shared.nodes.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
@@ -49,6 +53,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
+@ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeExplorerSharedViewModelTest {
 
@@ -81,19 +86,19 @@ class NodeExplorerSharedViewModelTest {
             getNodeNavigationStackUseCase,
             monitorConnectivityUseCase,
         )
-        whenever(monitorStorageStateUseCase()) doReturn flowOf()
-        whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf()
-        whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf()
+        whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
+        whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
+        whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
         whenever(monitorConnectivityUseCase()) doReturn emptyFlow()
+        whenever {
+            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
+        } doReturn emptyList()
 
         initViewModel()
     }
 
-    private fun initViewModel(
-        loadNodesImpl: () -> Unit = {},
-        refreshNodesImpl: () -> Unit = {},
-    ) {
+    private fun initViewModel() {
         viewModel = TestNodeExplorerSharedViewModel(
             monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
@@ -106,15 +111,18 @@ class NodeExplorerSharedViewModelTest {
             getNodeNavigationStackUseCase = getNodeNavigationStackUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             args = args,
-            loadNodesImpl = loadNodesImpl,
-            refreshNodesImpl = refreshNodesImpl
         )
     }
 
     @Test
-    fun `test that initial state is correct`() = runTest {
-        viewModel.nodeExplorerSharedUiState.test {
-            val actual = awaitItem()
+    fun `test that initial state is Loading`() = runTest {
+        assertThat(viewModel.uiState.value).isEqualTo(NodeExplorerUiState.Loading)
+    }
+
+    @Test
+    fun `test that the loaded state reflects args and defaults`() = runTest {
+        viewModel.uiState.test {
+            val actual = awaitData()
             assertThat(actual.currentFolderId).isEqualTo(nodeId)
             assertThat(actual.nodeSourceType).isEqualTo(nodeSourceType)
             assertThat(actual.isStorageOverQuota).isFalse()
@@ -122,6 +130,8 @@ class NodeExplorerSharedViewModelTest {
             assertThat(actual.showHiddenNodes).isFalse()
             assertThat(actual.items).isEmpty()
             assertThat(actual.navigateBack).isEqualTo(consumed)
+            assertThat(actual.isConnected).isTrue()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -142,98 +152,38 @@ class NodeExplorerSharedViewModelTest {
             )
         } doReturn items
 
-        initViewModel()
-        viewModel.onSearchQuery("doc")
-        advanceUntilIdle()
-
-        assertThat(viewModel.nodeExplorerSharedUiState.value.searchItems).isEqualTo(items)
+        viewModel.uiState.test {
+            awaitData()
+            viewModel.onSearchQuery("doc")
+            val actual = awaitDataUntil { it.searchItems.isNotEmpty() }
+            assertThat(actual.searchItems).isEqualTo(items)
+            assertThat(actual.searchedQuery).isEqualTo("doc")
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `test that onSearchQuery sets searchLoadingState to Loading for a new query`() = runTest {
-        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
-        whenever { searchUseCase(any(), any(), any()) } doReturn emptyList()
-        whenever {
-            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
-        } doReturn emptyList()
-        initViewModel()
-
-        // A completed search leaves the state FullyLoaded.
-        viewModel.onSearchQuery("first")
-        advanceUntilIdle()
-        assertThat(viewModel.nodeExplorerSharedUiState.value.searchLoadingState)
-            .isEqualTo(NodesLoadingState.FullyLoaded)
-
-        // A new query flips it back to Loading while the (suspended) search runs.
-        val gate = CompletableDeferred<List<TypedNode>>()
-        whenever { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
-        viewModel.onSearchQuery("second")
-
-        assertThat(viewModel.nodeExplorerSharedUiState.value.searchLoadingState)
-            .isEqualTo(NodesLoadingState.Loading)
-
-        gate.complete(emptyList())
-    }
-
-    @Test
-    fun `test that search records searchedQuery once the results settle`() = runTest {
-        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
-        whenever { searchUseCase(any(), any(), any()) } doReturn emptyList()
-        whenever {
-            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
-        } doReturn emptyList()
-        initViewModel()
-
-        viewModel.onSearchQuery("doc")
-        advanceUntilIdle()
-
-        assertThat(viewModel.nodeExplorerSharedUiState.value.searchedQuery).isEqualTo("doc")
-    }
-
-    @Test
-    fun `test that searchedQuery still trails the query while the search is running`() = runTest {
-        whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
-        whenever { searchUseCase(any(), any(), any()) } doReturn emptyList()
-        whenever {
-            nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
-        } doReturn emptyList()
-        initViewModel()
-
-        viewModel.onSearchQuery("first")
-        advanceUntilIdle()
-
-        val gate = CompletableDeferred<List<TypedNode>>()
-        whenever { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
-        viewModel.onSearchQuery("second")
-
-        // The in-flight query has not produced results yet, so searchedQuery still points at "first".
-        assertThat(viewModel.nodeExplorerSharedUiState.value.searchedQuery).isEqualTo("first")
-
-        gate.complete(emptyList())
-    }
-
-    @Test
-    fun `test that onSearchQuery keeps results without Loading when re-issuing the current query`() =
+    fun `test that searchLoadingState stays Loading while the search runs and settles afterwards`() =
         runTest {
+            val gate = CompletableDeferred<List<TypedNode>>()
             whenever(nodeSourceTypeToSearchTargetMapper(any())) doReturn SearchTarget.INCOMING_SHARE
-            whenever { searchUseCase(any(), any(), any()) } doReturn emptyList()
+            whenever { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
             whenever {
                 nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
             } doReturn emptyList()
-            initViewModel()
 
-            viewModel.onSearchQuery("doc")
-            advanceUntilIdle()
+            viewModel.uiState.test {
+                awaitData()
+                viewModel.onSearchQuery("doc")
+                val loading = awaitDataUntil { it.searchedQuery == "doc" }
+                assertThat(loading.searchLoadingState).isEqualTo(NodesLoadingState.Loading)
 
-            // Re-issuing the already-searched query must not blink back to Loading.
-            val gate = CompletableDeferred<List<TypedNode>>()
-            whenever { searchUseCase(any(), any(), any()) } doSuspendableAnswer { gate.await() }
-            viewModel.onSearchQuery("doc")
-
-            assertThat(viewModel.nodeExplorerSharedUiState.value.searchLoadingState)
-                .isEqualTo(NodesLoadingState.FullyLoaded)
-
-            gate.complete(emptyList())
+                gate.complete(emptyList())
+                val settled =
+                    awaitDataUntil { it.searchLoadingState == NodesLoadingState.FullyLoaded }
+                assertThat(settled.searchedQuery).isEqualTo("doc")
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -276,8 +226,10 @@ class NodeExplorerSharedViewModelTest {
 
         initViewModel()
 
-        viewModel.nodeExplorerSharedUiState.test {
-            assertThat(awaitItem().isStorageOverQuota).isEqualTo(expectedOverQuota)
+        viewModel.uiState.test {
+            val actual = awaitDataUntil { it.isStorageOverQuota == expectedOverQuota }
+            assertThat(actual.isStorageOverQuota).isEqualTo(expectedOverQuota)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -291,28 +243,26 @@ class NodeExplorerSharedViewModelTest {
 
         initViewModel()
 
-        viewModel.nodeExplorerSharedUiState.test {
-            val initialActual = awaitItem()
-            assertThat(initialActual.isHiddenNodesEnabled).isTrue()
-            assertThat(initialActual.showHiddenNodes).isTrue()
+        viewModel.uiState.test {
+            val initial = awaitDataUntil { it.isHiddenNodesEnabled && it.showHiddenNodes }
+            assertThat(initial.isHiddenNodesEnabled).isTrue()
+            assertThat(initial.showHiddenNodes).isTrue()
 
             hiddenEnabledFlow.value = false
-            val updatedActual = awaitItem()
-            assertThat(updatedActual.isHiddenNodesEnabled).isFalse()
-            assertThat(updatedActual.showHiddenNodes).isTrue()
+            val afterHidden = awaitDataUntil { !it.isHiddenNodesEnabled }
+            assertThat(afterHidden.showHiddenNodes).isTrue()
 
             showHiddenFlow.value = false
-            val finalActual = awaitItem()
-            assertThat(finalActual.isHiddenNodesEnabled).isFalse()
-            assertThat(finalActual.showHiddenNodes).isFalse()
+            val afterShow = awaitDataUntil { !it.showHiddenNodes }
+            assertThat(afterShow.isHiddenNodesEnabled).isFalse()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that setItems should map nodes to UI items and update state`() = runTest {
+    fun `test that nodes are mapped to UI items`() = runTest {
         val nodes = listOf<TypedNode>(mock())
         val nodeUiItems = listOf<NodeViewItem<TypedNode>>(mock())
-
         whenever(
             nodeViewItemMapper(
                 nodeList = nodes,
@@ -324,88 +274,81 @@ class NodeExplorerSharedViewModelTest {
             )
         ) doReturn nodeUiItems
 
-        viewModel.setTestItems(nodes, NodesLoadingState.FullyLoaded)
-        advanceUntilIdle()
+        viewModel.nodesResult = NodesResult(nodes, NodesLoadingState.FullyLoaded)
 
-        viewModel.nodeExplorerSharedUiState.test {
-            assertThat(awaitItem().items).isEqualTo(nodeUiItems)
+        viewModel.uiState.test {
+            val actual = awaitDataUntil { it.items.isNotEmpty() }
+            assertThat(actual.items).isEqualTo(nodeUiItems)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that monitorNodeUpdates should trigger navigateBack when node is removed`() =
-        runTest {
-            val nodeChangesFlow = MutableStateFlow<NodeChanges?>(null)
-
-            whenever(
-                monitorNodeUpdatesByIdUseCase(
-                    nodeId,
-                    nodeSourceType
-                )
-            ) doReturn nodeChangesFlow.filterNotNull()
-
-            initViewModel()
-            viewModel.monitorNodeUpdates()
-            advanceUntilIdle()
-
-            nodeChangesFlow.value = NodeChanges.Remove
-            advanceUntilIdle()
-
-            viewModel.nodeExplorerSharedUiState.test {
-                assertThat(awaitItem().navigateBack).isEqualTo(triggered)
-            }
-        }
-
-    @Test
-    fun `test that monitorNodeUpdates should invoke refreshNodes when change is not Remove`() =
-        runTest {
-            val nodeChangesFlow = MutableStateFlow<NodeChanges?>(null)
-
-            whenever(
-                monitorNodeUpdatesByIdUseCase(
-                    nodeId,
-                    nodeSourceType
-                )
-            ) doReturn nodeChangesFlow.filterNotNull()
-
-            var refreshCalled = false
-            initViewModel(refreshNodesImpl = { refreshCalled = true })
-
-            viewModel.monitorNodeUpdates()
-            advanceUntilIdle()
-
-            nodeChangesFlow.value = NodeChanges.Attributes
-            advanceUntilIdle()
-
-            assertThat(refreshCalled).isTrue()
-        }
-
-    @Test
-    fun `test that onNavigateBackEventConsumed should consume the event`() = runTest {
+    fun `test that navigateBack is triggered when the node is removed`() = runTest {
         val nodeChangesFlow = MutableStateFlow<NodeChanges?>(null)
-
-        whenever(
-            monitorNodeUpdatesByIdUseCase(
-                nodeId,
-                nodeSourceType
-            )
-        ) doReturn nodeChangesFlow.filterNotNull()
+        whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn
+                nodeChangesFlow.filterNotNull()
 
         initViewModel()
-        viewModel.monitorNodeUpdates()
-        advanceUntilIdle()
 
-        nodeChangesFlow.value = NodeChanges.Remove
-        advanceUntilIdle()
-
-        viewModel.nodeExplorerSharedUiState.test {
-            assertThat(awaitItem().navigateBack).isEqualTo(triggered)
+        viewModel.uiState.test {
+            awaitData()
+            nodeChangesFlow.value = NodeChanges.Remove
+            val actual = awaitDataUntil { it.navigateBack == triggered }
+            assertThat(actual.navigateBack).isEqualTo(triggered)
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
-        viewModel.onNavigateBackEventConsumed()
+    @Test
+    fun `test that nodes are refetched when the change is not Remove`() = runTest {
+        val nodeChangesFlow = MutableStateFlow<NodeChanges?>(null)
+        whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn
+                nodeChangesFlow.filterNotNull()
 
-        viewModel.nodeExplorerSharedUiState.test {
-            assertThat(awaitItem().navigateBack).isEqualTo(consumed)
+        initViewModel()
+
+        viewModel.uiState.test {
+            awaitDataUntil { it.nodesLoadingState == NodesLoadingState.FullyLoaded }
+            viewModel.nodesResult = NodesResult(emptyList(), NodesLoadingState.PartiallyLoaded)
+            nodeChangesFlow.value = NodeChanges.Attributes
+            val actual =
+                awaitDataUntil { it.nodesLoadingState == NodesLoadingState.PartiallyLoaded }
+            assertThat(actual.nodesLoadingState).isEqualTo(NodesLoadingState.PartiallyLoaded)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that refreshNodes refetches the nodes`() = runTest {
+        viewModel.uiState.test {
+            awaitDataUntil { it.nodesLoadingState == NodesLoadingState.FullyLoaded }
+            viewModel.nodesResult = NodesResult(emptyList(), NodesLoadingState.PartiallyLoaded)
+            viewModel.refreshNodes()
+            val actual =
+                awaitDataUntil { it.nodesLoadingState == NodesLoadingState.PartiallyLoaded }
+            assertThat(actual.nodesLoadingState).isEqualTo(NodesLoadingState.PartiallyLoaded)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onNavigateBackEventConsumed consumes the event`() = runTest {
+        val nodeChangesFlow = MutableStateFlow<NodeChanges?>(null)
+        whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn
+                nodeChangesFlow.filterNotNull()
+
+        initViewModel()
+
+        viewModel.uiState.test {
+            awaitData()
+            nodeChangesFlow.value = NodeChanges.Remove
+            awaitDataUntil { it.navigateBack == triggered }
+
+            viewModel.onNavigateBackEventConsumed()
+            val actual = awaitDataUntil { it.navigateBack == consumed }
+            assertThat(actual.navigateBack).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -416,12 +359,12 @@ class NodeExplorerSharedViewModelTest {
 
         initViewModel()
 
-        assertThat(viewModel.nodeExplorerSharedUiState.value.isConnected).isTrue()
-
-        connectivityFlow.value = false
-        advanceUntilIdle()
-
-        assertThat(viewModel.nodeExplorerSharedUiState.value.isConnected).isFalse()
+        viewModel.uiState.test {
+            assertThat(awaitDataUntil { it.isConnected }.isConnected).isTrue()
+            connectivityFlow.value = false
+            assertThat(awaitDataUntil { !it.isConnected }.isConnected).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -429,9 +372,12 @@ class NodeExplorerSharedViewModelTest {
         whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
 
         initViewModel()
-        advanceUntilIdle()
 
-        assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent).isEqualTo(triggered)
+        viewModel.uiState.test {
+            val actual = awaitDataUntil { it.noConnectionEvent == triggered }
+            assertThat(actual.noConnectionEvent).isEqualTo(triggered)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -439,38 +385,44 @@ class NodeExplorerSharedViewModelTest {
         whenever(monitorConnectivityUseCase()) doReturn flowOf(true)
 
         initViewModel()
-        advanceUntilIdle()
 
-        assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent).isEqualTo(consumed)
-    }
-
-    @Test
-    fun `test that noConnectionEvent stays consumed when connection is lost after opening online`() =
-        runTest {
-            val connectivityFlow = MutableStateFlow(true)
-            whenever(monitorConnectivityUseCase()) doReturn connectivityFlow
-
-            initViewModel()
-            advanceUntilIdle()
-
-            connectivityFlow.value = false
-            advanceUntilIdle()
-
-            assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent)
-                .isEqualTo(consumed)
+        viewModel.uiState.test {
+            val actual = awaitDataUntil { it.isConnected }
+            assertThat(actual.noConnectionEvent).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
         }
+    }
 
     @Test
     fun `test that onNoConnectionEventConsumed consumes the event`() = runTest {
         whenever(monitorConnectivityUseCase()) doReturn flowOf(false)
 
         initViewModel()
-        advanceUntilIdle()
-        assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent).isEqualTo(triggered)
 
-        viewModel.onNoConnectionEventConsumed()
+        viewModel.uiState.test {
+            awaitDataUntil { it.noConnectionEvent == triggered }
+            viewModel.onNoConnectionEventConsumed()
+            val actual = awaitDataUntil { it.noConnectionEvent == consumed }
+            assertThat(actual.noConnectionEvent).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
-        assertThat(viewModel.nodeExplorerSharedUiState.value.noConnectionEvent).isEqualTo(consumed)
+    private suspend fun ReceiveTurbine<NodeExplorerUiState>.awaitData(): NodeExplorerUiState.Data {
+        var item = awaitItem()
+        while (item !is NodeExplorerUiState.Data) {
+            item = awaitItem()
+        }
+        return item
+    }
+
+    private suspend fun ReceiveTurbine<NodeExplorerUiState>.awaitDataUntil(
+        predicate: (NodeExplorerUiState.Data) -> Boolean,
+    ): NodeExplorerUiState.Data {
+        while (true) {
+            val item = awaitItem()
+            if (item is NodeExplorerUiState.Data && predicate(item)) return item
+        }
     }
 
     private fun storageStates() = listOf(
@@ -479,16 +431,8 @@ class NodeExplorerSharedViewModelTest {
         arrayOf<Any>(StorageState.Green, false),
         arrayOf<Any>(StorageState.Change, false),
         arrayOf<Any>(StorageState.Orange, false),
-        arrayOf<Any>(StorageState.Unknown, false)
+        arrayOf<Any>(StorageState.Unknown, false),
     )
-
-    companion object {
-        private val testDispatcher = UnconfinedTestDispatcher()
-
-        @JvmField
-        @RegisterExtension
-        val extension = CoroutineMainDispatcherExtension(testDispatcher)
-    }
 }
 
 private class TestNodeExplorerSharedViewModel(
@@ -503,8 +447,6 @@ private class TestNodeExplorerSharedViewModel(
     getNodeNavigationStackUseCase: GetNodeNavigationStackUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     args: Args,
-    private val loadNodesImpl: () -> Unit = {},
-    private val refreshNodesImpl: () -> Unit = {},
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
     monitorStorageStateUseCase = monitorStorageStateUseCase,
@@ -518,9 +460,13 @@ private class TestNodeExplorerSharedViewModel(
     monitorConnectivityUseCase = monitorConnectivityUseCase,
     args = args,
 ) {
-    override fun loadNodes() = loadNodesImpl()
-    override fun refreshNodes() = refreshNodesImpl()
+    var nodesResult = NodesResult(emptyList(), NodesLoadingState.FullyLoaded)
 
-    fun setTestItems(nodes: List<TypedNode>, nodesLoadingState: NodesLoadingState) =
-        setItems(nodes, nodesLoadingState)
+    override val folderNameFlow: Flow<LocalizedText> = flowOf(LocalizedText.Literal(""))
+
+    override val isRootNodeFlow: Flow<Boolean> = flowOf(true)
+
+    override val nodesFlow: Flow<NodesResult> = refreshSignal
+        .onStart { emit(Unit) }
+        .map { nodesResult }
 }

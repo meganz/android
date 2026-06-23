@@ -14,6 +14,7 @@ sealed interface ChatExplorerUiState {
         val newChatCreatedEvent: StateEventWithContent<Long>,
         val chatsReadyToShareEvent: StateEventWithContent<List<Long>>,
         val searchResults: Items,
+        val isConnected: Boolean,
     ) : ChatExplorerUiState {
 
         val isEmpty: Boolean
