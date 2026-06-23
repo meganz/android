@@ -273,6 +273,46 @@ internal class LoginViewModelTest {
     }
 
     @Test
+    fun `test that setPendingFragmentToShow clears emailError and passwordError when showing the login screen`() =
+        runTest {
+            with(underTest) {
+                onLoginClicked(false)
+                state.test {
+                    awaitItem().let {
+                        assertThat(it.emailError).isEqualTo(LoginError.EmptyEmail)
+                        assertThat(it.passwordError).isEqualTo(LoginError.EmptyPassword)
+                    }
+                    setPendingFragmentToShow(LoginScreen.LoginScreen)
+                    awaitItem().let {
+                        assertThat(it.emailError).isNull()
+                        assertThat(it.passwordError).isNull()
+                    }
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+    @Test
+    fun `test that setPendingFragmentToShow does not clear emailError and passwordError when showing another screen`() =
+        runTest {
+            with(underTest) {
+                onLoginClicked(false)
+                state.test {
+                    awaitItem().let {
+                        assertThat(it.emailError).isEqualTo(LoginError.EmptyEmail)
+                        assertThat(it.passwordError).isEqualTo(LoginError.EmptyPassword)
+                    }
+                    setPendingFragmentToShow(LoginScreen.CreateAccount)
+                    awaitItem().let {
+                        assertThat(it.emailError).isEqualTo(LoginError.EmptyEmail)
+                        assertThat(it.passwordError).isEqualTo(LoginError.EmptyPassword)
+                    }
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+        }
+
+    @Test
     fun `test that ongoingTransfersExist is updated when onLoginClicked and there are transfers in progress`() =
         runTest {
             whenever(ongoingTransfersExistUseCase()).thenReturn(true)

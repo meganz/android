@@ -290,7 +290,16 @@ class LoginViewModel @Inject constructor(
      * @param fragmentType
      */
     fun setPendingFragmentToShow(fragmentType: LoginScreen) {
-        _state.update { state -> state.copy(isPendingToShowFragment = triggered(fragmentType)) }
+        _state.update { state ->
+            // Clear any stale email/password validation errors when (re-)entering the login form,
+            // otherwise they persist after navigating back to the tour and reopening it. See AND-23619.
+            val clearErrors = fragmentType == LoginScreen.LoginScreen
+            state.copy(
+                isPendingToShowFragment = triggered(fragmentType),
+                emailError = if (clearErrors) null else state.emailError,
+                passwordError = if (clearErrors) null else state.passwordError,
+            )
+        }
     }
 
     /**
