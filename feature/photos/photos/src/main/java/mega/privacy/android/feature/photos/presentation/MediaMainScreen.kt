@@ -418,7 +418,11 @@ fun MediaMainScreen(
                     .applyScrollToHideFabBehavior()
                     .testTag(MEDIA_ALBUMS_FAB_TAG),
                 visible = (currentTabIndex == MediaScreen.Albums.ordinal || currentTabIndex == MediaScreen.Playlists.ordinal)
-                        && selectionModeType == MediaSelectionModeType.None,
+                        && selectionModeType == MediaSelectionModeType.None
+                        // Keep the create-album FAB hidden until albums finish loading, otherwise the
+                        // auto-suggested album name is derived from a partial list and can collide
+                        // with an existing album ("already exists"). See AND-23286.
+                        && !(currentTabIndex == MediaScreen.Albums.ordinal && albumsTabUiState.isLoading),
                 onClick = {
                     if (currentTabIndex == MediaScreen.Albums.ordinal) {
                         viewModel.showNewAlbumDialog()
