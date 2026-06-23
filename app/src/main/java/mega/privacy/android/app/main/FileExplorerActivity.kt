@@ -857,6 +857,12 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                                 this@FileExplorerActivity,
                                 MegaActivity::class.java
                             ).also {
+                                if (credentials == null) {
+                                    it.putExtra(
+                                        Constants.INTENT_EXTRA_WARNING_MESSAGE,
+                                        getString(R.string.login_before_share)
+                                    )
+                                }
                                 it.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                 startActivity(it)
                             }
