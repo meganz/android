@@ -509,6 +509,24 @@ internal class DefaultSettingsRepositoryTest {
         }
 
     @Test
+    fun `test that monitorAskBeforePreviewDownloads returns the value from the gateway`() =
+        runTest {
+            whenever(appPreferencesGateway.monitorBoolean(any(), any())).thenReturn(flowOf(false))
+
+            underTest.monitorAskBeforePreviewDownloads().test {
+                assertThat(awaitItem()).isFalse()
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that setAskBeforePreviewDownloads stores the value in the gateway`() = runTest {
+        underTest.setAskBeforePreviewDownloads(false)
+
+        verify(appPreferencesGateway).putBoolean(any(), eq(false))
+    }
+
+    @Test
     fun `test that monitorHomeScreenWidgetConfiguration returns the values from the gateway`() =
         runTest {
             val expected = listOf(mock<HomeWidgetConfiguration>())

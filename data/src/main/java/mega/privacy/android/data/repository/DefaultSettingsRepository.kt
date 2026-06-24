@@ -252,6 +252,14 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) =
         megaLocalStorageGateway.setAskBeforeLargeDownloads(askForConfirmation)
 
+    override fun monitorAskBeforePreviewDownloads(): Flow<Boolean> =
+        appPreferencesGateway.monitorBoolean(ASK_BEFORE_PREVIEW_DOWNLOADS_KEY, true)
+            .flowOn(ioDispatcher)
+
+    override suspend fun setAskBeforePreviewDownloads(askForConfirmation: Boolean) {
+        appPreferencesGateway.putBoolean(ASK_BEFORE_PREVIEW_DOWNLOADS_KEY, askForConfirmation)
+    }
+
     override suspend fun setShowCopyright() = withContext(ioDispatcher) {
         if (megaApiGateway.getPublicLinks().isEmpty()) {
             Timber.d("No public links: showCopyright set true")
@@ -705,6 +713,7 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
 
     companion object {
+        private const val ASK_BEFORE_PREVIEW_DOWNLOADS_KEY = "ask_before_preview_downloads"
         private const val COLORED_FOLDERS_ONBOARDING_SHOWN_KEY = "colored_folders_onboarding_shown"
         private const val HOME_CONFIGURATION_TOOLTIP_SHOWN_KEY = "home_configuration_tooltip_shown"
         private const val DAYS_USER_FREE = 30

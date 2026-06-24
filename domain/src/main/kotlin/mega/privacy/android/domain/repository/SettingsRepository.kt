@@ -165,6 +165,16 @@ interface SettingsRepository {
     suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean)
 
     /**
+     * Monitor ask for confirmation before large preview downloads preference
+     */
+    fun monitorAskBeforePreviewDownloads(): Flow<Boolean>
+
+    /**
+     * Set ask for confirmation before large preview downloads preference
+     */
+    suspend fun setAskBeforePreviewDownloads(askForConfirmation: Boolean)
+
+    /**
      * Set if we want to show copyright notice
      */
     suspend fun setShowCopyright()
