@@ -327,6 +327,7 @@ dependencies {
     implementation(google.gson)
     implementation(google.material)
     implementation(google.media3.exoplayer)
+    implementation(google.media3.session)
     implementation(google.media3.ui)
     implementation(google.flexbox)
     implementation(google.zxing)

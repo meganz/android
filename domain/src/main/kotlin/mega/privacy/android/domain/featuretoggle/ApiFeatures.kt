@@ -207,6 +207,16 @@ enum class ApiFeatures(
     ),
 
     /**
+     * Audio Player Revamp feature flag.
+     * When enabled, opens the revamped Audio Player (AudioPlayerActivityV2) instead of the legacy one.
+     */
+    AudioPlayerRevamp(
+        experimentName = "aprv",
+        description = "Open the revamped Audio Player instead of the legacy one",
+        defaultValue = false
+    ),
+
+    /**
      * Viewed links feature flag for Home Revamp Phase 2
      * Enable viewed links section on Home Screen
      */
