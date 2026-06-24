@@ -100,6 +100,12 @@ interface IconPackInterface {
              */
             interface Solid {
                 val Play: ImageVector
+                val Pause: ImageVector
+                val SkipBack: ImageVector
+                val SkipForward: ImageVector
+                val Repeat: ImageVector
+                val RepeatOne: ImageVector
+                val Shuffle: ImageVector
             }
         }
 
@@ -112,6 +118,7 @@ interface IconPackInterface {
              */
             interface Outline {
                 val AlertCircle: ImageVector
+                val Airplay: ImageVector
                 val AlertTriangle: ImageVector
                 val Archive: ImageVector
                 val ArchiveArrowUp: ImageVector
@@ -134,6 +141,8 @@ interface IconPackInterface {
                 val CircleSmall: ImageVector
                 val ClockPlay: ImageVector
                 val ClockRotate: ImageVector
+                val ClockStopwatchLong: ImageVector
+                val ClockStopwatchShort: ImageVector
                 val ClockUser: ImageVector
                 val Cloud: ImageVector
                 val CloudOff: ImageVector
@@ -183,6 +192,7 @@ interface IconPackInterface {
                 val Link02: ImageVector
                 val LinkOff01: ImageVector
                 val LoaderGrad: ImageVector
+                val LoaderThrobber: ImageVector
                 val Lock: ImageVector
                 val LockKeyholeCircle: ImageVector
                 val LogOut02: ImageVector
@@ -238,6 +248,7 @@ interface IconPackInterface {
                 val UserRight: ImageVector
                 val Users: ImageVector
                 val UserSquare: ImageVector
+                val Waveform: ImageVector
                 val Video: ImageVector
                 val VideoJoin: ImageVector
                 val VideoPlus: ImageVector

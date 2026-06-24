@@ -8,7 +8,14 @@
 package mega.privacy.android.icon.pack
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidPauseImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidPlayImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidRepeatImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidRepeatOneImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidShuffleImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidSkipBackImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumRegularSolidSkipForwardImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineAirplayImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineAlertCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineAlertTriangleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArchiveArrowUpImageVector
@@ -33,6 +40,8 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineChevronUpDo
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCircleSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineClockPlayImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineClockRotateImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineClockStopwatchLongImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineClockStopwatchShortImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineClockUserImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudDownloadImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineCloudImageVector
@@ -80,6 +89,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLink01Image
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLink02ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLinkOff01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLoaderGradImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLoaderThrobberImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLockImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLockKeyholeCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineLogOut02ImageVector
@@ -139,6 +149,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVPNImageVec
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVideoImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVideoJoinImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineVideoPlusImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineWaveformImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineXCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineXImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineZapAutoImageVector
@@ -190,12 +201,33 @@ public object IconPack : IconPackInterface {
     public object Medium : IconPackInterface.Medium {
         public object Regular : IconPackInterface.Medium.Regular {
             public object Solid : IconPackInterface.Medium.Regular.Solid {
+                override val Pause: ImageVector by
+                        lazy { createMediumRegularSolidPauseImageVector() }
+
                 override val Play: ImageVector by lazy { createMediumRegularSolidPlayImageVector() }
+
+                override val Repeat: ImageVector by
+                        lazy { createMediumRegularSolidRepeatImageVector() }
+
+                override val RepeatOne: ImageVector by
+                        lazy { createMediumRegularSolidRepeatOneImageVector() }
+
+                override val Shuffle: ImageVector by
+                        lazy { createMediumRegularSolidShuffleImageVector() }
+
+                override val SkipBack: ImageVector by
+                        lazy { createMediumRegularSolidSkipBackImageVector() }
+
+                override val SkipForward: ImageVector by
+                        lazy { createMediumRegularSolidSkipForwardImageVector() }
             }
         }
 
         public object Thin : IconPackInterface.Medium.Thin {
             public object Outline : IconPackInterface.Medium.Thin.Outline {
+                override val Airplay: ImageVector by
+                        lazy { createMediumThinOutlineAirplayImageVector() }
+
                 override val AlertCircle: ImageVector by
                         lazy { createMediumThinOutlineAlertCircleImageVector() }
 
@@ -266,6 +298,12 @@ public object IconPack : IconPackInterface {
 
                 override val ClockRotate: ImageVector by
                         lazy { createMediumThinOutlineClockRotateImageVector() }
+
+                override val ClockStopwatchLong: ImageVector by
+                        lazy { createMediumThinOutlineClockStopwatchLongImageVector() }
+
+                override val ClockStopwatchShort: ImageVector by
+                        lazy { createMediumThinOutlineClockStopwatchShortImageVector() }
 
                 override val ClockUser: ImageVector by
                         lazy { createMediumThinOutlineClockUserImageVector() }
@@ -402,6 +440,9 @@ public object IconPack : IconPackInterface {
 
                 override val LoaderGrad: ImageVector by
                         lazy { createMediumThinOutlineLoaderGradImageVector() }
+
+                override val LoaderThrobber: ImageVector by
+                        lazy { createMediumThinOutlineLoaderThrobberImageVector() }
 
                 override val Lock: ImageVector by lazy { createMediumThinOutlineLockImageVector() }
 
@@ -570,6 +611,9 @@ public object IconPack : IconPackInterface {
 
                 override val VideoPlus: ImageVector by
                         lazy { createMediumThinOutlineVideoPlusImageVector() }
+
+                override val Waveform: ImageVector by
+                        lazy { createMediumThinOutlineWaveformImageVector() }
 
                 override val X: ImageVector by lazy { createMediumThinOutlineXImageVector() }
 
