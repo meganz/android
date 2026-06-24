@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":shared:chats"))
     implementation(project(":shared:nodes"))
+    implementation(project(":shared:sync"))
     implementation(project(":shared:search"))
     implementation(project(":shared:transfers"))
 

@@ -41,6 +41,8 @@ import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
+import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
+import mega.privacy.android.navigation.destination.SelectSyncFolderNavKey
 import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 import mega.privacy.android.navigation.destination.ShareFilesToMegaNavKey
 import mega.privacy.android.navigation.destination.ShareTextToMegaNavKey
@@ -135,6 +137,16 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                     onVideosPicked(nodeIds)
                     navigationHandler.remove(key)
                 },
+            )
+            nodePickerDestination<SelectSyncFolderNavKey>(
+                explorerMode = ExplorerMode.SelectSyncFolder,
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
+            )
+            nodePickerDestination<SelectStopBackupDestinationNavKey>(
+                explorerMode = ExplorerMode.SelectStopBackupDestination,
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
             )
             nodeExplorerDestination(
                 onCloseExplorerScreen = { navigationHandler.backTo(it, true) },

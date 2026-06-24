@@ -11,6 +11,9 @@ import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.selectsyncfolder.SelectSyncFolderViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.selectsyncfolder.SyncFolderPickerEffects
+import mega.privacy.android.feature.cloudexplorer.presentation.selectsyncfolder.rememberSyncFolderPicker
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 
 /**
@@ -30,6 +33,13 @@ internal fun NodePickerScreen(
     onFolderPicked: (NodeId) -> Unit = {},
     onFilesPicked: (List<NodeId>) -> Unit = {},
 ) {
+    // Sync / stop-backup picker behaviour layered on top of the explorer (null for other modes).
+    val syncFolderPicker = rememberSyncFolderPicker(
+        explorerMode = explorerMode,
+        startNavKey = startNavKey,
+        folderHandle = SelectSyncFolderViewModel.INVALID_FOLDER_HANDLE,
+    )
+
     if (uiState is NodePickerUiState.Data) {
         var isProcessingAction by rememberSaveable { mutableStateOf(false) }
 
@@ -42,16 +52,30 @@ internal fun NodePickerScreen(
             onCloseExplorerScreen = onNavigateBack,
             onNavigateBack = onNavigateBack,
             onNavigate = onNavigate,
-            isProcessingAction = isProcessingAction,
+            isProcessingAction = syncFolderPicker?.isProcessingAction ?: isProcessingAction,
             disabledNodeIds = disabledNodeIds,
+            pickerRestrictions = syncFolderPicker?.restrictions,
             onFolderPicked = { nodeId ->
-                isProcessingAction = true
-                onFolderPicked(nodeId)
+                if (syncFolderPicker != null) {
+                    syncFolderPicker.onCurrentFolderSelected()
+                } else {
+                    isProcessingAction = true
+                    onFolderPicked(nodeId)
+                }
             },
             onFilesPicked = { nodeIds ->
                 isProcessingAction = true
                 onFilesPicked(nodeIds)
             },
+        )
+    }
+
+    syncFolderPicker?.let {
+        SyncFolderPickerEffects(
+            uiState = it.uiState,
+            syncPermissionsManager = it.syncPermissionsManager,
+            onAction = it.onAction,
+            onFolderConfirmed = onNavigateBack,
         )
     }
 }

@@ -36,9 +36,10 @@ import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.components.ExplorerNodeGridItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.ExplorerNodeListItem
 import mega.privacy.android.feature.cloudexplorer.presentation.components.explorerNodeClick
-import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerPickerRestrictions
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.rememberVisibleItems
+import mega.privacy.android.feature.cloudexplorer.presentation.selectsyncfolder.SyncFolderPickerEffects
+import mega.privacy.android.feature.cloudexplorer.presentation.selectsyncfolder.rememberSyncFolderPicker
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.DiscardScanWarningDialogNavKey
@@ -77,7 +78,6 @@ internal fun NodesExplorerScreen(
     onFilesPicked: (List<NodeId>) -> Unit = {},
     disabledTargetId: NodeId? = null,
     disabledNodeIds: Set<NodeId> = emptySet(),
-    pickerRestrictions: ExplorerPickerRestrictions? = null,
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
 ) {
@@ -88,6 +88,12 @@ internal fun NodesExplorerScreen(
             || explorerMode == ExplorerMode.ShareTextToMega
             || explorerMode == ExplorerMode.ShareURLToMega
             || explorerMode == ExplorerMode.SaveScannedDocument
+    // Sync / stop-backup picker behaviour layered on top of the explorer (null for other modes).
+    val syncFolderPicker = rememberSyncFolderPicker(
+        explorerMode = explorerMode,
+        startNavKey = startNavKey,
+        folderHandle = nodeExplorerId.longValue,
+    )
 
     EventEffect(
         event = fileUriEvent,
@@ -118,9 +124,9 @@ internal fun NodesExplorerScreen(
         shareUris = shareUris,
         disabledTargetId = disabledTargetId,
         disabledNodeIds = disabledNodeIds,
-        pickerRestrictions = pickerRestrictions,
+        pickerRestrictions = syncFolderPicker?.restrictions,
         onCloseExplorerScreen = onCancelExplorerScreen,
-        isProcessingAction = isProcessingAction,
+        isProcessingAction = syncFolderPicker?.isProcessingAction ?: isProcessingAction,
         onFolderPicked = { nodeId ->
             when {
                 (explorerMode == ExplorerMode.ShareFilesToMega
@@ -158,7 +164,7 @@ internal fun NodesExplorerScreen(
 
                 explorerMode == ExplorerMode.SelectSyncFolder
                         || explorerMode == ExplorerMode.SelectStopBackupDestination -> {
-                    onSelectFolder(nodeId)
+                    syncFolderPicker?.onCurrentFolderSelected?.invoke()
                 }
 
                 else -> {}
@@ -186,6 +192,15 @@ internal fun NodesExplorerScreen(
             onStartUpload = onStartUpload,
             onCloseExplorerScreen = onCloseExplorerScreen,
             onNavigate = onNavigate,
+        )
+    }
+
+    syncFolderPicker?.let {
+        SyncFolderPickerEffects(
+            uiState = it.uiState,
+            syncPermissionsManager = it.syncPermissionsManager,
+            onAction = it.onAction,
+            onFolderConfirmed = onCloseExplorerScreen,
         )
     }
 }
