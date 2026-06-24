@@ -120,6 +120,16 @@ internal class FileSystemRepositoryImplTest {
         assertThat(underTest.localDCIMFolderPath).isEqualTo(testPath)
     }
 
+    @ParameterizedTest(name = "and gateway returns {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that hasSuitableAppToOpenFile returns the gateway result`(expected: Boolean) =
+        runTest {
+            val mimeType = "application/pdf"
+            whenever(fileGateway.hasSuitableAppToOpenFile(mimeType)).thenReturn(expected)
+
+            assertThat(underTest.hasSuitableAppToOpenFile(mimeType)).isEqualTo(expected)
+        }
+
     @Test
     fun `test that temporary file is created successfully`() = runTest {
         val localPath = "/path/to/local"

@@ -532,6 +532,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun hasSuitableAppToOpenFile(mimeType: String): Boolean =
+        withContext(ioDispatcher) {
+            fileGateway.hasSuitableAppToOpenFile(mimeType)
+        }
+
     private fun generateNewName(fileName: String, counter: Int): String {
         val fileNameWithoutExtension = fileName.substringBeforeLast(".")
         val extension = fileName.substringAfterLast('.', missingDelimiterValue = "")

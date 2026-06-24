@@ -687,4 +687,12 @@ interface FileGateway {
         createIfMissing: Boolean,
         lastAsFolder: Boolean
     ): UriPath?
+
+    /**
+     * Checks if there is at least one installed app able to open a file with the given [mimeType].
+     *
+     * @param mimeType the MIME type of the file to be opened
+     * @return true if a suitable app is available, false otherwise
+     */
+    fun hasSuitableAppToOpenFile(mimeType: String): Boolean
 }

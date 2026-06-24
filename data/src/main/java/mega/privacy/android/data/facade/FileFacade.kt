@@ -1367,6 +1367,13 @@ internal class FileFacade @Inject constructor(
         return success(UriPath(currentDocument.uri.toString()))
     }
 
+    override fun hasSuitableAppToOpenFile(mimeType: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW).apply { type = mimeType }
+        return runCatching {
+            intent.resolveActivity(context.packageManager) != null
+        }.getOrDefault(false)
+    }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val PHOTO_DIR = "MEGA Photos"
