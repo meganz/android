@@ -11,6 +11,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -47,11 +48,13 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.get
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
+import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
@@ -88,6 +91,12 @@ internal fun DriveSyncScreen(
     initialTabIndex: Int = 0,
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
+
+    val useCloudExplorerPicker by produceState(initialValue = false) {
+        value = runCatching {
+            viewModel.getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+        }.getOrDefault(false)
+    }
 
     val selectionState = rememberNodeSelectionState()
 
@@ -302,9 +311,11 @@ internal fun DriveSyncScreen(
                         },
                         onSelectStopBackupDestinationClicked = {
                             navigationHandler.navigate(
-                                SyncSelectStopBackupDestinationNavKey(
-                                    folderName = it
-                                )
+                                if (useCloudExplorerPicker) {
+                                    SelectStopBackupDestinationNavKey(folderName = it)
+                                } else {
+                                    SyncSelectStopBackupDestinationNavKey(folderName = it)
+                                }
                             )
                         },
                         onOpenUpgradeAccountClicked = {

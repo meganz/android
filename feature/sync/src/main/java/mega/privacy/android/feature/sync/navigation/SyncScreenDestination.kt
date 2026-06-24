@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.navigation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -12,6 +13,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
 import mega.privacy.android.feature.sync.ui.isDarkMode
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
@@ -19,11 +21,13 @@ import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
+import mega.privacy.android.navigation.destination.SelectSyncFolderNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncEmptyRouteNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
@@ -33,6 +37,7 @@ import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinati
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AddSyncScreenEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncGetStartedButtonEvent
 import timber.log.Timber
@@ -42,10 +47,16 @@ fun EntryProviderScope<NavKey>.syncScreens(
     fileTypeIconMapper: FileTypeIconMapper,
     syncPermissionsManager: SyncPermissionsManager,
     monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     openUpgradeAccountPage: () -> Unit,
 ) {
     entry<SyncListNavKey> {
         val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val useCloudExplorerPicker by produceState(initialValue = false) {
+            value = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+        }
         OriginalTheme(isDark = themeMode.isDarkMode()) {
             SyncListRoute(
                 syncPermissionsManager = syncPermissionsManager,
@@ -56,7 +67,13 @@ fun EntryProviderScope<NavKey>.syncScreens(
                     navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_BACKUP))
                 },
                 onSelectStopBackupDestinationClicked = { folderName ->
-                    navigationHandler.navigate(SyncSelectStopBackupDestinationNavKey(folderName = folderName))
+                    navigationHandler.navigate(
+                        if (useCloudExplorerPicker) {
+                            SelectStopBackupDestinationNavKey(folderName = folderName)
+                        } else {
+                            SyncSelectStopBackupDestinationNavKey(folderName = folderName)
+                        }
+                    )
                 },
                 onOpenUpgradeAccountClicked = openUpgradeAccountPage,
                 selectedChip = SyncChip.SYNC_FOLDERS,
@@ -72,6 +89,11 @@ fun EntryProviderScope<NavKey>.syncScreens(
 
     entry<SyncNewFolderNavKey> { navKey ->
         val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val useCloudExplorerPicker by produceState(initialValue = false) {
+            value = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)
+            }.getOrDefault(false)
+        }
         val context = LocalContext.current
         val viewModel =
             hiltViewModel<SyncNewFolderViewModel, SyncNewFolderViewModel.SyncNewFolderViewModelFactory> { factory ->
@@ -104,7 +126,13 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 viewModel = viewModel,
                 syncPermissionsManager = syncPermissionsManager,
                 openSelectMegaFolderScreen = {
-                    navigationHandler.navigate(SyncMegaPickerNavKey)
+                    navigationHandler.navigate(
+                        if (useCloudExplorerPicker) {
+                            SelectSyncFolderNavKey
+                        } else {
+                            SyncMegaPickerNavKey
+                        }
+                    )
                 },
                 openNextScreen = { _ ->
                     if (navKey.isFromDeviceCenter) {
