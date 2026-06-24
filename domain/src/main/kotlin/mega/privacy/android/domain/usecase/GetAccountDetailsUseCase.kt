@@ -14,7 +14,7 @@ class GetAccountDetailsUseCase @Inject constructor(
     private val isDatabaseEntryStale: IsDatabaseEntryStale,
 ) {
     suspend operator fun invoke(forceRefresh: Boolean): UserAccount {
-        if (forceRefresh || accountsRepository.storageCapacityUsedIsBlank() || isDatabaseEntryStale()) {
+        if (forceRefresh || isDatabaseEntryStale()) {
             accountsRepository.resetAccountDetailsTimeStamp()
             accountsRepository.requestAccount()
         }

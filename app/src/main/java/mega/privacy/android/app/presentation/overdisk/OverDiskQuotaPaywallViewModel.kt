@@ -4,13 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import timber.log.Timber
@@ -28,6 +33,7 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     monitorUpdateUserDataUseCase: MonitorUpdateUserDataUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
+    monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
     private val _pricing = MutableStateFlow(Pricing(emptyList()))
 
@@ -35,6 +41,13 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
      * Pricing
      */
     val pricing = _pricing.asStateFlow()
+
+    /**
+     * Storage used by the account, in bytes.
+     */
+    val usedStorage: StateFlow<Long> = monitorAccountDetailUseCase()
+        .mapNotNull { it.storageDetail?.usedStorage }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0L)
 
     /**
      * Monitor update user data broadcast event

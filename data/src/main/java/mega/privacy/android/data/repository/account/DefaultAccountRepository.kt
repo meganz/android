@@ -203,9 +203,6 @@ internal class DefaultAccountRepository @Inject constructor(
         )
     }
 
-    override fun storageCapacityUsedIsBlank() =
-        myAccountInfoFacade.storageCapacityUsedAsFormattedString.isBlank()
-
     override suspend fun requestAccount() {
         withContext(ioDispatcher) {
             val request = suspendCancellableCoroutine { continuation ->

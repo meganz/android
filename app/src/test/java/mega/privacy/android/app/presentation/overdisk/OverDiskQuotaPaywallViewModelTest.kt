@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -14,6 +15,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import org.junit.jupiter.api.AfterEach
@@ -46,6 +48,9 @@ class OverDiskQuotaPaywallViewModelTest {
     )
     private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>() {
         on { invoke() }.thenReturn(myAccountUpdateFlow)
+    }
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>() {
+        on { invoke() }.thenReturn(emptyFlow())
     }
 
     @BeforeEach
@@ -191,7 +196,8 @@ class OverDiskQuotaPaywallViewModelTest {
             getPricing,
             getUserDataUseCase,
             monitorUpdateUserDataUseCase,
-            monitorMyAccountUpdateUseCase
+            monitorMyAccountUpdateUseCase,
+            monitorAccountDetailUseCase
         )
     }
 }

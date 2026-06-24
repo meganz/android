@@ -8,11 +8,6 @@ import nz.mega.sdk.MegaRequest
  */
 interface AccountInfoWrapper {
     /**
-     * Storage capacity used as a formatted string
-     */
-    val storageCapacityUsedAsFormattedString: String
-
-    /**
      * Handle account detail
      * Legacy support, it will remove after refactor done
      *

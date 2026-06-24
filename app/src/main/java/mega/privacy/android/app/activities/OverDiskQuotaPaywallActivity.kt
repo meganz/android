@@ -19,6 +19,7 @@ import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
+import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
@@ -83,6 +84,10 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         collectFlow(viewModel.monitorMyAccountUpdate) {
             updateStrings()
         }
+
+        collectFlow(viewModel.usedStorage) {
+            updateStrings()
+        }
     }
 
     override fun onClick(v: View?) {
@@ -132,11 +137,10 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
      * NOTE: call this method any time the related info is updated.
      */
     private fun updateStrings() {
-
         val email = megaApi.myEmail
         val warningsTs = megaApi.overquotaWarningsTs
         val files = megaApi.numNodes
-        val size = myAccountInfo.usedFormatted
+        val size = getSizeString(viewModel.usedStorage.value, this)
         deadlineTs = megaApi.overquotaDeadlineTs
 
         if (warningsTs == null || warningsTs.size() == 0) {
@@ -255,7 +259,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         val gb = 1073741824 // 1024(KB) * 1024(MB) * 1024(GB)
         val products = viewModel.pricing.value.products
         products.forEach {
-            if (it.storage > myAccountInfo.usedStorage / gb) {
+            if (it.storage > viewModel.usedStorage.value / gb) {
                 proPlanNeeded = it.level
                 return when (it.level) {
                     1 -> getString(R.string.pro1_account)

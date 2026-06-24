@@ -37,12 +37,6 @@ interface AccountRepository {
     suspend fun getUserAccount(): UserAccount
 
     /**
-     * Storage capacity used is blank
-     *
-     */
-    fun storageCapacityUsedIsBlank(): Boolean
-
-    /**
      * Request account
      * Sends a request to update account data asynchronously
      */

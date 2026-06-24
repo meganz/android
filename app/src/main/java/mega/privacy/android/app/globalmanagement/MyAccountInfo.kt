@@ -31,7 +31,6 @@ class MyAccountInfo @Inject constructor(
 
     var usedStorage = INVALID_VALUE.toLong()
     var accountType = INVALID_VALUE
-    var usedFormatted = ""
     var formattedUsedRubbish = ""
 
     /**
@@ -42,7 +41,6 @@ class MyAccountInfo @Inject constructor(
     fun resetDefaults() {
         usedStorage = INVALID_VALUE.toLong()
         accountType = INVALID_VALUE
-        usedFormatted = ""
         formattedUsedRubbish = ""
     }
 
@@ -64,7 +62,6 @@ class MyAccountInfo @Inject constructor(
             }
 
             usedStorage = accountInfo.storageUsed
-            usedFormatted = getSizeString(usedStorage, context)
         }
 
         if (pro) {
