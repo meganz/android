@@ -235,7 +235,7 @@ internal fun CloudDriveContent(
                 ),
                 actionButtonText = stringResource(sharedR.string.general_learn_more),
                 onActionButtonClick = {
-                    megaNavigator.launchUrl(context, ACCOUNT_EXPIRY_LEARN_MORE_URI)
+                    megaNavigator.launchUrl(context, ACCOUNT_INACTIVITY_LEARN_MORE_URI)
                 },
                 onCancelButtonClick = {
                     inactivityBannerData.purgeTimestamp?.let { ts ->
@@ -481,6 +481,7 @@ internal fun NodeSortOption.trackAnalyticsEvent() {
 
 /**
  * Help article shown when the user taps "Learn more" on the account inactivity banner.
+ * Explains how data may be deleted by MEGA due to account inactivity.
  */
-private const val ACCOUNT_EXPIRY_LEARN_MORE_URI =
-    "https://help.mega.io/accounts/create-account/account-expiry"
+private const val ACCOUNT_INACTIVITY_LEARN_MORE_URI =
+    "https://help.mega.io/files-folders/restore-delete/data-deleted-by-mega"
