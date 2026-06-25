@@ -128,6 +128,16 @@ interface PhotosRepository {
     fun monitorImageNodes(): Flow<List<ImageNode>>
 
     /**
+     * Monitor timeline image nodes for the image viewer, derived from the in-memory
+     * media nodes already loaded for the timeline grid ([monitorMediaTypedNodes]).
+     *
+     * Unlike [monitorImageNodes] this does not trigger a full-account media search or
+     * eagerly serialize every node, so opening an image from the timeline is fast and
+     * holds no serialized blobs in memory.
+     */
+    fun monitorTimelineImageNodes(): Flow<List<ImageNode>>
+
+    /**
      * Get image node from cache
      * @param nodeId
      */

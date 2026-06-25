@@ -23,6 +23,7 @@ import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
+import mega.privacy.android.data.mapper.node.TypedFileNodeToImageNodeMapper
 import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.FileNode
@@ -63,6 +65,8 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.time.Duration.Companion.seconds
@@ -103,6 +107,7 @@ class DefaultPhotosRepositoryTest {
     private val mediaTimelinePreferencesGateway = mock<MediaTimelinePreferencesGateway>()
     private val photoMapper = mock<PhotoMapper>()
     private val typedNodeMapper = mock<TypedNodeMapper>()
+    private val typedFileNodeToImageNodeMapper = mock<TypedFileNodeToImageNodeMapper>()
     private val ioDispatcher = UnconfinedTestDispatcher()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -407,7 +412,8 @@ class DefaultPhotosRepositoryTest {
         uiPreferencesGateway = uiPreferencesGateway,
         mediaTimelinePreferencesGateway = mediaTimelinePreferencesGateway,
         photoMapper = photoMapper,
-        typedNodeMapper = typedNodeMapper
+        typedNodeMapper = typedNodeMapper,
+        typedFileNodeToImageNodeMapper = typedFileNodeToImageNodeMapper,
     )
 
     private fun createMegaNode(
@@ -1043,6 +1049,62 @@ class DefaultPhotosRepositoryTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that monitorTimelineImageNodes maps media nodes from monitorMediaTypedNodes and excludes non-media`() =
+        runTest {
+            val filter = mock<MegaSearchFilter>()
+            val token = mock<MegaCancelToken>()
+            val imageMegaNode = createMegaNode(handle = 1L, name = "photo.jpg")
+            val videoMegaNode = createMegaNode(handle = 2L, name = "video.mp4")
+            val otherMegaNode = createMegaNode(handle = 3L, name = "doc.pdf")
+            whenever(
+                megaSearchFilterMapper(
+                    parentHandle = null,
+                    searchQuery = "",
+                    searchTarget = SearchTarget.ROOT_NODES,
+                    searchCategory = SearchCategory.ALL_MEDIA,
+                )
+            ).thenReturn(filter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
+            whenever(
+                megaApiGateway.searchWithFilter(filter, MegaApiJava.ORDER_MODIFICATION_DESC, token)
+            ).thenReturn(listOf(imageMegaNode, videoMegaNode, otherMegaNode))
+            whenever(megaApiGateway.isInRubbish(any())).thenReturn(false)
+
+            val otherType = UnknownFileTypeInfo(mimeType = "", extension = "pdf")
+            val imageTypedNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(1L))
+                on { type }.thenReturn(defaultImageType)
+            }
+            val videoTypedNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(2L))
+                on { type }.thenReturn(defaultVideoType)
+            }
+            val otherTypedNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(3L))
+                on { type }.thenReturn(otherType)
+            }
+            whenever(typedNodeMapper(megaNode = imageMegaNode, folderTypeData = null, offline = null))
+                .thenReturn(imageTypedNode)
+            whenever(typedNodeMapper(megaNode = videoMegaNode, folderTypeData = null, offline = null))
+                .thenReturn(videoTypedNode)
+            whenever(typedNodeMapper(megaNode = otherMegaNode, folderTypeData = null, offline = null))
+                .thenReturn(otherTypedNode)
+
+            val imageNode = mock<ImageNode>()
+            val videoImageNode = mock<ImageNode>()
+            whenever(typedFileNodeToImageNodeMapper(imageTypedNode)).thenReturn(imageNode)
+            whenever(typedFileNodeToImageNodeMapper(videoTypedNode)).thenReturn(videoImageNode)
+
+            underTest = createUnderTest()
+
+            underTest.monitorTimelineImageNodes().test {
+                assertThat(awaitItem()).containsExactly(imageNode, videoImageNode).inOrder()
+                cancelAndConsumeRemainingEvents()
+            }
+            verify(typedFileNodeToImageNodeMapper, never()).invoke(otherTypedNode)
+        }
 
     @Test
     fun `test that monitorMediaTypedNodes emits updated list when a valid node is added`() =

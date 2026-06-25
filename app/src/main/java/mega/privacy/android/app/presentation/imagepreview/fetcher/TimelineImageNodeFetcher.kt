@@ -35,10 +35,11 @@ class TimelineImageNodeFetcher @Inject constructor(
         val source = bundle.readEnum<TimelinePhotosSource>(TIMELINE_MEDIA_SOURCE)
             ?: TimelinePhotosSource.ALL_PHOTOS
 
-        return monitorTimelineNodesUseCase().mapLatest { imageNodes ->
-            val filteredImageNodes = filterImageNodes(imageNodes, mediaType, source)
-            sortImageNodes(filteredImageNodes, sortType)
-        }.flowOn(defaultDispatcher)
+        return monitorTimelineNodesUseCase()
+            .mapLatest { imageNodes ->
+                val filteredImageNodes = filterImageNodes(imageNodes, mediaType, source)
+                sortImageNodes(filteredImageNodes, sortType)
+            }.flowOn(defaultDispatcher)
     }
 
     private inline fun <reified T : Enum<T>> Bundle.readEnum(key: String): T? =

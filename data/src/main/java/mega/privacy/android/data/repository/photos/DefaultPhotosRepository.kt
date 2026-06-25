@@ -50,6 +50,7 @@ import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
+import mega.privacy.android.data.mapper.node.TypedFileNodeToImageNodeMapper
 import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
@@ -79,6 +80,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
+import mega.privacy.android.domain.extension.getNodeMappingStrategy
 import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -128,6 +130,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val mediaTimelinePreferencesGateway: MediaTimelinePreferencesGateway,
     private val photoMapper: PhotoMapper,
     private val typedNodeMapper: TypedNodeMapper,
+    private val typedFileNodeToImageNodeMapper: TypedFileNodeToImageNodeMapper,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
@@ -162,11 +165,6 @@ internal class DefaultPhotosRepository @Inject constructor(
     private var monitorNodeUpdatesJob: Job? = null
 
     private var monitorOfflineNodeJob: Job? = null
-
-    private val constraints: List<suspend (Node) -> Boolean> = listOf(
-        ::checkMediaNode,
-        ::checkCloudDriveNode,
-    )
 
     init {
         appScope.launch {
@@ -275,7 +273,8 @@ internal class DefaultPhotosRepository @Inject constructor(
                 nodeUpdate.changes.forEach { (node, _) ->
                     if (node !is FileNode ||
                         nodeRepository.isNodeInRubbishBin(node.id) ||
-                        !constraints.all { it(node) }
+                        !checkMediaNode(node) ||
+                        !checkCloudDriveNode(node)
                     ) {
                         if (currentNodes.remove(node.id) != null) {
                             changed = true
@@ -308,7 +307,10 @@ internal class DefaultPhotosRepository @Inject constructor(
         .flowOn(ioDispatcher)
         .shareIn(
             scope = appScope,
-            started = SharingStarted.WhileSubscribed(),
+            // Keep the media nodes warm briefly after the grid stops collecting, so
+            // opening the image viewer (a separate Activity) reuses the cached list via
+            // replay instead of re-running a full-account media search.
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = MEDIA_TYPED_NODES_KEEP_ALIVE_MS),
             replay = 1
         )
 
@@ -400,7 +402,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     private suspend fun updatePhotos(mediaNodes: List<MegaNode>) {
         withContext(ioDispatcher) {
-            val photos = mediaNodes.mapAsync { node ->
+            val photos = mediaNodes.mapAsync(getNodeMappingStrategy(mediaNodes.size)) { node ->
                 mapMegaNodeToPhotoItem(megaNode = node)
             }.filterNotNull()
 
@@ -413,7 +415,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     private suspend fun updateImageNodes(mediaNodes: List<MegaNode>) {
         withContext(ioDispatcher) {
-            val nodes = mediaNodes.mapAsync { node ->
+            val nodes = mediaNodes.mapAsync(getNodeMappingStrategy(mediaNodes.size)) { node ->
                 imageNodeMapper(
                     megaNode = node,
                     requireSerializedData = true,
@@ -448,7 +450,7 @@ internal class DefaultPhotosRepository @Inject constructor(
             if (node is FolderNode && changes.contains(NodeChanges.Sensitive)) {
                 shouldRefreshSensitiveContent = true
             } else {
-                val isPotentialNode = constraints.all { it(node) }
+                val isPotentialNode = checkMediaNode(node) && checkCloudDriveNode(node)
                 if (!isPotentialNode) {
                     nodesToRemove += node.id
                 } else {
@@ -567,7 +569,16 @@ internal class DefaultPhotosRepository @Inject constructor(
             .onStart { initialize() }
     }
 
-    private suspend fun checkMediaNode(node: Node): Boolean {
+    override fun monitorTimelineImageNodes(): Flow<List<ImageNode>> =
+        monitorMediaTypedNodes
+            .map { nodes ->
+                nodes.filterIsInstance<TypedFileNode>()
+                    .filter(::checkMediaNode)
+                    .map(typedFileNodeToImageNodeMapper::invoke)
+            }
+            .flowOn(ioDispatcher)
+
+    private fun checkMediaNode(node: Node): Boolean {
         return node is FileNode && (node.type is ImageFileTypeInfo || node.type is VideoFileTypeInfo)
     }
 
@@ -1211,5 +1222,6 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     companion object {
         private const val PHOTOS_FETCH_LIMIT = 500L
+        private const val MEDIA_TYPED_NODES_KEEP_ALIVE_MS = 5_000L
     }
 }

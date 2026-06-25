@@ -9,5 +9,5 @@ import javax.inject.Inject
 class MonitorTimelineNodesUseCase @Inject constructor(
     private val photosRepository: PhotosRepository,
 ) {
-    operator fun invoke() = photosRepository.monitorImageNodes()
+    operator fun invoke() = photosRepository.monitorTimelineImageNodes()
 }
