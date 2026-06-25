@@ -55,8 +55,8 @@ class LargeDownloadConfirmationDialogTest {
             onNodeWithTag(TEST_TAG_LARGE_DOWNLOAD_CONFIRMATION_DIALOG).assertIsDisplayed()
             onNodeWithText(sharedR.string.alert_larger_file_preview_title).assertIsDisplayed()
             onNodeWithText(message).assertIsDisplayed()
-            onNodeWithText(sharedR.string.alert_larger_file_preview_confirm_button).assertIsDisplayed()
-            onNodeWithText(sharedR.string.alert_larger_file_preview_always_allow_button).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_save_to_device).assertIsDisplayed()
+            onNodeWithText(R.string.transfers_confirm_large_download_button_start_always).assertIsDisplayed()
             onNodeWithText(sharedR.string.general_dialog_cancel_button).assertIsDisplayed()
         }
     }
@@ -75,7 +75,7 @@ class LargeDownloadConfirmationDialogTest {
     fun `test that clicking on allow button for preview calls onAllow`() {
         initComposeTestRule(isPreviewDownload = true)
 
-        composeTestRule.onNodeWithText(sharedR.string.alert_larger_file_preview_confirm_button)
+        composeTestRule.onNodeWithText(sharedR.string.general_save_to_device)
             .performClick()
 
         verify(onAllow).invoke()
@@ -95,7 +95,7 @@ class LargeDownloadConfirmationDialogTest {
     fun `test that clicking on always allow button for previews calls onAlwaysAllow`() {
         initComposeTestRule(isPreviewDownload = true)
 
-        composeTestRule.onNodeWithText(sharedR.string.alert_larger_file_preview_always_allow_button)
+        composeTestRule.onNodeWithText(R.string.transfers_confirm_large_download_button_start_always)
             .performClick()
 
         verify(onAlwaysAllow).invoke()

@@ -128,6 +128,11 @@ sealed interface StartTransferEvent {
         data object FinishCopyUri : MessageStringRes(R.string.copy_already_downloaded)
 
         /**
+         * No installed app can open the file requested for preview
+         */
+        data object NoAppToOpenFile : MessageStringRes(sharedR.string.intent_not_available)
+
+        /**
          * Text file upload has finished
          *
          * @property isEditMode True if the file is uploaded in edit mode, false otherwise.

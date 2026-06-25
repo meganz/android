@@ -32,6 +32,8 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.ZipFileTypeInfo
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -49,12 +51,15 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
+import mega.privacy.android.domain.usecase.file.HasSuitableAppToOpenFileUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
 import mega.privacy.android.domain.usecase.setting.IsAskBeforeLargeDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.setting.SetAskBeforeLargeDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.setting.SetAskBeforePreviewDownloadsSettingUseCase
+import mega.privacy.android.domain.usecase.setting.ShouldAskBeforePreviewDownloadsSettingUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.DeleteCacheFilesUseCase
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
@@ -104,6 +109,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val isAskBeforeLargeDownloadsSettingUseCase: IsAskBeforeLargeDownloadsSettingUseCase,
     private val setAskBeforeLargeDownloadsSettingUseCase: SetAskBeforeLargeDownloadsSettingUseCase,
+    private val shouldAskBeforePreviewDownloadsSettingUseCase: ShouldAskBeforePreviewDownloadsSettingUseCase,
+    private val setAskBeforePreviewDownloadsSettingUseCase: SetAskBeforePreviewDownloadsSettingUseCase,
     private val monitorOngoingActiveTransfersUseCase: MonitorOngoingActiveTransfersUseCase,
     private val getCurrentDownloadSpeedUseCase: GetCurrentDownloadSpeedUseCase,
     private val shouldAskDownloadDestinationUseCase: ShouldAskDownloadDestinationUseCase,
@@ -138,6 +145,7 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val deleteCompletedTransfersByIdUseCase: DeleteCompletedTransfersByIdUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val getPreviewDownloadUseCase: GetPreviewDownloadUseCase,
+    private val hasSuitableAppToOpenFileUseCase: HasSuitableAppToOpenFileUseCase,
     private val ratingHandler: RatingHandlerImpl,
     private val crashReporter: CrashReporter,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -184,8 +192,15 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     if (transferTriggerEvent.nodes.isEmpty() && !isCopyEvent) {
                         Timber.e("Node in $transferTriggerEvent must exist")
                         _uiState.updateEventAndClearProgress(StartTransferEvent.Message.TransferCancelled)
-                    } else if (!checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)) {
-                        startDownloadWithoutConfirmation(transferTriggerEvent)
+                    } else {
+                        val noSuitableAppForPreview =
+                            transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview
+                                    && checkAndHandleNoSuitableAppForPreview(transferTriggerEvent)
+                        if (!noSuitableAppForPreview
+                            && !checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent)
+                        ) {
+                            startDownloadWithoutConfirmation(transferTriggerEvent)
+                        }
                     }
                 }
 
@@ -835,8 +850,13 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         if (downloadTriggerEvent != null) {
             if (saveDoNotAskAgain) {
                 viewModelScope.launch {
-                    runCatching { setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false) }
-                        .onFailure { Timber.e(it) }
+                    runCatching {
+                        if (downloadTriggerEvent is TransferTriggerEvent.StartDownloadForPreview) {
+                            setAskBeforePreviewDownloadsSettingUseCase(askForConfirmation = false)
+                        } else {
+                            setAskBeforeLargeDownloadsSettingUseCase(askForConfirmation = false)
+                        }
+                    }.onFailure { Timber.e(it) }
                 }
             }
             startDownloadWithoutConfirmation(
@@ -875,12 +895,50 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         }
 
     /**
+     * Checks if there is a suitable app to open the file requested for preview. If there isn't one,
+     * a snackbar is shown and the download is avoided.
+     *
+     * @return true if no suitable app is available, so the download should not start
+     */
+    private suspend fun checkAndHandleNoSuitableAppForPreview(
+        event: TransferTriggerEvent.StartDownloadForPreview,
+    ): Boolean {
+        val fileNode = event.node as? TypedFileNode ?: return false
+        // Zip files are opened in-app and don't require an external app
+        if (!event.isOpenWith && fileNode.type is ZipFileTypeInfo) return false
+
+        val hasSuitableApp =
+            runCatching { hasSuitableAppToOpenFileUseCase(fileNode.type.mimeType) }
+                .getOrDefault(true)
+
+        if (!hasSuitableApp) {
+            _uiState.updateEventAndClearProgress(StartTransferEvent.Message.NoAppToOpenFile)
+        }
+
+        return !hasSuitableApp
+    }
+
+    /**
+     * Whether confirmation should be asked for a large download.
+     *
+     * Preview downloads use the preview-specific setting and regular downloads use the existing one,
+     * so opting out of one type of confirmation doesn't silence the other.
+     */
+    private suspend fun shouldAskConfirmationForLargeDownload(
+        transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent,
+    ): Boolean = if (transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview) {
+        runCatching { shouldAskBeforePreviewDownloadsSettingUseCase() }.getOrDefault(false)
+    } else {
+        runCatching { isAskBeforeLargeDownloadsSettingUseCase() }.getOrDefault(false)
+    }
+
+    /**
      * Checks if confirmation dialog for large download should be shown and updates uiState if so
      *
      * @return true if the state has been handled to ask for confirmation, so no extra action should be done
      */
     private suspend fun checkAndHandleNeedConfirmationForLargeDownload(transferTriggerEvent: TransferTriggerEvent.DownloadTriggerEvent): Boolean {
-        if (runCatching { isAskBeforeLargeDownloadsSettingUseCase() }.getOrDefault(false)) {
+        if (shouldAskConfirmationForLargeDownload(transferTriggerEvent)) {
             val size = runCatching { totalFileSizeOfNodesUseCase(transferTriggerEvent.nodes) }
                 .getOrDefault(0L)
             if (size > TransfersConstants.CONFIRM_SIZE_MIN_BYTES) {

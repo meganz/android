@@ -43,18 +43,12 @@ fun LargeDownloadConfirmationDialog(
     ),
     buttonOption1Text = stringResource(
         id = if (isPreviewDownload) {
-            sharedR.string.alert_larger_file_preview_confirm_button
+            sharedR.string.general_save_to_device
         } else {
             R.string.transfers_confirm_large_download_button_start
         }
     ),
-    buttonOption2Text = stringResource(
-        id = if (isPreviewDownload) {
-            sharedR.string.alert_larger_file_preview_always_allow_button
-        } else {
-            R.string.transfers_confirm_large_download_button_start_always
-        }
-    ),
+    buttonOption2Text = stringResource(id = R.string.transfers_confirm_large_download_button_start_always),
     cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
     onOption1 = onAllow,
     onOption2 = onAlwaysAllow,
