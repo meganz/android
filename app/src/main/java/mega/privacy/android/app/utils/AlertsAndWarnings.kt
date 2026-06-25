@@ -15,7 +15,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
@@ -43,16 +45,16 @@ object AlertsAndWarnings {
      */
     @JvmStatic
     fun showOverDiskQuotaPaywallWarning(activity: Activity?, loginFinished: Boolean) {
-        if (activity is OverDiskQuotaPaywallActivity) {
+        if (activity == null || activity is OverDiskQuotaPaywallActivity) {
             return
         }
 
-        val intent = Intent(
-            MegaApplication.getInstance().applicationContext,
-            OverDiskQuotaPaywallActivity::class.java
+        activity.startActivity(
+            MegaActivity.getIntentWithExtraDestinations(
+                activity,
+                listOf(OverDiskQuotaPaywallWarningNavKey)
+            )
         )
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        MegaApplication.getInstance().startActivity(intent)
     }
 
     /**

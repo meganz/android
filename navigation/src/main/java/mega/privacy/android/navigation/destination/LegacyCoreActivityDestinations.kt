@@ -14,7 +14,8 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 
 @Serializable
-data object OverDiskQuotaPaywallWarningNavKey : NavKey
+@Parcelize
+data object OverDiskQuotaPaywallWarningNavKey : NavKey, Parcelable
 
 @Serializable
 @Parcelize
