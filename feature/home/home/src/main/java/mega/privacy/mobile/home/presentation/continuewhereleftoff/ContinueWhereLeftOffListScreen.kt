@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -374,7 +374,10 @@ private fun ContinueWhereLeftOffGridItem(
             surfaceColor = SurfaceColor.Surface1,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
+                // Match the Cloud Drive grid item aspect ratio (NodeGridViewItem) so CWLO grid
+                // cards keep the same proportions as the rest of the app instead of a fixed
+                // height whose ratio drifts as the column count changes in landscape (AND-23926).
+                .aspectRatio(5f / 4f)
                 .clip(RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center,
         ) {
