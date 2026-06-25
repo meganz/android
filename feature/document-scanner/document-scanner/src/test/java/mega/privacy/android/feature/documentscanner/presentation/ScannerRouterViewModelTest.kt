@@ -9,6 +9,7 @@ import mega.privacy.android.feature.documentscanner.domain.launchmode.LegacyReas
 import mega.privacy.android.feature.documentscanner.domain.launchmode.ScannerLaunchMode
 import mega.privacy.android.feature.documentscanner.domain.usecase.GetScannerLaunchModeUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.GrantScannerCellularConsentUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.StartScannerModelDownloadUseCase
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,14 +29,19 @@ class ScannerRouterViewModelTest {
 
     private val getScannerLaunchMode = mock<GetScannerLaunchModeUseCase>()
     private val grantScannerCellularConsent = mock<GrantScannerCellularConsentUseCase>()
+    private val startScannerModelDownload = mock<StartScannerModelDownloadUseCase>()
 
     @BeforeEach
     fun resetMocks() {
-        reset(getScannerLaunchMode, grantScannerCellularConsent)
+        reset(getScannerLaunchMode, grantScannerCellularConsent, startScannerModelDownload)
     }
 
     private fun initTestSubject() {
-        underTest = ScannerRouterViewModel(getScannerLaunchMode, grantScannerCellularConsent)
+        underTest = ScannerRouterViewModel(
+            getScannerLaunchMode,
+            grantScannerCellularConsent,
+            startScannerModelDownload,
+        )
     }
 
     @Test
@@ -111,17 +117,19 @@ class ScannerRouterViewModelTest {
     }
 
     @Test
-    fun `test that onDownloadConfirmed does not grant cellular consent`() = runTest {
-        whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.NeedsDownload)
+    fun `test that onDownloadConfirmed enqueues an immediate download without granting cellular consent`() =
+        runTest {
+            whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.NeedsDownload)
 
-        initTestSubject()
-        underTest.onDownloadConfirmed()
+            initTestSubject()
+            underTest.onDownloadConfirmed()
 
-        verifyNoInteractions(grantScannerCellularConsent)
-    }
+            verify(startScannerModelDownload).invoke(requireUnmeteredNetwork = false)
+            verifyNoInteractions(grantScannerCellularConsent)
+        }
 
     @Test
-    fun `test that onCellularDownloadConfirmed persists consent and moves the route to PreparingDownload`() =
+    fun `test that onCellularDownloadConfirmed persists consent, starts the download, and moves the route to PreparingDownload`() =
         runTest {
             whenever(getScannerLaunchMode()).thenAnswer { throw CellularConsentRequiredException() }
 
@@ -133,10 +141,11 @@ class ScannerRouterViewModelTest {
                 assertThat(awaitItem()).isEqualTo(ScannerRoute.PreparingDownload)
             }
             verify(grantScannerCellularConsent).invoke()
+            verify(startScannerModelDownload).invoke(requireUnmeteredNetwork = false)
         }
 
     @Test
-    fun `test that onDownloadDeclined routes to legacy with UserDeclined reason`() = runTest {
+    fun `test that onDownloadDeclined routes to legacy without starting a download`() = runTest {
         whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.NeedsDownload)
 
         initTestSubject()
@@ -147,5 +156,23 @@ class ScannerRouterViewModelTest {
             assertThat(awaitItem())
                 .isEqualTo(ScannerRoute.UseLegacy(LegacyReason.UserDeclined))
         }
+        verifyNoInteractions(startScannerModelDownload)
     }
+
+    @Test
+    fun `test that onCellularDownloadDeclined defers the download to un-metered and routes to legacy`() =
+        runTest {
+            whenever(getScannerLaunchMode()).thenAnswer { throw CellularConsentRequiredException() }
+
+            initTestSubject()
+
+            underTest.route.test {
+                assertThat(awaitItem()).isEqualTo(ScannerRoute.NeedsCellularConsent)
+                underTest.onCellularDownloadDeclined()
+                assertThat(awaitItem())
+                    .isEqualTo(ScannerRoute.UseLegacy(LegacyReason.UserDeclined))
+            }
+            verify(startScannerModelDownload).invoke(requireUnmeteredNetwork = true)
+            verifyNoInteractions(grantScannerCellularConsent)
+        }
 }

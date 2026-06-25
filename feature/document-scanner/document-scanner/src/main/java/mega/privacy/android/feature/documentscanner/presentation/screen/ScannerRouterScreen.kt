@@ -57,7 +57,7 @@ internal fun ScannerRouterScreen(
         ScannerRoute.NeedsCellularConsent -> ScannerDownloadConfirmationDialog(
             onCellular = true,
             onConfirmDownload = viewModel::onCellularDownloadConfirmed,
-            onUseOldScanner = viewModel::onDownloadDeclined,
+            onUseOldScanner = viewModel::onCellularDownloadDeclined,
         )
 
         // TODO(AND-23986): replace PreparingDownload with the prepare/loading screen

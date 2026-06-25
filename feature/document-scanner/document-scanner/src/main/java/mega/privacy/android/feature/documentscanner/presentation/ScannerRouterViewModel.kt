@@ -12,6 +12,7 @@ import mega.privacy.android.feature.documentscanner.domain.launchmode.LegacyReas
 import mega.privacy.android.feature.documentscanner.domain.launchmode.ScannerLaunchMode
 import mega.privacy.android.feature.documentscanner.domain.usecase.GetScannerLaunchModeUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.GrantScannerCellularConsentUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.StartScannerModelDownloadUseCase
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,12 +24,15 @@ import javax.inject.Inject
  * launch-mode decision once and exposes a [ScannerRoute] the screen acts on —
  * camera, download flow, cellular-consent prompt, or legacy fallback. The
  * confirmation dialog's choices feed back through [onDownloadConfirmed],
- * [onCellularDownloadConfirmed], and [onDownloadDeclined].
+ * [onCellularDownloadConfirmed], [onDownloadDeclined], and
+ * [onCellularDownloadDeclined], which also start the model download with the
+ * appropriate network constraint.
  */
 @HiltViewModel
 class ScannerRouterViewModel @Inject constructor(
     private val getScannerLaunchMode: GetScannerLaunchModeUseCase,
     private val grantScannerCellularConsent: GrantScannerCellularConsentUseCase,
+    private val startScannerModelDownload: StartScannerModelDownloadUseCase,
 ) : ViewModel() {
 
     private val _route = MutableStateFlow<ScannerRoute>(ScannerRoute.Resolving)
@@ -62,26 +66,50 @@ class ScannerRouterViewModel @Inject constructor(
 
     /**
      * The user confirmed the download on Wi-Fi (or on cellular with consent already
-     * granted). Hand off to the prepare/loading screen, which drives the download.
+     * granted). Start the download now on any connected network, then hand off to the
+     * prepare/loading screen that observes it.
      */
     fun onDownloadConfirmed() {
-        _route.value = ScannerRoute.PreparingDownload
+        viewModelScope.launch {
+            enqueueModelDownload(requireUnmeteredNetwork = false)
+            _route.value = ScannerRoute.PreparingDownload
+        }
     }
 
     /**
      * The user confirmed the download over cellular. Persist the metered-data consent
-     * so it is never asked again, then hand off to the prepare/loading screen.
+     * so it is never asked again, start the download now, then hand off to the
+     * prepare/loading screen.
      */
     fun onCellularDownloadConfirmed() {
         viewModelScope.launch {
             runCatching { grantScannerCellularConsent() }
                 .onFailure { Timber.e(it, "[DocScanner] Failed to persist cellular consent") }
+            enqueueModelDownload(requireUnmeteredNetwork = false)
             _route.value = ScannerRoute.PreparingDownload
         }
     }
 
-    /** The user declined the download from the confirmation dialog; fall back to legacy. */
+    /**
+     * The user declined the download on Wi-Fi; fall back to legacy without downloading.
+     */
     fun onDownloadDeclined() {
         _route.value = ScannerRoute.UseLegacy(LegacyReason.UserDeclined)
+    }
+
+    /**
+     * The user declined the metered download; defer the download to an un-metered
+     * network so it completes in the background, and fall back to legacy meanwhile.
+     */
+    fun onCellularDownloadDeclined() {
+        viewModelScope.launch {
+            enqueueModelDownload(requireUnmeteredNetwork = true)
+            _route.value = ScannerRoute.UseLegacy(LegacyReason.UserDeclined)
+        }
+    }
+
+    private suspend fun enqueueModelDownload(requireUnmeteredNetwork: Boolean) {
+        runCatching { startScannerModelDownload(requireUnmeteredNetwork) }
+            .onFailure { Timber.e(it, "[DocScanner] Failed to enqueue model download") }
     }
 }
