@@ -6,7 +6,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.NextClicked
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.AndroidSyncLocalFolderSelectedEvent
 import mega.privacy.mobile.analytics.event.AndroidSyncStartSyncButtonEvent
 import mega.privacy.mobile.analytics.event.SyncNewFolderScreenBackNavigationEvent

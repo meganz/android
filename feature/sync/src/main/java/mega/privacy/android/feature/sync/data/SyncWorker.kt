@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.coroutine.logAndSwallowExceptions
 import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.LoginMutex
@@ -38,8 +39,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBas
 import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
-import mega.privacy.android.core.coroutine.logAndSwallowExceptions
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.SyncWorkerForegroundExecutionStartedEvent
 import timber.log.Timber
 import kotlin.time.Duration.Companion.hours

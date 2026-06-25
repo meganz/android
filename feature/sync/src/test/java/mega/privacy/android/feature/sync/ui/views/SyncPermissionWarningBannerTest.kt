@@ -7,7 +7,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.sync.R
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

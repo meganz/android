@@ -7,8 +7,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.internal.CANCEL_TAG
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

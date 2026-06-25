@@ -7,8 +7,8 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerViewModel
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 
 /**
  * Route to the Stop Backup MEGA folder picker screen

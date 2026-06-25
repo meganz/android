@@ -14,11 +14,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.android.feature.sync.ui.views.SyncScreen
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import javax.inject.Inject
 
 /**

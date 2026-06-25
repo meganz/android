@@ -45,7 +45,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBas
 import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
-import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
